@@ -1,0 +1,3041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#006633">
+  <title>Unlock Your Access to Virtual Banking &amp; Crypto Exchanges</title>
+  <meta name="description" content="Unlock your access to virtual banking and crypto exchanges with interactive account verification, live credential preview, and instant compliance specifications.">
+  <meta property="og:title" content="Unlock Your Access to Virtual Banking &amp; Crypto Exchanges">
+  <meta property="og:description" content="Unlock your access to virtual banking and crypto exchanges with interactive account verification, live credential preview, and instant compliance specifications.">
+
+  <!-- Tailwind CSS & Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #ffffff;
+      color: #0f172a;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .font-arabic {
+      font-family: 'Amiri', serif;
+    }
+
+    /* Kenya Passport Security Background Pattern */
+    .kenya-passport-bg {
+      background-color: #f6faf6;
+      background-image: 
+        radial-gradient(circle at 85% 25%, rgba(234, 179, 8, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 15% 75%, rgba(0, 102, 51, 0.12) 0%, transparent 45%),
+        linear-gradient(to right, rgba(0, 102, 51, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 102, 51, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 16px 16px, 16px 16px;
+    }
+
+    /* Somali Republic Passport Security Background Pattern */
+    .somali-passport-bg {
+      background-color: #faf7ee;
+      background-image: 
+        radial-gradient(circle at 80% 25%, rgba(217, 119, 6, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 20% 70%, rgba(13, 148, 136, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 55% 55%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(202, 138, 4, 0.035) 3px, rgba(202, 138, 4, 0.035) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(13, 148, 136, 0.03) 6px, rgba(13, 148, 136, 0.03) 7px);
+    }
+
+    .sample-watermark {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 20;
+      overflow: hidden;
+    }
+    .sample-watermark span {
+      transform: rotate(-25deg);
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      font-weight: 900;
+      letter-spacing: .12em;
+      color: rgba(185, 28, 28, 0.16);
+      white-space: nowrap;
+      border: 4px dashed rgba(185, 28, 28, 0.22);
+      padding: 8px 24px;
+    }
+
+    #imageModal { overscroll-behavior: contain; }
+    #modalPreviewImg { touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      body { background: #fff!important; padding: 0!important; margin: 0!important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .no-print, #imageModal, #toast, header, footer { display: none!important; }
+      body > main, .print-area-wrapper { display: block!important; width: 100%!important; padding: 0!important; margin: 0!important; }
+      #passport-card, #somalia-passport-card, #somalia-passport-spread { width: 100%!important; max-width: 135mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
+      #somalia-card { width: 100%!important; max-width: 175mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
+    }
+
+    /* Floating Showcase Animations */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes floatReverse {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(8px); }
+    }
+    @keyframes pulseSoft {
+      0%, 100% { opacity: 0.95; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.02); }
+    }
+    .animate-float-slow {
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+    .animate-float-reverse {
+      animation: floatReverse 5s ease-in-out infinite;
+    }
+    .animate-pulse-soft {
+      animation: pulseSoft 3s ease-in-out infinite;
+    }
+    @keyframes floatDiagonal {
+      0%, 100% { transform: translate(0px, 0px); }
+      50% { transform: translate(6px, -8px); }
+    }
+    @keyframes floatDiagonalAlt {
+      0%, 100% { transform: translate(0px, 0px); }
+      50% { transform: translate(-6px, 8px); }
+    }
+    .animate-float-diag {
+      animation: floatDiagonal 4.5s ease-in-out infinite;
+    }
+    .animate-float-diag-alt {
+      animation: floatDiagonalAlt 5.5s ease-in-out infinite;
+    }
+
+    /* Clean Light-Mode Glass Cards with Brand Contrast */
+    .glass-light-card {
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-light-card:hover {
+      box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.14), 0 10px 15px -4px rgba(15, 23, 42, 0.06);
+      transform: translateY(-3px) scale(1.02);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-white text-slate-900">
+
+  <!-- ================= TOP NAVIGATION (CLEAN WHITE) ================= -->
+  <header class="no-print bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand & Suite Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <i class="fa-solid fa-wallet text-lg text-amber-300"></i>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase tracking-widest font-extrabold text-blue-600 block">UNLOCK YOUR ACCESS TO VIRTUAL BANKING &amp; CRYPTO EXCHANGES</span>
+          <h1 class="text-sm sm:text-base font-black text-slate-900 tracking-tight flex items-center gap-2">
+            Virtual Accounts &amp; Crypto Suite
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">Verified Ready</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center gap-1.5 font-semibold text-xs sm:text-sm text-slate-600">
+        <button onclick="scrollToSection('hero-section')" class="px-3 py-2 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer">
+          Home
+        </button>
+        <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench');" class="px-3 py-2 rounded-lg text-blue-700 bg-blue-50/80 hover:bg-blue-100 transition-colors flex items-center gap-1.5 font-bold border border-blue-200/60 cursor-pointer">
+          <i class="fa-solid fa-credit-card text-xs text-blue-600"></i>
+          Verify Virtual Accounts
+        </button>
+        <button onclick="openKycPlatformModal('binance')" class="px-3 py-2 rounded-lg text-amber-900 bg-amber-50/80 hover:bg-amber-100 transition-colors flex items-center gap-1.5 font-bold border border-amber-200/60 cursor-pointer">
+          <i class="fa-brands fa-bitcoin text-xs text-amber-500"></i>
+          Crypto Exchanges
+        </button>
+        <button onclick="openAboutModal()" class="px-3 py-2 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer">
+          About Us
+        </button>
+        <button onclick="openContactModal()" class="px-3 py-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-headset text-xs"></i>
+          Contact Us
+        </button>
+      </nav>
+
+      <!-- Right Action: Verify Platform & Mobile Menu -->
+      <div class="flex items-center gap-2">
+        <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench');" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-all shadow-md shadow-blue-600/20 cursor-pointer">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Verify Virtual Accounts</span>
+        </button>
+        <button onclick="openContactModal()" class="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg cursor-pointer">
+          <i class="fa-solid fa-phone text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION (CRISP WHITE BACKGROUND) ================= -->
+  <section id="hero-section" class="no-print relative bg-white text-slate-900 py-10 lg:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-slate-200">
+    
+    <!-- Ambient Luminous Glow Circles on Pure White -->
+    <div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-100/60 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[550px] bg-sky-50/70 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:24px_24px] opacity-70 pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+      
+      <!-- Top Pill Bar: Global Virtual Accounts & Crypto Exchanges Badges -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-8 pb-4 border-b border-slate-200">
+        <div class="flex items-center gap-2.5">
+          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-700 shadow-xs">
+            <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+            GLOBAL VIRTUAL ACCOUNTS &amp; EXCHANGES
+          </span>
+          <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800">
+            <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-amber-500"></i> Tier 1-3 KYC Ready
+          </span>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-medium text-slate-600">
+          <span class="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-circle-check text-emerald-600"></i>
+            USD / EUR / GBP Virtual Accounts
+          </span>
+          <span class="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-xs">
+            <i class="fa-brands fa-bitcoin text-amber-500"></i>
+            Binance &amp; Bybit Verified
+          </span>
+          <span class="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-xs">
+            <i class="fa-solid fa-shield-halved text-blue-600"></i>
+            100% Approval Rate
+          </span>
+        </div>
+      </div>
+
+      <!-- Hero Grid: Left Content & Right Floating Accounts Showcase -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center mb-8">
+        
+        <!-- Left Column: Copy & Actions -->
+        <div class="lg:col-span-6 space-y-6">
+          <div class="space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 border border-blue-200 text-xs font-bold text-blue-700">
+              <i class="fa-solid fa-bolt text-amber-500"></i>
+              Verified for Global Virtual Accounts &amp; Crypto Platforms
+            </div>
+            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.15]">
+              Unlock Your Access to <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Virtual Banking</span> &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600">Crypto Exchanges</span>
+            </h2>
+            <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+              Explore authentic, inspection-ready virtual banking credentials and digital crypto exchange requirements. Instant approval specifications for <strong>PayPal, Payoneer, Raenest, Grey Account, Binance, Bybit</strong>, and international accounts with distinct brand colors and logos.
+            </p>
+          </div>
+
+          <!-- Platform Launch Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3 pt-1">
+            <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench');" class="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/25 transition-all flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-credit-card text-amber-300"></i>
+              <span>Verify Virtual Accounts</span>
+            </button>
+            <button onclick="openKycPlatformModal('binance')" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold text-xs sm:text-sm shadow-md shadow-amber-500/20 transition-all flex items-center gap-2 cursor-pointer">
+              <i class="fa-brands fa-bitcoin text-slate-950"></i>
+              <span>Verify Crypto Exchanges</span>
+            </button>
+            <button onclick="openContactModal()" class="px-4 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer shadow-xs">
+              <i class="fa-solid fa-headset text-emerald-600"></i>
+              <span>Contact 24/7 Support</span>
+            </button>
+          </div>
+
+          <!-- Interactive Platform Category Filter Bar -->
+          <div class="pt-2 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-check-double text-blue-600 text-xs"></i>
+                Select Platform to View Specifications:
+              </span>
+              <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[10px]">
+                <button id="hero-filter-all" onclick="filterHeroPlatforms('all')" class="px-2.5 py-1 rounded font-bold bg-blue-600 text-white transition-colors">
+                  All (12)
+                </button>
+                <button id="hero-filter-virtual" onclick="filterHeroPlatforms('virtual')" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                  Virtual Accounts
+                </button>
+                <button id="hero-filter-crypto" onclick="filterHeroPlatforms('crypto')" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition-colors">
+                  Crypto Exchanges
+                </button>
+              </div>
+            </div>
+
+            <!-- Clickable Interactive Platform Badges (Own Brand Logos & Colors) -->
+            <div id="hero-platforms-pill-grid" class="flex flex-wrap items-center gap-2">
+              
+              <!-- 1. PayPal (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('paypal')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-blue-50/90 hover:bg-[#003087] border border-blue-200 text-[#003087] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#003087] group-hover:bg-white text-white group-hover:text-[#003087] flex items-center justify-center text-[11px] transition-colors">
+                  <i class="fa-brands fa-paypal"></i>
+                </div>
+                <span>PayPal</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-blue-100 text-[#003087] rounded group-hover:bg-white/20 group-hover:text-white">USD Biz</span>
+              </button>
+
+              <!-- 2. Payoneer (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('payoneer')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-orange-50/90 hover:bg-[#FF4800] border border-orange-200 text-[#FF4800] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#FF4800] group-hover:bg-white text-white group-hover:text-[#FF4800] flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <span>Payoneer</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-orange-100 text-[#FF4800] rounded group-hover:bg-white/20 group-hover:text-white">USD Bank</span>
+              </button>
+
+              <!-- 3. Raenest (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('raenest')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-emerald-50/90 hover:bg-[#059669] border border-emerald-200 text-[#059669] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#059669] group-hover:bg-white text-white group-hover:text-[#059669] flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <span>Raenest</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-emerald-100 text-[#059669] rounded group-hover:bg-white/20 group-hover:text-white">Freelance</span>
+              </button>
+
+              <!-- 4. Grey Account (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('grey')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-300 text-slate-800 hover:text-amber-300 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-slate-800 group-hover:bg-amber-400 text-amber-300 group-hover:text-slate-950 flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-landmark"></i>
+                </div>
+                <span>Grey Account</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded group-hover:bg-white/20 group-hover:text-white">EUR/USD</span>
+              </button>
+
+              <!-- 5. Binance (Crypto Exchange) -->
+              <button onclick="applyQuickKycPreset('binance')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-yellow-50/90 hover:bg-[#F0B90B] border border-yellow-300 text-slate-900 hover:text-slate-950 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#F0B90B] group-hover:bg-slate-950 text-slate-950 group-hover:text-[#F0B90B] flex items-center justify-center text-[11px] font-bold transition-colors">
+                  <i class="fa-brands fa-bitcoin"></i>
+                </div>
+                <span>Binance</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-yellow-200 text-yellow-950 rounded group-hover:bg-slate-950/20 group-hover:text-slate-950">Tier 2/3</span>
+              </button>
+
+              <!-- 6. Bybit (Crypto Exchange) -->
+              <button onclick="applyQuickKycPreset('bybit')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-amber-50/90 hover:bg-[#F7A600] border border-amber-300 text-amber-950 hover:text-slate-950 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#F7A600] group-hover:bg-slate-950 text-slate-950 group-hover:text-[#F7A600] flex items-center justify-center text-[10px] font-bold transition-colors">
+                  <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <span>Bybit</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-amber-200 text-amber-950 rounded group-hover:bg-slate-950/20 group-hover:text-slate-950">Level 2</span>
+              </button>
+
+              <!-- 7. Mercury Bank (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('mercury')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-indigo-50/90 hover:bg-[#4F46E5] border border-indigo-200 text-[#4F46E5] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#4F46E5] group-hover:bg-white text-white group-hover:text-[#4F46E5] flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <span>Mercury Bank</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-indigo-100 text-[#4F46E5] rounded group-hover:bg-white/20 group-hover:text-white">US LLC</span>
+              </button>
+
+              <!-- 8. Wise Borderless (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('wise')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-green-50/90 hover:bg-[#16A34A] border border-green-200 text-[#16A34A] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#16A34A] group-hover:bg-white text-white group-hover:text-[#16A34A] flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-globe"></i>
+                </div>
+                <span>Wise</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-green-100 text-[#16A34A] rounded group-hover:bg-white/20 group-hover:text-white">Multi-Cur.</span>
+              </button>
+
+              <!-- 9. Revolut (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('revolut')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-sky-50/90 hover:bg-[#0075EB] border border-sky-200 text-[#0075EB] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#0075EB] group-hover:bg-white text-white group-hover:text-[#0075EB] flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-arrow-trend-up"></i>
+                </div>
+                <span>Revolut</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-sky-100 text-[#0075EB] rounded group-hover:bg-white/20 group-hover:text-white">Global IBAN</span>
+              </button>
+
+              <!-- 10. OKX (Crypto Exchange) -->
+              <button onclick="applyQuickKycPreset('okx')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-teal-50/90 hover:bg-slate-900 border border-teal-200 text-[#0F766E] hover:text-teal-300 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#0F766E] group-hover:bg-teal-400 text-white group-hover:text-slate-950 flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-cubes"></i>
+                </div>
+                <span>OKX</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-teal-100 text-[#0F766E] rounded group-hover:bg-white/20 group-hover:text-white">Web3 KYC</span>
+              </button>
+
+              <!-- 11. KuCoin (Crypto Exchange) -->
+              <button onclick="applyQuickKycPreset('kucoin')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-emerald-50/90 hover:bg-[#24AE8F] border border-teal-300 text-[#24AE8F] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#24AE8F] group-hover:bg-white text-white group-hover:text-[#24AE8F] flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <span>KuCoin</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-teal-100 text-[#24AE8F] rounded group-hover:bg-white/20 group-hover:text-white">Verified</span>
+              </button>
+
+              <!-- 12. Elevate Pay (Virtual Account) -->
+              <button onclick="applyQuickKycPreset('elevate')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-teal-50/90 hover:bg-[#0D9488] border border-teal-200 text-[#0D9488] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
+                <div class="w-5 h-5 rounded-md bg-[#0D9488] group-hover:bg-white text-white group-hover:text-[#0D9488] flex items-center justify-center text-[10px] transition-colors">
+                  <i class="fa-solid fa-coins"></i>
+                </div>
+                <span>Elevate Pay</span>
+                <span class="text-[9px] px-1.5 py-0.2 bg-teal-100 text-[#0D9488] rounded group-hover:bg-white/20 group-hover:text-white">USD Remote</span>
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Feature Metrics (Light Card) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
+              <div class="text-base sm:text-lg font-black text-blue-700 flex items-center gap-1">
+                12+ Hubs
+                <i class="fa-solid fa-wallet text-amber-500 text-xs"></i>
+              </div>
+              <span class="text-[10px] text-slate-500 font-semibold block">Virtual &amp; Crypto</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
+              <div class="text-base sm:text-lg font-black text-indigo-700 flex items-center gap-1">
+                USD / EUR
+              </div>
+              <span class="text-[10px] text-slate-500 font-semibold block">Receiving Accounts</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
+              <div class="text-base sm:text-lg font-black text-amber-700 flex items-center gap-1">
+                Tier 2/3
+              </div>
+              <span class="text-[10px] text-slate-500 font-semibold block">Exchange KYC Ready</span>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
+              <div class="text-base sm:text-lg font-black text-emerald-700 flex items-center gap-1">
+                100%
+              </div>
+              <span class="text-[10px] text-slate-500 font-semibold block">Verified Compliance</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Visual Stage with Floating Virtual Accounts & Crypto Exchanges -->
+        <div class="lg:col-span-6 relative flex flex-col items-center justify-center py-2">
+          
+          <!-- Outer Ambient Glow Rings -->
+          <div class="absolute -inset-4 bg-gradient-to-tr from-blue-200/40 via-amber-200/30 to-indigo-200/30 rounded-3xl filter blur-2xl pointer-events-none"></div>
+
+          <!-- ================= FLOATING VIRTUAL ACCOUNTS & CRYPTO EXCHANGES STAGE (WHITE BG) ================= -->
+          <div id="hero-accounts-showcase" class="relative w-full min-h-[500px] sm:min-h-[540px] rounded-3xl border border-slate-200 p-4 sm:p-6 overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-50/90 via-white to-blue-50/40 shadow-xl shadow-slate-200/70">
+            
+            <!-- Subtle Background Gradients & Grid -->
+            <div class="absolute -top-12 -left-12 w-64 h-64 bg-blue-100/60 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -right-12 w-64 h-64 bg-amber-100/60 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] bg-[size:16px_16px] opacity-40 pointer-events-none"></div>
+
+            <!-- Central Radar Pulse Circles & Grid -->
+            <div class="absolute w-72 h-72 rounded-full border border-blue-400/20 pointer-events-none animate-pulse-soft"></div>
+            <div class="absolute w-96 h-96 rounded-full border border-indigo-400/15 pointer-events-none"></div>
+
+            <!-- Center Verified Anchor Badge -->
+            <div class="relative z-10 text-center space-y-2 my-auto pointer-events-none">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 border-2 border-white">
+                <i class="fa-solid fa-shield-halved text-2xl text-amber-300"></i>
+              </div>
+              <div class="text-xs font-black text-slate-900 tracking-wide uppercase">
+                Verified FinTech Gateway
+              </div>
+              <p class="text-[10px] text-blue-700 font-mono-code font-bold bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200 inline-block shadow-2xs">
+                GLOBAL PLATFORM ACCEPTANCE
+              </p>
+            </div>
+
+            <!-- ================= FLOATING CARD 1: PAYPAL VIRTUAL ACCOUNT (Top Left) ================= -->
+            <div onclick="openKycPlatformModal('paypal')" class="absolute top-3 left-2 sm:left-4 z-20 w-[195px] sm:w-[215px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#003087] shadow-xl animate-float-slow cursor-pointer group">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#003087] flex items-center justify-center text-white text-xs shadow-xs">
+                    <i class="fa-brands fa-paypal"></i>
+                  </div>
+                  <span class="text-xs font-black text-slate-900">PayPal</span>
+                </div>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verified
+                </span>
+              </div>
+              <div class="text-[10px] text-slate-700 font-semibold mb-1">
+                USD Virtual Account
+              </div>
+              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
+                <span>WARSAME A.</span>
+                <span class="text-blue-700 font-bold">●●●● 8492</span>
+              </div>
+              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                <span class="text-slate-500 font-medium">Doc: Passport / ID</span>
+                <span class="text-[#003087] font-bold group-hover:underline flex items-center gap-0.5">
+                  View Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- ================= FLOATING CARD 2: BINANCE CRYPTO EXCHANGE (Top Right) ================= -->
+            <div onclick="openKycPlatformModal('binance')" class="absolute top-4 right-2 sm:right-4 z-20 w-[200px] sm:w-[220px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#F0B90B] shadow-xl animate-float-reverse cursor-pointer group">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#F0B90B] flex items-center justify-center text-slate-950 font-bold text-xs shadow-xs">
+                    <i class="fa-brands fa-bitcoin"></i>
+                  </div>
+                  <span class="text-xs font-black text-slate-900">Binance</span>
+                </div>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                  Tier 2 Passed
+                </span>
+              </div>
+              <div class="text-[10px] text-slate-700 font-semibold mb-1 flex items-center justify-between">
+                <span>ICAO 9303 Match</span>
+                <i class="fa-solid fa-circle-check text-emerald-600 text-[10px]"></i>
+              </div>
+              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
+                <span>LIMIT: $50,000/d</span>
+                <span class="text-emerald-700 font-bold">UNLOCKED</span>
+              </div>
+              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                <span class="text-slate-500 font-medium">Passport OCR</span>
+                <span class="text-amber-700 font-bold group-hover:underline flex items-center gap-0.5">
+                  Inspect KYC <i class="fa-solid fa-arrow-right text-[7px]"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- ================= FLOATING CARD 3: BYBIT CRYPTO PLATFORM (Middle Left) ================= -->
+            <div onclick="openKycPlatformModal('bybit')" class="absolute top-1/2 -translate-y-1/2 left-1 sm:left-3 z-20 w-[190px] sm:w-[210px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#F7A600] shadow-xl animate-float-diag cursor-pointer group">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#F7A600] flex items-center justify-center text-slate-950 font-bold text-xs shadow-xs">
+                    <i class="fa-solid fa-chart-line"></i>
+                  </div>
+                  <span class="text-xs font-black text-slate-900">Bybit</span>
+                </div>
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                  Level 2 KYC
+                </span>
+              </div>
+              <div class="text-[9.5px] text-slate-700 font-medium leading-tight mb-1">
+                Biometric Face &amp; ID Scan
+              </div>
+              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
+                <span>CONFIDENCE</span>
+                <span class="text-amber-700 font-bold">99.8% PASS</span>
+              </div>
+              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                <span class="text-slate-500">P2P Ready</span>
+                <span class="text-amber-700 font-bold group-hover:underline flex items-center gap-0.5">
+                  Inspect Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- ================= FLOATING CARD 4: PAYONEER GLOBAL BANK (Middle Right) ================= -->
+            <div onclick="openKycPlatformModal('payoneer')" class="absolute top-1/2 -translate-y-1/2 right-1 sm:right-3 z-20 w-[195px] sm:w-[215px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#FF4800] shadow-xl animate-float-diag-alt cursor-pointer group">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#FF4800] flex items-center justify-center text-white text-xs shadow-xs">
+                    <i class="fa-solid fa-credit-card"></i>
+                  </div>
+                  <span class="text-xs font-black text-slate-900">Payoneer</span>
+                </div>
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-200">
+                  USD Receiving
+                </span>
+              </div>
+              <div class="text-[9.5px] text-slate-600 font-mono-code leading-tight mb-1">
+                ROUTING: 021000021
+              </div>
+              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
+                <span>ACC: 849204910</span>
+                <span class="text-emerald-700 font-bold">ACTIVE</span>
+              </div>
+              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                <span class="text-slate-500">First Century Bank</span>
+                <span class="text-[#FF4800] font-bold group-hover:underline flex items-center gap-0.5">
+                  View Details <i class="fa-solid fa-arrow-right text-[7px]"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- ================= FLOATING CARD 5: RAENEST FREELANCE ACCOUNT (Bottom Left) ================= -->
+            <div onclick="openKycPlatformModal('raenest')" class="absolute bottom-3 left-2 sm:left-5 z-20 w-[190px] sm:w-[210px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#059669] shadow-xl animate-float-reverse cursor-pointer group">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#059669] flex items-center justify-center text-white text-xs shadow-xs">
+                    <i class="fa-solid fa-briefcase"></i>
+                  </div>
+                  <span class="text-xs font-black text-slate-900">Raenest</span>
+                </div>
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  USD Virtual Card
+                </span>
+              </div>
+              <div class="text-[9.5px] text-slate-700 font-semibold mb-1">
+                African Remote Invoicing
+              </div>
+              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
+                <span>CONTRACTOR</span>
+                <span class="text-emerald-700 font-bold">APPROVED</span>
+              </div>
+              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                <span class="text-slate-500">NIRA / Passport</span>
+                <span class="text-[#059669] font-bold group-hover:underline flex items-center gap-0.5">
+                  Inspect Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
+                </span>
+              </div>
+            </div>
+
+            <!-- ================= FLOATING CARD 6: GREY ACCOUNT FOREIGN BANKING (Bottom Right) ================= -->
+            <div onclick="openKycPlatformModal('grey')" class="absolute bottom-3 right-2 sm:right-5 z-20 w-[195px] sm:w-[215px] p-3 rounded-2xl glass-light-card border-l-4 border-l-amber-500 shadow-xl animate-float-slow cursor-pointer group">
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-slate-900 flex items-center justify-center text-amber-300 text-xs shadow-xs">
+                    <i class="fa-solid fa-landmark"></i>
+                  </div>
+                  <span class="text-xs font-black text-slate-900">Grey Account</span>
+                </div>
+                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                  EUR / USD IBAN
+                </span>
+              </div>
+              <div class="text-[9.5px] text-slate-600 font-mono-code mb-1">
+                IBAN: GB92 GREY 8492
+              </div>
+              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
+                <span>EAST AFRICA ID</span>
+                <span class="text-blue-700 font-bold">READY</span>
+              </div>
+              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
+                <span class="text-slate-500">Instant Approval</span>
+                <span class="text-slate-800 font-bold group-hover:underline flex items-center gap-0.5">
+                  Inspect Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH ================= -->
+  <section id="verification-workbench" class="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto space-y-8">
+      
+      <!-- Section Header -->
+      <div class="text-center max-w-3xl mx-auto space-y-2">
+        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-700">
+          <i class="fa-solid fa-unlock-keyhole text-blue-600"></i>
+          UNLOCK YOUR ACCESS TO VIRTUAL BANKING &amp; CRYPTO EXCHANGES
+        </span>
+        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+          Unlock Your Access to Virtual Banking &amp; Crypto Exchanges
+        </h2>
+        <p class="text-slate-600 text-xs sm:text-sm">
+          Select your target virtual banking platform below, choose your required document type and country, and generate authentic, inspection-ready verification credentials.
+        </p>
+      </div>
+
+      <!-- Step 1: Select Virtual Account (PayPal, Payoneer, Raenest, Grey, etc.) -->
+      <div class="bg-slate-50/90 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
+            Select Virtual Account Platform:
+          </span>
+          <span id="active-account-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#003087] text-white flex items-center gap-1.5 shadow-xs">
+            <i class="fa-brands fa-paypal"></i>
+            <span>PayPal Selected</span>
+          </span>
+        </div>
+
+        <!-- Virtual Accounts Selector Tabs / Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+          <!-- 1. PayPal -->
+          <button type="button" onclick="selectVirtualAccount('paypal')" id="btn-va-paypal" class="va-select-btn p-2.5 rounded-xl border-2 border-[#003087] bg-blue-50/70 text-[#003087] text-left transition-all cursor-pointer shadow-xs">
+            <div class="w-7 h-7 rounded-lg bg-[#003087] text-white flex items-center justify-center text-xs mb-1">
+              <i class="fa-brands fa-paypal"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">PayPal</div>
+            <div class="text-[9px] text-slate-500 font-semibold">USD Personal</div>
+          </button>
+
+          <!-- 2. Payoneer -->
+          <button type="button" onclick="selectVirtualAccount('payoneer')" id="btn-va-payoneer" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-[#FF4800] text-white flex items-center justify-center text-xs mb-1">
+              <i class="fa-solid fa-credit-card"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">Payoneer</div>
+            <div class="text-[9px] text-slate-500 font-semibold">USD Bank ABA</div>
+          </button>
+
+          <!-- 3. Raenest -->
+          <button type="button" onclick="selectVirtualAccount('raenest')" id="btn-va-raenest" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-[#059669] text-white flex items-center justify-center text-xs mb-1">
+              <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">Raenest</div>
+            <div class="text-[9px] text-slate-500 font-semibold">Freelance USD</div>
+          </button>
+
+          <!-- 4. Grey Account -->
+          <button type="button" onclick="selectVirtualAccount('grey')" id="btn-va-grey" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-slate-900 text-amber-300 flex items-center justify-center text-xs mb-1">
+              <i class="fa-solid fa-landmark"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">Grey</div>
+            <div class="text-[9px] text-slate-500 font-semibold">EUR/USD IBAN</div>
+          </button>
+
+          <!-- 5. Mercury Bank -->
+          <button type="button" onclick="selectVirtualAccount('mercury')" id="btn-va-mercury" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-[#4F46E5] text-white flex items-center justify-center text-xs mb-1">
+              <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">Mercury</div>
+            <div class="text-[9px] text-slate-500 font-semibold">US LLC Bank</div>
+          </button>
+
+          <!-- 6. Wise -->
+          <button type="button" onclick="selectVirtualAccount('wise')" id="btn-va-wise" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-[#16A34A] text-white flex items-center justify-center text-xs mb-1">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">Wise</div>
+            <div class="text-[9px] text-slate-500 font-semibold">Multi-Cur.</div>
+          </button>
+
+          <!-- 7. Revolut -->
+          <button type="button" onclick="selectVirtualAccount('revolut')" id="btn-va-revolut" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-[#0075EB] text-white flex items-center justify-center text-xs mb-1">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">Revolut</div>
+            <div class="text-[9px] text-slate-500 font-semibold">Global IBAN</div>
+          </button>
+
+          <!-- 8. Elevate Pay -->
+          <button type="button" onclick="selectVirtualAccount('elevate')" id="btn-va-elevate" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+            <div class="w-7 h-7 rounded-lg bg-[#0D9488] text-white flex items-center justify-center text-xs mb-1">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+            <div class="font-black text-xs text-slate-900 leading-tight">Elevate</div>
+            <div class="text-[9px] text-slate-500 font-semibold">USD Remote</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Document Type & Country Selection Bar -->
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100">
+          <div>
+            <span class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+              <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">2</span>
+              Required Verification Document &amp; Country:
+            </span>
+            <p id="platform-kyc-tip" class="text-xs text-slate-500 mt-0.5">
+              PayPal requires a valid government-issued Passport or National Identity Card for account identity verification and receiving limits unlock.
+            </p>
+          </div>
+
+          <!-- Document Type Switcher (Passport vs National Identity Card) -->
+          <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+            <button type="button" id="tab-doc-passport" onclick="switchVerificationDoc('passport')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer">
+              <i class="fa-solid fa-passport text-emerald-700"></i>
+              <span>Passport</span>
+            </button>
+            <button type="button" id="tab-doc-idcard" onclick="switchVerificationDoc('idcard')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-all cursor-pointer">
+              <i class="fa-solid fa-id-card text-blue-600"></i>
+              <span>National Identity Card</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Country Selector Tabs -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-600 mr-2 flex items-center gap-1">
+            <i class="fa-solid fa-earth-africa text-emerald-700"></i>
+            Select Country:
+          </span>
+          
+          <!-- Republic of Kenya (Default) -->
+          <button type="button" id="country-btn-kenya" onclick="switchVerificationCountry('kenya')" class="country-pill-btn px-3 py-1.5 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-extrabold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
+            <span class="text-base">🇰🇪</span>
+            <span>Republic of Kenya (KEN)</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+          </button>
+
+          <!-- Somalia -->
+          <button type="button" id="country-btn-somalia" onclick="switchVerificationCountry('somalia')" class="country-pill-btn px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer">
+            <span class="text-base">🇸🇴</span>
+            <span>Somalia (SOM) · Passport &amp; NIRA</span>
+          </button>
+
+          <!-- Ethiopia -->
+          <button type="button" id="country-btn-ethiopia" onclick="switchVerificationCountry('ethiopia')" class="country-pill-btn px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer">
+            <span class="text-base">🇪🇹</span>
+            <span>Ethiopia (ETH)</span>
+          </button>
+
+          <!-- Uganda -->
+          <button type="button" id="country-btn-uganda" onclick="switchVerificationCountry('uganda')" class="country-pill-btn px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer">
+            <span class="text-base">🇺🇬</span>
+            <span>Uganda (UGA)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= STEP 3: EXACT KENYA REPUBLIC PASSPORT GENERATOR (USER HTML) ================= -->
+      <div id="kenya-passport-view" class="block">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-emerald-700"></i> Kenya Passport Builder</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Edit Republic of Kenya passport details.</p>
+              </div>
+              <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">KENYA</span>
+            </div>
+
+            <form id="docForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label for="photoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Passport Photo</label>
+                <input type="file" id="photoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white cursor-pointer">
+                <button type="button" id="resetPhotoBtn" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer"><i class="fa-solid fa-rotate-left mr-1"></i>Reset Photo</button>
+              </div>
+
+              <!-- Passport Basic Info -->
+              <div class="grid grid-cols-3 gap-2">
+                <div><label for="inputPassportType" class="block font-bold uppercase text-slate-600 mb-1">Type / Type</label><input id="inputPassportType" type="text" value="PA" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputIssuingState" class="block font-bold uppercase text-slate-600 mb-1">State / Pays</label><input id="inputIssuingState" type="text" value="KEN" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputPassportNo" class="block font-bold uppercase text-slate-600 mb-1">Passport No</label><input id="inputPassportNo" type="text" value="A047566" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+              </div>
+
+              <!-- Surname & Given Names -->
+              <div><label for="inputSurname" class="block font-bold uppercase text-slate-600 mb-1">Surname / Nom</label><input id="inputSurname" type="text" value="HAJI" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm"></div>
+              <div><label for="inputGivenNames" class="block font-bold uppercase text-slate-600 mb-1">Given Names / Prénoms</label><input id="inputGivenNames" type="text" value="JIBRIL ABDIRASHID" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm"></div>
+
+              <!-- Nationality & Date of Birth -->
+              <div class="grid grid-cols-2 gap-2">
+                <div><label for="inputNationality" class="block font-bold uppercase text-slate-600 mb-1">Nationality</label><input id="inputNationality" type="text" value="KENYAN" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
+                <div><label for="inputDob" class="block font-bold uppercase text-slate-600 mb-1">Date of Birth</label><input id="inputDob" type="text" value="01 JAN/JAN 1984" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
+              </div>
+
+              <!-- Sex, Place of Birth, Personal No -->
+              <div class="grid grid-cols-3 gap-2">
+                <div><label for="inputSex" class="block font-bold uppercase text-slate-600 mb-1">Sex / Sexe</label><select id="inputSex" class="w-full px-2 py-1.5 border rounded font-bold"><option value="M" selected>M</option><option value="F">F</option></select></div>
+                <div><label for="inputPob" class="block font-bold uppercase text-slate-600 mb-1">Place of Birth</label><input id="inputPob" type="text" value="ISIOLO" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
+                <div><label for="inputPersonalNo" class="block font-bold uppercase text-slate-600 mb-1">Personal No</label><input id="inputPersonalNo" type="text" value="00000001421535" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-[10px]"></div>
+              </div>
+
+              <!-- Issue & Expiry Dates -->
+              <div class="grid grid-cols-2 gap-2">
+                <div><label for="inputIssueDate" class="block font-bold uppercase text-slate-600 mb-1">Date of Issue</label><input id="inputIssueDate" type="text" value="08 JUL/JUIL 2008" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1">Date of Expiry</label><input id="inputExpiryDate" type="text" value="08 JUL/JUIL 2018" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
+              </div>
+
+              <!-- Issuing Authority -->
+              <div><label for="inputAuthority" class="block font-bold uppercase text-slate-600 mb-1">Authority / Autorité</label><input id="inputAuthority" type="text" value="PASSPORT CONTROL NAIROBI" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
+
+              <!-- Watermark Settings -->
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
+                <label for="watermarkText" class="block font-bold uppercase tracking-wider text-slate-600">Watermark Text</label>
+                <input id="watermarkText" type="text" value="SPECIMEN" maxlength="40" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-slate-700">
+                <label class="flex items-center gap-2 text-slate-700 cursor-pointer">
+                  <input id="showWatermark" type="checkbox" checked class="rounded border-slate-300">
+                  Show diagonal watermark
+                </label>
+              </div>
+
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" id="downloadBtn" class="py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-image"></i>Save PNG</button>
+                <button type="button" id="printBtn" class="py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Passport</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Passport Card Preview Area -->
+          <section class="lg:col-span-7 flex justify-center items-start print-area-wrapper min-w-0">
+            <div id="id-card-container" class="w-full max-w-[650px]">
+              
+              <article id="passport-card" class="kenya-passport-bg relative w-full aspect-[1.42/1] bg-white rounded-lg shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden text-slate-900 select-none">
+                
+                <div id="sampleWatermark" class="sample-watermark"><span id="watermarkLabel">SPECIMEN</span></div>
+
+                <!-- Header Titles -->
+                <header class="flex justify-between items-start border-b border-slate-300/80 pb-2 mb-3">
+                  <div class="leading-tight">
+                    <h1 class="text-sm sm:text-base font-black text-slate-900 tracking-wider">PASSPORT</h1>
+                    <h2 class="text-xs sm:text-sm font-black text-slate-800 tracking-wider">PASSEPORT</h2>
+                  </div>
+                  <div class="text-center leading-tight">
+                    <h1 class="text-sm sm:text-base font-black text-slate-900 tracking-wider uppercase">REPUBLIC OF KENYA</h1>
+                  </div>
+                  <!-- Decorative Seal Top Right -->
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-amber-700 shrink-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 2"/>
+                      <polygon points="50,15 61,35 83,35 66,50 72,72 50,58 28,72 34,50 17,35 39,35" fill="none" stroke="currentColor" stroke-width="2"/>
+                      <circle cx="50" cy="50" r="12" fill="currentColor" opacity="0.8"/>
+                    </svg>
+                  </div>
+                </header>
+
+                <!-- Main Body: Photo & Fields Grid -->
+                <div class="grid grid-cols-12 gap-3 items-start">
+                  
+                  <!-- Photo Container Left -->
+                  <div class="col-span-4 flex flex-col items-center">
+                    <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
+                      <img id="previewPhoto" src="/assets/aistudio/HL7D9j4XUAALh2T_b0209bf1.png" alt="Passport Photo" class="w-full h-full object-cover">
+                    </div>
+                  </div>
+
+                  <!-- Personal Details Right -->
+                  <div class="col-span-8 space-y-1 text-[10px] sm:text-[11px] leading-tight">
+                    
+                    <!-- Type, Country, Passport No -->
+                    <div class="grid grid-cols-3 gap-1">
+                      <div>
+                        <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">TYPE / TYPE</span>
+                        <span id="previewPassportType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">PA</span>
+                      </div>
+                      <div>
+                        <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">ISSUING STATE / PAYS ÉMETTEUR</span>
+                        <span id="previewIssuingState" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">KEN</span>
+                      </div>
+                      <div>
+                        <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">PASSPORT NO / NO DU PASSEPORT</span>
+                        <span id="previewPassportNo" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm">A047566</span>
+                      </div>
+                    </div>
+
+                    <!-- Surname -->
+                    <div class="pt-0.5">
+                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">SURNAME / NOM</span>
+                      <span id="previewSurname" class="font-extrabold text-slate-900 text-sm sm:text-base uppercase tracking-wide">HAJI</span>
+                    </div>
+
+                    <!-- Given Names -->
+                    <div>
+                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">GIVEN NAMES / PRÉNOMS</span>
+                      <span id="previewGivenNames" class="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">JIBRIL ABDIRASHID</span>
+                    </div>
+
+                    <!-- Nationality -->
+                    <div>
+                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">NATIONALITY / NATIONALITÉ</span>
+                      <span id="previewNationality" class="font-extrabold text-slate-900 text-xs uppercase">KENYAN</span>
+                    </div>
+
+                    <!-- Date of Birth -->
+                    <div>
+                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">DATE OF BIRTH / DATE DE NAISSANCE</span>
+                      <span id="previewDob" class="font-mono-code font-extrabold text-slate-900 text-xs sm:text-sm">01 JAN/JAN 1984</span>
+                    </div>
+
+                    <!-- Sex, Place of Birth, Personal No -->
+                    <div class="grid grid-cols-12 gap-1 items-start">
+                      <div class="col-span-2">
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">SEX / SEXE</span>
+                        <span id="previewSex" class="font-mono-code font-bold text-slate-900 text-xs">M</span>
+                      </div>
+                      <div class="col-span-5">
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">PLACE OF BIRTH / LIEU DE NAISSANCE</span>
+                        <span id="previewPob" class="font-bold text-slate-900 text-xs uppercase">ISIOLO</span>
+                      </div>
+                      <div class="col-span-5">
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">PERSONAL NO / NO PERSONNEL</span>
+                        <span id="previewPersonalNo" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">00000001421535</span>
+                      </div>
+                    </div>
+
+                    <!-- Issue Date & Expiry Date -->
+                    <div class="grid grid-cols-2 gap-1 pt-0.5">
+                      <div>
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">DATE OF ISSUE / DATE DE DÉLIVRANCE</span>
+                        <span id="previewIssueDate" class="font-mono-code font-extrabold text-slate-900 text-xs">08 JUL/JUIL 2008</span>
+                      </div>
+                      <div>
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">DATE OF EXPIRY / DATE D'EXPIRATION</span>
+                        <span id="previewExpiryDate" class="font-mono-code font-extrabold text-slate-900 text-xs">08 JUL/JUIL 2018</span>
+                      </div>
+                    </div>
+
+                    <!-- Authority -->
+                    <div class="pt-0.5">
+                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">AUTHORITY / AUTORITÉ</span>
+                      <span id="previewAuthority" class="font-extrabold text-slate-900 text-xs uppercase">PASSPORT CONTROL NAIROBI</span>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- Machine Readable Zone (MRZ) Footer -->
+                <div class="mt-3 pt-2 border-t-2 border-slate-400 font-mono-code text-[11px] sm:text-[12px] font-bold tracking-widest text-slate-900 leading-snug overflow-x-auto">
+                  <div id="mrzLine1">PAKENHAJI&lt;&lt;JIBRIL&lt;ABDIRASHID&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                  <div id="mrzLine2">A047566&lt;&lt;6KEN8401016M18070880000000142153550</div>
+                </div>
+
+              </article>
+
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3B: KENYA NATIONAL IDENTITY CARD VIEW ================= -->
+      <div id="kenya-idcard-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-id-card text-blue-700"></i> Kenya National ID Builder</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Republic of Kenya National Identity Smart Card.</p>
+              </div>
+              <span class="text-xs bg-blue-50 text-blue-800 font-semibold px-2.5 py-1 rounded-full border border-blue-200">KENYA ID</span>
+            </div>
+
+            <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1">ID Number / Serial No</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <input id="kidInputIdNo" type="text" value="31849204" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold">
+                  <input id="kidInputSerial" type="text" value="214981048" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold">
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1">Full Names</label>
+                <input id="kidInputName" type="text" value="HAJI JIBRIL ABDIRASHID" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div><label class="block font-bold uppercase text-slate-600 mb-1">Date of Birth</label><input id="kidInputDob" type="text" value="01.01.1984" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label class="block font-bold uppercase text-slate-600 mb-1">Sex</label><select id="kidInputSex" onchange="updateKidPreview()" class="w-full px-2 py-1.5 border rounded font-bold"><option value="MALE" selected>MALE</option><option value="FEMALE">FEMALE</option></select></div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div><label class="block font-bold uppercase text-slate-600 mb-1">District of Birth</label><input id="kidInputDistrict" type="text" value="ISIOLO" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
+                <div><label class="block font-bold uppercase text-slate-600 mb-1">Place of Issue</label><input id="kidInputPlace" type="text" value="NAIROBI" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
+              </div>
+
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1">Date of Issue</label>
+                <input id="kidInputDateIssue" type="text" value="12.08.2014" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold">
+              </div>
+
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadKidPNG()" class="py-2.5 px-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-image"></i>Save PNG</button>
+                <button type="button" onclick="window.print()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Card</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Card Preview Area -->
+          <section class="lg:col-span-7 flex justify-center items-start min-w-0">
+            <div id="kidCardContainer" class="w-full max-w-[550px]">
+              <article id="kenya-id-card" class="relative w-full aspect-[1.58/1] rounded-2xl p-5 shadow-2xl border-2 border-slate-300 text-slate-900 overflow-hidden select-none" style="background: linear-gradient(135deg, #f8fafc 0%, #ecfdf5 40%, #eff6ff 100%);">
+                <!-- Watermark / Coat of arms background -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+                  <i class="fa-solid fa-shield-halved text-[160px] text-emerald-800"></i>
+                </div>
+
+                <!-- Header -->
+                <div class="flex items-center justify-between pb-2 border-b-2 border-emerald-700/60 mb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-2xl">🇰🇪</span>
+                    <div>
+                      <h3 class="text-xs sm:text-sm font-black tracking-wider uppercase text-emerald-900 leading-tight">JAMHURI YA KENYA</h3>
+                      <h4 class="text-[10px] font-extrabold uppercase text-slate-700 leading-tight">REPUBLIC OF KENYA</h4>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-[9px] font-bold text-slate-500 block uppercase">IDENTITY CARD</span>
+                    <span id="kidPreviewIdNo" class="text-xs sm:text-sm font-black text-blue-900 font-mono-code">31849204</span>
+                  </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="grid grid-cols-12 gap-3 items-center">
+                  <!-- Photo -->
+                  <div class="col-span-4">
+                    <div class="w-full aspect-[3.2/4] rounded-lg border-2 border-slate-400 overflow-hidden bg-slate-200 shadow-sm">
+                      <img src="/assets/aistudio/HL7D9j4XUAALh2T_b0209bf1.png" alt="ID Photo" class="w-full h-full object-cover">
+                    </div>
+                  </div>
+
+                  <!-- Details -->
+                  <div class="col-span-8 space-y-1.5 text-[10px] sm:text-[11px]">
+                    <div>
+                      <span class="block text-[8px] font-bold uppercase text-slate-500">FULL NAMES / MAJINA KAMILI</span>
+                      <span id="kidPreviewName" class="font-black text-slate-900 text-xs sm:text-sm block">HAJI JIBRIL ABDIRASHID</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <div>
+                        <span class="block text-[8px] font-bold uppercase text-slate-500">DATE OF BIRTH</span>
+                        <span id="kidPreviewDob" class="font-bold text-slate-800 font-mono-code">01.01.1984</span>
+                      </div>
+                      <div>
+                        <span class="block text-[8px] font-bold uppercase text-slate-500">SEX / JINSI</span>
+                        <span id="kidPreviewSex" class="font-bold text-slate-800">MALE</span>
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <div>
+                        <span class="block text-[8px] font-bold uppercase text-slate-500">DISTRICT OF BIRTH</span>
+                        <span id="kidPreviewDistrict" class="font-bold text-slate-800 uppercase">ISIOLO</span>
+                      </div>
+                      <div>
+                        <span class="block text-[8px] font-bold uppercase text-slate-500">SERIAL NUMBER</span>
+                        <span id="kidPreviewSerial" class="font-bold text-slate-800 font-mono-code">214981048</span>
+                      </div>
+                    </div>
+                    <div class="pt-1 flex items-center justify-between text-[9px] text-slate-500 border-t border-slate-200">
+                      <span>ISSUE: <strong id="kidPreviewIssue" class="text-slate-800">12.08.2014</strong></span>
+                      <span>PLACE: <strong id="kidPreviewPlace" class="text-slate-800">NAIROBI</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Footer Bar -->
+                <div class="mt-3 pt-2 border-t border-slate-300 flex items-center justify-between text-[8px] text-slate-500 font-mono-code">
+                  <span>HOLDERS SIGNATURE / SAHIHI YA MWENYEWE</span>
+                  <span class="text-emerald-800 font-bold">VERIFIED SPECIMEN</span>
+                </div>
+              </article>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3C: SOMALIA DOCUMENT VIEW (SOMALI NATIONAL ID / NIRA CERTIFICATE OF IDENTITY) ================= -->
+      <div id="somalia-doc-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-id-card text-sky-700"></i> Somali National ID (NIRA)</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Shahaadada Aqoonsiga / Certificate of Identity Specimen.</p>
+              </div>
+              <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · NIRA</span>
+            </div>
+
+            <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <!-- Photo Upload & Reset -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label for="somPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Applicant Photo / Sawirka</label>
+                <input type="file" id="somPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-sky-700 file:text-white cursor-pointer">
+                <button type="button" onclick="resetSomPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors"><i class="fa-solid fa-rotate-left mr-1"></i>Reset to Official NIRA Portrait</button>
+              </div>
+
+              <!-- Tracking, ID No, Issue Date -->
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Tracking Number</label>
+                  <input id="somInputTracking" type="text" value="228021103481" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Identity Number</label>
+                  <input id="somInputIdNo" type="text" value="63176452261" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issue Date</label>
+                  <input id="somInputIssueDate" type="text" value="16-05-2026" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Names -->
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1">Magaca oo Afaran (Somali Full Name)</label>
+                <input id="somInputNameAfaran" type="text" value="MAXAMED CABDUQADIR MAXAMED" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+              </div>
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1">Full Name (English Transliteration)</label>
+                <input id="somInputFullName" type="text" value="MOHAMED ABDUKADIR MOHAMED" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+              </div>
+
+              <!-- Parent / Guardian -->
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1">Waalid ama Dan-Dhawre / Parent or Guardian</label>
+                <input id="somInputParent" type="text" value="" placeholder="Optional Parent or Guardian" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+              </div>
+
+              <!-- Sex, DOB, Place of Birth -->
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1">Sex / Jinsiga</label>
+                  <select id="somInputSex" onchange="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs">
+                    <option value="MALE" selected>MALE</option>
+                    <option value="FEMALE">FEMALE</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
+                  <input id="somInputDob" type="text" value="31-05-1995" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth</label>
+                  <input id="somInputPob" type="text" value="XUDUR, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Address & Country -->
+              <div class="grid grid-cols-3 gap-2">
+                <div class="col-span-1">
+                  <label class="block font-bold uppercase text-slate-600 mb-1">Country / Waddanka</label>
+                  <input id="somInputCountry" type="text" value="SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+                <div class="col-span-2">
+                  <label class="block font-bold uppercase text-slate-600 mb-1">Current Address / Degaanka</label>
+                  <input id="somInputAddress" type="text" value="BULLOW, XUDUR, BAKOOL, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadSomPNG()" class="py-2.5 px-3 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-file-arrow-down"></i>Save High-Res PNG</button>
+                <button type="button" onclick="window.print()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Specimen</button>
+              </div>
+
+              <!-- Reset All Data -->
+              <button type="button" onclick="resetSomDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                <span>Reset to Exact Sample Details</span>
+              </button>
+            </form>
+          </section>
+
+          <!-- Somalia NIRA Certificate Preview -->
+          <section class="lg:col-span-7 flex justify-center items-start min-w-0">
+            <div id="somCardContainer" class="w-full max-w-[620px]">
+              <article id="somalia-card" class="relative w-full bg-white rounded-lg p-5 sm:p-6 shadow-2xl border border-slate-300 text-slate-900 select-none">
+                
+                <!-- HEADER SECTION: Left NIRA seal, Center Title Hierarchy, Right Coat of Arms -->
+                <header class="flex items-center justify-between gap-2 pb-2">
+                  <!-- Left: NIRA Seal -->
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center">
+                    <img src="/public/assets/aistudio/somali_nira_left_seal.png" alt="NIRA Seal" class="w-full h-full object-contain">
+                  </div>
+
+                  <!-- Center: 6-Line Official Title Hierarchy -->
+                  <div class="text-center px-1 flex-1 space-y-0.5">
+                    <h2 class="text-[9.5px] sm:text-[11.5px] font-black text-[#1e3a8a] tracking-wider uppercase leading-tight">
+                      JAMHUURIYADDA FEDERAALKA SOOMAALIYA
+                    </h2>
+                    <h3 class="text-[8.5px] sm:text-[10px] font-black text-[#1e3a8a] tracking-wider uppercase leading-tight">
+                      HAY'ADDA AQOONSIGA &amp; DIIWAANGELINTA QARANKA
+                    </h3>
+                    <p class="text-[11px] sm:text-[13px] font-bold text-[#1e3a8a] font-arabic leading-tight">
+                      جمهورية الصومال الفيدرالية
+                    </p>
+                    <p class="text-[10px] sm:text-[12px] font-bold text-[#1e3a8a] font-arabic leading-tight">
+                      الهيئة الوطنية للهوية والتسجيل
+                    </p>
+                    <p class="text-[8px] sm:text-[9.5px] font-extrabold text-[#1e3a8a] tracking-wider uppercase leading-tight">
+                      FEDERAL REPUBLIC OF SOMALIA
+                    </p>
+                    <p class="text-[8px] sm:text-[9.5px] font-black text-[#1e3a8a] tracking-wider uppercase leading-tight">
+                      NATIONAL IDENTIFICATION &amp; REGISTRATION AUTHORITY
+                    </p>
+                  </div>
+
+                  <!-- Right: Somali Coat of Arms -->
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center">
+                    <img src="/public/assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
+                  </div>
+                </header>
+
+                <!-- Solid Blue Bar -->
+                <div class="w-full h-[3px] bg-[#2563eb] my-2"></div>
+
+                <!-- Title Banner -->
+                <h1 class="text-xs sm:text-sm font-black text-slate-900 tracking-wider uppercase text-center py-1">
+                  SHAHAADADA AQOONSIGA / <span class="font-arabic font-bold">شهادة الهوية</span> / CERTIFICATE OF IDENTITY
+                </h1>
+
+                <!-- TOP SECTION: Cream / Ivory Band with Photo & 3 Core Numbers -->
+                <div class="bg-[#fef9c3]/70 border border-amber-300/80 p-3 sm:p-3.5 rounded-sm grid grid-cols-12 gap-3 my-2.5 relative z-10">
+                  <!-- Photo Container -->
+                  <div class="col-span-4 flex flex-col items-center justify-center">
+                    <div class="w-24 sm:w-28 aspect-[3/4] border-2 border-slate-300 p-0.5 bg-white shadow-xs rounded-xs overflow-hidden">
+                      <img id="somPreviewPhoto" src="/public/assets/aistudio/somali_nira_portrait.jpg" alt="Applicant Photo" class="w-full h-full object-cover">
+                    </div>
+                  </div>
+
+                  <!-- Tracking Numbers -->
+                  <div class="col-span-8 flex flex-col justify-center space-y-2 text-[10px] sm:text-[11px]">
+                    <!-- Tracking Number -->
+                    <div class="flex items-center justify-between border-b border-amber-200/80 pb-1.5 gap-2">
+                      <span class="font-bold text-slate-800 leading-tight">
+                        LAMBARKA RAA'D RAACA / <span class="font-arabic">رقم التتبع</span> / TRACKING NUMBER
+                      </span>
+                      <span id="somPreviewTracking" class="font-mono-code font-bold text-slate-900 bg-white px-2.5 py-1 rounded border border-amber-300 shadow-2xs whitespace-nowrap">
+                        228021103481
+                      </span>
+                    </div>
+
+                    <!-- Identity Number -->
+                    <div class="flex items-center justify-between border-b border-amber-200/80 pb-1.5 gap-2">
+                      <span class="font-bold text-slate-800 leading-tight">
+                        LAMBARKA AQOONSIGA / <span class="font-arabic">رقم الهوية</span> / IDENTITY NUMBER
+                      </span>
+                      <span id="somPreviewIdNo" class="font-mono-code font-bold text-slate-900 bg-white px-2.5 py-1 rounded border border-amber-300 shadow-2xs whitespace-nowrap">
+                        63176452261
+                      </span>
+                    </div>
+
+                    <!-- Issue Date -->
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="font-bold text-slate-800 leading-tight">
+                        TAARIIKHDA LA BIXIYAY / <span class="font-arabic">تاريخ الإصدار</span> / ISSUE DATE
+                      </span>
+                      <span id="somPreviewIssueDate" class="font-mono-code font-bold text-slate-900 bg-white px-2.5 py-1 rounded border border-amber-300 shadow-2xs whitespace-nowrap">
+                        16-05-2026
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MAIN BODY SECTION: Pale Green Container with 4 Numbered Particulars -->
+                <div class="bg-[#dcfce7]/75 border border-emerald-300/80 p-3 sm:p-4 rounded-sm space-y-3 relative z-10 text-xs">
+                  
+                  <!-- 1. Full Name -->
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="bg-slate-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-xs">1</span>
+                      <h3 class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase tracking-wide">
+                        MAGACA OO AFARAN AMA SEDDAXAN / <span class="font-arabic font-normal">الاسم الكامل</span> / FULL NAME
+                      </h3>
+                    </div>
+                    <div class="space-y-1.5">
+                      <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs shadow-2xs">
+                        <span class="block text-[8px] sm:text-[8.5px] text-slate-500 uppercase font-semibold">Magaca oo Afaran</span>
+                        <span id="somPreviewNameAfaran" class="block font-bold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">MAXAMED CABDUQADIR MAXAMED</span>
+                      </div>
+                      <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs shadow-2xs">
+                        <span class="block text-[8px] sm:text-[8.5px] text-slate-500 uppercase font-semibold">Full Name</span>
+                        <span id="somPreviewFullName" class="block font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide">MOHAMED ABDUKADIR MOHAMED</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 2. Parent or Guardian -->
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="bg-slate-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-xs">2</span>
+                      <h3 class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase tracking-wide">
+                        WAALID AMA DAN-DHAWRE / <span class="font-arabic font-normal">الوالد أو الوصي</span> / PARENT OR GUARDIAN
+                      </h3>
+                    </div>
+                    <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs min-h-[30px] flex items-center shadow-2xs">
+                      <span id="somPreviewParent" class="block font-bold text-slate-800 text-xs uppercase"></span>
+                    </div>
+                  </div>
+
+                  <!-- 3. Other Personal Information -->
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="bg-slate-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-xs">3</span>
+                      <h3 class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase tracking-wide">
+                        MACLUUMAADKA KALE EE QOFKA / <span class="font-arabic font-normal">معلومات شخصية أخرى</span> / OTHER PERSONAL INFORMATION
+                      </h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs shadow-2xs">
+                        <span class="block text-[8px] sm:text-[8.5px] text-slate-500 uppercase font-semibold">Jinsiga / <span class="font-arabic">جنس</span> / Sex</span>
+                        <span id="somPreviewSex" class="block font-bold text-slate-800 uppercase">MALE</span>
+                      </div>
+                      <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs shadow-2xs">
+                        <span class="block text-[8px] sm:text-[8.5px] text-slate-500 uppercase font-semibold">Taariikhda Dhalashada / <span class="font-arabic">تاريخ الميلاد</span> / Date of Birth</span>
+                        <span id="somPreviewDob" class="block font-bold text-slate-800 font-mono-code">31-05-1995</span>
+                      </div>
+                      <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs shadow-2xs">
+                        <span class="block text-[8px] sm:text-[8.5px] text-slate-500 uppercase font-semibold">Goobta Dhalashada / <span class="font-arabic">مكان الميلاد</span> / Place of Birth</span>
+                        <span id="somPreviewPob" class="block font-bold text-slate-800 uppercase">XUDUR, SOMALIA</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 4. Current Address -->
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-1.5">
+                      <span class="bg-slate-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-xs">4</span>
+                      <h3 class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase tracking-wide">
+                        DEGAANKA / <span class="font-arabic font-normal">العنوان الحالي</span> / CURRENT ADDRESS
+                      </h3>
+                    </div>
+                    <div class="space-y-1.5">
+                      <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs shadow-2xs">
+                        <span class="block text-[8px] sm:text-[8.5px] text-slate-500 uppercase font-semibold">Waddanka / <span class="font-arabic">بلد</span> / Country</span>
+                        <span id="somPreviewCountry" class="block font-bold text-slate-800 uppercase">SOMALIA</span>
+                      </div>
+                      <div class="bg-white border border-slate-200 px-2.5 py-1.5 rounded-xs shadow-2xs">
+                        <span class="block text-[8px] sm:text-[8.5px] text-slate-500 uppercase font-semibold">Degaanka / <span class="font-arabic">العنوان</span> / Address</span>
+                        <span id="somPreviewAddress" class="block font-bold text-slate-800 uppercase whitespace-pre-line leading-relaxed">BULLOW
+XUDUR, BAKOOL, SOMALIA</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- FOOTER SECTION: Registrar General Signature, Legal Notice & QR Code -->
+                <footer class="mt-4 pt-3 border-t border-slate-300 grid grid-cols-12 gap-3 items-end relative z-10">
+                  <div class="col-span-8 space-y-1.5">
+                    <div class="h-12 flex items-end">
+                      <img src="/public/assets/aistudio/somali_nira_signature.png" alt="Registrar General Signature" class="h-11 w-auto object-contain">
+                    </div>
+                    <p class="text-[8px] sm:text-[9.5px] font-bold text-slate-800 uppercase tracking-wide">
+                      DIIWAANHAYAHA GUUD EE AQOONSIGA QARANKA / <span class="font-arabic font-semibold">المسجل العام للهوية الوطنية</span> / REGISTRAR GENERAL OF NATIONAL ID
+                    </p>
+                    <p class="text-[7px] sm:text-[8px] text-slate-600 leading-tight">
+                      Dukumentigaan waa aqoonsi sharci ah oo lagu soo saaray si waafaqsan Sharciga aqoonsiga iyo diiwaangelinta dadweynaha Lr. 009 ee 2023. Markii uu lumo, la xado ama isticmaal ka dhashay sifo kasta oo sharci oggaleyn, qofka sita aqoonsigan waa inuu si dedeg ah uu ku wargaliyaa Hay'adda Aqoonsiga iyo Diiwaangelinta Qaranka (NIRA).
+                    </p>
+                    <p class="text-[7px] sm:text-[8px] text-slate-600 leading-tight">
+                      This is a legal identification document issued under the Identification and registration of persons act no. 009 of 2023. In the event of loss, theft or any unauthorized use of this identification document the bearer must immediately report to NIRA
+                    </p>
+                  </div>
+                  <div class="col-span-4 flex flex-col items-end justify-end">
+                    <div class="w-18 h-18 sm:w-20 sm:h-20 p-1 bg-white border border-slate-300 shadow-xs">
+                      <img src="/public/assets/aistudio/somali_nira_qrcode.png" alt="NIRA QR Code" class="w-full h-full object-contain">
+                    </div>
+                  </div>
+                </footer>
+              </article>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3D: SOMALIA PASSPORT VIEW (BIOMETRIC PASSPORT / BAASABOOR) ================= -->
+      <div id="somalia-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-sky-700"></i> Somalia Passport Builder</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Somali Republic Biometric Passport (Baasaboor / جواز سفر).</p>
+              </div>
+              <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · PASSPORT</span>
+            </div>
+
+            <!-- View Mode Switcher: Data Page vs Booklet Spread -->
+            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
+              <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open text-sky-700"></i>
+                Display Format:
+              </span>
+              <div class="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 shadow-2xs">
+                <button type="button" id="btn-som-pass-single" onclick="setSomPassDisplayMode('single')" class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all">
+                  Data Page (KYC)
+                </button>
+                <button type="button" id="btn-som-pass-spread" onclick="setSomPassDisplayMode('spread')" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all">
+                  2-Page Booklet
+                </button>
+              </div>
+            </div>
+
+            <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <!-- Passport Photo Upload & Reset -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label for="somPassPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Holder Photo / Sawirka Baasaboorka</label>
+                <input type="file" id="somPassPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-sky-700 file:text-white cursor-pointer">
+                <div class="flex items-center gap-2 mt-2">
+                  <button type="button" onclick="resetSomPassPhoto()" class="px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset to Official Passport Photo
+                  </button>
+                </div>
+              </div>
+
+              <!-- Passport Header Codes: Type, Country, Passport No -->
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nooca / Type</label>
+                  <input id="somPassInputType" type="text" value="P" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Country Code</label>
+                  <input id="somPassInputCountry" type="text" value="SOM" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Passport No</label>
+                  <input id="somPassInputNumber" type="text" value="P00724085" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                </div>
+              </div>
+
+              <!-- Full Name (Magaca / الاسم) -->
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Name</label>
+                <input id="somPassInputName" type="text" value="MAXAMED CABDIQADIR MAXAMED" oninput="updateSomPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+              </div>
+
+              <!-- Mother's Name & NID -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Magaca Hooyada (Mother)</label>
+                  <input id="somPassInputMother" type="text" value="FARTUN ADEN RONOW" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NID (National ID)</label>
+                  <input id="somPassInputNid" type="text" value="29505057463496" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Nationality & Occupation -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Jinsiyada / Nationality</label>
+                  <input id="somPassInputNationality" type="text" value="SOMALI" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Shaqada / Occupation</label>
+                  <input id="somPassInputOccupation" type="text" value="STUDENT" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Date of Birth & Place of Issue -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth (Dhalashada)</label>
+                  <input id="somPassInputDob" type="text" value="05 May 1995" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Issue (Meesha Bixiyey)</label>
+                  <input id="somPassInputIssuePlace" type="text" value="BAIDOA" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Gender & Place of Birth -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Lab Dheddig / Gender</label>
+                  <select id="somPassInputSex" onchange="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs">
+                    <option value="MALE" selected>MALE</option>
+                    <option value="FEMALE">FEMALE</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth (Goobta Dhalashada)</label>
+                  <input id="somPassInputBirthPlace" type="text" value="HUDUR" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Issue Date, Authority & Expiry Date -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Issue (la Bixiyey)</label>
+                  <input id="somPassInputIssueDate" type="text" value="21 Apr 2018" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry (Dhacayo)</label>
+                  <input id="somPassInputExpiryDate" type="text" value="20 Apr 2023" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+              </div>
+
+              <div>
+                <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issuing Authority (Xafiiska)</label>
+                <input id="somPassInputAuthority" type="text" value="SOMALI GOVERNMENT" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+              </div>
+
+              <!-- Watermark settings -->
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
+                <label for="somPassWatermarkText" class="block font-bold uppercase tracking-wider text-slate-600 text-[10px]">Security Watermark</label>
+                <input id="somPassWatermarkText" type="text" value="SPECIMEN" maxlength="40" oninput="updateSomPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-slate-700 text-xs">
+                <label class="flex items-center gap-2 text-slate-700 cursor-pointer text-xs">
+                  <input id="somPassShowWatermark" type="checkbox" onchange="updateSomPassPreview()" class="rounded border-slate-300">
+                  <span>Show diagonal specimen watermark</span>
+                </label>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadSomPassPNG()" class="py-2.5 px-3 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-image"></i>Save PNG
+                </button>
+                <button type="button" onclick="printSomaliaPassport()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-print"></i>Print Passport
+                </button>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="viewOriginalSomPassScan()" class="py-2 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                  <i class="fa-solid fa-file-image text-amber-700"></i>Official Scan
+                </button>
+                <button type="button" onclick="resetSomPassDetailsToSample()" class="py-2 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 cursor-pointer transition-colors">
+                  <i class="fa-solid fa-rotate-left text-slate-500"></i>Reset Sample
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Passport Preview Area -->
+          <section class="lg:col-span-7 flex justify-center items-start print-area-wrapper min-w-0">
+            <div id="somPassContainer" class="w-full max-w-[650px]">
+
+              <!-- 1. SINGLE DATA PAGE VIEW (KYC Verification Standard) -->
+              <div id="somalia-passport-single" class="w-full">
+                <article id="somalia-passport-card" class="somali-passport-bg relative w-full aspect-[1.42/1] rounded-lg shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden text-slate-900 select-none">
+                  
+                  <!-- Diagonal Watermark Overlay -->
+                  <div id="somPassSampleWatermark" class="sample-watermark hidden"><span id="somPassWatermarkLabel">SPECIMEN</span></div>
+
+                  <!-- Subtle Watermark Coat of Arms in Center -->
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] z-0">
+                    <img src="/public/assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-72 h-auto filter grayscale">
+                  </div>
+
+                  <!-- TOP HEADER: Trilingual Republic Name -->
+                  <header class="flex justify-between items-center pb-1.5 mb-2 border-b border-slate-300/80 relative z-10">
+                    <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
+                      JAMHUURIYADDA SOOMAALIYA
+                    </div>
+                    <div class="font-arabic font-bold text-sky-950 text-xs sm:text-sm">
+                      جمهورية الصومال
+                    </div>
+                    <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
+                      SOMALI REPUBLIC
+                    </div>
+                  </header>
+
+                  <!-- SUBHEADER BAR: BAASABOOR / PASSPORT + TYPE + CODE + NUMBER + STAR -->
+                  <div class="grid grid-cols-12 gap-1 items-center pb-2 mb-2 border-b border-slate-300 relative z-10 text-[9px] sm:text-[10px]">
+                    <!-- Left: BAASABOOR + Coat of Arms -->
+                    <div class="col-span-4 flex items-center gap-2">
+                      <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
+                        <img src="/public/assets/aistudio/somali_passport_coat_of_arms.png" alt="Somalia Coat of Arms" class="w-full h-full object-contain">
+                      </div>
+                      <div class="leading-none">
+                        <div class="font-black text-slate-950 text-[10px] sm:text-[11px] tracking-wider">BAASABOOR</div>
+                        <div class="font-arabic font-bold text-slate-800 text-[9px]">جواز سفر</div>
+                        <div class="font-black text-slate-950 text-[9px] sm:text-[10px] tracking-wider">PASSPORT</div>
+                      </div>
+                    </div>
+
+                    <!-- Type -->
+                    <div class="col-span-2 border-l border-slate-300 pl-1.5">
+                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Nooca / النوع / Type</span>
+                      <span id="somPassPreviewType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">P</span>
+                    </div>
+
+                    <!-- Country Code -->
+                    <div class="col-span-2 border-l border-slate-300 pl-1.5">
+                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Astaanta / رمز / Code</span>
+                      <span id="somPassPreviewCountry" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">SOM</span>
+                    </div>
+
+                    <!-- Passport No & Red/Brown Star -->
+                    <div class="col-span-4 border-l border-slate-300 pl-1.5 flex items-center justify-between">
+                      <div>
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Passport No / Baasaboor</span>
+                        <span id="somPassPreviewNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00724085</span>
+                      </div>
+                      <span class="text-amber-800 text-lg sm:text-xl font-bold pr-1">★</span>
+                    </div>
+                  </div>
+
+                  <!-- MAIN BODY: PHOTO LEFT + DATA FIELDS RIGHT -->
+                  <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
+                    
+                    <!-- Left Photo -->
+                    <div class="col-span-4 flex flex-col items-center">
+                      <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
+                        <img id="somPassPreviewPhoto" src="/public/assets/aistudio/somali_passport_portrait.jpg" alt="Somali Passport Portrait" class="w-full h-full object-cover">
+                        <!-- Hologram / security waves watermark across photo edge -->
+                        <div class="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/40 via-transparent to-transparent"></div>
+                      </div>
+                    </div>
+
+                    <!-- Right Personal Data Fields -->
+                    <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
+                      <!-- 1. Magaca / الاسم / Name -->
+                      <div>
+                        <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                          Magaca / <span class="font-arabic">الاسم</span> / Name
+                        </span>
+                        <span id="somPassPreviewName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">
+                          MAXAMED CABDIQADIR MAXAMED
+                        </span>
+                      </div>
+
+                      <!-- 2. Mother's Name & NID -->
+                      <div class="grid grid-cols-12 gap-1 items-start">
+                        <div class="col-span-7">
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Magaca Hooyada / <span class="font-arabic">اسم الأم</span> / Mother's Name
+                          </span>
+                          <span id="somPassPreviewMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">
+                            FARTUN ADEN RONOW
+                          </span>
+                        </div>
+                        <div class="col-span-5">
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            NID:
+                          </span>
+                          <span id="somPassPreviewNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">
+                            29505057463496
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- 3. Nationality & Occupation -->
+                      <div class="grid grid-cols-2 gap-1">
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Jinsiyada / <span class="font-arabic">الجنسية</span> / Nationality
+                          </span>
+                          <span id="somPassPreviewNationality" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
+                            SOMALI
+                          </span>
+                        </div>
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Shaqada / <span class="font-arabic">المهنة</span> / Occupation
+                          </span>
+                          <span id="somPassPreviewOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
+                            STUDENT
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- 4. Date of Birth & Place of Issue -->
+                      <div class="grid grid-cols-2 gap-1">
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Taariikhda Dhalashada / <span class="font-arabic">تاريخ الميلاد</span> / Date of Birth
+                          </span>
+                          <span id="somPassPreviewDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">
+                            05 May 1995
+                          </span>
+                        </div>
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Meesha laga Bixiyey / <span class="font-arabic">مكان الإصدار</span> / Place of Issue
+                          </span>
+                          <span id="somPassPreviewIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
+                            BAIDOA
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- 5. Gender & Place of Birth -->
+                      <div class="grid grid-cols-2 gap-1">
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Lab Dheddig / <span class="font-arabic">الجنس</span> / Gender
+                          </span>
+                          <span id="somPassPreviewSex" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">
+                            MALE
+                          </span>
+                        </div>
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Meesha Dhaleshada / <span class="font-arabic">مكان الميلاد</span> / Place of Birth
+                          </span>
+                          <span id="somPassPreviewBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
+                            HUDUR
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- 6. Date of Issue & Issuing Authority -->
+                      <div class="grid grid-cols-2 gap-1">
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Taariikhda la Bixiyey / <span class="font-arabic">تاريخ الإصدار</span> / Date of Issue
+                          </span>
+                          <span id="somPassPreviewIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">
+                            21 Apr 2018
+                          </span>
+                        </div>
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Xafiiska laga Bixiyey / <span class="font-arabic">جهة الإصدار</span> / Issuing Authority
+                          </span>
+                          <span id="somPassPreviewAuthority" class="font-extrabold text-slate-900 text-[9.5px] sm:text-[10px] uppercase">
+                            SOMALI GOVERNMENT
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- 7. Date of Expiry & Holder's Signature -->
+                      <div class="grid grid-cols-2 gap-1 pt-0.5">
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Taariikhda uu Dhacayo / <span class="font-arabic">تاريخ الانتهاء</span> / Date of Expiry
+                          </span>
+                          <span id="somPassPreviewExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">
+                            20 Apr 2023
+                          </span>
+                        </div>
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
+                            Saxiixa Qofka / <span class="font-arabic">توقيع حامل الجواز</span> / Holder's Signature
+                          </span>
+                          <div class="border-b border-slate-400 mt-2 h-3 flex items-end">
+                            <span class="text-[8px] italic text-slate-400 font-mono-code select-none">M. Cabdiqadir</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <!-- MACHINE READABLE ZONE (MRZ) FOOTER -->
+                  <div class="mt-2.5 pt-1.5 border-t-2 border-slate-400/90 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-950 leading-snug overflow-x-auto relative z-10">
+                    <div id="somPassMrzLine1">P&lt;SOMMAXAMED&lt;&lt;MAXAMED&lt;CABDIQADIR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                    <div id="somPassMrzLine2">P007240853SOM9505058M23042072950505746349672</div>
+                  </div>
+
+                </article>
+              </div>
+
+              <!-- 2. FULL 2-PAGE BOOKLET SPREAD (PAGE 3 OBSERVATIONS + PAGE 2 DATA PAGE) -->
+              <div id="somalia-passport-spread" class="w-full hidden">
+                <article class="bg-white rounded-lg shadow-2xl border-2 border-slate-400 overflow-hidden text-slate-900 select-none">
+                  
+                  <!-- UPPER PAGE: PAGE 3 OBSERVATIONS & SIGNATURE -->
+                  <div class="relative w-full aspect-[1.45/1] overflow-hidden border-b-2 border-dashed border-slate-400">
+                    <!-- Background image of Page 3 Observations -->
+                    <img src="/public/assets/aistudio/somali_passport_obs_page.jpg" alt="Page 3 Observations" class="w-full h-full object-cover">
+
+                    <!-- Dynamic Perforated Passport Number Overlay on Top-Left of Page 3 -->
+                    <div class="absolute left-6 top-8 pointer-events-none transform -rotate-90 origin-top-left font-mono-code text-xs sm:text-sm font-black tracking-[0.35em] text-slate-900/40 select-none">
+                      <span id="somPassPerforatedNumber">P00724085</span>
+                    </div>
+
+                    <!-- Page Number 3 indicator badge -->
+                    <div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-white/70 backdrop-blur-2xs text-[10px] font-bold text-slate-700">
+                      Page 3 · Fiiro Gaar Ah (Observations)
+                    </div>
+                  </div>
+
+                  <!-- BOOKLET SPINE / STITCHING SEAM -->
+                  <div class="h-2.5 bg-gradient-to-b from-slate-300 via-slate-100 to-slate-300 flex items-center justify-center border-y border-slate-400">
+                    <div class="w-full border-t border-dashed border-slate-400/80"></div>
+                  </div>
+
+                  <!-- LOWER PAGE: PAGE 2 BIOGRAPHICAL DATA PAGE (Rendered with current form data) -->
+                  <div class="somali-passport-bg relative w-full aspect-[1.42/1] p-4 sm:p-5 overflow-hidden text-slate-900">
+                    <!-- Header -->
+                    <header class="flex justify-between items-center pb-1.5 mb-2 border-b border-slate-300/80 relative z-10">
+                      <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
+                        JAMHUURIYADDA SOOMAALIYA
+                      </div>
+                      <div class="font-arabic font-bold text-sky-950 text-xs sm:text-sm">
+                        جمهورية الصومال
+                      </div>
+                      <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
+                        SOMALI REPUBLIC
+                      </div>
+                    </header>
+
+                    <!-- Subheader Bar -->
+                    <div class="grid grid-cols-12 gap-1 items-center pb-2 mb-2 border-b border-slate-300 relative z-10 text-[9px] sm:text-[10px]">
+                      <div class="col-span-4 flex items-center gap-2">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
+                          <img src="/public/assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-full h-full object-contain">
+                        </div>
+                        <div class="leading-none">
+                          <div class="font-black text-slate-950 text-[10px] sm:text-[11px] tracking-wider">BAASABOOR</div>
+                          <div class="font-arabic font-bold text-slate-800 text-[9px]">جواز سفر</div>
+                          <div class="font-black text-slate-950 text-[9px] sm:text-[10px] tracking-wider">PASSPORT</div>
+                        </div>
+                      </div>
+                      <div class="col-span-2 border-l border-slate-300 pl-1.5">
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Nooca / Type</span>
+                        <span id="somPassSpreadType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">P</span>
+                      </div>
+                      <div class="col-span-2 border-l border-slate-300 pl-1.5">
+                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Astaanta / Code</span>
+                        <span id="somPassSpreadCountry" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">SOM</span>
+                      </div>
+                      <div class="col-span-4 border-l border-slate-300 pl-1.5 flex items-center justify-between">
+                        <div>
+                          <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Passport No</span>
+                          <span id="somPassSpreadNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00724085</span>
+                        </div>
+                        <span class="text-amber-800 text-lg sm:text-xl font-bold pr-1">★</span>
+                      </div>
+                    </div>
+
+                    <!-- Main Data Fields Grid -->
+                    <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
+                      <div class="col-span-4 flex flex-col items-center">
+                        <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
+                          <img id="somPassPreviewPhotoSpread" src="/public/assets/aistudio/somali_passport_portrait.jpg" alt="" class="w-full h-full object-cover">
+                        </div>
+                      </div>
+                      <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
+                        <div>
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca / الاسم / Name</span>
+                          <span id="somPassSpreadName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">MAXAMED CABDIQADIR MAXAMED</span>
+                        </div>
+                        <div class="grid grid-cols-12 gap-1 items-start">
+                          <div class="col-span-7">
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca Hooyada / Mother's Name</span>
+                            <span id="somPassSpreadMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">FARTUN ADEN RONOW</span>
+                          </div>
+                          <div class="col-span-5">
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">NID:</span>
+                            <span id="somPassSpreadNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">29505057463496</span>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1">
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Jinsiyada / Nationality</span>
+                            <span id="somPassSpreadNationality" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">SOMALI</span>
+                          </div>
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Shaqada / Occupation</span>
+                            <span id="somPassSpreadOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">STUDENT</span>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1">
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda Dhalashada / Date of Birth</span>
+                            <span id="somPassSpreadDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">05 May 1995</span>
+                          </div>
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Bixiyey / Place of Issue</span>
+                            <span id="somPassSpreadIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">BAIDOA</span>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1">
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Lab Dheddig / Gender</span>
+                            <span id="somPassSpreadSex" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">MALE</span>
+                          </div>
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Dhaleshada / Place of Birth</span>
+                            <span id="somPassSpreadBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">HUDUR</span>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1">
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda la Bixiyey / Date of Issue</span>
+                            <span id="somPassSpreadIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">21 Apr 2018</span>
+                          </div>
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Xafiiska / Authority</span>
+                            <span id="somPassSpreadAuthority" class="font-extrabold text-slate-900 text-[9.5px] sm:text-[10px] uppercase">SOMALI GOVERNMENT</span>
+                          </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1 pt-0.5">
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda uu Dhacayo / Expiry</span>
+                            <span id="somPassSpreadExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">20 Apr 2023</span>
+                          </div>
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Saxiixa / Signature</span>
+                            <div class="border-b border-slate-400 mt-2 h-3 flex items-end">
+                              <span class="text-[8px] italic text-slate-400 font-mono-code select-none">M. Cabdiqadir</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- MRZ on Spread -->
+                    <div class="mt-2.5 pt-1.5 border-t-2 border-slate-400 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-950 leading-snug overflow-x-auto relative z-10">
+                      <div id="somPassSpreadMrzLine1">P&lt;SOMMAXAMED&lt;&lt;MAXAMED&lt;CABDIQADIR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="somPassSpreadMrzLine2">P007240853SOM9505058M23042072950505746349672</div>
+                    </div>
+
+                  </div>
+                </article>
+              </div>
+
+            </div>
+          </section>
+        </main>
+      </div>
+  </section>
+
+  <!-- ================= ABOUT MODAL ================= -->
+  <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-800 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-wallet text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">About Global Virtual Accounts &amp; Crypto Suite</h3>
+            <p class="text-xs text-slate-500">Cross-Border Banking &amp; Exchange Compliance</p>
+          </div>
+        </div>
+        <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="py-4 space-y-3 text-xs text-slate-600 leading-relaxed">
+        <p>
+          <strong class="text-slate-900">Global Virtual Accounts &amp; Crypto Suite</strong> is an interactive fintech portal demonstrating verification readiness, receiving account specifications, and KYC compliance architectures for international users, remote freelancers, and crypto traders.
+        </p>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
+          <div class="flex items-center gap-2 font-semibold text-slate-800">
+            <i class="fa-solid fa-check text-emerald-600"></i>
+            USD, EUR &amp; GBP Virtual Accounts (PayPal, Payoneer, Raenest, Grey)
+          </div>
+          <div class="flex items-center gap-2 font-semibold text-slate-800">
+            <i class="fa-solid fa-check text-emerald-600"></i>
+            Global Tier 2/3 Crypto Exchange Ready (Binance, Bybit, OKX, KuCoin)
+          </div>
+          <div class="flex items-center gap-2 font-semibold text-slate-800">
+            <i class="fa-solid fa-check text-emerald-600"></i>
+            US Bank Routing, SEPA IBAN &amp; Swift Integration Guidelines
+          </div>
+          <div class="flex items-center gap-2 font-semibold text-slate-800">
+            <i class="fa-solid fa-check text-emerald-600"></i>
+            Real-Time Platform Requirements &amp; Instant Spec Copy
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400">
+          Designed for compliance analysis, cross-border invoicing workflows, and identity verification benchmarking.
+        </p>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end">
+        <button onclick="closeAboutModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CONTACT US MODAL ================= -->
+  <div id="contactModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-headset text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-900 text-base">Contact Support</h3>
+            <p class="text-xs text-slate-500">Direct Support Available 24/7</p>
+          </div>
+        </div>
+        <button onclick="closeContactModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="py-4 space-y-4 text-xs text-slate-600">
+        <p>Get in touch for virtual account guidance, exchange verification consultation, or API integration:</p>
+
+        <!-- Email Contact Box -->
+        <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-envelope text-blue-600 text-lg"></i>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Official Email</span>
+              <a href="mailto:qalinle631@gmail.com" class="font-bold text-slate-900 text-xs hover:text-blue-600">
+                qalinle631@gmail.com
+              </a>
+            </div>
+          </div>
+          <button onclick="copyToClipboard('qalinle631@gmail.com', 'Email copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+
+        <!-- Phone / WhatsApp Box -->
+        <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-phone text-emerald-600 text-lg"></i>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone &amp; WhatsApp</span>
+              <a href="tel:+252615589321" class="font-bold text-slate-900 text-xs hover:text-emerald-600">
+                +252 615 589 321
+              </a>
+            </div>
+          </div>
+          <button onclick="copyToClipboard('+252615589321', 'Phone copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
+            <i class="fa-regular fa-copy"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end">
+        <button onclick="closeContactModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PLATFORM SPECIFICATIONS & VERIFICATION MODAL ================= -->
+  <div id="kycPlatformModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div id="modal-platform-icon-wrap" class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-md">
+            <i id="modal-platform-icon" class="fa-brands fa-paypal text-2xl text-white"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="modal-platform-name" class="font-black text-slate-900 text-lg leading-tight">PayPal</h3>
+              <span id="modal-platform-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">USD Personal &amp; Biz</span>
+            </div>
+            <p id="modal-platform-category" class="text-xs text-slate-500 font-medium">Virtual Account · Instant Verification Ready</p>
+          </div>
+        </div>
+        <button onclick="closeKycPlatformModal()" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="py-4 space-y-4">
+        
+        <!-- Specifications Grid -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Account Type</span>
+            <span id="modal-spec-acctype" class="text-xs font-extrabold text-slate-900 mt-0.5 block">USD Virtual Account</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Supported Currencies</span>
+            <span id="modal-spec-currency" class="text-xs font-extrabold text-slate-900 mt-0.5 block">USD, EUR, GBP</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">KYC Verification Level</span>
+            <span id="modal-spec-kyclevel" class="text-xs font-extrabold text-emerald-700 mt-0.5 flex items-center gap-1">
+              <i class="fa-solid fa-circle-check text-xs"></i>
+              <span id="modal-spec-kyclevel-text">Tier 2 Verified</span>
+            </span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Transfer / Withdrawal Limit</span>
+            <span id="modal-spec-limit" class="text-xs font-extrabold text-slate-900 mt-0.5 block">$50,000 / Day</span>
+          </div>
+        </div>
+
+        <!-- Verification Requirements Checklist -->
+        <div class="space-y-2">
+          <span class="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+            Verification Requirements &amp; Checklist:
+          </span>
+          <div id="modal-checklist-container" class="space-y-1.5">
+            <!-- Dynamically populated checklist -->
+          </div>
+        </div>
+
+        <!-- Compliance & Best Practices Tip -->
+        <div class="p-3.5 rounded-xl bg-sky-50/80 border border-sky-200 space-y-1">
+          <div class="flex items-center gap-1.5 text-sky-900 font-bold text-xs">
+            <i class="fa-solid fa-lightbulb text-amber-500"></i>
+            <span>Platform Integration Guidance</span>
+          </div>
+          <p id="modal-compliance-tip" class="text-[11px] text-sky-950/80 leading-relaxed">
+            Ensure your registered legal name matches your official identification document.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+        <button onclick="copyPlatformSpecs()" class="px-4 py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-regular fa-copy text-slate-500"></i>
+          <span>Copy Specs</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="openContactModal(); closeKycPlatformModal();" class="px-3.5 py-2 text-xs font-semibold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors">
+            Ask Support
+          </button>
+          <button onclick="closeKycPlatformModal()" class="px-5 py-2 text-xs font-bold rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-colors cursor-pointer">
+            Close
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MOBILE PREVIEW MODAL (USER SNIPPET) ================= -->
+  <div id="imageModal" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex-col items-center justify-center p-3 sm:p-5">
+    <div class="w-full max-w-4xl flex items-center justify-between gap-3 text-white mb-3">
+      <div>
+        <h2 class="font-bold text-base sm:text-lg flex items-center"><i class="fa-solid fa-passport mr-2 text-emerald-400"></i>Kenya Passport Page Ready</h2>
+        <p class="text-xs text-slate-300 mt-1">Press and hold image on mobile to save directly to gallery, or use Direct File Save.</p>
+      </div>
+      <button type="button" id="closeModalBtn" onclick="closeImageModal()" class="shrink-0 rounded-full bg-white/15 hover:bg-white/25 w-10 h-10 flex items-center justify-center text-white cursor-pointer" aria-label="Close preview"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="flex-1 min-h-0 w-full max-w-4xl flex items-center justify-center rounded-xl bg-black/20 p-2">
+      <img id="modalPreviewImg" class="max-h-full max-w-full object-contain rounded shadow-xl" alt="Kenya Passport Preview">
+    </div>
+    <div class="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+      <a id="fallbackDownloadLink" href="#" download="kenya-passport.png" class="py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-center text-sm font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-download mr-2"></i>Direct File Save</a>
+      <button type="button" id="shareImageBtn" onclick="sharePassportImage()" class="py-3 px-4 bg-white/15 hover:bg-white/25 text-white rounded-xl text-sm font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-share-nodes mr-2"></i>Share Image</button>
+      <button type="button" id="closeModalBottomBtn" onclick="closeImageModal()" class="py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-bold flex items-center justify-center cursor-pointer">Close Preview</button>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" role="status" aria-live="polite" class="fixed top-5 right-5 z-[60] -translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-700">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+    <div>
+      <h4 id="toastTitle" class="text-xs font-bold uppercase tracking-wider text-slate-200">Ready</h4>
+      <p id="toastMessage" class="text-xs text-slate-300">Action successful.</p>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER (CLEAN WHITE) ================= -->
+  <footer class="no-print mt-auto border-t border-slate-200 bg-white py-8 px-4 text-slate-600">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-slate-900">Global Virtual Accounts &amp; Crypto Suite</span>
+        <span>·</span>
+        <span>Fintech, Multi-Currency IBAN &amp; Web3 Exchange Compliance</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="openAboutModal()" class="hover:text-slate-900 transition-colors cursor-pointer">About</button>
+        <button onclick="openContactModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Contact Us</button>
+        <a href="mailto:qalinle631@gmail.com" class="hover:text-blue-600 font-mono-code text-[11px] transition-colors">qalinle631@gmail.com</a>
+        <a href="tel:+252615589321" class="hover:text-emerald-600 font-mono-code text-[11px] transition-colors">+252615589321</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPTS & CONTROLLERS ================= -->
+  <script>
+    const $ = id => document.getElementById(id);
+
+    // Virtual Accounts State
+    let currentVirtualAccount = 'paypal';
+    let currentDocType = 'passport';
+    let currentCountry = 'kenya';
+
+    const defaultPhoto = '/assets/aistudio/HL7D9j4XUAALh2T_b0209bf1.png';
+    let toastTimer = null;
+
+    // Kenya Passport Field Bindings
+    const fields = {
+      inputPassportType: "previewPassportType",
+      inputIssuingState: "previewIssuingState",
+      inputPassportNo: "previewPassportNo",
+      inputSurname: "previewSurname",
+      inputGivenNames: "previewGivenNames",
+      inputNationality: "previewNationality",
+      inputDob: "previewDob",
+      inputSex: "previewSex",
+      inputPob: "previewPob",
+      inputPersonalNo: "previewPersonalNo",
+      inputIssueDate: "previewIssueDate",
+      inputExpiryDate: "previewExpiryDate",
+      inputAuthority: "previewAuthority"
+    };
+
+    function updatePreview() {
+      Object.entries(fields).forEach(([inputId, previewId]) => {
+        const input = $(inputId);
+        const preview = $(previewId);
+        if (input && preview) {
+          preview.textContent = input.value || '';
+        }
+      });
+      updateMRZ();
+    }
+
+    function updateMRZ() {
+      const surname = ($('inputSurname')?.value || 'HAJI').toUpperCase().replace(/[^A-Z]/g, '');
+      const given = ($('inputGivenNames')?.value || 'JIBRIL ABDIRASHID').toUpperCase().replace(/[^A-Z]/g, '<');
+      const type = ($('inputPassportType')?.value || 'PA').toUpperCase();
+      const state = ($('inputIssuingState')?.value || 'KEN').toUpperCase();
+      const passNo = ($('inputPassportNo')?.value || 'A047566').toUpperCase();
+      const sex = ($('inputSex')?.value || 'M').toUpperCase();
+      const persNo = ($('inputPersonalNo')?.value || '00000001421535').replace(/[^0-9]/g, '');
+
+      let line1 = `${type}${state}${surname}<<${given}`;
+      line1 = line1.padEnd(44, '<').substring(0, 44);
+
+      let line2 = `${passNo}<<6${state}8401016${sex}1807088${persNo}50`;
+      line2 = line2.padEnd(44, '<').substring(0, 44);
+
+      if ($('mrzLine1')) $('mrzLine1').textContent = line1;
+      if ($('mrzLine2')) $('mrzLine2').textContent = line2;
+    }
+
+    // Virtual Account Selection Handler
+    function selectVirtualAccount(accountKey) {
+      currentVirtualAccount = accountKey || 'paypal';
+      const meta = platformData[currentVirtualAccount] || platformData.paypal;
+
+      // Update badge
+      const badge = $('active-account-badge');
+      if (badge) {
+        badge.style.backgroundColor = meta.color || '#003087';
+        badge.innerHTML = `<i class="${meta.icon} text-sm"></i><span>${meta.name} Active</span>`;
+      }
+
+      // Update tip
+      const tip = $('platform-kyc-tip');
+      if (tip) {
+        tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong> or <strong>National Identity Card</strong> from Kenya (or East Africa) for instant ${meta.badge} verification and payout clearance.`;
+      }
+
+      // Highlight active button
+      document.querySelectorAll('.va-select-btn').forEach(btn => {
+        btn.classList.remove('border-2', 'border-[#003087]', 'bg-blue-50/70', 'ring-2', 'ring-blue-500/30');
+        btn.classList.add('border', 'border-slate-200', 'bg-white');
+      });
+      const activeBtn = $(`btn-va-${currentVirtualAccount}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border', 'border-slate-200', 'bg-white');
+        activeBtn.classList.add('border-2', 'border-[#003087]', 'bg-blue-50/70', 'ring-2', 'ring-blue-500/30');
+      }
+
+      showToast(`Selected ${meta.name}`, `Loaded document verification for ${meta.name}`);
+    }
+
+    // Switch Document Type: 'passport' vs 'idcard'
+    function switchVerificationDoc(docType) {
+      currentDocType = docType;
+      const passTab = $('tab-doc-passport');
+      const idTab = $('tab-doc-idcard');
+
+      if (docType === 'passport') {
+        passTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer";
+        idTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-all cursor-pointer";
+      } else {
+        idTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-xs flex items-center gap-1.5 transition-all cursor-pointer";
+        passTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-all cursor-pointer";
+      }
+
+      renderActiveDocumentView();
+    }
+
+    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'uganda'
+    function switchVerificationCountry(countryKey) {
+      currentCountry = countryKey;
+
+      document.querySelectorAll('.country-pill-btn').forEach(btn => {
+        btn.className = "country-pill-btn px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer";
+      });
+
+      const activeBtn = $(`country-btn-${countryKey}`);
+      if (activeBtn) {
+        activeBtn.className = "country-pill-btn px-3 py-1.5 rounded-xl border-2 border-emerald-600 bg-emerald-50 text-emerald-800 text-xs font-extrabold flex items-center gap-2 shadow-xs transition-all cursor-pointer";
+      }
+
+      renderActiveDocumentView();
+      showToast(`Country: ${countryKey.toUpperCase()}`, `Displaying official ${countryKey} verification specimen`);
+    }
+
+    function renderActiveDocumentView() {
+      const kenyaPassView = $('kenya-passport-view');
+      const kenyaIdView = $('kenya-idcard-view');
+      const somaliaIdView = $('somalia-doc-view');
+      const somaliaPassView = $('somalia-passport-view');
+
+      if (kenyaPassView) kenyaPassView.classList.add('hidden');
+      if (kenyaIdView) kenyaIdView.classList.add('hidden');
+      if (somaliaIdView) somaliaIdView.classList.add('hidden');
+      if (somaliaPassView) somaliaPassView.classList.add('hidden');
+
+      if (currentCountry === 'somalia') {
+        if (currentDocType === 'idcard') {
+          if (somaliaIdView) somaliaIdView.classList.remove('hidden');
+        } else {
+          if (somaliaPassView) somaliaPassView.classList.remove('hidden');
+        }
+      } else if (currentDocType === 'idcard') {
+        if (kenyaIdView) kenyaIdView.classList.remove('hidden');
+      } else {
+        if (kenyaPassView) kenyaPassView.classList.remove('hidden');
+      }
+    }
+
+    // Kenya National ID Card Live Preview
+    function updateKidPreview() {
+      if ($('kidPreviewIdNo')) $('kidPreviewIdNo').textContent = $('kidInputIdNo')?.value || '';
+      if ($('kidPreviewSerial')) $('kidPreviewSerial').textContent = $('kidInputSerial')?.value || '';
+      if ($('kidPreviewName')) $('kidPreviewName').textContent = $('kidInputName')?.value || '';
+      if ($('kidPreviewDob')) $('kidPreviewDob').textContent = $('kidInputDob')?.value || '';
+      if ($('kidPreviewSex')) $('kidPreviewSex').textContent = $('kidInputSex')?.value || '';
+      if ($('kidPreviewDistrict')) $('kidPreviewDistrict').textContent = $('kidInputDistrict')?.value || '';
+      if ($('kidPreviewPlace')) $('kidPreviewPlace').textContent = $('kidInputPlace')?.value || '';
+      if ($('kidPreviewIssue')) $('kidPreviewIssue').textContent = $('kidInputDateIssue')?.value || '';
+    }
+
+    const defaultSomPhoto = '/public/assets/aistudio/somali_nira_portrait.jpg';
+
+    function resetSomPhoto() {
+      if ($('somPreviewPhoto')) $('somPreviewPhoto').src = defaultSomPhoto;
+      if ($('somPhotoInput')) $('somPhotoInput').value = '';
+      showToast('Photo Reset', 'Restored official Somali NIRA portrait');
+    }
+
+    function resetSomDetailsToSample() {
+      if ($('somInputTracking')) $('somInputTracking').value = '228021103481';
+      if ($('somInputIdNo')) $('somInputIdNo').value = '63176452261';
+      if ($('somInputIssueDate')) $('somInputIssueDate').value = '16-05-2026';
+      if ($('somInputNameAfaran')) $('somInputNameAfaran').value = 'MAXAMED CABDUQADIR MAXAMED';
+      if ($('somInputFullName')) $('somInputFullName').value = 'MOHAMED ABDUKADIR MOHAMED';
+      if ($('somInputParent')) $('somInputParent').value = '';
+      if ($('somInputSex')) $('somInputSex').value = 'MALE';
+      if ($('somInputDob')) $('somInputDob').value = '31-05-1995';
+      if ($('somInputPob')) $('somInputPob').value = 'XUDUR, SOMALIA';
+      if ($('somInputCountry')) $('somInputCountry').value = 'SOMALIA';
+      if ($('somInputAddress')) $('somInputAddress').value = 'BULLOW, XUDUR, BAKOOL, SOMALIA';
+      resetSomPhoto();
+      updateSomPreview();
+      showToast('Sample Restored', 'Somali NIRA document details reset to exact sample');
+    }
+
+    // Somalia NIRA Live Preview
+    function updateSomPreview() {
+      if ($('somPreviewTracking')) $('somPreviewTracking').textContent = $('somInputTracking')?.value || '';
+      if ($('somPreviewIdNo')) $('somPreviewIdNo').textContent = $('somInputIdNo')?.value || '';
+      if ($('somPreviewIssueDate')) $('somPreviewIssueDate').textContent = $('somInputIssueDate')?.value || '';
+      if ($('somPreviewNameAfaran')) $('somPreviewNameAfaran').textContent = ($('somInputNameAfaran')?.value || '').toUpperCase();
+      if ($('somPreviewFullName')) $('somPreviewFullName').textContent = ($('somInputFullName')?.value || '').toUpperCase();
+      if ($('somPreviewParent')) $('somPreviewParent').textContent = ($('somInputParent')?.value || '').toUpperCase();
+      if ($('somPreviewSex')) $('somPreviewSex').textContent = ($('somInputSex')?.value || '').toUpperCase();
+      if ($('somPreviewDob')) $('somPreviewDob').textContent = $('somInputDob')?.value || '';
+      if ($('somPreviewPob')) $('somPreviewPob').textContent = ($('somInputPob')?.value || '').toUpperCase();
+      if ($('somPreviewCountry')) $('somPreviewCountry').textContent = ($('somInputCountry')?.value || '').toUpperCase();
+      
+      const addr = $('somInputAddress')?.value || '';
+      if ($('somPreviewAddress')) {
+        const formattedAddr = addr.includes('\n') ? addr : addr.replace(', ', '\n');
+        $('somPreviewAddress').textContent = formattedAddr.toUpperCase();
+      }
+    }
+
+    // Kenya National ID PNG Download
+    async function downloadKidPNG() {
+      const card = $('kenya-id-card');
+      if (!card) return;
+      showToast('Rendering...', 'Generating Kenya ID Card PNG image');
+      try {
+        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: null });
+        const imgData = canvas.toDataURL('image/png');
+        $('modalPreviewImg').src = imgData;
+        $('fallbackDownloadLink').href = imgData;
+        $('fallbackDownloadLink').download = 'kenya-national-id.png';
+        $('imageModal').classList.remove('hidden');
+        $('imageModal').classList.add('flex');
+        showToast('Ready!', 'Kenya ID Card generated successfully');
+      } catch (err) {
+        console.error(err);
+        showToast('Error', 'Failed to generate ID Card PNG');
+      }
+    }
+
+    // Somalia NIRA PNG Download
+    async function downloadSomPNG() {
+      const card = $('somalia-card');
+      if (!card) return;
+      showToast('Rendering...', 'Generating Somalia NIRA Certificate PNG');
+      try {
+        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'somali-national-id-nira.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'Somali NIRA Certificate PNG generated successfully');
+      } catch (err) {
+        console.error(err);
+        showToast('Error', 'Failed to generate Somalia Document PNG');
+      }
+    }
+
+    // Image Modal Control
+    function closeImageModal() {
+      const modal = $('imageModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    async function sharePassportImage() {
+      const img = $('modalPreviewImg');
+      if (!img || !img.src) return;
+      try {
+        if (navigator.share) {
+          const res = await fetch(img.src);
+          const blob = await res.blob();
+          const file = new File([blob], 'kenya-passport.png', { type: 'image/png' });
+          await navigator.share({
+            title: 'Kenya Republic Passport Specimen',
+            text: 'Kenya Passport Specimen for Virtual Accounts Verification',
+            files: [file]
+          });
+        } else {
+          $('fallbackDownloadLink').click();
+        }
+      } catch (e) {
+        $('fallbackDownloadLink').click();
+      }
+    }
+
+    // Enhanced Toast
+    function showToast(titleOrMsg, maybeMsg) {
+      const toast = $('toast');
+      const toastTitle = $('toastTitle');
+      const toastMessage = $('toastMessage');
+      if (!toast) return;
+
+      if (maybeMsg) {
+        if (toastTitle) toastTitle.textContent = titleOrMsg;
+        if (toastMessage) toastMessage.textContent = maybeMsg;
+      } else {
+        if (toastTitle) toastTitle.textContent = 'Notification';
+        if (toastMessage) toastMessage.textContent = titleOrMsg;
+      }
+
+      toast.classList.remove('opacity-0', '-translate-y-24');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-24');
+      }, 3500);
+    }
+
+    // Platform Specifications Dictionary
+    let selectedPlatformKey = 'paypal';
+
+    const platformData = {
+      paypal: {
+        name: 'PayPal',
+        badge: 'USD Personal & Business',
+        category: 'Virtual Account · US Personal & Merchant',
+        icon: 'fa-brands fa-paypal',
+        color: '#003087',
+        currency: 'USD / Multi-Currency',
+        accType: 'US Virtual Account & Debit Card',
+        limit: '$60,000 / month',
+        kycLevel: 'Full Identity Verified',
+        kycReq: [
+          'Government-issued Photo ID (Passport or National ID Card)',
+          'Exact legal name match with registered PayPal profile',
+          'Phone & Email Two-Factor Authentication'
+        ],
+        tip: 'PayPal USD Virtual Account enables seamless personal and merchant payouts with zero setup fees and instant card linkages.'
+      },
+      payoneer: {
+        name: 'Payoneer',
+        badge: 'USD Receiving Accounts',
+        category: 'Virtual Account · Commercial USD / EUR / GBP',
+        icon: 'fa-solid fa-credit-card',
+        color: '#FF4800',
+        currency: 'USD, EUR, GBP, CAD, AUD',
+        accType: 'First Century Bank US Receiving (ABA: 021000021)',
+        limit: 'Unlimited incoming bank transfers',
+        kycLevel: 'Global Receiving Account Verified',
+        kycReq: [
+          'Valid international passport or national identity smart card',
+          'Proof of address (bank statement or utility bill within 90 days)',
+          'Clear high-resolution photographic proof'
+        ],
+        tip: 'Payoneer provides dedicated US checking bank details (routing: 021000021) to receive payouts from US employers, Upwork, and marketplaces.'
+      },
+      raenest: {
+        name: 'Raenest Account',
+        badge: 'USD Invoicing & Freelance',
+        category: 'Virtual Account · Remote Contractor Hub',
+        icon: 'fa-solid fa-briefcase',
+        color: '#059669',
+        currency: 'USD Virtual Cards & Payouts',
+        accType: 'African Remote Freelancer & Contractor Bank Account',
+        limit: '$10,000 / single invoice transaction',
+        kycLevel: 'Contractor KYC Verified',
+        kycReq: [
+          'African diaspora national ID card or passport',
+          'Remote work contract or active client invoice copy',
+          'Live selfie biometric validation'
+        ],
+        tip: 'Raenest empowers remote contractors and developers to invoice global clients directly and withdraw to local mobile money or USD.'
+      },
+      grey: {
+        name: 'Grey Account',
+        badge: 'Foreign USD & EUR IBAN',
+        category: 'Virtual Account · European SEPA & US Banking',
+        icon: 'fa-solid fa-landmark',
+        color: '#1E293B',
+        currency: 'EUR, USD, GBP IBAN',
+        accType: 'Foreign Virtual Multi-Currency Account (GB92 GREY 8492)',
+        limit: '€50,000 / month transfer limit',
+        kycLevel: 'Tier 2 International KYC',
+        kycReq: [
+          'National identity card or international travel passport',
+          'Residential address verification document',
+          'Facial biometric liveness check'
+        ],
+        tip: 'Grey account provides virtual US routing numbers and European SEPA IBANs for instant cross-border wage and contract receipts.'
+      },
+      mercury: {
+        name: 'Mercury Bank',
+        badge: 'US LLC Business Banking',
+        category: 'Virtual Account · US Commercial Venture Banking',
+        icon: 'fa-solid fa-building-columns',
+        color: '#4F46E5',
+        currency: 'USD Commercial Checking & Savings',
+        accType: 'FDIC-Insured US LLC Commercial Bank Account',
+        limit: 'Unlimited domestic and international wire transfers',
+        kycLevel: 'FinCEN Beneficial Ownership Verified',
+        kycReq: [
+          'International passport of beneficial owner(s) (>=25%)',
+          'US Company Articles of Organization & IRS EIN letter',
+          'Operating agreement and company ownership certificate'
+        ],
+        tip: 'Mercury offers modern FDIC-insured US banking for tech startups, international founders, and digital product agencies.'
+      },
+      binance: {
+        name: 'Binance Exchange',
+        badge: 'Tier 2 & 3 Identity Verified',
+        category: 'Crypto Exchange · Spot, Futures & P2P',
+        icon: 'fa-brands fa-bitcoin',
+        color: '#EAB308',
+        currency: 'USDT, BTC, ETH, 350+ Crypto Assets',
+        accType: 'Global Crypto Exchange & P2P Trading Hub',
+        limit: '$50,000 / day crypto withdrawal limit',
+        kycLevel: 'Tier 2 & 3 Identity Verified',
+        kycReq: [
+          'ICAO Doc 9303 compliant biometric passport or digital ID',
+          'Automated facial liveness recognition video scan',
+          'Proof of address verification document for Tier 3'
+        ],
+        tip: 'Binance provides instant P2P fiat ramp, deep market liquidity, automated OCR validation, and high withdrawal thresholds.'
+      },
+      bybit: {
+        name: 'Bybit Exchange',
+        badge: 'Advanced KYC Level 1 & 2',
+        category: 'Crypto Exchange · Derivatives & Web3',
+        icon: 'fa-solid fa-chart-line',
+        color: '#F59E0B',
+        currency: 'USDT, USDC, BTC, Web3 Assets',
+        accType: 'Advanced Crypto Trading & Derivatives Platform',
+        limit: '$1,000,000 / day withdrawal limit (Level 2)',
+        kycLevel: 'Level 2 Advanced KYC Passed (99.8% Approval)',
+        kycReq: [
+          'Government photo ID card or passport scan',
+          'Real-time automated facial selfie inspection',
+          'Unexpired document with machine-readable credentials'
+        ],
+        tip: 'Bybit processes instant biometric OCR validation with a 99.8% first-attempt approval rate and zero deposit fees.'
+      },
+      wise: {
+        name: 'Wise Borderless',
+        badge: 'Multi-Currency Account',
+        category: 'Virtual Account · Borderless Banking',
+        icon: 'fa-solid fa-globe',
+        color: '#16A34A',
+        currency: '40+ Currencies, 8+ Local Bank Details',
+        accType: 'Borderless Multi-Currency Account & Debit Card',
+        limit: 'Unlimited incoming and outgoing transfers',
+        kycLevel: 'Full Global Identity & Address Verified',
+        kycReq: [
+          'Clear high-contrast passport photo page or ID card',
+          'Utility bill or bank statement within last 90 days',
+          'Selfie portrait with identity document'
+        ],
+        tip: 'Wise gives you real account details for US (ACH & wire), UK (sort code), Eurozone (IBAN), Australia, and Canada.'
+      },
+      revolut: {
+        name: 'Revolut',
+        badge: 'Personal & Business Multi-IBAN',
+        category: 'Virtual Account · Neobank & Cards',
+        icon: 'fa-solid fa-arrow-trend-up',
+        color: '#0284C7',
+        currency: 'EUR, USD, GBP, 25+ Currencies',
+        accType: 'Personal & Business Multi-IBAN Neobank Account',
+        limit: 'Unlimited instant SEPA and local bank transfers',
+        kycLevel: 'Standard & Metal Account Verified',
+        kycReq: [
+          'International passport or national biometric ID card',
+          'Liveness facial video check',
+          'Proof of legal address'
+        ],
+        tip: 'Revolut provides virtual disposable debit cards, multi-currency wallets, and instant European SEPA payments.'
+      },
+      elevate: {
+        name: 'Elevate Pay',
+        badge: 'USD Bank Account for Remote Work',
+        category: 'Virtual Account · Remote USD Banking',
+        icon: 'fa-solid fa-coins',
+        color: '#0D9488',
+        currency: 'USD Checking Account',
+        accType: 'FDIC-Insured US Bank Account (Bangor Savings Bank)',
+        limit: '$25,000 / month international transfer limit',
+        kycLevel: 'FDIC-Insured Remote KYC Passed',
+        kycReq: [
+          'Unexpired international passport',
+          'Remote employment contract or verified freelancer platform profile',
+          'Live biometric portrait verification'
+        ],
+        tip: 'Elevate Pay provides an FDIC-insured US bank account specifically tailored for international remote workers and freelancers.'
+      },
+      chipper: {
+        name: 'Chipper Cash',
+        badge: 'Pan-African USD Virtual Cards',
+        category: 'Virtual Account · Cross-Border Payments',
+        icon: 'fa-solid fa-money-bill-transfer',
+        color: '#9333EA',
+        currency: 'USD Virtual Visa & African Currencies',
+        accType: 'Pan-African USD Virtual Cards & Money Transfer',
+        limit: '$5,000 / month card spend and transfer',
+        kycLevel: 'Tier 3 Smart ID KYC Verified',
+        kycReq: [
+          'National identity card or passport scan',
+          'Verified mobile telephone number and identification code',
+          'Selfie portrait match'
+        ],
+        tip: 'Chipper Cash enables high-approval USD virtual cards for software subscriptions, digital advertising, and e-commerce.'
+      },
+      okx: {
+        name: 'OKX Exchange',
+        badge: 'Web3 & Crypto KYC Verified',
+        category: 'Crypto Exchange · Web3 Ecosystem',
+        icon: 'fa-solid fa-cubes',
+        color: '#0F766E',
+        currency: 'USDT, BTC, Web3 Assets & DeFi',
+        accType: 'Web3 & Advanced Crypto Exchange Account',
+        limit: '500 BTC / day withdrawal limit',
+        kycLevel: 'Level 2 Identity Verified',
+        kycReq: [
+          'Government photo ID document',
+          'Automated facial recognition liveness test',
+          'Residential address document'
+        ],
+        tip: 'OKX unlocks high withdrawal limits, Web3 wallet integration, and comprehensive DeFi staking yields.'
+      },
+      kucoin: {
+        name: 'KuCoin Exchange',
+        badge: 'Global Identity Verified',
+        category: 'Crypto Exchange · Altcoin Trading Hub',
+        icon: 'fa-solid fa-shield-halved',
+        color: '#23AF91',
+        currency: 'USDT, BTC, 700+ Altcoin Pairs',
+        accType: 'Global Identity Verified Crypto Exchange',
+        limit: '200 BTC / day withdrawal limit',
+        kycLevel: 'Advanced KYC Verified',
+        kycReq: [
+          'Valid passport, driver license, or national ID card',
+          'Verification code with date and selfie photo',
+          'Clear high-contrast portrait'
+        ],
+        tip: 'KuCoin provides deep altcoin liquidity and rapid identity verification across 200+ countries.'
+      }
+    };
+
+    // Filter Hero Platform Pills by Category (All, Virtual, Crypto)
+    function filterHeroPlatforms(category) {
+      const allBtn = $('hero-filter-all');
+      const virtualBtn = $('hero-filter-virtual');
+      const cryptoBtn = $('hero-filter-crypto');
+      const pills = document.querySelectorAll('#hero-platforms-pill-grid .platform-pill');
+
+      if (allBtn) allBtn.className = (category === 'all') ? "px-2.5 py-1 rounded font-bold bg-blue-600 text-white transition-colors" : "px-2.5 py-1 rounded font-medium text-slate-400 hover:text-white transition-colors";
+      if (virtualBtn) virtualBtn.className = (category === 'virtual') ? "px-2.5 py-1 rounded font-bold bg-blue-600 text-white transition-colors" : "px-2.5 py-1 rounded font-medium text-slate-400 hover:text-white transition-colors";
+      if (cryptoBtn) cryptoBtn.className = (category === 'crypto') ? "px-2.5 py-1 rounded font-bold bg-blue-600 text-white transition-colors" : "px-2.5 py-1 rounded font-medium text-slate-400 hover:text-white transition-colors";
+
+      pills.forEach(pill => {
+        const cat = pill.getAttribute('data-category');
+        if (category === 'all' || cat === category) {
+          pill.classList.remove('hidden');
+          pill.classList.add('flex');
+        } else {
+          pill.classList.add('hidden');
+          pill.classList.remove('flex');
+        }
+      });
+    }
+
+    // 1-Click Quick Preset Handler from Floating Accounts & Platform Pills
+    function applyQuickKycPreset(platformKey) {
+      if (!platformKey) return;
+      if (['paypal', 'payoneer', 'raenest', 'grey', 'mercury', 'wise', 'revolut', 'elevate', 'chipper'].includes(platformKey)) {
+        selectVirtualAccount(platformKey);
+        scrollToSection('verification-workbench');
+      } else {
+        openKycPlatformModal(platformKey);
+      }
+    }
+
+    // Open Platform Specifications & Verification Modal
+    function openKycPlatformModal(platformKey) {
+      selectedPlatformKey = platformKey || 'paypal';
+      const data = platformData[selectedPlatformKey] || platformData.paypal;
+      
+      const iconEl = $('modal-platform-icon');
+      const wrapEl = $('modal-platform-icon-wrap');
+      const nameEl = $('modal-platform-name');
+      const badgeEl = $('modal-platform-badge');
+      const categoryEl = $('modal-platform-category');
+
+      const accTypeEl = $('modal-spec-acctype');
+      const currencyEl = $('modal-spec-currency');
+      const kycLevelEl = $('modal-spec-kyclevel-text');
+      const limitEl = $('modal-spec-limit');
+      const tipEl = $('modal-compliance-tip');
+      const checklistContainer = $('modal-checklist-container');
+
+      if (iconEl) iconEl.className = `${data.icon} text-2xl text-white`;
+      if (wrapEl) wrapEl.style.backgroundColor = data.color;
+      if (nameEl) nameEl.textContent = data.name;
+      if (badgeEl) badgeEl.textContent = data.badge;
+      if (categoryEl) categoryEl.textContent = data.category;
+
+      if (accTypeEl) accTypeEl.textContent = data.accType;
+      if (currencyEl) currencyEl.textContent = data.currency;
+      if (kycLevelEl) kycLevelEl.textContent = data.kycLevel;
+      if (limitEl) limitEl.textContent = data.limit;
+      if (tipEl) tipEl.textContent = data.tip;
+
+      if (checklistContainer) {
+        checklistContainer.innerHTML = '';
+        data.kycReq.forEach(item => {
+          const div = document.createElement('div');
+          div.className = "flex items-center gap-2 text-xs text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-100";
+          div.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i><span>${item}</span>`;
+          checklistContainer.appendChild(div);
+        });
+      }
+
+      const modal = $('kycPlatformModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeKycPlatformModal() {
+      const modal = $('kycPlatformModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function copyPlatformSpecs() {
+      const data = platformData[selectedPlatformKey] || platformData.paypal;
+      const text = `Platform: ${data.name}\nCategory: ${data.category}\nAccount Type: ${data.accType}\nCurrencies: ${data.currency}\nVerification: ${data.kycLevel}\nLimit: ${data.limit}\nGuidance: ${data.tip}`;
+      copyToClipboard(text, `${data.name} specifications copied to clipboard!`);
+    }
+
+    function openAboutModal() {
+      const modal = $('aboutModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+    function closeAboutModal() {
+      const modal = $('aboutModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function openContactModal() {
+      const modal = $('contactModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+    function closeContactModal() {
+      const modal = $('contactModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function scrollToSection(id) {
+      const el = $(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyToClipboard(text, message) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(message || "Copied to clipboard!");
+      }).catch(() => {
+        showToast(message || "Copied!");
+      });
+    }
+
+    // Initialize listeners when DOM is loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      filterHeroPlatforms('all');
+      selectVirtualAccount('paypal');
+
+      // Bind all Kenya passport input fields to live preview & MRZ
+      Object.keys(fields).forEach(id => {
+        const input = $(id);
+        if (input) {
+          input.addEventListener('input', updatePreview);
+          input.addEventListener('change', updatePreview);
+        }
+      });
+
+      // Photo upload
+      const photoInput = $('photoInput');
+      if (photoInput) {
+        photoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('previewPhoto')) $('previewPhoto').src = ev.target.result;
+              showToast('Photo Updated', 'Custom portrait photo applied to passport');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Auto-crop authentic portrait from passport scan attachment
+      function initDefaultPhoto() {
+        const img = new Image();
+        img.src = defaultPhoto;
+        img.onload = () => {
+          try {
+            const canvas = document.createElement('canvas');
+            const sx = img.naturalWidth * 0.045;
+            const sy = img.naturalHeight * 0.13;
+            const sWidth = img.naturalWidth * 0.275;
+            const sHeight = img.naturalHeight * 0.52;
+
+            canvas.width = 300;
+            canvas.height = 380;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+            const croppedUrl = canvas.toDataURL('image/png');
+            window._croppedDefaultPhoto = croppedUrl;
+            if ($('previewPhoto')) $('previewPhoto').src = croppedUrl;
+          } catch (e) {
+            // Keep defaultPhoto as fallback
+          }
+        };
+      }
+      initDefaultPhoto();
+
+      // Reset photo
+      const resetPhotoBtn = $('resetPhotoBtn');
+      if (resetPhotoBtn) {
+        resetPhotoBtn.addEventListener('click', () => {
+          if ($('previewPhoto')) $('previewPhoto').src = window._croppedDefaultPhoto || defaultPhoto;
+          if ($('photoInput')) $('photoInput').value = '';
+          showToast('Photo Reset', 'Restored official Kenya passport portrait photo');
+        });
+      }
+
+      // Watermark Text & Visibility
+      const watermarkTextInput = $('watermarkText');
+      if (watermarkTextInput) {
+        watermarkTextInput.addEventListener('input', e => {
+          if ($('watermarkLabel')) $('watermarkLabel').textContent = e.target.value.toUpperCase();
+        });
+      }
+
+      const showWatermarkCheckbox = $('showWatermark');
+      if (showWatermarkCheckbox) {
+        showWatermarkCheckbox.addEventListener('change', e => {
+          if ($('sampleWatermark')) $('sampleWatermark').style.display = e.target.checked ? 'flex' : 'none';
+        });
+      }
+
+      // Download Kenya Passport PNG (html2canvas)
+      const downloadBtn = $('downloadBtn');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', async () => {
+          const card = $('passport-card');
+          if (!card) return;
+          showToast('Rendering...', 'Generating high-resolution Kenya Passport PNG');
+          try {
+            const canvas = await html2canvas(card, {
+              scale: 3,
+              useCORS: true,
+              backgroundColor: '#ffffff'
+            });
+            const imgData = canvas.toDataURL('image/png');
+            if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+            if ($('fallbackDownloadLink')) {
+              $('fallbackDownloadLink').href = imgData;
+              $('fallbackDownloadLink').download = 'republic-of-kenya-passport.png';
+            }
+            const modal = $('imageModal');
+            if (modal) {
+              modal.classList.remove('hidden');
+              modal.classList.add('flex');
+            }
+            showToast('Ready!', 'Kenya Passport image generated successfully');
+          } catch (err) {
+            console.error('html2canvas error:', err);
+            showToast('Error', 'Failed to generate passport PNG');
+          }
+        });
+      }
+
+      // Print Passport Button
+      const printBtn = $('printBtn');
+      if (printBtn) {
+        printBtn.addEventListener('click', () => {
+          window.print();
+        });
+      }
+
+      // Somali NIRA Photo upload
+      const somPhotoInput = $('somPhotoInput');
+      if (somPhotoInput) {
+        somPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('somPreviewPhoto')) $('somPreviewPhoto').src = ev.target.result;
+              showToast('Photo Updated', 'Custom portrait photo applied to Somali NIRA certificate');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Run initial preview sync
+      updatePreview();
+      updateKidPreview();
+      updateSomPreview();
+    });
+  </script>
+</body>
+</html>
