@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#006633">
-  <title>Global Virtual Accounts &amp; Crypto Suite</title>
-  <meta name="description" content="Interactive showcase and verification portal for floating virtual accounts including PayPal, Payoneer, Raenest, and Grey, alongside leading crypto exchanges like Binance and Bybit.">
-  <meta property="og:title" content="Global Virtual Accounts &amp; Crypto Suite">
-  <meta property="og:description" content="Interactive showcase and verification portal for floating virtual accounts including PayPal, Payoneer, Raenest, and Grey, alongside leading crypto exchanges like Binance and Bybit.">
+  <title>kycGetApproved · Global Virtual Accounts &amp; Identity Verification</title>
+  <meta name="description" content="kycGetApproved - Interactive showcase and verification approval portal for virtual accounts and digital identity compliance.">
+  <meta property="og:title" content="kycGetApproved · Global Virtual Accounts &amp; Identity Verification">
+  <meta property="og:description" content="kycGetApproved - Interactive showcase and verification approval portal for virtual accounts and digital identity compliance.">
 
   <!-- Tailwind CSS & Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -114,15 +114,15 @@
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
     }
 
-    /* Somali Republic Polycarbonate Smart National ID Background */
+    /* Somali Republic Polycarbonate Smart National ID Background (Exact Match to Official Specimen) */
     .somali-smart-id-bg {
-      background-color: #ebfaee;
+      background-color: #f2fadc;
       background-image: 
-        radial-gradient(ellipse at 85% 25%, rgba(34, 197, 94, 0.22) 0%, transparent 55%),
-        radial-gradient(circle at 18% 75%, rgba(16, 185, 129, 0.18) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.10) 0%, transparent 45%),
-        repeating-linear-gradient(45deg, rgba(34, 197, 94, 0.035) 0px, rgba(34, 197, 94, 0.035) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(16, 185, 129, 0.03) 0px, rgba(16, 185, 129, 0.03) 1px, transparent 1px, transparent 6px);
+        radial-gradient(ellipse at 85% 20%, rgba(132, 204, 22, 0.28) 0%, transparent 55%),
+        radial-gradient(circle at 18% 75%, rgba(34, 197, 94, 0.22) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.18) 0%, transparent 45%),
+        repeating-linear-gradient(45deg, rgba(132, 204, 22, 0.045) 0px, rgba(132, 204, 22, 0.045) 1px, transparent 1px, transparent 5px),
+        repeating-linear-gradient(-45deg, rgba(34, 197, 94, 0.04) 0px, rgba(34, 197, 94, 0.04) 1px, transparent 1px, transparent 5px);
     }
 
     /* Somali Republic Driving License Security Background Pattern */
@@ -259,17 +259,37 @@
   <!-- ================= TOP NAVIGATION (CLEAN & RESPONSIVE MAIN MENU) ================= -->
   <header class="no-print bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <!-- Clean Brand Logo & Identity -->
+      <!-- Clean Brand Logo & Identity: kycGetApproved -->
       <a href="#hero-section" onclick="scrollToSection('hero-section')" class="flex items-center gap-2.5 group cursor-pointer shrink-0">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-          <i class="fa-solid fa-shield-halved text-lg text-amber-300"></i>
+        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 via-teal-700 to-indigo-900 flex items-center justify-center text-white shadow-md shadow-emerald-600/25 group-hover:scale-105 transition-all ring-1 ring-emerald-400/30 overflow-hidden shrink-0">
+          <!-- Subtle ambient glow -->
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(52,211,153,0.4),transparent_70%)]"></div>
+          <svg viewBox="0 0 36 36" fill="none" class="w-6 h-6 relative z-10 drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
+            <!-- Shield Silhouette -->
+            <path d="M18 4L6 8.5V16.5C6 24.5 11.2 30.5 18 32.5C24.8 30.5 30 24.5 30 16.5V8.5L18 4Z" fill="url(#kycShieldGrad)" stroke="#34d399" stroke-width="1.6" stroke-linejoin="round"/>
+            <!-- Approved Checkmark -->
+            <path d="M11.5 17.5L16 22L24.5 13" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Gold Star/Seal Accent -->
+            <circle cx="25" cy="10" r="2.2" fill="#fbbf24"/>
+            <defs>
+              <linearGradient id="kycShieldGrad" x1="6" y1="4" x2="30" y2="32.5" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#059669"/>
+                <stop offset="0.5" stop-color="#0d9488"/>
+                <stop offset="1" stop-color="#1e1b4b"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span class="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900 shadow-xs"></span>
         </div>
         <div class="flex flex-col">
           <div class="flex items-center gap-1.5">
-            <span class="text-base sm:text-lg font-black tracking-tight text-slate-900">KYC<span class="text-blue-600">Suite</span></span>
-            <span class="hidden xl:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">Verified</span>
+            <span class="text-base sm:text-lg font-black tracking-tight text-slate-900 leading-none">kyc<span class="text-emerald-600">Get</span><span class="text-blue-600">Approved</span></span>
+            <span class="hidden xl:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
+              <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
+              <span>APPROVED</span>
+            </span>
           </div>
-          <span class="text-[10px] text-slate-500 font-medium hidden sm:block">Virtual Banking &amp; Identity</span>
+          <span class="text-[10px] text-slate-500 font-medium hidden sm:block">Identity &amp; Virtual Banking Verification</span>
         </div>
       </a>
 
@@ -295,10 +315,6 @@
         <button onclick="openCryptoExchangesHub()" class="px-3 py-2 rounded-lg text-amber-900 bg-amber-50 hover:bg-amber-100 transition-colors flex items-center gap-1.5 font-bold border border-amber-200/60 cursor-pointer">
           <i class="fa-brands fa-bitcoin text-xs text-amber-500"></i>
           Verify Crypto Exchanges
-        </button>
-        <button onclick="switchVerificationDoc('driverlicense'); switchVerificationCountry('somalia'); scrollToSection('verification-workbench');" class="px-3 py-2 rounded-lg text-sky-700 bg-sky-50 hover:bg-sky-100 transition-colors flex items-center gap-1.5 font-bold border border-sky-200/60 cursor-pointer">
-          <i class="fa-solid fa-id-badge text-xs text-sky-600"></i>
-          Driver's License
         </button>
         <button onclick="scrollToSection('verification-workbench');" class="px-3 py-2 rounded-lg text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5 font-semibold cursor-pointer">
           <i class="fa-solid fa-passport text-xs text-emerald-700"></i>
@@ -343,13 +359,6 @@
       </div>
 
       <div class="space-y-1.5 text-xs font-semibold text-slate-700">
-        <button onclick="switchVerificationDoc('driverlicense'); switchVerificationCountry('somalia'); scrollToSection('verification-workbench'); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-sky-50/70 hover:bg-sky-50 text-sky-950 border border-sky-200/60 cursor-pointer">
-          <span class="flex items-center gap-2.5">
-            <i class="fa-solid fa-id-badge text-sky-600 text-sm"></i>
-            <span>Somali Driver's License</span>
-          </span>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800">Ministry of Transport</span>
-        </button>
 
         <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench'); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50/60 hover:bg-blue-50 text-blue-900 border border-blue-200/60 cursor-pointer">
           <span class="flex items-center gap-2.5">
@@ -1925,24 +1934,24 @@
               <!-- National ID Number -->
               <div>
                 <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">L. Qaranka / رقم الهوية / National ID No</label>
-                <input id="somSmartIdInputNo" type="text" value="28901014439167" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                <input id="somSmartIdInputNo" type="text" value="26405034834834" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
               </div>
 
               <!-- Full Name -->
               <div>
                 <label class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Full Name</label>
-                <input id="somSmartIdInputName" type="text" value="MOHAMED ALI ABDULLAHI" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+                <input id="somSmartIdInputName" type="text" value="Mohamed Ali Mahdi" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm">
               </div>
 
               <!-- Date of Birth & Place of Birth -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Dhalashada / Birth Date</label>
-                  <input id="somSmartIdInputDob" type="text" value="01 Jan 1989" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somSmartIdInputDob" type="text" value="01Janaury 1999" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Goobta / Place of Birth</label>
-                  <input id="somSmartIdInputPob" type="text" value="BELEDWEYN" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somSmartIdInputPob" type="text" value="Mogadishu" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs">
                 </div>
               </div>
 
@@ -1950,7 +1959,7 @@
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">La Bixiyay / Issue Date</label>
-                  <input id="somSmartIdInputIssue" type="text" value="12 Feb 2018" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somSmartIdInputIssue" type="text" value="26 DEC 2017" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Meesha / Place of Issue</label>
@@ -1962,7 +1971,7 @@
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Dhacayo / Expiry Date</label>
-                  <input id="somSmartIdInputExpiry" type="text" value="11 Feb 2023" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somSmartIdInputExpiry" type="text" value="26 DEC 2022" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Jinsiga / Gender</label>
@@ -2082,59 +2091,53 @@
               <div id="somalia-smart-id-specimen-wrap" class="w-full">
                 <article id="somali-smart-id-card" class="somali-smart-id-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none p-3.5 sm:p-5 flex flex-col justify-between">
                   
+                  <!-- Top & Bottom Guilloche Wave Security Accent Strips -->
+                  <div class="absolute top-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
+                  <div class="absolute bottom-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
+
                   <!-- Central Coat of Arms Security Watermark (Teal / Cyan tinted as in real card) -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.14] z-0 translate-x-6 sm:translate-x-10">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 sm:w-80 h-auto filter hue-rotate-180 brightness-95">
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.20] z-0 translate-x-5 sm:translate-x-8">
+                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-60 sm:w-76 h-auto filter hue-rotate-165 saturate-200">
                   </div>
 
-                  <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Silver Rosette on Right -->
+                  <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Metallic Rosette on Right -->
                   <div class="relative z-10 flex items-start justify-between gap-1 pb-1">
                     <!-- Left: National ID Label & Number -->
                     <div class="leading-tight shrink-0 text-left">
                       <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
                         L_Qaranka/<span class="font-arabic font-normal">رقم الهوية</span>/National ID
                       </div>
-                      <div id="somSmartIdPreviewNo" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm md:text-base tracking-wider mt-0.5">
-                        28901014439167
+                      <div id="somSmartIdPreviewNo" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wider mt-0.5">
+                        26405034834834
                       </div>
                     </div>
 
                     <!-- Center: Official Titles Hierarchy (Exact wording & colors from uploaded card) -->
-                    <div class="text-center text-[#14532d] leading-none space-y-0.5 px-1 flex-1">
-                      <div class="font-bold text-[8px] sm:text-[10px] tracking-wide uppercase">
+                    <div class="text-center text-slate-950 leading-none space-y-0.5 px-1 flex-1">
+                      <div class="font-bold text-[8px] sm:text-[10px] tracking-wide uppercase text-slate-950">
                         JAMHUURIYADDA SOOMAALIYA
                       </div>
-                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none">
+                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-slate-950">
                         جمهورية الصومال
                       </div>
-                      <div class="font-semibold text-[7px] sm:text-[8.5px] tracking-wider uppercase">
+                      <div class="font-bold text-[7px] sm:text-[8.5px] tracking-wider uppercase text-red-900">
                         SOMALI REPUBLIC
                       </div>
-                      <div class="font-black text-[9px] sm:text-[11px] tracking-wide uppercase pt-0.5">
+                      <div class="font-black text-[8.5px] sm:text-[10.5px] tracking-wide uppercase pt-0.5 text-slate-950">
                         WARAQADDA AQOONSIGA
                       </div>
-                      <div class="font-arabic font-bold text-[9.5px] sm:text-[12px] leading-none">
+                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-slate-950">
                         بطاقة الهوية
                       </div>
-                      <div class="font-black text-[8px] sm:text-[9.5px] tracking-wider uppercase">
-                        IDENTITY CARD
+                      <div class="font-black text-[7.5px] sm:text-[9px] tracking-wider uppercase text-slate-950 flex items-center justify-center gap-1.5">
+                        <span>IDENTITY CARD</span>
+                        <span class="text-slate-500 font-light text-[10px]">|</span>
                       </div>
                     </div>
 
-                    <!-- Right: Authentic 8-Pointed Scalloped Rosette Silver Hologram Seal -->
+                    <!-- Right: Authentic 8-Pointed Scalloped Rosette Metallic Hologram Seal -->
                     <div class="shrink-0 flex items-center justify-end">
-                      <svg viewBox="0 0 100 100" class="w-9 h-9 sm:w-12 sm:h-12 drop-shadow-xs">
-                        <defs>
-                          <radialGradient id="silverHoloRosette" cx="45%" cy="40%" r="55%">
-                            <stop offset="0%" stop-color="#ffffff"/>
-                            <stop offset="40%" stop-color="#f8fafc"/>
-                            <stop offset="75%" stop-color="#e2e8f0"/>
-                            <stop offset="100%" stop-color="#cbd5e1"/>
-                          </radialGradient>
-                        </defs>
-                        <path d="M 50,4 Q 63,4 66,16 Q 78,16 80,28 Q 93,31 93,44 Q 96,56 86,63 Q 86,75 75,79 Q 67,90 54,92 Q 41,92 35,82 Q 22,81 19,70 Q 7,63 8,50 Q 7,37 18,30 Q 21,18 33,16 Q 37,4 50,4 Z" 
-                              fill="url(#silverHoloRosette)" stroke="#e2e8f0" stroke-width="1.2"/>
-                      </svg>
+                      <img src="/assets/aistudio/somali_national_id_rosette.png" alt="Hologram Rosette" class="w-9 h-9 sm:w-12 sm:h-12 object-contain drop-shadow-xs filter contrast-125">
                     </div>
                   </div>
 
@@ -2162,13 +2165,13 @@
                           </div>
                         </div>
 
-                        <!-- Name Block (MOHAMED on line 1, ALI ABDULLAHI on line 2) -->
+                        <!-- Name Block (Mohamed on line 1, Ali Mahdi on line 2) -->
                         <div class="flex-1 min-w-0">
                           <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
                             Magaca/<span class="font-arabic font-normal">الاسم</span>/Name
                           </div>
-                          <div id="somSmartIdPreviewName" class="font-black text-slate-950 text-xs sm:text-[13px] md:text-sm uppercase tracking-wide leading-tight mt-0.5">
-                            MOHAMED<br>ALI ABDULLAHI
+                          <div id="somSmartIdPreviewName" class="font-black text-slate-950 text-xs sm:text-[13px] md:text-sm tracking-wide leading-tight mt-0.5">
+                            Mohamed<br><span class="inline-block pl-2">Ali Mahdi</span>
                           </div>
                         </div>
                       </div>
@@ -2178,9 +2181,9 @@
                         <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
                           Taariikhda dhalashada/<span class="font-arabic font-normal">الميلاد</span>/Birth
                         </div>
-                        <div class="flex items-center gap-4 sm:gap-6 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
-                          <span id="somSmartIdPreviewDob" class="text-slate-950 font-mono-code">01 Jan 1989</span>
-                          <span id="somSmartIdPreviewPob" class="text-slate-950 uppercase tracking-wide">BELEDWEYN</span>
+                        <div class="flex items-center gap-3 sm:gap-5 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
+                          <span id="somSmartIdPreviewDob" class="text-slate-950">01Janaury 1999</span>
+                          <span id="somSmartIdPreviewPob" class="text-slate-950 tracking-wide">Mogadishu</span>
                         </div>
                       </div>
 
@@ -2190,7 +2193,7 @@
                           Taariikhda la bixiyay/<span class="font-arabic font-normal">الاصدار</span>/Issue
                         </div>
                         <div class="flex items-center gap-4 sm:gap-6 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
-                          <span id="somSmartIdPreviewIssue" class="text-slate-950 font-mono-code">12 Feb 2018</span>
+                          <span id="somSmartIdPreviewIssue" class="text-slate-950 font-mono-code">26 DEC 2017</span>
                           <span id="somSmartIdPreviewIssuePlace" class="text-slate-950 uppercase tracking-wide">MOGADISHU</span>
                         </div>
                       </div>
@@ -2201,7 +2204,7 @@
                           Taariikhda uu dhacayo/<span class="font-arabic font-normal">الانتهاء</span>/Expiry
                         </div>
                         <div id="somSmartIdPreviewExpiry" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 font-mono-code mt-0.5">
-                          11 Feb 2023
+                          26 DEC 2022
                         </div>
                       </div>
 
@@ -2211,7 +2214,7 @@
                     <div class="w-24 sm:w-28 md:w-32 shrink-0 flex flex-col items-center">
                       <!-- Bearer Portrait Photo (Exact image from uploaded card) -->
                       <div class="w-full aspect-[3/3.8] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
-                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/somali_smart_id_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/somali_national_id_portrait_new.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Gender Field (Directly under the photo as in the actual card) -->
@@ -3306,7 +3309,7 @@ XUDUR, BAKOOL, SOMALIA</span>
             <i class="fa-solid fa-wallet text-lg"></i>
           </div>
           <div>
-            <h3 class="font-bold text-slate-900 text-base">About Global Virtual Accounts &amp; Crypto Suite</h3>
+            <h3 class="font-bold text-slate-900 text-base">About kycGetApproved</h3>
             <p class="text-xs text-slate-500">Cross-Border Banking &amp; Exchange Compliance</p>
           </div>
         </div>
@@ -3317,7 +3320,7 @@ XUDUR, BAKOOL, SOMALIA</span>
 
       <div class="py-4 space-y-3 text-xs text-slate-600 leading-relaxed">
         <p>
-          <strong class="text-slate-900">Global Virtual Accounts &amp; Crypto Suite</strong> is an interactive fintech portal demonstrating verification readiness, receiving account specifications, and KYC compliance architectures for international users, remote freelancers, and crypto traders.
+          <strong class="text-slate-900">kycGetApproved</strong> is an interactive fintech portal demonstrating verification readiness, receiving account specifications, and KYC compliance architectures for international users, remote freelancers, and crypto traders.
         </p>
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
           <div class="flex items-center gap-2 font-semibold text-slate-800">
@@ -3958,8 +3961,11 @@ XUDUR, BAKOOL, SOMALIA</span>
   <!-- ================= FOOTER (LEGAL & POLICY MENU) ================= -->
   <footer class="no-print mt-auto border-t border-slate-200 bg-white py-8 px-4 text-slate-600">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-      <div class="text-slate-500 font-medium text-center md:text-left">
-        &copy; 2026 Virtual Accounts &amp; Crypto Suite. All rights reserved.
+      <div class="text-slate-500 font-medium text-center md:text-left flex items-center justify-center md:justify-start gap-2">
+        <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-600 text-white text-[10px]">
+          <i class="fa-solid fa-check"></i>
+        </span>
+        <span>&copy; 2026 <strong>kycGetApproved</strong>. All rights reserved.</span>
       </div>
       <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-slate-600">
         <button type="button" onclick="openPrivacyModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Privacy Policy</button>
@@ -4583,7 +4589,7 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     // ================= SOMALIA SMART NATIONAL ID (POLYCARBONATE) CONTROLLER =================
-    const defaultSomSmartIdSrc = '/assets/aistudio/somali_smart_id_portrait.jpg';
+    const defaultSomSmartIdSrc = '/assets/aistudio/somali_national_id_portrait_new.jpg';
 
     function initSomSmartIdDefaultPhoto() {
       if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
@@ -4628,35 +4634,35 @@ XUDUR, BAKOOL, SOMALIA</span>
       const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
       const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
 
-      setText('somSmartIdPreviewNo', getVal('somSmartIdInputNo', '28901014439167'));
+      setText('somSmartIdPreviewNo', getVal('somSmartIdInputNo', '26405034834834'));
 
-      const nameVal = getVal('somSmartIdInputName', 'MOHAMED ALI ABDULLAHI').toUpperCase();
+      const nameVal = getVal('somSmartIdInputName', 'Mohamed Ali Mahdi');
       if ($('somSmartIdPreviewName')) {
         const parts = nameVal.split(' ');
         if (parts.length >= 2) {
-          $('somSmartIdPreviewName').innerHTML = `${parts[0]}<br>${parts.slice(1).join(' ')}`;
+          $('somSmartIdPreviewName').innerHTML = `${parts[0]}<br><span class="inline-block pl-2">${parts.slice(1).join(' ')}</span>`;
         } else {
           $('somSmartIdPreviewName').textContent = nameVal;
         }
       }
 
-      setText('somSmartIdPreviewDob', getVal('somSmartIdInputDob', '01 Jan 1989'));
-      setText('somSmartIdPreviewPob', getVal('somSmartIdInputPob', 'BELEDWEYN').toUpperCase());
-      setText('somSmartIdPreviewIssue', getVal('somSmartIdInputIssue', '12 Feb 2018'));
+      setText('somSmartIdPreviewDob', getVal('somSmartIdInputDob', '01Janaury 1999'));
+      setText('somSmartIdPreviewPob', getVal('somSmartIdInputPob', 'Mogadishu'));
+      setText('somSmartIdPreviewIssue', getVal('somSmartIdInputIssue', '26 DEC 2017'));
       setText('somSmartIdPreviewIssuePlace', getVal('somSmartIdInputIssuePlace', 'MOGADISHU').toUpperCase());
-      setText('somSmartIdPreviewExpiry', getVal('somSmartIdInputExpiry', '11 Feb 2023'));
+      setText('somSmartIdPreviewExpiry', getVal('somSmartIdInputExpiry', '26 DEC 2022'));
       setText('somSmartIdPreviewGender', getVal('somSmartIdInputGender', 'MALE').toUpperCase());
     }
 
     function resetSomSmartIdSample() {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('somSmartIdInputNo', '28901014439167');
-      setVal('somSmartIdInputName', 'MOHAMED ALI ABDULLAHI');
-      setVal('somSmartIdInputDob', '01 Jan 1989');
-      setVal('somSmartIdInputPob', 'BELEDWEYN');
-      setVal('somSmartIdInputIssue', '12 Feb 2018');
+      setVal('somSmartIdInputNo', '26405034834834');
+      setVal('somSmartIdInputName', 'Mohamed Ali Mahdi');
+      setVal('somSmartIdInputDob', '01Janaury 1999');
+      setVal('somSmartIdInputPob', 'Mogadishu');
+      setVal('somSmartIdInputIssue', '26 DEC 2017');
       setVal('somSmartIdInputIssuePlace', 'MOGADISHU');
-      setVal('somSmartIdInputExpiry', '11 Feb 2023');
+      setVal('somSmartIdInputExpiry', '26 DEC 2022');
       setVal('somSmartIdInputGender', 'MALE');
 
       resetSomSmartIdPhoto();
@@ -4675,13 +4681,13 @@ XUDUR, BAKOOL, SOMALIA</span>
         const canvas = await html2canvas(card, {
           scale: 3,
           useCORS: true,
-          backgroundColor: '#ebfaee'
+          backgroundColor: '#f2fadc'
         });
         const imgData = canvas.toDataURL('image/png');
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `somali-national-id-${$('somSmartIdInputNo') ? $('somSmartIdInputNo').value : '28901014439167'}.png`;
+          $('fallbackDownloadLink').download = `somali-national-id-${$('somSmartIdInputNo') ? $('somSmartIdInputNo').value : '26405034834834'}.png`;
         }
         const modal = $('imageModal');
         if (modal) {
