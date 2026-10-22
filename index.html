@@ -2078,321 +2078,382 @@
           <section class="lg:col-span-7 flex justify-center items-start min-w-0">
             <div class="w-full max-w-[620px] space-y-4">
 
-              <!-- ================= 1. SOMALI SMART POLYCARBONATE NATIONAL ID CARD ================= -->
+              <!-- ================= 1. SOMALI SMART POLYCARBONATE NATIONAL ID CARD (EXACT OFFICIAL MATCH) ================= -->
               <div id="somalia-smart-id-specimen-wrap" class="w-full">
-                <article id="somali-smart-id-card" class="somali-smart-id-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none flex flex-col justify-between p-3.5 sm:p-5">
+                <article id="somali-smart-id-card" class="somali-smart-id-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none p-3.5 sm:p-5 flex flex-col justify-between">
                   
-                  <!-- Central Coat of Arms Security Hologram / Watermark -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.10] z-0">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-60 sm:w-72 h-auto filter grayscale">
+                  <!-- Central Coat of Arms Security Watermark (Teal / Cyan tinted as in real card) -->
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.14] z-0 translate-x-6 sm:translate-x-10">
+                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 sm:w-80 h-auto filter hue-rotate-180 brightness-95">
                   </div>
 
-                  <!-- TOP HEADER: National ID Number, Official Titles & Rosette Hologram Seal -->
-                  <header class="relative z-10 flex items-start justify-between gap-2 border-b border-emerald-600/30 pb-2">
+                  <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Silver Rosette on Right -->
+                  <div class="relative z-10 flex items-start justify-between gap-1 pb-1">
                     <!-- Left: National ID Label & Number -->
-                    <div class="leading-tight shrink-0">
-                      <span class="block text-[8px] sm:text-[9.5px] font-bold text-emerald-950 uppercase tracking-tight">
-                        L. Qaranka / <span class="font-arabic font-normal">رقم الهوية</span> / National ID
-                      </span>
-                      <span id="somSmartIdPreviewNo" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wider block mt-0.5">
+                    <div class="leading-tight shrink-0 text-left">
+                      <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                        L_Qaranka/<span class="font-arabic font-normal">رقم الهوية</span>/National ID
+                      </div>
+                      <div id="somSmartIdPreviewNo" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm md:text-base tracking-wider mt-0.5">
                         28901014439167
-                      </span>
+                      </div>
                     </div>
 
-                    <!-- Center: Official Hierarchy Header -->
-                    <div class="text-center px-1 flex-1 leading-none space-y-0.5">
-                      <div class="font-black text-[9px] sm:text-[11px] text-emerald-950 tracking-tight uppercase">
+                    <!-- Center: Official Titles Hierarchy (Exact wording & colors from uploaded card) -->
+                    <div class="text-center text-[#14532d] leading-none space-y-0.5 px-1 flex-1">
+                      <div class="font-bold text-[8px] sm:text-[10px] tracking-wide uppercase">
                         JAMHUURIYADDA SOOMAALIYA
                       </div>
-                      <div class="font-bold text-[10px] sm:text-[12px] text-emerald-950 font-arabic">
+                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none">
                         جمهورية الصومال
                       </div>
-                      <div class="font-extrabold text-[8px] sm:text-[9.5px] text-emerald-900 tracking-wider uppercase">
+                      <div class="font-semibold text-[7px] sm:text-[8.5px] tracking-wider uppercase">
                         SOMALI REPUBLIC
                       </div>
-                      <div class="font-black text-[8.5px] sm:text-[10px] text-emerald-950 uppercase tracking-wide pt-0.5">
+                      <div class="font-black text-[9px] sm:text-[11px] tracking-wide uppercase pt-0.5">
                         WARAQADDA AQOONSIGA
                       </div>
-                      <div class="font-bold text-[9.5px] sm:text-[11px] text-emerald-950 font-arabic">
+                      <div class="font-arabic font-bold text-[9.5px] sm:text-[12px] leading-none">
                         بطاقة الهوية
                       </div>
-                      <div class="font-black text-[8.5px] sm:text-[10px] text-emerald-950 uppercase tracking-wider">
+                      <div class="font-black text-[8px] sm:text-[9.5px] tracking-wider uppercase">
                         IDENTITY CARD
                       </div>
                     </div>
 
-                    <!-- Right: Scalloped Silver/White Holographic Rosette Emblem -->
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-slate-100 via-white to-slate-200 border border-slate-300 shadow-xs flex items-center justify-center shrink-0">
-                      <i class="fa-solid fa-certificate text-2xl sm:text-3xl text-slate-300 drop-shadow-xs"></i>
+                    <!-- Right: Authentic 8-Pointed Scalloped Rosette Silver Hologram Seal -->
+                    <div class="shrink-0 flex items-center justify-end">
+                      <svg viewBox="0 0 100 100" class="w-9 h-9 sm:w-12 sm:h-12 drop-shadow-xs">
+                        <defs>
+                          <radialGradient id="silverHoloRosette" cx="45%" cy="40%" r="55%">
+                            <stop offset="0%" stop-color="#ffffff"/>
+                            <stop offset="40%" stop-color="#f8fafc"/>
+                            <stop offset="75%" stop-color="#e2e8f0"/>
+                            <stop offset="100%" stop-color="#cbd5e1"/>
+                          </radialGradient>
+                        </defs>
+                        <path d="M 50,4 Q 63,4 66,16 Q 78,16 80,28 Q 93,31 93,44 Q 96,56 86,63 Q 86,75 75,79 Q 67,90 54,92 Q 41,92 35,82 Q 22,81 19,70 Q 7,63 8,50 Q 7,37 18,30 Q 21,18 33,16 Q 37,4 50,4 Z" 
+                              fill="url(#silverHoloRosette)" stroke="#e2e8f0" stroke-width="1.2"/>
+                      </svg>
                     </div>
-                  </header>
+                  </div>
 
-                  <!-- CARD BODY: Gold Smart Microchip, Data Fields, and Bearer Photo -->
-                  <div class="relative z-10 flex-1 flex items-center gap-3 sm:gap-4 my-2">
-                    <!-- Left: Electronic Smart Chip -->
-                    <div class="shrink-0 flex flex-col justify-center">
-                      <div class="w-12 sm:w-16 h-10 sm:h-12 rounded-lg bg-gradient-to-br from-amber-300 via-amber-200 to-amber-400 border border-amber-600/80 p-1 flex flex-col justify-between shadow-xs">
-                        <div class="h-px bg-amber-700/60 w-full my-auto"></div>
-                        <div class="flex justify-between h-full">
-                          <div class="w-1/3 border-r border-amber-700/60"></div>
-                          <div class="w-1/3 border-r border-amber-700/60"></div>
+                  <!-- MAIN BODY ROW: Smart Chip + Full Name (Left/Center) & Bearer Photo (Right) -->
+                  <div class="relative z-10 flex items-start gap-2 sm:gap-3 my-auto">
+                    <!-- Left Column: Chip, Name, Birth, Issue, Expiry -->
+                    <div class="flex-1 space-y-1.5 min-w-0">
+                      
+                      <!-- Top Sub-row: Chip & Full Name side-by-side -->
+                      <div class="flex items-center gap-2 sm:gap-3">
+                        <!-- Electronic Gold Smart Chip (Exact contact pad layout) -->
+                        <div class="shrink-0">
+                          <div class="w-13 sm:w-16 h-9 sm:h-11 rounded-md bg-gradient-to-br from-[#fde68a] via-[#f59e0b] to-[#d97706] border border-[#b45309] p-0.5 relative shadow-xs overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-amber-300 via-yellow-100 to-amber-400 opacity-80"></div>
+                            <svg viewBox="0 0 60 42" class="w-full h-full relative z-10 text-amber-950/70 stroke-current stroke-[1.2] fill-none">
+                              <rect x="1" y="1" width="58" height="40" rx="4" stroke="#92400e" stroke-width="1"/>
+                              <line x1="1" y1="14" x2="20" y2="14"/>
+                              <line x1="1" y1="28" x2="20" y2="28"/>
+                              <line x1="40" y1="14" x2="59" y2="14"/>
+                              <line x1="40" y1="28" x2="59" y2="28"/>
+                              <line x1="20" y1="1" x2="20" y2="41"/>
+                              <line x1="40" y1="1" x2="40" y2="41"/>
+                              <rect x="23" y="12" width="14" height="18" rx="2" fill="#fbbf24" fill-opacity="0.25"/>
+                            </svg>
+                          </div>
+                        </div>
+
+                        <!-- Name Block (MOHAMED on line 1, ALI ABDULLAHI on line 2) -->
+                        <div class="flex-1 min-w-0">
+                          <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                            Magaca/<span class="font-arabic font-normal">الاسم</span>/Name
+                          </div>
+                          <div id="somSmartIdPreviewName" class="font-black text-slate-950 text-xs sm:text-[13px] md:text-sm uppercase tracking-wide leading-tight mt-0.5">
+                            MOHAMED<br>ALI ABDULLAHI
+                          </div>
                         </div>
                       </div>
+
+                      <!-- Birth Row: Date + Place of Birth -->
+                      <div>
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Taariikhda dhalashada/<span class="font-arabic font-normal">الميلاد</span>/Birth
+                        </div>
+                        <div class="flex items-center gap-4 sm:gap-6 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
+                          <span id="somSmartIdPreviewDob" class="text-slate-950 font-mono-code">01 Jan 1989</span>
+                          <span id="somSmartIdPreviewPob" class="text-slate-950 uppercase tracking-wide">BELEDWEYN</span>
+                        </div>
+                      </div>
+
+                      <!-- Issue Row: Date + Place of Issue -->
+                      <div>
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Taariikhda la bixiyay/<span class="font-arabic font-normal">الاصدار</span>/Issue
+                        </div>
+                        <div class="flex items-center gap-4 sm:gap-6 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
+                          <span id="somSmartIdPreviewIssue" class="text-slate-950 font-mono-code">12 Feb 2018</span>
+                          <span id="somSmartIdPreviewIssuePlace" class="text-slate-950 uppercase tracking-wide">MOGADISHU</span>
+                        </div>
+                      </div>
+
+                      <!-- Bottom Left Expiry Row -->
+                      <div>
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Taariikhda uu dhacayo/<span class="font-arabic font-normal">الانتهاء</span>/Expiry
+                        </div>
+                        <div id="somSmartIdPreviewExpiry" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 font-mono-code mt-0.5">
+                          11 Feb 2023
+                        </div>
+                      </div>
+
                     </div>
 
-                    <!-- Center: Key Particulars Grid -->
-                    <div class="flex-1 space-y-1.5 text-[8.5px] sm:text-[10.5px] leading-tight min-w-0">
-                      <!-- Name -->
-                      <div>
-                        <span class="text-emerald-950 font-bold text-[8px] sm:text-[9.5px]">
-                          Magaca / <span class="font-arabic font-normal">الاسم</span> / Name
-                        </span>
-                        <span id="somSmartIdPreviewName" class="font-black text-slate-950 text-xs sm:text-sm tracking-wide uppercase block truncate">
-                          MOHAMED ALI ABDULLAHI
-                        </span>
+                    <!-- Right Column: Bearer Portrait Photo & Gender Field below it -->
+                    <div class="w-24 sm:w-28 md:w-32 shrink-0 flex flex-col items-center">
+                      <!-- Bearer Portrait Photo (Exact image from uploaded card) -->
+                      <div class="w-full aspect-[3/3.8] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
+                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/somali_smart_id_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
-                      <!-- Date of Birth & Place of Birth -->
-                      <div>
-                        <span class="text-emerald-950 font-bold text-[8px] sm:text-[9.5px]">
-                          Taariikhda dhalashada / <span class="font-arabic font-normal">الميلاد</span> / Birth
-                        </span>
-                        <div class="flex items-center gap-2 mt-0.5">
-                          <span id="somSmartIdPreviewDob" class="font-bold text-slate-900 font-mono-code text-[9.5px] sm:text-[11.5px]">
-                            01 Jan 1989
-                          </span>
-                          <span id="somSmartIdPreviewPob" class="font-black text-slate-950 uppercase text-[9.5px] sm:text-[11.5px] tracking-wide">
-                            BELEDWEYN
-                          </span>
+                      <!-- Gender Field (Directly under the photo as in the actual card) -->
+                      <div class="w-full text-left mt-1">
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Lab/Dheddig/<span class="font-arabic font-normal">الجنس</span>/Gender
                         </div>
-                      </div>
-
-                      <!-- Issue Date & Place of Issue -->
-                      <div>
-                        <span class="text-emerald-950 font-bold text-[8px] sm:text-[9.5px]">
-                          Taariikhda la bixiyay / <span class="font-arabic font-normal">الإصدار</span> / Issue
-                        </span>
-                        <div class="flex items-center gap-2 mt-0.5">
-                          <span id="somSmartIdPreviewIssue" class="font-bold text-slate-900 font-mono-code text-[9.5px] sm:text-[11.5px]">
-                            12 Feb 2018
-                          </span>
-                          <span id="somSmartIdPreviewIssuePlace" class="font-black text-slate-950 uppercase text-[9.5px] sm:text-[11.5px] tracking-wide">
-                            MOGADISHU
-                          </span>
+                        <div id="somSmartIdPreviewGender" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 uppercase mt-0.5">
+                          MALE
                         </div>
-                      </div>
-
-                      <!-- Expiry Date & Gender Row -->
-                      <div class="flex items-end justify-between pt-0.5 border-t border-emerald-600/20">
-                        <div>
-                          <span class="text-emerald-950 font-bold text-[8px] sm:text-[9.5px]">
-                            Taariikhda uu dhacayo / <span class="font-arabic font-normal">الإنتهاء</span> / Expiry
-                          </span>
-                          <span id="somSmartIdPreviewExpiry" class="font-bold text-slate-900 font-mono-code text-[9.5px] sm:text-[11.5px] block mt-0.5">
-                            11 Feb 2023
-                          </span>
-                        </div>
-                        <div class="text-right">
-                          <span class="text-emerald-950 font-bold text-[8px] sm:text-[9.5px]">
-                            Lab/Dheddig / <span class="font-arabic font-normal">الجنس</span> / Gender
-                          </span>
-                          <span id="somSmartIdPreviewGender" class="font-black text-slate-950 uppercase text-[9.5px] sm:text-[11.5px] block mt-0.5">
-                            MALE
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Right: Bearer Photo -->
-                    <div class="w-20 sm:w-26 md:w-28 shrink-0 flex flex-col items-center justify-center">
-                      <div class="w-full aspect-[3/3.8] rounded-lg overflow-hidden border-2 border-slate-300 shadow-md bg-slate-200 relative">
-                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/images__5__c9c0dbaa.png" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
                     </div>
                   </div>
+
                 </article>
               </div>
 
 
 
-              <!-- ================= 2. NIRA PASSPORT CARD / CERTIFICATE OF IDENTITY CONTAINER ================= -->
-              <div id="somCardContainer" class="hidden w-full">
-                <article id="somalia-card" class="relative w-full bg-[#fafafa] rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-slate-300 text-slate-900 select-none overflow-hidden">
+              <!-- ================= 2. NIRA CERTIFICATE OF IDENTITY CONTAINER (EXACT OFFICIAL SPECIMEN) ================= -->
+              <div id="somCardContainer" class="w-full">
+                <article id="somalia-card" class="relative w-full max-w-[680px] mx-auto bg-white rounded-none p-5 sm:p-7 shadow-xl border border-slate-300 text-slate-900 select-none overflow-hidden">
                   
                   <!-- Subtle Central Coat of Arms Security Watermark -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] z-0">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-72 sm:w-80 h-auto filter grayscale">
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] z-0">
+                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-80 h-auto filter grayscale">
+                  </div>
+                  <!-- Subtle botanical/leaf watermark pattern on the right side matching screenshot -->
+                  <div class="absolute top-28 right-2 w-48 h-48 pointer-events-none opacity-[0.05] z-0">
+                    <svg viewBox="0 0 120 120" class="w-full h-full text-emerald-800 fill-current">
+                      <path d="M60,10 C75,35 85,50 115,60 C85,70 75,85 60,110 C45,85 35,70 5,60 C35,50 45,35 60,10 Z M60,30 C68,48 76,56 94,60 C76,64 68,72 60,90 C52,72 44,64 26,60 C44,56 52,48 60,30 Z"/>
+                    </svg>
                   </div>
 
-                  <!-- HEADER SECTION: Left NIRA seal, Center Title Hierarchy, Right Coat of Arms -->
-                  <header class="relative z-10 flex items-center justify-between gap-2 pb-2 border-b border-slate-300/80">
+                  <!-- HEADER SECTION: Left NIRA seal, Center Trilingual Hierarchy, Right Somali Coat of Arms -->
+                  <header class="relative z-10 flex items-center justify-between gap-2 sm:gap-3 pb-1">
                     <!-- Left: NIRA Seal -->
-                    <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 flex items-center justify-center">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
                       <img src="/assets/aistudio/somali_nira_left_seal.png" alt="NIRA Seal" class="w-full h-full object-contain">
                     </div>
 
-                    <!-- Center: Official Hierarchy Header -->
-                    <div class="text-center px-1 flex-1 space-y-0.5 leading-tight">
-                      <h2 class="text-[9.5px] sm:text-[11px] font-black text-slate-950 tracking-wider uppercase">
+                    <!-- Center: Official Hierarchy Header in Navy Blue (Exact wording and fonts) -->
+                    <div class="text-center px-1 flex-1 space-y-0.5 leading-snug text-[#004080]">
+                      <div class="text-[11px] sm:text-[13px] font-black tracking-wider uppercase">
                         JAMHUURIYADDA FEDERAALKA SOOMAALIYA
-                      </h2>
-                      <h3 class="text-[8.5px] sm:text-[9.5px] font-extrabold text-slate-800 tracking-wider uppercase">
-                        FEDERAL REPUBLIC OF SOMALIA · <span class="font-arabic font-normal">جمهورية الصومال الفيدرالية</span>
-                      </h3>
-                      <p class="text-[8px] sm:text-[9px] font-bold text-slate-700 tracking-wide uppercase">
-                        HAY'ADDA AQOONSIGA &amp; DIIWAANGELINTA QARANKA (NIRA)
-                      </p>
-                      <div class="pt-0.5">
-                        <span class="text-[9px] sm:text-[10px] font-black text-slate-950 uppercase tracking-widest bg-slate-200/80 px-2 py-0.5 rounded border border-slate-300">
-                          PASSPORT CARD · SHAHAADADA AQOONSIGA · CERTIFICATE OF IDENTITY
-                        </span>
+                      </div>
+                      <div class="text-[10px] sm:text-[12px] font-black tracking-wider uppercase">
+                        HAY'ADDA AQOONSIGA &amp; DIIWAANGELINTA QARANKA
+                      </div>
+                      <div class="font-arabic text-[12px] sm:text-[14px] font-bold">
+                        جمهورية الصومال الفيدرالية
+                      </div>
+                      <div class="font-arabic text-[11px] sm:text-[13px] font-bold">
+                        الهيئة الوطنية للهوية والتسجيل
+                      </div>
+                      <div class="text-[9.5px] sm:text-[11.5px] font-black tracking-wider uppercase">
+                        FEDERAL REPUBLIC OF SOMALIA
+                      </div>
+                      <div class="text-[8.5px] sm:text-[10px] font-black tracking-wider uppercase">
+                        NATIONAL IDENTIFICATION &amp; REGISTRATION AUTHORITY
                       </div>
                     </div>
 
                     <!-- Right: Somali Coat of Arms -->
-                    <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 flex items-center justify-center">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
                       <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
                     </div>
                   </header>
 
-                  <!-- METADATA STRIP: Document Category, Tracking No, Identity No & Issue Date -->
-                  <div class="relative z-10 bg-slate-100/90 border border-slate-300 rounded px-3 py-1.5 my-2.5 grid grid-cols-4 gap-2 text-[9px] sm:text-[10px]">
-                    <div>
-                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Type / State</span>
-                      <span class="font-mono-code font-bold text-slate-950 text-xs">PC / SOM</span>
-                    </div>
-                    <div>
-                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Tracking No</span>
-                      <span id="somPreviewTracking" class="font-mono-code font-bold text-slate-950 text-xs block">228021103481</span>
-                    </div>
-                    <div>
-                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Identity No</span>
-                      <span id="somPreviewIdNo" class="font-mono-code font-black text-slate-950 text-xs block">63176452261</span>
-                    </div>
-                    <div>
-                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Issue Date</span>
-                      <span id="somPreviewIssueDate" class="font-mono-code font-bold text-slate-950 text-xs block">16-05-2026</span>
-                    </div>
+                  <!-- Solid Royal Blue Horizontal Bar (Exact match to screenshot) -->
+                  <div class="w-full h-[2.5px] sm:h-[3px] bg-[#3b82f6] my-2"></div>
+
+                  <!-- CERTIFICATE SUB-TITLE -->
+                  <div class="text-center py-1 mb-2">
+                    <span class="text-xs sm:text-[13.5px] font-black text-slate-900 uppercase tracking-wide">
+                      SHAHAADADA AQOONSIGA / <span class="font-arabic font-bold text-sm sm:text-base">شهادة الهوية</span> / CERTIFICATE OF IDENTITY
+                    </span>
                   </div>
 
-                  <!-- MAIN BODY: Photo Left + Data Fields Right -->
-                  <div class="relative z-10 grid grid-cols-12 gap-3 items-start my-1 text-xs">
+                  <!-- UPPER SECTION: Warm Pale Yellow Band with Framed Photo Left & 3 Numbered Metadata Rows Right -->
+                  <div class="relative z-10 bg-[#fdf8e6]/80 border border-[#fef08a] rounded-none p-3 sm:p-4 mb-3 grid grid-cols-12 gap-3 sm:gap-4 items-center">
                     
-                    <!-- Left: Passport-style Framed Photo -->
-                    <div class="col-span-4 flex flex-col items-center">
-                      <div class="w-full aspect-[3.2/4] border-2 border-slate-300 bg-slate-200 rounded overflow-hidden shadow-xs relative">
+                    <!-- Left: Framed Applicant Photo (Exact match) -->
+                    <div class="col-span-4 sm:col-span-3 flex justify-center">
+                      <div class="w-24 sm:w-28 aspect-[3.2/4] p-1 bg-white border border-slate-300 shadow-xs relative">
                         <img id="somPreviewPhoto" src="/assets/aistudio/somali_nira_portrait.jpg" alt="Applicant Photo" class="w-full h-full object-cover">
                       </div>
-                      <span class="text-[7.5px] font-mono-code font-bold text-slate-500 uppercase tracking-widest mt-1 block">BIOMETRIC CITIZEN</span>
                     </div>
 
-                    <!-- Right: Tabular Personal Details Grid -->
-                    <div class="col-span-8 space-y-1.5 text-[9.5px] sm:text-[10.5px] leading-tight min-w-0">
-                      
-                      <!-- 1. Full Name (Somali) -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                          1. Magaca oo Afaran / Full Name / <span class="font-arabic font-normal">الاسم الكامل</span>
-                        </span>
-                        <span id="somPreviewNameAfaran" class="font-black text-slate-950 text-xs sm:text-sm tracking-wide uppercase block truncate">
-                          MAXAMED CABDUQADIR MAXAMED
-                        </span>
-                      </div>
-
-                      <!-- 2. Full Name (English Transliteration) -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                          2. English Transliteration / Prénoms &amp; Nom
-                        </span>
-                        <span id="somPreviewFullName" class="font-extrabold text-slate-800 text-xs sm:text-sm tracking-wide uppercase block truncate">
-                          MOHAMED ABDUKADIR MOHAMED
-                        </span>
-                      </div>
-
-                      <!-- 3. DOB, Sex, Nationality Grid -->
-                      <div class="grid grid-cols-3 gap-1.5 pt-0.5">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Date of Birth / <span class="font-arabic">الميلاد</span>
-                          </span>
-                          <span id="somPreviewDob" class="font-mono-code font-bold text-slate-950 text-[10.5px] sm:text-xs block mt-0.5">
-                            31-05-1995
-                          </span>
+                    <!-- Right: 3 Numbered Metadata Rows -->
+                    <div class="col-span-8 sm:col-span-9 space-y-2">
+                      <!-- Row 1: Tracking Number -->
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="text-[8px] sm:text-[9.5px] font-black text-slate-800 uppercase tracking-tight flex-1">
+                          LAMBARKA RAAD RAACA / <span class="font-arabic font-normal">رقم التتبع</span> / TRACKING NUMBER
                         </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Sex / <span class="font-arabic">الجنس</span>
-                          </span>
-                          <span id="somPreviewSex" class="font-black text-slate-950 text-[10.5px] sm:text-xs uppercase block mt-0.5">
-                            MALE
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Country / <span class="font-arabic">بلد</span>
-                          </span>
-                          <span id="somPreviewCountry" class="font-black text-slate-950 text-[10.5px] sm:text-xs uppercase block mt-0.5">
-                            SOMALIA
-                          </span>
+                        <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
+                          <span id="somPreviewTracking">228021103481</span>
                         </div>
                       </div>
 
-                      <!-- 4. Place of Birth & Parent/Guardian Grid -->
-                      <div class="grid grid-cols-2 gap-1.5 pt-0.5">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Place of Birth / <span class="font-arabic">مكان الميلاد</span>
-                          </span>
-                          <span id="somPreviewPob" class="font-bold text-slate-950 text-[10.5px] sm:text-xs uppercase block mt-0.5">
-                            XUDUR, SOMALIA
-                          </span>
+                      <!-- Row 2: Identity Number -->
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="text-[8px] sm:text-[9.5px] font-black text-slate-800 uppercase tracking-tight flex-1">
+                          LAMBARKA AQOONSIGA / <span class="font-arabic font-normal">رقم الهوية</span> / IDENTITY NUMBER
                         </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Parent/Guardian / <span class="font-arabic">الوصي</span>
-                          </span>
-                          <span id="somPreviewParent" class="font-bold text-slate-800 text-[10.5px] sm:text-xs uppercase block mt-0.5"></span>
+                        <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
+                          <span id="somPreviewIdNo">63176452261</span>
                         </div>
                       </div>
 
-                      <!-- 5. Current Address -->
-                      <div class="pt-0.5">
-                        <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                          Current Address / Degaanka / <span class="font-arabic">العنوان</span>
-                        </span>
-                        <span id="somPreviewAddress" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase whitespace-pre-line leading-tight block mt-0.5">
-                          BULLOW, XUDUR, BAKOOL, SOMALIA
-                        </span>
+                      <!-- Row 3: Issue Date -->
+                      <div class="flex items-center justify-between gap-2">
+                        <div class="text-[8px] sm:text-[9.5px] font-black text-slate-800 uppercase tracking-tight flex-1">
+                          TAARIIKHDA LA BIXIYAY / <span class="font-arabic font-normal">تاريخ الإصدار</span> / ISSUE DATE
+                        </div>
+                        <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
+                          <span id="somPreviewIssueDate">16-05-2026</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- FOOTER SECTION: Registrar General Signature, Legal Notice & QR Code -->
-                  <footer class="relative z-10 mt-2.5 pt-2 border-t border-slate-300 grid grid-cols-12 gap-2 items-end">
-                    <div class="col-span-8 space-y-1">
-                      <div class="h-9 flex items-end">
-                        <img src="/assets/aistudio/somali_nira_signature.png" alt="Registrar General Signature" class="h-8 w-auto object-contain">
+                  <!-- MAIN GREEN BODY: Pale Sage/Mint Box with 4 Sections (Exact match to screenshot) -->
+                  <div class="relative z-10 bg-[#d7edd9] border border-[#b8dfbc] p-3 sm:p-4 space-y-3 rounded-none shadow-2xs">
+                    
+                    <!-- Section 1: Full Name -->
+                    <div>
+                      <div class="flex items-center gap-1.5 mb-1.5">
+                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">1</span>
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
+                          MAGACA OO AFARAN AMA SEDDAXAN / <span class="font-arabic font-normal">الاسم الكامل</span> / FULL NAME
+                        </span>
                       </div>
-                      <p class="text-[7.5px] sm:text-[8.5px] font-bold text-slate-900 uppercase tracking-wide">
-                        DIIWAANHAYAHA GUUD EE AQOONSIGA QARANKA / REGISTRAR GENERAL OF NATIONAL ID
-                      </p>
-                      <p class="text-[6.5px] sm:text-[7.5px] text-slate-500 leading-tight">
-                        Dukumentigaan waa aqoonsi sharci ah oo lagu soo saaray si waafaqsan Sharciga aqoonsiga Lr. 009 ee 2023. This is an official identification document issued under Act No. 009 of 2023.
-                      </p>
+                      <div class="space-y-1.5 pl-5 sm:pl-5.5">
+                        <div>
+                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Magaca oo Afaran</div>
+                          <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 tracking-wide uppercase truncate">
+                            <span id="somPreviewNameAfaran">MAXAMED CABDUQADIR MAXAMED</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Full Name</div>
+                          <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 tracking-wide uppercase truncate">
+                            <span id="somPreviewFullName">MOHAMED ABDUKADIR MOHAMED</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div class="col-span-4 flex flex-col items-end justify-end">
-                      <div class="w-16 h-16 p-0.5 bg-white border border-slate-300 shadow-2xs">
+
+                    <!-- Section 2: Parent or Guardian -->
+                    <div>
+                      <div class="flex items-center gap-1.5 mb-1.5">
+                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">2</span>
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
+                          WAALID AMA DAN-DHAWRE / <span class="font-arabic font-normal">الوالد أو الوصي</span> / PARENT OR GUARDIAN
+                        </span>
+                      </div>
+                      <div class="pl-5 sm:pl-5.5">
+                        <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 uppercase min-h-[28px] flex items-center">
+                          <span id="somPreviewParent"></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Section 3: Other Personal Information -->
+                    <div>
+                      <div class="flex items-center gap-1.5 mb-1.5">
+                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">3</span>
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
+                          MACLUUMAADKA KALE EE QOFKA / <span class="font-arabic font-normal">معلومات شخصية أخرى</span> / OTHER PERSONAL INFORMATION
+                        </span>
+                      </div>
+                      <div class="pl-5 sm:pl-5.5 grid grid-cols-12 gap-2">
+                        <div class="col-span-3">
+                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Jinsiga / <span class="font-arabic">جنس</span> / Sex</div>
+                          <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold text-slate-900 text-center uppercase">
+                            <span id="somPreviewSex">MALE</span>
+                          </div>
+                        </div>
+                        <div class="col-span-4">
+                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Taariikhda Dhalashada / <span class="font-arabic">تاريخ الميلاد</span> / Date of Birth</div>
+                          <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold font-mono-code text-slate-900 text-center">
+                            <span id="somPreviewDob">31-05-1995</span>
+                          </div>
+                        </div>
+                        <div class="col-span-5">
+                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Goobta Dhalashada / <span class="font-arabic">مكان الميلاد</span> / Place of Birth</div>
+                          <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold text-slate-900 text-center uppercase">
+                            <span id="somPreviewPob">XUDUR, SOMALIA</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Section 4: Current Address -->
+                    <div>
+                      <div class="flex items-center gap-1.5 mb-1.5">
+                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">4</span>
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
+                          DEGAANKA / <span class="font-arabic font-normal">العنوان الحالي</span> / CURRENT ADDRESS
+                        </span>
+                      </div>
+                      <div class="pl-5 sm:pl-5.5 space-y-1.5">
+                        <div>
+                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Waddanka / <span class="font-arabic">بلد</span> / Country</div>
+                          <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 uppercase">
+                            <span id="somPreviewCountry">SOMALIA</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Degaanka / <span class="font-arabic">العنوان</span> / Address</div>
+                          <div class="bg-white border border-slate-300/80 px-2.5 py-1.5 text-xs sm:text-[13px] font-bold text-slate-900 uppercase min-h-[46px] leading-relaxed whitespace-pre-line">
+                            <span id="somPreviewAddress">BULLOW
+XUDUR, BAKOOL, SOMALIA</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- FOOTER SECTION: Registrar General Signature + Disclaimer on Left, QR Code on Right (Exact match to screenshot) -->
+                  <footer class="relative z-10 mt-4 pt-2 flex items-end justify-between gap-4">
+                    <div class="flex-1 space-y-1">
+                      <div class="h-10 sm:h-12 flex items-end">
+                        <img src="/assets/aistudio/somali_nira_signature.png" alt="Registrar General Signature" class="h-9 sm:h-11 w-auto object-contain">
+                      </div>
+                      <div class="text-[7.5px] sm:text-[8.5px] font-black text-slate-900 uppercase tracking-tight">
+                        DIIWAANHAYAHA GUUD EE AQOONSIGA QARANKA / <span class="font-arabic font-normal">المسجل العام للهوية الوطنية</span> / REGISTRAR GENERAL OF NATIONAL ID
+                      </div>
+                      <div class="border-l border-slate-800 pl-2 mt-1 space-y-0.5 text-[6.5px] sm:text-[7.5px] text-slate-800 leading-tight">
+                        <p>Dukumentigaan waa aqoonsi sharci ah oo lagu soo saaray si waafaqsan Sharciga aqoonsiga iyo diiwaangelinta dadweynaha Lr. 009 ee 2023. Markii uu lumo, la xado ama isticmaal ka dhashay sifo kasta oo sharci oggaleyn, qofka sita aqoonsigan waa inuu si dedeg ah uu ku wargaliyaa Hay'adda Aqoonsiga iyo Diiwaangelinta Qaranka (NIRA).</p>
+                        <p>This is a legal identification document issued under the Identification and registration of persons act no. 009 of 2023. In the event of loss, theft or any unauthorized use of this identification document the bearer must immediately report to NIRA</p>
+                      </div>
+                    </div>
+                    <div class="shrink-0 flex flex-col items-center justify-end">
+                      <div class="w-16 h-16 sm:w-20 sm:h-20 p-0.5 bg-white border border-slate-300 shadow-2xs">
                         <img src="/assets/aistudio/somali_nira_qrcode.png" alt="NIRA QR Code" class="w-full h-full object-contain">
                       </div>
                     </div>
                   </footer>
-
-                  <!-- Machine Readable Zone (MRZ) - 3 Lines Standard TD1 Passport Card Format -->
-                  <div class="relative z-10 mt-2.5 pt-2 border-t-2 border-slate-400 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-900 leading-snug select-all bg-slate-100/70 p-2 rounded">
-                    <div id="somNiraMrzLine1">IPSO63176452261&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                    <div id="somNiraMrzLine2">9505315M2605160SOM&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;4</div>
-                    <div id="somNiraMrzLine3">MOHAMED&lt;&lt;MOHAMED&lt;ABDUKADIR&lt;&lt;&lt;&lt;</div>
-                  </div>
 
                 </article>
               </div>
@@ -2415,20 +2476,15 @@
               <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · PASSPORT</span>
             </div>
 
-            <!-- View Mode Switcher: Data Page vs Booklet Spread -->
-            <div class="flex items-center justify-between bg-slate-50 p-2 rounded-xl border border-slate-200">
-              <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+            <!-- Display Format: 2-Page Booklet Spread -->
+            <div class="flex items-center justify-between bg-sky-50/80 p-2.5 rounded-xl border border-sky-200">
+              <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
                 <i class="fa-solid fa-book-open text-sky-700"></i>
-                Display Format:
+                Passport Display Format:
               </span>
-              <div class="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 shadow-2xs">
-                <button type="button" id="btn-som-pass-single" onclick="setSomPassDisplayMode('single')" class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all">
-                  Data Page (KYC)
-                </button>
-                <button type="button" id="btn-som-pass-spread" onclick="setSomPassDisplayMode('spread')" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all">
-                  2-Page Booklet
-                </button>
-              </div>
+              <span class="px-3 py-1 rounded-lg text-xs font-black bg-sky-700 text-white shadow-xs">
+                2-Page Booklet
+              </span>
             </div>
 
             <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
@@ -2563,225 +2619,8 @@
           <section class="lg:col-span-7 flex justify-center items-start print-area-wrapper min-w-0">
             <div id="somPassContainer" class="w-full max-w-[650px]">
 
-              <!-- 1. SINGLE DATA PAGE VIEW (KYC Verification Standard) -->
-              <div id="somalia-passport-single" class="w-full">
-                <article id="somalia-passport-card" class="somali-passport-bg relative w-full aspect-[1.42/1] rounded-lg shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden text-slate-900 select-none">
-                  
-                  <!-- Diagonal Watermark Overlay -->
-                  <div id="somPassSampleWatermark" class="sample-watermark hidden"><span id="somPassWatermarkLabel">SPECIMEN</span></div>
-
-                  <!-- Subtle Watermark Coat of Arms in Center -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] z-0">
-                    <img src="/assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-72 h-auto filter grayscale">
-                  </div>
-
-                  <!-- TOP HEADER: Trilingual Republic Name -->
-                  <header class="flex justify-between items-center pb-1.5 mb-2 border-b border-slate-300/80 relative z-10">
-                    <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
-                      JAMHUURIYADDA SOOMAALIYA
-                    </div>
-                    <div class="font-arabic font-bold text-sky-950 text-xs sm:text-sm">
-                      جمهورية الصومال
-                    </div>
-                    <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
-                      SOMALI REPUBLIC
-                    </div>
-                  </header>
-
-                  <!-- SUBHEADER BAR: BAASABOOR / PASSPORT + TYPE + CODE + NUMBER + STAR -->
-                  <div class="grid grid-cols-12 gap-1 items-center pb-2 mb-2 border-b border-slate-300 relative z-10 text-[9px] sm:text-[10px]">
-                    <!-- Left: BAASABOOR + Coat of Arms -->
-                    <div class="col-span-4 flex items-center gap-2">
-                      <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
-                        <img src="/assets/aistudio/somali_passport_coat_of_arms.png" alt="Somalia Coat of Arms" class="w-full h-full object-contain">
-                      </div>
-                      <div class="leading-none">
-                        <div class="font-black text-slate-950 text-[10px] sm:text-[11px] tracking-wider">BAASABOOR</div>
-                        <div class="font-arabic font-bold text-slate-800 text-[9px]">جواز سفر</div>
-                        <div class="font-black text-slate-950 text-[9px] sm:text-[10px] tracking-wider">PASSPORT</div>
-                      </div>
-                    </div>
-
-                    <!-- Type -->
-                    <div class="col-span-2 border-l border-slate-300 pl-1.5">
-                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Nooca / النوع / Type</span>
-                      <span id="somPassPreviewType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">P</span>
-                    </div>
-
-                    <!-- Country Code -->
-                    <div class="col-span-2 border-l border-slate-300 pl-1.5">
-                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Astaanta / رمز / Code</span>
-                      <span id="somPassPreviewCountry" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">SOM</span>
-                    </div>
-
-                    <!-- Passport No & Red/Brown Star -->
-                    <div class="col-span-4 border-l border-slate-300 pl-1.5 flex items-center justify-between">
-                      <div>
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Passport No / Baasaboor</span>
-                        <span id="somPassPreviewNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00724085</span>
-                      </div>
-                      <span class="text-amber-800 text-lg sm:text-xl font-bold pr-1">★</span>
-                    </div>
-                  </div>
-
-                  <!-- MAIN BODY: PHOTO LEFT + DATA FIELDS RIGHT -->
-                  <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
-                    
-                    <!-- Left Photo -->
-                    <div class="col-span-4 flex flex-col items-center">
-                      <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                        <img id="somPassPreviewPhoto" src="/assets/aistudio/somali_passport_portrait.jpg" alt="Somali Passport Portrait" class="w-full h-full object-cover">
-                        <!-- Hologram / security waves watermark across photo edge -->
-                        <div class="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/40 via-transparent to-transparent"></div>
-                      </div>
-                    </div>
-
-                    <!-- Right Personal Data Fields -->
-                    <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
-                      <!-- 1. Magaca / الاسم / Name -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                          Magaca / <span class="font-arabic">الاسم</span> / Name
-                        </span>
-                        <span id="somPassPreviewName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">
-                          MAXAMED CABDIQADIR MAXAMED
-                        </span>
-                      </div>
-
-                      <!-- 2. Mother's Name & NID -->
-                      <div class="grid grid-cols-12 gap-1 items-start">
-                        <div class="col-span-7">
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Magaca Hooyada / <span class="font-arabic">اسم الأم</span> / Mother's Name
-                          </span>
-                          <span id="somPassPreviewMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">
-                            FARTUN ADEN RONOW
-                          </span>
-                        </div>
-                        <div class="col-span-5">
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            NID:
-                          </span>
-                          <span id="somPassPreviewNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">
-                            29505057463496
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- 3. Nationality & Occupation -->
-                      <div class="grid grid-cols-2 gap-1">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Jinsiyada / <span class="font-arabic">الجنسية</span> / Nationality
-                          </span>
-                          <span id="somPassPreviewNationality" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
-                            SOMALI
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Shaqada / <span class="font-arabic">المهنة</span> / Occupation
-                          </span>
-                          <span id="somPassPreviewOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
-                            STUDENT
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- 4. Date of Birth & Place of Issue -->
-                      <div class="grid grid-cols-2 gap-1">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Taariikhda Dhalashada / <span class="font-arabic">تاريخ الميلاد</span> / Date of Birth
-                          </span>
-                          <span id="somPassPreviewDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">
-                            05 May 1995
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Meesha laga Bixiyey / <span class="font-arabic">مكان الإصدار</span> / Place of Issue
-                          </span>
-                          <span id="somPassPreviewIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
-                            BAIDOA
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- 5. Gender & Place of Birth -->
-                      <div class="grid grid-cols-2 gap-1">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Lab Dheddig / <span class="font-arabic">الجنس</span> / Gender
-                          </span>
-                          <span id="somPassPreviewSex" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">
-                            MALE
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Meesha Dhaleshada / <span class="font-arabic">مكان الميلاد</span> / Place of Birth
-                          </span>
-                          <span id="somPassPreviewBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">
-                            HUDUR
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- 6. Date of Issue & Issuing Authority -->
-                      <div class="grid grid-cols-2 gap-1">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Taariikhda la Bixiyey / <span class="font-arabic">تاريخ الإصدار</span> / Date of Issue
-                          </span>
-                          <span id="somPassPreviewIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">
-                            21 Apr 2018
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Xafiiska laga Bixiyey / <span class="font-arabic">جهة الإصدار</span> / Issuing Authority
-                          </span>
-                          <span id="somPassPreviewAuthority" class="font-extrabold text-slate-900 text-[9.5px] sm:text-[10px] uppercase">
-                            SOMALI GOVERNMENT
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- 7. Date of Expiry & Holder's Signature -->
-                      <div class="grid grid-cols-2 gap-1 pt-0.5">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Taariikhda uu Dhacayo / <span class="font-arabic">تاريخ الانتهاء</span> / Date of Expiry
-                          </span>
-                          <span id="somPassPreviewExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">
-                            20 Apr 2023
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">
-                            Saxiixa Qofka / <span class="font-arabic">توقيع حامل الجواز</span> / Holder's Signature
-                          </span>
-                          <div class="border-b border-slate-400 mt-2 h-3 flex items-end">
-                            <span class="text-[8px] italic text-slate-400 font-mono-code select-none">M. Cabdiqadir</span>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  <!-- MACHINE READABLE ZONE (MRZ) FOOTER -->
-                  <div class="mt-2.5 pt-1.5 border-t-2 border-slate-400/90 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-950 leading-snug overflow-x-auto relative z-10">
-                    <div id="somPassMrzLine1">P&lt;SOMMAXAMED&lt;&lt;MAXAMED&lt;CABDIQADIR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                    <div id="somPassMrzLine2">P007240853SOM9505058M23042072950505746349672</div>
-                  </div>
-
-                </article>
-              </div>
-
-              <!-- 2. FULL 2-PAGE BOOKLET SPREAD (PAGE 3 OBSERVATIONS + PAGE 2 DATA PAGE) -->
-              <div id="somalia-passport-spread" class="w-full hidden">
+              <!-- OFFICIAL 2-PAGE BOOKLET SPREAD (PAGE 3 OBSERVATIONS + PAGE 2 DATA PAGE) -->
+              <div id="somalia-passport-spread" class="w-full">
                 <article class="bg-white rounded-lg shadow-2xl border-2 border-slate-400 overflow-hidden text-slate-900 select-none">
                   
                   <!-- UPPER PAGE: PAGE 3 OBSERVATIONS & SIGNATURE -->
@@ -4744,36 +4583,14 @@
     }
 
     // ================= SOMALIA SMART NATIONAL ID (POLYCARBONATE) CONTROLLER =================
-    const defaultSomSmartIdSrc = '/assets/aistudio/images__5__c9c0dbaa.png';
+    const defaultSomSmartIdSrc = '/assets/aistudio/somali_smart_id_portrait.jpg';
 
     function initSomSmartIdDefaultPhoto() {
-      const img = new Image();
-      img.src = defaultSomSmartIdSrc;
-      img.onload = () => {
-        try {
-          // Crop portrait from official Somali Smart ID card source
-          const canvas = document.createElement('canvas');
-          const sx = img.naturalWidth * 0.665;
-          const sy = img.naturalHeight * 0.255;
-          const sWidth = img.naturalWidth * 0.245;
-          const sHeight = img.naturalHeight * 0.405;
-
-          canvas.width = 280;
-          canvas.height = 340;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-          const croppedUrl = canvas.toDataURL('image/jpeg', 0.95);
-          window._defaultSomSmartIdCroppedPhoto = croppedUrl;
-          if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = croppedUrl;
-        } catch (e) {
-          // Keep default image fallback
-        }
-      };
+      if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
     }
 
     function resetSomSmartIdPhoto() {
-      const fallback = window._defaultSomSmartIdCroppedPhoto || defaultSomSmartIdSrc;
-      if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = fallback;
+      if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
       if ($('somSmartIdPhotoInput')) $('somSmartIdPhotoInput').value = '';
       showToast('Photo Reset', 'Restored official Somali National Identity Card bearer portrait');
     }
@@ -4812,7 +4629,17 @@
       const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
 
       setText('somSmartIdPreviewNo', getVal('somSmartIdInputNo', '28901014439167'));
-      setText('somSmartIdPreviewName', getVal('somSmartIdInputName', 'MOHAMED ALI ABDULLAHI').toUpperCase());
+
+      const nameVal = getVal('somSmartIdInputName', 'MOHAMED ALI ABDULLAHI').toUpperCase();
+      if ($('somSmartIdPreviewName')) {
+        const parts = nameVal.split(' ');
+        if (parts.length >= 2) {
+          $('somSmartIdPreviewName').innerHTML = `${parts[0]}<br>${parts.slice(1).join(' ')}`;
+        } else {
+          $('somSmartIdPreviewName').textContent = nameVal;
+        }
+      }
+
       setText('somSmartIdPreviewDob', getVal('somSmartIdInputDob', '01 Jan 1989'));
       setText('somSmartIdPreviewPob', getVal('somSmartIdInputPob', 'BELEDWEYN').toUpperCase());
       setText('somSmartIdPreviewIssue', getVal('somSmartIdInputIssue', '12 Feb 2018'));
@@ -5050,34 +4877,11 @@
     }
 
     function setSomPassDisplayMode(mode) {
-      const single = $('somalia-passport-single');
       const spread = $('somalia-passport-spread');
-      const btnSingle = $('btn-som-pass-single');
-      const btnSpread = $('btn-som-pass-spread');
-
-      if (mode === 'spread') {
-        if (single) single.classList.add('hidden');
-        if (spread) spread.classList.remove('hidden');
-        if (btnSingle) {
-          btnSingle.className = "px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all";
-        }
-        if (btnSpread) {
-          btnSpread.className = "px-3 py-1 rounded-lg text-xs font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all";
-        }
-      } else {
-        if (single) single.classList.remove('hidden');
-        if (spread) spread.classList.add('hidden');
-        if (btnSingle) {
-          btnSingle.className = "px-3 py-1 rounded-lg text-xs font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all";
-        }
-        if (btnSpread) {
-          btnSpread.className = "px-3 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all";
-        }
-      }
+      if (spread) spread.classList.remove('hidden');
     }
 
     function resetSomPassPhoto() {
-      if ($('somPassPreviewPhoto')) $('somPassPreviewPhoto').src = defaultSomPassPhoto;
       if ($('somPassPreviewPhotoSpread')) $('somPassPreviewPhotoSpread').src = defaultSomPassPhoto;
       if ($('somPassPhotoInput')) $('somPassPhotoInput').value = '';
       showToast('Photo Reset', 'Restored official Somali passport portrait photo');
@@ -5107,10 +4911,9 @@
     }
 
     async function downloadSomPassPNG() {
-      const isSpread = !$('somalia-passport-spread')?.classList.contains('hidden');
-      const card = isSpread ? $('somalia-passport-spread') : $('somalia-passport-card');
+      const card = $('somalia-passport-spread');
       if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Somali Passport PNG');
+      showToast('Rendering...', 'Generating high-resolution Somali Passport 2-Page Booklet PNG');
       try {
         const canvas = await html2canvas(card, {
           scale: 3,
@@ -5121,7 +4924,7 @@
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-republic-biometric-passport.png';
+          $('fallbackDownloadLink').download = 'somali-republic-biometric-passport-booklet.png';
         }
         const modal = $('imageModal');
         if (modal) {
