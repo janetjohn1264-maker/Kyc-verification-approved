@@ -259,38 +259,13 @@
   <!-- ================= TOP NAVIGATION (CLEAN & RESPONSIVE MAIN MENU) ================= -->
   <header class="no-print bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <!-- Clean Brand Logo & Identity: kycGetApproved -->
-      <a href="#hero-section" onclick="scrollToSection('hero-section')" class="flex items-center gap-2.5 group cursor-pointer shrink-0">
-        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 via-teal-700 to-indigo-900 flex items-center justify-center text-white shadow-md shadow-emerald-600/25 group-hover:scale-105 transition-all ring-1 ring-emerald-400/30 overflow-hidden shrink-0">
-          <!-- Subtle ambient glow -->
-          <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(52,211,153,0.4),transparent_70%)]"></div>
-          <svg viewBox="0 0 36 36" fill="none" class="w-6 h-6 relative z-10 drop-shadow-sm" xmlns="http://www.w3.org/2000/svg">
-            <!-- Shield Silhouette -->
-            <path d="M18 4L6 8.5V16.5C6 24.5 11.2 30.5 18 32.5C24.8 30.5 30 24.5 30 16.5V8.5L18 4Z" fill="url(#kycShieldGrad)" stroke="#34d399" stroke-width="1.6" stroke-linejoin="round"/>
-            <!-- Approved Checkmark -->
-            <path d="M11.5 17.5L16 22L24.5 13" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Gold Star/Seal Accent -->
-            <circle cx="25" cy="10" r="2.2" fill="#fbbf24"/>
-            <defs>
-              <linearGradient id="kycShieldGrad" x1="6" y1="4" x2="30" y2="32.5" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#059669"/>
-                <stop offset="0.5" stop-color="#0d9488"/>
-                <stop offset="1" stop-color="#1e1b4b"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <span class="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900 shadow-xs"></span>
-        </div>
-        <div class="flex flex-col">
-          <div class="flex items-center gap-1.5">
-            <span class="text-base sm:text-lg font-black tracking-tight text-slate-900 leading-none">kyc<span class="text-emerald-600">Get</span><span class="text-blue-600">Approved</span></span>
-            <span class="hidden xl:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
-              <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
-              <span>APPROVED</span>
-            </span>
-          </div>
-          <span class="text-[10px] text-slate-500 font-medium hidden sm:block">Identity &amp; Virtual Banking Verification</span>
-        </div>
+      <!-- Clean Brand Logo & Identity: GetKYCApproved -->
+      <a href="#hero-section" onclick="scrollToSection('hero-section')" class="flex items-center gap-2 group cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
+        <img src="/assets/aistudio/file_000000000b8882118dc5a4ec4bf590c1_189e69e1.png" alt="GetKYCApproved" class="h-9 sm:h-11 w-auto max-w-[190px] sm:max-w-[230px] object-contain group-hover:opacity-90 transition-all">
+        <span class="hidden xl:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
+          <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
+          <span>VERIFIED</span>
+        </span>
       </a>
 
       <!-- Desktop Main Menu: Home, About Us, Contact Us, Virtual Accounts, Crypto Exchanges -->
@@ -1541,28 +1516,7 @@
 
                     <!-- Center: Kenya Coat of Arms -->
                     <div class="w-12 h-10 sm:w-14 sm:h-12 flex items-center justify-center shrink-0 -mt-0.5">
-                      <svg viewBox="0 0 100 85" class="w-full h-full drop-shadow-xs">
-                        <!-- Mount Kenya base -->
-                        <polygon points="15,80 50,68 85,80 75,84 25,84" fill="#15803d"/>
-                        <polygon points="35,70 50,60 65,70" fill="#166534"/>
-                        <!-- Left Lion -->
-                        <path d="M 22 45 Q 18 35 25 25 Q 32 30 30 42 Q 35 50 28 65 L 22 65 Q 26 52 22 45 Z" fill="#b45309"/>
-                        <!-- Right Lion -->
-                        <path d="M 78 45 Q 82 35 75 25 Q 68 30 70 42 Q 65 50 72 65 L 78 65 Q 74 52 78 45 Z" fill="#b45309"/>
-                        <!-- Crossed Spears -->
-                        <line x1="18" y1="20" x2="82" y2="72" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round"/>
-                        <line x1="82" y1="20" x2="18" y2="72" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Central Maasai Shield -->
-                        <ellipse cx="50" cy="46" rx="14" ry="20" fill="#991b1b" stroke="#ffffff" stroke-width="1.2"/>
-                        <ellipse cx="50" cy="46" rx="6" ry="19" fill="#15803d"/>
-                        <!-- White Cockerel holding axe -->
-                        <circle cx="50" cy="42" r="3.5" fill="#ffffff"/>
-                        <path d="M 48 44 Q 50 50 52 44 Z" fill="#ffffff"/>
-                        <line x1="50" y1="41" x2="55" y2="38" stroke="#facc15" stroke-width="1.5"/>
-                        <!-- Harambee Banner -->
-                        <rect x="24" y="75" width="52" height="7" rx="2" fill="#b91c1c"/>
-                        <text x="50" y="80.5" font-size="5" font-weight="900" text-anchor="middle" fill="#ffffff" font-family="sans-serif" letter-spacing="0.5">HARAMBEE</text>
-                      </svg>
+                      <img src="/assets/aistudio/kenya_coat_of_arms.png" alt="Republic of Kenya Coat of Arms" class="h-full w-auto object-contain mix-blend-multiply drop-shadow-xs">
                     </div>
 
                     <!-- Right Title & ICAO Smart Chip Icon -->
@@ -1598,8 +1552,8 @@
                     <!-- Bearer Portrait Photo -->
                     <div class="col-span-4 flex flex-col items-center">
                       <div class="w-full aspect-[3.2/4.1] rounded-lg overflow-hidden border border-slate-400/90 shadow-sm relative bg-slate-200">
-                        <!-- High-resolution cropped specimen photo with CSS fallback -->
-                        <img id="kidPreviewPhoto" src="/assets/aistudio/1791439829976_2503f681.jpg" alt="Bearer Portrait" class="w-full h-full object-cover" style="object-position: 23% 65%;">
+                        <!-- High-resolution cropped specimen photo of Adan Abdirahman Mohamed -->
+                        <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_adan.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
                         <!-- Overlay wavy guilloche curves on shoulder/bottom for authentic security blend -->
                         <div class="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-emerald-600/30 via-transparent to-transparent"></div>
                       </div>
@@ -1685,26 +1639,9 @@
                   </div>
 
                   <!-- BOTTOM RIGHT: MAISHA LOGO & SECURITY MARKS -->
-                  <div class="absolute bottom-2.5 right-3.5 flex flex-col items-end text-right z-10 pointer-events-none">
-                    <div class="flex items-center gap-1">
-                      <!-- Stylized Maisha Figure Icon -->
-                      <svg viewBox="0 0 40 40" class="w-6 h-6">
-                        <!-- Coral crescent -->
-                        <path d="M 20 8 Q 10 12 10 24 Q 10 32 18 36 Q 14 26 20 16 Z" fill="#e05353"/>
-                        <!-- Head dot -->
-                        <circle cx="28" cy="11" r="3.5" fill="#1b7355"/>
-                        <!-- Green curved body -->
-                        <path d="M 28 16 Q 16 20 18 34 Q 24 30 26 24 Q 28 20 33 22 Z" fill="#1b7355"/>
-                      </svg>
-                      <!-- Maisha Script Name -->
-                      <span class="text-sm sm:text-base font-bold text-[#1b7355] italic font-serif tracking-tight leading-none">
-                        Maisha
-                      </span>
-                    </div>
-                    <span class="text-[5.5px] sm:text-[6.5px] font-extrabold tracking-wider text-slate-600 uppercase mt-0.5">
-                      KENYA'S UNIQUE PERSONAL IDENTIFIER <strong class="text-[#1b7355]">NAMBA</strong>
-                    </span>
-                    <span class="text-[9px] sm:text-[10px] font-black text-slate-700 tracking-[0.4em] mt-0.5 mr-1 font-mono-code">
+                  <div class="absolute bottom-2 right-3 flex flex-col items-end text-right z-10 pointer-events-none">
+                    <img src="/assets/aistudio/kenya_maisha_logo.png" alt="Maisha Namba Logo" class="h-10 sm:h-12 w-auto object-contain mix-blend-multiply drop-shadow-2xs">
+                    <span class="text-[9px] sm:text-[10px] font-black text-slate-800 tracking-[0.45em] mt-0.5 mr-1 font-mono-code">
                       X X X
                     </span>
                   </div>
@@ -1757,32 +1694,12 @@
                         <div class="flex-1 flex flex-col items-center space-y-1.5">
                           <!-- Maasai Shield & Crossed Spears with G and K -->
                           <div class="w-14 sm:w-16 h-8 sm:h-9 flex items-center justify-center">
-                            <svg viewBox="0 0 100 60" class="w-full h-full">
-                              <!-- Crossed Spears -->
-                              <line x1="28" y1="10" x2="72" y2="50" stroke="#78350f" stroke-width="3" stroke-linecap="round"/>
-                              <line x1="72" y1="10" x2="28" y2="50" stroke="#78350f" stroke-width="3" stroke-linecap="round"/>
-                              <!-- Shield -->
-                              <ellipse cx="50" cy="30" rx="10" ry="18" fill="#78350f" stroke="#451a03" stroke-width="1.5"/>
-                              <line x1="50" y1="12" x2="50" y2="48" stroke="#ffffff" stroke-width="1.5"/>
-                              <!-- Letter G and K -->
-                              <text x="24" y="36" font-size="16" font-weight="900" font-family="serif" fill="#451a03" text-anchor="middle">G</text>
-                              <text x="76" y="36" font-size="16" font-weight="900" font-family="serif" fill="#451a03" text-anchor="middle">K</text>
-                            </svg>
+                            <img src="/assets/aistudio/kenya_gk_emblem.png" alt="GK Maasai Shield" class="h-full w-auto object-contain mix-blend-multiply">
                           </div>
 
                           <!-- Metallic Gold Smartcard Chip (ISO 7816) -->
-                          <div class="w-13 sm:w-16 aspect-[1.25/1] rounded-lg p-0.5 shadow-md border border-amber-600/80 bg-gradient-to-br from-[#ffd700] via-[#e5b822] to-[#aa7c11] relative overflow-hidden">
-                            <!-- Circuit Pattern Lines on Chip -->
-                            <div class="w-full h-full rounded border border-amber-700/60 grid grid-cols-2 gap-0.5 p-0.5 bg-gradient-to-tr from-[#f5d045] to-[#d69e16]">
-                              <div class="border-r border-b border-amber-800/50"></div>
-                              <div class="border-b border-amber-800/50"></div>
-                              <div class="border-r border-amber-800/50 flex items-center justify-center">
-                                <div class="w-2.5 h-2.5 rounded-full border border-amber-900/40"></div>
-                              </div>
-                              <div class="flex items-center justify-center">
-                                <div class="w-2.5 h-2.5 rounded-full border border-amber-900/40"></div>
-                              </div>
-                            </div>
+                          <div class="w-13 sm:w-16 aspect-[1.15/1] rounded-lg shadow-sm border border-amber-800/40 overflow-hidden">
+                            <img src="/assets/aistudio/kenya_chip_gold.png" alt="Gold Contact Chip" class="w-full h-full object-cover">
                           </div>
                         </div>
                       </div>
@@ -1842,7 +1759,7 @@
 
                         <!-- Ghost Secondary Portrait -->
                         <div class="w-10 sm:w-12 aspect-[3.2/4] rounded border border-slate-300/80 overflow-hidden shadow-2xs bg-slate-100 relative">
-                          <img id="kidGhostPhoto" src="/assets/aistudio/1791439829976_2503f681.jpg" alt="Ghost Portrait" class="w-full h-full object-cover opacity-60 mix-blend-multiply" style="object-position: 23% 65%;">
+                          <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_adan.jpg" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
                         </div>
 
                         <!-- Principal Registrar Signature -->
@@ -1851,10 +1768,7 @@
                             PRINCIPAL REGISTRAR'S SIGN.
                           </span>
                           <div class="h-6 sm:h-7 w-20 sm:w-24 flex items-center justify-end mt-0.5">
-                            <svg viewBox="0 0 100 35" class="w-full h-full">
-                              <path d="M 10 25 Q 20 5 32 18 Q 45 30 55 12 Q 62 8 70 20 L 85 22 Q 95 24 88 15" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                              <circle cx="28" cy="18" r="7" fill="none" stroke="#0f172a" stroke-width="1.8"/>
-                            </svg>
+                            <img src="/assets/aistudio/kenya_registrar_signature.png" alt="Principal Registrar Signature" class="h-full w-auto object-contain mix-blend-multiply">
                           </div>
                         </div>
                       </div>
@@ -3960,12 +3874,15 @@ XUDUR, BAKOOL, SOMALIA</span>
 
   <!-- ================= FOOTER (LEGAL & POLICY MENU) ================= -->
   <footer class="no-print mt-auto border-t border-slate-200 bg-white py-8 px-4 text-slate-600">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-      <div class="text-slate-500 font-medium text-center md:text-left flex items-center justify-center md:justify-start gap-2">
-        <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-600 text-white text-[10px]">
-          <i class="fa-solid fa-check"></i>
-        </span>
-        <span>&copy; 2026 <strong>kycGetApproved</strong>. All rights reserved.</span>
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
+      <div class="flex flex-col sm:flex-row items-center gap-3.5 text-center sm:text-left">
+        <a href="#hero-section" onclick="scrollToSection('hero-section')" class="inline-flex items-center cursor-pointer group" aria-label="GetKYCApproved Home">
+          <img src="/assets/aistudio/file_000000000b8882118dc5a4ec4bf590c1_189e69e1.png" alt="GetKYCApproved" class="h-8 sm:h-9 w-auto max-w-[170px] sm:max-w-[190px] object-contain group-hover:opacity-90 transition-all">
+        </a>
+        <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
+        <div class="text-slate-500 font-medium">
+          <span>&copy; 2026 <strong>GetKYCApproved</strong>. All rights reserved. Identity &amp; Virtual Banking Verification.</span>
+        </div>
       </div>
       <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-slate-600">
         <button type="button" onclick="openPrivacyModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Privacy Policy</button>
@@ -4214,38 +4131,17 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     // ================= KENYA NATIONAL ID (MAISHA NAMBA 3RD GEN) CONTROLLER =================
-    const defaultKidPhotoSrc = '/assets/aistudio/1791439829976_2503f681.jpg';
+    const defaultKidPhotoSrc = '/assets/aistudio/kenya_maisha_portrait_adan.jpg';
+    const defaultKidGhostSrc = '/assets/aistudio/kenya_maisha_ghost_adan.jpg';
 
-    // Auto-crop authentic portrait from user's Maisha ID attachment
     function initKidDefaultPhoto() {
-      const img = new Image();
-      img.src = defaultKidPhotoSrc;
-      img.onload = () => {
-        try {
-          const canvas = document.createElement('canvas');
-          const sx = img.naturalWidth * 0.125;
-          const sy = img.naturalHeight * 0.34;
-          const sWidth = img.naturalWidth * 0.25;
-          const sHeight = img.naturalHeight * 0.54;
-
-          canvas.width = 300;
-          canvas.height = 380;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-          const croppedUrl = canvas.toDataURL('image/jpeg', 0.95);
-          window._defaultKidCroppedPhoto = croppedUrl;
-          if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = croppedUrl;
-          if ($('kidGhostPhoto')) $('kidGhostPhoto').src = croppedUrl;
-        } catch (e) {
-          // Keep CSS object-position fallback
-        }
-      };
+      if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
+      if ($('kidGhostPhoto')) $('kidGhostPhoto').src = defaultKidGhostSrc;
     }
 
     function resetKidPhoto() {
-      const fallback = window._defaultKidCroppedPhoto || defaultKidPhotoSrc;
-      if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = fallback;
-      if ($('kidGhostPhoto')) $('kidGhostPhoto').src = fallback;
+      if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
+      if ($('kidGhostPhoto')) $('kidGhostPhoto').src = defaultKidGhostSrc;
       if ($('kidPhotoInput')) $('kidPhotoInput').value = '';
       showToast('Photo Reset', 'Restored official Kenya Maisha ID specimen portrait');
     }
