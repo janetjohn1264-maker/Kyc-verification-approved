@@ -154,6 +154,17 @@
         repeating-linear-gradient(-45deg, rgba(34, 197, 94, 0.04) 0px, rgba(34, 197, 94, 0.04) 1px, transparent 1px, transparent 5px);
     }
 
+    /* Somali Passport Identity Card (Waraqadda Aqoonsiga) Reference Background */
+    .somali-pass-idcard-bg {
+      background-color: #f0f9fd;
+      background-image: 
+        radial-gradient(ellipse at 15% 45%, rgba(14, 165, 233, 0.16) 0%, transparent 60%),
+        radial-gradient(circle at 85% 25%, rgba(56, 189, 248, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(224, 242, 254, 0.45) 0%, transparent 70%),
+        repeating-linear-gradient(60deg, rgba(14, 165, 233, 0.035) 0px, rgba(14, 165, 233, 0.035) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-60deg, rgba(2, 132, 199, 0.03) 0px, rgba(2, 132, 199, 0.03) 1px, transparent 1px, transparent 6px);
+    }
+
     /* Somali Republic Driving License Security Background Pattern */
     .somali-driver-license-bg {
       background-color: #f8fafc;
@@ -2458,18 +2469,30 @@ XUDUR, BAKOOL, SOMALIA</span>
               <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · PASSPORT</span>
             </div>
 
-            <!-- Display Format: 2-Page Booklet Spread -->
-            <div class="flex items-center justify-between bg-sky-50/80 p-2.5 rounded-xl border border-sky-200">
-              <span class="text-xs font-bold text-sky-950 flex items-center gap-1.5">
-                <i class="fa-solid fa-book-open text-sky-700"></i>
-                Passport Display Format:
-              </span>
-              <span class="px-3 py-1 rounded-lg text-xs font-black bg-sky-700 text-white shadow-xs">
-                2-Page Booklet
-              </span>
+            <!-- Active Document Editor Switcher -->
+            <div class="bg-slate-50 p-2 rounded-xl border border-slate-200 space-y-1.5">
+              <div class="flex items-center justify-between px-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  Select Document to Edit:
+                </span>
+                <span class="text-[9.5px] font-mono-code font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+                  Stacked Pair
+                </span>
+              </div>
+              <div class="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs text-xs">
+                <button type="button" id="btn-sompass-editor-pass" onclick="setSomPassActiveForm('passport')" class="py-2 px-2.5 rounded-md font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 text-center">
+                  <i class="fa-solid fa-book-open"></i>
+                  <span>1. Passport</span>
+                </button>
+                <button type="button" id="btn-sompass-editor-card" onclick="setSomPassActiveForm('idcard')" class="py-2 px-2.5 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer transition-all flex items-center justify-center gap-1.5 text-center">
+                  <i class="fa-solid fa-id-card"></i>
+                  <span>2. Identity Card</span>
+                </button>
+              </div>
             </div>
 
-            <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+            <!-- Form 1: Somali Passport Booklet Controls -->
+            <form id="somPassDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
               <!-- Passport Photo Upload & Reset -->
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <label for="somPassPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Holder Photo / Sawirka Baasaboorka</label>
@@ -2593,6 +2616,98 @@ XUDUR, BAKOOL, SOMALIA</span>
               <button type="button" onclick="resetSomPassDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
                 <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>
                 <span>Reset to Sample Details</span>
+              </button>
+            </form>
+
+            <!-- Form 2: Somali Passport Identity Card (Waraqadda Aqoonsiga) Controls -->
+            <form id="somPassIdCardForm" class="hidden space-y-3 text-xs" onsubmit="event.preventDefault();">
+              
+              <!-- Quick Sync from Passport -->
+              <div class="bg-sky-50/80 p-2.5 rounded-xl border border-sky-200 flex items-center justify-between gap-2">
+                <div>
+                  <div class="font-bold text-sky-950 text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrows-rotate text-sky-600"></i>
+                    <span>Quick Sync with Passport</span>
+                  </div>
+                  <div class="text-[10px] text-sky-700">Fill card with applicant details from Passport Booklet above.</div>
+                </div>
+                <button type="button" onclick="syncSomPassToIdCard()" class="px-2.5 py-1.5 bg-sky-700 hover:bg-sky-800 text-white font-bold text-[11px] rounded-lg shadow-xs cursor-pointer transition-colors shrink-0">
+                  Sync Passport Data
+                </button>
+              </div>
+
+              <!-- Bearer Photo Upload & Reset -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label for="somPassIdPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Sawirka / Bearer Photo</label>
+                <input type="file" id="somPassIdPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-sky-700 file:text-white cursor-pointer">
+                <div class="flex items-center gap-2 mt-2">
+                  <button type="button" onclick="resetSomPassIdPhoto()" class="px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors text-[11px]">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset Photo
+                  </button>
+                  <button type="button" onclick="usePassportPhotoForIdCard()" class="px-2.5 py-1 text-sky-700 hover:bg-sky-50 rounded font-medium cursor-pointer transition-colors text-[11px]">
+                    <i class="fa-regular fa-image mr-1"></i>Copy from Passport
+                  </button>
+                </div>
+              </div>
+
+              <!-- Full Name (Magaca / الاسم) -->
+              <div>
+                <label for="somPassIdInputName" class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Name</label>
+                <input id="somPassIdInputName" type="text" value="Shufti Ahmed Mahammud" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+              </div>
+
+              <!-- Father's Name (Magaca Aabbaha / اسم الأب) -->
+              <div>
+                <label for="somPassIdInputFather" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Magaca Aabbaha / اسم الأب / Father's Name</label>
+                <input id="somPassIdInputFather" type="text" value="Hameed Ahmed" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+              </div>
+
+              <!-- Sex & Date of Birth -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="somPassIdInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Jinsiga / Sex</label>
+                  <select id="somPassIdInputSex" onchange="updateSomPassIdCardPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                    <option value="Female" selected>Female</option>
+                    <option value="Male">Male</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="somPassIdInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda Dhalashada / Date of Birth</label>
+                  <input id="somPassIdInputDob" type="text" value="22-02-1980" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+              </div>
+
+              <!-- Identity Number (Lambarka aqoonsiga / رقم الهوية) -->
+              <div>
+                <label for="somPassIdInputIdNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Lambarka aqoonsiga / Identity Number</label>
+                <input id="somPassIdInputIdNo" type="text" value="23654789221" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white text-slate-900">
+              </div>
+
+              <!-- Date of Issue & Date of Expiry -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="somPassIdInputIssue" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda la bixiyay / Issue Date</label>
+                  <input id="somPassIdInputIssue" type="text" value="15-11-2022" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+                <div>
+                  <label for="somPassIdInputExpiry" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda uu dhacayo / Expiry Date</label>
+                  <input id="somPassIdInputExpiry" type="text" value="12-06-2027" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadSomPassIdCardPNG()" class="py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-image"></i>Save Card PNG
+                </button>
+                <button type="button" onclick="printSomPassIdCard()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-print"></i>Print Card
+                </button>
+              </div>
+
+              <button type="button" onclick="resetSomPassIdCardToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>
+                <span>Reset to Reference Sample Details</span>
               </button>
             </form>
           </section>
@@ -2774,166 +2889,184 @@ XUDUR, BAKOOL, SOMALIA</span>
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-700"></span>
                     2. SOMALI PASSPORT IDENTITY CARD · WARAQADDA AQOONSIGA
                   </span>
-                  <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR-80 · 85.6 × 53.98 mm</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR-80 · 85.6 × 53.98 mm</span>
+                    <button type="button" onclick="setSomPassActiveForm('idcard')" class="px-2.5 py-1 text-[10px] font-bold text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 rounded-lg border border-sky-200 cursor-pointer no-print transition-colors">
+                      <i class="fa-solid fa-pen-to-square mr-1"></i>Edit Card
+                    </button>
+                  </div>
                 </div>
 
-                <article id="somalia-passport-id-card" class="somali-smart-id-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none p-3.5 sm:p-5 flex flex-col justify-between">
+                <!-- Live Interactive Somali National Identity Card Specimen -->
+                <article id="somalia-passport-id-card" class="somali-pass-idcard-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none p-3.5 sm:p-5 flex flex-col justify-between">
                   
-                  <!-- Top & Bottom Guilloche Wave Security Accent Strips -->
-                  <div class="absolute top-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
-                  <div class="absolute bottom-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
-
-                  <!-- Central Coat of Arms Security Watermark -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] z-0 translate-x-5 sm:translate-x-8">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-60 sm:w-76 h-auto filter hue-rotate-165 saturate-200">
+                  <!-- Fine Guilloche Wave Background SVG Overlay -->
+                  <div class="absolute inset-0 pointer-events-none opacity-40 z-0 overflow-hidden">
+                    <svg viewBox="0 0 600 380" class="w-full h-full text-sky-400 stroke-current fill-none stroke-[0.6]">
+                      <path d="M-50,50 Q100,120 250,50 T550,50 T850,50" />
+                      <path d="M-50,70 Q100,140 250,70 T550,70 T850,70" />
+                      <path d="M-50,90 Q100,160 250,90 T550,90 T850,90" />
+                      <path d="M-50,110 Q100,180 250,110 T550,110 T850,110" />
+                      <path d="M-50,130 Q100,200 250,130 T550,130 T850,130" />
+                      <path d="M-50,150 Q100,220 250,150 T550,150 T850,150" />
+                      <path d="M-50,170 Q100,240 250,170 T550,170 T850,170" />
+                      <path d="M-50,190 Q100,260 250,190 T550,190 T850,190" />
+                      <path d="M-50,210 Q100,280 250,210 T550,210 T850,210" />
+                      <path d="M-50,230 Q100,300 250,230 T550,230 T850,230" />
+                      <path d="M-50,250 Q100,320 250,250 T550,250 T850,250" />
+                    </svg>
                   </div>
 
-                  <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Silver Metallic Rosette on Right -->
-                  <div class="relative z-10 flex items-start justify-between gap-1 pb-1">
-                    <!-- Left: National ID Label & Number -->
-                    <div class="leading-tight shrink-0 text-left">
-                      <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                        National ID / <span class="font-arabic font-normal">رقم الهوية</span> / L. Qaranka
+                  <!-- Central Faint Coat of Arms Security Watermark -->
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.09] z-0 translate-x-4">
+                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 h-auto filter grayscale">
+                  </div>
+
+                  <!-- Faint Pink / Magenta Rosette Watermark (Top-Right of center) -->
+                  <div class="absolute top-8 right-28 sm:right-36 w-20 sm:w-24 h-20 sm:h-24 pointer-events-none opacity-20 z-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-pink-600 fill-current">
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3,3" />
+                      <path d="M50,15 C60,35 65,35 85,50 C65,65 60,65 50,85 C40,65 35,65 15,50 C35,35 40,35 50,15 Z" fill="currentColor" opacity="0.3"/>
+                    </svg>
+                  </div>
+
+                  <!-- TOP HEADER SECTION -->
+                  <div class="relative z-10 flex items-start justify-between gap-2 pb-1">
+                    <!-- Left: Somali Coat of Arms -->
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 flex items-center justify-center">
+                      <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
+                    </div>
+
+                    <!-- Center: 5 Official Header Lines -->
+                    <div class="text-center text-slate-950 leading-tight space-y-0.5 px-1 flex-1">
+                      <div class="font-extrabold text-[9px] sm:text-[11.5px] tracking-wide text-slate-900 font-sans">
+                        Jamhuuriyadda Federaalka Soomaaliya
                       </div>
-                      <div id="somPassIdCardNo" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wider mt-0.5">
-                        29505057463496
+                      <div class="font-arabic font-bold text-[10px] sm:text-[12.5px] leading-none text-slate-900">
+                        جمهورية الصومال الفدرالية
+                      </div>
+                      <div class="font-bold text-[8.5px] sm:text-[10.5px] tracking-wide text-slate-900 font-sans">
+                        Federal Republic of Somalia
+                      </div>
+                      <div class="font-extrabold text-[8.5px] sm:text-[10.5px] tracking-wide text-slate-900 font-sans">
+                        Kaarka Aqoonsiga
+                      </div>
+                      <div class="font-black text-[8px] sm:text-[10px] tracking-wider text-slate-900 font-sans">
+                        IDENTITY CARD / <span class="font-arabic font-bold">بطاقة الهوية</span>
                       </div>
                     </div>
 
-                    <!-- Center: Official Titles Hierarchy -->
-                    <div class="text-center text-slate-950 leading-none space-y-0.5 px-1 flex-1">
-                      <div class="font-bold text-[8px] sm:text-[10px] tracking-wide uppercase text-[#14532d]">
-                        JAMHUURIYADDA SOOMAALIYA
-                      </div>
-                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-[#14532d]">
-                        جمهورية الصومال
-                      </div>
-                      <div class="font-bold text-[7px] sm:text-[8.5px] tracking-wider uppercase text-[#14532d]">
-                        SOMALI REPUBLIC
-                      </div>
-                      <div class="font-black text-[8.5px] sm:text-[10.5px] tracking-wide uppercase pt-0.5 text-[#14532d]">
-                        WARAQADDA AQOONSIGA
-                      </div>
-                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-[#14532d]">
-                        بطاقة الهوية
-                      </div>
-                      <div class="font-black text-[7.5px] sm:text-[9px] tracking-wider uppercase text-[#14532d]">
-                        IDENTITY CARD
-                      </div>
-                    </div>
-
-                    <!-- Right: Authentic 8-Lobed Silver Scalloped Metallic Foil Hologram Seal -->
-                    <div class="shrink-0 flex items-center justify-end pt-0.5">
-                      <div class="w-10 h-10 sm:w-13 sm:h-13 relative flex items-center justify-center drop-shadow-sm">
-                        <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow-2xs">
-                          <defs>
-                            <radialGradient id="silverFoilGlowPass" cx="45%" cy="40%" r="55%">
-                              <stop offset="0%" stop-color="#ffffff"/>
-                              <stop offset="40%" stop-color="#f8fafc"/>
-                              <stop offset="70%" stop-color="#e2e8f0"/>
-                              <stop offset="100%" stop-color="#cbd5e1"/>
-                            </radialGradient>
-                            <linearGradient id="silverEdgePass" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stop-color="#ffffff"/>
-                              <stop offset="50%" stop-color="#cbd5e1"/>
-                              <stop offset="100%" stop-color="#94a3b8"/>
-                            </linearGradient>
-                          </defs>
-                          <path d="M 50,5 C 57,5 62,13 68,10 C 74,8 81,13 85,19 C 89,24 95,28 96,35 C 97,42 93,48 95,55 C 96,62 90,68 88,74 C 86,81 79,84 74,89 C 68,93 62,90 55,94 C 48,97 42,93 35,95 C 28,96 24,90 19,85 C 13,81 8,74 10,68 C 13,62 5,57 5,50 C 5,43 13,38 10,32 C 8,26 13,19 19,15 C 24,11 28,5 35,6 C 42,7 48,11 50,5 Z" 
-                                fill="url(#silverFoilGlowPass)" stroke="url(#silverEdgePass)" stroke-width="1.2"/>
-                          <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(203, 213, 225, 0.6)" stroke-width="0.8" stroke-dasharray="2 2"/>
-                          <polygon points="50,30 55,42 68,42 58,50 62,62 50,54 38,62 42,50 32,42 45,42" fill="rgba(255,255,255,0.7)" stroke="#cbd5e1" stroke-width="0.5"/>
-                        </svg>
-                      </div>
+                    <!-- Right: Somali National Flag -->
+                    <div class="w-11 sm:w-14 h-7 sm:h-9 shrink-0 rounded-xs shadow-2xs border border-[#3b82f6]/40 bg-[#4189dd] flex items-center justify-center relative overflow-hidden">
+                      <span class="text-white text-xs sm:text-sm font-black select-none leading-none">★</span>
                     </div>
                   </div>
 
-                  <!-- MAIN BODY ROW: Smart Chip + Full Name (Left/Center) & Bearer Photo (Right) -->
-                  <div class="relative z-10 flex items-start gap-2 sm:gap-3 my-auto">
-                    <!-- Left Column: Chip, Name, Birth, Issue, Expiry -->
-                    <div class="flex-1 space-y-1.5 min-w-0">
+                  <!-- MAIN BODY ROW: Left (Emblem & Ghost) + Center (Fields) + Right (Photo & Signature) -->
+                  <div class="relative z-10 grid grid-cols-12 gap-2 sm:gap-3 items-center my-auto">
+                    
+                    <!-- Col 1: Left Security Icons (Gold Star Badge & Ghost Portrait Oval) -->
+                    <div class="col-span-2 sm:col-span-2 flex flex-col items-center justify-between h-full py-1 space-y-3">
+                      <!-- Golden Metallic Badge with White Star -->
+                      <div class="w-10 sm:w-12 h-6 sm:h-7 rounded-sm shadow-xs border border-[#92400e]/60 bg-gradient-to-r from-[#b4802c] via-[#eab308] to-[#a16207] flex items-center justify-center">
+                        <span class="text-white text-[11px] sm:text-xs font-black select-none">★</span>
+                      </div>
+
+                      <!-- Lenticular Oval Ghost Portrait Lens -->
+                      <div class="w-11 sm:w-13 h-7 sm:h-8 rounded-[50%] overflow-hidden border border-slate-400/80 shadow-2xs relative bg-slate-200 flex items-center justify-center">
+                        <img id="somPassIdCardGhostPhoto" src="/assets/aistudio/somali_card_female_portrait.jpg" alt="" class="w-full h-full object-cover filter grayscale contrast-125 opacity-70">
+                        <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 3px);"></div>
+                      </div>
+                    </div>
+
+                    <!-- Col 2: Center Data Fields -->
+                    <div class="col-span-7 sm:col-span-7 space-y-1 text-slate-900">
                       
-                      <!-- Top Sub-row: Chip & Full Name side-by-side -->
-                      <div class="flex items-center gap-2 sm:gap-3">
-                        <!-- Electronic Gold Smart Chip -->
-                        <div class="shrink-0">
-                          <div class="w-13 sm:w-16 h-9 sm:h-11 rounded-md bg-gradient-to-br from-[#fde68a] via-[#f59e0b] to-[#d97706] border border-[#b45309] p-0.5 relative shadow-xs overflow-hidden">
-                            <div class="absolute inset-0 bg-gradient-to-tr from-amber-300 via-yellow-100 to-amber-400 opacity-80"></div>
-                            <svg viewBox="0 0 60 42" class="w-full h-full relative z-10 text-amber-950/70 stroke-current stroke-[1.2] fill-none">
-                              <rect x="1" y="1" width="58" height="40" rx="4" stroke="#92400e" stroke-width="1"/>
-                              <line x1="1" y1="14" x2="20" y2="14"/>
-                              <line x1="1" y1="28" x2="20" y2="28"/>
-                              <line x1="40" y1="14" x2="59" y2="14"/>
-                              <line x1="40" y1="28" x2="59" y2="28"/>
-                              <line x1="20" y1="1" x2="20" y2="41"/>
-                              <line x1="40" y1="1" x2="40" y2="41"/>
-                              <rect x="23" y="12" width="14" height="18" rx="2" fill="#fbbf24" fill-opacity="0.25"/>
-                            </svg>
+                      <!-- Field 1: Name -->
+                      <div class="border-b border-dashed border-slate-400/80 pb-0.5">
+                        <div class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">
+                          Magaca / <span class="font-arabic font-normal">الاسم</span> / Name
+                        </div>
+                        <div id="somPassIdCardPreviewName" class="font-black text-slate-950 text-xs sm:text-[13px] tracking-wide uppercase leading-tight mt-0.5 truncate">
+                          Shufti Ahmed Mahammud
+                        </div>
+                      </div>
+
+                      <!-- Field 2: Father's Name -->
+                      <div class="border-b border-dashed border-slate-400/80 pb-0.5">
+                        <div class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">
+                          Magaca Aabbaha / <span class="font-arabic font-normal">اسم الأب</span> / Father's Name
+                        </div>
+                        <div id="somPassIdCardPreviewFather" class="font-black text-slate-950 text-[10.5px] sm:text-[11.5px] tracking-wide uppercase leading-tight mt-0.5 truncate">
+                          Hameed Ahmed
+                        </div>
+                      </div>
+
+                      <!-- Field 3 & 4: Sex & Date of Birth -->
+                      <div class="grid grid-cols-12 gap-1 border-b border-dashed border-slate-400/80 pb-0.5 items-start">
+                        <div class="col-span-5">
+                          <div class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">
+                            Jinsiga / <span class="font-arabic font-normal">الجنس</span> / Sex
+                          </div>
+                          <div id="somPassIdCardPreviewSex" class="font-black text-slate-950 text-[10px] sm:text-[11px] leading-tight mt-0.5 capitalize">
+                            Female
                           </div>
                         </div>
-
-                        <!-- Name Block -->
-                        <div class="flex-1 min-w-0">
-                          <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                            Magaca / <span class="font-arabic font-normal">الاسم</span> / Name
+                        <div class="col-span-7 border-l border-slate-300 pl-1.5">
+                          <div class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">
+                            Taariikhda Dhalashada / <span class="font-arabic font-normal">الميلاد</span> / Date of Birth
                           </div>
-                          <div id="somPassIdCardName" class="font-black text-slate-950 text-xs sm:text-[13px] md:text-sm tracking-wide leading-tight mt-0.5 uppercase break-words">
-                            MAXAMED CABDIQADIR MAXAMED
+                          <div id="somPassIdCardPreviewDob" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-[11px] leading-tight mt-0.5">
+                            22-02-1980
                           </div>
                         </div>
                       </div>
 
-                      <!-- Birth Row: Date + Place of Birth -->
-                      <div>
-                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Taariikhda dhalashada / <span class="font-arabic font-normal">الميلاد</span> / Birth
+                      <!-- Field 5: Identity Number -->
+                      <div class="border-b border-dashed border-slate-400/80 pb-0.5">
+                        <div class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">
+                          Lambarka aqoonsiga / <span class="font-arabic font-normal">رقم الهوية</span> / Identity Number
                         </div>
-                        <div class="flex items-center gap-3 sm:gap-5 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
-                          <span id="somPassIdCardDob" class="text-slate-950 font-mono-code">05 May 1995</span>
-                          <span id="somPassIdCardPob" class="text-slate-950 tracking-wide uppercase">HUDUR</span>
-                        </div>
-                      </div>
-
-                      <!-- Issue Row: Date + Place of Issue -->
-                      <div>
-                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Taariikhda la bixiyay / <span class="font-arabic font-normal">الاصدار</span> / Issue
-                        </div>
-                        <div class="flex items-center gap-4 sm:gap-6 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
-                          <span id="somPassIdCardIssue" class="text-slate-950 font-mono-code">21 Apr 2018</span>
-                          <span id="somPassIdCardIssuePlace" class="text-slate-950 uppercase tracking-wide">BAIDOA</span>
+                        <div id="somPassIdCardPreviewIdNo" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm md:text-[14.5px] tracking-[0.08em] leading-tight mt-0.5">
+                          23654789221
                         </div>
                       </div>
 
-                      <!-- Bottom Left Expiry Row -->
-                      <div>
-                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Taariikhda uu dhacayo / <span class="font-arabic font-normal">الانتهاء</span> / Expiry
+                      <!-- Field 6 & 7: Issue Date & Expiry Date -->
+                      <div class="grid grid-cols-2 gap-1.5 text-[7px] sm:text-[8px] pt-0.5">
+                        <div>
+                          <div class="font-bold text-slate-700 leading-none">
+                            Taariikhda la bixiyay / <span class="font-arabic font-normal">الاصدار</span> / Date of Issue
+                          </div>
+                          <div id="somPassIdCardPreviewIssue" class="font-mono-code font-bold text-slate-900 text-[9.5px] sm:text-[10.5px] leading-tight mt-0.5">
+                            15-11-2022
+                          </div>
                         </div>
-                        <div id="somPassIdCardExpiry" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 font-mono-code mt-0.5">
-                          20 Apr 2023
+                        <div class="border-l border-slate-300 pl-1.5">
+                          <div class="font-bold text-slate-700 leading-none">
+                            Taariikhda uu dhacayo / <span class="font-arabic font-normal">الانتهاء</span> / Date of Expiry
+                          </div>
+                          <div id="somPassIdCardPreviewExpiry" class="font-mono-code font-bold text-slate-900 text-[9.5px] sm:text-[10.5px] leading-tight mt-0.5">
+                            12-06-2027
+                          </div>
                         </div>
                       </div>
 
                     </div>
 
-                    <!-- Right Column: Bearer Portrait Photo & Gender Field below it -->
-                    <div class="w-24 sm:w-28 md:w-32 shrink-0 flex flex-col items-center">
+                    <!-- Col 3: Right Column (Photo & Signature) -->
+                    <div class="col-span-3 sm:col-span-3 flex flex-col items-center">
                       <!-- Bearer Portrait Photo -->
-                      <div class="w-full aspect-[3/3.8] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
-                        <img id="somPassIdCardPhoto" src="/assets/aistudio/somali_passport_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                      <div class="w-full aspect-[3/3.7] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
+                        <img id="somPassIdCardPreviewPhoto" src="/assets/aistudio/somali_card_female_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
-                      <!-- Gender Field -->
-                      <div class="w-full text-left mt-1">
-                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Lab/Dheddig / <span class="font-arabic font-normal">الجنس</span> / Gender
-                        </div>
-                        <div id="somPassIdCardGender" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 uppercase mt-0.5">
-                          MALE
-                        </div>
+                      <!-- Holder's Signature block directly under photo -->
+                      <div class="w-full mt-1.5">
+                        <img src="/assets/aistudio/somali_card_signature_block.png" alt="Holder's Signature" class="w-full h-auto object-contain">
                       </div>
                     </div>
+
                   </div>
 
                 </article>
@@ -3537,204 +3670,31 @@ XUDUR, BAKOOL, SOMALIA</span>
             </div>
           </header>
 
-          <!-- Main Grid: Card Showcase & Technical Datasheet -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- Left Column: High-Res Official Specimen Card Display -->
-            <section class="lg:col-span-7 flex flex-col items-center">
-              <div class="w-full max-w-[620px] space-y-3">
-                <div class="flex items-center justify-between text-xs px-1 text-slate-500">
-                  <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                    <span>Official National Identity Card Specimen</span>
-                  </div>
-                  <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    588 × 351 px · CR-80 Standard
-                  </span>
+          <!-- Specimen Card Display (Centered) -->
+          <section class="flex flex-col items-center justify-center">
+            <div class="w-full max-w-[680px] space-y-3">
+              <div class="flex items-center justify-between text-xs px-1 text-slate-500">
+                <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                  <span>Official National Identity Card Specimen</span>
                 </div>
-
-                <!-- Specimen Card Container with Real Shadow and Frame -->
-                <div class="relative w-full aspect-[1.62/1] rounded-2xl shadow-xl border-2 border-emerald-900/30 overflow-hidden bg-slate-100 group">
-                  <img src="/assets/aistudio/images__7__6a48fe94.png" alt="Official Federal Republic of Nigeria National Identity Card Specimen" class="w-full h-full object-cover">
-                  
-                  <!-- Watermark Pill Overlay -->
-                  <div class="absolute bottom-2.5 right-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10.5px] px-2.5 py-1 rounded-lg font-mono-code font-bold flex items-center gap-1.5 shadow-md">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Official NIMC Specimen · 1:1 Reference</span>
-                  </div>
-                </div>
-
-                <!-- Fast Actions Bar under Card -->
-                <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-white rounded-xl border border-slate-200 text-xs no-print">
-                  <div class="flex items-center gap-2 text-slate-600">
-                    <i class="fa-solid fa-shield-halved text-emerald-600"></i>
-                    <span class="font-medium">Specimen verified against NIMC issuance format standards</span>
-                  </div>
-                  <button type="button" onclick="copyNgaSpecimenData()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg border border-slate-200 transition-colors cursor-pointer flex items-center gap-1.5">
-                    <i class="fa-regular fa-copy"></i>
-                    <span>Copy Credentials</span>
-                  </button>
-                </div>
-
-                <!-- Security Verification Markers Breakdown -->
-                <div class="bg-emerald-950 text-white p-4 sm:p-5 rounded-2xl shadow-sm space-y-3">
-                  <div class="flex items-center justify-between border-b border-emerald-800/60 pb-2.5">
-                    <h3 class="font-bold text-xs uppercase tracking-wider flex items-center gap-2 text-emerald-300">
-                      <i class="fa-solid fa-microchip"></i>
-                      <span>Key Security &amp; Physical Features</span>
-                    </h3>
-                    <span class="text-[10px] text-emerald-400 font-mono-code font-semibold">ICAO 9303 / NIMC Spec</span>
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-memory"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">Gold Contact Smartchip</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">Microchip with embedded national biometric data &amp; cryptographic certificate.</div>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-fingerprint"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">Secondary Ghost Portrait</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">Laser-imprinted faint secondary watermark at bottom-left corner.</div>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-blue-400/20 text-blue-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-certificate"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">Optical NGA Hologram</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">Diffractive optically variable device (DOVD) featuring national country code.</div>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-teal-400/20 text-teal-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-shield"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">Coat of Arms Guilloche</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">Anti-copy fine line guilloche geometry centered with federal crest.</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </section>
-
-            <!-- Right Column: Official Specimen Data Sheet -->
-            <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div>
-                  <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-id-card text-emerald-600"></i>
-                    <span>Official Specimen Credential Record</span>
-                  </h2>
-                  <p class="text-[11px] text-slate-500 mt-0.5">Data extracted verbatim from official NIMC reference card.</p>
-                </div>
-                <span class="text-[10px] bg-slate-100 text-slate-700 font-mono-code font-bold px-2 py-0.5 rounded border border-slate-200">
-                  NGA · SPECIMEN
+                <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  588 × 351 px · CR-80 Standard
                 </span>
               </div>
 
-              <!-- Data Fields Table -->
-              <div class="divide-y divide-slate-100 text-xs">
+              <!-- Specimen Card Container with Real Shadow and Frame -->
+              <div class="relative w-full aspect-[1.62/1] rounded-2xl shadow-xl border-2 border-emerald-900/30 overflow-hidden bg-slate-100 group">
+                <img src="/assets/aistudio/images__7__6a48fe94.png" alt="Official Federal Republic of Nigeria National Identity Card Specimen" class="w-full h-full object-cover">
                 
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Surname</span>
-                  <span class="font-black text-slate-900 uppercase font-mono-code">PROUD</span>
+                <!-- Watermark Pill Overlay -->
+                <div class="absolute bottom-2.5 right-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10.5px] px-2.5 py-1 rounded-lg font-mono-code font-bold flex items-center gap-1.5 shadow-md">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>Official NIMC Specimen · 1:1 Reference</span>
                 </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">First Name</span>
-                  <span class="font-black text-slate-900 uppercase font-mono-code">NIGERIAN</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Middle Name</span>
-                  <span class="font-black text-slate-900 uppercase font-mono-code">CITIZEN</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Date of Birth (DOB)</span>
-                  <span class="font-black text-slate-900 font-mono-code">01 OCT 60</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Issue Date</span>
-                  <span class="font-black text-slate-900 font-mono-code">28 AUG 14</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Expiry Date</span>
-                  <span class="font-black text-slate-900 font-mono-code">01/19</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Nationality</span>
-                  <span class="font-black text-slate-900 font-mono-code">NGA (NIGERIAN)</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Sex</span>
-                  <span class="font-black text-slate-900 font-mono-code">M (MALE)</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Height</span>
-                  <span class="font-black text-slate-900 font-mono-code">26cm</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Card Number (16-Digit)</span>
-                  <span class="font-black text-emerald-800 font-mono-code tracking-wider bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    5394 2678 4245 0618
-                  </span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Document Number</span>
-                  <span class="font-black text-slate-900 font-mono-code">4812640614</span>
-                </div>
-
-                <div class="py-2.5 flex items-center justify-between">
-                  <span class="font-semibold text-slate-500 uppercase text-[10.5px] tracking-wider">Issuing Authority</span>
-                  <span class="font-bold text-slate-800">NIMC · Federal Republic of Nigeria</span>
-                </div>
-
               </div>
-
-              <!-- Verification Readiness Box -->
-              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
-                <div class="font-bold text-slate-800 flex items-center gap-1.5">
-                  <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                  <span>Global KYC &amp; Verification Suitability</span>
-                </div>
-                <p class="text-[11px] text-slate-600 leading-relaxed">
-                  The Nigerian National Identity Smart Card is recognized across international payment processors (PayPal, Payoneer, Raenest, Grey) and global cryptocurrency exchanges (Binance, Bybit, OKX) under Tier 2/3 biometric KYC standards.
-                </p>
-              </div>
-
-              <!-- Quick action download button -->
-              <div class="pt-2 no-print">
-                <button type="button" onclick="downloadNgaCardPNG()" class="w-full py-2.5 px-4 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-sm text-center flex items-center justify-center gap-2 cursor-pointer transition-all">
-                  <i class="fa-solid fa-download"></i>
-                  <span>Download Authentic Specimen PNG</span>
-                </button>
-              </div>
-
-            </section>
-
-          </div>
+            </div>
+          </section>
         </main>
       </div>
 
@@ -6171,6 +6131,134 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
       window.print();
     }
 
+    // ================= SOMALIA PASSPORT IDENTITY CARD (WARAQADDA AQOONSIGA) CONTROLLER =================
+    const defaultSomPassIdPhoto = '/assets/aistudio/somali_card_female_portrait.jpg';
+
+    function setSomPassActiveForm(mode) {
+      const passForm = $('somPassDocForm');
+      const cardForm = $('somPassIdCardForm');
+      const btnPass = $('btn-sompass-editor-pass');
+      const btnCard = $('btn-sompass-editor-card');
+
+      if (mode === 'idcard') {
+        if (passForm) passForm.classList.add('hidden');
+        if (cardForm) cardForm.classList.remove('hidden');
+        if (btnPass) {
+          btnPass.className = 'py-2 px-2.5 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer transition-all flex items-center justify-center gap-1.5 text-center';
+        }
+        if (btnCard) {
+          btnCard.className = 'py-2 px-2.5 rounded-md font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 text-center';
+        }
+      } else {
+        if (passForm) passForm.classList.remove('hidden');
+        if (cardForm) cardForm.classList.add('hidden');
+        if (btnPass) {
+          btnPass.className = 'py-2 px-2.5 rounded-md font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 text-center';
+        }
+        if (btnCard) {
+          btnCard.className = 'py-2 px-2.5 rounded-md font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer transition-all flex items-center justify-center gap-1.5 text-center';
+        }
+      }
+    }
+
+    function updateSomPassIdCardPreview() {
+      const name = $('somPassIdInputName')?.value || 'Shufti Ahmed Mahammud';
+      const father = $('somPassIdInputFather')?.value || 'Hameed Ahmed';
+      const sex = $('somPassIdInputSex')?.value || 'Female';
+      const dob = $('somPassIdInputDob')?.value || '22-02-1980';
+      const idNo = $('somPassIdInputIdNo')?.value || '23654789221';
+      const issue = $('somPassIdInputIssue')?.value || '15-11-2022';
+      const expiry = $('somPassIdInputExpiry')?.value || '12-06-2027';
+
+      if ($('somPassIdCardPreviewName')) $('somPassIdCardPreviewName').textContent = name;
+      if ($('somPassIdCardPreviewFather')) $('somPassIdCardPreviewFather').textContent = father;
+      if ($('somPassIdCardPreviewSex')) $('somPassIdCardPreviewSex').textContent = sex;
+      if ($('somPassIdCardPreviewDob')) $('somPassIdCardPreviewDob').textContent = dob;
+      if ($('somPassIdCardPreviewIdNo')) $('somPassIdCardPreviewIdNo').textContent = idNo;
+      if ($('somPassIdCardPreviewIssue')) $('somPassIdCardPreviewIssue').textContent = issue;
+      if ($('somPassIdCardPreviewExpiry')) $('somPassIdCardPreviewExpiry').textContent = expiry;
+    }
+
+    function resetSomPassIdPhoto() {
+      if ($('somPassIdCardPreviewPhoto')) $('somPassIdCardPreviewPhoto').src = defaultSomPassIdPhoto;
+      if ($('somPassIdCardGhostPhoto')) $('somPassIdCardGhostPhoto').src = defaultSomPassIdPhoto;
+      if ($('somPassIdPhotoInput')) $('somPassIdPhotoInput').value = '';
+      showToast('Photo Reset', 'Restored official Identity Card reference photo');
+    }
+
+    function usePassportPhotoForIdCard() {
+      const passPhoto = $('somPassPreviewPhotoSpread')?.src || defaultSomPassPhoto;
+      if ($('somPassIdCardPreviewPhoto')) $('somPassIdCardPreviewPhoto').src = passPhoto;
+      if ($('somPassIdCardGhostPhoto')) $('somPassIdCardGhostPhoto').src = passPhoto;
+      showToast('Photo Synced', 'Applied Passport photo to Identity Card');
+    }
+
+    function syncSomPassToIdCard() {
+      const passName = $('somPassInputName')?.value;
+      const passDob = $('somPassInputDob')?.value;
+      const passSex = $('somPassInputSex')?.value;
+      const passNid = $('somPassInputNid')?.value;
+      const passIssue = $('somPassInputIssueDate')?.value;
+      const passExp = $('somPassInputExpiryDate')?.value;
+
+      if (passName && $('somPassIdInputName')) $('somPassIdInputName').value = passName;
+      if (passDob && $('somPassIdInputDob')) $('somPassIdInputDob').value = passDob;
+      if (passSex && $('somPassIdInputSex')) {
+        $('somPassIdInputSex').value = passSex.toUpperCase().startsWith('F') ? 'Female' : 'Male';
+      }
+      if (passNid && $('somPassIdInputIdNo')) $('somPassIdInputIdNo').value = passNid;
+      if (passIssue && $('somPassIdInputIssue')) $('somPassIdInputIssue').value = passIssue;
+      if (passExp && $('somPassIdInputExpiry')) $('somPassIdInputExpiry').value = passExp;
+
+      usePassportPhotoForIdCard();
+      updateSomPassIdCardPreview();
+      showToast('Data Synced', 'Synchronized applicant details from Passport into Identity Card');
+    }
+
+    function resetSomPassIdCardToSample() {
+      if ($('somPassIdInputName')) $('somPassIdInputName').value = 'Shufti Ahmed Mahammud';
+      if ($('somPassIdInputFather')) $('somPassIdInputFather').value = 'Hameed Ahmed';
+      if ($('somPassIdInputSex')) $('somPassIdInputSex').value = 'Female';
+      if ($('somPassIdInputDob')) $('somPassIdInputDob').value = '22-02-1980';
+      if ($('somPassIdInputIdNo')) $('somPassIdInputIdNo').value = '23654789221';
+      if ($('somPassIdInputIssue')) $('somPassIdInputIssue').value = '15-11-2022';
+      if ($('somPassIdInputExpiry')) $('somPassIdInputExpiry').value = '12-06-2027';
+      resetSomPassIdPhoto();
+      updateSomPassIdCardPreview();
+      showToast('Sample Restored', 'Restored Somali Passport Identity Card reference details');
+    }
+
+    async function downloadSomPassIdCardPNG() {
+      const card = $('somalia-passport-id-card');
+      if (!card) return;
+      showToast('Rendering...', 'Generating high-resolution Somali Passport Identity Card PNG');
+      try {
+        const canvas = await html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#f0f9fd'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'somali-passport-identity-card.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'Identity Card PNG generated successfully');
+      } catch (err) {
+        console.error('html2canvas error:', err);
+        showToast('Error', 'Failed to generate Identity Card PNG');
+      }
+    }
+
+    function printSomPassIdCard() {
+      window.print();
+    }
 
     // ================= SOMALIA DRIVER'S LICENSE CONTROLLER =================
     const defaultSomLicPhotoSrc = '/assets/aistudio/FB_IMG_1792645056894_600495b6.jpg';
@@ -7016,6 +7104,23 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
               if ($('somPassPreviewPhotoSpread')) $('somPassPreviewPhotoSpread').src = ev.target.result;
               if ($('somPassIdCardPhoto')) $('somPassIdCardPhoto').src = ev.target.result;
               showToast('Photo Updated', 'Custom portrait photo applied to Somali Passport & ID Card');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Somalia Passport Identity Card Photo upload
+      const somPassIdPhotoInput = $('somPassIdPhotoInput');
+      if (somPassIdPhotoInput) {
+        somPassIdPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('somPassIdCardPreviewPhoto')) $('somPassIdCardPreviewPhoto').src = ev.target.result;
+              if ($('somPassIdCardGhostPhoto')) $('somPassIdCardGhostPhoto').src = ev.target.result;
+              showToast('Card Photo Updated', 'Custom portrait photo applied to Identity Card');
             };
             reader.readAsDataURL(file);
           }
