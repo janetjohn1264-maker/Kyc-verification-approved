@@ -3321,7 +3321,7 @@ XUDUR, BAKOOL, SOMALIA</span>
               <div>
                 <h1 class="text-lg font-bold flex items-center gap-2">
                   <span class="text-xl">🇪🇹</span>
-                  <span>Ethiopia national id</span>
+                  <span>Ethiopian National ID (Fayda)</span>
                 </h1>
                 <p class="text-xs text-slate-500 mt-0.5">የኢትዮጵያ ዲጂታል መታወቂያ ካርድ · Ethiopian Digital ID Card Specimen Builder.</p>
               </div>
@@ -3331,26 +3331,28 @@ XUDUR, BAKOOL, SOMALIA</span>
             </div>
 
             <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
-              <!-- Bearer Photo Upload -->
-              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 space-y-2">
+              <!-- Photo Upload & Toggle -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
                 <div class="flex items-center justify-between">
                   <label for="ethPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 text-[10px]">
                     Bearer Photo / ፎቶግራፍ
                   </label>
-                  <span class="text-[10px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
-                    Ethiopia national id
-                  </span>
+                  <div class="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 text-[10px]">
+                    <button type="button" id="btn-eth-sil" onclick="setEthPhotoMode('silhouette')" class="px-2 py-0.5 rounded font-bold bg-emerald-700 text-white shadow-2xs transition-all cursor-pointer">
+                      Silhouette
+                    </button>
+                    <button type="button" id="btn-eth-photo" onclick="setEthPhotoMode('photo')" class="px-2 py-0.5 rounded font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+                      Custom Photo
+                    </button>
+                  </div>
                 </div>
 
                 <input type="file" id="ethPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white cursor-pointer">
                 
-                <div class="flex items-center justify-between pt-0.5">
-                  <button type="button" onclick="resetEthPhoto()" class="text-slate-600 hover:text-emerald-800 rounded font-medium cursor-pointer transition-colors text-[11px] flex items-center gap-1">
-                    <i class="fa-solid fa-rotate-left text-[10px]"></i>
-                    <span>Reset Specimen Photo</span>
-                  </button>
-                  <span class="text-[10px] text-slate-400">JPG / PNG portrait</span>
-                </div>
+                <button type="button" onclick="resetEthPhoto()" class="px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors text-[11px] flex items-center gap-1">
+                  <i class="fa-solid fa-rotate-left mr-1"></i>
+                  <span>Reset to Reference Silhouette</span>
+                </button>
               </div>
 
               <!-- Names Section -->
@@ -3515,11 +3517,19 @@ XUDUR, BAKOOL, SOMALIA</span>
                 <!-- Main Content Body: Portrait on Left + Data Fields on Right -->
                 <div class="grid grid-cols-12 gap-3 sm:gap-4 items-start relative z-10 mt-2 sm:mt-2.5">
                   
-                  <!-- Left: Bearer Portrait -->
+                  <!-- Left: Bearer Portrait (Silhouette or Custom Photo) -->
                   <div class="col-span-4 flex flex-col items-center">
-                    <div id="ethPortraitContainer" class="w-full aspect-[3.1/3.9] rounded-2xl overflow-hidden shadow-xs relative bg-slate-100/60 flex items-center justify-center">
-                      <!-- Photo Image -->
-                      <img id="ethPreviewPhoto" src="/assets/aistudio/ethiopia_fayda_portrait.jpg" alt="Fayda Bearer Photo" class="w-full h-full object-cover rounded-2xl">
+                    <div id="ethPortraitContainer" class="w-full aspect-[3.1/3.9] rounded-2xl overflow-hidden shadow-xs relative bg-transparent flex items-center justify-center">
+                      <!-- Silhouette Box (Default matching reference image) -->
+                      <div id="ethSilhouetteBox" class="w-full h-full flex items-center justify-center">
+                        <svg viewBox="0 0 160 190" class="w-full h-full text-[#383b3d]" fill="currentColor">
+                          <circle cx="80" cy="56" r="36"/>
+                          <path d="M12 178 C12 125, 45 108, 80 108 C115 108, 148 125, 148 178 Z"/>
+                        </svg>
+                      </div>
+
+                      <!-- Custom Photo Element (Hidden by default until photo uploaded/toggled) -->
+                      <img id="ethPreviewPhoto" src="/assets/aistudio/ethiopia_fayda_portrait.jpg" alt="Fayda Bearer Photo" class="hidden w-full h-full object-cover rounded-2xl">
                     </div>
                   </div>
 
@@ -3634,340 +3644,57 @@ XUDUR, BAKOOL, SOMALIA</span>
                     NIMC Official Specimen
                   </span>
                   <span class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded-full border border-slate-200 font-mono-code">
-                    Live Preview Editor
+                    1:1 Authentic Reference
                   </span>
                 </div>
                 <p class="text-xs text-slate-500 mt-1">
-                  National Identity Management Commission (NIMC) · Polycarbonate Smart Card Specimen for Verification &amp; Live Document Editor.
+                  National Identity Management Commission (NIMC) · Polycarbonate Smart Card Specimen for Verification &amp; Compliance.
                 </p>
               </div>
             </div>
 
-            <!-- View Switcher & Action Buttons in Header -->
+            <!-- Action Buttons in Header -->
             <div class="flex flex-wrap items-center gap-2.5 no-print">
-              <!-- Mode Switcher: Live Editor vs Original Specimen -->
-              <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                <button type="button" id="btn-nga-card-editor" onclick="setNgaCardViewMode('editor')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 text-white shadow-xs cursor-pointer transition-all">
-                  <i class="fa-solid fa-pen-to-square mr-1"></i>Live Editor
-                </button>
-                <button type="button" id="btn-nga-card-specimen" onclick="setNgaCardViewMode('specimen')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200 cursor-pointer transition-all">
-                  <i class="fa-solid fa-book-open mr-1"></i>Official Specimen
-                </button>
-              </div>
-
               <button type="button" onclick="downloadNgaCardPNG()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
                 <i class="fa-solid fa-download"></i>
-                <span>Download (PNG)</span>
+                <span>Download Specimen (PNG)</span>
               </button>
               <button type="button" onclick="printNgaCard()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
                 <i class="fa-solid fa-print"></i>
-                <span>Print</span>
+                <span>Print Specimen</span>
               </button>
               <button type="button" onclick="viewNgaFullRes()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-2 cursor-pointer transition-all">
                 <i class="fa-solid fa-magnifying-glass-plus"></i>
-                <span>Full Res</span>
+                <span>Full Resolution</span>
               </button>
             </div>
           </header>
 
-          <!-- Main Grid: Controls Form (Left) & Live Card Preview (Right) -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- Left Column: Controls Form -->
-            <section id="ngaCardFormSection" class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
-              <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                <div>
-                  <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
-                    <i class="fa-solid fa-id-card text-emerald-700"></i>
-                    <span>NIMC Card Editor</span>
-                  </h2>
-                  <p class="text-xs text-slate-500 mt-0.5">Live bio-data editor for Nigeria National Identity Smart Card.</p>
-                </div>
-                <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200 font-mono-code">
-                  NGA · NIMC
-                </span>
-              </div>
-
-              <!-- Quick Presets -->
-              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                  <button type="button" onclick="resetNgaDetailsToSample()" class="px-2.5 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                    <span>1. Official Specimen</span>
-                    <i class="fa-solid fa-rotate-left text-slate-400 text-[10px]"></i>
-                  </button>
-                  <button type="button" onclick="loadNgaCardPreset('adebayo')" class="px-2.5 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                    <span>2. Adebayo C.</span>
-                    <i class="fa-solid fa-user-check text-slate-400 text-[10px]"></i>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Photo Upload Section -->
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                <label for="ngaPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 text-[10px]">
-                  Bearer Portrait Photo / Hoton Mai Shaida
-                </label>
-                <input type="file" id="ngaPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white cursor-pointer">
-                <div class="flex items-center justify-between pt-1">
-                  <button type="button" onclick="resetNgaPhoto()" class="text-slate-600 hover:text-red-600 rounded font-medium cursor-pointer transition-colors text-[11px] flex items-center gap-1">
-                    <i class="fa-solid fa-rotate-left text-[10px]"></i>
-                    <span>Reset Specimen Photo</span>
-                  </button>
-                  <span class="text-[10px] text-slate-400">Updates main &amp; ghost portrait</span>
-                </div>
-              </div>
-
-              <!-- Names Section -->
-              <div class="space-y-2.5">
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">SURNAME / SUNA NA GIDA</label>
-                  <input id="ngaInputSurname" type="text" value="PROUD" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">FIRST NAME / SUNAN FARKO</label>
-                  <input id="ngaInputFirstName" type="text" value="NIGERIAN" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">MIDDLE NAME / SUNA NA TSAMIYA</label>
-                  <input id="ngaInputMiddleName" type="text" value="CITIZEN" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-              </div>
-
-              <!-- Dates & Nationality -->
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF BIRTH</label>
-                  <input id="ngaInputDob" type="text" value="01 OCT 60" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">ISSUE DATE</label>
-                  <input id="ngaInputIssueDate" type="text" value="28 AUG 14" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-3 gap-2.5">
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NATIONALITY</label>
-                  <input id="ngaInputNationality" type="text" value="NGA" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">SEX</label>
-                  <select id="ngaInputSex" onchange="updateNgaPreview()" oninput="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                    <option value="M" selected>M (Male)</option>
-                    <option value="F">F (Female)</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">HEIGHT</label>
-                  <input id="ngaInputHeight" type="text" value="26cm" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">EXPIRY DATE</label>
-                  <input id="ngaInputExpiry" type="text" value="01/19" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DOCUMENT NUMBER</label>
-                  <input id="ngaInputDocNo" type="text" value="4812640614" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono font-bold text-xs bg-white">
-                </div>
-              </div>
-
-              <!-- Card Number (Embossed OCR) -->
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="block font-bold uppercase text-slate-600 text-[10px]">CARD NUMBER (16-DIGIT)</label>
-                  <button type="button" onclick="generateRandomNgaCardNo()" class="text-[10px] text-emerald-700 hover:text-emerald-900 font-bold flex items-center gap-1 cursor-pointer">
-                    <i class="fa-solid fa-dice"></i>
-                    <span>Generate</span>
-                  </button>
-                </div>
-                <input id="ngaInputCardNo" type="text" value="5394 2678 4245 0618" oninput="updateNgaPreview()" onchange="updateNgaPreview()" onkeyup="updateNgaPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono font-black text-xs bg-white">
-              </div>
-
-              <!-- Copy Record Button -->
-              <button type="button" onclick="copyNgaSpecimenData()" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl border border-slate-200 transition-colors cursor-pointer flex items-center justify-center gap-2">
-                <i class="fa-solid fa-copy"></i>
-                <span>Copy NIMC Credential Record</span>
-              </button>
-            </section>
-
-            <!-- Right Column: Live Card Preview / Specimen View -->
-            <section class="lg:col-span-7 space-y-4">
-              
-              <!-- Card Header / Meta info -->
+          <!-- Specimen Card Display (Centered) -->
+          <section class="flex flex-col items-center justify-center">
+            <div class="w-full max-w-[680px] space-y-3">
               <div class="flex items-center justify-between text-xs px-1 text-slate-500">
-                <div class="flex items-center gap-2 font-bold uppercase tracking-wider text-[11px] text-slate-700">
+                <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
                   <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                  <span id="ngaCardModeLabel">Live Document Editor Preview</span>
+                  <span>Official National Identity Card Specimen</span>
                 </div>
                 <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  CR-80 Standard · 85.6 × 53.98 mm
+                  588 × 351 px · CR-80 Standard
                 </span>
               </div>
 
-              <!-- Live Editor Card Container -->
-              <div id="ngaCardEditorWrap" class="w-full">
-                <!-- Outer Card Wrapper -->
-                <article id="nigeria-id-card" class="nigeria-nimc-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-xl border-2 border-emerald-900/40 p-3.5 sm:p-5 overflow-hidden text-slate-900 select-none">
-                  
-                  <!-- Security Watermarks -->
-                  <div class="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
-                    <img src="/assets/aistudio/nigeria_coat_of_arms_watermark.png" alt="" class="absolute left-[38%] top-1/2 -translate-x-1/2 -translate-y-1/2 w-[190px] sm:w-[270px] opacity-25 object-contain">
-                    <img src="/assets/aistudio/nigeria_eagle_watermark.png" alt="" class="absolute left-[40%] top-[24%] -translate-x-1/2 -translate-y-1/2 w-[110px] sm:w-[160px] opacity-20 object-contain">
-                  </div>
-
-                  <!-- Card Header -->
-                  <header class="relative z-10 flex items-start justify-between">
-                    <div>
-                      <div class="font-black text-[#008751] text-xs sm:text-[17px] tracking-wide uppercase leading-tight font-sans">
-                        FEDERAL REPUBLIC OF NIGERIA
-                      </div>
-                      <div class="font-bold text-slate-800 text-[9px] sm:text-[12px] leading-tight mt-0.5">
-                        National Identity Card
-                      </div>
-                    </div>
-                  </header>
-
-                  <!-- Card Middle Body: Chevron + Chip + Bio Fields + Photo -->
-                  <div class="relative z-10 grid grid-cols-12 gap-2 sm:gap-3 items-start mt-2 sm:mt-3">
-                    
-                    <!-- Left: Arrow indicator & Smart Chip -->
-                    <div class="col-span-3 sm:col-span-3 flex items-center gap-1 sm:gap-1.5 pt-1">
-                      <span class="text-slate-900 font-black text-xs sm:text-base leading-none select-none">◀</span>
-                      <div class="w-10 sm:w-16 aspect-[1.22/1] rounded-lg overflow-hidden shadow-xs border border-amber-600/40 bg-[#e5c158]">
-                        <img src="/assets/aistudio/nigeria_chip_exact.png" alt="Smart Chip" class="w-full h-full object-contain">
-                      </div>
-                    </div>
-
-                    <!-- Center: Bio-data Fields -->
-                    <div class="col-span-5 sm:col-span-5 space-y-1 sm:space-y-1.5 text-[8.5px] sm:text-[11px] leading-tight">
-                      <!-- Surname -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[8.5px] font-bold text-slate-500 uppercase leading-none">SURNAME</span>
-                        <div id="ngaPreviewSurname" class="font-black text-slate-950 text-[11px] sm:text-[14px] uppercase tracking-wide leading-tight">
-                          PROUD
-                        </div>
-                      </div>
-
-                      <!-- First Name -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[8.5px] font-bold text-slate-500 uppercase leading-none">FIRST NAME</span>
-                        <div id="ngaPreviewFirstName" class="font-black text-slate-950 text-[11px] sm:text-[14px] uppercase tracking-wide leading-tight">
-                          NIGERIAN
-                        </div>
-                      </div>
-
-                      <!-- Middle Name -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[8.5px] font-bold text-slate-500 uppercase leading-none">MIDDLE NAME</span>
-                        <div id="ngaPreviewMiddleName" class="font-black text-slate-950 text-[11px] sm:text-[14px] uppercase tracking-wide leading-tight">
-                          CITIZEN
-                        </div>
-                      </div>
-
-                      <!-- DOB & Issue Date -->
-                      <div class="grid grid-cols-2 gap-1.5 sm:gap-2 pt-0.5">
-                        <div>
-                          <span class="block text-[6.5px] sm:text-[8px] font-bold text-slate-500 uppercase leading-none">DATE OF BIRTH</span>
-                          <span id="ngaPreviewDob" class="font-bold text-slate-950 text-[9px] sm:text-[11.5px] leading-none block mt-0.5">
-                            01 OCT 60
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[6.5px] sm:text-[8px] font-bold text-slate-500 uppercase leading-none">ISSUE DATE</span>
-                          <span id="ngaPreviewIssueDate" class="font-bold text-slate-950 text-[9px] sm:text-[11.5px] leading-none block mt-0.5">
-                            28 AUG 14
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- Nationality, Sex, Height -->
-                      <div class="grid grid-cols-3 gap-1 pt-0.5">
-                        <div>
-                          <span class="block text-[6.5px] sm:text-[8px] font-bold text-slate-500 uppercase leading-none">NATIONALITY</span>
-                          <span id="ngaPreviewNationality" class="font-bold text-slate-950 text-[9px] sm:text-[11.5px] uppercase leading-none block mt-0.5">
-                            NGA
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[6.5px] sm:text-[8px] font-bold text-slate-500 uppercase leading-none">SEX</span>
-                          <span id="ngaPreviewSex" class="font-bold text-slate-950 text-[9px] sm:text-[11.5px] uppercase leading-none block mt-0.5">
-                            M
-                          </span>
-                        </div>
-                        <div>
-                          <span class="block text-[6.5px] sm:text-[8px] font-bold text-slate-500 uppercase leading-none">HEIGHT</span>
-                          <span id="ngaPreviewHeight" class="font-bold text-slate-950 text-[9px] sm:text-[11.5px] leading-none block mt-0.5">
-                            26cm
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Right: Photo & Signature -->
-                    <div class="col-span-4 sm:col-span-4 flex flex-col items-center pl-1">
-                      <div class="w-full aspect-[3.1/3.9] rounded-xl overflow-hidden shadow-xs border border-slate-300 bg-slate-200">
-                        <img id="ngaPreviewPhoto" src="/assets/aistudio/nigeria_photo_exact.png" alt="NIMC Bearer Photo" class="w-full h-full object-cover">
-                      </div>
-                      <div class="w-full flex items-center justify-center mt-1">
-                        <img id="ngaPreviewSig" src="/assets/aistudio/nigeria_signature_exact.png" alt="Signature" class="h-4 sm:h-6 object-contain">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Middle/Bottom: Large Card Number -->
-                  <div class="relative z-10 mt-2 sm:mt-3 flex items-center justify-between">
-                    <div id="ngaPreviewCardNo" class="font-mono text-sm sm:text-[20px] font-black text-slate-950 tracking-[0.16em] sm:tracking-[0.22em] drop-shadow-xs">
-                      5394  2678  4245  0618
-                    </div>
-                  </div>
-
-                  <!-- Bottom Strip: Mini Ghost + NIMC logo + Hologram + Expiry + Document Number -->
-                  <div class="relative z-10 flex items-end justify-between mt-1 sm:mt-2 pt-1 border-t border-slate-200/60">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                      <!-- Mini Ghost Photo -->
-                      <div class="w-6 sm:w-8 aspect-[3/4] rounded overflow-hidden opacity-75 border border-slate-300 bg-slate-200 shadow-2xs shrink-0">
-                        <img id="ngaGhostPhoto" src="/assets/aistudio/nigeria_ghost_exact.png" alt="Ghost" class="w-full h-full object-cover">
-                      </div>
-                      <!-- NIMC Logo -->
-                      <img src="/assets/aistudio/nigeria_nimc_logo_exact.png" alt="NIMC Logo" class="h-5 sm:h-7 object-contain shrink-0">
-                      <!-- Reddish NGA Hologram -->
-                      <span class="font-black text-sm sm:text-lg text-rose-600/75 tracking-wider font-mono select-none drop-shadow-xs shrink-0">
-                        NGA
-                      </span>
-                    </div>
-
-                    <div class="flex items-center gap-3 sm:gap-4 text-right">
-                      <div>
-                        <span class="block text-[6.5px] sm:text-[8px] font-bold text-slate-500 uppercase leading-none">EXPIRY</span>
-                        <span id="ngaPreviewExpiry" class="font-black text-slate-950 text-[9px] sm:text-[11.5px] leading-none block mt-0.5">
-                          01/19
-                        </span>
-                      </div>
-                      <div>
-                        <span class="block text-[6.5px] sm:text-[8px] font-bold text-slate-500 uppercase leading-none">DOCUMENT NUMBER</span>
-                        <span id="ngaPreviewDocNo" class="font-black text-slate-950 text-[9px] sm:text-[11.5px] font-mono leading-none block mt-0.5">
-                          4812640614
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              </div>
-
-              <!-- Official Specimen Reference Image (Toggled when in specimen view) -->
-              <div id="ngaSpecimenWrap" class="hidden relative w-full aspect-[1.62/1] rounded-2xl shadow-xl border-2 border-emerald-900/30 overflow-hidden bg-slate-100 group">
+              <!-- Specimen Card Container with Real Shadow and Frame -->
+              <div class="relative w-full aspect-[1.62/1] rounded-2xl shadow-xl border-2 border-emerald-900/30 overflow-hidden bg-slate-100 group">
                 <img src="/assets/aistudio/images__7__6a48fe94.png" alt="Official Federal Republic of Nigeria National Identity Card Specimen" class="w-full h-full object-cover">
+                
+                <!-- Watermark Pill Overlay -->
                 <div class="absolute bottom-2.5 right-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10.5px] px-2.5 py-1 rounded-lg font-mono-code font-bold flex items-center gap-1.5 shadow-md">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   <span>Official NIMC Specimen · 1:1 Reference</span>
                 </div>
               </div>
-            </section>
-          </div>
+            </div>
+          </section>
         </main>
       </div>
 
@@ -5260,11 +4987,8 @@ XUDUR, BAKOOL, SOMALIA</span>
       } else if (currentCountry === 'nigeria') {
         if (currentDocType === 'passport') {
           if (nigeriaPassView) nigeriaPassView.classList.remove('hidden');
-          updateNgaPassPreview();
         } else {
           if (nigeriaDocView) nigeriaDocView.classList.remove('hidden');
-          setNgaCardViewMode('editor');
-          updateNgaPreview();
         }
       } else if (currentCountry === 'ethiopia') {
         if (ethiopiaDocView) ethiopiaDocView.classList.remove('hidden');
@@ -5536,25 +5260,33 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     // ================= ETHIOPIAN NATIONAL ID (FAYDA) HELPERS =================
-    const defaultEthPhotoSrc = '/assets/aistudio/ethiopia_fayda_portrait.jpg';
-    let currentEthPhotoMode = 'photo';
-
-    function initEthDefaultPhoto() {
-      if ($('ethPreviewPhoto')) $('ethPreviewPhoto').src = defaultEthPhotoSrc;
-      setEthPhotoMode('photo');
-    }
+    const defaultEthPhoto = '/assets/aistudio/ethiopia_fayda_portrait.jpg';
 
     function setEthPhotoMode(mode) {
-      currentEthPhotoMode = 'photo';
+      const silBox = $('ethSilhouetteBox');
       const photoImg = $('ethPreviewPhoto');
-      if (photoImg) photoImg.classList.remove('hidden');
-    }
+      const btnSil = $('btn-eth-sil');
+      const btnPhoto = $('btn-eth-photo');
 
-    function resetEthPhoto() {
-      if ($('ethPreviewPhoto')) $('ethPreviewPhoto').src = defaultEthPhotoSrc;
-      if ($('ethPhotoInput')) $('ethPhotoInput').value = '';
-      setEthPhotoMode('photo');
-      showToast('Photo Reset', 'Restored Ethiopia national id reference specimen portrait');
+      if (mode === 'photo') {
+        if (silBox) silBox.classList.add('hidden');
+        if (photoImg) photoImg.classList.remove('hidden');
+        if (btnPhoto) {
+          btnPhoto.className = 'px-2 py-0.5 rounded font-bold bg-emerald-700 text-white shadow-2xs transition-all cursor-pointer';
+        }
+        if (btnSil) {
+          btnSil.className = 'px-2 py-0.5 rounded font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        }
+      } else {
+        if (silBox) silBox.classList.remove('hidden');
+        if (photoImg) photoImg.classList.add('hidden');
+        if (btnSil) {
+          btnSil.className = 'px-2 py-0.5 rounded font-bold bg-emerald-700 text-white shadow-2xs transition-all cursor-pointer';
+        }
+        if (btnPhoto) {
+          btnPhoto.className = 'px-2 py-0.5 rounded font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
+        }
+      }
     }
 
     function updateEthPreview() {
@@ -5600,6 +5332,13 @@ XUDUR, BAKOOL, SOMALIA</span>
         fcn = `${digitsOnly.slice(0, 4)}-${digitsOnly.slice(4, 8)}-${digitsOnly.slice(8, 12)}`;
       }
       if ($('ethPreviewFCN')) $('ethPreviewFCN').textContent = fcn;
+    }
+
+    function resetEthPhoto() {
+      if ($('ethPreviewPhoto')) $('ethPreviewPhoto').src = defaultEthPhoto;
+      if ($('ethPhotoInput')) $('ethPhotoInput').value = '';
+      setEthPhotoMode('silhouette');
+      showToast('Photo Reset', 'Restored official reference dark silhouette');
     }
 
     function resetEthDetailsToSample() {
@@ -5660,184 +5399,33 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     // ================= NIGERIA NATIONAL IDENTITY CARD (NIMC) CONTROLLER =================
-    const defaultNgaPhotoSrc = '/assets/aistudio/nigeria_photo_exact.png';
-    const defaultNgaGhostSrc = '/assets/aistudio/nigeria_ghost_exact.png';
     const officialNgaSpecimenSrc = '/assets/aistudio/images__7__6a48fe94.png';
-    let currentNgaCardViewMode = 'editor'; // 'editor' | 'specimen'
 
     function initNgaDefaultPhoto() {
-      if ($('ngaPreviewPhoto')) $('ngaPreviewPhoto').src = defaultNgaPhotoSrc;
-      if ($('ngaGhostPhoto')) $('ngaGhostPhoto').src = defaultNgaGhostSrc;
+      // Maintained for backward compatibility
     }
 
     function resetNgaPhoto() {
-      if ($('ngaPreviewPhoto')) $('ngaPreviewPhoto').src = defaultNgaPhotoSrc;
-      if ($('ngaGhostPhoto')) $('ngaGhostPhoto').src = defaultNgaGhostSrc;
-      if ($('ngaPhotoInput')) $('ngaPhotoInput').value = '';
-      showToast('Photo Reset', 'Restored official Nigerian NIMC portrait');
-    }
-
-    function setNgaCardViewMode(mode) {
-      currentNgaCardViewMode = mode;
-      const editorWrap = $('ngaCardEditorWrap');
-      const specimenWrap = $('ngaSpecimenWrap');
-      const formSection = $('ngaCardFormSection');
-      const btnEditor = $('btn-nga-card-editor');
-      const btnSpecimen = $('btn-nga-card-specimen');
-      const label = $('ngaCardModeLabel');
-
-      const activeClass = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 text-white shadow-xs cursor-pointer transition-all";
-      const inactiveClass = "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-200 cursor-pointer transition-all";
-
-      if (btnEditor) btnEditor.className = mode === 'editor' ? activeClass : inactiveClass;
-      if (btnSpecimen) btnSpecimen.className = mode === 'specimen' ? activeClass : inactiveClass;
-
-      if (mode === 'editor') {
-        if (editorWrap) editorWrap.classList.remove('hidden');
-        if (specimenWrap) specimenWrap.classList.add('hidden');
-        if (formSection) formSection.classList.remove('hidden');
-        if (label) label.textContent = 'Live Document Editor Preview';
-      } else {
-        if (editorWrap) editorWrap.classList.add('hidden');
-        if (specimenWrap) specimenWrap.classList.remove('hidden');
-        if (label) label.textContent = 'Official NIMC Specimen (1:1 Reference)';
-      }
-    }
-
-    function switchNgaPreviewTab(mode) {
-      setNgaCardViewMode(mode);
+      // Maintained for backward compatibility
     }
 
     function updateNgaPreview() {
-      const surname = $('ngaInputSurname')?.value !== undefined ? $('ngaInputSurname').value : 'PROUD';
-      const firstName = $('ngaInputFirstName')?.value !== undefined ? $('ngaInputFirstName').value : 'NIGERIAN';
-      const middleName = $('ngaInputMiddleName')?.value !== undefined ? $('ngaInputMiddleName').value : 'CITIZEN';
-      const dob = $('ngaInputDob')?.value !== undefined ? $('ngaInputDob').value : '01 OCT 60';
-      const issueDate = $('ngaInputIssueDate')?.value !== undefined ? $('ngaInputIssueDate').value : '28 AUG 14';
-      const expiry = $('ngaInputExpiry')?.value !== undefined ? $('ngaInputExpiry').value : '01/19';
-      const nationality = $('ngaInputNationality')?.value !== undefined ? $('ngaInputNationality').value : 'NGA';
-      const sex = $('ngaInputSex')?.value !== undefined ? $('ngaInputSex').value : 'M';
-      const height = $('ngaInputHeight')?.value !== undefined ? $('ngaInputHeight').value : '26cm';
-      let cardNo = $('ngaInputCardNo')?.value !== undefined ? $('ngaInputCardNo').value : '5394 2678 4245 0618';
-      const docNo = $('ngaInputDocNo')?.value !== undefined ? $('ngaInputDocNo').value : '4812640614';
-
-      if ($('ngaPreviewSurname')) $('ngaPreviewSurname').textContent = surname.toUpperCase();
-      if ($('ngaPreviewFirstName')) $('ngaPreviewFirstName').textContent = firstName.toUpperCase();
-      if ($('ngaPreviewMiddleName')) $('ngaPreviewMiddleName').textContent = middleName.toUpperCase();
-      if ($('ngaPreviewDob')) $('ngaPreviewDob').textContent = dob.toUpperCase();
-      if ($('ngaPreviewIssueDate')) $('ngaPreviewIssueDate').textContent = issueDate.toUpperCase();
-      if ($('ngaPreviewExpiry')) $('ngaPreviewExpiry').textContent = expiry.toUpperCase();
-      if ($('ngaPreviewNationality')) $('ngaPreviewNationality').textContent = nationality.toUpperCase();
-      if ($('ngaPreviewSex')) $('ngaPreviewSex').textContent = sex.toUpperCase();
-      if ($('ngaPreviewHeight')) $('ngaPreviewHeight').textContent = height;
-
-      // Format card number with spaces if typed continuously
-      const rawCard = cardNo.replace(/\s+/g, '');
-      if (rawCard.length === 16) {
-        cardNo = `${rawCard.slice(0, 4)}  ${rawCard.slice(4, 8)}  ${rawCard.slice(8, 12)}  ${rawCard.slice(12, 16)}`;
-      }
-      if ($('ngaPreviewCardNo')) $('ngaPreviewCardNo').textContent = cardNo;
-      if ($('ngaPreviewDocNo')) $('ngaPreviewDocNo').textContent = docNo;
+      // Maintained for backward compatibility
     }
 
     function resetNgaDetailsToSample() {
-      if ($('ngaInputSurname')) $('ngaInputSurname').value = 'PROUD';
-      if ($('ngaInputFirstName')) $('ngaInputFirstName').value = 'NIGERIAN';
-      if ($('ngaInputMiddleName')) $('ngaInputMiddleName').value = 'CITIZEN';
-      if ($('ngaInputDob')) $('ngaInputDob').value = '01 OCT 60';
-      if ($('ngaInputIssueDate')) $('ngaInputIssueDate').value = '28 AUG 14';
-      if ($('ngaInputExpiry')) $('ngaInputExpiry').value = '01/19';
-      if ($('ngaInputNationality')) $('ngaInputNationality').value = 'NGA';
-      if ($('ngaInputSex')) $('ngaInputSex').value = 'M';
-      if ($('ngaInputHeight')) $('ngaInputHeight').value = '26cm';
-      if ($('ngaInputCardNo')) $('ngaInputCardNo').value = '5394 2678 4245 0618';
-      if ($('ngaInputDocNo')) $('ngaInputDocNo').value = '4812640614';
-      resetNgaPhoto();
-      updateNgaPreview();
-      showToast('Sample Restored', 'Reset to official NIMC National Identity Card specimen');
+      // Maintained for backward compatibility
     }
 
-    function loadNgaCardPreset(preset) {
-      if (preset === 'adebayo') {
-        if ($('ngaInputSurname')) $('ngaInputSurname').value = 'ADEBAYO';
-        if ($('ngaInputFirstName')) $('ngaInputFirstName').value = 'CHUKWUMA';
-        if ($('ngaInputMiddleName')) $('ngaInputMiddleName').value = 'IBRAHIM';
-        if ($('ngaInputDob')) $('ngaInputDob').value = '15 MAY 88';
-        if ($('ngaInputIssueDate')) $('ngaInputIssueDate').value = '10 JAN 21';
-        if ($('ngaInputExpiry')) $('ngaInputExpiry').value = '01/26';
-        if ($('ngaInputNationality')) $('ngaInputNationality').value = 'NGA';
-        if ($('ngaInputSex')) $('ngaInputSex').value = 'M';
-        if ($('ngaInputHeight')) $('ngaInputHeight').value = '178cm';
-        if ($('ngaInputCardNo')) $('ngaInputCardNo').value = '4120  8931  6520  9411';
-        if ($('ngaInputDocNo')) $('ngaInputDocNo').value = '5192840182';
-        updateNgaPreview();
-        showToast('Preset Loaded', 'Applied Adebayo C. I. profile');
-      }
-    }
-
-    function generateRandomNgaCardNo() {
-      const p1 = Math.floor(1000 + Math.random() * 9000);
-      const p2 = Math.floor(1000 + Math.random() * 9000);
-      const p3 = Math.floor(1000 + Math.random() * 9000);
-      const p4 = Math.floor(1000 + Math.random() * 9000);
-      const num = `${p1}  ${p2}  ${p3}  ${p4}`;
-      if ($('ngaInputCardNo')) $('ngaInputCardNo').value = num;
-      updateNgaPreview();
-      showToast('Card Number Generated', `New 16-digit card number: ${num}`);
-    }
-
-    async function downloadNgaCardPNG() {
-      if (currentNgaCardViewMode === 'specimen') {
-        const a = document.createElement('a');
-        a.href = officialNgaSpecimenSrc;
-        a.download = 'nigeria-national-identity-card-official-specimen.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Specimen Downloaded', 'Official Nigeria National Identity Card specimen downloaded');
-        return;
-      }
-
-      const card = $('nigeria-id-card');
-      if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Nigeria NIMC Card PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f6faf6'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'nigeria-nimc-identity-card.png';
-        }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Nigeria NIMC Card generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate NIMC card PNG');
-      }
+    function switchNgaPreviewTab(mode) {
+      // Maintained for backward compatibility
     }
 
     function viewNgaFullRes() {
-      if (currentNgaCardViewMode === 'specimen') {
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = officialNgaSpecimenSrc;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = officialNgaSpecimenSrc;
-          $('fallbackDownloadLink').download = 'nigeria-national-identity-card-official-specimen.png';
-        }
-      } else {
-        const card = $('nigeria-id-card');
-        if (card) {
-          downloadNgaCardPNG();
-          return;
-        }
+      if ($('modalPreviewImg')) $('modalPreviewImg').src = officialNgaSpecimenSrc;
+      if ($('fallbackDownloadLink')) {
+        $('fallbackDownloadLink').href = officialNgaSpecimenSrc;
+        $('fallbackDownloadLink').download = 'nigeria-national-identity-card-official-specimen.png';
       }
       const modal = $('imageModal');
       if (modal) {
@@ -5846,35 +5434,33 @@ XUDUR, BAKOOL, SOMALIA</span>
       }
     }
 
+    function downloadNgaCardPNG() {
+      const a = document.createElement('a');
+      a.href = officialNgaSpecimenSrc;
+      a.download = 'nigeria-national-identity-card-official-specimen.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Specimen Downloaded', 'Official Nigeria National Identity Card specimen downloaded');
+    }
+
     function printNgaCard() {
       window.print();
     }
 
     function copyNgaSpecimenData() {
-      const surname = $('ngaInputSurname')?.value || 'PROUD';
-      const firstName = $('ngaInputFirstName')?.value || 'NIGERIAN';
-      const middleName = $('ngaInputMiddleName')?.value || 'CITIZEN';
-      const dob = $('ngaInputDob')?.value || '01 OCT 60';
-      const issueDate = $('ngaInputIssueDate')?.value || '28 AUG 14';
-      const expiry = $('ngaInputExpiry')?.value || '01/19';
-      const nationality = $('ngaInputNationality')?.value || 'NGA';
-      const sex = $('ngaInputSex')?.value || 'M';
-      const height = $('ngaInputHeight')?.value || '26cm';
-      const cardNo = $('ngaInputCardNo')?.value || '5394 2678 4245 0618';
-      const docNo = $('ngaInputDocNo')?.value || '4812640614';
-
       const text = `FEDERAL REPUBLIC OF NIGERIA - NATIONAL IDENTITY CARD (NIMC SPECIMEN)
-Surname: ${surname}
-First Name: ${firstName}
-Middle Name: ${middleName}
-Date of Birth: ${dob}
-Issue Date: ${issueDate}
-Expiry Date: ${expiry}
-Nationality: ${nationality}
-Sex: ${sex}
-Height: ${height}
-Card Number: ${cardNo}
-Document Number: ${docNo}
+Surname: PROUD
+First Name: NIGERIAN
+Middle Name: CITIZEN
+Date of Birth: 01 OCT 60
+Issue Date: 28 AUG 14
+Expiry Date: 01/19
+Nationality: NGA (NIGERIAN)
+Sex: M (MALE)
+Height: 26cm
+Card Number: 5394 2678 4245 0618
+Document Number: 4812640614
 Issuing Authority: National Identity Management Commission (NIMC)`;
       copyToClipboard(text, 'Nigeria specimen credential record copied to clipboard!');
     }
@@ -7474,6 +7060,23 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
         });
       }
 
+      // Ethiopian Fayda Photo upload
+      const ethPhotoInput = $('ethPhotoInput');
+      if (ethPhotoInput) {
+        ethPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('ethPreviewPhoto')) $('ethPreviewPhoto').src = ev.target.result;
+              setEthPhotoMode('photo');
+              showToast('Photo Updated', 'Custom portrait photo applied to Ethiopian Digital ID');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
       // Ethiopia Watermark Text & Visibility
       const ethWatermarkTextInput = $('ethWatermarkText');
       if (ethWatermarkTextInput) {
@@ -7595,15 +7198,6 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
       }
       initNgaDefaultPhoto();
 
-      // Automatic real-time fill for NIMC Card Editor to card ID
-      const ngaCardSection = $('ngaCardFormSection');
-      if (ngaCardSection) {
-        ngaCardSection.addEventListener('input', updateNgaPreview);
-        ngaCardSection.addEventListener('change', updateNgaPreview);
-        ngaCardSection.addEventListener('keyup', updateNgaPreview);
-        ngaCardSection.addEventListener('paste', () => setTimeout(updateNgaPreview, 0));
-      }
-
       // Nigeria Passport Photo upload
       const ngaPassPhotoInput = $('ngaPassPhotoInput');
       if (ngaPassPhotoInput) {
@@ -7621,24 +7215,6 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
         });
       }
       initNgaPassDefaultPhoto();
-
-      // Ethiopian National ID (Fayda) Photo upload
-      const ethPhotoInput = $('ethPhotoInput');
-      if (ethPhotoInput) {
-        ethPhotoInput.addEventListener('change', e => {
-          const file = e.target.files && e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = ev => {
-              if ($('ethPreviewPhoto')) $('ethPreviewPhoto').src = ev.target.result;
-              setEthPhotoMode('photo');
-              showToast('Photo Updated', 'Custom portrait photo applied to Ethiopia national id');
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-      }
-      initEthDefaultPhoto();
 
       // Run initial preview sync
       updatePreview();
