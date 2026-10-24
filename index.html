@@ -176,6 +176,19 @@
         repeating-linear-gradient(-45deg, rgba(2, 132, 199, 0.02) 0px, rgba(2, 132, 199, 0.02) 1px, transparent 1px, transparent 7px);
     }
 
+    /* United Kingdom (British Citizen) Passport Security Background Pattern */
+    .uk-passport-bg {
+      background-color: #fdfaf3;
+      background-image: 
+        radial-gradient(ellipse at 50% 28%, rgba(249, 115, 22, 0.14) 0%, transparent 60%),
+        radial-gradient(circle at 82% 65%, rgba(245, 158, 11, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 18% 75%, rgba(202, 138, 4, 0.10) 0%, transparent 50%),
+        radial-gradient(circle at 65% 85%, rgba(234, 88, 12, 0.09) 0%, transparent 40%),
+        repeating-radial-gradient(circle at 55% 45%, transparent 0, transparent 6px, rgba(217, 119, 6, 0.035) 7px, transparent 8px),
+        repeating-linear-gradient(45deg, rgba(234, 88, 12, 0.025) 0px, rgba(234, 88, 12, 0.025) 1px, transparent 1px, transparent 7px),
+        repeating-linear-gradient(-45deg, rgba(217, 119, 6, 0.025) 0px, rgba(217, 119, 6, 0.025) 1px, transparent 1px, transparent 7px);
+    }
+
     /* Floating Showcase Animations */
     @keyframes floatSlow {
       0%, 100% { transform: translateY(0px); }
@@ -403,7 +416,7 @@
             <i class="fa-solid fa-passport text-emerald-700 text-sm"></i>
             <span>ID &amp; Passport Documents</span>
           </span>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">Kenya · Somalia · Ethiopia</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">Kenya · Somalia · Ethiopia · Nigeria · UK</span>
         </button>
       </div>
     </div>
@@ -1084,7 +1097,7 @@
             <span class="text-[11px] font-medium text-slate-400">Jurisdiction &amp; registry formatting</span>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <!-- Republic of Kenya (Default) -->
             <button type="button" id="country-btn-kenya" onclick="switchVerificationCountry('kenya')" class="country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer">
               <div class="flex items-center justify-between">
@@ -1130,6 +1143,18 @@
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Nigeria</div>
                 <div class="text-[10px] font-medium text-slate-500">National ID &amp; E-Passport</div>
+              </div>
+            </button>
+
+            <!-- United Kingdom -->
+            <button type="button" id="country-btn-uk" onclick="switchVerificationCountry('uk')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇬🇧</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">United Kingdom</div>
+                <div class="text-[10px] font-medium text-slate-500">British Citizen Passport</div>
               </div>
             </button>
           </div>
@@ -4428,6 +4453,408 @@ XUDUR, BAKOOL, SOMALIA</span>
                 </div>
 
               </div>
+            </section>
+
+          </div>
+        </main>
+      </div>
+
+      <!-- ================= STEP 7: UNITED KINGDOM BRITISH CITIZEN PASSPORT GENERATOR ================= -->
+      <div id="uk-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto space-y-6">
+          
+          <!-- View Header -->
+          <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-2xl drop-shadow-xs">🇬🇧</span>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                  <span>United Kingdom Passport Builder</span>
+                </h1>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-100 text-blue-900 border border-blue-300">
+                  GBR · British Citizen
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">
+                Her Majesty's Passport Office (HMPO) / UKPA · Official British Citizen Biometric Passport Specimen.
+              </p>
+            </div>
+
+            <!-- Action Buttons in Header -->
+            <div class="flex flex-wrap items-center gap-2.5 no-print">
+              <button type="button" onclick="downloadUkPassPNG()" class="px-4 py-2.5 bg-blue-800 hover:bg-blue-900 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-download"></i>
+                <span>Download (PNG)</span>
+              </button>
+              <button type="button" onclick="printUkPass()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-print"></i>
+                <span>Print</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Main Grid: UK Passport Editor (Left) & Official Specimen Live Preview (Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Controls Form / UK Passport Editor -->
+            <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+              <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
+                    <i class="fa-solid fa-passport text-blue-700"></i>
+                    <span>UK Passport Editor</span>
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Live bio-data editor for British Citizen Passport.</p>
+                </div>
+                <span class="text-xs bg-blue-50 text-blue-800 font-semibold px-2.5 py-1 rounded-full border border-blue-200 font-mono-code">
+                  UK · 007 SPECIMEN
+                </span>
+              </div>
+
+              <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
+              <div class="pt-0.5">
+                <button type="button" onclick="randomizeUkPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-rose-600 hover:from-blue-600 hover:via-indigo-600 hover:to-rose-500 text-white font-black text-sm tracking-wide shadow-xl shadow-blue-800/25 hover:shadow-blue-800/40 border-2 border-blue-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                  <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                    <i class="fa-solid fa-dice"></i>
+                  </div>
+                  <div class="text-left">
+                    <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                      <span>Randomize Card Details</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    </div>
+                    <div class="text-[11px] font-normal text-blue-100 opacity-90 mt-0.5">Generate authentic British Citizen bio-data, 9-digit passport &amp; MRZ</div>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Sample Presets -->
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <button type="button" onclick="resetUkPassDetailsToSample()" class="px-2.5 py-2 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg font-bold text-slate-800 hover:text-blue-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span>1. 007 James Bond</span>
+                    <i class="fa-solid fa-rotate-left text-[10px] text-blue-600"></i>
+                  </button>
+                  <button type="button" onclick="randomizeUkPassport()" class="px-2.5 py-2 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-lg font-bold text-slate-800 hover:text-rose-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span>2. Random Citizen</span>
+                    <i class="fa-solid fa-shuffle text-[10px] text-rose-600"></i>
+                  </button>
+                </div>
+              </div>
+
+              <form id="ukPassDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+                
+                <!-- Bearer Photo Upload -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <label for="ukPassPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Bearer Photo / Sawirka</label>
+                  <input type="file" id="ukPassPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-800 file:text-white cursor-pointer">
+                  <button type="button" onclick="resetUkPassPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset to James Bond (007 Reference)
+                  </button>
+                </div>
+
+                <!-- Passport Header Codes: Type, Country, Passport No -->
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Type / Type</label>
+                    <input id="ukPassInputType" type="text" value="P" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
+                  </div>
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issuing Code</label>
+                    <input id="ukPassInputCountry" type="text" value="GBR" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
+                  </div>
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Passport No</label>
+                    <input id="ukPassInputNumber" type="text" value="094612751" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
+                  </div>
+                </div>
+
+                <!-- Surname (Nom 1) & Given Names (Prénoms 2) -->
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1">Surname / Nom (1)</label>
+                  <input id="ukPassInputSurname" type="text" value="BOND" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+                </div>
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1">Given names / Prénoms (2)</label>
+                  <input id="ukPassInputGivenNames" type="text" value="JAMES" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+                </div>
+
+                <!-- Nationality & Sex -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nationality / Nationalité (3)</label>
+                    <input id="ukPassInputNationality" type="text" value="BRITISH CITIZEN" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                  </div>
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sex / Sexe (5)</label>
+                    <select id="ukPassInputSex" onchange="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                      <option value="M" selected>M</option>
+                      <option value="F">F</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Date of Birth & Place of Birth -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of birth (4)</label>
+                    <input id="ukPassInputDob" type="text" value="13 APR /AVR 68" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  </div>
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of birth (6)</label>
+                    <input id="ukPassInputPob" type="text" value="BERLIN" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- Date of Issue & Authority -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of issue (7)</label>
+                    <input id="ukPassInputIssueDate" type="text" value="16 FEB /FEV 06" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  </div>
+                  <div>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Authority / Autorité (8)</label>
+                    <input id="ukPassInputAuthority" type="text" value="UKPA" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- Date of Expiry -->
+                <div>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of expiry / Date d'expiration (9)</label>
+                  <input id="ukPassInputExpiryDate" type="text" value="16 FEB /FEV 16" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                  <button type="button" onclick="downloadUkPassPNG()" class="py-2.5 px-3 bg-blue-800 hover:bg-blue-900 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-file-arrow-down"></i>Save PNG
+                  </button>
+                  <button type="button" onclick="printUkPass()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-print"></i>Print Passport
+                  </button>
+                </div>
+
+                <button type="button" onclick="resetUkPassDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>
+                  <span>Reset to 007 James Bond Specimen</span>
+                </button>
+              </form>
+            </section>
+
+            <!-- Right Column: Document Preview Area -->
+            <section class="lg:col-span-7 flex flex-col items-center justify-start min-w-0 space-y-4">
+              
+              <!-- Preview Header Tag -->
+              <div class="w-full max-w-[650px] flex items-center justify-between px-1">
+                <span class="text-[11px] font-black uppercase tracking-wider text-blue-950 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-700"></span>
+                  UNITED KINGDOM PASSPORT · BRITISH CITIZEN
+                </span>
+                <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO TD3 · 125 × 88 mm</span>
+              </div>
+
+              <!-- ================= 1. RECREATED HIGH-FIDELITY UK PASSPORT CARD ================= -->
+              <div id="uk-passport-container" class="w-full max-w-[650px]">
+                <article id="uk-passport-card" class="uk-passport-bg relative w-full aspect-[1.42/1] bg-[#fcf9f2] rounded-xl shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
+                  
+                  <!-- Watermark / Guilloche Security Pattern Overlays -->
+                  <!-- Center UK & Ireland Map Contour Outline -->
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] z-0 translate-x-12 translate-y-2">
+                    <svg viewBox="0 0 400 400" class="w-96 h-96 text-amber-900 fill-current">
+                      <path d="M180,60 C200,80 230,120 250,150 C260,180 280,210 270,240 C250,280 220,310 190,340 C170,320 160,280 150,240 C140,210 120,170 140,120 Z"/>
+                    </svg>
+                  </div>
+                  <!-- Right Rosette Knot Medallion -->
+                  <div class="absolute right-4 top-24 w-44 h-44 pointer-events-none opacity-[0.08] z-0">
+                    <svg viewBox="0 0 100 100" class="w-full h-full text-orange-950 fill-none stroke-current stroke-1">
+                      <circle cx="50" cy="50" r="45" stroke-dasharray="2 2"/>
+                      <circle cx="50" cy="50" r="35"/>
+                      <circle cx="50" cy="50" r="25"/>
+                      <path d="M50,10 C60,35 65,40 90,50 C65,60 60,65 50,90 C40,65 35,60 10,50 C35,40 40,35 50,10 Z"/>
+                    </svg>
+                  </div>
+
+                  <!-- TOP HEADER: United Kingdom of Great Britain and Northern Ireland -->
+                  <header class="relative z-10 border-b border-slate-300/60 pb-2 mb-2">
+                    <div class="text-center">
+                      <h1 class="font-serif font-bold text-sm sm:text-base md:text-[17px] text-slate-950 tracking-wide leading-tight">
+                        United Kingdom of Great Britain and Northern Ireland
+                      </h1>
+                    </div>
+
+                    <!-- Under-header Metadata: Passport/Passeport Left, Type/Code Center, Passport No Right -->
+                    <div class="grid grid-cols-12 gap-1 items-end mt-1.5 pt-1 text-[9px] sm:text-[10px] leading-tight">
+                      <!-- Left: Passport / Passeport -->
+                      <div class="col-span-3 text-left">
+                        <div class="font-serif font-bold text-slate-950 text-xs sm:text-sm">Passport</div>
+                        <div class="font-serif italic font-medium text-slate-800 text-[10px] sm:text-xs">Passeport</div>
+                      </div>
+
+                      <!-- Center: Type & Issuing State -->
+                      <div class="col-span-5 grid grid-cols-2 gap-2 text-left pl-2">
+                        <div>
+                          <div class="text-[7px] sm:text-[8px] text-slate-600 font-bold uppercase leading-none">Type/Type</div>
+                          <div class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">P</div>
+                        </div>
+                        <div>
+                          <div class="text-[7px] sm:text-[8px] text-slate-600 font-bold uppercase leading-none">Code of issuing State/Code de l'État émetteur</div>
+                          <div class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">GBR</div>
+                        </div>
+                      </div>
+
+                      <!-- Right: Passport No -->
+                      <div class="col-span-4 text-right">
+                        <div class="text-[7.5px] sm:text-[8.5px] text-slate-600 font-bold uppercase leading-none">Passport No./Passeport No</div>
+                        <div id="ukPassPreviewNumber" class="font-mono-code font-black text-slate-950 text-sm sm:text-base tracking-widest mt-0.5">
+                          094612751
+                        </div>
+                      </div>
+                    </div>
+                  </header>
+
+                  <!-- MAIN BODY: Photo Left + Personal Data Grid Right -->
+                  <div class="grid grid-cols-12 gap-3 sm:gap-4 items-start relative z-10 flex-1">
+                    
+                    <!-- LEFT COLUMN: Photo with top & bottom spiral scroll motifs -->
+                    <div class="col-span-4 sm:col-span-4 flex flex-col items-center">
+                      
+                      <!-- Top Decorative Spiral Scrolls (Exact match to uploaded passport) -->
+                      <div class="flex items-center justify-center gap-1.5 mb-1 opacity-70">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
+                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
+                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
+                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        </svg>
+                      </div>
+
+                      <!-- Portrait Frame -->
+                      <div class="w-full aspect-[3.2/4] max-w-[150px] bg-slate-200 border border-slate-400 rounded-xs overflow-hidden shadow-sm flex items-center justify-center relative">
+                        <img id="ukPassPreviewPhoto" src="/assets/aistudio/uk_bond_portrait_head.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                      </div>
+
+                      <!-- Bottom Decorative Spiral Scrolls -->
+                      <div class="flex items-center justify-center gap-1.5 mt-1 opacity-70">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
+                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
+                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
+                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        </svg>
+                      </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Numbered Metadata Fields (1) through (10) -->
+                    <div class="col-span-8 sm:col-span-8 space-y-1 sm:space-y-1.5 text-[9.5px] sm:text-[10.5px] leading-tight">
+                      
+                      <!-- 1. Surname/Nom (1) -->
+                      <div>
+                        <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Surname/Nom (1)</span>
+                        <span id="ukPassPreviewSurname" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm tracking-wider uppercase">BOND</span>
+                      </div>
+
+                      <!-- 2. Given names/Prénoms (2) -->
+                      <div>
+                        <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Given names/Prénoms (2)</span>
+                        <span id="ukPassPreviewGivenNames" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm tracking-wider uppercase">JAMES</span>
+                      </div>
+
+                      <!-- 3. Nationality/Nationalité (3) -->
+                      <div>
+                        <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Nationality/Nationalité (3)</span>
+                        <span id="ukPassPreviewNationality" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">BRITISH CITIZEN</span>
+                      </div>
+
+                      <!-- 4 & 6: Date of birth & Place of birth -->
+                      <div class="grid grid-cols-12 gap-2 items-start">
+                        <div class="col-span-6">
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Date of birth/Date de naissance (4)</span>
+                          <span id="ukPassPreviewDob" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">13 APR /AVR 68</span>
+                        </div>
+                        <div class="col-span-6">
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Place of birth/Lieu de naissance (6)</span>
+                          <span id="ukPassPreviewPob" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">BERLIN</span>
+                        </div>
+                      </div>
+
+                      <!-- 5 & 8: Sex & Authority -->
+                      <div class="grid grid-cols-12 gap-2 items-start">
+                        <div class="col-span-6">
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Sex/Sexe (5)</span>
+                          <span id="ukPassPreviewSex" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">M</span>
+                        </div>
+                        <div class="col-span-6">
+                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Authority/Autorité (8)</span>
+                          <span id="ukPassPreviewAuthority" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">UKPA</span>
+                        </div>
+                      </div>
+
+                      <!-- 7, 9 & 10: Date of issue, Date of expiry & Holder Signature -->
+                      <div class="grid grid-cols-12 gap-2 items-end pt-0.5">
+                        <div class="col-span-6 space-y-1">
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Date of issue/Date de délivrance (7)</span>
+                            <span id="ukPassPreviewIssueDate" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">16 FEB /FEV 06</span>
+                          </div>
+                          <div>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Date of expiry/Date d'expiration (9)</span>
+                            <span id="ukPassPreviewExpiryDate" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">16 FEB /FEV 16</span>
+                          </div>
+                        </div>
+
+                        <!-- 10. Holder's signature (Exact signature) -->
+                        <div class="col-span-6 flex flex-col items-center justify-end text-center">
+                          <span class="block text-[6.5px] sm:text-[7px] text-slate-600 font-bold uppercase leading-none mb-1">
+                            Holder's signature/Signature du titulaire (10)
+                          </span>
+                          <div class="h-8 sm:h-10 w-full flex items-center justify-center">
+                            <img id="ukPassPreviewSig" src="/assets/aistudio/uk_bond_sig_clean_alpha.png" alt="James Bond Signature" class="max-h-full max-w-[120px] object-contain">
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <!-- ICAO Doc 9303 Machine Readable Zone (MRZ) Footer -->
+                  <div class="mt-2.5 pt-1.5 border-t border-slate-300 font-mono-code text-[10.5px] sm:text-[12px] font-bold tracking-[0.14em] sm:tracking-[0.18em] text-slate-950 leading-tight overflow-x-auto relative z-10 select-all">
+                    <!-- Subtle Chevron row matching the uploaded passport -->
+                    <div class="text-[7.5px] text-slate-400 tracking-[0.4em] select-none mb-0.5 opacity-60">
+                      &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                    </div>
+                    <div id="ukPassMrzLine1">P&lt;GBRBOND&lt;&lt;JAMES&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                    <div id="ukPassMrzLine2">0946127513GBR6804130M1602168&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;02</div>
+                  </div>
+
+                </article>
+              </div>
+
+              <!-- ================= 2. OFFICIAL UPLOADED SPECIMEN REFERENCE COMPARISON ================= -->
+              <div class="w-full max-w-[650px] space-y-2 pt-2">
+                <div class="flex items-center justify-between px-1">
+                  <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-camera text-blue-700"></i>
+                    Original Specimen Photo (Reference)
+                  </span>
+                  <span class="text-[10px] text-slate-400 font-mono-code">Uploaded British Passport</span>
+                </div>
+
+                <div class="relative w-full rounded-2xl shadow-md border border-slate-200 overflow-hidden bg-slate-900 group">
+                  <img src="/assets/aistudio/img-160_f55dc498.jpg" alt="Uploaded UK Passport Specimen (James Bond)" class="w-full h-auto object-cover max-h-[300px]">
+                  
+                  <div class="absolute bottom-2.5 right-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10.5px] px-2.5 py-1 rounded-lg font-mono-code font-bold flex items-center gap-1.5 shadow-md">
+                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                    <span>Exact Reference Details Matching 100%</span>
+                  </div>
+                </div>
+              </div>
+
             </section>
 
           </div>
