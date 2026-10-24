@@ -73,13 +73,13 @@
     .kenya-maisha-front-bg {
       background-color: #f7faf7;
       background-image: 
-        radial-gradient(ellipse at 50% 12%, rgba(239, 68, 68, 0.18) 0%, transparent 60%),
-        radial-gradient(circle at 18% 70%, rgba(16, 185, 129, 0.22) 0%, transparent 50%),
-        radial-gradient(circle at 82% 70%, rgba(16, 185, 129, 0.20) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.10) 0%, transparent 40%),
-        repeating-radial-gradient(circle at 50% 12%, transparent 0, transparent 6px, rgba(239, 68, 68, 0.05) 7px, transparent 8px),
-        repeating-radial-gradient(circle at 20% 70%, transparent 0, transparent 8px, rgba(16, 185, 129, 0.06) 9px, transparent 10px),
-        repeating-radial-gradient(circle at 80% 70%, transparent 0, transparent 8px, rgba(16, 185, 129, 0.06) 9px, transparent 10px);
+        radial-gradient(ellipse at 50% 8%, rgba(244, 63, 94, 0.22) 0%, rgba(251, 113, 133, 0.12) 35%, transparent 68%),
+        radial-gradient(circle at 18% 70%, rgba(16, 185, 129, 0.25) 0%, transparent 52%),
+        radial-gradient(circle at 82% 70%, rgba(16, 185, 129, 0.22) 0%, transparent 52%),
+        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.10) 0%, transparent 42%),
+        repeating-radial-gradient(circle at 50% 10%, transparent 0, transparent 4px, rgba(239, 68, 68, 0.05) 5px, transparent 6px),
+        repeating-radial-gradient(circle at 20% 70%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.06) 7px, transparent 8px),
+        repeating-radial-gradient(circle at 80% 70%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.06) 7px, transparent 8px);
     }
 
     .kenya-maisha-back-bg {
@@ -108,7 +108,7 @@
       body { background: #fff!important; padding: 0!important; margin: 0!important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
       .no-print, #imageModal, #toast, header, footer { display: none!important; }
       body > main, .print-area-wrapper { display: block!important; width: 100%!important; padding: 0!important; margin: 0!important; }
-      #passport-card, #somalia-passport-card, #somalia-passport-spread { width: 100%!important; max-width: 135mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
+      #passport-card, #somalia-passport-card, #somalia-passport-spread, #somalia-passport-id-card { width: 100%!important; max-width: 135mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
       #somalia-card { width: 100%!important; max-width: 175mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
       #somali-smart-id-card { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #ethiopia-fayda-card { width: 100%!important; max-width: 160mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
@@ -1372,11 +1372,11 @@
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Surname</label>
-                    <input id="kidInputSurname" type="text" value="HASSAN" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputSurname" type="text" value="ADAN" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Given Name</label>
-                    <input id="kidInputGivenName" type="text" value="ABDIRAHMAN ALI" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputGivenName" type="text" value="ABDIRAHMAN MOHAMED" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -1384,11 +1384,11 @@
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">ID Number</label>
-                    <input id="kidInputIdNo" type="text" value="792148413" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputIdNo" type="text" value="223136390" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Serial No (Left Edge)</label>
-                    <input id="kidInputSerial" type="text" value="70694683" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputSerial" type="text" value="256970356" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -1407,7 +1407,7 @@
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
-                    <input id="kidInputDob" type="text" value="02. 08. 2005" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputDob" type="text" value="01. 07. 2004" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -1415,15 +1415,15 @@
                 <div class="grid grid-cols-3 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth</label>
-                    <input id="kidInputPob" type="text" value="NAKURU" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputPob" type="text" value="MANDERA EAST" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry</label>
-                    <input id="kidInputExpiry" type="text" value="26. 05. 2036" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputExpiry" type="text" value="27. 02. 2035" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Issue</label>
-                    <input id="kidInputPlace" type="text" value="MUNICIPALITY" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputPlace" type="text" value="KHALALIYO" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
               </div>
@@ -1440,37 +1440,37 @@
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Issue</label>
-                    <input id="kidInputDateIssue" type="text" value="04. 06. 2026" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputDateIssue" type="text" value="28. 02. 2025" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Back Serial (Left Edge)</label>
-                    <input id="kidInputBackSerial" type="text" value="25338P416954" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputBackSerial" type="text" value="24314P237429" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">County</label>
-                    <input id="kidInputCounty" type="text" value="NAKURU" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputCounty" type="text" value="MANDERA" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sub-County</label>
-                    <input id="kidInputSubCounty" type="text" value="NAKURU EAST" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputSubCounty" type="text" value="MANDERA EAST" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Division</label>
-                    <input id="kidInputDivision" type="text" value="MUNICIPALITY" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputDivision" type="text" value="KHALALIYO" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Location</label>
-                    <input id="kidInputLocation" type="text" value="BONDENI" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputLocation" type="text" value="GINGO" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sub-Location</label>
-                    <input id="kidInputSubLocation" type="text" value="BAHARINI" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputSubLocation" type="text" value="MEYGAAG" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
               </div>
@@ -1515,7 +1515,7 @@
                 <div class="flex items-center justify-between px-1">
                   <span class="text-[11px] font-black uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                    FRONT SIDE · MAISHA SMART CARD
+                    FRONT SIDE · MAISHA SMART CARD · DEMONSTRATION SPECIMEN
                   </span>
                   <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR-80 · 85.6 × 53.98 mm</span>
                 </div>
@@ -1559,13 +1559,13 @@
                       <h3 class="text-[8.5px] sm:text-[10.5px] font-extrabold tracking-wide text-[#0f3d2e] uppercase font-sans">
                         NATIONAL IDENTITY CARD
                       </h3>
-                      <!-- Smart Card Biometric Chip Symbol -->
-                      <div class="mt-1">
-                        <svg viewBox="0 0 28 16" class="w-6 h-3.5 fill-[#0f3d2e]">
-                          <rect x="2" y="1" width="24" height="14" rx="2" fill="none" stroke="#0f3d2e" stroke-width="1.8"/>
-                          <circle cx="14" cy="8" r="3.2" fill="none" stroke="#0f3d2e" stroke-width="1.8"/>
-                          <line x1="0" y1="8" x2="6" y2="8" stroke="#0f3d2e" stroke-width="2"/>
-                          <line x1="22" y1="8" x2="28" y2="8" stroke="#0f3d2e" stroke-width="2"/>
+                      <!-- Smart Card Biometric Chip Symbol (Dark Green Badge with White Icon) -->
+                      <div class="mt-1 bg-[#0e3e28] px-1.5 py-0.5 rounded-[3px] shadow-2xs flex items-center justify-center">
+                        <svg viewBox="0 0 28 14" class="w-5 sm:w-6 h-2.5 sm:h-3">
+                          <circle cx="14" cy="7" r="3" fill="none" stroke="#f1f5f9" stroke-width="1.5"/>
+                          <circle cx="14" cy="7" r="1.1" fill="#f1f5f9"/>
+                          <line x1="1" y1="7" x2="11" y2="7" stroke="#f1f5f9" stroke-width="1.5"/>
+                          <line x1="17" y1="7" x2="27" y2="7" stroke="#f1f5f9" stroke-width="1.5"/>
                         </svg>
                       </div>
                     </div>
@@ -1574,31 +1574,31 @@
                   <!-- CARD MAIN BODY -->
                   <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10 mt-1">
                     
-                    <!-- Vertical Serial Number along far-left border -->
+                    <!-- Vertical Serial Number along far-left border (Reads top-to-bottom as in reference) -->
                     <div class="col-span-1 flex items-center justify-center h-full">
-                      <div class="transform -rotate-90 origin-center whitespace-nowrap text-[9px] sm:text-[11px] font-black font-mono-code text-slate-800 tracking-wider">
-                        <span id="kidPreviewSerial">70694683</span>
+                      <div class="transform rotate-90 origin-center whitespace-nowrap text-[9px] sm:text-[11px] font-black font-mono-code text-slate-800 tracking-wider">
+                        <span id="kidPreviewSerial">256970356</span>
                       </div>
                     </div>
 
                     <!-- Bearer Portrait Photo -->
                     <div class="col-span-4 flex flex-col items-center">
                       <div class="w-full aspect-[3.2/4.1] rounded-lg overflow-hidden border border-slate-400/90 shadow-sm relative bg-slate-200">
-                        <!-- High-resolution cropped specimen photo of Hassan Abdirahman Ali -->
-                        <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_hassan.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                        <!-- Specimen reference photo of Adan Abdirahman Mohamed -->
+                        <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_adan.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
                         <!-- Overlay wavy guilloche curves on shoulder/bottom for authentic security blend -->
                         <div class="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-emerald-600/30 via-transparent to-transparent"></div>
                       </div>
                     </div>
 
                     <!-- Personal Information Data Fields -->
-                    <div class="col-span-7 space-y-1 sm:space-y-1.5 text-left leading-tight pl-1">
+                    <div class="col-span-7 space-y-1 text-left leading-tight pl-1">
                       
                       <!-- 1. Surname -->
                       <div>
                         <span class="block text-[7.5px] sm:text-[8.5px] font-bold uppercase text-slate-500 leading-none">SURNAME</span>
                         <div id="kidPreviewSurname" class="font-black text-slate-900 text-xs sm:text-[14px] uppercase tracking-wide leading-tight">
-                          HASSAN
+                          ADAN
                         </div>
                       </div>
 
@@ -1606,7 +1606,7 @@
                       <div>
                         <span class="block text-[7.5px] sm:text-[8.5px] font-bold uppercase text-slate-500 leading-none">GIVEN NAME</span>
                         <div id="kidPreviewGiven" class="font-black text-slate-900 text-[11px] sm:text-[13px] uppercase tracking-wide leading-tight">
-                          ABDIRAHMAN ALI
+                          ABDIRAHMAN MOHAMED
                         </div>
                       </div>
 
@@ -1627,55 +1627,61 @@
                             KEN
                           </div>
                         </div>
-                        <div class="col-span-5">
+                        <div class="col-span-5 text-left">
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF BIRTH</span>
                           <div id="kidPreviewDob" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] font-mono-code">
-                            02. 08. 2005
+                            01. 07. 2004
                           </div>
                         </div>
                       </div>
 
-                      <!-- 4. Place of Birth -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF BIRTH</span>
-                        <div id="kidPreviewPob" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                          NAKURU
-                        </div>
-                      </div>
+                      <!-- 4. Lower Section: Left Side Details + Right Column (Maisha Logo & X X X below Date of Birth) -->
+                      <div class="grid grid-cols-12 gap-1 items-start pt-0.5">
+                        <!-- Left Details (Place of Birth, ID Number, Expiry, Place of Issue) -->
+                        <div class="col-span-7 space-y-1 leading-tight">
+                          <!-- Place of Birth -->
+                          <div>
+                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF BIRTH</span>
+                            <div id="kidPreviewPob" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
+                              MANDERA EAST
+                            </div>
+                          </div>
 
-                      <!-- 5. ID Number -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">ID NUMBER</span>
-                        <div id="kidPreviewIdNo" class="font-black text-slate-950 text-[13px] sm:text-[16px] font-mono-code tracking-wider">
-                          792148413
-                        </div>
-                      </div>
+                          <!-- ID Number -->
+                          <div>
+                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">ID NUMBER</span>
+                            <div id="kidPreviewIdNo" class="font-black text-slate-950 text-[13px] sm:text-[16px] font-mono-code tracking-wider">
+                              223136390
+                            </div>
+                          </div>
 
-                      <!-- 6. Date of Expiry & Place of Issue -->
-                      <div class="grid grid-cols-2 gap-1 items-start">
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF EXPIRY</span>
-                          <div id="kidPreviewExpiry" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] font-mono-code">
-                            26. 05. 2036
+                          <!-- Date of Expiry -->
+                          <div>
+                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF EXPIRY</span>
+                            <div id="kidPreviewExpiry" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] font-mono-code">
+                              27. 02. 2035
+                            </div>
+                          </div>
+
+                          <!-- Place of Issue -->
+                          <div>
+                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF ISSUE</span>
+                            <div id="kidPreviewPlace" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] uppercase">
+                              KHALALIYO
+                            </div>
                           </div>
                         </div>
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF ISSUE</span>
-                          <div id="kidPreviewPlace" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] uppercase">
-                            MUNICIPALITY
-                          </div>
+
+                        <!-- Right Column: Located directly under Date of Birth -->
+                        <div class="col-span-5 flex flex-col items-center justify-start text-center pt-0.5 pointer-events-none">
+                          <img src="/assets/aistudio/kenya_maisha_logo.png" alt="Maisha Namba Logo" class="h-10 sm:h-12 w-auto max-w-full object-contain mix-blend-multiply drop-shadow-2xs">
+                          <span class="text-[9px] sm:text-[11px] font-black text-slate-800 tracking-[0.45em] mt-1 font-mono-code">
+                            X X X
+                          </span>
                         </div>
                       </div>
 
                     </div>
-                  </div>
-
-                  <!-- BOTTOM RIGHT: MAISHA LOGO & SECURITY MARKS -->
-                  <div class="absolute bottom-2 right-3 flex flex-col items-end text-right z-10 pointer-events-none">
-                    <img src="/assets/aistudio/kenya_maisha_logo.png" alt="Maisha Namba Logo" class="h-10 sm:h-12 w-auto object-contain mix-blend-multiply drop-shadow-2xs">
-                    <span class="text-[9px] sm:text-[10px] font-black text-slate-800 tracking-[0.45em] mt-0.5 mr-1 font-mono-code">
-                      X X X
-                    </span>
                   </div>
                 </article>
               </div>
@@ -1685,7 +1691,7 @@
                 <div class="flex items-center justify-between px-1">
                   <span class="text-[11px] font-black uppercase tracking-wider text-teal-900 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-                    BACK SIDE · REVERSE DATA &amp; SMART CHIP
+                    BACK SIDE · REVERSE DATA &amp; SMART CHIP · DEMONSTRATION SPECIMEN
                   </span>
                   <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO TD1 · 3-LINE MRZ</span>
                 </div>
@@ -1718,7 +1724,7 @@
                         <!-- Vertical Left Serial -->
                         <div class="w-3 flex items-center justify-center pt-8">
                           <div class="transform -rotate-90 origin-center whitespace-nowrap text-[8.5px] sm:text-[10px] font-black font-mono-code text-slate-800 tracking-wider">
-                            <span id="kidPreviewBackSerial">25338P416954</span>
+                            <span id="kidPreviewBackSerial">24314P237429</span>
                           </div>
                         </div>
 
@@ -1742,7 +1748,7 @@
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">COUNTY</span>
                           <div id="kidPreviewCounty" class="font-black text-slate-900 text-xs sm:text-[13.5px] uppercase">
-                            NAKURU
+                            MANDERA
                           </div>
                         </div>
 
@@ -1750,7 +1756,7 @@
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SUB-COUNTY</span>
                           <div id="kidPreviewSubCounty" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] uppercase">
-                            NAKURU EAST
+                            MANDERA EAST
                           </div>
                         </div>
 
@@ -1758,7 +1764,7 @@
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DIVISION</span>
                           <div id="kidPreviewDivision" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            MUNICIPALITY
+                            KHALALIYO
                           </div>
                         </div>
 
@@ -1766,7 +1772,7 @@
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">LOCATION</span>
                           <div id="kidPreviewLocation" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            BONDENI
+                            GINGO
                           </div>
                         </div>
 
@@ -1774,7 +1780,7 @@
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SUB-LOCATION</span>
                           <div id="kidPreviewSubLocation" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            BAHARINI
+                            MEYGAAG
                           </div>
                         </div>
                       </div>
@@ -1785,13 +1791,13 @@
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF ISSUE</span>
                           <div id="kidPreviewDateIssue" class="font-black text-slate-900 text-[11px] sm:text-[13px] font-mono-code">
-                            04. 06. 2026
+                            28. 02. 2025
                           </div>
                         </div>
 
                         <!-- Ghost Secondary Portrait -->
                         <div class="w-10 sm:w-12 aspect-[3.2/4] rounded border border-slate-300/80 overflow-hidden shadow-2xs bg-slate-100 relative">
-                          <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_hassan.jpg" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
+                          <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_adan.jpg" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
                         </div>
 
                         <!-- Principal Registrar Signature -->
@@ -1817,9 +1823,9 @@
 
                     <!-- 3-Line Machine Readable Zone (MRZ) - Exact ICAO 9303 TD1 Specification -->
                     <div class="font-mono-code text-[9.5px] sm:text-[11.5px] font-bold text-slate-950 tracking-[0.14em] sm:tracking-[0.16em] leading-tight text-center">
-                      <div id="kidPreviewMrz1">IDKEN7921484139&lt;321&lt;3211&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                      <div id="kidPreviewMrz2">0508023M3605266KEN706946983045</div>
-                      <div id="kidPreviewMrz3">HASSAN&lt;&lt;ABDIRAHMAN&lt;ALI&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="kidPreviewMrz1">IDKEN2231363903&lt;091&lt;0912&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="kidPreviewMrz2">0407012M3502273KEN256970356038</div>
+                      <div id="kidPreviewMrz3">ADAN&lt;&lt;ABDIRAHMAN&lt;MOHAMED&lt;&lt;&lt;&lt;&lt;&lt;</div>
                     </div>
                   </div>
 
@@ -1879,33 +1885,33 @@
 
               <!-- National ID Number -->
               <div>
-                <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">L. Qaranka / رقم الهوية / National ID No</label>
-                <input id="somSmartIdInputNo" type="text" value="26405034834834" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">National ID / رقم الهوية / L. Qaranka</label>
+                <input id="somSmartIdInputNo" type="text" value="28901014439167" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
               </div>
 
               <!-- Full Name -->
               <div>
-                <label class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Full Name</label>
-                <input id="somSmartIdInputName" type="text" value="Mohamed Ali Mahdi" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm">
+                <label class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Name</label>
+                <input id="somSmartIdInputName" type="text" value="MOHAMED ALI ABDULLAHI" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm uppercase">
               </div>
 
               <!-- Date of Birth & Place of Birth -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Dhalashada / Birth Date</label>
-                  <input id="somSmartIdInputDob" type="text" value="01Janaury 1999" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs">
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda dhalashada / تاريخ الميلاد / Birth</label>
+                  <input id="somSmartIdInputDob" type="text" value="01 Jan 1989" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Goobta / Place of Birth</label>
-                  <input id="somSmartIdInputPob" type="text" value="Mogadishu" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs">
+                  <input id="somSmartIdInputPob" type="text" value="BELEDWEYN" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
               </div>
 
               <!-- Issue Date & Place of Issue -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">La Bixiyay / Issue Date</label>
-                  <input id="somSmartIdInputIssue" type="text" value="26 DEC 2017" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda la bixiyay / تاريخ الإصدار / Issue</label>
+                  <input id="somSmartIdInputIssue" type="text" value="12 Feb 2018" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Meesha / Place of Issue</label>
@@ -1916,11 +1922,11 @@
               <!-- Expiry Date & Gender -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Dhacayo / Expiry Date</label>
-                  <input id="somSmartIdInputExpiry" type="text" value="26 DEC 2022" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda uu dhacayo / تاريخ الانتهاء / Expiry</label>
+                  <input id="somSmartIdInputExpiry" type="text" value="11 Feb 2023" oninput="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Jinsiga / Gender</label>
+                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Lab/Dheddig / الجنس / Gender</label>
                   <select id="somSmartIdInputGender" onchange="updateSomSmartIdPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs">
                     <option value="MALE" selected>MALE</option>
                     <option value="FEMALE">FEMALE</option>
@@ -2034,7 +2040,15 @@
             <div class="w-full max-w-[620px] space-y-4">
 
               <!-- ================= 1. SOMALI SMART POLYCARBONATE NATIONAL ID CARD (EXACT OFFICIAL MATCH) ================= -->
-              <div id="somalia-smart-id-specimen-wrap" class="w-full">
+              <div id="somalia-smart-id-specimen-wrap" class="w-full space-y-1.5">
+                <div class="flex items-center justify-between px-1">
+                  <span class="text-[11px] font-black uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                    SOMALI NATIONAL ID · DEMONSTRATION SPECIMEN
+                  </span>
+                  <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR-80 · 85.6 × 53.98 mm</span>
+                </div>
+
                 <article id="somali-smart-id-card" class="somali-smart-id-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none p-3.5 sm:p-5 flex flex-col justify-between">
                   
                   <!-- Top & Bottom Guilloche Wave Security Accent Strips -->
@@ -2042,48 +2056,67 @@
                   <div class="absolute bottom-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
 
                   <!-- Central Coat of Arms Security Watermark (Teal / Cyan tinted as in real card) -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.20] z-0 translate-x-5 sm:translate-x-8">
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] z-0 translate-x-5 sm:translate-x-8">
                     <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-60 sm:w-76 h-auto filter hue-rotate-165 saturate-200">
                   </div>
 
-                  <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Metallic Rosette on Right -->
+                  <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Silver Metallic Rosette on Right -->
                   <div class="relative z-10 flex items-start justify-between gap-1 pb-1">
                     <!-- Left: National ID Label & Number -->
                     <div class="leading-tight shrink-0 text-left">
                       <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                        L_Qaranka/<span class="font-arabic font-normal">رقم الهوية</span>/National ID
+                        National ID / <span class="font-arabic font-normal">رقم الهوية</span> / L. Qaranka
                       </div>
                       <div id="somSmartIdPreviewNo" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wider mt-0.5">
-                        26405034834834
+                        28901014439167
                       </div>
                     </div>
 
-                    <!-- Center: Official Titles Hierarchy (Exact wording & colors from uploaded card) -->
+                    <!-- Center: Official Titles Hierarchy (Exact wording & colors from reference card) -->
                     <div class="text-center text-slate-950 leading-none space-y-0.5 px-1 flex-1">
-                      <div class="font-bold text-[8px] sm:text-[10px] tracking-wide uppercase text-slate-950">
+                      <div class="font-bold text-[8px] sm:text-[10px] tracking-wide uppercase text-[#14532d]">
                         JAMHUURIYADDA SOOMAALIYA
                       </div>
-                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-slate-950">
+                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-[#14532d]">
                         جمهورية الصومال
                       </div>
-                      <div class="font-bold text-[7px] sm:text-[8.5px] tracking-wider uppercase text-red-900">
+                      <div class="font-bold text-[7px] sm:text-[8.5px] tracking-wider uppercase text-[#14532d]">
                         SOMALI REPUBLIC
                       </div>
-                      <div class="font-black text-[8.5px] sm:text-[10.5px] tracking-wide uppercase pt-0.5 text-slate-950">
+                      <div class="font-black text-[8.5px] sm:text-[10.5px] tracking-wide uppercase pt-0.5 text-[#14532d]">
                         WARAQADDA AQOONSIGA
                       </div>
-                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-slate-950">
+                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-[#14532d]">
                         بطاقة الهوية
                       </div>
-                      <div class="font-black text-[7.5px] sm:text-[9px] tracking-wider uppercase text-slate-950 flex items-center justify-center gap-1.5">
-                        <span>IDENTITY CARD</span>
-                        <span class="text-slate-500 font-light text-[10px]">|</span>
+                      <div class="font-black text-[7.5px] sm:text-[9px] tracking-wider uppercase text-[#14532d]">
+                        IDENTITY CARD
                       </div>
                     </div>
 
-                    <!-- Right: Authentic 8-Pointed Scalloped Rosette Metallic Hologram Seal -->
-                    <div class="shrink-0 flex items-center justify-end">
-                      <img src="/assets/aistudio/somali_national_id_rosette.png" alt="Hologram Rosette" class="w-9 h-9 sm:w-12 sm:h-12 object-contain drop-shadow-xs filter contrast-125">
+                    <!-- Right: Authentic 8-Lobed Silver Scalloped Metallic Foil Hologram Seal -->
+                    <div class="shrink-0 flex items-center justify-end pt-0.5">
+                      <div class="w-10 h-10 sm:w-13 sm:h-13 relative flex items-center justify-center drop-shadow-sm">
+                        <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow-2xs">
+                          <defs>
+                            <radialGradient id="silverFoilGlow" cx="45%" cy="40%" r="55%">
+                              <stop offset="0%" stop-color="#ffffff"/>
+                              <stop offset="40%" stop-color="#f8fafc"/>
+                              <stop offset="70%" stop-color="#e2e8f0"/>
+                              <stop offset="100%" stop-color="#cbd5e1"/>
+                            </radialGradient>
+                            <linearGradient id="silverEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#ffffff"/>
+                              <stop offset="50%" stop-color="#cbd5e1"/>
+                              <stop offset="100%" stop-color="#94a3b8"/>
+                            </linearGradient>
+                          </defs>
+                          <path d="M 50,5 C 57,5 62,13 68,10 C 74,8 81,13 85,19 C 89,24 95,28 96,35 C 97,42 93,48 95,55 C 96,62 90,68 88,74 C 86,81 79,84 74,89 C 68,93 62,90 55,94 C 48,97 42,93 35,95 C 28,96 24,90 19,85 C 13,81 8,74 10,68 C 13,62 5,57 5,50 C 5,43 13,38 10,32 C 8,26 13,19 19,15 C 24,11 28,5 35,6 C 42,7 48,11 50,5 Z" 
+                                fill="url(#silverFoilGlow)" stroke="url(#silverEdge)" stroke-width="1.2"/>
+                          <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(203, 213, 225, 0.6)" stroke-width="0.8" stroke-dasharray="2 2"/>
+                          <polygon points="50,30 55,42 68,42 58,50 62,62 50,54 38,62 42,50 32,42 45,42" fill="rgba(255,255,255,0.7)" stroke="#cbd5e1" stroke-width="0.5"/>
+                        </svg>
+                      </div>
                     </div>
                   </div>
 
@@ -2111,13 +2144,13 @@
                           </div>
                         </div>
 
-                        <!-- Name Block (Mohamed on line 1, Ali Mahdi on line 2) -->
+                        <!-- Name Block (MOHAMED on line 1, ALI ABDULLAHI on line 2) -->
                         <div class="flex-1 min-w-0">
                           <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                            Magaca/<span class="font-arabic font-normal">الاسم</span>/Name
+                            Magaca / <span class="font-arabic font-normal">الاسم</span> / Name
                           </div>
-                          <div id="somSmartIdPreviewName" class="font-black text-slate-950 text-xs sm:text-[13px] md:text-sm tracking-wide leading-tight mt-0.5">
-                            Mohamed<br><span class="inline-block pl-2">Ali Mahdi</span>
+                          <div id="somSmartIdPreviewName" class="font-black text-slate-950 text-xs sm:text-[13px] md:text-sm tracking-wide leading-tight mt-0.5 uppercase">
+                            MOHAMED<br><span>ALI ABDULLAHI</span>
                           </div>
                         </div>
                       </div>
@@ -2125,21 +2158,21 @@
                       <!-- Birth Row: Date + Place of Birth -->
                       <div>
                         <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Taariikhda dhalashada/<span class="font-arabic font-normal">الميلاد</span>/Birth
+                          Taariikhda dhalashada / <span class="font-arabic font-normal">الميلاد</span> / Birth
                         </div>
                         <div class="flex items-center gap-3 sm:gap-5 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
-                          <span id="somSmartIdPreviewDob" class="text-slate-950">01Janaury 1999</span>
-                          <span id="somSmartIdPreviewPob" class="text-slate-950 tracking-wide">Mogadishu</span>
+                          <span id="somSmartIdPreviewDob" class="text-slate-950">01 Jan 1989</span>
+                          <span id="somSmartIdPreviewPob" class="text-slate-950 tracking-wide uppercase">BELEDWEYN</span>
                         </div>
                       </div>
 
                       <!-- Issue Row: Date + Place of Issue -->
                       <div>
                         <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Taariikhda la bixiyay/<span class="font-arabic font-normal">الاصدار</span>/Issue
+                          Taariikhda la bixiyay / <span class="font-arabic font-normal">الاصدار</span> / Issue
                         </div>
                         <div class="flex items-center gap-4 sm:gap-6 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
-                          <span id="somSmartIdPreviewIssue" class="text-slate-950 font-mono-code">26 DEC 2017</span>
+                          <span id="somSmartIdPreviewIssue" class="text-slate-950 font-mono-code">12 Feb 2018</span>
                           <span id="somSmartIdPreviewIssuePlace" class="text-slate-950 uppercase tracking-wide">MOGADISHU</span>
                         </div>
                       </div>
@@ -2147,10 +2180,10 @@
                       <!-- Bottom Left Expiry Row -->
                       <div>
                         <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Taariikhda uu dhacayo/<span class="font-arabic font-normal">الانتهاء</span>/Expiry
+                          Taariikhda uu dhacayo / <span class="font-arabic font-normal">الانتهاء</span> / Expiry
                         </div>
                         <div id="somSmartIdPreviewExpiry" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 font-mono-code mt-0.5">
-                          26 DEC 2022
+                          11 Feb 2023
                         </div>
                       </div>
 
@@ -2158,15 +2191,15 @@
 
                     <!-- Right Column: Bearer Portrait Photo & Gender Field below it -->
                     <div class="w-24 sm:w-28 md:w-32 shrink-0 flex flex-col items-center">
-                      <!-- Bearer Portrait Photo (Exact image from uploaded card) -->
+                      <!-- Bearer Portrait Photo (Exact image of Mohamed Ali Abdullahi) -->
                       <div class="w-full aspect-[3/3.8] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
-                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/somali_national_id_portrait_new.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/somali_smart_id_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
-                      <!-- Gender Field (Directly under the photo as in the actual card) -->
+                      <!-- Gender Field (Directly under the photo as in the reference card) -->
                       <div class="w-full text-left mt-1">
                         <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
-                          Lab/Dheddig/<span class="font-arabic font-normal">الجنس</span>/Gender
+                          Lab/Dheddig / <span class="font-arabic font-normal">الجنس</span> / Gender
                         </div>
                         <div id="somSmartIdPreviewGender" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 uppercase mt-0.5">
                           MALE
@@ -2566,161 +2599,343 @@ XUDUR, BAKOOL, SOMALIA</span>
 
           <!-- Passport Preview Area -->
           <section class="lg:col-span-7 flex justify-center items-start print-area-wrapper min-w-0">
-            <div id="somPassContainer" class="w-full max-w-[650px]">
+            <div id="somPassContainer" class="w-full max-w-[650px] space-y-6">
 
-              <!-- OFFICIAL 2-PAGE BOOKLET SPREAD (PAGE 3 OBSERVATIONS + PAGE 2 DATA PAGE) -->
-              <div id="somalia-passport-spread" class="w-full">
-                <article class="bg-white rounded-lg shadow-2xl border-2 border-slate-400 overflow-hidden text-slate-900 select-none">
-                  
-                  <!-- UPPER PAGE: PAGE 3 OBSERVATIONS & SIGNATURE -->
-                  <div class="relative w-full aspect-[1.45/1] overflow-hidden border-b-2 border-dashed border-slate-400">
-                    <!-- Background image of Page 3 Observations -->
-                    <img src="/assets/aistudio/somali_passport_obs_page.jpg" alt="Page 3 Observations" class="w-full h-full object-cover">
+              <!-- 1. TOP: SOMALI PASSPORT (2-PAGE BOOKLET SPREAD) -->
+              <div class="w-full space-y-2">
+                <div class="flex items-center justify-between px-1">
+                  <span class="text-[11px] font-black uppercase tracking-wider text-sky-950 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-700"></span>
+                    1. SOMALI PASSPORT · BIOMETRIC BOOKLET SPREAD
+                  </span>
+                  <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO DOC 9303 · PASSPORT</span>
+                </div>
 
-                    <!-- Dynamic Perforated Passport Number Overlay on Top-Left of Page 3 -->
-                    <div class="absolute left-6 top-8 pointer-events-none transform -rotate-90 origin-top-left font-mono-code text-xs sm:text-sm font-black tracking-[0.35em] text-slate-900/40 select-none">
-                      <span id="somPassPerforatedNumber">P00724085</span>
-                    </div>
+                <div id="somalia-passport-spread" class="w-full">
+                  <article class="bg-white rounded-lg shadow-2xl border-2 border-slate-400 overflow-hidden text-slate-900 select-none">
+                    
+                    <!-- UPPER PAGE: PAGE 3 OBSERVATIONS & SIGNATURE -->
+                    <div class="relative w-full aspect-[1.45/1] overflow-hidden border-b-2 border-dashed border-slate-400">
+                      <!-- Background image of Page 3 Observations -->
+                      <img src="/assets/aistudio/somali_passport_obs_page.jpg" alt="Page 3 Observations" class="w-full h-full object-cover">
 
-                    <!-- Page Number 3 indicator badge -->
-                    <div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-white/70 backdrop-blur-2xs text-[10px] font-bold text-slate-700">
-                      Page 3 · Fiiro Gaar Ah (Observations)
-                    </div>
-                  </div>
+                      <!-- Dynamic Perforated Passport Number Overlay on Top-Left of Page 3 -->
+                      <div class="absolute left-6 top-8 pointer-events-none transform -rotate-90 origin-top-left font-mono-code text-xs sm:text-sm font-black tracking-[0.35em] text-slate-900/40 select-none">
+                        <span id="somPassPerforatedNumber">P00724085</span>
+                      </div>
 
-                  <!-- BOOKLET SPINE / STITCHING SEAM -->
-                  <div class="h-2.5 bg-gradient-to-b from-slate-300 via-slate-100 to-slate-300 flex items-center justify-center border-y border-slate-400">
-                    <div class="w-full border-t border-dashed border-slate-400/80"></div>
-                  </div>
-
-                  <!-- LOWER PAGE: PAGE 2 BIOGRAPHICAL DATA PAGE (Rendered with current form data) -->
-                  <div class="somali-passport-bg relative w-full aspect-[1.42/1] p-4 sm:p-5 overflow-hidden text-slate-900">
-                    <!-- Header -->
-                    <header class="flex justify-between items-center pb-1.5 mb-2 border-b border-slate-300/80 relative z-10">
-                      <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
-                        JAMHUURIYADDA SOOMAALIYA
-                      </div>
-                      <div class="font-arabic font-bold text-sky-950 text-xs sm:text-sm">
-                        جمهورية الصومال
-                      </div>
-                      <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
-                        SOMALI REPUBLIC
-                      </div>
-                    </header>
-
-                    <!-- Subheader Bar -->
-                    <div class="grid grid-cols-12 gap-1 items-center pb-2 mb-2 border-b border-slate-300 relative z-10 text-[9px] sm:text-[10px]">
-                      <div class="col-span-4 flex items-center gap-2">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
-                          <img src="/assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-full h-full object-contain">
-                        </div>
-                        <div class="leading-none">
-                          <div class="font-black text-slate-950 text-[10px] sm:text-[11px] tracking-wider">BAASABOOR</div>
-                          <div class="font-arabic font-bold text-slate-800 text-[9px]">جواز سفر</div>
-                          <div class="font-black text-slate-950 text-[9px] sm:text-[10px] tracking-wider">PASSPORT</div>
-                        </div>
-                      </div>
-                      <div class="col-span-2 border-l border-slate-300 pl-1.5">
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Nooca / Type</span>
-                        <span id="somPassSpreadType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">P</span>
-                      </div>
-                      <div class="col-span-2 border-l border-slate-300 pl-1.5">
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Astaanta / Code</span>
-                        <span id="somPassSpreadCountry" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">SOM</span>
-                      </div>
-                      <div class="col-span-4 border-l border-slate-300 pl-1.5 flex items-center justify-between">
-                        <div>
-                          <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Passport No</span>
-                          <span id="somPassSpreadNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00724085</span>
-                        </div>
-                        <span class="text-amber-800 text-lg sm:text-xl font-bold pr-1">★</span>
+                      <!-- Page Number 3 indicator badge -->
+                      <div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-white/70 backdrop-blur-2xs text-[10px] font-bold text-slate-700">
+                        Page 3 · Fiiro Gaar Ah (Observations)
                       </div>
                     </div>
 
-                    <!-- Main Data Fields Grid -->
-                    <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
-                      <div class="col-span-4 flex flex-col items-center">
-                        <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                          <img id="somPassPreviewPhotoSpread" src="/assets/aistudio/somali_passport_portrait.jpg" alt="" class="w-full h-full object-cover">
+                    <!-- BOOKLET SPINE / STITCHING SEAM -->
+                    <div class="h-2.5 bg-gradient-to-b from-slate-300 via-slate-100 to-slate-300 flex items-center justify-center border-y border-slate-400">
+                      <div class="w-full border-t border-dashed border-slate-400/80"></div>
+                    </div>
+
+                    <!-- LOWER PAGE: PAGE 2 BIOGRAPHICAL DATA PAGE (Rendered with current form data) -->
+                    <div class="somali-passport-bg relative w-full aspect-[1.42/1] p-4 sm:p-5 overflow-hidden text-slate-900">
+                      <!-- Header -->
+                      <header class="flex justify-between items-center pb-1.5 mb-2 border-b border-slate-300/80 relative z-10">
+                        <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
+                          JAMHUURIYADDA SOOMAALIYA
+                        </div>
+                        <div class="font-arabic font-bold text-sky-950 text-xs sm:text-sm">
+                          جمهورية الصومال
+                        </div>
+                        <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
+                          SOMALI REPUBLIC
+                        </div>
+                      </header>
+
+                      <!-- Subheader Bar -->
+                      <div class="grid grid-cols-12 gap-1 items-center pb-2 mb-2 border-b border-slate-300 relative z-10 text-[9px] sm:text-[10px]">
+                        <div class="col-span-4 flex items-center gap-2">
+                          <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
+                            <img src="/assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-full h-full object-contain">
+                          </div>
+                          <div class="leading-none">
+                            <div class="font-black text-slate-950 text-[10px] sm:text-[11px] tracking-wider">BAASABOOR</div>
+                            <div class="font-arabic font-bold text-slate-800 text-[9px]">جواز سفر</div>
+                            <div class="font-black text-slate-950 text-[9px] sm:text-[10px] tracking-wider">PASSPORT</div>
+                          </div>
+                        </div>
+                        <div class="col-span-2 border-l border-slate-300 pl-1.5">
+                          <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Nooca / Type</span>
+                          <span id="somPassSpreadType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">P</span>
+                        </div>
+                        <div class="col-span-2 border-l border-slate-300 pl-1.5">
+                          <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Astaanta / Code</span>
+                          <span id="somPassSpreadCountry" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">SOM</span>
+                        </div>
+                        <div class="col-span-4 border-l border-slate-300 pl-1.5 flex items-center justify-between">
+                          <div>
+                            <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Passport No</span>
+                            <span id="somPassSpreadNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00724085</span>
+                          </div>
+                          <span class="text-amber-800 text-lg sm:text-xl font-bold pr-1">★</span>
                         </div>
                       </div>
-                      <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca / الاسم / Name</span>
-                          <span id="somPassSpreadName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">MAXAMED CABDIQADIR MAXAMED</span>
-                        </div>
-                        <div class="grid grid-cols-12 gap-1 items-start">
-                          <div class="col-span-7">
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca Hooyada / Mother's Name</span>
-                            <span id="somPassSpreadMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">FARTUN ADEN RONOW</span>
-                          </div>
-                          <div class="col-span-5">
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">NID:</span>
-                            <span id="somPassSpreadNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">29505057463496</span>
+
+                      <!-- Main Data Fields Grid -->
+                      <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
+                        <div class="col-span-4 flex flex-col items-center">
+                          <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
+                            <img id="somPassPreviewPhotoSpread" src="/assets/aistudio/somali_passport_portrait.jpg" alt="" class="w-full h-full object-cover">
                           </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-1">
+                        <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
                           <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Jinsiyada / Nationality</span>
-                            <span id="somPassSpreadNationality" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">SOMALI</span>
+                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca / الاسم / Name</span>
+                            <span id="somPassSpreadName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">MAXAMED CABDIQADIR MAXAMED</span>
                           </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Shaqada / Occupation</span>
-                            <span id="somPassSpreadOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">STUDENT</span>
+                          <div class="grid grid-cols-12 gap-1 items-start">
+                            <div class="col-span-7">
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca Hooyada / Mother's Name</span>
+                              <span id="somPassSpreadMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">FARTUN ADEN RONOW</span>
+                            </div>
+                            <div class="col-span-5">
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">NID:</span>
+                              <span id="somPassSpreadNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">29505057463496</span>
+                            </div>
                           </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda Dhalashada / Date of Birth</span>
-                            <span id="somPassSpreadDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">05 May 1995</span>
+                          <div class="grid grid-cols-2 gap-1">
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Jinsiyada / Nationality</span>
+                              <span id="somPassSpreadNationality" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">SOMALI</span>
+                            </div>
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Shaqada / Occupation</span>
+                              <span id="somPassSpreadOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">STUDENT</span>
+                            </div>
                           </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Bixiyey / Place of Issue</span>
-                            <span id="somPassSpreadIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">BAIDOA</span>
+                          <div class="grid grid-cols-2 gap-1">
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda Dhalashada / Date of Birth</span>
+                              <span id="somPassSpreadDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">05 May 1995</span>
+                            </div>
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Bixiyey / Place of Issue</span>
+                              <span id="somPassSpreadIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">BAIDOA</span>
+                            </div>
                           </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Lab Dheddig / Gender</span>
-                            <span id="somPassSpreadSex" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">MALE</span>
+                          <div class="grid grid-cols-2 gap-1">
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Lab Dheddig / Gender</span>
+                              <span id="somPassSpreadSex" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">MALE</span>
+                            </div>
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Dhaleshada / Place of Birth</span>
+                              <span id="somPassSpreadBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">HUDUR</span>
+                            </div>
                           </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Dhaleshada / Place of Birth</span>
-                            <span id="somPassSpreadBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">HUDUR</span>
+                          <div class="grid grid-cols-2 gap-1">
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda la Bixiyey / Date of Issue</span>
+                              <span id="somPassSpreadIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">21 Apr 2018</span>
+                            </div>
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Xafiiska / Authority</span>
+                              <span id="somPassSpreadAuthority" class="font-extrabold text-slate-900 text-[9.5px] sm:text-[10px] uppercase">SOMALI GOVERNMENT</span>
+                            </div>
                           </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda la Bixiyey / Date of Issue</span>
-                            <span id="somPassSpreadIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">21 Apr 2018</span>
-                          </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Xafiiska / Authority</span>
-                            <span id="somPassSpreadAuthority" class="font-extrabold text-slate-900 text-[9.5px] sm:text-[10px] uppercase">SOMALI GOVERNMENT</span>
-                          </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1 pt-0.5">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda uu Dhacayo / Expiry</span>
-                            <span id="somPassSpreadExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">20 Apr 2023</span>
-                          </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Saxiixa / Signature</span>
-                            <div class="border-b border-slate-400 mt-2 h-3 flex items-end">
-                              <span class="text-[8px] italic text-slate-400 font-mono-code select-none">M. Cabdiqadir</span>
+                          <div class="grid grid-cols-2 gap-1 pt-0.5">
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda uu Dhacayo / Expiry</span>
+                              <span id="somPassSpreadExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">20 Apr 2023</span>
+                            </div>
+                            <div>
+                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Saxiixa / Signature</span>
+                              <div class="border-b border-slate-400 mt-2 h-3 flex items-end">
+                                <span class="text-[8px] italic text-slate-400 font-mono-code select-none">M. Cabdiqadir</span>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <!-- MRZ on Spread -->
-                    <div class="mt-2.5 pt-1.5 border-t-2 border-slate-400 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-950 leading-snug overflow-x-auto relative z-10">
-                      <div id="somPassSpreadMrzLine1">P&lt;SOMMAXAMED&lt;&lt;MAXAMED&lt;CABDIQADIR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                      <div id="somPassSpreadMrzLine2">P007240853SOM9505058M23042072950505746349672</div>
-                    </div>
+                      <!-- MRZ on Spread -->
+                      <div class="mt-2.5 pt-1.5 border-t-2 border-slate-400 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-950 leading-snug overflow-x-auto relative z-10">
+                        <div id="somPassSpreadMrzLine1">P&lt;SOMMAXAMED&lt;&lt;MAXAMED&lt;CABDIQADIR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                        <div id="somPassSpreadMrzLine2">P007240853SOM9505058M23042072950505746349672</div>
+                      </div>
 
+                    </div>
+                  </article>
+                </div>
+              </div>
+
+              <!-- 2. BOTTOM: SOMALI PASSPORT IDENTITY CARD (WARAQADDA AQOONSIGA) -->
+              <div class="w-full space-y-2 pt-1">
+                <div class="flex items-center justify-between px-1">
+                  <span class="text-[11px] font-black uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-700"></span>
+                    2. SOMALI PASSPORT IDENTITY CARD · WARAQADDA AQOONSIGA
+                  </span>
+                  <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR-80 · 85.6 × 53.98 mm</span>
+                </div>
+
+                <article id="somalia-passport-id-card" class="somali-smart-id-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none p-3.5 sm:p-5 flex flex-col justify-between">
+                  
+                  <!-- Top & Bottom Guilloche Wave Security Accent Strips -->
+                  <div class="absolute top-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
+                  <div class="absolute bottom-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
+
+                  <!-- Central Coat of Arms Security Watermark -->
+                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] z-0 translate-x-5 sm:translate-x-8">
+                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-60 sm:w-76 h-auto filter hue-rotate-165 saturate-200">
                   </div>
+
+                  <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Silver Metallic Rosette on Right -->
+                  <div class="relative z-10 flex items-start justify-between gap-1 pb-1">
+                    <!-- Left: National ID Label & Number -->
+                    <div class="leading-tight shrink-0 text-left">
+                      <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                        National ID / <span class="font-arabic font-normal">رقم الهوية</span> / L. Qaranka
+                      </div>
+                      <div id="somPassIdCardNo" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wider mt-0.5">
+                        29505057463496
+                      </div>
+                    </div>
+
+                    <!-- Center: Official Titles Hierarchy -->
+                    <div class="text-center text-slate-950 leading-none space-y-0.5 px-1 flex-1">
+                      <div class="font-bold text-[8px] sm:text-[10px] tracking-wide uppercase text-[#14532d]">
+                        JAMHUURIYADDA SOOMAALIYA
+                      </div>
+                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-[#14532d]">
+                        جمهورية الصومال
+                      </div>
+                      <div class="font-bold text-[7px] sm:text-[8.5px] tracking-wider uppercase text-[#14532d]">
+                        SOMALI REPUBLIC
+                      </div>
+                      <div class="font-black text-[8.5px] sm:text-[10.5px] tracking-wide uppercase pt-0.5 text-[#14532d]">
+                        WARAQADDA AQOONSIGA
+                      </div>
+                      <div class="font-arabic font-bold text-[9px] sm:text-[11px] leading-none text-[#14532d]">
+                        بطاقة الهوية
+                      </div>
+                      <div class="font-black text-[7.5px] sm:text-[9px] tracking-wider uppercase text-[#14532d]">
+                        IDENTITY CARD
+                      </div>
+                    </div>
+
+                    <!-- Right: Authentic 8-Lobed Silver Scalloped Metallic Foil Hologram Seal -->
+                    <div class="shrink-0 flex items-center justify-end pt-0.5">
+                      <div class="w-10 h-10 sm:w-13 sm:h-13 relative flex items-center justify-center drop-shadow-sm">
+                        <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow-2xs">
+                          <defs>
+                            <radialGradient id="silverFoilGlowPass" cx="45%" cy="40%" r="55%">
+                              <stop offset="0%" stop-color="#ffffff"/>
+                              <stop offset="40%" stop-color="#f8fafc"/>
+                              <stop offset="70%" stop-color="#e2e8f0"/>
+                              <stop offset="100%" stop-color="#cbd5e1"/>
+                            </radialGradient>
+                            <linearGradient id="silverEdgePass" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stop-color="#ffffff"/>
+                              <stop offset="50%" stop-color="#cbd5e1"/>
+                              <stop offset="100%" stop-color="#94a3b8"/>
+                            </linearGradient>
+                          </defs>
+                          <path d="M 50,5 C 57,5 62,13 68,10 C 74,8 81,13 85,19 C 89,24 95,28 96,35 C 97,42 93,48 95,55 C 96,62 90,68 88,74 C 86,81 79,84 74,89 C 68,93 62,90 55,94 C 48,97 42,93 35,95 C 28,96 24,90 19,85 C 13,81 8,74 10,68 C 13,62 5,57 5,50 C 5,43 13,38 10,32 C 8,26 13,19 19,15 C 24,11 28,5 35,6 C 42,7 48,11 50,5 Z" 
+                                fill="url(#silverFoilGlowPass)" stroke="url(#silverEdgePass)" stroke-width="1.2"/>
+                          <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(203, 213, 225, 0.6)" stroke-width="0.8" stroke-dasharray="2 2"/>
+                          <polygon points="50,30 55,42 68,42 58,50 62,62 50,54 38,62 42,50 32,42 45,42" fill="rgba(255,255,255,0.7)" stroke="#cbd5e1" stroke-width="0.5"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MAIN BODY ROW: Smart Chip + Full Name (Left/Center) & Bearer Photo (Right) -->
+                  <div class="relative z-10 flex items-start gap-2 sm:gap-3 my-auto">
+                    <!-- Left Column: Chip, Name, Birth, Issue, Expiry -->
+                    <div class="flex-1 space-y-1.5 min-w-0">
+                      
+                      <!-- Top Sub-row: Chip & Full Name side-by-side -->
+                      <div class="flex items-center gap-2 sm:gap-3">
+                        <!-- Electronic Gold Smart Chip -->
+                        <div class="shrink-0">
+                          <div class="w-13 sm:w-16 h-9 sm:h-11 rounded-md bg-gradient-to-br from-[#fde68a] via-[#f59e0b] to-[#d97706] border border-[#b45309] p-0.5 relative shadow-xs overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-amber-300 via-yellow-100 to-amber-400 opacity-80"></div>
+                            <svg viewBox="0 0 60 42" class="w-full h-full relative z-10 text-amber-950/70 stroke-current stroke-[1.2] fill-none">
+                              <rect x="1" y="1" width="58" height="40" rx="4" stroke="#92400e" stroke-width="1"/>
+                              <line x1="1" y1="14" x2="20" y2="14"/>
+                              <line x1="1" y1="28" x2="20" y2="28"/>
+                              <line x1="40" y1="14" x2="59" y2="14"/>
+                              <line x1="40" y1="28" x2="59" y2="28"/>
+                              <line x1="20" y1="1" x2="20" y2="41"/>
+                              <line x1="40" y1="1" x2="40" y2="41"/>
+                              <rect x="23" y="12" width="14" height="18" rx="2" fill="#fbbf24" fill-opacity="0.25"/>
+                            </svg>
+                          </div>
+                        </div>
+
+                        <!-- Name Block -->
+                        <div class="flex-1 min-w-0">
+                          <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                            Magaca / <span class="font-arabic font-normal">الاسم</span> / Name
+                          </div>
+                          <div id="somPassIdCardName" class="font-black text-slate-950 text-xs sm:text-[13px] md:text-sm tracking-wide leading-tight mt-0.5 uppercase break-words">
+                            MAXAMED CABDIQADIR MAXAMED
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Birth Row: Date + Place of Birth -->
+                      <div>
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Taariikhda dhalashada / <span class="font-arabic font-normal">الميلاد</span> / Birth
+                        </div>
+                        <div class="flex items-center gap-3 sm:gap-5 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
+                          <span id="somPassIdCardDob" class="text-slate-950 font-mono-code">05 May 1995</span>
+                          <span id="somPassIdCardPob" class="text-slate-950 tracking-wide uppercase">HUDUR</span>
+                        </div>
+                      </div>
+
+                      <!-- Issue Row: Date + Place of Issue -->
+                      <div>
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Taariikhda la bixiyay / <span class="font-arabic font-normal">الاصدار</span> / Issue
+                        </div>
+                        <div class="flex items-center gap-4 sm:gap-6 mt-0.5 text-[9.5px] sm:text-[11.5px] font-black">
+                          <span id="somPassIdCardIssue" class="text-slate-950 font-mono-code">21 Apr 2018</span>
+                          <span id="somPassIdCardIssuePlace" class="text-slate-950 uppercase tracking-wide">BAIDOA</span>
+                        </div>
+                      </div>
+
+                      <!-- Bottom Left Expiry Row -->
+                      <div>
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Taariikhda uu dhacayo / <span class="font-arabic font-normal">الانتهاء</span> / Expiry
+                        </div>
+                        <div id="somPassIdCardExpiry" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 font-mono-code mt-0.5">
+                          20 Apr 2023
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- Right Column: Bearer Portrait Photo & Gender Field below it -->
+                    <div class="w-24 sm:w-28 md:w-32 shrink-0 flex flex-col items-center">
+                      <!-- Bearer Portrait Photo -->
+                      <div class="w-full aspect-[3/3.8] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
+                        <img id="somPassIdCardPhoto" src="/assets/aistudio/somali_passport_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                      </div>
+
+                      <!-- Gender Field -->
+                      <div class="w-full text-left mt-1">
+                        <div class="text-[7.5px] sm:text-[9px] font-bold text-[#14532d] leading-none">
+                          Lab/Dheddig / <span class="font-arabic font-normal">الجنس</span> / Gender
+                        </div>
+                        <div id="somPassIdCardGender" class="text-[9.5px] sm:text-[11.5px] font-black text-slate-950 uppercase mt-0.5">
+                          MALE
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </article>
               </div>
 
@@ -3897,103 +4112,6 @@ XUDUR, BAKOOL, SOMALIA</span>
                   </div>
                 </div>
 
-                <!-- Fast Actions Bar under Passport -->
-                <div class="flex flex-wrap items-center justify-between gap-2 p-3 bg-white rounded-xl border border-slate-200 text-xs no-print">
-                  <div class="flex items-center gap-2 text-slate-600">
-                    <i class="fa-solid fa-shield-halved text-emerald-600"></i>
-                    <span class="font-medium">ICAO Doc 9303 Type 3 Biometric e-Passport Standard</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <button type="button" onclick="copyNgaPassportData()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg border border-slate-200 transition-colors cursor-pointer flex items-center gap-1.5">
-                      <i class="fa-regular fa-copy"></i>
-                      <span>Copy Passport Data</span>
-                    </button>
-                    <button type="button" onclick="copyNgaPassportMrz()" class="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg border border-slate-200 transition-colors cursor-pointer flex items-center gap-1.5">
-                      <i class="fa-solid fa-barcode"></i>
-                      <span>Copy MRZ</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Official Preamble Section (Top Page of Nigerian Passport) -->
-                <div class="p-4 bg-gradient-to-br from-emerald-50/70 via-white to-emerald-50/40 rounded-2xl border border-emerald-200/80 shadow-xs space-y-2">
-                  <div class="flex items-center justify-between pb-2 border-b border-emerald-200/60">
-                    <div class="flex items-center gap-2 text-emerald-950 font-bold text-xs uppercase tracking-wide">
-                      <i class="fa-solid fa-feather-pointed text-emerald-700"></i>
-                      <span>Official Presidential Preamble (Top Page)</span>
-                    </div>
-                    <span id="ngaPassPerforatedNumber" class="font-mono-code text-[10.5px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded border border-emerald-200">
-                      A 06496111
-                    </span>
-                  </div>
-                  <p class="text-[11px] text-slate-700 italic leading-relaxed">
-                    &ldquo;These are to request and require in the name of the President and Commander-in-Chief of the Armed Forces of the Federal Republic of Nigeria all those whom it may concern to allow the bearer to pass freely without let or hindrance and to afford him or her every assistance and protection of which he or she may stand in need.&rdquo;
-                  </p>
-                </div>
-
-                <!-- Security Verification Markers Breakdown -->
-                <div class="bg-emerald-950 text-white p-4 sm:p-5 rounded-2xl shadow-sm space-y-3">
-                  <div class="flex items-center justify-between border-b border-emerald-800/60 pb-2.5">
-                    <h3 class="font-bold text-xs uppercase tracking-wider flex items-center gap-2 text-emerald-300">
-                      <i class="fa-solid fa-microchip"></i>
-                      <span>Key Security &amp; Physical Features</span>
-                    </h3>
-                    <span class="text-[10px] text-emerald-400 font-mono-code font-semibold">ICAO 9303 / NIS Standard</span>
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-wifi"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">Contactless Biometric Chip</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">Embedded electronic microchip with facial biometric and PKI signature.</div>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-fingerprint"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">Optical Guilloche &amp; Coat of Arms</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">Polycarbonate security weave and Nigerian national seal with UV reactive ink.</div>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-blue-400/20 text-blue-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-signature"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">Holder Signature &amp; Hologram</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">High-security diffractive hologram patch with authentic holder signature.</div>
-                      </div>
-                    </div>
-
-                    <div class="flex items-start gap-2.5 bg-emerald-900/40 p-2.5 rounded-xl border border-emerald-800/50">
-                      <div class="w-7 h-7 rounded-lg bg-teal-400/20 text-teal-300 flex items-center justify-center shrink-0 text-sm">
-                        <i class="fa-solid fa-barcode"></i>
-                      </div>
-                      <div>
-                        <div class="font-bold text-emerald-100 text-[11px]">2-Line ICAO 9303 MRZ</div>
-                        <div class="text-[10.5px] text-emerald-300/80 mt-0.5">Type 3 machine-readable zone formatted for airport &amp; automated e-gate border scanners.</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Verification Readiness Box -->
-                <div class="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200/80 space-y-2 text-xs">
-                  <div class="font-bold text-emerald-950 flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                    <span>Global KYC &amp; Verification Suitability</span>
-                  </div>
-                  <p class="text-[11px] text-emerald-900/85 leading-relaxed">
-                    The Nigerian Standard e-Passport is accepted worldwide as Tier 1 primary identity proof for international financial infrastructure: PayPal, Payoneer, Raenest, Grey, Binance, Bybit, Stripe Identity, and Onfido.
-                  </p>
-                </div>
-
               </div>
             </section>
 
@@ -4928,8 +5046,8 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     // ================= KENYA NATIONAL ID (MAISHA NAMBA 3RD GEN) CONTROLLER =================
-    const defaultKidPhotoSrc = '/assets/aistudio/kenya_maisha_portrait_hassan.jpg';
-    const defaultKidGhostSrc = '/assets/aistudio/kenya_maisha_ghost_hassan.jpg';
+    const defaultKidPhotoSrc = '/assets/aistudio/kenya_maisha_portrait_adan.jpg';
+    const defaultKidGhostSrc = '/assets/aistudio/kenya_maisha_ghost_adan.jpg';
 
     function initKidDefaultPhoto() {
       if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
@@ -4940,7 +5058,7 @@ XUDUR, BAKOOL, SOMALIA</span>
       if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
       if ($('kidGhostPhoto')) $('kidGhostPhoto').src = defaultKidGhostSrc;
       if ($('kidPhotoInput')) $('kidPhotoInput').value = '';
-      showToast('Photo Reset', 'Restored official Kenya Maisha ID specimen portrait');
+      showToast('Photo Reset', 'Restored Kenya Maisha ID reference specimen portrait');
     }
 
     // Display Format Switcher: 'both' | 'front' | 'back'
@@ -5009,25 +5127,25 @@ XUDUR, BAKOOL, SOMALIA</span>
     // Kenya National ID (Maisha Namba) Live Preview & Dynamic MRZ Generator
     function updateKidPreview() {
       // Front details
-      const surname = ($('kidInputSurname')?.value || 'HASSAN').toUpperCase();
-      const givenName = ($('kidInputGivenName')?.value || 'ABDIRAHMAN ALI').toUpperCase();
-      const idNo = ($('kidInputIdNo')?.value || '792148413').replace(/[^0-9]/g, '');
-      const serialNo = ($('kidInputSerial')?.value || '70694683').replace(/[^0-9]/g, '');
+      const surname = ($('kidInputSurname')?.value || 'ADAN').toUpperCase();
+      const givenName = ($('kidInputGivenName')?.value || 'ABDIRAHMAN MOHAMED').toUpperCase();
+      const idNo = ($('kidInputIdNo')?.value || '223136390').replace(/[^0-9]/g, '');
+      const serialNo = ($('kidInputSerial')?.value || '256970356').replace(/[^0-9]/g, '');
       const sex = ($('kidInputSex')?.value || 'MALE').toUpperCase();
       const nationality = ($('kidInputNationality')?.value || 'KEN').toUpperCase();
-      const dob = $('kidInputDob')?.value || '02. 08. 2005';
-      const pob = ($('kidInputPob')?.value || 'NAKURU').toUpperCase();
-      const expiry = $('kidInputExpiry')?.value || '26. 05. 2036';
-      const place = ($('kidInputPlace')?.value || 'MUNICIPALITY').toUpperCase();
+      const dob = $('kidInputDob')?.value || '01. 07. 2004';
+      const pob = ($('kidInputPob')?.value || 'MANDERA EAST').toUpperCase();
+      const expiry = $('kidInputExpiry')?.value || '27. 02. 2035';
+      const place = ($('kidInputPlace')?.value || 'KHALALIYO').toUpperCase();
 
       // Back details
-      const dateIssue = $('kidInputDateIssue')?.value || '04. 06. 2026';
-      const backSerial = ($('kidInputBackSerial')?.value || '25338P416954').toUpperCase();
-      const county = ($('kidInputCounty')?.value || 'NAKURU').toUpperCase();
-      const subCounty = ($('kidInputSubCounty')?.value || 'NAKURU EAST').toUpperCase();
-      const division = ($('kidInputDivision')?.value || 'MUNICIPALITY').toUpperCase();
-      const location = ($('kidInputLocation')?.value || 'BONDENI').toUpperCase();
-      const subLocation = ($('kidInputSubLocation')?.value || 'BAHARINI').toUpperCase();
+      const dateIssue = $('kidInputDateIssue')?.value || '28. 02. 2025';
+      const backSerial = ($('kidInputBackSerial')?.value || '24314P237429').toUpperCase();
+      const county = ($('kidInputCounty')?.value || 'MANDERA').toUpperCase();
+      const subCounty = ($('kidInputSubCounty')?.value || 'MANDERA EAST').toUpperCase();
+      const division = ($('kidInputDivision')?.value || 'KHALALIYO').toUpperCase();
+      const location = ($('kidInputLocation')?.value || 'GINGO').toUpperCase();
+      const subLocation = ($('kidInputSubLocation')?.value || 'MEYGAAG').toUpperCase();
 
       // Update Front card elements
       if ($('kidPreviewSurname')) $('kidPreviewSurname').textContent = surname;
@@ -5053,18 +5171,18 @@ XUDUR, BAKOOL, SOMALIA</span>
       // Calculate & update 3-line TD1 Machine Readable Zone (MRZ)
       const cleanId = idNo.padEnd(9, '<').substring(0, 9);
       const idCheck = calculateIcaoCheckDigit(cleanId);
-      let mrz1 = `IDKEN${cleanId}${idCheck}<321<3211<<<<<<`.padEnd(30, '<').substring(0, 30);
+      let mrz1 = `IDKEN${cleanId}${idCheck}<091<0912<<<<<<<`.padEnd(30, '<').substring(0, 30);
 
-      const dobYYMMDD = dateToYYMMDD(dob, '050802');
+      const dobYYMMDD = dateToYYMMDD(dob, '040701');
       const dobCheck = calculateIcaoCheckDigit(dobYYMMDD);
       const sexChar = sex.startsWith('F') ? 'F' : 'M';
-      const expYYMMDD = dateToYYMMDD(expiry, '360526');
+      const expYYMMDD = dateToYYMMDD(expiry, '350227');
       const expCheck = calculateIcaoCheckDigit(expYYMMDD);
-      const serialSuffix = (serialNo === '70694683') ? '706946983045' : `${serialNo.padEnd(9, '<').substring(0, 9)}038`;
-      let mrz2 = `${dobYYMMDD}${dobCheck}${sexChar}${expYYMMDD}${expCheck}${nationality}${serialSuffix}`.padEnd(30, '<').substring(0, 30);
+      const cleanSerial = serialNo.padEnd(9, '<').substring(0, 9);
+      let mrz2 = `${dobYYMMDD}${dobCheck}${sexChar}${expYYMMDD}${expCheck}${nationality}${cleanSerial}038`.padEnd(30, '<').substring(0, 30);
 
       const cleanSur = surname.replace(/[^A-Z]/g, '<');
-      const cleanGiv = givenName.replace(/[^A-Z]/g, '<');
+      const cleanGiv = givenName.trim().replace(/\s+/g, '<').replace(/[^A-Z<]/g, '');
       let mrz3 = `${cleanSur}<<${cleanGiv}`.padEnd(30, '<').substring(0, 30);
 
       if ($('kidPreviewMrz1')) $('kidPreviewMrz1').textContent = mrz1;
@@ -5073,29 +5191,29 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     function resetKidDetailsToSample() {
-      if ($('kidInputSurname')) $('kidInputSurname').value = 'HASSAN';
-      if ($('kidInputGivenName')) $('kidInputGivenName').value = 'ABDIRAHMAN ALI';
-      if ($('kidInputIdNo')) $('kidInputIdNo').value = '792148413';
-      if ($('kidInputSerial')) $('kidInputSerial').value = '70694683';
+      if ($('kidInputSurname')) $('kidInputSurname').value = 'ADAN';
+      if ($('kidInputGivenName')) $('kidInputGivenName').value = 'ABDIRAHMAN MOHAMED';
+      if ($('kidInputIdNo')) $('kidInputIdNo').value = '223136390';
+      if ($('kidInputSerial')) $('kidInputSerial').value = '256970356';
       if ($('kidInputSex')) $('kidInputSex').value = 'MALE';
       if ($('kidInputNationality')) $('kidInputNationality').value = 'KEN';
-      if ($('kidInputDob')) $('kidInputDob').value = '02. 08. 2005';
-      if ($('kidInputPob')) $('kidInputPob').value = 'NAKURU';
-      if ($('kidInputExpiry')) $('kidInputExpiry').value = '26. 05. 2036';
-      if ($('kidInputPlace')) $('kidInputPlace').value = 'MUNICIPALITY';
+      if ($('kidInputDob')) $('kidInputDob').value = '01. 07. 2004';
+      if ($('kidInputPob')) $('kidInputPob').value = 'MANDERA EAST';
+      if ($('kidInputExpiry')) $('kidInputExpiry').value = '27. 02. 2035';
+      if ($('kidInputPlace')) $('kidInputPlace').value = 'KHALALIYO';
 
-      if ($('kidInputDateIssue')) $('kidInputDateIssue').value = '04. 06. 2026';
-      if ($('kidInputBackSerial')) $('kidInputBackSerial').value = '25338P416954';
-      if ($('kidInputCounty')) $('kidInputCounty').value = 'NAKURU';
-      if ($('kidInputSubCounty')) $('kidInputSubCounty').value = 'NAKURU EAST';
-      if ($('kidInputDivision')) $('kidInputDivision').value = 'MUNICIPALITY';
-      if ($('kidInputLocation')) $('kidInputLocation').value = 'BONDENI';
-      if ($('kidInputSubLocation')) $('kidInputSubLocation').value = 'BAHARINI';
+      if ($('kidInputDateIssue')) $('kidInputDateIssue').value = '28. 02. 2025';
+      if ($('kidInputBackSerial')) $('kidInputBackSerial').value = '24314P237429';
+      if ($('kidInputCounty')) $('kidInputCounty').value = 'MANDERA';
+      if ($('kidInputSubCounty')) $('kidInputSubCounty').value = 'MANDERA EAST';
+      if ($('kidInputDivision')) $('kidInputDivision').value = 'KHALALIYO';
+      if ($('kidInputLocation')) $('kidInputLocation').value = 'GINGO';
+      if ($('kidInputSubLocation')) $('kidInputSubLocation').value = 'MEYGAAG';
 
       resetKidPhoto();
       updateKidPreview();
       setKidDisplayMode('both');
-      showToast('Sample Restored', 'Restored official Kenya Maisha Namba specimen details');
+      showToast('Sample Restored', 'Restored Kenya Maisha Namba reference specimen details');
     }
 
     // High-Resolution PNG Exports for Front, Back, and Both Sides
@@ -5683,7 +5801,7 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
     }
 
     // ================= SOMALIA SMART NATIONAL ID (POLYCARBONATE) CONTROLLER =================
-    const defaultSomSmartIdSrc = '/assets/aistudio/somali_national_id_portrait_new.jpg';
+    const defaultSomSmartIdSrc = '/assets/aistudio/somali_smart_id_portrait.jpg';
 
     function initSomSmartIdDefaultPhoto() {
       if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
@@ -5692,7 +5810,7 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
     function resetSomSmartIdPhoto() {
       if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
       if ($('somSmartIdPhotoInput')) $('somSmartIdPhotoInput').value = '';
-      showToast('Photo Reset', 'Restored official Somali National Identity Card bearer portrait');
+      showToast('Photo Reset', 'Restored Somali National ID reference specimen portrait');
     }
 
     function setSomIdFormat(format) {
@@ -5728,40 +5846,40 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
       const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
       const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
 
-      setText('somSmartIdPreviewNo', getVal('somSmartIdInputNo', '26405034834834'));
+      setText('somSmartIdPreviewNo', getVal('somSmartIdInputNo', '28901014439167'));
 
-      const nameVal = getVal('somSmartIdInputName', 'Mohamed Ali Mahdi');
+      const nameVal = getVal('somSmartIdInputName', 'MOHAMED ALI ABDULLAHI').toUpperCase();
       if ($('somSmartIdPreviewName')) {
         const parts = nameVal.split(' ');
         if (parts.length >= 2) {
-          $('somSmartIdPreviewName').innerHTML = `${parts[0]}<br><span class="inline-block pl-2">${parts.slice(1).join(' ')}</span>`;
+          $('somSmartIdPreviewName').innerHTML = `${parts[0]}<br><span>${parts.slice(1).join(' ')}</span>`;
         } else {
           $('somSmartIdPreviewName').textContent = nameVal;
         }
       }
 
-      setText('somSmartIdPreviewDob', getVal('somSmartIdInputDob', '01Janaury 1999'));
-      setText('somSmartIdPreviewPob', getVal('somSmartIdInputPob', 'Mogadishu'));
-      setText('somSmartIdPreviewIssue', getVal('somSmartIdInputIssue', '26 DEC 2017'));
+      setText('somSmartIdPreviewDob', getVal('somSmartIdInputDob', '01 Jan 1989'));
+      setText('somSmartIdPreviewPob', getVal('somSmartIdInputPob', 'BELEDWEYN').toUpperCase());
+      setText('somSmartIdPreviewIssue', getVal('somSmartIdInputIssue', '12 Feb 2018'));
       setText('somSmartIdPreviewIssuePlace', getVal('somSmartIdInputIssuePlace', 'MOGADISHU').toUpperCase());
-      setText('somSmartIdPreviewExpiry', getVal('somSmartIdInputExpiry', '26 DEC 2022'));
+      setText('somSmartIdPreviewExpiry', getVal('somSmartIdInputExpiry', '11 Feb 2023'));
       setText('somSmartIdPreviewGender', getVal('somSmartIdInputGender', 'MALE').toUpperCase());
     }
 
     function resetSomSmartIdSample() {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('somSmartIdInputNo', '26405034834834');
-      setVal('somSmartIdInputName', 'Mohamed Ali Mahdi');
-      setVal('somSmartIdInputDob', '01Janaury 1999');
-      setVal('somSmartIdInputPob', 'Mogadishu');
-      setVal('somSmartIdInputIssue', '26 DEC 2017');
+      setVal('somSmartIdInputNo', '28901014439167');
+      setVal('somSmartIdInputName', 'MOHAMED ALI ABDULLAHI');
+      setVal('somSmartIdInputDob', '01 Jan 1989');
+      setVal('somSmartIdInputPob', 'BELEDWEYN');
+      setVal('somSmartIdInputIssue', '12 Feb 2018');
       setVal('somSmartIdInputIssuePlace', 'MOGADISHU');
-      setVal('somSmartIdInputExpiry', '26 DEC 2022');
+      setVal('somSmartIdInputExpiry', '11 Feb 2023');
       setVal('somSmartIdInputGender', 'MALE');
 
       resetSomSmartIdPhoto();
       updateSomSmartIdPreview();
-      showToast('Sample Restored', 'Restored official Somali National Identity Card sample details');
+      showToast('Sample Restored', 'Restored Somali National Identity Card reference specimen details');
     }
 
     async function downloadSomSmartIdPNG() {
@@ -5957,6 +6075,16 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
       if ($('somPassSpreadExpiryDate')) $('somPassSpreadExpiryDate').textContent = expDate;
       if ($('somPassSpreadAuthority')) $('somPassSpreadAuthority').textContent = authority;
 
+      // Update associated Somali Passport Identity Card
+      if ($('somPassIdCardNo')) $('somPassIdCardNo').textContent = nid;
+      if ($('somPassIdCardName')) $('somPassIdCardName').textContent = name;
+      if ($('somPassIdCardDob')) $('somPassIdCardDob').textContent = dob;
+      if ($('somPassIdCardPob')) $('somPassIdCardPob').textContent = birthPlace;
+      if ($('somPassIdCardIssue')) $('somPassIdCardIssue').textContent = issueDate;
+      if ($('somPassIdCardIssuePlace')) $('somPassIdCardIssuePlace').textContent = issuePlace;
+      if ($('somPassIdCardExpiry')) $('somPassIdCardExpiry').textContent = expDate;
+      if ($('somPassIdCardGender')) $('somPassIdCardGender').textContent = sex;
+
       // MRZ generation
       const cleanName = name.toUpperCase().replace(/[^A-Z]/g, '<');
       const cleanPass = passNo.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -5983,6 +6111,7 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
 
     function resetSomPassPhoto() {
       if ($('somPassPreviewPhotoSpread')) $('somPassPreviewPhotoSpread').src = defaultSomPassPhoto;
+      if ($('somPassIdCardPhoto')) $('somPassIdCardPhoto').src = defaultSomPassPhoto;
       if ($('somPassPhotoInput')) $('somPassPhotoInput').value = '';
       showToast('Photo Reset', 'Restored official Somali passport portrait photo');
     }
@@ -6011,27 +6140,27 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
     }
 
     async function downloadSomPassPNG() {
-      const card = $('somalia-passport-spread');
+      const card = $('somPassContainer') || $('somalia-passport-spread');
       if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Somali Passport 2-Page Booklet PNG');
+      showToast('Rendering...', 'Generating high-resolution Somali Passport & Identity Card PNG');
       try {
         const canvas = await html2canvas(card, {
           scale: 3,
           useCORS: true,
-          backgroundColor: '#faf7ee'
+          backgroundColor: '#f8fafc'
         });
         const imgData = canvas.toDataURL('image/png');
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-republic-biometric-passport-booklet.png';
+          $('fallbackDownloadLink').download = 'somali-passport-and-identity-card.png';
         }
         const modal = $('imageModal');
         if (modal) {
           modal.classList.remove('hidden');
           modal.classList.add('flex');
         }
-        showToast('Ready!', 'Somali Passport image generated successfully');
+        showToast('Ready!', 'Somali Passport & Identity Card image generated successfully');
       } catch (err) {
         console.error('html2canvas error:', err);
         showToast('Error', 'Failed to generate passport PNG');
@@ -6885,7 +7014,8 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
             reader.onload = ev => {
               if ($('somPassPreviewPhoto')) $('somPassPreviewPhoto').src = ev.target.result;
               if ($('somPassPreviewPhotoSpread')) $('somPassPreviewPhotoSpread').src = ev.target.result;
-              showToast('Photo Updated', 'Custom portrait photo applied to Somali Passport');
+              if ($('somPassIdCardPhoto')) $('somPassIdCardPhoto').src = ev.target.result;
+              showToast('Photo Updated', 'Custom portrait photo applied to Somali Passport & ID Card');
             };
             reader.readAsDataURL(file);
           }
