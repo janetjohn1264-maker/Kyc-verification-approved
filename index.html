@@ -115,7 +115,19 @@
       #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-passport-card, #uk-passport-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+    }
+
+    /* Uganda Refugee Identity Card Security Pattern */
+    .uganda-refugee-bg {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(ellipse at 80% 25%, rgba(245, 158, 11, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 18% 75%, rgba(239, 68, 68, 0.10) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(202, 138, 4, 0.08) 0%, transparent 45%),
+        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, rgba(14, 165, 233, 0.03) 9px, transparent 10px),
+        repeating-linear-gradient(45deg, rgba(202, 138, 4, 0.02) 0px, rgba(202, 138, 4, 0.02) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-45deg, rgba(239, 68, 68, 0.02) 0px, rgba(239, 68, 68, 0.02) 1px, transparent 1px, transparent 6px);
     }
 
     /* Nigeria National Identity Card (NIMC) Security Pattern */
@@ -416,7 +428,7 @@
             <i class="fa-solid fa-passport text-emerald-700 text-sm"></i>
             <span>ID &amp; Passport Documents</span>
           </span>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">Kenya · Somalia · Ethiopia · Nigeria · UK</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">Kenya · Somalia · Ethiopia · Nigeria · UK · Uganda</span>
         </button>
       </div>
     </div>
@@ -1000,7 +1012,7 @@
             <span class="text-[11px] font-medium text-slate-400">Tap card to switch preview</span>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
             <!-- 1. PASSPORT COLOR CARD (Deep Emerald Green & Gold) -->
             <button type="button" id="tab-doc-passport" onclick="switchVerificationDoc('passport')" class="doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group">
               <div class="flex items-start justify-between gap-3">
@@ -1084,6 +1096,62 @@
                 <span>Ministry Crest</span>
               </div>
             </button>
+
+            <!-- 4. UGANDA REFUGEE CARD (Warm Amber & Gold Crest) -->
+            <button type="button" id="tab-doc-refugeecard" onclick="switchVerificationDoc('refugeecard')" class="doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-600 via-yellow-600 to-red-600 text-white flex items-center justify-center text-xl shadow-md shadow-amber-600/25 shrink-0 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-address-card"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">Refugee Card</h3>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Republic of Uganda</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-0.5 font-medium">Refugee Identity Card Specimen</p>
+                  </div>
+                </div>
+                <div id="refugeecard-radio-indicator" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </div>
+              <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2 text-[11px] text-slate-500 font-medium">
+                <span class="inline-flex items-center gap-1"><i class="fa-solid fa-shield-halved text-[10px] text-amber-600"></i> Individual ID: H9B</span>
+                <span class="text-slate-300">•</span>
+                <span>Barcode &amp; QR</span>
+                <span class="text-slate-300">•</span>
+                <span>High Acceptance</span>
+              </div>
+            </button>
+
+            <!-- 5. PROOF OF ACCOUNT & ADDRESS (Grey Bank Confirmation & PDF) -->
+            <button type="button" id="tab-doc-proofofaccount" onclick="switchVerificationDoc('proofofaccount')" class="doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-slate-950 via-slate-800 to-zinc-900 text-amber-300 flex items-center justify-center text-xl shadow-md shadow-slate-900/25 shrink-0 group-hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">Proof of Account</h3>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-red-600 text-white border border-red-700">PDF Document</span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-0.5 font-medium">Proof of Address &amp; Bank Letter</p>
+                  </div>
+                </div>
+                <div id="proofofaccount-radio-indicator" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </div>
+              <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2 text-[11px] text-slate-500 font-medium">
+                <span class="inline-flex items-center gap-1 font-bold text-red-600"><i class="fa-solid fa-file-pdf text-[10px]"></i> Proof of Address</span>
+                <span class="text-slate-300">•</span>
+                <span>All Countries Verified</span>
+                <span class="text-slate-300">•</span>
+                <span class="text-emerald-700 font-bold">PDF Ready</span>
+              </div>
+            </button>
           </div>
         </div>
 
@@ -1097,7 +1165,7 @@
             <span class="text-[11px] font-medium text-slate-400">Jurisdiction &amp; registry formatting</span>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             <!-- Republic of Kenya (Default) -->
             <button type="button" id="country-btn-kenya" onclick="switchVerificationCountry('kenya')" class="country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer">
               <div class="flex items-center justify-between">
@@ -1155,6 +1223,18 @@
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">United Kingdom</div>
                 <div class="text-[10px] font-medium text-slate-500">British Citizen Passport</div>
+              </div>
+            </button>
+
+            <!-- Republic of Uganda -->
+            <button type="button" id="country-btn-uganda" onclick="switchVerificationCountry('uganda')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇺🇬</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Uganda</div>
+                <div class="text-[10px] font-medium text-slate-500">Refugee Identity Card</div>
               </div>
             </button>
           </div>
@@ -4821,6 +4901,659 @@ XUDUR, BAKOOL, SOMALIA</span>
         </main>
       </div>
 
+      <!-- ================= STEP 3H: REPUBLIC OF UGANDA REFUGEE IDENTITY CARD VIEW ================= -->
+      <div id="uganda-doc-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form Column -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-address-card text-amber-600"></i>
+                  Refugee Card Builder
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">Republic of Uganda Refugee Identity Card (Department of Refugees / OPM).</p>
+              </div>
+              <span class="text-xs bg-amber-50 text-amber-800 font-semibold px-2.5 py-1 rounded-full border border-amber-200">UGANDA</span>
+            </div>
+
+            <!-- Big Randomize Card Button -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeUgandaRefugeeCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 hover:from-amber-500 hover:via-orange-500 hover:to-yellow-500 text-white font-black text-sm tracking-wide shadow-xl shadow-amber-600/25 hover:shadow-amber-600/40 border-2 border-amber-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-200 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card Details</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-amber-100 opacity-90 mt-0.5">Generate authentic Uganda Refugee ID details, H9B serials &amp; barcodes</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Sample Presets -->
+            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="resetUgandaDetailsToSample()" class="px-2.5 py-2 bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg font-bold text-slate-800 hover:text-amber-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                  <span>1. Suleyman Abdi Salad</span>
+                  <i class="fa-solid fa-rotate-left text-[10px] text-amber-600"></i>
+                </button>
+                <button type="button" onclick="randomizeUgandaRefugeeCard()" class="px-2.5 py-2 bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-lg font-bold text-slate-800 hover:text-orange-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                  <span>2. Random Refugee Card</span>
+                  <i class="fa-solid fa-shuffle text-[10px] text-orange-600"></i>
+                </button>
+              </div>
+            </div>
+
+            <form id="ugaDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <!-- Photo Upload & Reset -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label for="ugaPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Bearer Photo / Sawirka</label>
+                <input type="file" id="ugaPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-amber-700 file:text-white cursor-pointer">
+                <button type="button" onclick="resetUgandaPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors">
+                  <i class="fa-solid fa-rotate-left mr-1"></i>Reset to Official Portrait Photo
+                </button>
+              </div>
+
+              <!-- Full Name -->
+              <div>
+                <label for="ugaInputName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Name (Full Legal Name)</label>
+                <input id="ugaInputName" type="text" value="SULEYMAN ABDI SALAD" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+              </div>
+
+              <!-- Individual ID & Nationality -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="ugaInputId" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Individual ID</label>
+                  <input id="ugaInputId" type="text" value="H9B-00021428" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+                <div>
+                  <label for="ugaInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nationality</label>
+                  <input id="ugaInputNationality" type="text" value="Somali" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                </div>
+              </div>
+
+              <!-- Date of Birth & Expiry Date -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="ugaInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
+                  <input id="ugaInputDob" type="text" value="09-Sep-2001" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+                <div>
+                  <label for="ugaInputExpiry" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Expiry Date</label>
+                  <input id="ugaInputExpiry" type="text" value="25-Jul-2028" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+              </div>
+
+              <!-- Issuance Date & Sex -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="ugaInputIssue" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issuance Date</label>
+                  <input id="ugaInputIssue" type="text" value="25-Jul-2023" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+                <div>
+                  <label for="ugaInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sex</label>
+                  <select id="ugaInputSex" onchange="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                    <option value="Male" selected>Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadUgandaPNG()" class="py-2.5 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-file-arrow-down"></i>Save PNG
+                </button>
+                <button type="button" onclick="printUgandaCard()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-print"></i>Print Card
+                </button>
+              </div>
+
+              <button type="button" onclick="resetUgandaDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>
+                <span>Reset to Suleyman Abdi Salad Specimen</span>
+              </button>
+            </form>
+          </section>
+
+          <!-- Document Preview Area Column -->
+          <section class="lg:col-span-7 flex flex-col items-center justify-start min-w-0 space-y-4">
+            
+            <!-- Preview Header Tag -->
+            <div class="w-full max-w-[650px] flex items-center justify-between px-1">
+              <span class="text-[11px] font-black uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                REPUBLIC OF UGANDA · REFUGEE IDENTITY CARD
+              </span>
+              <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR80 (85.6 × 54 mm) · OPM Specimen</span>
+            </div>
+
+            <!-- Recreated Uganda Refugee Identity Card (CR80) -->
+            <div id="uganda-card-container" class="w-full max-w-[650px]">
+              <article id="uganda-refugee-card" class="uganda-refugee-bg relative w-full aspect-[1.58/1] bg-white rounded-2xl shadow-2xl border-2 border-slate-300 p-5 sm:p-6 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
+                
+                <!-- Security Pattern Watermark Overlay -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] z-0">
+                  <img src="/assets/aistudio/uganda_coat_of_arms.png" alt="Uganda Crest Watermark" class="w-72 h-72 object-contain grayscale">
+                </div>
+
+                <!-- CARD HEADER: Coat of Arms + Country & Title -->
+                <header class="relative z-10 flex items-center gap-4 border-b border-slate-200/90 pb-2.5">
+                  <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
+                    <img src="/assets/aistudio/uganda_coat_of_arms.png" alt="Coat of Arms of Uganda" class="w-full h-full object-contain drop-shadow-2xs">
+                  </div>
+                  <div class="leading-tight">
+                    <h2 class="font-extrabold text-base sm:text-lg md:text-xl text-slate-900 tracking-tight">
+                      Republic of Uganda
+                    </h2>
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-700 mt-0.5">
+                      Refugee Identity Card
+                    </h3>
+                  </div>
+                </header>
+
+                <!-- CARD BODY: Photo Left + Metadata Right -->
+                <div class="grid grid-cols-12 gap-3 sm:gap-5 items-center relative z-10 my-auto py-1">
+                  
+                  <!-- Left: Portrait Photo Frame -->
+                  <div class="col-span-4 sm:col-span-3.5 flex flex-col items-center">
+                    <div class="w-full aspect-[3.1/4] max-w-[140px] bg-slate-200 border-2 border-slate-300 rounded-sm overflow-hidden shadow-sm relative">
+                      <img id="ugaPreviewPhoto" src="/assets/aistudio/uganda_refugee_portrait.jpg" alt="Refugee Photo" class="w-full h-full object-cover">
+                    </div>
+                  </div>
+
+                  <!-- Right: Two-Column Data Layout (matching exact document layout) -->
+                  <div class="col-span-8 sm:col-span-8.5 grid grid-cols-12 gap-y-2.5 gap-x-3 text-xs sm:text-sm leading-tight">
+                    
+                    <!-- Name (Spans full right width) -->
+                    <div class="col-span-12 flex items-baseline gap-2">
+                      <span class="text-[10px] sm:text-[11px] font-bold text-slate-600 shrink-0">Name:</span>
+                      <span id="ugaPreviewName" class="font-extrabold text-slate-950 text-xs sm:text-sm tracking-wide uppercase">
+                        SULEYMAN ABDI SALAD
+                      </span>
+                    </div>
+
+                    <!-- Individual ID & Nationality -->
+                    <div class="col-span-6 flex flex-col">
+                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Individual ID:</span>
+                      <span id="ugaPreviewId" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm tracking-wide mt-0.5">
+                        H9B-00021428
+                      </span>
+                    </div>
+                    <div class="col-span-6 flex flex-col">
+                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Nationality:</span>
+                      <span id="ugaPreviewNationality" class="font-extrabold text-slate-950 text-xs sm:text-sm mt-0.5">
+                        Somali
+                      </span>
+                    </div>
+
+                    <!-- Date of Birth & Expiry Date -->
+                    <div class="col-span-6 flex flex-col">
+                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Date of Birth:</span>
+                      <span id="ugaPreviewDob" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
+                        09-Sep-2001
+                      </span>
+                    </div>
+                    <div class="col-span-6 flex flex-col">
+                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Expiry Date:</span>
+                      <span id="ugaPreviewExpiry" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
+                        25-Jul-2028
+                      </span>
+                    </div>
+
+                    <!-- Issuance Date & Sex -->
+                    <div class="col-span-6 flex flex-col">
+                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Issuance Date:</span>
+                      <span id="ugaPreviewIssue" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
+                        25-Jul-2023
+                      </span>
+                    </div>
+                    <div class="col-span-6 flex flex-col">
+                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Sex:</span>
+                      <span id="ugaPreviewSex" class="font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
+                        Male
+                      </span>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- CARD FOOTER: Machine-Readable Barcode + 2D QR Code + Microtext Serial -->
+                <footer class="relative z-10 pt-2 border-t border-slate-200 flex items-center justify-between gap-3">
+                  <!-- Barcode -->
+                  <div class="flex-1 flex flex-col pr-2">
+                    <svg viewBox="0 0 340 38" class="w-full h-7 sm:h-9 text-slate-900 fill-current">
+                      <!-- High-contrast standard 1D barcode pattern -->
+                      <rect x="0" y="0" width="3" height="38"/>
+                      <rect x="5" y="0" width="2" height="38"/>
+                      <rect x="9" y="0" width="4" height="38"/>
+                      <rect x="15" y="0" width="1" height="38"/>
+                      <rect x="18" y="0" width="5" height="38"/>
+                      <rect x="25" y="0" width="2" height="38"/>
+                      <rect x="29" y="0" width="3" height="38"/>
+                      <rect x="34" y="0" width="1" height="38"/>
+                      <rect x="37" y="0" width="4" height="38"/>
+                      <rect x="43" y="0" width="2" height="38"/>
+                      <rect x="47" y="0" width="6" height="38"/>
+                      <rect x="55" y="0" width="2" height="38"/>
+                      <rect x="59" y="0" width="3" height="38"/>
+                      <rect x="64" y="0" width="1" height="38"/>
+                      <rect x="67" y="0" width="5" height="38"/>
+                      <rect x="74" y="0" width="2" height="38"/>
+                      <rect x="78" y="0" width="4" height="38"/>
+                      <rect x="84" y="0" width="1" height="38"/>
+                      <rect x="87" y="0" width="3" height="38"/>
+                      <rect x="92" y="0" width="5" height="38"/>
+                      <rect x="99" y="0" width="2" height="38"/>
+                      <rect x="103" y="0" width="4" height="38"/>
+                      <rect x="109" y="0" width="1" height="38"/>
+                      <rect x="112" y="0" width="6" height="38"/>
+                      <rect x="120" y="0" width="2" height="38"/>
+                      <rect x="124" y="0" width="3" height="38"/>
+                      <rect x="129" y="0" width="2" height="38"/>
+                      <rect x="133" y="0" width="5" height="38"/>
+                      <rect x="140" y="0" width="1" height="38"/>
+                      <rect x="143" y="0" width="4" height="38"/>
+                      <rect x="149" y="0" width="2" height="38"/>
+                      <rect x="153" y="0" width="6" height="38"/>
+                      <rect x="161" y="0" width="3" height="38"/>
+                      <rect x="166" y="0" width="1" height="38"/>
+                      <rect x="169" y="0" width="4" height="38"/>
+                      <rect x="175" y="0" width="2" height="38"/>
+                      <rect x="179" y="0" width="5" height="38"/>
+                      <rect x="186" y="0" width="2" height="38"/>
+                      <rect x="190" y="0" width="3" height="38"/>
+                      <rect x="195" y="0" width="1" height="38"/>
+                      <rect x="198" y="0" width="6" height="38"/>
+                      <rect x="206" y="0" width="2" height="38"/>
+                      <rect x="210" y="0" width="4" height="38"/>
+                      <rect x="216" y="0" width="1" height="38"/>
+                      <rect x="219" y="0" width="5" height="38"/>
+                      <rect x="226" y="0" width="3" height="38"/>
+                      <rect x="231" y="0" width="2" height="38"/>
+                      <rect x="235" y="0" width="4" height="38"/>
+                      <rect x="241" y="0" width="1" height="38"/>
+                      <rect x="244" y="0" width="5" height="38"/>
+                      <rect x="251" y="0" width="2" height="38"/>
+                      <rect x="255" y="0" width="3" height="38"/>
+                      <rect x="260" y="0" width="2" height="38"/>
+                      <rect x="264" y="0" width="6" height="38"/>
+                      <rect x="272" y="0" width="1" height="38"/>
+                      <rect x="275" y="0" width="4" height="38"/>
+                      <rect x="281" y="0" width="2" height="38"/>
+                      <rect x="285" y="0" width="5" height="38"/>
+                      <rect x="292" y="0" width="2" height="38"/>
+                      <rect x="296" y="0" width="3" height="38"/>
+                      <rect x="301" y="0" width="1" height="38"/>
+                      <rect x="304" y="0" width="5" height="38"/>
+                      <rect x="311" y="0" width="2" height="38"/>
+                      <rect x="315" y="0" width="4" height="38"/>
+                      <rect x="321" y="0" width="2" height="38"/>
+                      <rect x="325" y="0" width="4" height="38"/>
+                      <rect x="331" y="0" width="2" height="38"/>
+                      <rect x="335" y="0" width="5" height="38"/>
+                    </svg>
+                  </div>
+
+                  <!-- QR Code (Authentic 2D Matrix) -->
+                  <div class="w-8 h-8 sm:w-10 sm:h-10 bg-white border border-slate-400 p-0.5 rounded shrink-0 shadow-2xs flex items-center justify-center">
+                    <svg viewBox="0 0 29 29" class="w-full h-full fill-current text-slate-950">
+                      <path d="M0,0 h7 v7 h-7 z M1,1 v5 h5 v-5 z M2,2 h3 v3 h-3 z"/>
+                      <path d="M22,0 h7 v7 h-7 z M23,1 v5 h5 v-5 z M24,2 h3 v3 h-3 z"/>
+                      <path d="M0,22 h7 v7 h-7 z M1,23 v5 h5 v-5 z M2,24 h3 v3 h-3 z"/>
+                      <rect x="9" y="1" width="2" height="2"/>
+                      <rect x="13" y="1" width="3" height="1"/>
+                      <rect x="18" y="1" width="2" height="2"/>
+                      <rect x="9" y="4" width="3" height="1"/>
+                      <rect x="14" y="3" width="2" height="3"/>
+                      <rect x="18" y="4" width="2" height="2"/>
+                      <rect x="9" y="7" width="1" height="4"/>
+                      <rect x="12" y="8" width="4" height="2"/>
+                      <rect x="18" y="8" width="3" height="2"/>
+                      <rect x="1" y="9" width="3" height="2"/>
+                      <rect x="5" y="10" width="2" height="2"/>
+                      <rect x="23" y="9" width="2" height="3"/>
+                      <rect x="26" y="11" width="2" height="2"/>
+                      <rect x="8" y="13" width="3" height="2"/>
+                      <rect x="13" y="12" width="2" height="4"/>
+                      <rect x="17" y="13" width="4" height="1"/>
+                      <rect x="22" y="14" width="2" height="3"/>
+                      <rect x="26" y="15" width="2" height="3"/>
+                      <rect x="9" y="18" width="3" height="2"/>
+                      <rect x="14" y="18" width="2" height="2"/>
+                      <rect x="18" y="17" width="2" height="4"/>
+                      <rect x="9" y="22" width="2" height="3"/>
+                      <rect x="13" y="23" width="3" height="2"/>
+                      <rect x="18" y="23" width="3" height="2"/>
+                      <rect x="23" y="20" width="2" height="4"/>
+                      <rect x="26" y="23" width="2" height="4"/>
+                      <rect x="11" y="26" width="4" height="2"/>
+                      <rect x="17" y="26" width="3" height="2"/>
+                    </svg>
+                  </div>
+
+                  <!-- Microprint Serial Edge Code -->
+                  <div class="font-mono-code text-[7px] text-slate-400 font-bold tracking-tight select-none shrink-0" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                    2506/72134117
+                  </div>
+                </footer>
+
+              </article>
+            </div>
+
+          </section>
+
+      <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY BANK LETTER & PDF) VIEW ================= -->
+      <div id="proofofaccount-doc-view" class="hidden">
+        <!-- Active Country & PDF Verification Banner -->
+        <div class="max-w-7xl mx-auto mb-6 no-print">
+          <div id="poaCountryBanner" class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 border-2 border-slate-700/80 text-white shadow-xl flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div id="poaCountryBannerDot" class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                <i class="fa-solid fa-file-pdf"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2.5 flex-wrap">
+                  <span id="poaCountryBannerBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Proof of Address Verified</span>
+                  </span>
+                  <span id="poaCountryBannerCountry" class="text-base sm:text-lg font-black text-white">United Kingdom</span>
+                </div>
+                <p id="poaCountryBannerText" class="text-xs text-slate-300 mt-1">Official Proof of Address &amp; Account confirmation PDF loaded for <strong class="text-amber-300">United Kingdom</strong>.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button type="button" onclick="switchPoaViewMode('pdf')" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition-colors cursor-pointer inline-flex items-center gap-2">
+                <i class="fa-solid fa-file-pdf"></i> Official PDF Viewer
+              </button>
+              <button type="button" onclick="switchPoaViewMode('letter')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-600 transition-colors cursor-pointer inline-flex items-center gap-2">
+                <i class="fa-solid fa-file-lines"></i> Interactive Letter
+              </button>
+              <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" download="proof_of_account__1__3c9d9253.pdf" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-colors cursor-pointer inline-flex items-center gap-2">
+                <i class="fa-solid fa-download"></i> Download PDF
+              </a>
+            </div>
+          </div>
+        </div>
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form Column -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-file-invoice-dollar text-slate-900"></i>
+                  Proof of Account Builder
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">Grey Inc. Delaware · Clear Junction Limited (UK/EEA) Bank Confirmation Letter</p>
+              </div>
+              <span class="text-xs bg-slate-900 text-white font-bold px-2.5 py-1 rounded-full border border-slate-700">GREY · GBP</span>
+            </div>
+
+            <!-- Big Randomize Button -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeProofOfAccount()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-800 to-zinc-900 hover:from-slate-900 hover:via-slate-700 hover:to-zinc-800 text-white font-black text-sm tracking-wide shadow-xl shadow-slate-900/25 hover:shadow-slate-900/40 border-2 border-slate-600/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Account Details</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-slate-300 opacity-90 mt-0.5">Generate authentic UK IBAN, Sort Code, Swift &amp; client holder data</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" download="proof_of_account__1__3c9d9253.pdf" class="py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs">
+                <i class="fa-solid fa-file-pdf text-red-600"></i>
+                <span>Download PDF</span>
+              </a>
+              <button type="button" onclick="downloadProofOfAccountPNG()" class="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs">
+                <i class="fa-solid fa-image text-amber-300"></i>
+                <span>Download PNG</span>
+              </button>
+            </div>
+
+            <!-- Sample Presets -->
+            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Specimen Presets:</span>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="resetProofOfAccountDefaults()" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-400 rounded-lg font-bold text-slate-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                  <span class="truncate">1. Original PDF (Abdirahman)</span>
+                  <i class="fa-solid fa-rotate-left text-[10px] text-slate-600 shrink-0 ml-1"></i>
+                </button>
+                <button type="button" onclick="randomizeProofOfAccount()" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-400 rounded-lg font-bold text-slate-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                  <span class="truncate">2. Random Account</span>
+                  <i class="fa-solid fa-shuffle text-[10px] text-slate-600 shrink-0 ml-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Controls Form -->
+            <form id="poaDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <div>
+                <label for="poaInputName" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Name on Account</label>
+                <input type="text" id="poaInputName" value="ABDIRAHMAN MOHAMED ADAN" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="poaInputBank" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank Name</label>
+                  <input type="text" id="poaInputBank" value="Clear Junction Limited" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                </div>
+                <div>
+                  <label for="poaInputOpened" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Date Opened</label>
+                  <input type="text" id="poaInputOpened" value="Sep 29, 2026" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="poaInputAccNum" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Account Number</label>
+                  <input type="text" id="poaInputAccNum" value="44041786" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                </div>
+                <div>
+                  <label for="poaInputSortCode" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Sort Code</label>
+                  <input type="text" id="poaInputSortCode" value="041307" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                </div>
+              </div>
+
+              <div>
+                <label for="poaInputIban" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">IBAN</label>
+                <input type="text" id="poaInputIban" value="GB97CLJU04130744041786" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="poaInputSwift" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Swift Code</label>
+                  <input type="text" id="poaInputSwift" value="CLJUGB21XXX" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                </div>
+                <div>
+                  <label for="poaInputLetterDate" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Letter Date</label>
+                  <input type="text" id="poaInputLetterDate" value="Sunday, October 25, 2026" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                </div>
+              </div>
+
+              <div>
+                <label for="poaInputEmail" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Contact Email</label>
+                <input type="email" id="poaInputEmail" value="support@grey.co" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+              </div>
+            </form>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+              <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-600"></i> Grey Delaware Registered</span>
+              <button type="button" onclick="printProofOfAccount()" class="text-slate-700 hover:text-slate-900 font-bold inline-flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-print"></i> Print Letter
+              </button>
+            </div>
+          </section>
+
+          <!-- Specimen Display Column -->
+          <section class="lg:col-span-7 space-y-4">
+            <!-- View Mode Switcher -->
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs no-print">
+              <div class="inline-flex p-1 bg-slate-100 rounded-xl">
+                <button type="button" id="poaViewTabPdf" onclick="switchPoaViewMode('pdf')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs cursor-pointer">
+                  <i class="fa-solid fa-file-pdf mr-1.5 text-red-600"></i>Attached PDF Viewer
+                </button>
+                <button type="button" id="poaViewTabLetter" onclick="switchPoaViewMode('letter')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900 cursor-pointer">
+                  <i class="fa-solid fa-file-lines mr-1.5 text-slate-900"></i>Interactive Letter
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" target="_blank" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Open PDF in Tab
+                </a>
+                <button type="button" onclick="downloadProofOfAccountPNG()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-download text-[11px] text-amber-300"></i> Save PNG
+                </button>
+              </div>
+            </div>
+
+            <!-- 1. Interactive Letter Container -->
+            <div id="poaLetterContainer" class="hidden">
+              <article id="proof-of-account-card" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden font-sans max-w-2xl mx-auto transition-all">
+                <!-- Header Banner -->
+                <div class="w-full relative overflow-hidden bg-black text-white select-none">
+                  <img src="/assets/aistudio/proof_of_account_header.png" alt="Proof of Account - Grey" class="w-full h-auto object-cover block">
+                </div>
+
+                <!-- Letter Body -->
+                <div class="p-6 sm:p-10 text-slate-900 space-y-5 text-[13px] sm:text-[14px] leading-relaxed">
+                  <!-- Address block -->
+                  <div class="text-xs sm:text-[13px] text-slate-700 leading-snug">
+                    <p>651 N Broad Street, Suite</p>
+                    <p>206 Middletown, DE 19709</p>
+                    <p>USA.</p>
+                    <p id="poaPreviewLetterDate" class="mt-1 font-semibold text-slate-900">Sunday, October 25, 2026</p>
+                  </div>
+
+                  <!-- Salutation -->
+                  <p class="font-medium text-slate-900 pt-1">To whom it may concern,</p>
+
+                  <!-- Confirmation Statement -->
+                  <p class="text-slate-800">This letter is being furnished by Grey to confirm the following client account details as of the date listed above</p>
+
+                  <!-- Details Table / Key-Value Grid -->
+                  <div class="my-4 border border-slate-200 rounded-xl bg-slate-50/70 p-4 sm:p-5 shadow-2xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-y-2.5 sm:gap-y-3 text-xs sm:text-[13px]">
+                      <div class="sm:col-span-4 font-semibold text-slate-600">Name on Account:</div>
+                      <div class="sm:col-span-8 font-black text-slate-900 uppercase tracking-wide" id="poaPreviewName">ABDIRAHMAN MOHAMED ADAN</div>
+
+                      <div class="sm:col-span-4 font-semibold text-slate-600">Bank Name:</div>
+                      <div class="sm:col-span-8 font-bold text-slate-800" id="poaPreviewBank">Clear Junction Limited</div>
+
+                      <div class="sm:col-span-4 font-semibold text-slate-600">Date Account Opened:</div>
+                      <div class="sm:col-span-8 font-medium text-slate-800" id="poaPreviewOpened">Sep 29, 2026</div>
+
+                      <div class="sm:col-span-4 font-semibold text-slate-600">Account Number:</div>
+                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 text-sm" id="poaPreviewAccNum">44041786</div>
+
+                      <div class="sm:col-span-4 font-semibold text-slate-600">IBAN:</div>
+                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 tracking-wider text-sm break-all" id="poaPreviewIban">GB97CLJU04130744041786</div>
+
+                      <div class="sm:col-span-4 font-semibold text-slate-600">Sort Code:</div>
+                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 text-sm" id="poaPreviewSortCode">041307</div>
+
+                      <div class="sm:col-span-4 font-semibold text-slate-600">Swift Code:</div>
+                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 text-sm" id="poaPreviewSwift">CLJUGB21XXX</div>
+                    </div>
+                  </div>
+
+                  <!-- Please Note Blue Callout Box -->
+                  <div class="bg-[#f0f7ff] rounded-xl p-4 sm:p-5 border border-sky-100 text-xs sm:text-[12.5px] leading-relaxed text-slate-700">
+                    <span class="font-bold text-sky-950">Please Note:</span> This account only support payments via Faster payments (FPS), Bacs and CHAPS payment schemes from EEA regions. Account can only receive funds in the Great Britain Pounds (GBP) You'll be charged 0.8% fee on payments via FPS and GBP with a minimum value of 2 GBP, capped at 10 GBP. You'll be charged 15 GBP flat fee for BACS. You'll be charged 25 GBP flat fee for CHAPS. Incoming payments can take between 1-3 days depending on the payment scheme used by the sending bank
+                  </div>
+
+                  <!-- Confidentiality Notice -->
+                  <p class="text-[11.5px] sm:text-xs text-slate-600 leading-relaxed pt-1">
+                    In strict confidence and for the informational purposes solely of the intended audience, it is understood that this letter makes no representations whatsoever as to the financial or general operating condition of the aforementioned Grey client, nor does it attach any liability or financial responsibility to Grey, its officers or employees, or any affiliated entities thereof.
+                  </p>
+
+                  <!-- Contact Support -->
+                  <p class="text-xs sm:text-[12.5px] text-slate-700">
+                    We hope this information is useful, and should you have further questions, please feel free to contact us directly at <a href="mailto:support@grey.co" id="poaPreviewEmail" class="text-blue-600 underline font-semibold">support@grey.co</a>
+                  </p>
+
+                  <!-- Sign-off -->
+                  <div class="pt-2 text-xs sm:text-[13px]">
+                    <p class="text-slate-600">Sincerely,</p>
+                    <p id="poaPreviewSignoff" class="font-bold text-slate-900 mt-0.5">Grey Team</p>
+                  </div>
+
+                  <!-- Page 2 Delaware Corporate Entity Notice -->
+                  <div class="mt-8 pt-4 border-t border-slate-100 text-[10px] text-slate-400 leading-normal">
+                    Grey's services are provided by Grey Inc. A company duly incorporated under the laws of Delaware, United States of America
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <!-- 2. Attached PDF Viewer Container (Default Active) -->
+            <div id="poaPdfContainer" class="block space-y-4">
+              <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-4 sm:p-5 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-lg font-bold">
+                      <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-bold text-slate-900">proof_of_account__1__3c9d9253.pdf</h3>
+                      <p class="text-xs text-slate-500">Official 2-Page Grey Proof of Account &amp; Proof of Address PDF Document</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span id="poaPdfCountryHeaderBadge" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
+                      <span id="poaPdfCountryDot" class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                      <span id="poaPdfCountryText">United Kingdom Proof of Address</span>
+                    </span>
+                    <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" download="proof_of_account.pdf" class="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                      <i class="fa-solid fa-download"></i> Download Original PDF
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Embedded PDF Frame -->
+                <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-inner">
+                  <iframe src="/assets/aistudio/proof_of_account__1__3c9d9253.pdf#toolbar=1" class="w-full h-[750px] border-0" title="Proof of Account PDF"></iframe>
+                </div>
+
+                <!-- High-Resolution Page Previews -->
+                <div class="pt-3 border-t border-slate-100">
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3">High-Resolution Page Renderings:</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                      <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
+                        <span>Page 1: Account Confirmation</span>
+                        <a href="/assets/aistudio/proof_of_account_page_1.png" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full PNG &rarr;</a>
+                      </div>
+                      <img src="/assets/aistudio/proof_of_account_page_1.png" alt="Proof of Account Page 1" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                      <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
+                        <span>Page 2: Delaware Registration Notice</span>
+                        <a href="/assets/aistudio/proof_of_account_page_2.png" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full PNG &rarr;</a>
+                      </div>
+                      <img src="/assets/aistudio/proof_of_account_page_2.png" alt="Proof of Account Page 2" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </section>
+        </main>
+      </div>
+
   <!-- ================= ABOUT MODAL ================= -->
   <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
@@ -5616,7 +6349,11 @@ XUDUR, BAKOOL, SOMALIA</span>
       // Update tip
       const tip = $('platform-kyc-tip');
       if (tip) {
-        tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong> or <strong>National Identity Card</strong> (from Kenya, the United Kingdom, Somalia, Ethiopia, or Nigeria) for instant ${meta.badge} verification and payout clearance.`;
+        if (currentVirtualAccount === 'grey') {
+          tip.innerHTML = `<strong>Grey Account:</strong> Requires a valid <strong>Proof of Account</strong> letter (Clear Junction Ltd IBAN &amp; Sort Code) or Passport/National ID. <button type="button" onclick="switchVerificationDoc('proofofaccount')" class="underline font-bold text-slate-900 ml-1 cursor-pointer">Open Proof of Account Card &rarr;</button>`;
+        } else {
+          tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong>, <strong>National Identity Card</strong>, <strong>Refugee Identity Card</strong>, or <strong>Proof of Account</strong> (from Kenya, the United Kingdom, Somalia, Ethiopia, Nigeria, or Uganda) for instant ${meta.badge} verification and payout clearance.`;
+        }
       }
 
       // Highlight active button
@@ -5633,15 +6370,19 @@ XUDUR, BAKOOL, SOMALIA</span>
       showToast(`Selected ${meta.name}`, `Loaded document verification for ${meta.name}`);
     }
 
-    // Switch Document Type: 'passport' vs 'idcard' vs 'driverlicense'
+    // Switch Document Type: 'passport' vs 'idcard' vs 'driverlicense' vs 'refugeecard'
     function switchVerificationDoc(docType) {
       currentDocType = docType;
       const passTab = $('tab-doc-passport');
       const idTab = $('tab-doc-idcard');
       const dlTab = $('tab-doc-driverlicense');
+      const refTab = $('tab-doc-refugeecard');
+      const poaTab = $('tab-doc-proofofaccount');
       const passRadio = $('passport-radio-indicator');
       const idRadio = $('idcard-radio-indicator');
       const dlRadio = $('driverlicense-radio-indicator');
+      const refRadio = $('refugeecard-radio-indicator');
+      const poaRadio = $('proofofaccount-radio-indicator');
 
       // Reset all tabs to inactive
       if (passTab) {
@@ -5653,6 +6394,12 @@ XUDUR, BAKOOL, SOMALIA</span>
       if (dlTab) {
         dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
       }
+      if (refTab) {
+        refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+      }
+      if (poaTab) {
+        poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+      }
 
       if (passRadio) {
         passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
@@ -5662,6 +6409,12 @@ XUDUR, BAKOOL, SOMALIA</span>
       }
       if (dlRadio) {
         dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      }
+      if (refRadio) {
+        refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      }
+      if (poaRadio) {
+        poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       }
 
       // Activate selected tab
@@ -5686,40 +6439,119 @@ XUDUR, BAKOOL, SOMALIA</span>
         if (dlRadio) {
           dlRadio.className = "w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
+      } else if (docType === 'refugeecard') {
+        currentCountry = 'uganda';
+        if (refTab) {
+          refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
+        }
+        if (refRadio) {
+          refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        }
+      } else if (docType === 'proofofaccount') {
+        if (poaTab) {
+          poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-slate-900 bg-gradient-to-br from-slate-900/5 via-white to-slate-100 text-slate-900 shadow-md ring-2 ring-slate-900/20 transition-all cursor-pointer relative group";
+        }
+        if (poaRadio) {
+          poaRadio.className = "w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        }
+        switchPoaViewMode('pdf', true);
+        updatePoaCountryDisplay(currentCountry);
       }
 
       renderActiveDocumentView();
       const docTitles = {
         passport: 'Passport Selected',
         idcard: 'National ID Selected',
-        driverlicense: "Driver's License Selected"
+        driverlicense: "Driver's License Selected",
+        refugeecard: "Refugee Card Selected",
+        proofofaccount: "Proof of Address & Account Selected"
       };
       const docDescs = {
         passport: 'official biometric passport',
         idcard: 'official national ID card',
-        driverlicense: "International Driver's License"
+        driverlicense: "International Driver's License",
+        refugeecard: "Republic of Uganda Refugee Identity Card",
+        proofofaccount: "official Proof of Address & Account confirmation PDF"
       };
       showToast(docTitles[docType] || 'Document Selected', `Switched specimen generator to ${docDescs[docType] || 'official document'}`);
     }
 
-    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk'
+    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda'
     function switchVerificationCountry(countryKey) {
       currentCountry = countryKey;
 
-      if (countryKey === 'uk') {
+      if (currentDocType === 'proofofaccount') {
+        // User is in Proof of Account mode: Keep Proof of Account selected and show the PDF of proof of address
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-slate-900 bg-gradient-to-br from-slate-900/5 via-white to-slate-100 text-slate-900 shadow-md ring-2 ring-slate-900/20 transition-all cursor-pointer relative group";
+
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+
+        // Show the PDF of proof of address
+        switchPoaViewMode('pdf', true);
+        updatePoaCountryDisplay(countryKey);
+      } else if (countryKey === 'uk') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
         const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
         const passRadio = $('passport-radio-indicator');
         const idRadio = $('idcard-radio-indicator');
         const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
         if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group";
         if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      } else if (countryKey === 'uganda') {
+        currentDocType = 'refugeecard';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       }
 
       const countryStyles = {
@@ -5747,6 +6579,11 @@ XUDUR, BAKOOL, SOMALIA</span>
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-blue-600 bg-gradient-to-br from-blue-50 via-white to-blue-50/50 text-blue-950 text-left shadow-sm ring-2 ring-blue-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-blue-600"
+        },
+        uganda: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50 via-white to-amber-50/50 text-amber-950 text-left shadow-sm ring-2 ring-amber-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-amber-600"
         }
       };
 
@@ -5768,9 +6605,14 @@ XUDUR, BAKOOL, SOMALIA</span>
         somalia: 'Somalia',
         ethiopia: 'Ethiopia',
         nigeria: 'Nigeria',
-        uk: 'United Kingdom'
+        uk: 'United Kingdom',
+        uganda: 'Uganda'
       };
-      showToast(`Country: ${countryNames[countryKey] || countryKey.toUpperCase()}`, `Displaying official ${countryNames[countryKey] || countryKey} verification specimen`);
+      if (currentDocType === 'proofofaccount') {
+        showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
+      } else {
+        showToast(`Country: ${countryNames[countryKey] || countryKey.toUpperCase()}`, `Displaying official ${countryNames[countryKey] || countryKey} verification specimen`);
+      }
     }
 
     function renderActiveDocumentView() {
@@ -5783,6 +6625,8 @@ XUDUR, BAKOOL, SOMALIA</span>
       const nigeriaDocView = $('nigeria-doc-view');
       const nigeriaPassView = $('nigeria-passport-view');
       const ukPassView = $('uk-passport-view');
+      const ugandaDocView = $('uganda-doc-view');
+      const poaDocView = $('proofofaccount-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
       if (kenyaIdView) kenyaIdView.classList.add('hidden');
@@ -5793,8 +6637,14 @@ XUDUR, BAKOOL, SOMALIA</span>
       if (nigeriaDocView) nigeriaDocView.classList.add('hidden');
       if (nigeriaPassView) nigeriaPassView.classList.add('hidden');
       if (ukPassView) ukPassView.classList.add('hidden');
+      if (ugandaDocView) ugandaDocView.classList.add('hidden');
+      if (poaDocView) poaDocView.classList.add('hidden');
 
-      if (currentCountry === 'uk') {
+      if (currentDocType === 'proofofaccount') {
+        if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'uganda' || currentDocType === 'refugeecard') {
+        if (ugandaDocView) ugandaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'uk') {
         if (ukPassView) ukPassView.classList.remove('hidden');
       } else if (currentDocType === 'driverlicense') {
         if (somaliaDlView) somaliaDlView.classList.remove('hidden');
@@ -5817,6 +6667,329 @@ XUDUR, BAKOOL, SOMALIA</span>
       } else {
         if (kenyaPassView) kenyaPassView.classList.remove('hidden');
       }
+    }
+
+    // ================= PROOF OF ACCOUNT & ADDRESS (GREY BANK LETTER & PDF) CONTROLLER =================
+    function switchPoaViewMode(mode, silent) {
+      const letterTab = $('poaViewTabLetter');
+      const pdfTab = $('poaViewTabPdf');
+      const letterContainer = $('poaLetterContainer');
+      const pdfContainer = $('poaPdfContainer');
+
+      if (mode === 'pdf') {
+        if (letterContainer) letterContainer.classList.add('hidden');
+        if (pdfContainer) pdfContainer.classList.remove('hidden');
+        if (letterTab) letterTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900 cursor-pointer";
+        if (pdfTab) pdfTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs cursor-pointer";
+        if (!silent) showToast('PDF Viewer', 'Displaying official 2-page Proof of Address & Account PDF');
+      } else {
+        if (pdfContainer) pdfContainer.classList.add('hidden');
+        if (letterContainer) letterContainer.classList.remove('hidden');
+        if (pdfTab) pdfTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900 cursor-pointer";
+        if (letterTab) letterTab.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs cursor-pointer";
+        if (!silent) showToast('Letter Builder', 'Displaying interactive editable Proof of Account & Address letter');
+      }
+    }
+
+    function updatePoaCountryDisplay(countryKey) {
+      const countryMap = {
+        kenya: {
+          name: 'Kenya',
+          fullName: 'Republic of Kenya',
+          city: 'Nairobi',
+          address: 'Riverside Green Suites, Riverside Drive, Nairobi, Kenya',
+          bank: 'Equity Bank Kenya / Clear Junction',
+          dotColor: 'bg-emerald-600',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+        },
+        somalia: {
+          name: 'Somalia',
+          fullName: 'Federal Republic of Somalia',
+          city: 'Mogadishu',
+          address: 'KM4 Airport Road, Wadajir District, Mogadishu, Somalia',
+          bank: 'Premier Bank / Clear Junction Global',
+          dotColor: 'bg-sky-600',
+          badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+        },
+        ethiopia: {
+          name: 'Ethiopia',
+          fullName: 'Federal Democratic Republic of Ethiopia',
+          city: 'Addis Ababa',
+          address: 'Bole Sub-City, Africa Avenue, Addis Ababa, Ethiopia',
+          bank: 'Commercial Bank of Ethiopia / Clear Junction',
+          dotColor: 'bg-amber-600',
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+        },
+        nigeria: {
+          name: 'Nigeria',
+          fullName: 'Federal Republic of Nigeria',
+          city: 'Lagos',
+          address: '12 Admiralty Way, Lekki Phase 1, Lagos, Nigeria',
+          bank: 'Wema Bank / Clear Junction Limited',
+          dotColor: 'bg-emerald-600',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+        },
+        uk: {
+          name: 'United Kingdom',
+          fullName: 'United Kingdom (Clear Junction Specimen)',
+          city: 'London',
+          address: '1 Canada Square, Canary Wharf, London E14 5AA, United Kingdom',
+          bank: 'Clear Junction Limited',
+          dotColor: 'bg-blue-600',
+          badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+        },
+        uganda: {
+          name: 'Uganda',
+          fullName: 'Republic of Uganda',
+          city: 'Kampala',
+          address: 'Plot 24 Jinja Road, Central Division, Kampala, Uganda',
+          bank: 'Stanbic Bank Uganda / Clear Junction',
+          dotColor: 'bg-amber-600',
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+        }
+      };
+
+      const c = countryMap[countryKey] || countryMap['uk'];
+
+      const countryEl = $('poaCountryBannerCountry');
+      const descEl = $('poaCountryBannerText');
+      const badgeEl = $('poaCountryBannerBadge');
+      const pdfBadgeText = $('poaPdfCountryText');
+      const pdfDot = $('poaPdfCountryDot');
+
+      if (countryEl) countryEl.textContent = c.fullName;
+      if (descEl) descEl.innerHTML = `Official Proof of Address &amp; Account confirmation PDF loaded for <strong class="text-amber-300">${c.name}</strong>.`;
+      if (badgeEl) {
+        badgeEl.className = `px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border flex items-center gap-1.5 ${c.badgeClass}`;
+      }
+      if (pdfBadgeText) {
+        pdfBadgeText.textContent = `${c.name} Proof of Address PDF Verified`;
+      }
+      if (pdfDot) {
+        pdfDot.className = `w-2.5 h-2.5 rounded-full ${c.dotColor}`;
+      }
+    }
+
+    function updateProofOfAccountPreview() {
+      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
+
+      setText('poaPreviewName', getVal('poaInputName', 'ABDIRAHMAN MOHAMED ADAN').toUpperCase());
+      setText('poaPreviewBank', getVal('poaInputBank', 'Clear Junction Limited'));
+      setText('poaPreviewOpened', getVal('poaInputOpened', 'Sep 29, 2026'));
+      setText('poaPreviewAccNum', getVal('poaInputAccNum', '44041786'));
+      setText('poaPreviewIban', getVal('poaInputIban', 'GB97CLJU04130744041786').toUpperCase());
+      setText('poaPreviewSortCode', getVal('poaInputSortCode', '041307'));
+      setText('poaPreviewSwift', getVal('poaInputSwift', 'CLJUGB21XXX').toUpperCase());
+      setText('poaPreviewLetterDate', getVal('poaInputLetterDate', 'Sunday, October 25, 2026'));
+      const email = getVal('poaInputEmail', 'support@grey.co');
+      const emailEl = $('poaPreviewEmail');
+      if (emailEl) {
+        emailEl.textContent = email;
+        emailEl.href = 'mailto:' + email;
+      }
+    }
+
+    function resetProofOfAccountDefaults() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('poaInputName', 'ABDIRAHMAN MOHAMED ADAN');
+      setVal('poaInputBank', 'Clear Junction Limited');
+      setVal('poaInputOpened', 'Sep 29, 2026');
+      setVal('poaInputLetterDate', 'Sunday, October 25, 2026');
+      setVal('poaInputAccNum', '44041786');
+      setVal('poaInputIban', 'GB97CLJU04130744041786');
+      setVal('poaInputSortCode', '041307');
+      setVal('poaInputSwift', 'CLJUGB21XXX');
+      setVal('poaInputEmail', 'support@grey.co');
+      updateProofOfAccountPreview();
+      showToast('Specimen Reset', 'Restored original Proof of Account details from PDF');
+    }
+
+    function randomizeProofOfAccount() {
+      const names = [
+        'ABDIRAHMAN MOHAMED ADAN',
+        'FATIMA ALI HASSAN',
+        'OMAR FAROOQ IBRAHIM',
+        'ZAINAB AHMED NOOR',
+        'HAMZA KHALID WARSAME',
+        'AISHA MUSTAFA BASHIR',
+        'BILAL TARIQ JAMA',
+        'MARIAM YUSUF OSMAN'
+      ];
+      const randomName = names[Math.floor(Math.random() * names.length)];
+      const accNum = String(Math.floor(10000000 + Math.random() * 89999999));
+      const sortCode = '041307';
+      const ibanCheck = String(Math.floor(10 + Math.random() * 89));
+      const iban = `GB${ibanCheck}CLJU${sortCode}${accNum}`;
+
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const opDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
+      const opMonth = months[Math.floor(Math.random() * months.length)];
+      const opYear = '2026';
+      const openedDate = `${opMonth} ${opDay}, ${opYear}`;
+
+      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const today = new Date();
+      const dayName = daysOfWeek[today.getDay()];
+      const letterDate = `${dayName}, ${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('poaInputName', randomName);
+      setVal('poaInputBank', 'Clear Junction Limited');
+      setVal('poaInputOpened', openedDate);
+      setVal('poaInputLetterDate', letterDate);
+      setVal('poaInputAccNum', accNum);
+      setVal('poaInputIban', iban);
+      setVal('poaInputSortCode', sortCode);
+      setVal('poaInputSwift', 'CLJUGB21XXX');
+
+      updateProofOfAccountPreview();
+      showToast('Account Randomized!', `Generated Proof of Account for ${randomName}`);
+    }
+
+    async function downloadProofOfAccountPNG() {
+      const card = $('proof-of-account-card');
+      if (!card || typeof html2canvas === 'undefined') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Proof of Account Letter PNG');
+      try {
+        const canvas = await html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'proof-of-account-grey.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'Proof of Account PNG generated successfully');
+      } catch (err) {
+        console.error(err);
+        showToast('Download Error', 'Could not export letter image');
+      }
+    }
+
+    function printProofOfAccount() {
+      window.print();
+    }
+
+    // ================= REPUBLIC OF UGANDA REFUGEE IDENTITY CARD CONTROLLER =================
+    const defaultUgaPhoto = '/assets/aistudio/uganda_refugee_portrait.jpg';
+
+    function initUgandaDefaultPhoto() {
+      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
+    }
+
+    function resetUgandaPhoto() {
+      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
+      if ($('ugaPhotoInput')) $('ugaPhotoInput').value = '';
+      showToast('Photo Reset', 'Restored official Uganda Refugee ID portrait photo');
+    }
+
+    function updateUgandaPreview() {
+      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
+
+      setText('ugaPreviewName', getVal('ugaInputName', 'SULEYMAN ABDI SALAD').toUpperCase());
+      setText('ugaPreviewId', getVal('ugaInputId', 'H9B-00021428').toUpperCase());
+      setText('ugaPreviewNationality', getVal('ugaInputNationality', 'Somali'));
+      setText('ugaPreviewDob', getVal('ugaInputDob', '09-Sep-2001'));
+      setText('ugaPreviewIssue', getVal('ugaInputIssue', '25-Jul-2023'));
+      setText('ugaPreviewExpiry', getVal('ugaInputExpiry', '25-Jul-2028'));
+      setText('ugaPreviewSex', getVal('ugaInputSex', 'Male'));
+    }
+
+    function resetUgandaDetailsToSample() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('ugaInputName', 'SULEYMAN ABDI SALAD');
+      setVal('ugaInputId', 'H9B-00021428');
+      setVal('ugaInputNationality', 'Somali');
+      setVal('ugaInputDob', '09-Sep-2001');
+      setVal('ugaInputIssue', '25-Jul-2023');
+      setVal('ugaInputExpiry', '25-Jul-2028');
+      setVal('ugaInputSex', 'Male');
+      resetUgandaPhoto();
+      updateUgandaPreview();
+      showToast('Sample Restored', 'Restored Uganda Refugee Identity Card specimen data');
+    }
+
+    function randomizeUgandaRefugeeCard() {
+      const maleNames = ['SULEYMAN ABDI SALAD', 'HASSAN OMAR GUURE', 'KHALID ABDIRAHMAN ALI', 'ISMAIL YUSUF WARSAME', 'MUKHTAR DAUD ADEN', 'IBRAHIM HUSSEIN FARAH'];
+      const femaleNames = ['FATUMA AHMED NUR', 'SAFIA DAHIR SHIRE', 'MARYAN OMAR ROBLE', 'DEEQA KHALID HASSAN', 'XALIIMO CALI JIBRIL'];
+      const nationalities = ['Somali', 'Congolese (DRC)', 'South Sudanese', 'Rwandan', 'Burundian', 'Eritrean'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      const isMale = Math.random() > 0.4;
+      const name = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
+      const nat = nationalities[Math.floor(Math.random() * nationalities.length)];
+      const idNum = 'H9B-' + String(Math.floor(10000000 + Math.random() * 90000000));
+
+      const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
+      const bMonth = months[Math.floor(Math.random() * months.length)];
+      const bYear = String(Math.floor(1985 + Math.random() * 18));
+      const dob = `${bDay}-${bMonth}-${bYear}`;
+
+      const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
+      const iMonth = months[Math.floor(Math.random() * months.length)];
+      const iYear = String(Math.floor(2021 + Math.random() * 3));
+      const issueDate = `${iDay}-${iMonth}-${iYear}`;
+      const expDate = `${iDay}-${iMonth}-${parseInt(iYear, 10) + 5}`;
+
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('ugaInputName', name);
+      setVal('ugaInputId', idNum);
+      setVal('ugaInputNationality', nat);
+      setVal('ugaInputDob', dob);
+      setVal('ugaInputIssue', issueDate);
+      setVal('ugaInputExpiry', expDate);
+      setVal('ugaInputSex', isMale ? 'Male' : 'Female');
+
+      updateUgandaPreview();
+      showToast('Card Randomized!', `Generated Refugee Card for ${name}`);
+    }
+
+    async function downloadUgandaPNG() {
+      const card = $('uganda-refugee-card');
+      if (!card || typeof html2canvas === 'undefined') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Uganda Refugee Identity Card PNG');
+      try {
+        const canvas = await html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'uganda-refugee-identity-card.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'Uganda Refugee Identity Card PNG generated successfully');
+      } catch (err) {
+        console.error(err);
+        showToast('Download Error', 'Could not export card image');
+      }
+    }
+
+    function printUgandaCard() {
+      window.print();
     }
 
     // ================= KENYA NATIONAL ID (MAISHA NAMBA 3RD GEN) CONTROLLER =================
@@ -8235,7 +9408,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     // 1-Click Quick Preset Handler from Floating Accounts & Platform Pills
     function applyQuickKycPreset(platformKey) {
       if (!platformKey) return;
-      if (['paypal', 'payoneer', 'raenest', 'grey', 'mercury', 'wise', 'revolut', 'elevate', 'chipper'].includes(platformKey)) {
+      if (platformKey === 'grey') {
+        selectVirtualAccount('grey');
+        switchVerificationDoc('proofofaccount');
+        scrollToSection('verification-workbench');
+        return;
+      }
+      if (['paypal', 'payoneer', 'raenest', 'mercury', 'wise', 'revolut', 'elevate', 'chipper'].includes(platformKey)) {
         selectVirtualAccount(platformKey);
         scrollToSection('verification-workbench');
       } else {
@@ -8735,6 +9914,23 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       }
       initUkPassDefaultPhoto();
 
+      // Uganda Refugee Card Photo upload
+      const ugaPhotoInput = $('ugaPhotoInput');
+      if (ugaPhotoInput) {
+        ugaPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = ev.target.result;
+              showToast('Photo Updated', 'Custom portrait applied to Uganda Refugee Identity Card');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      initUgandaDefaultPhoto();
+
       // Run initial preview sync
       updatePreview();
       updateKidPreview();
@@ -8747,6 +9943,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       updateNgaPreview();
       updateNgaPassPreview();
       updateUkPassPreview();
+      updateUgandaPreview();
+      updateProofOfAccountPreview();
     });
   </script>
 </body>
