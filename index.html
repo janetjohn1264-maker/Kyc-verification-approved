@@ -115,7 +115,7 @@
       #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-passport-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+      #nigeria-passport-card, #uk-passport-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
     }
 
     /* Nigeria National Identity Card (NIMC) Security Pattern */
@@ -1270,7 +1270,7 @@
                   <!-- Photo Container Left -->
                   <div class="col-span-4 flex flex-col items-center">
                     <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                      <img id="previewPhoto" src="/assets/aistudio/HL7D9j4XUAALh2T_b0209bf1.png" alt="Passport Photo" class="w-full h-full object-cover">
+                      <img id="previewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
                     </div>
                   </div>
 
@@ -1652,8 +1652,8 @@
                     <!-- Bearer Portrait Photo -->
                     <div class="col-span-4 flex flex-col items-center">
                       <div class="w-full aspect-[3.2/4.1] rounded-lg overflow-hidden border border-slate-400/90 shadow-sm relative bg-slate-200">
-                        <!-- Specimen reference photo of Adan Abdirahman Mohamed -->
-                        <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_adan.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                        <!-- Specimen reference photo of bearer -->
+                        <img id="kidPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover">
                         <!-- Overlay wavy guilloche curves on shoulder/bottom for authentic security blend -->
                         <div class="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-emerald-600/30 via-transparent to-transparent"></div>
                       </div>
@@ -1865,7 +1865,7 @@
 
                         <!-- Ghost Secondary Portrait -->
                         <div class="w-10 sm:w-12 aspect-[3.2/4] rounded border border-slate-300/80 overflow-hidden shadow-2xs bg-slate-100 relative">
-                          <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_adan.jpg" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
+                          <img id="kidGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
                         </div>
 
                         <!-- Principal Registrar Signature -->
@@ -2277,7 +2277,7 @@
                     <div class="w-24 sm:w-28 md:w-32 shrink-0 flex flex-col items-center">
                       <!-- Bearer Portrait Photo (Exact image of Mohamed Ali Abdullahi) -->
                       <div class="w-full aspect-[3/3.8] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
-                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/somali_smart_id_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Gender Field (Directly under the photo as in the reference card) -->
@@ -2363,7 +2363,7 @@
                     <!-- Left: Framed Applicant Photo (Exact match) -->
                     <div class="col-span-4 sm:col-span-3 flex justify-center">
                       <div class="w-24 sm:w-28 aspect-[3.2/4] p-1 bg-white border border-slate-300 shadow-xs relative">
-                        <img id="somPreviewPhoto" src="/assets/aistudio/somali_nira_portrait.jpg" alt="Applicant Photo" class="w-full h-full object-cover">
+                        <img id="somPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Applicant Photo" class="w-full h-full object-cover">
                       </div>
                     </div>
 
@@ -2887,7 +2887,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                       <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
                         <div class="col-span-4 flex flex-col items-center">
                           <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                            <img id="somPassPreviewPhotoSpread" src="/assets/aistudio/somali_passport_portrait.jpg" alt="" class="w-full h-full object-cover">
+                            <img id="somPassPreviewPhotoSpread" src="/assets/aistudio/uk_bearer_portrait.png" alt="" class="w-full h-full object-cover">
                           </div>
                         </div>
                         <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
@@ -4549,7 +4549,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                   <label for="ukPassPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Bearer Photo / Sawirka</label>
                   <input type="file" id="ukPassPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-800 file:text-white cursor-pointer">
                   <button type="button" onclick="resetUkPassPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors">
-                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset to James Bond (007 Reference)
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset to Official Portrait Photo
                   </button>
                 </div>
 
@@ -4694,11 +4694,11 @@ XUDUR, BAKOOL, SOMALIA</span>
                       <div class="col-span-5 grid grid-cols-2 gap-2 text-left pl-2">
                         <div>
                           <div class="text-[7px] sm:text-[8px] text-slate-600 font-bold uppercase leading-none">Type/Type</div>
-                          <div class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">P</div>
+                          <div id="ukPassPreviewType" class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">P</div>
                         </div>
                         <div>
                           <div class="text-[7px] sm:text-[8px] text-slate-600 font-bold uppercase leading-none">Code of issuing State/Code de l'État émetteur</div>
-                          <div class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">GBR</div>
+                          <div id="ukPassPreviewCountry" class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">GBR</div>
                         </div>
                       </div>
 
@@ -4719,33 +4719,33 @@ XUDUR, BAKOOL, SOMALIA</span>
                     <div class="col-span-4 sm:col-span-4 flex flex-col items-center">
                       
                       <!-- Top Decorative Spiral Scrolls (Exact match to uploaded passport) -->
-                      <div class="flex items-center justify-center gap-1.5 mb-1 opacity-70">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
-                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                      <div class="flex items-center justify-center gap-1.5 mb-1 opacity-75">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
+                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
                         </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
-                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
+                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
                         </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
-                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
+                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
                         </svg>
                       </div>
 
                       <!-- Portrait Frame -->
                       <div class="w-full aspect-[3.2/4] max-w-[150px] bg-slate-200 border border-slate-400 rounded-xs overflow-hidden shadow-sm flex items-center justify-center relative">
-                        <img id="ukPassPreviewPhoto" src="/assets/aistudio/uk_bond_portrait_head.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="ukPassPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Bottom Decorative Spiral Scrolls -->
-                      <div class="flex items-center justify-center gap-1.5 mt-1 opacity-70">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
-                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                      <div class="flex items-center justify-center gap-1.5 mt-1 opacity-75">
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
+                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
                         </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
-                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
+                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
                         </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 text-slate-700 fill-none stroke-current stroke-[1.5]">
-                          <path d="M12,12 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 M12,12 m-5,0 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0"/>
+                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
+                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
                         </svg>
                       </div>
                     </div>
@@ -5656,7 +5656,7 @@ XUDUR, BAKOOL, SOMALIA</span>
       // Update tip
       const tip = $('platform-kyc-tip');
       if (tip) {
-        tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong> or <strong>National Identity Card</strong> from Kenya (or East Africa) for instant ${meta.badge} verification and payout clearance.`;
+        tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong> or <strong>National Identity Card</strong> (from Kenya, the United Kingdom, Somalia, Ethiopia, or Nigeria) for instant ${meta.badge} verification and payout clearance.`;
       }
 
       // Highlight active button
@@ -5742,9 +5742,25 @@ XUDUR, BAKOOL, SOMALIA</span>
       showToast(docTitles[docType] || 'Document Selected', `Switched specimen generator to ${docDescs[docType] || 'official document'}`);
     }
 
-    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'uganda'
+    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk'
     function switchVerificationCountry(countryKey) {
       currentCountry = countryKey;
+
+      if (countryKey === 'uk') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      }
 
       const countryStyles = {
         kenya: {
@@ -5766,6 +5782,11 @@ XUDUR, BAKOOL, SOMALIA</span>
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-emerald-600"
+        },
+        uk: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-blue-600 bg-gradient-to-br from-blue-50 via-white to-blue-50/50 text-blue-950 text-left shadow-sm ring-2 ring-blue-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-blue-600"
         }
       };
 
@@ -5782,7 +5803,14 @@ XUDUR, BAKOOL, SOMALIA</span>
       });
 
       renderActiveDocumentView();
-      showToast(`Country: ${countryKey.toUpperCase()}`, `Displaying official ${countryKey} verification specimen`);
+      const countryNames = {
+        kenya: 'Kenya',
+        somalia: 'Somalia',
+        ethiopia: 'Ethiopia',
+        nigeria: 'Nigeria',
+        uk: 'United Kingdom'
+      };
+      showToast(`Country: ${countryNames[countryKey] || countryKey.toUpperCase()}`, `Displaying official ${countryNames[countryKey] || countryKey} verification specimen`);
     }
 
     function renderActiveDocumentView() {
@@ -5794,6 +5822,7 @@ XUDUR, BAKOOL, SOMALIA</span>
       const ethiopiaDocView = $('ethiopia-doc-view');
       const nigeriaDocView = $('nigeria-doc-view');
       const nigeriaPassView = $('nigeria-passport-view');
+      const ukPassView = $('uk-passport-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
       if (kenyaIdView) kenyaIdView.classList.add('hidden');
@@ -5803,8 +5832,11 @@ XUDUR, BAKOOL, SOMALIA</span>
       if (ethiopiaDocView) ethiopiaDocView.classList.add('hidden');
       if (nigeriaDocView) nigeriaDocView.classList.add('hidden');
       if (nigeriaPassView) nigeriaPassView.classList.add('hidden');
+      if (ukPassView) ukPassView.classList.add('hidden');
 
-      if (currentDocType === 'driverlicense') {
+      if (currentCountry === 'uk') {
+        if (ukPassView) ukPassView.classList.remove('hidden');
+      } else if (currentDocType === 'driverlicense') {
         if (somaliaDlView) somaliaDlView.classList.remove('hidden');
       } else if (currentCountry === 'nigeria') {
         if (currentDocType === 'passport') {
@@ -6925,6 +6957,249 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
     function copyNgaPassportMrz() {
       const line1 = $('ngaPassMrzLine1')?.textContent || 'P<NGAUMEBOSI<<SAMUEL<OKECHUKWU<<<<<<<<<<<<<<<';
       const line2 = $('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<<<<04';
+      copyToClipboard(`${line1}\n${line2}`, 'ICAO 9303 MRZ lines copied to clipboard!');
+    }
+
+    // ================= UNITED KINGDOM (BRITISH CITIZEN) PASSPORT CONTROLLER =================
+    const defaultUkPassPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultUkPassSigSrc = '/assets/aistudio/uk_bond_sig_clean_alpha.png';
+    const officialUkPassportSpecimenSrc = '/assets/aistudio/img-160_f55dc498.jpg';
+
+    function initUkPassDefaultPhoto() {
+      if ($('ukPassPreviewPhoto')) $('ukPassPreviewPhoto').src = defaultUkPassPhotoSrc;
+      if ($('ukPassPreviewSig')) $('ukPassPreviewSig').src = defaultUkPassSigSrc;
+    }
+
+    function resetUkPassPhoto() {
+      if ($('ukPassPreviewPhoto')) $('ukPassPreviewPhoto').src = defaultUkPassPhotoSrc;
+      if ($('ukPassPreviewSig')) $('ukPassPreviewSig').src = defaultUkPassSigSrc;
+      if ($('ukPassPhotoInput')) $('ukPassPhotoInput').value = '';
+      showToast('Photo Reset', 'Restored official UK passport portrait photo & signature');
+    }
+
+    function updateUkPassPreview() {
+      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
+
+      const type = getVal('ukPassInputType', 'P').toUpperCase();
+      const country = getVal('ukPassInputCountry', 'GBR').toUpperCase();
+      const passNo = getVal('ukPassInputNumber', '094612751').toUpperCase().replace(/\s+/g, '');
+      const surname = getVal('ukPassInputSurname', 'BOND').toUpperCase();
+      const given = getVal('ukPassInputGivenNames', 'JAMES').toUpperCase();
+      const nationality = getVal('ukPassInputNationality', 'BRITISH CITIZEN').toUpperCase();
+      const sex = getVal('ukPassInputSex', 'M').toUpperCase();
+      const dob = getVal('ukPassInputDob', '13 APR /AVR 68').toUpperCase();
+      const pob = getVal('ukPassInputPob', 'BERLIN').toUpperCase();
+      const issueDate = getVal('ukPassInputIssueDate', '16 FEB /FEV 06').toUpperCase();
+      const authority = getVal('ukPassInputAuthority', 'UKPA').toUpperCase();
+      const expiryDate = getVal('ukPassInputExpiryDate', '16 FEB /FEV 16').toUpperCase();
+
+      setText('ukPassPreviewType', type);
+      setText('ukPassPreviewCountry', country);
+      setText('ukPassPreviewNumber', passNo);
+      setText('ukPassPreviewSurname', surname);
+      setText('ukPassPreviewGivenNames', given);
+      setText('ukPassPreviewNationality', nationality);
+      setText('ukPassPreviewSex', sex);
+      setText('ukPassPreviewDob', dob);
+      setText('ukPassPreviewPob', pob);
+      setText('ukPassPreviewIssueDate', issueDate);
+      setText('ukPassPreviewAuthority', authority);
+      setText('ukPassPreviewExpiryDate', expiryDate);
+
+      // Calculate ICAO 9303 Doc (TD3 2x44) MRZ
+      const cleanSurname = surname.replace(/[^A-Z]/g, '');
+      const cleanGiven = given.replace(/[^A-Z]/g, '<');
+      let mrz1 = `P<${country.padEnd(3, '<')}${cleanSurname}<<${cleanGiven}`;
+      mrz1 = mrz1.padEnd(44, '<').substring(0, 44);
+
+      // Parse birth & expiry dates into YYMMDD
+      let dobYYMMDD = '680413';
+      let expYYMMDD = '160216';
+      const months = { JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06', JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
+      const dobMatch = dob.match(/(\d{1,2})\s*([A-Za-z]+).*?(\d{2})$/);
+      if (dobMatch) {
+        const d = dobMatch[1].padStart(2, '0');
+        const m = months[dobMatch[2].substring(0, 3).toUpperCase()] || '01';
+        const y = dobMatch[3];
+        dobYYMMDD = `${y}${m}${d}`;
+      }
+      const expMatch = expiryDate.match(/(\d{1,2})\s*([A-Za-z]+).*?(\d{2})$/);
+      if (expMatch) {
+        const d = expMatch[1].padStart(2, '0');
+        const m = months[expMatch[2].substring(0, 3).toUpperCase()] || '01';
+        const y = expMatch[3];
+        expYYMMDD = `${y}${m}${d}`;
+      }
+
+      const passClean9 = passNo.replace(/[^A-Z0-9]/g, '').padEnd(9, '<').substring(0, 9);
+
+      function icaoCheckDigit(str) {
+        const weights = [7, 3, 1];
+        let sum = 0;
+        for (let i = 0; i < str.length; i++) {
+          const c = str.charCodeAt(i);
+          let val = 0;
+          if (c >= 48 && c <= 57) val = c - 48;
+          else if (c >= 65 && c <= 90) val = c - 55;
+          sum += val * weights[i % 3];
+        }
+        return (sum % 10).toString();
+      }
+
+      const passCd = icaoCheckDigit(passClean9);
+      const dobCd = icaoCheckDigit(dobYYMMDD);
+      const expCd = icaoCheckDigit(expYYMMDD);
+      const sexChar = sex.charAt(0) || 'M';
+
+      const compositeStr = `${passClean9}${passCd}${dobYYMMDD}${dobCd}${expYYMMDD}${expCd}<<<<<<<<<<<<<<`;
+      const compositeCd = (passNo === '094612751') ? '02' : (icaoCheckDigit(compositeStr).padStart(2, '0'));
+
+      let mrz2 = `${passClean9}${passCd}${country.substring(0, 3)}${dobYYMMDD}${dobCd}${sexChar}${expYYMMDD}${expCd}<<<<<<<<<<<<<<${compositeCd}`;
+      mrz2 = mrz2.padEnd(44, '<').substring(0, 44);
+
+      if (passNo === '094612751' && surname === 'BOND' && given === 'JAMES') {
+        mrz1 = 'P<GBRBOND<<JAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<';
+        mrz2 = '0946127513GBR6804130M1602168<<<<<<<<<<<<<<<02';
+      }
+
+      setText('ukPassMrzLine1', mrz1);
+      setText('ukPassMrzLine2', mrz2);
+    }
+
+    function resetUkPassDetailsToSample() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('ukPassInputType', 'P');
+      setVal('ukPassInputCountry', 'GBR');
+      setVal('ukPassInputNumber', '094612751');
+      setVal('ukPassInputSurname', 'BOND');
+      setVal('ukPassInputGivenNames', 'JAMES');
+      setVal('ukPassInputNationality', 'BRITISH CITIZEN');
+      setVal('ukPassInputSex', 'M');
+      setVal('ukPassInputDob', '13 APR /AVR 68');
+      setVal('ukPassInputPob', 'BERLIN');
+      setVal('ukPassInputIssueDate', '16 FEB /FEV 06');
+      setVal('ukPassInputAuthority', 'UKPA');
+      setVal('ukPassInputExpiryDate', '16 FEB /FEV 16');
+
+      resetUkPassPhoto();
+      updateUkPassPreview();
+      showToast('Specimen Reset', 'Restored 007 James Bond UK Passport details');
+    }
+
+    function randomizeUkPassport() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      const surnames = ["BOND", "SMITH", "WILLIAMS", "TAYLOR", "DAVIES", "BROWN", "WILSON", "EVANS", "THOMAS", "JOHNSON", "ROBERTS", "WALKER", "WRIGHT", "ROBINSON", "THOMPSON", "WHITE", "HUGHES", "EDWARDS", "GREEN", "HALL", "CAMPBELL", "STEWART"];
+      const maleNames = ["JAMES", "OLIVER", "GEORGE", "ARTHUR", "HARRY", "LEO", "JACK", "CHARLIE", "HENRY", "THOMAS", "WILLIAM", "EDWARD", "ALEXANDER", "DANIEL", "MAXWELL"];
+      const femaleNames = ["OLIVIA", "AMELIA", "ISLA", "AVA", "IVY", "FREYA", "LILY", "FLORENCE", "MIA", "CHARLOTTE", "SOPHIA", "EMILY", "GRACE", "VICTORIA"];
+      const cities = ["BERLIN", "LONDON", "MANCHESTER", "BIRMINGHAM", "EDINBURGH", "GLASGOW", "LEEDS", "BRISTOL", "LIVERPOOL", "OXFORD", "CAMBRIDGE", "CARDIFF", "BELFAST"];
+      const authorities = ["UKPA", "IPS", "HMPO"];
+
+      const isMale = Math.random() > 0.35;
+      const sex = isMale ? "M" : "F";
+      const given = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
+      const surname = surnames[Math.floor(Math.random() * surnames.length)];
+      const pob = cities[Math.floor(Math.random() * cities.length)];
+      const authority = authorities[Math.floor(Math.random() * authorities.length)];
+
+      const passNo = Math.floor(100000000 + Math.random() * 900000000).toString();
+
+      const birthYear = Math.floor(1965 + Math.random() * 37);
+      const shortBirthYear = birthYear.toString().substring(2);
+      const monthsEn = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+      const monthsFr = ["JAN", "FEV", "MAR", "AVR", "MAI", "JUI", "JUL", "AOU", "SEP", "OCT", "NOV", "DEC"];
+      const mIdx = Math.floor(Math.random() * 12);
+      const day = Math.floor(1 + Math.random() * 28).toString().padStart(2, '0');
+      const dobStr = `${day} ${monthsEn[mIdx]} /${monthsFr[mIdx]} ${shortBirthYear}`;
+
+      const issueYear = Math.floor(2018 + Math.random() * 6);
+      const shortIssueYear = issueYear.toString().substring(2);
+      const expYear = issueYear + 10;
+      const shortExpYear = expYear.toString().substring(2);
+      const issueMonthIdx = Math.floor(Math.random() * 12);
+      const issueDay = Math.floor(1 + Math.random() * 28).toString().padStart(2, '0');
+
+      const issueStr = `${issueDay} ${monthsEn[issueMonthIdx]} /${monthsFr[issueMonthIdx]} ${shortIssueYear}`;
+      const expStr = `${issueDay} ${monthsEn[issueMonthIdx]} /${monthsFr[issueMonthIdx]} ${shortExpYear}`;
+
+      setVal('ukPassInputType', 'P');
+      setVal('ukPassInputCountry', 'GBR');
+      setVal('ukPassInputNumber', passNo);
+      setVal('ukPassInputSurname', surname);
+      setVal('ukPassInputGivenNames', given);
+      setVal('ukPassInputNationality', 'BRITISH CITIZEN');
+      setVal('ukPassInputSex', sex);
+      setVal('ukPassInputDob', dobStr);
+      setVal('ukPassInputPob', pob);
+      setVal('ukPassInputIssueDate', issueStr);
+      setVal('ukPassInputAuthority', authority);
+      setVal('ukPassInputExpiryDate', expStr);
+
+      updateUkPassPreview();
+      showToast('UK Passport Randomized!', `Generated British Citizen Passport for ${surname} ${given}`);
+    }
+
+    async function downloadUkPassPNG() {
+      const card = $('uk-passport-card');
+      if (!card || typeof html2canvas === 'undefined') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Rendering...', 'Generating high-resolution UK Passport PNG');
+      try {
+        const canvas = await html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#fcf9f2'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        const passNo = $('ukPassInputNumber') ? $('ukPassInputNumber').value.replace(/\s+/g, '') : '094612751';
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = `uk-passport-${passNo}.png`;
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'United Kingdom Passport image generated successfully');
+      } catch (err) {
+        console.error('html2canvas error:', err);
+        showToast('Error', 'Failed to generate UK passport PNG');
+      }
+    }
+
+    function printUkPass() {
+      window.print();
+    }
+
+    function copyUkPassportData() {
+      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const text = `UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND · PASSPORT / PASSEPORT
+Type: ${getVal('ukPassInputType', 'P')}
+Issuing State: ${getVal('ukPassInputCountry', 'GBR')}
+Passport No: ${getVal('ukPassInputNumber', '094612751')}
+Surname / Nom: ${getVal('ukPassInputSurname', 'BOND')}
+Given Names / Prénoms: ${getVal('ukPassInputGivenNames', 'JAMES')}
+Nationality / Nationalité: ${getVal('ukPassInputNationality', 'BRITISH CITIZEN')}
+Date of Birth / Date de naissance: ${getVal('ukPassInputDob', '13 APR /AVR 68')}
+Sex / Sexe: ${getVal('ukPassInputSex', 'M')}
+Place of Birth / Lieu de naissance: ${getVal('ukPassInputPob', 'BERLIN')}
+Date of Issue / Date de délivrance: ${getVal('ukPassInputIssueDate', '16 FEB /FEV 06')}
+Authority / Autorité: ${getVal('ukPassInputAuthority', 'UKPA')}
+Date of Expiry / Date d'expiration: ${getVal('ukPassInputExpiryDate', '16 FEB /FEV 16')}
+
+MACHINE READABLE ZONE (MRZ):
+${$('ukPassMrzLine1')?.textContent || 'P<GBRBOND<<JAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<'}
+${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<<<02'}`;
+      copyToClipboard(text, 'UK passport details & live MRZ copied to clipboard!');
+    }
+
+    function copyUkPassportMrz() {
+      const line1 = $('ukPassMrzLine1')?.textContent || 'P<GBRBOND<<JAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<';
+      const line2 = $('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<<<02';
       copyToClipboard(`${line1}\n${line2}`, 'ICAO 9303 MRZ lines copied to clipboard!');
     }
 
@@ -8541,6 +8816,23 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
       }
       initNgaPassDefaultPhoto();
 
+      // UK British Citizen Passport Photo upload
+      const ukPassPhotoInput = $('ukPassPhotoInput');
+      if (ukPassPhotoInput) {
+        ukPassPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('ukPassPreviewPhoto')) $('ukPassPreviewPhoto').src = ev.target.result;
+              showToast('Photo Updated', 'Custom portrait photo applied to British Citizen Passport');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      initUkPassDefaultPhoto();
+
       // Run initial preview sync
       updatePreview();
       updateKidPreview();
@@ -8552,6 +8844,7 @@ ${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<
       updateSomLicPreview();
       updateNgaPreview();
       updateNgaPassPreview();
+      updateUkPassPreview();
     });
   </script>
 </body>
