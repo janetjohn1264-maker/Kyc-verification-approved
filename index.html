@@ -3063,7 +3063,7 @@ XUDUR, BAKOOL, SOMALIA</span>
 
                       <!-- Lenticular Oval Ghost Portrait Lens -->
                       <div class="w-11 sm:w-13 h-7 sm:h-8 rounded-[50%] overflow-hidden border border-slate-400/80 shadow-2xs relative bg-slate-200 flex items-center justify-center">
-                        <img id="somPassIdCardGhostPhoto" src="/assets/aistudio/somali_card_female_portrait.jpg" alt="" class="w-full h-full object-cover filter grayscale contrast-125 opacity-70">
+                        <img id="somPassIdCardGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="" class="w-full h-full object-cover filter grayscale contrast-125 opacity-70">
                         <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 3px);"></div>
                       </div>
                     </div>
@@ -3147,7 +3147,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                     <div class="col-span-3 sm:col-span-3 flex flex-col items-center">
                       <!-- Bearer Portrait Photo -->
                       <div class="w-full aspect-[3/3.7] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
-                        <img id="somPassIdCardPreviewPhoto" src="/assets/aistudio/somali_card_female_portrait.jpg" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="somPassIdCardPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Holder's Signature block directly under photo -->
@@ -3337,7 +3337,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                     <!-- Left: Bearer Photo & Signature -->
                     <div class="w-24 sm:w-28 shrink-0 flex flex-col items-center justify-between">
                       <div class="w-full aspect-[3/3.8] rounded-lg overflow-hidden border border-slate-300/90 shadow-sm bg-slate-200 relative">
-                        <img id="somLicPreviewPhoto" src="/assets/aistudio/FB_IMG_1792645056894_600495b6.jpg" alt="Driver Portrait" class="w-full h-full object-cover">
+                        <img id="somLicPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Driver Portrait" class="w-full h-full object-cover">
                       </div>
                       
                       <!-- Holder Signature -->
@@ -3401,7 +3401,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                         <!-- Secondary Ghost Portrait -->
                         <div class="flex items-center gap-1.5 opacity-80">
                           <div class="w-10 h-12 rounded overflow-hidden border border-slate-300/70 bg-slate-100 shadow-2xs">
-                            <img id="somLicGhostPhoto" src="/assets/aistudio/FB_IMG_1792645056894_600495b6.jpg" alt="Ghost Portrait" class="w-full h-full object-cover filter contrast-110">
+                            <img id="somLicGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover filter contrast-110">
                           </div>
                         </div>
                       </div>
@@ -3451,27 +3451,16 @@ XUDUR, BAKOOL, SOMALIA</span>
             </div>
 
             <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
-              <!-- Photo Upload & Toggle -->
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                <div class="flex items-center justify-between">
-                  <label for="ethPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 text-[10px]">
-                    Bearer Photo / ፎቶግራፍ
-                  </label>
-                  <div class="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200 text-[10px]">
-                    <button type="button" id="btn-eth-sil" onclick="setEthPhotoMode('silhouette')" class="px-2 py-0.5 rounded font-bold bg-emerald-700 text-white shadow-2xs transition-all cursor-pointer">
-                      Silhouette
-                    </button>
-                    <button type="button" id="btn-eth-photo" onclick="setEthPhotoMode('photo')" class="px-2 py-0.5 rounded font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
-                      Custom Photo
-                    </button>
-                  </div>
-                </div>
-
+              <!-- Photo Upload -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <label for="ethPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5 text-[10px]">
+                  Bearer Photo / ፎቶግራፍ
+                </label>
                 <input type="file" id="ethPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white cursor-pointer">
                 
-                <button type="button" onclick="resetEthPhoto()" class="px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors text-[11px] flex items-center gap-1">
+                <button type="button" onclick="resetEthPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors text-[11px] flex items-center gap-1">
                   <i class="fa-solid fa-rotate-left mr-1"></i>
-                  <span>Reset to Reference Silhouette</span>
+                  <span>Reset to Official Photo</span>
                 </button>
               </div>
 
@@ -3637,19 +3626,10 @@ XUDUR, BAKOOL, SOMALIA</span>
                 <!-- Main Content Body: Portrait on Left + Data Fields on Right -->
                 <div class="grid grid-cols-12 gap-3 sm:gap-4 items-start relative z-10 mt-2 sm:mt-2.5">
                   
-                  <!-- Left: Bearer Portrait (Silhouette or Custom Photo) -->
+                  <!-- Left: Bearer Portrait -->
                   <div class="col-span-4 flex flex-col items-center">
                     <div id="ethPortraitContainer" class="w-full aspect-[3.1/3.9] rounded-2xl overflow-hidden shadow-xs relative bg-transparent flex items-center justify-center">
-                      <!-- Silhouette Box (Default matching reference image) -->
-                      <div id="ethSilhouetteBox" class="w-full h-full flex items-center justify-center">
-                        <svg viewBox="0 0 160 190" class="w-full h-full text-[#383b3d]" fill="currentColor">
-                          <circle cx="80" cy="56" r="36"/>
-                          <path d="M12 178 C12 125, 45 108, 80 108 C115 108, 148 125, 148 178 Z"/>
-                        </svg>
-                      </div>
-
-                      <!-- Custom Photo Element (Hidden by default until photo uploaded/toggled) -->
-                      <img id="ethPreviewPhoto" src="/assets/aistudio/ethiopia_fayda_portrait.jpg" alt="Fayda Bearer Photo" class="hidden w-full h-full object-cover rounded-2xl">
+                      <img id="ethPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Fayda Bearer Photo" class="w-full h-full object-cover rounded-2xl">
                     </div>
                   </div>
 
@@ -4028,7 +4008,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                     <!-- Right: Large Bearer Portrait Photo + Overlaid Signature -->
                     <div class="relative shrink-0 pt-0.5">
                       <div class="w-24 sm:w-28 md:w-32 aspect-[3/4] rounded-md overflow-hidden border border-slate-300 shadow-sm bg-white">
-                        <img id="ngaPreviewPhoto" src="/assets/aistudio/nigeria_nimc_portrait.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                        <img id="ngaPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover">
                       </div>
                       <img id="ngaPreviewSignature" src="/assets/aistudio/nigeria_signature.png" alt="Signature" class="absolute -bottom-2 -left-6 w-24 sm:w-28 h-auto pointer-events-none drop-shadow-xs object-contain">
                     </div>
@@ -4040,7 +4020,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                     <!-- Bottom-Left: Ghost Oval, NIMC Logo, NGA Hologram -->
                     <div class="flex items-center gap-2 shrink-0">
                       <div class="w-9 sm:w-11 h-12 sm:h-14 rounded-[50%] overflow-hidden border border-emerald-700/60 grayscale contrast-125 opacity-80 shrink-0 bg-white/40 shadow-xs">
-                        <img id="ngaGhostPhoto" src="/assets/aistudio/nigeria_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover">
+                        <img id="ngaGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover">
                       </div>
                       <img src="/assets/aistudio/nigeria_nimc_logo.png" alt="NIMC" class="h-6 sm:h-7 w-auto object-contain">
                       <img src="/assets/aistudio/nigeria_nga_hologram_exact.png" alt="Hologram" class="h-6 sm:h-7 w-auto object-contain drop-shadow-xs">
@@ -4340,7 +4320,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                       <!-- Left Column: Primary Portrait + Ghost + Hologram + Signature -->
                       <div class="col-span-4 flex flex-col items-center space-y-1.5">
                         <div class="relative w-full aspect-[3.2/4] bg-slate-200 border-2 border-emerald-900/40 rounded overflow-hidden shadow-sm flex items-center justify-center">
-                          <img id="ngaPassPreviewPhoto" src="/assets/aistudio/nigeria_photo_exact.png" alt="Passport Photo" class="w-full h-full object-cover">
+                          <img id="ngaPassPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
                           
                           <!-- Hologram Overlay on Photo Corner -->
                           <div class="absolute bottom-1 right-1 w-6 h-6 sm:w-7 sm:h-7 pointer-events-none">
@@ -4352,7 +4332,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                         <div class="w-full flex items-center justify-between gap-1 pt-0.5">
                           <!-- Small Ghost Photo -->
                           <div class="w-9 h-11 bg-slate-100 border border-emerald-400/80 rounded overflow-hidden shadow-2xs shrink-0">
-                            <img id="ngaPassGhostPhoto" src="/assets/aistudio/nigeria_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-75">
+                            <img id="ngaPassGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-75">
                           </div>
 
                           <!-- Signature container -->
@@ -4833,26 +4813,6 @@ XUDUR, BAKOOL, SOMALIA</span>
                   </div>
 
                 </article>
-              </div>
-
-              <!-- ================= 2. OFFICIAL UPLOADED SPECIMEN REFERENCE COMPARISON ================= -->
-              <div class="w-full max-w-[650px] space-y-2 pt-2">
-                <div class="flex items-center justify-between px-1">
-                  <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                    <i class="fa-solid fa-camera text-blue-700"></i>
-                    Original Specimen Photo (Reference)
-                  </span>
-                  <span class="text-[10px] text-slate-400 font-mono-code">Uploaded British Passport</span>
-                </div>
-
-                <div class="relative w-full rounded-2xl shadow-md border border-slate-200 overflow-hidden bg-slate-900 group">
-                  <img src="/assets/aistudio/img-160_f55dc498.jpg" alt="Uploaded UK Passport Specimen (James Bond)" class="w-full h-auto object-cover max-h-[300px]">
-                  
-                  <div class="absolute bottom-2.5 right-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10.5px] px-2.5 py-1 rounded-lg font-mono-code font-bold flex items-center gap-1.5 shadow-md">
-                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                    <span>Exact Reference Details Matching 100%</span>
-                  </div>
-                </div>
               </div>
 
             </section>
@@ -5551,7 +5511,7 @@ XUDUR, BAKOOL, SOMALIA</span>
     let currentDocType = 'passport';
     let currentCountry = 'kenya';
 
-    const defaultPhoto = '/assets/aistudio/HL7D9j4XUAALh2T_b0209bf1.png';
+    const defaultPhoto = '/assets/aistudio/uk_bearer_portrait.png';
     let toastTimer = null;
 
     // Kenya Passport Field Bindings
@@ -5860,8 +5820,8 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     // ================= KENYA NATIONAL ID (MAISHA NAMBA 3RD GEN) CONTROLLER =================
-    const defaultKidPhotoSrc = '/assets/aistudio/kenya_maisha_portrait_adan.jpg';
-    const defaultKidGhostSrc = '/assets/aistudio/kenya_maisha_ghost_adan.jpg';
+    const defaultKidPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultKidGhostSrc = '/assets/aistudio/uk_bearer_ghost.png';
 
     function initKidDefaultPhoto() {
       if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
@@ -6171,33 +6131,11 @@ XUDUR, BAKOOL, SOMALIA</span>
     }
 
     // ================= ETHIOPIAN NATIONAL ID (FAYDA) HELPERS =================
-    const defaultEthPhoto = '/assets/aistudio/ethiopia_fayda_portrait.jpg';
+    const defaultEthPhoto = '/assets/aistudio/uk_bearer_portrait.png';
 
     function setEthPhotoMode(mode) {
-      const silBox = $('ethSilhouetteBox');
       const photoImg = $('ethPreviewPhoto');
-      const btnSil = $('btn-eth-sil');
-      const btnPhoto = $('btn-eth-photo');
-
-      if (mode === 'photo') {
-        if (silBox) silBox.classList.add('hidden');
-        if (photoImg) photoImg.classList.remove('hidden');
-        if (btnPhoto) {
-          btnPhoto.className = 'px-2 py-0.5 rounded font-bold bg-emerald-700 text-white shadow-2xs transition-all cursor-pointer';
-        }
-        if (btnSil) {
-          btnSil.className = 'px-2 py-0.5 rounded font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
-        }
-      } else {
-        if (silBox) silBox.classList.remove('hidden');
-        if (photoImg) photoImg.classList.add('hidden');
-        if (btnSil) {
-          btnSil.className = 'px-2 py-0.5 rounded font-bold bg-emerald-700 text-white shadow-2xs transition-all cursor-pointer';
-        }
-        if (btnPhoto) {
-          btnPhoto.className = 'px-2 py-0.5 rounded font-medium text-slate-600 hover:text-slate-900 transition-all cursor-pointer';
-        }
-      }
+      if (photoImg) photoImg.classList.remove('hidden');
     }
 
     function updateEthPreview() {
@@ -6248,8 +6186,7 @@ XUDUR, BAKOOL, SOMALIA</span>
     function resetEthPhoto() {
       if ($('ethPreviewPhoto')) $('ethPreviewPhoto').src = defaultEthPhoto;
       if ($('ethPhotoInput')) $('ethPhotoInput').value = '';
-      setEthPhotoMode('silhouette');
-      showToast('Photo Reset', 'Restored official reference dark silhouette');
+      showToast('Photo Reset', 'Restored official portrait photo');
     }
 
     function resetEthDetailsToSample() {
@@ -6371,8 +6308,8 @@ XUDUR, BAKOOL, SOMALIA</span>
 
     // ================= NIGERIA NATIONAL IDENTITY CARD (NIMC) CONTROLLER =================
     const officialNgaSpecimenSrc = '/assets/aistudio/images__7__6a48fe94.png';
-    const defaultNgaCardPhotoSrc = '/assets/aistudio/nigeria_nimc_portrait.jpg';
-    const defaultNgaCardGhostSrc = '/assets/aistudio/nigeria_ghost_exact.png';
+    const defaultNgaCardPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultNgaCardGhostSrc = '/assets/aistudio/uk_bearer_ghost.png';
 
     function initNgaDefaultPhoto() {
       if ($('ngaPreviewPhoto')) $('ngaPreviewPhoto').src = defaultNgaCardPhotoSrc;
@@ -6682,8 +6619,8 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
     }
 
     // ================= NIGERIA STANDARD E-PASSPORT LIVE CONTROLLER =================
-    const defaultNgaPassPhotoSrc = '/assets/aistudio/nigeria_photo_exact.png';
-    const defaultNgaPassGhostSrc = '/assets/aistudio/nigeria_ghost_exact.png';
+    const defaultNgaPassPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultNgaPassGhostSrc = '/assets/aistudio/uk_bearer_ghost.png';
     let currentNgaPassViewMode = 'editor'; // 'editor' | 'specimen'
 
     function initNgaPassDefaultPhoto() {
@@ -7204,7 +7141,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     // ================= SOMALIA SMART NATIONAL ID (POLYCARBONATE) CONTROLLER =================
-    const defaultSomSmartIdSrc = '/assets/aistudio/somali_smart_id_portrait.jpg';
+    const defaultSomSmartIdSrc = '/assets/aistudio/uk_bearer_portrait.png';
 
     function initSomSmartIdDefaultPhoto() {
       if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
@@ -7393,7 +7330,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
 
-    const defaultSomPhoto = '/assets/aistudio/somali_nira_portrait.jpg';
+    const defaultSomPhoto = '/assets/aistudio/uk_bearer_portrait.png';
 
     function resetSomPhoto() {
       if ($('somPreviewPhoto')) $('somPreviewPhoto').src = defaultSomPhoto;
@@ -7496,7 +7433,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     // ================= SOMALIA BIOMETRIC PASSPORT CONTROLLER =================
-    const defaultSomPassPhoto = '/assets/aistudio/somali_passport_portrait.jpg';
+    const defaultSomPassPhoto = '/assets/aistudio/uk_bearer_portrait.png';
 
     function updateSomPassPreview() {
       const type = $('somPassInputType')?.value || 'P';
@@ -7697,7 +7634,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     // ================= SOMALIA PASSPORT IDENTITY CARD (WARAQADDA AQOONSIGA) CONTROLLER =================
-    const defaultSomPassIdPhoto = '/assets/aistudio/somali_card_female_portrait.jpg';
+    const defaultSomPassIdPhoto = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultSomPassIdGhost = '/assets/aistudio/uk_bearer_ghost.png';
 
     function setSomPassActiveForm(mode) {
       const passForm = $('somPassDocForm');
@@ -7746,7 +7684,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
     function resetSomPassIdPhoto() {
       if ($('somPassIdCardPreviewPhoto')) $('somPassIdCardPreviewPhoto').src = defaultSomPassIdPhoto;
-      if ($('somPassIdCardGhostPhoto')) $('somPassIdCardGhostPhoto').src = defaultSomPassIdPhoto;
+      if ($('somPassIdCardGhostPhoto')) $('somPassIdCardGhostPhoto').src = defaultSomPassIdGhost;
       if ($('somPassIdPhotoInput')) $('somPassIdPhotoInput').value = '';
       showToast('Photo Reset', 'Restored official Identity Card reference photo');
     }
@@ -7826,32 +7764,17 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     // ================= SOMALIA DRIVER'S LICENSE CONTROLLER =================
-    const defaultSomLicPhotoSrc = '/assets/aistudio/FB_IMG_1792645056894_600495b6.jpg';
+    const defaultSomLicPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultSomLicGhostSrc = '/assets/aistudio/uk_bearer_ghost.png';
+    const defaultSomLicSpecimenSrc = '/assets/aistudio/FB_IMG_1792645056894_600495b6.jpg';
 
     function initSomLicDefaultPhoto() {
+      if ($('somLicPreviewPhoto')) $('somLicPreviewPhoto').src = defaultSomLicPhotoSrc;
+      if ($('somLicGhostPhoto')) $('somLicGhostPhoto').src = defaultSomLicGhostSrc;
+
       const img = new Image();
-      img.src = defaultSomLicPhotoSrc;
+      img.src = defaultSomLicSpecimenSrc;
       img.onload = () => {
-        try {
-          // Crop bearer portrait from official specimen
-          const canvas = document.createElement('canvas');
-          const sx = img.naturalWidth * 0.03;
-          const sy = img.naturalHeight * 0.36;
-          const sWidth = img.naturalWidth * 0.225;
-          const sHeight = img.naturalHeight * 0.39;
-
-          canvas.width = 300;
-          canvas.height = 360;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-          const croppedUrl = canvas.toDataURL('image/jpeg', 0.95);
-          window._defaultSomLicCroppedPhoto = croppedUrl;
-          if ($('somLicPreviewPhoto')) $('somLicPreviewPhoto').src = croppedUrl;
-          if ($('somLicGhostPhoto')) $('somLicGhostPhoto').src = croppedUrl;
-        } catch (e) {
-          // Keep default fallback
-        }
-
         try {
           // Crop authentic driver signature from official specimen
           const sigCanvas = document.createElement('canvas');
@@ -7873,9 +7796,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function resetSomLicPhoto() {
-      const fallback = window._defaultSomLicCroppedPhoto || defaultSomLicPhotoSrc;
-      if ($('somLicPreviewPhoto')) $('somLicPreviewPhoto').src = fallback;
-      if ($('somLicGhostPhoto')) $('somLicGhostPhoto').src = fallback;
+      if ($('somLicPreviewPhoto')) $('somLicPreviewPhoto').src = defaultSomLicPhotoSrc;
+      if ($('somLicGhostPhoto')) $('somLicGhostPhoto').src = defaultSomLicGhostSrc;
       if ($('somLicPhotoInput')) $('somLicPhotoInput').value = '';
       showToast('Photo Reset', 'Restored official Somali driver license photo');
     }
@@ -8553,29 +8475,9 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
         });
       }
 
-      // Auto-crop authentic portrait from passport scan attachment
+      // Default portrait photo
       function initDefaultPhoto() {
-        const img = new Image();
-        img.src = defaultPhoto;
-        img.onload = () => {
-          try {
-            const canvas = document.createElement('canvas');
-            const sx = img.naturalWidth * 0.045;
-            const sy = img.naturalHeight * 0.13;
-            const sWidth = img.naturalWidth * 0.275;
-            const sHeight = img.naturalHeight * 0.52;
-
-            canvas.width = 300;
-            canvas.height = 380;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
-            const croppedUrl = canvas.toDataURL('image/png');
-            window._croppedDefaultPhoto = croppedUrl;
-            if ($('previewPhoto')) $('previewPhoto').src = croppedUrl;
-          } catch (e) {
-            // Keep defaultPhoto as fallback
-          }
-        };
+        if ($('previewPhoto')) $('previewPhoto').src = defaultPhoto;
       }
       initDefaultPhoto();
 
@@ -8583,9 +8485,9 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       const resetPhotoBtn = $('resetPhotoBtn');
       if (resetPhotoBtn) {
         resetPhotoBtn.addEventListener('click', () => {
-          if ($('previewPhoto')) $('previewPhoto').src = window._croppedDefaultPhoto || defaultPhoto;
+          if ($('previewPhoto')) $('previewPhoto').src = defaultPhoto;
           if ($('photoInput')) $('photoInput').value = '';
-          showToast('Photo Reset', 'Restored official Kenya passport portrait photo');
+          showToast('Photo Reset', 'Restored official passport portrait photo');
         });
       }
 
