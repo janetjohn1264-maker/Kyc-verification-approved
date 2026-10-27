@@ -2398,7 +2398,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `senegal-passeport-${senCurrentViewMode}-specimen.png`;
+          $('fallbackDownloadLink').download = `senegal-passeport-${senCurrentViewMode}.png`;
         }
         const modal = $('imageModal');
         if (modal) {
@@ -12115,9 +12115,6 @@ XUDUR, BAKOOL, SOMALIA</span>
                   <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-300">
                     Passeport Biométrique (CEDEAO)
                   </span>
-                  <span class="text-xs bg-amber-50 text-amber-800 font-bold px-2.5 py-0.5 rounded-full border border-amber-300 font-mono-code">
-                    SAMPLE — NOT VALID
-                  </span>
                 </div>
                 <p class="text-xs text-slate-500 mt-1">
                   Passeport de la République du Sénégal · Communauté Économique des États de l'Afrique de l'Ouest (CEDEAO / ECOWAS) · Éditeur de maquette visuelle avec livret ouvert et page de données biométriques.
@@ -12356,15 +12353,6 @@ XUDUR, BAKOOL, SOMALIA</span>
                     
                     <!-- ====== PAGE 1: INSIDE COVER / OBSERVATION PAGE ====== -->
                     <div id="senegal-spread-page1" class="senegal-page1-bg relative w-full aspect-[1.48/1] p-3 sm:p-5 border-b border-slate-300 overflow-hidden flex flex-col justify-between">
-                      <!-- Watermark "SAMPLE — NOT VALID" -->
-                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
-                        <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
-                          <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
-                            SAMPLE — NOT VALID
-                          </span>
-                        </div>
-                      </div>
-
                       <!-- Faint Background Watermark Page Number "1" on right -->
                       <div class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 font-serif text-[70px] sm:text-[90px] font-black text-slate-400/[0.12] pointer-events-none select-none">
                         1
@@ -12438,22 +12426,6 @@ XUDUR, BAKOOL, SOMALIA</span>
 
                     <!-- ====== PAGE 2: BIOMETRIC DATAPAGE ====== -->
                     <div id="senegal-spread-datapage" class="senegal-datapage-bg relative w-full aspect-[1.48/1] p-3 sm:p-5 overflow-hidden flex flex-col justify-between text-slate-900">
-                      <!-- Watermark "SAMPLE — NOT VALID" -->
-                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
-                        <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
-                          <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
-                            SAMPLE — NOT VALID
-                          </span>
-                        </div>
-                      </div>
-
-                      <!-- Center Stylized Watermark Text "REPUBLIQUE DU SENEGAL" -->
-                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.14]">
-                        <span class="font-black text-rose-800 text-2xl sm:text-4xl tracking-widest uppercase transform -rotate-12">
-                          REPUBLIQUE DU SENEGAL
-                        </span>
-                      </div>
-
                       <!-- Top Header Line -->
                       <div class="relative z-10 w-full text-center pb-1 border-b border-emerald-900/10">
                         <div class="font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wider uppercase">
@@ -12600,15 +12572,6 @@ XUDUR, BAKOOL, SOMALIA</span>
                 <!-- ================= 2. DATAPAGE ONLY VIEW ================= -->
                 <div id="sen-view-datapage" class="hidden w-full">
                   <article id="senegal-datapage-card" class="senegal-datapage-bg relative w-full aspect-[1.48/1] rounded-2xl shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden flex flex-col justify-between text-slate-900 select-none">
-                    <!-- Watermark "SAMPLE — NOT VALID" -->
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
-                      <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
-                        <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
-                          SAMPLE — NOT VALID
-                        </span>
-                      </div>
-                    </div>
-
                     <div class="relative z-10 w-full text-center pb-1 border-b border-emerald-900/10">
                       <div class="font-black text-slate-950 text-sm sm:text-base md:text-lg tracking-wider uppercase">
                         REPUBLIQUE DU SENEGAL
@@ -12720,14 +12683,6 @@ XUDUR, BAKOOL, SOMALIA</span>
                 <!-- ================= 3. OBSERVATION PAGE ONLY VIEW ================= -->
                 <div id="sen-view-page1" class="hidden w-full">
                   <article id="senegal-page1-card" class="senegal-page1-bg relative w-full aspect-[1.48/1] rounded-2xl shadow-2xl border-2 border-slate-300 p-4 sm:p-6 overflow-hidden flex flex-col justify-between text-slate-900 select-none">
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
-                      <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
-                        <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
-                          SAMPLE — NOT VALID
-                        </span>
-                      </div>
-                    </div>
-
                     <div class="relative z-10 flex h-full items-stretch justify-between gap-4">
                       <div class="flex items-center gap-1.5 shrink-0 pl-1">
                         <div class="font-bold text-slate-700 text-[8px] sm:text-[9.5px] leading-tight select-none uppercase tracking-wider" style="writing-mode: vertical-rl; transform: rotate(180deg);">
