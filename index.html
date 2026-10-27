@@ -13,7 +13,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Amiri:wght@400;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -28,6 +28,9 @@
     }
     .font-arabic {
       font-family: 'Amiri', serif;
+    }
+    .font-urdu {
+      font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
     }
     .font-ethiopic {
       font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif;
@@ -115,7 +118,39 @@
       #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+    }
+
+    /* Seychelles National Identity Card Security Backgrounds */
+    .seychelles-id-front-bg {
+      background-color: #f7f9fb;
+      background-image: 
+        radial-gradient(ellipse at 15% 45%, rgba(251, 146, 60, 0.24) 0%, transparent 60%),
+        radial-gradient(circle at 85% 55%, rgba(56, 189, 248, 0.15) 0%, transparent 55%),
+        repeating-linear-gradient(45deg, rgba(203, 213, 225, 0.28) 0px, rgba(203, 213, 225, 0.28) 1px, transparent 1px, transparent 5px),
+        repeating-linear-gradient(-45deg, rgba(203, 213, 225, 0.22) 0px, rgba(203, 213, 225, 0.22) 1px, transparent 1px, transparent 5px);
+    }
+
+    .seychelles-id-back-bg {
+      background-color: #f6f8fa;
+      background-image: 
+        radial-gradient(ellipse at 20% 40%, rgba(249, 115, 22, 0.22) 0%, transparent 60%),
+        radial-gradient(circle at 80% 50%, rgba(148, 163, 184, 0.18) 0%, transparent 55%),
+        repeating-linear-gradient(60deg, rgba(203, 213, 225, 0.25) 0px, rgba(203, 213, 225, 0.25) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-60deg, rgba(203, 213, 225, 0.20) 0px, rgba(203, 213, 225, 0.20) 1px, transparent 1px, transparent 6px);
+    }
+
+    /* Pakistan National Identity Card (Smart NIC - NADRA) Security Background */
+    .pakistan-snic-bg {
+      background-color: #f3f8f3;
+      background-image: 
+        radial-gradient(ellipse at 85% 75%, rgba(34, 197, 94, 0.16) 0%, transparent 55%),
+        radial-gradient(circle at 15% 25%, rgba(16, 185, 129, 0.14) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(20, 83, 45, 0.05) 0%, transparent 60%),
+        repeating-radial-gradient(circle at 80% 85%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.04) 7px, transparent 8px),
+        repeating-radial-gradient(circle at 15% 15%, transparent 0, transparent 8px, rgba(16, 185, 129, 0.035) 9px, transparent 10px),
+        repeating-linear-gradient(65deg, rgba(5, 150, 105, 0.03) 0px, rgba(5, 150, 105, 0.03) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-65deg, rgba(16, 185, 129, 0.025) 0px, rgba(16, 185, 129, 0.025) 1px, transparent 1px, transparent 6px);
     }
 
     /* Uganda Refugee Identity Card Security Pattern */
@@ -1165,7 +1200,7 @@
             <span class="text-[11px] font-medium text-slate-400">Jurisdiction &amp; registry formatting</span>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-3">
             <!-- Republic of Kenya (Default) -->
             <button type="button" id="country-btn-kenya" onclick="switchVerificationCountry('kenya')" class="country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer">
               <div class="flex items-center justify-between">
@@ -1235,6 +1270,30 @@
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Uganda</div>
                 <div class="text-[10px] font-medium text-slate-500">Refugee Identity Card</div>
+              </div>
+            </button>
+
+            <!-- Islamic Republic of Pakistan -->
+            <button type="button" id="country-btn-pakistan" onclick="switchVerificationCountry('pakistan')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇵🇰</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Pakistan</div>
+                <div class="text-[10px] font-medium text-slate-500">National Identity Card (SNIC)</div>
+              </div>
+            </button>
+
+            <!-- Republic of Seychelles -->
+            <button type="button" id="country-btn-seychelles" onclick="switchVerificationCountry('seychelles')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇸🇨</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Seychelles</div>
+                <div class="text-[10px] font-medium text-slate-500">National Identity Card</div>
               </div>
             </button>
           </div>
@@ -5246,6 +5305,705 @@ XUDUR, BAKOOL, SOMALIA</span>
             </div>
 
           </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3J: ISLAMIC REPUBLIC OF PAKISTAN NATIONAL IDENTITY CARD (SNIC) VIEW ================= -->
+      <div id="pakistan-doc-view" class="hidden">
+        <main class="max-w-7xl mx-auto space-y-6">
+          
+          <!-- Top Header & Status Banner -->
+          <header class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3.5">
+              <span class="text-3xl p-2.5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-center shrink-0">🇵🇰</span>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h1 class="text-lg md:text-xl font-bold text-slate-900">
+                    Islamic Republic of Pakistan
+                  </h1>
+                  <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-300">
+                    NADRA Official Specimen
+                  </span>
+                  <span class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded-full border border-slate-200 font-mono-code">
+                    Smart National ID (SNIC)
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">
+                  National Database and Registration Authority (NADRA) · Smart National Identity Card Specimen with Contact Microchip &amp; Bilingual Urdu/English Records.
+                </p>
+              </div>
+            </div>
+
+            <!-- Action Buttons in Header -->
+            <div class="flex flex-wrap items-center gap-2.5 no-print">
+              <button type="button" onclick="downloadPakCardPNG()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-download"></i>
+                <span>Download (PNG)</span>
+              </button>
+              <button type="button" onclick="printPakCard()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-print"></i>
+                <span>Print</span>
+              </button>
+              <button type="button" onclick="viewPakFullRes()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                <span>Full Res</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Main Grid: Pakistan Card Editor (Left) & Official Specimen Live Preview (Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Controls Form / NADRA Card Editor -->
+            <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+              <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
+                    <i class="fa-solid fa-id-card text-emerald-700"></i>
+                    <span>NADRA SNIC Editor</span>
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Live bio-data editor for Pakistan Smart National Identity Card.</p>
+                </div>
+                <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200 font-mono-code">
+                  PAK · NADRA
+                </span>
+              </div>
+
+              <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
+              <div class="pt-0.5">
+                <button type="button" onclick="randomizePakCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-green-800 hover:from-emerald-600 hover:via-teal-600 hover:to-green-700 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-800/25 hover:shadow-emerald-800/40 border-2 border-emerald-400/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                  <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                    <i class="fa-solid fa-dice"></i>
+                  </div>
+                  <div class="text-left">
+                    <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                      <span>Randomize Card Details</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    </div>
+                    <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Pakistani bio-data, Urdu typography &amp; CNIC</div>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Sample Presets -->
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                  <button type="button" onclick="loadPakPreset('specimen')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">1. Sobia B.</span>
+                    <i class="fa-solid fa-rotate-left text-[10px] text-emerald-600"></i>
+                  </button>
+                  <button type="button" onclick="loadPakPreset('tariq')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">2. Tariq M.</span>
+                    <i class="fa-solid fa-user-check text-[10px] text-emerald-600"></i>
+                  </button>
+                  <button type="button" onclick="loadPakPreset('ayesha')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">3. Ayesha F.</span>
+                    <i class="fa-solid fa-user-check text-[10px] text-emerald-600"></i>
+                  </button>
+                </div>
+              </div>
+
+              <form id="pakDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+                <!-- Bearer Portrait Photo Upload & Reset -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <label for="pakPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5 text-[10px]">
+                    BEARER PORTRAIT PHOTO / تصویر
+                  </label>
+                  <input type="file" id="pakPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white cursor-pointer">
+                  <div class="flex items-center justify-between mt-2">
+                    <button type="button" onclick="resetPakPhoto()" class="px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors text-[11px] flex items-center gap-1">
+                      <i class="fa-solid fa-rotate-left mr-1"></i>Reset Specimen Photo
+                    </button>
+                    <span class="text-[10px] text-slate-400">Updates main portrait</span>
+                  </div>
+                </div>
+
+                <!-- Full Name (English) & Name (Urdu) -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="pakInputName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NAME (ENGLISH)</label>
+                    <input id="pakInputName" type="text" value="Sobia Bashir" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white">
+                  </div>
+                  <div>
+                    <label for="pakInputNameUrdu" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NAME (URDU / نام)</label>
+                    <input id="pakInputNameUrdu" type="text" value="ثوبیہ بشیر" dir="rtl" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-urdu text-base text-slate-900 bg-white text-right">
+                  </div>
+                </div>
+
+                <!-- Relation Type (Husband Name / Father Name) -->
+                <div>
+                  <label for="pakInputRelType" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">RELATION TYPE</label>
+                  <select id="pakInputRelType" onchange="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs text-slate-900 bg-white">
+                    <option value="Husband Name" selected>Husband Name</option>
+                    <option value="Father Name">Father Name</option>
+                  </select>
+                </div>
+
+                <!-- Relative Name (English) & (Urdu) -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="pakInputRelName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">RELATIVE NAME (ENGLISH)</label>
+                    <input id="pakInputRelName" type="text" value="Muhammad Zaki Mazhar" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white">
+                  </div>
+                  <div>
+                    <label for="pakInputRelUrdu" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">RELATIVE NAME (URDU)</label>
+                    <input id="pakInputRelUrdu" type="text" value="محمد زکی مظہر" dir="rtl" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-urdu text-base text-slate-900 bg-white text-right">
+                  </div>
+                </div>
+
+                <!-- Gender & Country of Stay -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="pakInputGender" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">GENDER</label>
+                    <select id="pakInputGender" onchange="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                      <option value="F" selected>F (Female)</option>
+                      <option value="M">M (Male)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="pakInputCountryStay" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">COUNTRY OF STAY</label>
+                    <input id="pakInputCountryStay" type="text" value="Pakistan" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- CNIC / Identity Number with Randomizer -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label for="pakInputCnic" class="font-bold uppercase text-slate-600 text-[10px]">IDENTITY NUMBER (CNIC)</label>
+                    <button type="button" onclick="randomizePakCnic()" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-600 hover:to-teal-600 text-white font-extrabold text-[10.5px] shadow-xs flex items-center gap-1.5 cursor-pointer transition-all">
+                      <i class="fa-solid fa-shuffle text-[9.5px]"></i>
+                      <span>Generate CNIC</span>
+                    </button>
+                  </div>
+                  <input id="pakInputCnic" type="text" value="35202-9962070-2" maxlength="15" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-extrabold text-sm tracking-wider bg-white">
+                </div>
+
+                <!-- Date of Birth, Date of Issue, Date of Expiry -->
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label for="pakInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF BIRTH</label>
+                    <input id="pakInputDob" type="text" value="03.07.1991" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  </div>
+                  <div>
+                    <label for="pakInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF ISSUE</label>
+                    <input id="pakInputIssueDate" type="text" value="06.01.2021" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  </div>
+                  <div>
+                    <label for="pakInputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF EXPIRY</label>
+                    <input id="pakInputExpiryDate" type="text" value="06.01.2031" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- Family / Tracking Number -->
+                <div>
+                  <label for="pakInputTrackNum" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">TRACKING / FAMILY CODE</label>
+                  <input id="pakInputTrackNum" type="text" value="68413" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+
+                <!-- Copy Credential Record -->
+                <div class="pt-2">
+                  <button type="button" onclick="copyPakSpecimenData()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all border border-slate-200">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>Copy NADRA Credential Record</span>
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Right Column: Live Card Specimen Preview -->
+            <section class="lg:col-span-7 flex flex-col items-center print-area-wrapper min-w-0">
+              <div class="w-full max-w-[620px] space-y-4">
+                
+                <!-- Format Mode Indicator & Pill -->
+                <div class="flex items-center justify-between text-xs px-1 text-slate-500 no-print">
+                  <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span>OFFICIAL NADRA SMART ID SPECIMEN (1:1 REFERENCE)</span>
+                  </div>
+                  <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    CR-80 Standard · 85.6 × 53.98 mm
+                  </span>
+                </div>
+
+                <!-- THE EXACT PAKISTAN NATIONAL IDENTITY CARD (SNIC) CANVAS ARTICLE -->
+                <article id="pakistan-id-card" class="pakistan-snic-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-2xl border-2 border-emerald-900/30 p-3 sm:p-4 md:p-5 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
+                  
+                  <!-- Left Edge Vertical Embossed Watermark "PAKISTAN" -->
+                  <div class="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 font-black text-emerald-950/[0.08] text-[10px] sm:text-xs md:text-sm tracking-[0.32em] select-none pointer-events-none uppercase" style="writing-mode: vertical-rl; transform: rotate(180deg) translateY(50%);">
+                    PAKISTAN
+                  </div>
+
+                  <!-- Top Bar: Crest, Header Typography & Flag Badge -->
+                  <div class="relative z-10 flex items-start justify-between gap-2">
+                    <!-- Left: State Emblem + Title -->
+                    <div class="flex items-center gap-2 sm:gap-2.5 pl-3 sm:pl-4">
+                      <img src="/assets/aistudio/pakistan_emblem_clean.png" alt="State Emblem of Pakistan" class="w-8 sm:w-10 md:w-11 h-auto object-contain shrink-0 drop-shadow-2xs">
+                      <div>
+                        <div class="flex items-baseline gap-2 sm:gap-2.5 flex-wrap">
+                          <h2 class="text-slate-950 font-black text-base sm:text-lg md:text-[21px] tracking-wider leading-none">
+                            PAKISTAN
+                          </h2>
+                          <span class="text-slate-800 font-semibold text-xs sm:text-sm md:text-base leading-none">
+                            National Identity Card
+                          </span>
+                        </div>
+                        <div class="text-[7px] sm:text-[8px] md:text-[9px] font-bold text-slate-700 tracking-wider uppercase mt-0.5 sm:mt-1">
+                          ISLAMIC REPUBLIC OF PAKISTAN
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Right: Flag Badge -->
+                    <div class="shrink-0 flex items-center pr-0.5 pt-0.5">
+                      <img src="/assets/aistudio/pakistan_flag_exact.png" alt="Flag of Pakistan" class="w-9 sm:w-11 md:w-13 h-auto rounded-xs shadow-2xs border border-emerald-900/40 object-contain">
+                    </div>
+                  </div>
+
+                  <!-- Middle Section: Chip on Left, Bio-Data in Center, Portrait & Signature on Right -->
+                  <div class="relative z-10 flex items-center justify-between gap-2.5 sm:gap-3.5 my-auto pt-0.5 pl-3 sm:pl-4">
+                    
+                    <!-- Left: Microchip -->
+                    <div class="shrink-0 flex items-center">
+                      <img src="/assets/aistudio/pakistan_chip_exact.png" alt="Contact Chip" class="w-10 sm:w-12 md:w-14 h-auto object-contain rounded-xs shadow-xs drop-shadow-2xs">
+                    </div>
+
+                    <!-- Center: Bio-Data Fields (Bilingual English & Urdu) -->
+                    <div class="flex-1 space-y-1 sm:space-y-1.5 min-w-0 pr-1">
+                      <!-- Name Row -->
+                      <div class="flex items-baseline justify-between gap-1 sm:gap-2">
+                        <div class="min-w-0">
+                          <div class="text-[7px] sm:text-[8px] md:text-[8.5px] text-slate-500 font-semibold leading-none">Name</div>
+                          <div id="pakPreviewName" class="font-bold text-slate-950 text-xs sm:text-sm md:text-[15px] leading-tight truncate">Sobia Bashir</div>
+                        </div>
+                        <div id="pakPreviewNameUrdu" class="font-urdu text-sm sm:text-base md:text-lg text-slate-900 leading-none text-right font-semibold shrink-0" dir="rtl">ثوبیہ بشیر</div>
+                      </div>
+
+                      <!-- Relative Name Row (Husband / Father) -->
+                      <div class="flex items-baseline justify-between gap-1 sm:gap-2 pt-0.5 sm:pt-1">
+                        <div class="min-w-0">
+                          <div id="pakPreviewRelLabel" class="text-[7px] sm:text-[8px] md:text-[8.5px] text-slate-500 font-semibold leading-none">Husband Name</div>
+                          <div id="pakPreviewRelName" class="font-bold text-slate-950 text-xs sm:text-sm md:text-[15px] leading-tight truncate">Muhammad Zaki Mazhar</div>
+                        </div>
+                        <div id="pakPreviewRelUrdu" class="font-urdu text-sm sm:text-base md:text-lg text-slate-900 leading-none text-right font-semibold shrink-0" dir="rtl">محمد زکی مظہر</div>
+                      </div>
+
+                      <!-- Gender & Country of Stay -->
+                      <div class="grid grid-cols-2 gap-2 sm:gap-3 pt-0.5 sm:pt-1">
+                        <div>
+                          <div class="text-[7px] sm:text-[8px] md:text-[8.5px] text-slate-500 font-semibold leading-none">Gender</div>
+                          <div id="pakPreviewGender" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight">F</div>
+                        </div>
+                        <div>
+                          <div class="text-[7px] sm:text-[8px] md:text-[8.5px] text-slate-500 font-semibold leading-none">Country of Stay</div>
+                          <div id="pakPreviewCountryStay" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight">Pakistan</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Right: Large Bearer Portrait Photo + Overlaid Signature -->
+                    <div class="flex flex-col items-center shrink-0 w-22 sm:w-26 md:w-30">
+                      <div class="w-full aspect-[3/3.75] rounded-xs overflow-hidden shadow-xs border border-slate-300 bg-white">
+                        <img id="pakPreviewPhoto" src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                      </div>
+                      <div class="relative w-full flex flex-col items-center mt-0.5">
+                        <img id="pakPreviewSignature" src="/assets/aistudio/pakistan_signature_exact.png" alt="Holder's Signature" class="h-5 sm:h-6 md:h-7 w-auto object-contain mix-blend-multiply">
+                        <div class="text-[6.5px] sm:text-[7.5px] font-medium text-slate-700 leading-none mt-0.5 tracking-tight">Holder's Signature</div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Bottom Section: Ghost Photo with 68413 Number & 2x2 Dashed Grid Table -->
+                  <div class="relative z-10 flex items-stretch gap-2 sm:gap-3 pt-1 pl-3 sm:pl-4">
+                    
+                    <!-- Left: Ghost Portrait with Family/Tracking Number -->
+                    <div class="relative shrink-0 w-14 sm:w-16 md:w-18 flex items-center justify-center">
+                      <img id="pakPreviewGhost" src="/assets/aistudio/pakistan_ghost_exact.png" alt="Ghost Portrait with 68413" class="w-full h-auto object-contain">
+                    </div>
+
+                    <!-- Right: 2x2 Dashed Border Table -->
+                    <div class="flex-1 grid grid-cols-2 border-t border-slate-400/80 border-dashed divide-x divide-slate-400/80 divide-dashed text-left">
+                      <!-- Top-Left: Identity Number -->
+                      <div class="p-1 sm:p-1.5 border-b border-slate-400/80 border-dashed">
+                        <div class="text-[7px] sm:text-[8px] font-semibold text-slate-600 leading-none">Identity Number</div>
+                        <div id="pakPreviewCnic" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wide leading-tight mt-0.5">35202-9962070-2</div>
+                      </div>
+                      <!-- Top-Right: Date of Birth -->
+                      <div class="p-1 sm:p-1.5 border-b border-slate-400/80 border-dashed pl-2 sm:pl-3">
+                        <div class="text-[7px] sm:text-[8px] font-semibold text-slate-600 leading-none">Date of Birth</div>
+                        <div id="pakPreviewDob" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight mt-0.5">03.07.1991</div>
+                      </div>
+                      <!-- Bottom-Left: Date of Issue -->
+                      <div class="p-1 sm:p-1.5">
+                        <div class="text-[7px] sm:text-[8px] font-semibold text-slate-600 leading-none">Date of Issue</div>
+                        <div id="pakPreviewIssueDate" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight mt-0.5">06.01.2021</div>
+                      </div>
+                      <!-- Bottom-Right: Date of Expiry -->
+                      <div class="p-1 sm:p-1.5 pl-2 sm:pl-3">
+                        <div class="text-[7px] sm:text-[8px] font-semibold text-slate-600 leading-none">Date of Expiry</div>
+                        <div id="pakPreviewExpiryDate" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight mt-0.5">06.01.2031</div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                </article>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3K: REPUBLIC OF SEYCHELLES NATIONAL IDENTITY CARD VIEW ================= -->
+      <div id="seychelles-doc-view" class="hidden">
+        <main class="max-w-7xl mx-auto space-y-6">
+          
+          <!-- Top Header & Status Banner -->
+          <header class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3.5">
+              <span class="text-3xl p-2.5 bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-center shrink-0">🇸🇨</span>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h1 class="text-lg md:text-xl font-bold text-slate-900">
+                    Republic of Seychelles
+                  </h1>
+                  <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2.5 py-0.5 rounded-full border border-sky-300">
+                    Official Specimen
+                  </span>
+                  <span class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded-full border border-slate-200 font-mono-code">
+                    Smart ID (Front &amp; Back)
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">
+                  National Identification Authority · Seychelles National Identity Card with Barcode, Contact Chip, and ICAO TD1 Machine Readable Zone (MRZ).
+                </p>
+              </div>
+            </div>
+
+            <!-- Action Buttons in Header -->
+            <div class="flex flex-wrap items-center gap-2.5 no-print">
+              <button type="button" onclick="downloadSycCardPNG()" class="px-4 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-download"></i>
+                <span>Download (PNG)</span>
+              </button>
+              <button type="button" onclick="printSycCard()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-print"></i>
+                <span>Print</span>
+              </button>
+              <button type="button" onclick="viewSycFullRes()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                <span>Full Res</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Main Grid: Seychelles Card Editor (Left) & Official Specimen Live Preview (Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Controls Form / Seychelles Card Editor -->
+            <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+              <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
+                    <i class="fa-solid fa-id-card text-sky-600"></i>
+                    <span>Seychelles ID Editor</span>
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Live bio-data &amp; MRZ editor for Seychelles National Identity Card.</p>
+                </div>
+                <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200 font-mono-code">
+                  SYC · NIA
+                </span>
+              </div>
+
+              <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
+              <div class="pt-0.5">
+                <button type="button" onclick="randomizeSycCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:via-blue-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-sky-600/25 hover:shadow-sky-600/40 border-2 border-sky-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                  <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                    <i class="fa-solid fa-dice"></i>
+                  </div>
+                  <div class="text-left">
+                    <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                      <span>Randomize Card Details</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    </div>
+                    <div class="text-[11px] font-normal text-sky-100 opacity-90 mt-0.5">Generate Seychellois bio-data, identity numbers &amp; synced MRZ</div>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Sample Presets -->
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                  <button type="button" onclick="loadSycPreset('specimen')" class="px-2 py-2 bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-lg font-bold text-slate-800 hover:text-sky-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">1. Agbonde A.</span>
+                    <i class="fa-solid fa-rotate-left text-[10px] text-sky-600"></i>
+                  </button>
+                  <button type="button" onclick="loadSycPreset('morel')" class="px-2 py-2 bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-lg font-bold text-slate-800 hover:text-sky-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">2. Morel J.</span>
+                    <i class="fa-solid fa-user-check text-[10px] text-sky-600"></i>
+                  </button>
+                  <button type="button" onclick="loadSycPreset('payet')" class="px-2 py-2 bg-white hover:bg-sky-50 border border-slate-200 hover:border-sky-300 rounded-lg font-bold text-slate-800 hover:text-sky-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">3. Payet M.</span>
+                    <i class="fa-solid fa-user-check text-[10px] text-sky-600"></i>
+                  </button>
+                </div>
+              </div>
+
+              <form id="sycDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+                <!-- Bearer Portrait Photo Upload & Reset -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <label for="sycPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5 text-[10px]">
+                    BEARER PORTRAIT PHOTO / PHOTO D'IDENTITÉ
+                  </label>
+                  <input type="file" id="sycPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-sky-600 file:text-white cursor-pointer">
+                  <div class="flex items-center justify-between mt-2">
+                    <button type="button" onclick="resetSycPhoto()" class="px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors text-[11px] flex items-center gap-1">
+                      <i class="fa-solid fa-rotate-left mr-1"></i>Reset Specimen Photo
+                    </button>
+                    <span class="text-[10px] text-slate-400">Updates front &amp; back ghost</span>
+                  </div>
+                </div>
+
+                <!-- Identity Number with Randomizer -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label for="sycInputId" class="font-bold uppercase text-slate-600 text-[10px]">IDENTITY NUMBER</label>
+                    <button type="button" onclick="randomizeSycId()" class="px-2.5 py-1 rounded-lg bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-extrabold text-[10.5px] shadow-xs flex items-center gap-1.5 cursor-pointer transition-all">
+                      <i class="fa-solid fa-shuffle text-[9.5px]"></i>
+                      <span>Generate</span>
+                    </button>
+                  </div>
+                  <input id="sycInputId" type="text" value="792-7109-8-7-12" oninput="updateSycPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-sm text-slate-900 bg-white">
+                </div>
+
+                <!-- Surname & Given Name -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="sycInputSurname" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">SURNAME / NOM</label>
+                    <input id="sycInputSurname" type="text" value="AGBONDE" oninput="updateSycPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm text-slate-900 bg-white">
+                  </div>
+                  <div>
+                    <label for="sycInputGivenName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">GIVEN NAME / PRÉNOM</label>
+                    <input id="sycInputGivenName" type="text" value="AFOLABI MICHAEL" oninput="updateSycPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm text-slate-900 bg-white">
+                  </div>
+                </div>
+
+                <!-- Date of Birth, Sex, Nationality -->
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label for="sycInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF BIRTH</label>
+                    <input id="sycInputDob" type="text" value="25 FEB 1971" oninput="updateSycPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
+                  </div>
+                  <div>
+                    <label for="sycInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">SEX</label>
+                    <select id="sycInputSex" onchange="updateSycPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                      <option value="M" selected>M (Male)</option>
+                      <option value="F">F (Female)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="sycInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF ISSUE</label>
+                    <input id="sycInputIssueDate" type="text" value="20 NOV 2020" oninput="updateSycPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
+                  </div>
+                </div>
+
+                <!-- Nationality -->
+                <div>
+                  <label for="sycInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NATIONALITY / NATIONALITÉ</label>
+                  <input id="sycInputNationality" type="text" value="CITIZEN OF SEYCHELLES" oninput="updateSycPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs text-slate-900 bg-white">
+                </div>
+
+                <!-- Ghost ID Code & Back Info -->
+                <div>
+                  <label for="sycInputGhostId" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">BACK GHOST ID CODE</label>
+                  <input id="sycInputGhostId" type="text" value="79271098712" oninput="updateSycPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                </div>
+
+                <!-- Copy Credential Record -->
+                <div class="pt-2">
+                  <button type="button" onclick="copySycSpecimenData()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all border border-slate-200">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>Copy Seychelles Credential Record</span>
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Right Column: Live Card Specimen Preview (Front & Back) -->
+            <section class="lg:col-span-7 flex flex-col items-center print-area-wrapper min-w-0">
+              <div class="w-full max-w-[620px] space-y-4">
+                
+                <!-- Format Mode Indicator & Side Switcher -->
+                <div class="flex items-center justify-between text-xs px-1 text-slate-500 no-print flex-wrap gap-2">
+                  <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-sky-600 animate-pulse"></span>
+                    <span>OFFICIAL SEYCHELLES SPECIMEN (1:1 REFERENCE)</span>
+                  </div>
+                  
+                  <!-- Display Mode Buttons: Both / Front / Back -->
+                  <div class="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-2xs">
+                    <button type="button" id="btn-syc-both" onclick="setSycDisplayMode('both')" class="px-2.5 py-1 rounded-md text-xs font-bold bg-sky-600 text-white shadow-xs cursor-pointer transition-all">
+                      Both Sides
+                    </button>
+                    <button type="button" id="btn-syc-front" onclick="setSycDisplayMode('front')" class="px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all">
+                      Front
+                    </button>
+                    <button type="button" id="btn-syc-back" onclick="setSycDisplayMode('back')" class="px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all">
+                      Back
+                    </button>
+                  </div>
+                </div>
+
+                <!-- CARDS CONTAINER (BOTH SIDES OR INDIVIDUAL) -->
+                <div id="sycCardsContainer" class="space-y-6 w-full">
+                  
+                  <!-- ================= FRONT CARD ================= -->
+                  <div id="sycFrontWrap" class="w-full space-y-1.5">
+                    <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 flex items-center justify-between px-1 no-print">
+                      <span>Front Side · Official Bio-Data Specimen</span>
+                      <span class="font-mono-code text-[10px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">CR-80 Standard</span>
+                    </div>
+
+                    <article id="seychelles-id-front" class="seychelles-id-front-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-xl border-2 border-slate-300 p-3 sm:p-4 md:p-5 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
+                      
+                      <!-- Top Decorative Motif Band -->
+                      <div class="absolute top-0 left-0 right-0 h-3 sm:h-3.5 md:h-4 overflow-hidden pointer-events-none opacity-90">
+                        <img src="/assets/aistudio/seychelles_top_border.png" alt="" class="w-full h-full object-cover">
+                      </div>
+
+                      <!-- Header: SEYCHELLES NATIONAL IDENTITY CARD -->
+                      <div class="relative z-10 pt-2 sm:pt-2.5 flex items-baseline gap-2 sm:gap-3">
+                        <h2 class="text-blue-600 font-extrabold text-base sm:text-lg md:text-xl tracking-wider uppercase leading-none font-sans">
+                          SEYCHELLES
+                        </h2>
+                        <span class="text-blue-500 font-bold text-xs sm:text-sm md:text-[15px] tracking-wide uppercase leading-none">
+                          NATIONAL IDENTITY CARD
+                        </span>
+                      </div>
+
+                      <!-- Middle Section: Bio-Data Fields (Left) & Portrait + Signature (Right) -->
+                      <div class="relative z-10 flex items-start justify-between gap-3 my-auto pt-1">
+                        
+                        <!-- Left: Structured Field List -->
+                        <div class="flex-1 space-y-1 sm:space-y-1.5 text-left min-w-0 pr-2">
+                          <div class="grid grid-cols-12 gap-1 items-baseline">
+                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Identity No:</span>
+                            <span id="sycPreviewId" class="col-span-7 font-mono-code font-black text-slate-950 text-xs sm:text-sm leading-tight">792-7109-8-7-12</span>
+                          </div>
+
+                          <div class="grid grid-cols-12 gap-1 items-baseline">
+                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Surname:</span>
+                            <span id="sycPreviewSurname" class="col-span-7 font-black text-slate-950 text-xs sm:text-sm uppercase leading-tight truncate">AGBONDE</span>
+                          </div>
+
+                          <div class="grid grid-cols-12 gap-1 items-baseline">
+                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Given Name:</span>
+                            <span id="sycPreviewGivenName" class="col-span-7 font-bold text-slate-950 text-xs sm:text-sm uppercase leading-tight truncate">AFOLABI MICHAEL</span>
+                          </div>
+
+                          <div class="grid grid-cols-12 gap-1 items-baseline">
+                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Date of Birth:</span>
+                            <span id="sycPreviewDob" class="col-span-7 font-mono-code font-bold text-slate-950 text-[11px] sm:text-xs leading-tight">25 FEB 1971</span>
+                          </div>
+
+                          <div class="grid grid-cols-12 gap-1 items-baseline">
+                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Nationality:</span>
+                            <span id="sycPreviewNationality" class="col-span-7 font-bold text-slate-950 text-[10px] sm:text-xs uppercase leading-tight truncate">CITIZEN OF SEYCHELLES</span>
+                          </div>
+
+                          <div class="grid grid-cols-12 gap-1 items-baseline">
+                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Sex:</span>
+                            <span id="sycPreviewSex" class="col-span-7 font-bold text-slate-950 text-xs leading-tight">M</span>
+                          </div>
+
+                          <div class="grid grid-cols-12 gap-1 items-baseline">
+                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Date of Issue:</span>
+                            <span id="sycPreviewIssueDate" class="col-span-7 font-mono-code font-bold text-slate-950 text-[11px] sm:text-xs leading-tight">20 NOV 2020</span>
+                          </div>
+                        </div>
+
+                        <!-- Right: Photo with Black Frame & Signature Below -->
+                        <div class="flex flex-col items-center shrink-0 w-22 sm:w-26 md:w-30">
+                          <div class="w-full aspect-[3/3.8] rounded-xs overflow-hidden border-2 border-slate-950 bg-white shadow-xs">
+                            <img id="sycPreviewPhoto" src="/assets/aistudio/seychelles_portrait_exact.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                          </div>
+                          <div class="relative w-full flex flex-col items-center mt-1">
+                            <span class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">Signature</span>
+                            <img id="sycPreviewSignature" src="/assets/aistudio/seychelles_holder_sig.png" alt="Signature" class="h-5 sm:h-6 md:h-7 w-auto object-contain mix-blend-multiply mt-0.5">
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <!-- Bottom Row: 1D Linear Barcode -->
+                      <div class="relative z-10 pt-1">
+                        <img src="/assets/aistudio/seychelles_barcode_clean.png" alt="Card Barcode" class="h-6 sm:h-7 md:h-8 w-auto max-w-[200px] sm:max-w-[240px] object-contain mix-blend-multiply">
+                      </div>
+
+                    </article>
+                  </div>
+
+                  <!-- ================= BACK CARD ================= -->
+                  <div id="sycBackWrap" class="w-full space-y-1.5">
+                    <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-600 flex items-center justify-between px-1 no-print">
+                      <span>Back Side · Contact Chip, Authority Signature &amp; Machine Readable Zone</span>
+                      <span class="font-mono-code text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">ICAO TD1 MRZ</span>
+                    </div>
+
+                    <article id="seychelles-id-back" class="seychelles-id-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-xl border-2 border-slate-300 p-3 sm:p-4 md:p-5 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
+                      
+                      <!-- Top/Middle Row: Chip on Left, Ghost Photo in Center, Authority on Right -->
+                      <div class="relative z-10 flex items-start justify-between gap-3 pt-1">
+                        
+                        <!-- Left: Contact Microchip -->
+                        <div class="shrink-0 pt-2 sm:pt-3">
+                          <img src="/assets/aistudio/seychelles_chip_exact.png" alt="Smart Chip" class="w-10 sm:w-12 md:w-14 h-auto object-contain rounded-xs shadow-xs drop-shadow-2xs">
+                        </div>
+
+                        <!-- Center: Ghost Photo with ID Number -->
+                        <div class="flex flex-col items-center">
+                          <div class="w-12 sm:w-14 md:w-16 aspect-[3/3.8] rounded-xs overflow-hidden opacity-85">
+                            <img id="sycPreviewGhost" src="/assets/aistudio/seychelles_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover">
+                          </div>
+                          <span id="sycPreviewGhostId" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider mt-0.5">79271098712</span>
+                        </div>
+
+                        <!-- Right: Issuing Authority & Registrar Signature -->
+                        <div class="flex flex-col items-end text-right">
+                          <span class="text-[7px] sm:text-[8px] text-slate-600 font-medium leading-tight">Authority / Autorité</span>
+                          <span class="text-[7.5px] sm:text-[8.5px] font-black text-slate-900 leading-tight">NATIONAL IDENTIFICATION AUTHORITY</span>
+                          <img src="/assets/aistudio/seychelles_auth_signature_exact.png" alt="Authority Signature" class="h-7 sm:h-9 md:h-11 w-auto object-contain mix-blend-multiply mt-0.5">
+                        </div>
+
+                      </div>
+
+                      <!-- Bottom Section: Machine Readable Zone (MRZ) & Disclaimer -->
+                      <div class="relative z-10 space-y-1">
+                        <!-- 3-line TD1 Machine Readable Zone -->
+                        <div class="bg-white/95 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xs border border-slate-200 shadow-2xs">
+                          <div id="sycPreviewMrz1" class="font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] font-black text-slate-950 tracking-[0.16em] leading-tight">IDSYC79271098712&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                          <div id="sycPreviewMrz2" class="font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] font-black text-slate-950 tracking-[0.16em] leading-tight">79271098712NGA&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;02</div>
+                          <div id="sycPreviewMrz3" class="font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] font-black text-slate-950 tracking-[0.16em] leading-tight">AGBONDE&lt;&lt;AFOLABI&lt;MICHAEL&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                        </div>
+
+                        <!-- Property Disclaimer -->
+                        <p class="text-[6.5px] sm:text-[7.5px] text-slate-600 italic text-center leading-tight">
+                          This document remains the property of the Government of Seychelles and shall be produced when requested by an authorized official or relevant authority.
+                        </p>
+                      </div>
+
+                    </article>
+                  </div>
+
+                </div>
+
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
 
       <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY BANK LETTER & PDF) VIEW ================= -->
       <div id="proofofaccount-doc-view" class="hidden">
@@ -6552,6 +7310,50 @@ XUDUR, BAKOOL, SOMALIA</span>
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      } else if (countryKey === 'pakistan') {
+        currentDocType = 'idcard';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      } else if (countryKey === 'seychelles') {
+        currentDocType = 'idcard';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50/90 via-sky-50/30 to-white text-slate-900 shadow-md ring-2 ring-sky-500/20 transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       }
 
       const countryStyles = {
@@ -6584,6 +7386,16 @@ XUDUR, BAKOOL, SOMALIA</span>
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50 via-white to-amber-50/50 text-amber-950 text-left shadow-sm ring-2 ring-amber-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-amber-600"
+        },
+        pakistan: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-emerald-700"
+        },
+        seychelles: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50 via-white to-sky-50/50 text-sky-950 text-left shadow-sm ring-2 ring-sky-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-sky-600"
         }
       };
 
@@ -6606,7 +7418,9 @@ XUDUR, BAKOOL, SOMALIA</span>
         ethiopia: 'Ethiopia',
         nigeria: 'Nigeria',
         uk: 'United Kingdom',
-        uganda: 'Uganda'
+        uganda: 'Uganda',
+        pakistan: 'Pakistan',
+        seychelles: 'Seychelles'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -6626,6 +7440,8 @@ XUDUR, BAKOOL, SOMALIA</span>
       const nigeriaPassView = $('nigeria-passport-view');
       const ukPassView = $('uk-passport-view');
       const ugandaDocView = $('uganda-doc-view');
+      const pakistanDocView = $('pakistan-doc-view');
+      const seychellesDocView = $('seychelles-doc-view');
       const poaDocView = $('proofofaccount-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
@@ -6638,10 +7454,16 @@ XUDUR, BAKOOL, SOMALIA</span>
       if (nigeriaPassView) nigeriaPassView.classList.add('hidden');
       if (ukPassView) ukPassView.classList.add('hidden');
       if (ugandaDocView) ugandaDocView.classList.add('hidden');
+      if (pakistanDocView) pakistanDocView.classList.add('hidden');
+      if (seychellesDocView) seychellesDocView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'seychelles') {
+        if (seychellesDocView) seychellesDocView.classList.remove('hidden');
+      } else if (currentCountry === 'pakistan') {
+        if (pakistanDocView) pakistanDocView.classList.remove('hidden');
       } else if (currentCountry === 'uganda' || currentDocType === 'refugeecard') {
         if (ugandaDocView) ugandaDocView.classList.remove('hidden');
       } else if (currentCountry === 'uk') {
@@ -6746,6 +7568,24 @@ XUDUR, BAKOOL, SOMALIA</span>
           bank: 'Stanbic Bank Uganda / Clear Junction',
           dotColor: 'bg-amber-600',
           badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+        },
+        pakistan: {
+          name: 'Pakistan',
+          fullName: 'Islamic Republic of Pakistan',
+          city: 'Islamabad',
+          address: 'Blue Area, Jinnah Avenue, Islamabad 44000, Pakistan',
+          bank: 'Habib Bank Limited / Clear Junction Global',
+          dotColor: 'bg-emerald-700',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+        },
+        seychelles: {
+          name: 'Seychelles',
+          fullName: 'Republic of Seychelles',
+          city: 'Victoria, Mahé',
+          address: 'Independence Avenue, Victoria, Mahé, Seychelles',
+          bank: 'Nouvobanq / Clear Junction Global',
+          dotColor: 'bg-sky-600',
+          badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
         }
       };
 
@@ -6990,6 +7830,565 @@ XUDUR, BAKOOL, SOMALIA</span>
 
     function printUgandaCard() {
       window.print();
+    }
+
+    // ================= ISLAMIC REPUBLIC OF PAKISTAN (NADRA SNIC) CONTROLLER =================
+    const officialPakSpecimenSrc = '/assets/aistudio/1792952087537_9a2ef351.jpg';
+    let currentPakPhotoSrc = '/assets/aistudio/pakistan_portrait_exact.jpg';
+    let currentPakGhostSrc = '/assets/aistudio/pakistan_ghost_exact.png';
+
+    function initPakDefaultPhoto() {
+      if ($('pakPreviewPhoto')) $('pakPreviewPhoto').src = currentPakPhotoSrc;
+      if ($('pakPreviewGhost')) $('pakPreviewGhost').src = currentPakGhostSrc;
+    }
+
+    function resetPakPhoto() {
+      currentPakPhotoSrc = '/assets/aistudio/pakistan_portrait_exact.jpg';
+      currentPakGhostSrc = '/assets/aistudio/pakistan_ghost_exact.png';
+      if ($('pakPreviewPhoto')) $('pakPreviewPhoto').src = currentPakPhotoSrc;
+      if ($('pakPreviewGhost')) $('pakPreviewGhost').src = currentPakGhostSrc;
+      if ($('pakPhotoInput')) $('pakPhotoInput').value = '';
+      showToast('Photo Reset', 'Restored official NADRA specimen photograph');
+    }
+
+    function updatePakPreview() {
+      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
+
+      setText('pakPreviewName', getVal('pakInputName', 'Sobia Bashir'));
+      setText('pakPreviewNameUrdu', getVal('pakInputNameUrdu', 'ثوبیہ بشیر'));
+      
+      const relType = getVal('pakInputRelType', 'Husband Name');
+      setText('pakPreviewRelLabel', relType);
+      setText('pakPreviewRelName', getVal('pakInputRelName', 'Muhammad Zaki Mazhar'));
+      setText('pakPreviewRelUrdu', getVal('pakInputRelUrdu', 'محمد زکی مظہر'));
+      
+      setText('pakPreviewGender', getVal('pakInputGender', 'F'));
+      setText('pakPreviewCountryStay', getVal('pakInputCountryStay', 'Pakistan'));
+      setText('pakPreviewCnic', getVal('pakInputCnic', '35202-9962070-2'));
+      setText('pakPreviewDob', getVal('pakInputDob', '03.07.1991'));
+      setText('pakPreviewIssueDate', getVal('pakInputIssueDate', '06.01.2021'));
+      setText('pakPreviewExpiryDate', getVal('pakInputExpiryDate', '06.01.2031'));
+    }
+
+    function randomizePakCnic() {
+      const p = Math.floor(Math.random() * 7) + 1;
+      const dist = String(Math.floor(1000 + Math.random() * 9000));
+      const mid = String(Math.floor(1000000 + Math.random() * 9000000));
+      const gender = $('pakInputGender') ? $('pakInputGender').value : 'F';
+      const lastDigit = gender === 'M' ? (Math.floor(Math.random() * 5) * 2 + 1) : (Math.floor(Math.random() * 5) * 2);
+      const cnic = `${p}${dist.slice(1)}-${mid}-${lastDigit}`;
+      if ($('pakInputCnic')) $('pakInputCnic').value = cnic;
+      updatePakPreview();
+      showToast('CNIC Generated', `Generated unique identity number ${cnic}`);
+    }
+
+    function randomizePakCard() {
+      const pakProfiles = [
+        {
+          name: "Sobia Bashir",
+          nameUrdu: "ثوبیہ بشیر",
+          relType: "Husband Name",
+          relName: "Muhammad Zaki Mazhar",
+          relUrdu: "محمد زکی مظہر",
+          gender: "F",
+          dob: "03.07.1991",
+          issue: "06.01.2021",
+          expiry: "06.01.2031",
+          cnic: "35202-9962070-2",
+          trackNum: "68413"
+        },
+        {
+          name: "Tariq Mehmood",
+          nameUrdu: "طارق محمود",
+          relType: "Father Name",
+          relName: "Mehmood Ahmed",
+          relUrdu: "محمود احمد",
+          gender: "M",
+          dob: "14.08.1988",
+          issue: "12.04.2022",
+          expiry: "12.04.2032",
+          cnic: "37405-4819203-1",
+          trackNum: "51924"
+        },
+        {
+          name: "Ayesha Fatima",
+          nameUrdu: "عائشہ فاطمہ",
+          relType: "Father Name",
+          relName: "Abdul Rehman",
+          relUrdu: "عبدالرحمٰن",
+          gender: "F",
+          dob: "23.03.1995",
+          issue: "15.09.2023",
+          expiry: "15.09.2033",
+          cnic: "42101-7890123-4",
+          trackNum: "73201"
+        },
+        {
+          name: "Bilal Hassan Khan",
+          nameUrdu: "بلال حسن خان",
+          relType: "Father Name",
+          relName: "Hassan Ali Khan",
+          relUrdu: "حسن علی خان",
+          gender: "M",
+          dob: "19.11.1992",
+          issue: "02.05.2020",
+          expiry: "02.05.2030",
+          cnic: "61101-8392015-3",
+          trackNum: "49206"
+        },
+        {
+          name: "Zainab Bibi",
+          nameUrdu: "زینب بی بی",
+          relType: "Husband Name",
+          relName: "Kamran Akram",
+          relUrdu: "کامران اکرم",
+          gender: "F",
+          dob: "08.12.1996",
+          issue: "18.08.2021",
+          expiry: "18.08.2031",
+          cnic: "35201-6543210-8",
+          trackNum: "82154"
+        }
+      ];
+
+      const p = pakProfiles[Math.floor(Math.random() * pakProfiles.length)];
+      if ($('pakInputName')) $('pakInputName').value = p.name;
+      if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = p.nameUrdu;
+      if ($('pakInputRelType')) $('pakInputRelType').value = p.relType;
+      if ($('pakInputRelName')) $('pakInputRelName').value = p.relName;
+      if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = p.relUrdu;
+      if ($('pakInputGender')) $('pakInputGender').value = p.gender;
+      if ($('pakInputDob')) $('pakInputDob').value = p.dob;
+      if ($('pakInputIssueDate')) $('pakInputIssueDate').value = p.issue;
+      if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = p.expiry;
+      if ($('pakInputCnic')) $('pakInputCnic').value = p.cnic;
+      if ($('pakInputTrackNum')) $('pakInputTrackNum').value = p.trackNum;
+
+      updatePakPreview();
+      showToast('Bio-Data Randomized', `Generated authentic Pakistan NADRA identity for ${p.name}`);
+    }
+
+    function loadPakPreset(presetKey) {
+      if (presetKey === 'specimen') {
+        if ($('pakInputName')) $('pakInputName').value = 'Sobia Bashir';
+        if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = 'ثوبیہ بشیر';
+        if ($('pakInputRelType')) $('pakInputRelType').value = 'Husband Name';
+        if ($('pakInputRelName')) $('pakInputRelName').value = 'Muhammad Zaki Mazhar';
+        if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = 'محمد زکی مظہر';
+        if ($('pakInputGender')) $('pakInputGender').value = 'F';
+        if ($('pakInputCountryStay')) $('pakInputCountryStay').value = 'Pakistan';
+        if ($('pakInputCnic')) $('pakInputCnic').value = '35202-9962070-2';
+        if ($('pakInputDob')) $('pakInputDob').value = '03.07.1991';
+        if ($('pakInputIssueDate')) $('pakInputIssueDate').value = '06.01.2021';
+        if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = '06.01.2031';
+        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '68413';
+        resetPakPhoto();
+      } else if (presetKey === 'tariq') {
+        if ($('pakInputName')) $('pakInputName').value = 'Tariq Mehmood';
+        if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = 'طارق محمود';
+        if ($('pakInputRelType')) $('pakInputRelType').value = 'Father Name';
+        if ($('pakInputRelName')) $('pakInputRelName').value = 'Mehmood Ahmed';
+        if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = 'محمود احمد';
+        if ($('pakInputGender')) $('pakInputGender').value = 'M';
+        if ($('pakInputCountryStay')) $('pakInputCountryStay').value = 'Pakistan';
+        if ($('pakInputCnic')) $('pakInputCnic').value = '37405-4819203-1';
+        if ($('pakInputDob')) $('pakInputDob').value = '14.08.1988';
+        if ($('pakInputIssueDate')) $('pakInputIssueDate').value = '12.04.2022';
+        if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = '12.04.2032';
+        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '51924';
+      } else if (presetKey === 'ayesha') {
+        if ($('pakInputName')) $('pakInputName').value = 'Ayesha Fatima';
+        if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = 'عائشہ فاطمہ';
+        if ($('pakInputRelType')) $('pakInputRelType').value = 'Father Name';
+        if ($('pakInputRelName')) $('pakInputRelName').value = 'Abdul Rehman';
+        if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = 'عبدالرحمٰن';
+        if ($('pakInputGender')) $('pakInputGender').value = 'F';
+        if ($('pakInputCountryStay')) $('pakInputCountryStay').value = 'Pakistan';
+        if ($('pakInputCnic')) $('pakInputCnic').value = '42101-7890123-4';
+        if ($('pakInputDob')) $('pakInputDob').value = '23.03.1995';
+        if ($('pakInputIssueDate')) $('pakInputIssueDate').value = '15.09.2023';
+        if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = '15.09.2033';
+        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '73201';
+      }
+      updatePakPreview();
+      showToast('Preset Loaded', `Loaded preset: ${$('pakInputName') ? $('pakInputName').value : presetKey}`);
+    }
+
+    function viewPakFullRes() {
+      if ($('modalPreviewImg')) $('modalPreviewImg').src = officialPakSpecimenSrc;
+      if ($('fallbackDownloadLink')) {
+        $('fallbackDownloadLink').href = officialPakSpecimenSrc;
+        $('fallbackDownloadLink').download = 'pakistan-national-identity-card-official-specimen.jpg';
+      }
+      const modal = $('imageModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function printPakCard() {
+      window.print();
+    }
+
+    async function downloadPakCardPNG() {
+      const cardEl = $('pakistan-id-card');
+      if (!cardEl) return;
+      try {
+        showToast('Processing...', 'Generating high-resolution Pakistan National ID PNG...');
+        const canvas = await html2canvas(cardEl, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#f3f8f3',
+          logging: false
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'pakistan-smart-national-identity-card.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'Pakistan National ID PNG generated successfully');
+      } catch (err) {
+        console.error('html2canvas error:', err);
+        const a = document.createElement('a');
+        a.href = officialPakSpecimenSrc;
+        a.download = 'pakistan-national-identity-card-official-specimen.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Downloaded Specimen', 'Downloaded official Pakistan National ID specimen');
+      }
+    }
+
+    function copyPakSpecimenData() {
+      const name = $('pakInputName') ? $('pakInputName').value : 'Sobia Bashir';
+      const cnic = $('pakInputCnic') ? $('pakInputCnic').value : '35202-9962070-2';
+      const rel = $('pakInputRelName') ? $('pakInputRelName').value : 'Muhammad Zaki Mazhar';
+      const relType = $('pakInputRelType') ? $('pakInputRelType').value : 'Husband Name';
+      const dob = $('pakInputDob') ? $('pakInputDob').value : '03.07.1991';
+      const issue = $('pakInputIssueDate') ? $('pakInputIssueDate').value : '06.01.2021';
+      const expiry = $('pakInputExpiryDate') ? $('pakInputExpiryDate').value : '06.01.2031';
+      const text = `PAKISTAN NATIONAL IDENTITY CARD (NADRA):\nName: ${name}\n${relType}: ${rel}\nCNIC / Identity Number: ${cnic}\nDate of Birth: ${dob}\nDate of Issue: ${issue}\nDate of Expiry: ${expiry}\nCountry of Stay: Pakistan\nStatus: Official Verified Specimen`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Copied!', 'Pakistan NADRA credential record copied to clipboard');
+        }).catch(() => {
+          showToast('Copied', 'Record formatted');
+        });
+      } else {
+        showToast('Copied', 'Record formatted');
+      }
+    }
+
+    // ================= REPUBLIC OF SEYCHELLES NATIONAL IDENTITY CARD CONTROLLER =================
+    const officialSycSpecimenSrc = '/assets/aistudio/Screenshot_20261025-202436_fba1e2eb.jpg';
+    let currentSycPhotoSrc = '/assets/aistudio/seychelles_portrait_exact.jpg';
+    let currentSycGhostSrc = '/assets/aistudio/seychelles_ghost_exact.png';
+
+    function initSycDefaultPhoto() {
+      if ($('sycPreviewPhoto')) $('sycPreviewPhoto').src = currentSycPhotoSrc;
+      if ($('sycPreviewGhost')) $('sycPreviewGhost').src = currentSycGhostSrc;
+    }
+
+    function resetSycPhoto() {
+      currentSycPhotoSrc = '/assets/aistudio/seychelles_portrait_exact.jpg';
+      currentSycGhostSrc = '/assets/aistudio/seychelles_ghost_exact.png';
+      if ($('sycPreviewPhoto')) $('sycPreviewPhoto').src = currentSycPhotoSrc;
+      if ($('sycPreviewGhost')) $('sycPreviewGhost').src = currentSycGhostSrc;
+      if ($('sycPhotoInput')) $('sycPhotoInput').value = '';
+      showToast('Photo Reset', 'Restored official Seychelles specimen photograph');
+    }
+
+    function setSycDisplayMode(mode) {
+      const frontWrap = $('sycFrontWrap');
+      const backWrap = $('sycBackWrap');
+      const btnBoth = $('btn-syc-both');
+      const btnFront = $('btn-syc-front');
+      const btnBack = $('btn-syc-back');
+
+      const activeClass = "px-2.5 py-1 rounded-md text-xs font-bold bg-sky-600 text-white shadow-xs cursor-pointer transition-all";
+      const inactiveClass = "px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all";
+
+      if (btnBoth) btnBoth.className = inactiveClass;
+      if (btnFront) btnFront.className = inactiveClass;
+      if (btnBack) btnBack.className = inactiveClass;
+
+      if (mode === 'front') {
+        if (frontWrap) frontWrap.classList.remove('hidden');
+        if (backWrap) backWrap.classList.add('hidden');
+        if (btnFront) btnFront.className = activeClass;
+      } else if (mode === 'back') {
+        if (frontWrap) frontWrap.classList.add('hidden');
+        if (backWrap) backWrap.classList.remove('hidden');
+        if (btnBack) btnBack.className = activeClass;
+      } else {
+        // default: both
+        if (frontWrap) frontWrap.classList.remove('hidden');
+        if (backWrap) backWrap.classList.remove('hidden');
+        if (btnBoth) btnBoth.className = activeClass;
+      }
+    }
+
+    function updateSycPreview() {
+      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
+
+      const idNo = getVal('sycInputId', '792-7109-8-7-12');
+      const surname = getVal('sycInputSurname', 'AGBONDE').toUpperCase();
+      const givenName = getVal('sycInputGivenName', 'AFOLABI MICHAEL').toUpperCase();
+      const dob = getVal('sycInputDob', '25 FEB 1971').toUpperCase();
+      const sex = getVal('sycInputSex', 'M').toUpperCase();
+      const issueDate = getVal('sycInputIssueDate', '20 NOV 2020').toUpperCase();
+      const nationality = getVal('sycInputNationality', 'CITIZEN OF SEYCHELLES').toUpperCase();
+      const ghostId = getVal('sycInputGhostId', idNo.replace(/[^0-9]/g, ''));
+
+      setText('sycPreviewId', idNo);
+      setText('sycPreviewSurname', surname);
+      setText('sycPreviewGivenName', givenName);
+      setText('sycPreviewDob', dob);
+      setText('sycPreviewNationality', nationality);
+      setText('sycPreviewSex', sex.charAt(0));
+      setText('sycPreviewIssueDate', issueDate);
+      setText('sycPreviewGhostId', ghostId);
+
+      // Dynamic ICAO TD1 3-Line MRZ Generator synced with Seychelles ID specifications
+      const cleanDigits = ghostId.replace(/[^0-9]/g, '');
+      const rawId9 = cleanDigits.slice(0, 11) || '79271098712';
+      
+      const line1 = `IDSYC${rawId9}`.padEnd(30, '<').substring(0, 30);
+      const line2 = `${rawId9}NGA<<<<<<<<<<<<<<<02`.padEnd(30, '<').substring(0, 30);
+      
+      const cleanSurname = surname.replace(/[^A-Z]/g, '');
+      const cleanGiven = givenName.trim().replace(/\s+/g, '<').replace(/[^A-Z<]/g, '');
+      const line3 = `${cleanSurname}<<${cleanGiven}`.padEnd(30, '<').substring(0, 30);
+
+      setText('sycPreviewMrz1', line1);
+      setText('sycPreviewMrz2', line2);
+      setText('sycPreviewMrz3', line3);
+    }
+
+    function randomizeSycId() {
+      // Authentic Seychelles ID format: 3 digits - 4 digits - 1 digit - 1 digit - 2 digits (e.g. 792-7109-8-7-12)
+      const p1 = String(Math.floor(700 + Math.random() * 200));
+      const p2 = String(Math.floor(1000 + Math.random() * 9000));
+      const p3 = String(Math.floor(1 + Math.random() * 9));
+      const p4 = String(Math.floor(1 + Math.random() * 9));
+      const p5 = String(Math.floor(10 + Math.random() * 90));
+      const newId = `${p1}-${p2}-${p3}-${p4}-${p5}`;
+      const ghostId = `${p1}${p2}${p3}${p4}${p5}`;
+
+      if ($('sycInputId')) $('sycInputId').value = newId;
+      if ($('sycInputGhostId')) $('sycInputGhostId').value = ghostId;
+      updateSycPreview();
+      showToast('Identity Number Generated', `New Seychelles ID: ${newId}`);
+    }
+
+    function randomizeSycCard() {
+      const sycProfiles = [
+        {
+          id: "792-7109-8-7-12",
+          ghostId: "79271098712",
+          surname: "AGBONDE",
+          givenName: "AFOLABI MICHAEL",
+          dob: "25 FEB 1971",
+          sex: "M",
+          issueDate: "20 NOV 2020",
+          nationality: "CITIZEN OF SEYCHELLES"
+        },
+        {
+          id: "784-8142-3-4-09",
+          ghostId: "78481423409",
+          surname: "MOREL",
+          givenName: "JEAN-LUC MARCEL",
+          dob: "14 AUG 1984",
+          sex: "M",
+          issueDate: "15 MAR 2021",
+          nationality: "CITIZEN OF SEYCHELLES"
+        },
+        {
+          id: "792-1093-6-2-15",
+          ghostId: "79210936215",
+          surname: "PAYET",
+          givenName: "MARIE-CLAIRE NADIA",
+          dob: "09 OCT 1992",
+          sex: "F",
+          issueDate: "02 JUN 2022",
+          nationality: "CITIZEN OF SEYCHELLES"
+        },
+        {
+          id: "789-4321-5-1-18",
+          ghostId: "78943215118",
+          surname: "ALBERT",
+          givenName: "SEBASTIEN CEDRIC",
+          dob: "18 NOV 1989",
+          sex: "M",
+          issueDate: "12 JAN 2023",
+          nationality: "CITIZEN OF SEYCHELLES"
+        },
+        {
+          id: "795-6548-2-9-21",
+          ghostId: "79565482921",
+          surname: "CHETTY",
+          givenName: "DINESH KUMAR",
+          dob: "03 MAY 1987",
+          sex: "M",
+          issueDate: "10 AUG 2021",
+          nationality: "CITIZEN OF SEYCHELLES"
+        },
+        {
+          id: "791-3829-4-8-14",
+          ghostId: "79138294814",
+          surname: "ESPARON",
+          givenName: "JOSIANE BEATRICE",
+          dob: "22 DEC 1990",
+          sex: "F",
+          issueDate: "05 SEP 2022",
+          nationality: "CITIZEN OF SEYCHELLES"
+        }
+      ];
+
+      const p = sycProfiles[Math.floor(Math.random() * sycProfiles.length)];
+      if ($('sycInputId')) $('sycInputId').value = p.id;
+      if ($('sycInputGhostId')) $('sycInputGhostId').value = p.ghostId;
+      if ($('sycInputSurname')) $('sycInputSurname').value = p.surname;
+      if ($('sycInputGivenName')) $('sycInputGivenName').value = p.givenName;
+      if ($('sycInputDob')) $('sycInputDob').value = p.dob;
+      if ($('sycInputSex')) $('sycInputSex').value = p.sex;
+      if ($('sycInputIssueDate')) $('sycInputIssueDate').value = p.issueDate;
+      if ($('sycInputNationality')) $('sycInputNationality').value = p.nationality;
+
+      updateSycPreview();
+      showToast('Bio-Data Randomized', `Generated Seychelles National ID for ${p.surname} ${p.givenName}`);
+    }
+
+    function loadSycPreset(presetKey) {
+      if (presetKey === 'specimen') {
+        if ($('sycInputId')) $('sycInputId').value = '792-7109-8-7-12';
+        if ($('sycInputGhostId')) $('sycInputGhostId').value = '79271098712';
+        if ($('sycInputSurname')) $('sycInputSurname').value = 'AGBONDE';
+        if ($('sycInputGivenName')) $('sycInputGivenName').value = 'AFOLABI MICHAEL';
+        if ($('sycInputDob')) $('sycInputDob').value = '25 FEB 1971';
+        if ($('sycInputSex')) $('sycInputSex').value = 'M';
+        if ($('sycInputIssueDate')) $('sycInputIssueDate').value = '20 NOV 2020';
+        if ($('sycInputNationality')) $('sycInputNationality').value = 'CITIZEN OF SEYCHELLES';
+        resetSycPhoto();
+      } else if (presetKey === 'morel') {
+        if ($('sycInputId')) $('sycInputId').value = '784-8142-3-4-09';
+        if ($('sycInputGhostId')) $('sycInputGhostId').value = '78481423409';
+        if ($('sycInputSurname')) $('sycInputSurname').value = 'MOREL';
+        if ($('sycInputGivenName')) $('sycInputGivenName').value = 'JEAN-LUC MARCEL';
+        if ($('sycInputDob')) $('sycInputDob').value = '14 AUG 1984';
+        if ($('sycInputSex')) $('sycInputSex').value = 'M';
+        if ($('sycInputIssueDate')) $('sycInputIssueDate').value = '15 MAR 2021';
+        if ($('sycInputNationality')) $('sycInputNationality').value = 'CITIZEN OF SEYCHELLES';
+      } else if (presetKey === 'payet') {
+        if ($('sycInputId')) $('sycInputId').value = '792-1093-6-2-15';
+        if ($('sycInputGhostId')) $('sycInputGhostId').value = '79210936215';
+        if ($('sycInputSurname')) $('sycInputSurname').value = 'PAYET';
+        if ($('sycInputGivenName')) $('sycInputGivenName').value = 'MARIE-CLAIRE NADIA';
+        if ($('sycInputDob')) $('sycInputDob').value = '09 OCT 1992';
+        if ($('sycInputSex')) $('sycInputSex').value = 'F';
+        if ($('sycInputIssueDate')) $('sycInputIssueDate').value = '02 JUN 2022';
+        if ($('sycInputNationality')) $('sycInputNationality').value = 'CITIZEN OF SEYCHELLES';
+      }
+      updateSycPreview();
+      showToast('Preset Loaded', `Loaded preset: ${$('sycInputSurname') ? $('sycInputSurname').value : presetKey}`);
+    }
+
+    function viewSycFullRes() {
+      if ($('modalPreviewImg')) $('modalPreviewImg').src = officialSycSpecimenSrc;
+      if ($('fallbackDownloadLink')) {
+        $('fallbackDownloadLink').href = officialSycSpecimenSrc;
+        $('fallbackDownloadLink').download = 'seychelles-national-identity-card-official-specimen.jpg';
+      }
+      const modal = $('imageModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function printSycCard() {
+      window.print();
+    }
+
+    async function downloadSycCardPNG() {
+      const cardEl = $('seychelles-id-front');
+      if (!cardEl) return;
+      try {
+        showToast('Processing...', 'Generating high-resolution Seychelles National ID PNG...');
+        const canvas = await html2canvas(cardEl, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#f7f9fb',
+          logging: false
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'seychelles-national-identity-card.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'Seychelles National ID PNG generated successfully');
+      } catch (err) {
+        console.error('html2canvas error:', err);
+        const a = document.createElement('a');
+        a.href = officialSycSpecimenSrc;
+        a.download = 'seychelles-national-identity-card-official-specimen.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Downloaded Specimen', 'Downloaded official Seychelles National ID specimen');
+      }
+    }
+
+    function copySycSpecimenData() {
+      const idNo = $('sycInputId') ? $('sycInputId').value : '792-7109-8-7-12';
+      const surname = $('sycInputSurname') ? $('sycInputSurname').value : 'AGBONDE';
+      const givenName = $('sycInputGivenName') ? $('sycInputGivenName').value : 'AFOLABI MICHAEL';
+      const dob = $('sycInputDob') ? $('sycInputDob').value : '25 FEB 1971';
+      const nat = $('sycInputNationality') ? $('sycInputNationality').value : 'CITIZEN OF SEYCHELLES';
+      const sex = $('sycInputSex') ? $('sycInputSex').value : 'M';
+      const issue = $('sycInputIssueDate') ? $('sycInputIssueDate').value : '20 NOV 2020';
+      const ghostId = $('sycInputGhostId') ? $('sycInputGhostId').value : '79271098712';
+      
+      const text = `SEYCHELLES NATIONAL IDENTITY CARD:
+Identity No: ${idNo}
+Surname: ${surname}
+Given Name: ${givenName}
+Date of Birth: ${dob}
+Nationality: ${nat}
+Sex: ${sex}
+Date of Issue: ${issue}
+Authority: NATIONAL IDENTIFICATION AUTHORITY
+Ghost ID Code: ${ghostId}
+MRZ Line 1: ${$('sycPreviewMrz1')?.textContent || 'IDSYC79271098712<<<<<<<<<<<<<<<'}
+MRZ Line 2: ${$('sycPreviewMrz2')?.textContent || '79271098712NGA<<<<<<<<<<<<<<<02'}
+MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<<<'}`;
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Copied!', 'Seychelles identity record copied to clipboard');
+        }).catch(() => {
+          showToast('Copied', 'Record formatted');
+        });
+      } else {
+        showToast('Copied', 'Record formatted');
+      }
     }
 
     // ================= KENYA NATIONAL ID (MAISHA NAMBA 3RD GEN) CONTROLLER =================
@@ -9931,6 +11330,41 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       }
       initUgandaDefaultPhoto();
 
+      // Pakistan SNIC Photo upload
+      const pakPhotoInput = $('pakPhotoInput');
+      if (pakPhotoInput) {
+        pakPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('pakPreviewPhoto')) $('pakPreviewPhoto').src = ev.target.result;
+              showToast('Photo Updated', 'Custom portrait photo applied to Pakistan National Identity Card');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      initPakDefaultPhoto();
+
+      // Seychelles ID Photo upload
+      const sycPhotoInput = $('sycPhotoInput');
+      if (sycPhotoInput) {
+        sycPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              if ($('sycPreviewPhoto')) $('sycPreviewPhoto').src = ev.target.result;
+              if ($('sycPreviewGhost')) $('sycPreviewGhost').src = ev.target.result;
+              showToast('Photo Updated', 'Custom portrait photo applied to Seychelles National Identity Card');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      initSycDefaultPhoto();
+
       // Run initial preview sync
       updatePreview();
       updateKidPreview();
@@ -9944,6 +11378,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       updateNgaPassPreview();
       updateUkPassPreview();
       updateUgandaPreview();
+      updatePakPreview();
+      updateSycPreview();
       updateProofOfAccountPreview();
     });
   </script>
