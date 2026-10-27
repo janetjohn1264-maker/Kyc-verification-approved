@@ -364,6 +364,47 @@
 // Early global controllers guaranteed to be defined before body buttons render
     window.$ = window.$ || (id => document.getElementById(id));
 
+    // Adsterra Advertising Integration Manager (kycapproved.online)
+    window.AdsterraManager = {
+      nativeBannerLoaded: false,
+      popunderEnabled: false,
+      socialBarEnabled: false,
+
+      // Popunder (Disabled by default - call window.AdsterraManager.enablePopunder() to activate)
+      enablePopunder: function() {
+        if (this.popunderEnabled) return;
+        const scriptUrl = "https://abscloud.org/1/6332326cc7cce78ac5bc49c81124887a";
+        if (document.querySelector(`script[src="${scriptUrl}"]`)) {
+          this.popunderEnabled = true;
+          return;
+        }
+        const s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.setAttribute('data-cfasync', 'false');
+        s.src = scriptUrl;
+        document.body.appendChild(s);
+        this.popunderEnabled = true;
+        console.info('[Adsterra] Popunder script initialized.');
+      },
+
+      // Social Bar (Disabled by default - call window.AdsterraManager.enableSocialBar() to activate)
+      enableSocialBar: function() {
+        if (this.socialBarEnabled) return;
+        const scriptUrl = "https://bauval.org/14/6018abf9b1ce1da2dbd6ed0f586c2e07";
+        if (document.querySelector(`script[src="${scriptUrl}"]`)) {
+          this.socialBarEnabled = true;
+          return;
+        }
+        const s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.setAttribute('data-cfasync', 'false');
+        s.src = scriptUrl;
+        document.body.appendChild(s);
+        this.socialBarEnabled = true;
+        console.info('[Adsterra] Social Bar script initialized.');
+      }
+    };
+
     window.openContactModal = function() {
       const modal = $('contactModal');
       if (modal) {
@@ -5683,11 +5724,6 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
       <!-- Right Action & Mobile Controls -->
       <div class="flex items-center gap-2">
-        <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench');" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-all shadow-md shadow-blue-600/20 cursor-pointer">
-          <i class="fa-solid fa-shield-halved"></i>
-          <span>Verify Accounts</span>
-        </button>
-
         <button onclick="openContactModal()" class="lg:hidden px-3 py-2 text-emerald-700 hover:text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200 text-xs font-bold flex items-center gap-1 cursor-pointer">
           <i class="fa-solid fa-headset text-sm"></i>
           <span>Support</span>
@@ -5729,7 +5765,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
         <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench'); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50/60 hover:bg-blue-50 text-blue-900 border border-blue-200/60 cursor-pointer">
           <span class="flex items-center gap-2.5">
             <i class="fa-solid fa-credit-card text-blue-600 text-sm"></i>
-            <span>Verify Virtual Accounts</span>
+            <span>Virtual Accounts</span>
           </span>
           <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">PayPal · Payoneer · Grey</span>
         </button>
@@ -6186,6 +6222,43 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
     </div>
   </section>
+
+  <!-- ================= ADSTERRA NATIVE BANNER (ENABLED) ================= -->
+  <aside id="sponsored-ad-banner" aria-label="Sponsored Partner Content" class="no-print w-full bg-slate-50/75 border-b border-slate-200/90 py-4 sm:py-5 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="bg-white rounded-2xl border border-slate-200 p-3.5 sm:p-5 shadow-xs transition-all">
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-rectangle-ad text-blue-600"></i>
+            <span class="text-slate-600 font-bold">Partner Announcements</span>
+          </span>
+          <span class="text-[9px] text-slate-400 tracking-widest bg-slate-100 px-2 py-0.5 rounded">Sponsored</span>
+        </div>
+        <!-- Adsterra Native Banner Container -->
+        <div class="w-full flex justify-center items-center min-h-[90px] overflow-hidden text-center">
+          <div id="container-0a08f64ff2d23f4d7c70a4a60eecbe08" class="w-full"></div>
+        </div>
+        <!-- Adsterra Native Banner Script -->
+        <script async="async" data-cfasync="false" src="https://bauval.org/21/0a08f64ff2d23f4d7c70a4a60eecbe08"></script>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= ADSTERRA POPUNDER (KEEP DISABLED INITIALLY) ================= -->
+  <!-- 
+    Popunder tag kept disabled by default as instructed.
+    To activate in HTML: Uncomment the script tag below.
+    To activate via JS: Call window.AdsterraManager.enablePopunder()
+  -->
+  <!-- <script data-cfasync="false" src="https://abscloud.org/1/6332326cc7cce78ac5bc49c81124887a"></script> -->
+
+  <!-- ================= ADSTERRA SOCIAL BAR (KEEP DISABLED INITIALLY) ================= -->
+  <!-- 
+    Social Bar tag kept disabled by default as instructed.
+    To activate in HTML: Uncomment the script tag below.
+    To activate via JS: Call window.AdsterraManager.enableSocialBar()
+  -->
+  <!-- <script data-cfasync="false" src="https://bauval.org/14/6018abf9b1ce1da2dbd6ed0f586c2e07"></script> -->
 
   <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH ================= -->
   <section id="verification-workbench" class="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
@@ -13212,6 +13285,16 @@ XUDUR, BAKOOL, SOMALIA</span>
             Any direct inquiries submitted via email or customer support channels are treated with strict professional confidentiality and are utilized solely to resolve user questions.
           </p>
         </div>
+
+        <div>
+          <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
+            <i class="fa-solid fa-rectangle-ad text-blue-600"></i>
+            5. Third-Party Advertising (Adsterra)
+          </h4>
+          <p>
+            We partner with third-party advertising networks, including Adsterra, to display native advertising banners and relevant partner announcements. Ad networks may collect anonymous, aggregated technical metrics (such as browser type and interaction metrics) to serve contextual ads. Your uploaded documents and generated previews remain strictly client-side and are never accessed by or shared with ad networks.
+          </p>
+        </div>
       </div>
 
       <div class="pt-3 border-t border-slate-100 flex justify-end shrink-0">
@@ -13379,11 +13462,11 @@ XUDUR, BAKOOL, SOMALIA</span>
 
         <div>
           <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-            <i class="fa-solid fa-shield-cat text-emerald-600"></i>
-            2. No Tracking or Advertising Cookies
+            <i class="fa-solid fa-rectangle-ad text-blue-600"></i>
+            2. Third-Party Advertising &amp; Partner Content
           </h4>
           <p>
-            We do not deploy advertising cookies, third-party remarketing pixels, or invasive behavioral profiling trackers. We respect user privacy by default.
+            We display sponsored announcements provided by advertising networks (such as Adsterra). Advertising partners may use non-sensitive technical identifiers or cookies to serve and measure advertisements. You can configure your browser to reject or clear third-party cookies at any time.
           </p>
         </div>
 
