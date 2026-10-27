@@ -111,7 +111,7 @@
       body { background: #fff!important; padding: 0!important; margin: 0!important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
       .no-print, #imageModal, #toast, header, footer { display: none!important; }
       body > main, .print-area-wrapper { display: block!important; width: 100%!important; padding: 0!important; margin: 0!important; }
-      #passport-card, #somalia-passport-card, #somalia-passport-spread, #somalia-passport-id-card { width: 100%!important; max-width: 135mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
+      #passport-card, #somalia-passport-card, #somalia-passport-spread, #somalia-passport-id-card, #senegal-passport-spread, #senegal-datapage-card, #senegal-page1-card { width: 100%!important; max-width: 135mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
       #somalia-card { width: 100%!important; max-width: 175mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
       #somali-smart-id-card { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #ethiopia-fayda-card { width: 100%!important; max-width: 160mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
@@ -143,6 +143,44 @@
     /* Pakistan National Identity Card (Smart NIC - NADRA) Security Background */
     
     /* Pakistan National Identity Card (CNIC / SNIC) - 1:1 Match to Reference Specimen */
+    
+    /* Republic of Senegal Biometric Passport (CEDEAO / ECOWAS) Security Patterns */
+    .senegal-passport-spread-bg {
+      background-color: #fbfaf5;
+      background-image: 
+        radial-gradient(ellipse at 80% 20%, rgba(234, 179, 8, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.06) 0%, transparent 40%),
+        repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.02) 0px, rgba(16, 185, 129, 0.02) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-45deg, rgba(234, 179, 8, 0.02) 0px, rgba(234, 179, 8, 0.02) 1px, transparent 1px, transparent 6px);
+    }
+
+    .senegal-page1-bg {
+      background-color: #faf8f2;
+      background-image: 
+        radial-gradient(ellipse at 50% 50%, rgba(244, 114, 182, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 80% 25%, rgba(56, 189, 248, 0.10) 0%, transparent 50%),
+        radial-gradient(circle at 20% 75%, rgba(250, 204, 21, 0.10) 0%, transparent 50%),
+        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, rgba(168, 85, 247, 0.025) 9px, transparent 10px),
+        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(16, 185, 129, 0.025) 3px, rgba(16, 185, 129, 0.025) 4px);
+    }
+
+    .senegal-datapage-bg {
+      background-color: #fcfbf7;
+      background-image: 
+        radial-gradient(ellipse at 85% 20%, rgba(16, 185, 129, 0.14) 0%, transparent 55%),
+        radial-gradient(circle at 18% 75%, rgba(239, 68, 68, 0.09) 0%, transparent 50%),
+        radial-gradient(circle at 50% 45%, rgba(245, 158, 11, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 75% 75%, rgba(56, 189, 248, 0.10) 0%, transparent 45%),
+        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.03) 7px, transparent 8px),
+        repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.03) 0px, rgba(16, 185, 129, 0.03) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-45deg, rgba(234, 179, 8, 0.025) 0px, rgba(234, 179, 8, 0.025) 1px, transparent 1px, transparent 6px);
+    }
+
+    .senegal-crease {
+      box-shadow: inset 0 -8px 12px -6px rgba(0, 0, 0, 0.15), inset 0 8px 12px -6px rgba(0, 0, 0, 0.15);
+    }
+
     .pakistan-cnic-front-bg {
       background-color: #eef6ed;
       background-image: 
@@ -485,6 +523,277 @@ var $ = window.$ || (id => document.getElementById(id));
       showToast('Card Randomized!', `Generated Kenyan Passport for ${surname} ${given}`);
     }
 
+    // Platform Specifications & KYC Compliance Data Dictionary
+    const platformData = {
+      paypal: {
+        name: 'PayPal',
+        category: 'Global Payments & Multi-Currency',
+        badge: 'Tier 2 Payout Ready',
+        color: '#003087',
+        icon: 'fa-brands fa-paypal',
+        accType: 'Personal & Business Multi-Currency Account',
+        currency: 'USD, EUR, GBP, CAD, AUD, JPY',
+        kycLevel: 'CIP Tier 2 (Identity & Proof of Address)',
+        limit: '$60,000 / tx with lifted 21-day reserves',
+        tip: 'Submit government-issued passport or national ID card along with matching proof of account/address for immediate KYC approval.',
+        url: 'https://www.paypal.com',
+        kycReq: [
+          'Government-Issued Passport or National ID',
+          'Residential Proof of Address (Utility or Bank Statement)',
+          'Matching Legal First and Last Name',
+          'Verified Phone & Email 2-Factor Authentication'
+        ]
+      },
+      payoneer: {
+        name: 'Payoneer',
+        category: 'Global B2B & Freelance Virtual Accounts',
+        badge: 'Receiving Accounts Enabled',
+        color: '#FF4800',
+        icon: 'fa-solid fa-circle-dollar-to-slot',
+        accType: 'Global Receiving Accounts (ACH, SEPA, BACS, EFT)',
+        currency: 'USD, EUR, GBP, JPY, AUD, CAD, SGD',
+        kycLevel: 'Global Payment Service (GPS) Level 2',
+        limit: 'Unlimited receiving from approved enterprise platforms',
+        tip: 'Ensure passport or ID card matches company registration or individual beneficiary details with clear MRZ zone.',
+        url: 'https://www.payoneer.com',
+        kycReq: [
+          'Passport or National ID with clear MRZ zone',
+          'Proof of Local Bank Account Ownership',
+          'Utility Bill or Official Residence Certificate',
+          'Completed Business/Freelance Activity Questionnaire'
+        ]
+      },
+      raenest: {
+        name: 'Raenest (Geegpay)',
+        category: 'African Remote Workforce & Multi-Currency USD',
+        badge: 'Instant USD/GBP/EUR IBAN',
+        color: '#059669',
+        icon: 'fa-solid fa-vault',
+        accType: 'Virtual Multi-Currency Account with Debit Card',
+        currency: 'USD, GBP, EUR, NGN, KES',
+        kycLevel: 'Tier 3 Enhanced Biometric Due Diligence',
+        limit: '$50,000 / month inbound & payout routing',
+        tip: 'High-resolution color scan of Kenya, Nigeria, or UK passport / ID required for instant automated biometric verification.',
+        url: 'https://www.raenest.com',
+        kycReq: [
+          'Valid National ID or International Passport',
+          'Real-Time Biometric Liveness Selfie',
+          'Proof of Address issued within 90 days',
+          'Tax Identification PIN or National Identifier'
+        ]
+      },
+      grey: {
+        name: 'Grey (Grey Finance)',
+        category: 'Global Bank Accounts for Africa & Remote Workers',
+        badge: 'Clear Junction IBAN & Sort Code',
+        color: '#D97706',
+        icon: 'fa-solid fa-building-columns',
+        accType: 'UK / EU / US Virtual Bank Account (Clear Junction Ltd)',
+        currency: 'GBP, EUR, USD, KES, NGN',
+        kycLevel: 'Tier 2 Account Payouts & Global Wire',
+        limit: 'No receiving cap; instant foreign currency conversion',
+        tip: 'Requires official Proof of Account certificate with Clear Junction IBAN or valid national ID / passport.',
+        url: 'https://grey.co',
+        kycReq: [
+          'Proof of Account Letter / Bank Confirmation',
+          'Valid International Passport or National ID',
+          'Liveness Face Match',
+          'Proof of Address'
+        ]
+      },
+      mercury: {
+        name: 'Mercury Bank',
+        category: 'US Tech & Startup Commercial Banking',
+        badge: 'FDIC Insured Partner Accounts',
+        color: '#4F46E5',
+        icon: 'fa-solid fa-landmark',
+        accType: 'US Checking & Treasury (Choice Financial / Evolve Bank)',
+        currency: 'USD (Domestic ACH, Fedwire & International SWIFT)',
+        kycLevel: 'FinCEN & Corporate CDD Verification',
+        limit: 'Full corporate Treasury & wire transfers with zero fee tiers',
+        tip: 'Valid passport bio-page with MRZ required for foreign founders alongside corporate registration certificates.',
+        url: 'https://mercury.com',
+        kycReq: [
+          'Founder International Passport (High-Res Scan)',
+          'Company Articles of Organization / Certificate of Incorporation',
+          'EIN / IRS Confirmation Letter (SS-4)',
+          'US Registered Agent Address & Proof'
+        ]
+      },
+      wise: {
+        name: 'Wise (TransferWise)',
+        category: 'Cross-Border Virtual Accounts & FX',
+        badge: 'Multi-Currency Local Routing',
+        color: '#16A34A',
+        icon: 'fa-solid fa-money-bill-transfer',
+        accType: 'Wise Business & Personal Account with 10+ Local Details',
+        currency: 'USD, EUR, GBP, AUD, CAD, NZD, SGD, HUF, RON',
+        kycLevel: 'FCA / FinCEN Regulated Enhanced KYC',
+        limit: 'Up to $1,000,000 per transfer via SWIFT / ACH',
+        tip: 'Submit passport or National Identity Card with selfie verification. Ensure exact match with recipient account details.',
+        url: 'https://wise.com',
+        kycReq: [
+          'Passport or National ID Card',
+          'Facial Verification (Selfie with Device)',
+          'Proof of Residence / Address Document',
+          'Source of Funds / Wealth Documentation'
+        ]
+      },
+      revolut: {
+        name: 'Revolut',
+        category: 'Digital Banking & Global Neo-Bank',
+        badge: 'EEA & UK Virtual IBAN',
+        color: '#0075EB',
+        icon: 'fa-solid fa-credit-card',
+        accType: 'Personal & Business Multi-Currency Account',
+        currency: 'GBP, EUR, USD, CHF, PLN, SEK, NOK, DKK',
+        kycLevel: 'Bank of Lithuania / FCA Full Customer Due Diligence',
+        limit: 'Unlimited tier-based spending and international transfers',
+        tip: 'Requires high-resolution color document scan (Passport or EU National ID) with active NFC biometric verification if available.',
+        url: 'https://www.revolut.com',
+        kycReq: [
+          'Valid Government Passport or EU National ID Card',
+          'Instant Selfie / Facial Liveness Scan',
+          'Legal Residential Address Proof',
+          'Tax Identification Number (TIN)'
+        ]
+      },
+      elevate: {
+        name: 'Elevate Pay',
+        category: 'US Virtual Bank Accounts for Remote Contractors',
+        badge: 'Bangor Savings Bank USD Account',
+        color: '#0D9488',
+        icon: 'fa-solid fa-wallet',
+        accType: 'US Checking Account with Debit Card & ACH Inbound',
+        currency: 'USD',
+        kycLevel: 'US Partner Bank KYC / AML Verification',
+        limit: '$25,000 / month standard receiving and payout tier',
+        tip: 'Available for freelancers and remote contractors in emerging markets with valid international passport.',
+        url: 'https://www.elevatepay.co',
+        kycReq: [
+          'International Passport (with minimum 6 months validity)',
+          'Proof of Freelance Contract or Invoices',
+          'Utility Bill / Proof of Residential Address',
+          'Facial Liveness Selfie'
+        ]
+      },
+      chipper: {
+        name: 'Chipper Cash',
+        category: 'Pan-African & Global Cross-Border Payments',
+        badge: 'African Mobile Payouts & USD Card',
+        color: '#7C3AED',
+        icon: 'fa-solid fa-mobile-screen-button',
+        accType: 'Pan-African Multi-Currency Wallet & Virtual USD Card',
+        currency: 'USD, NGN, KES, UGX, GHS, RWF, ZAR, GBP',
+        kycLevel: 'Tier 3 Verified User Status',
+        limit: 'Maximum tier transaction limits up to $10,000 / day',
+        tip: 'National ID or Passport scan with BVN / National PIN verification for instant tier escalation.',
+        url: 'https://chippercash.com',
+        kycReq: [
+          'National ID Card / Passport',
+          'Liveness Video / Selfie Capture',
+          'National Identification Number (NIN / PIN / BVN)',
+          'Residential Address Details'
+        ]
+      },
+      binance: {
+        name: 'Binance',
+        category: 'Crypto Exchange & P2P Fiat Gateway',
+        badge: 'Verified Plus / Level 2 KYC',
+        color: '#F0B90B',
+        icon: 'fa-brands fa-bitcoin',
+        accType: 'Global Spot, Futures & P2P Escrow Account',
+        currency: 'USDT, BTC, ETH, USD, EUR, KES, NGN, GBP',
+        kycLevel: 'Verified Plus (ID + Address + Liveness)',
+        limit: '$2,000,000 daily withdrawal / 50,000 USDT P2P trades',
+        tip: 'Strict facial recognition and ID document OCR. Ensure passport or ID card is unexpired, without glare or clipped borders.',
+        url: 'https://www.binance.com',
+        kycReq: [
+          'Government-Issued Passport, Driver License or ID Card',
+          'Facial Biometric Recognition (Live Camera)',
+          'Proof of Residential Address (Bank / Utility)',
+          'Questionnaire on Source of Wealth'
+        ]
+      },
+      bybit: {
+        name: 'Bybit',
+        category: 'Global Crypto Exchange & P2P Fiat Desk',
+        badge: 'Individual KYC Level 2',
+        color: '#F7A600',
+        icon: 'fa-solid fa-coins',
+        accType: 'Unified Trading Account & P2P Merchant',
+        currency: 'USDT, USDC, BTC, ETH, EUR, USD, BRL',
+        kycLevel: 'Level 2 (Identity Document + Proof of Address)',
+        limit: '2,000,000 USDT daily withdrawal / Unlimited P2P trading',
+        tip: 'Upload clear front and back scans of National ID or open passport bio page. No reflections or digital alterations.',
+        url: 'https://www.bybit.com',
+        kycReq: [
+          'Official Government Identity Document (Passport / National ID)',
+          'Facial Liveness Selfie Check',
+          'Proof of Address within past 90 days',
+          'PEP & Sanctions Screening Confirmation'
+        ]
+      },
+      okx: {
+        name: 'OKX',
+        category: 'Crypto Exchange & Web3 Financial Services',
+        badge: 'Level 2 Advanced Verification',
+        color: '#0F766E',
+        icon: 'fa-solid fa-cubes',
+        accType: 'Institutional & Retail Exchange Account',
+        currency: 'USDT, USDC, BTC, EUR, USD, ARS, BRL',
+        kycLevel: 'Level 2 Advanced Photo ID & Address Proof',
+        limit: 'Up to 500 BTC / $10,000,000 daily withdrawal',
+        tip: 'Ensure high resolution on passport bio-data and MRZ code for instant algorithmic OCR clearance.',
+        url: 'https://www.okx.com',
+        kycReq: [
+          'Passport or Government Photo ID',
+          'Facial Recognition Scan',
+          'Proof of Residential Address',
+          'Declaration of Legal Residency'
+        ]
+      },
+      kucoin: {
+        name: 'KuCoin',
+        category: 'Crypto Exchange & Global P2P Platform',
+        badge: 'Advanced KYC Verification',
+        color: '#24AE8F',
+        icon: 'fa-solid fa-chart-line',
+        accType: 'Multi-Asset Trading & P2P Payment Gateway',
+        currency: 'USDT, USDC, BTC, KCS, EUR, USD',
+        kycLevel: 'Level 3 Full Advanced Identity Verification',
+        limit: 'Up to 200 BTC / 500,000 USDT daily withdrawal',
+        tip: 'Requires clear picture of photo ID card or passport bio page with facial match confirmation.',
+        url: 'https://www.kucoin.com',
+        kycReq: [
+          'Valid Passport or National Identity Card',
+          'Facial Verification Check',
+          'Residential Address Documentation',
+          'Anti-Fraud Compliance Check'
+        ]
+      },
+      stripe: {
+        name: 'Stripe',
+        category: 'Payment Processing & Global Financial Infrastructure',
+        badge: 'Verified Merchant & Payouts',
+        color: '#635BFF',
+        icon: 'fa-brands fa-stripe',
+        accType: 'Stripe Connect & Standard Merchant Account',
+        currency: 'USD, EUR, GBP, CAD, AUD, JPY, SGD',
+        kycLevel: 'Full Merchant Due Diligence & CIP',
+        limit: 'Automated rolling 2-day payouts with zero hard limits',
+        tip: 'Provide government-issued photo ID with matching legal entity documents.',
+        url: 'https://stripe.com',
+        kycReq: [
+          'Government-Issued Photo ID / Passport',
+          'Bank Account Verification (Routing & Account Number)',
+          'Proof of Business Entity / Tax ID',
+          'Proof of Address'
+        ]
+      }
+    };
+    if (typeof window !== 'undefined') window.platformData = platformData;
+
     // Virtual Account Selection Handler
     function selectVirtualAccount(accountKey) {
       currentVirtualAccount = accountKey || 'paypal';
@@ -747,10 +1056,37 @@ var $ = window.$ || (id => document.getElementById(id));
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      } else if (countryKey === 'senegal') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       }
 
       const countryStyles = {
         kenya: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-emerald-600"
+        },
+        senegal: {
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-emerald-600"
@@ -808,6 +1144,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const countryNames = {
         kenya: 'Kenya',
         somalia: 'Somalia',
+        senegal: 'Senegal',
         ethiopia: 'Ethiopia',
         nigeria: 'Nigeria',
         uk: 'United Kingdom',
@@ -835,6 +1172,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const ugandaDocView = $('uganda-doc-view');
       const pakistanDocView = $('pakistan-doc-view');
       const seychellesDocView = $('seychelles-doc-view');
+      const senegalPassView = $('senegal-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
@@ -849,10 +1187,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (ugandaDocView) ugandaDocView.classList.add('hidden');
       if (pakistanDocView) pakistanDocView.classList.add('hidden');
       if (seychellesDocView) seychellesDocView.classList.add('hidden');
+      if (senegalPassView) senegalPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'senegal') {
+        if (senegalPassView) senegalPassView.classList.remove('hidden');
       } else if (currentCountry === 'seychelles') {
         if (seychellesDocView) seychellesDocView.classList.remove('hidden');
       } else if (currentCountry === 'pakistan') {
@@ -1231,6 +1572,7 @@ var $ = window.$ || (id => document.getElementById(id));
     let currentPakGhostSrc = '/assets/aistudio/pakistan_ghost_exact.png';
 
     function initPakDefaultPhoto() {
+      updateSenPreview();
       updatePakPreview();
     }
 
@@ -1724,6 +2066,431 @@ var $ = window.$ || (id => document.getElementById(id));
     window.printPakCard = printPakCard;
     window.downloadPakCardPNG = downloadPakCardPNG;
     window.copyPakSpecimenData = copyPakSpecimenData;
+
+    // Senegal Passport State & Controllers
+    var senCurrentViewMode = 'spread';
+    var senCurrentPhotoSrc = '/assets/aistudio/1_cce2ce96.png';
+    var senIsCustomPhoto = false;
+
+    function setSenegalViewMode(mode) {
+      senCurrentViewMode = mode || 'spread';
+      const spreadEl = $('sen-view-spread');
+      const datapageEl = $('sen-view-datapage');
+      const page1El = $('sen-view-page1');
+
+      if (spreadEl) spreadEl.classList.add('hidden');
+      if (datapageEl) datapageEl.classList.add('hidden');
+      if (page1El) page1El.classList.add('hidden');
+
+      const btnSpread = $('sen-tab-spread');
+      const btnDatapage = $('sen-tab-datapage');
+      const btnPage1 = $('sen-tab-page1');
+
+      [btnSpread, btnDatapage, btnPage1].forEach(b => {
+        if (b) {
+          b.classList.remove('bg-emerald-700', 'text-white', 'shadow-xs');
+          b.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+        }
+      });
+
+      if (mode === 'spread' && spreadEl) {
+        spreadEl.classList.remove('hidden');
+        if (btnSpread) {
+          btnSpread.classList.add('bg-emerald-700', 'text-white', 'shadow-xs');
+          btnSpread.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+        }
+      } else if (mode === 'datapage' && datapageEl) {
+        datapageEl.classList.remove('hidden');
+        if (btnDatapage) {
+          btnDatapage.classList.add('bg-emerald-700', 'text-white', 'shadow-xs');
+          btnDatapage.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+        }
+      } else if (mode === 'page1' && page1El) {
+        page1El.classList.remove('hidden');
+        if (btnPage1) {
+          btnPage1.classList.add('bg-emerald-700', 'text-white', 'shadow-xs');
+          btnPage1.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+        }
+      }
+      showToast('Mode Modifié', 'Affichage du passeport sénégalais mis à jour');
+    }
+
+    function setSenegalPhoto(type, url) {
+      if (type === 'reference') {
+        senIsCustomPhoto = false;
+        senCurrentPhotoSrc = '/assets/aistudio/1_cce2ce96.png';
+      } else {
+        senIsCustomPhoto = true;
+        senCurrentPhotoSrc = url || '/assets/aistudio/somali_card_female_portrait.jpg';
+      }
+      updateSenPhotoDisplay();
+      showToast('Photo Mise à Jour', 'Photo du titulaire mise à jour avec succès');
+    }
+
+    function resetSenegalPhoto() {
+      senIsCustomPhoto = false;
+      senCurrentPhotoSrc = '/assets/aistudio/1_cce2ce96.png';
+      const fileInput = $('senPassPhotoInput');
+      if (fileInput) fileInput.value = '';
+      updateSenPhotoDisplay();
+      showToast('Photo Réinitialisée', 'Photo de référence restaurée');
+    }
+
+    function updateSenPhotoDisplay() {
+      document.querySelectorAll('.sen-photo-ref-container').forEach(c => {
+        if (senIsCustomPhoto) {
+          c.classList.add('hidden');
+        } else {
+          c.classList.remove('hidden');
+        }
+      });
+      document.querySelectorAll('.sen-photo-custom-img').forEach(img => {
+        if (senIsCustomPhoto) {
+          img.src = senCurrentPhotoSrc;
+          img.classList.remove('hidden');
+        } else {
+          img.classList.add('hidden');
+        }
+      });
+      document.querySelectorAll('.sen-ghost-img').forEach(img => {
+        if (senIsCustomPhoto) {
+          img.src = senCurrentPhotoSrc;
+          img.classList.remove('hidden');
+        } else {
+          img.classList.add('hidden');
+        }
+      });
+      document.querySelectorAll('.sen-ghost-ref-container').forEach(c => {
+        if (senIsCustomPhoto) {
+          c.classList.add('hidden');
+        } else {
+          c.classList.remove('hidden');
+        }
+      });
+    }
+
+    function updateSenPreview() {
+      const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value.trim() : fb);
+      const setText = (id, val) => {
+        const el = $(id);
+        if (el) el.textContent = val;
+      };
+
+      const surname = getVal('senPassInputSurname', 'KASSE').toUpperCase();
+      const given = getVal('senPassInputGiven', 'DIEYNABA').toUpperCase();
+      const nationality = getVal('senPassInputNationality', 'SENEGALAISE').toUpperCase();
+      const dob = getVal('senPassInputDob', '25 NOV / NOV 2001').toUpperCase();
+      const sex = getVal('senPassInputSex', 'F').toUpperCase();
+      const pob = getVal('senPassInputPob', 'DOUMGA LAO').toUpperCase();
+      const passNo = getVal('senPassInputPassNo', 'A04163606').toUpperCase();
+      const personalNo = getVal('senPassInputPersonalNo', '2312201200531');
+      const issueDate = getVal('senPassInputIssueDate', '19 OCT / OCT 2024').toUpperCase();
+      const expiryDate = getVal('senPassInputExpiryDate', '18 OCT / OCT 2029').toUpperCase();
+      const authority = getVal('senPassInputAuthority', 'MINT/DGPN/DPETV').toUpperCase();
+      const signature = getVal('senPassInputSignature', 'Dieynaba');
+      const passType = getVal('senPassInputType', 'P').toUpperCase();
+      const countryCode = getVal('senPassInputCountryCode', 'SEN').toUpperCase();
+
+      // Formatted Passport Number with Space for Page 1 (e.g. "A 04163606")
+      const passNoSpaced = passNo.length > 1 ? passNo.charAt(0) + ' ' + passNo.substring(1) : passNo;
+
+      // Update Page 1 Elements
+      setText('senPage1PassNo', passNoSpaced);
+      setText('senSinglePage1PassNo', passNoSpaced);
+
+      // Update Datapage Elements (Spread & Single Datapage)
+      ['senPreviewSurname', 'senSingleSurname'].forEach(id => setText(id, surname));
+      ['senPreviewGiven', 'senSingleGiven'].forEach(id => setText(id, given));
+      ['senPreviewNationality', 'senSingleNationality'].forEach(id => setText(id, nationality));
+      ['senPreviewDob', 'senSingleDob'].forEach(id => setText(id, dob));
+      ['senPreviewSex', 'senSingleSex'].forEach(id => setText(id, sex));
+      ['senPreviewPob', 'senSinglePob'].forEach(id => setText(id, pob));
+      ['senPreviewPassNo', 'senSinglePassNo'].forEach(id => setText(id, passNo));
+      ['senPreviewPersonalNo', 'senSinglePersonalNo'].forEach(id => setText(id, personalNo));
+      ['senPreviewIssueDate', 'senSingleIssueDate'].forEach(id => setText(id, issueDate));
+      ['senPreviewExpiryDate', 'senSingleExpiryDate'].forEach(id => setText(id, expiryDate));
+      ['senPreviewAuthority', 'senSingleAuthority'].forEach(id => setText(id, authority));
+      ['senPreviewSignature', 'senSingleSignature'].forEach(id => setText(id, signature));
+      ['senPreviewType', 'senSingleType'].forEach(id => setText(id, passType));
+      ['senPreviewCountryCode', 'senSingleCountryCode'].forEach(id => setText(id, countryCode));
+
+      updateSenPhotoDisplay();
+      updateSenMRZ(surname, given, passNo, countryCode, dob, sex, expiryDate, personalNo);
+    }
+
+    function updateSenMRZ(surname, given, passNo, countryCode, dobRaw, sex, expiryRaw, personalNo) {
+      // 2 Lines of 44 Characters (ICAO TD-3 Standard)
+      // Line 1: P<SENKASSE<<DIEYNABA<<<<<<<<<<<<<<<<<<<<<<<<<<
+      const sClean = (surname || 'KASSE').replace(/[^A-Z]/g, '<');
+      const gClean = (given || 'DIEYNABA').replace(/[^A-Z]/g, '<');
+      const cCode = (countryCode || 'SEN').substring(0, 3).padEnd(3, '<');
+      let line1 = ('P<' + cCode + sClean + '<<' + gClean).padEnd(44, '<').substring(0, 44);
+
+      // Line 2: A041636060SEN0111252F29101832312201200531<20
+      const pClean = (passNo || 'A04163606').replace(/[^A-Z0-9]/g, '').padEnd(9, '<').substring(0, 9);
+      
+      // Compute fictional dates:
+      let bYY = '01', bMM = '11', bDD = '25';
+      const mMatch = dobRaw.match(/(\d{1,2})\s*([A-Za-z]{3})[\s/A-Za-z]*(\d{4})/);
+      if (mMatch) {
+        bDD = mMatch[1].padStart(2, '0');
+        bYY = mMatch[3].slice(-2);
+        const months = { JAN: '01', FEB: '02', FEV: '02', MAR: '03', APR: '04', AVR: '04', MAY: '05', MAI: '05', JUN: '06', JUIN: '06', JUL: '07', JUIL: '07', AUG: '08', AOU: '08', AOUT: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
+        bMM = months[mMatch[2].toUpperCase()] || '11';
+      }
+
+      let eYY = '29', eMM = '10', eDD = '18';
+      const eMatch = expiryRaw.match(/(\d{1,2})\s*([A-Za-z]{3})[\s/A-Za-z]*(\d{4})/);
+      if (eMatch) {
+        eDD = eMatch[1].padStart(2, '0');
+        eYY = eMatch[3].slice(-2);
+        const months = { JAN: '01', FEB: '02', FEV: '02', MAR: '03', APR: '04', AVR: '04', MAY: '05', MAI: '05', JUN: '06', JUIN: '06', JUL: '07', JUIL: '07', AUG: '08', AOU: '08', AOUT: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
+        eMM = months[eMatch[2].toUpperCase()] || '10';
+      }
+
+      const sChar = (sex || 'F').charAt(0).toUpperCase();
+      const persClean = (personalNo || '2312201200531').replace(/[^0-9]/g, '').padEnd(14, '<').substring(0, 14);
+
+      let line2 = (pClean + '0' + cCode + bYY + bMM + bDD + '2' + sChar + eYY + eMM + eDD + '83' + persClean + '<20').padEnd(44, '<').substring(0, 44);
+
+      ['senMrzLine1', 'senSingleMrzLine1'].forEach(id => setText(id, line1));
+      ['senMrzLine2', 'senSingleMrzLine2'].forEach(id => setText(id, line2));
+
+      function setText(id, text) {
+        const el = $(id);
+        if (el) el.textContent = text;
+      }
+    }
+
+    function randomizeSenegalPassport() {
+      const surnames = ['KASSÉ', 'DIALLO', 'NDIAYE', 'SARR', 'BA', 'FALL', 'DIOP', 'GUEYE', 'FAYE', 'SOW', 'SY', 'CISSE', 'TOURE', 'MBACKE', 'WADE', 'SECK'];
+      const femaleGiven = ['DIEYNABA', 'FATOU', 'AÏSSATOU', 'MARIAMA', 'AMINATA', 'KHADY', 'RAMATOULAYE', 'NOGAYE', 'NDEYE FAMA', 'MAME DIARRA'];
+      const maleGiven = ['AMADOU', 'CHEIKH', 'MOUHAMADOU', 'IBRAHIMA', 'MAMADOU', 'BABACAR', 'OUSMANE', 'ABDOULAYE', 'ALIOUNE', 'MALICK'];
+      const places = ['DOUMGA LAO', 'DAKAR', 'THIÈS', 'SAINT-LOUIS', 'KAOLACK', 'ZIGUINCHOR', 'TOUBA', 'TAMBACOUNDA', 'MBOUR', 'KOLDA', 'LOUGA'];
+      const months = ['JAN / JAN', 'FEV / FEB', 'MAR / MAR', 'AVR / APR', 'MAI / MAY', 'JUIN / JUN', 'JUIL / JUL', 'AOUT / AUG', 'SEP / SEP', 'OCT / OCT', 'NOV / NOV', 'DEC / DEC'];
+
+      const isFemale = Math.random() > 0.45;
+      const surname = surnames[Math.floor(Math.random() * surnames.length)];
+      const given = isFemale 
+        ? femaleGiven[Math.floor(Math.random() * femaleGiven.length)]
+        : maleGiven[Math.floor(Math.random() * maleGiven.length)];
+      const pob = places[Math.floor(Math.random() * places.length)];
+
+      const passNum = 'A0' + String(Math.floor(1000000 + Math.random() * 9000000));
+      const nin = '2' + String(Math.floor(100000000000 + Math.random() * 900000000000));
+
+      const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
+      const bMonth = months[Math.floor(Math.random() * months.length)];
+      const bYear = String(Math.floor(1985 + Math.random() * 20));
+      const dob = `${bDay} ${bMonth} ${bYear}`;
+
+      const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
+      const iMonth = months[Math.floor(Math.random() * months.length)];
+      const iYear = String(Math.floor(2022 + Math.random() * 3));
+      const issueDate = `${iDay} ${iMonth} ${iYear}`;
+      const expDate = `${iDay} ${iMonth} ${parseInt(iYear, 10) + 5}`;
+
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('senPassInputSurname', surname);
+      setVal('senPassInputGiven', given);
+      setVal('senPassInputNationality', 'SÉNÉGALAISE');
+      setVal('senPassInputSex', isFemale ? 'F' : 'M');
+      setVal('senPassInputDob', dob);
+      setVal('senPassInputPob', pob);
+      setVal('senPassInputPassNo', passNum);
+      setVal('senPassInputPersonalNo', nin);
+      setVal('senPassInputIssueDate', issueDate);
+      setVal('senPassInputExpiryDate', expDate);
+      setVal('senPassInputAuthority', 'MINT/DGPN/DPETV');
+      setVal('senPassInputSignature', given.charAt(0) + '. ' + surname);
+
+      updateSenPreview();
+      showToast('Profil Généré', `Données fictives créées pour ${given} ${surname}`);
+    }
+
+    function loadSenegalPreset(presetKey) {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      if (presetKey === 'reference') {
+        setVal('senPassInputSurname', 'KASSÉ');
+        setVal('senPassInputGiven', 'DIEYNABA');
+        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputSex', 'F');
+        setVal('senPassInputDob', '25 NOV / NOV 2001');
+        setVal('senPassInputPob', 'DOUMGA LAO');
+        setVal('senPassInputPassNo', 'A04163606');
+        setVal('senPassInputPersonalNo', '2312201200531');
+        setVal('senPassInputIssueDate', '19 OCT / OCT 2024');
+        setVal('senPassInputExpiryDate', '18 OCT / OCT 2029');
+        setVal('senPassInputAuthority', 'MINT/DGPN/DPETV');
+        setVal('senPassInputSignature', 'Dieynaba');
+        resetSenegalPhoto();
+      } else if (presetKey === 'amadou') {
+        setVal('senPassInputSurname', 'DIALLO');
+        setVal('senPassInputGiven', 'AMADOU');
+        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputSex', 'M');
+        setVal('senPassInputDob', '14 JUIN / JUN 1993');
+        setVal('senPassInputPob', 'DAKAR');
+        setVal('senPassInputPassNo', 'A05819204');
+        setVal('senPassInputPersonalNo', '1849103948192');
+        setVal('senPassInputIssueDate', '10 MAR / MAR 2023');
+        setVal('senPassInputExpiryDate', '09 MAR / MAR 2028');
+        setVal('senPassInputAuthority', 'MINT/DGPN/DPETV');
+        setVal('senPassInputSignature', 'A. Diallo');
+      } else if (presetKey === 'fatou') {
+        setVal('senPassInputSurname', 'NDIAYE');
+        setVal('senPassInputGiven', 'FATOU');
+        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputSex', 'F');
+        setVal('senPassInputDob', '08 SEP / SEP 1998');
+        setVal('senPassInputPob', 'SAINT-LOUIS');
+        setVal('senPassInputPassNo', 'A07194820');
+        setVal('senPassInputPersonalNo', '2948102938471');
+        setVal('senPassInputIssueDate', '22 JAN / JAN 2024');
+        setVal('senPassInputExpiryDate', '21 JAN / JAN 2029');
+        setVal('senPassInputAuthority', 'MINT/DGPN/DPETV');
+        setVal('senPassInputSignature', 'Fatou N.');
+      } else if (presetKey === 'cheikh') {
+        setVal('senPassInputSurname', 'SARR');
+        setVal('senPassInputGiven', 'CHEIKH');
+        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputSex', 'M');
+        setVal('senPassInputDob', '03 DEC / DEC 1990');
+        setVal('senPassInputPob', 'THIÈS');
+        setVal('senPassInputPassNo', 'A03918274');
+        setVal('senPassInputPersonalNo', '1092837461928');
+        setVal('senPassInputIssueDate', '15 MAI / MAY 2022');
+        setVal('senPassInputExpiryDate', '14 MAI / MAY 2027');
+        setVal('senPassInputAuthority', 'MINT/DGPN/DPETV');
+        setVal('senPassInputSignature', 'C. Sarr');
+      }
+      updateSenPreview();
+      showToast('Préréglage Chargé', `Profil: ${presetKey.toUpperCase()}`);
+    }
+
+    function printSenegalPassport() {
+      window.print();
+    }
+
+    async function downloadSenegalPassPNG() {
+      let targetEl = null;
+      if (senCurrentViewMode === 'datapage') {
+        targetEl = $('senegal-datapage-card');
+      } else if (senCurrentViewMode === 'page1') {
+        targetEl = $('senegal-page1-card');
+      } else {
+        targetEl = $('senegal-passport-spread');
+      }
+
+      if (!targetEl) targetEl = $('senegal-passport-spread');
+      if (!targetEl) return;
+
+      try {
+        showToast('En cours...', 'Génération du PNG haute résolution...');
+        const canvas = await html2canvas(targetEl, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = `senegal-passeport-${senCurrentViewMode}-specimen.png`;
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Prêt !', 'Passeport sénégalais téléchargé avec succès');
+      } catch (err) {
+        console.error('html2canvas error:', err);
+        showToast('Info', 'Téléchargement direct terminé');
+      }
+    }
+
+    function copySenegalSpecimenData() {
+      const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value : fb);
+      const text = [
+        "RÉPUBLIQUE DU SÉNÉGAL — PASSEPORT BIOMÉTRIQUE (CEDEAO / ECOWAS)",
+        "STATUT: SAMPLE — NOT VALID (Spécimen Éducatif Fictif)",
+        "Nom / Surname: " + getVal('senPassInputSurname', 'KASSÉ'),
+        "Prénoms / Given Names: " + getVal('senPassInputGiven', 'DIEYNABA'),
+        "Nationalité / Nationality: " + getVal('senPassInputNationality', 'SÉNÉGALAISE'),
+        "Date de naissance: " + getVal('senPassInputDob', '25 NOV / NOV 2001'),
+        "Sexe: " + getVal('senPassInputSex', 'F'),
+        "Lieu de naissance: " + getVal('senPassInputPob', 'DOUMGA LAO'),
+        "N° Passeport: " + getVal('senPassInputPassNo', 'A04163606'),
+        "N° Personnel (NIN): " + getVal('senPassInputPersonalNo', '2312201200531'),
+        "Date de délivrance: " + getVal('senPassInputIssueDate', '19 OCT / OCT 2024'),
+        "Date d'expiration: " + getVal('senPassInputExpiryDate', '18 OCT / OCT 2029'),
+        "Autorité: " + getVal('senPassInputAuthority', 'MINT/DGPN/DPETV')
+      ].join('\n');
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Copié !', 'Notice de passeport fictif copiée');
+        });
+      }
+    }
+
+    // Attach Senegal functions to window
+    window.setSenegalViewMode = setSenegalViewMode;
+    window.setSenegalPhoto = setSenegalPhoto;
+    window.resetSenegalPhoto = resetSenegalPhoto;
+    window.updateSenPhotoDisplay = updateSenPhotoDisplay;
+    window.updateSenPreview = updateSenPreview;
+    window.updateSenMRZ = updateSenMRZ;
+    window.randomizeSenegalPassport = randomizeSenegalPassport;
+    window.loadSenegalPreset = loadSenegalPreset;
+    window.printSenegalPassport = printSenegalPassport;
+    window.downloadSenegalPassPNG = downloadSenegalPassPNG;
+    window.copySenegalSpecimenData = copySenegalSpecimenData;
+
+    // Seychelles National ID Specimen & Controls
+    const officialSycSpecimenSrc = '/assets/aistudio/seychelles_front_card.jpg';
+    const defaultSycPhotoSrc = '/assets/aistudio/seychelles_portrait_exact.jpg';
+    const defaultSycGhostSrc = '/assets/aistudio/seychelles_ghost_exact.png';
+
+    function initSycDefaultPhoto() {
+      if ($('sycPreviewPhoto')) $('sycPreviewPhoto').src = defaultSycPhotoSrc;
+      if ($('sycPreviewGhost')) $('sycPreviewGhost').src = defaultSycGhostSrc;
+    }
+
+    function resetSycPhoto() {
+      if ($('sycPhotoInput')) $('sycPhotoInput').value = '';
+      initSycDefaultPhoto();
+      showToast('Photo Restored', 'Restored official Seychelles specimen photo');
+    }
+
+    function setSycDisplayMode(mode) {
+      const frontWrap = $('sycFrontWrap');
+      const backWrap = $('sycBackWrap');
+      const btnBoth = $('btn-syc-both');
+      const btnFront = $('btn-syc-front');
+      const btnBack = $('btn-syc-back');
+
+      const activeClass = "px-2.5 py-1 rounded-md text-xs font-bold bg-sky-600 text-white shadow-xs cursor-pointer transition-all";
+      const inactiveClass = "px-2.5 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 cursor-pointer transition-all";
+
+      if (btnBoth) btnBoth.className = (mode === 'both') ? activeClass : inactiveClass;
+      if (btnFront) btnFront.className = (mode === 'front') ? activeClass : inactiveClass;
+      if (btnBack) btnBack.className = (mode === 'back') ? activeClass : inactiveClass;
+
+      if (mode === 'both') {
+        if (frontWrap) frontWrap.classList.remove('hidden');
+        if (backWrap) backWrap.classList.remove('hidden');
+      } else if (mode === 'front') {
+        if (frontWrap) frontWrap.classList.remove('hidden');
+        if (backWrap) backWrap.classList.add('hidden');
+      } else if (mode === 'back') {
+        if (frontWrap) frontWrap.classList.add('hidden');
+        if (backWrap) backWrap.classList.remove('hidden');
+      }
+    }
 
     function updateSycPreview() {
       const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
@@ -4355,11 +5122,15 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function copyToClipboard(text, message) {
-      navigator.clipboard.writeText(text).then(() => {
-        showToast(message || "Copied to clipboard!");
-      }).catch(() => {
+      if (typeof navigator !== 'undefined' && navigator && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(message || "Copied to clipboard!");
+        }).catch(() => {
+          showToast(message || "Copied!");
+        });
+      } else {
         showToast(message || "Copied!");
-      });
+      }
     }
 
     // Initialize listeners when DOM is loaded
@@ -4698,6 +5469,23 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       }
       initPakDefaultPhoto();
 
+      // Senegal Passport Photo upload listener
+      const senPhotoInput = $('senPassPhotoInput');
+      if (senPhotoInput) {
+        senPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              setSenegalPhoto('custom', ev.target.result);
+              showToast('Photo Mise à Jour', 'Photo personnalisée appliquée au passeport sénégalais');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      updateSenPreview();
+
       // Seychelles ID Photo upload
       const sycPhotoInput = $('sycPhotoInput');
       if (sycPhotoInput) {
@@ -4735,6 +5523,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     });
 
     // Explicit Window Bindings for all inline event handlers:
+    if (typeof platformData !== "undefined") window.platformData = platformData;
     if (typeof scrollToSection !== "undefined") window.scrollToSection = scrollToSection;
     if (typeof openAboutModal !== "undefined") window.openAboutModal = openAboutModal;
     if (typeof openContactModal !== "undefined") window.openContactModal = openContactModal;
@@ -4825,6 +5614,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     if (typeof viewSycFullRes !== "undefined") window.viewSycFullRes = viewSycFullRes;
     if (typeof randomizeSycCard !== "undefined") window.randomizeSycCard = randomizeSycCard;
     if (typeof loadSycPreset !== "undefined") window.loadSycPreset = loadSycPreset;
+    if (typeof initSycDefaultPhoto !== "undefined") window.initSycDefaultPhoto = initSycDefaultPhoto;
     if (typeof resetSycPhoto !== "undefined") window.resetSycPhoto = resetSycPhoto;
     if (typeof randomizeSycId !== "undefined") window.randomizeSycId = randomizeSycId;
     if (typeof copySycSpecimenData !== "undefined") window.copySycSpecimenData = copySycSpecimenData;
@@ -5780,6 +6570,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Pakistan</div>
                 <div class="text-[10px] font-medium text-slate-500">National Identity Card (SNIC)</div>
+              </div>
+            </button>
+
+            <!-- Republic of Senegal -->
+            <button type="button" id="country-btn-senegal" onclick="switchVerificationCountry('senegal')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇸🇳</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Senegal</div>
+                <div class="text-[10px] font-medium text-slate-500">Passeport Biométrique (CEDEAO)</div>
               </div>
             </button>
 
@@ -11296,6 +12098,695 @@ XUDUR, BAKOOL, SOMALIA</span>
           </div>
         </main>
       </div>
+
+      <!-- ================= STEP 3L: RÉPUBLIQUE DU SÉNÉGAL BIOMETRIC PASSPORT VIEW ================= -->
+      <div id="senegal-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto space-y-6">
+          
+          <!-- Top Header & Status Banner -->
+          <header class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start sm:items-center gap-3.5">
+              <span class="text-3xl p-2.5 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center justify-center shrink-0">🇸🇳</span>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h1 class="text-lg md:text-xl font-bold text-slate-900">
+                    République du Sénégal
+                  </h1>
+                  <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-300">
+                    Passeport Biométrique (CEDEAO)
+                  </span>
+                  <span class="text-xs bg-amber-50 text-amber-800 font-bold px-2.5 py-0.5 rounded-full border border-amber-300 font-mono-code">
+                    SAMPLE — NOT VALID
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">
+                  Passeport de la République du Sénégal · Communauté Économique des États de l'Afrique de l'Ouest (CEDEAO / ECOWAS) · Éditeur de maquette visuelle avec livret ouvert et page de données biométriques.
+                </p>
+              </div>
+            </div>
+
+            <!-- Action Buttons & Presentation Mode Switcher -->
+            <div class="flex flex-wrap items-center gap-2.5 no-print">
+              <!-- View Mode Segmented Controls -->
+              <div class="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-bold">
+                <button type="button" id="sen-tab-spread" onclick="setSenegalViewMode('spread')" class="px-3 py-1.5 rounded-lg bg-emerald-700 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-book-open"></i>
+                  <span>Livret Ouvert</span>
+                </button>
+                <button type="button" id="sen-tab-datapage" onclick="setSenegalViewMode('datapage')" class="px-3 py-1.5 rounded-lg bg-white text-slate-700 hover:bg-slate-100 transition-all cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-id-badge"></i>
+                  <span>Page 2 (Biométrique)</span>
+                </button>
+                <button type="button" id="sen-tab-page1" onclick="setSenegalViewMode('page1')" class="px-2.5 py-1.5 rounded-lg bg-white text-slate-700 hover:bg-slate-100 transition-all cursor-pointer">
+                  <span>Page 1 (CEDEAO)</span>
+                </button>
+              </div>
+
+              <button type="button" onclick="downloadSenegalPassPNG()" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-download"></i>
+                <span>Télécharger (PNG)</span>
+              </button>
+              <button type="button" onclick="printSenegalPassport()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
+                <i class="fa-solid fa-print"></i>
+                <span>Imprimer</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Main Grid: Senegal Passport Editor (Left) & Live Preview (Right) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Controls Form / Senegal Passport Editor -->
+            <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+              <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div>
+                  <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
+                    <i class="fa-solid fa-passport text-emerald-700"></i>
+                    <span>Éditeur du Passeport Sénégalais</span>
+                  </h2>
+                  <p class="text-xs text-slate-500 mt-0.5">Édition des données signalétiques et spécimen fictif du passeport.</p>
+                </div>
+                <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200 font-mono-code">
+                  SEN · CEDEAO
+                </span>
+              </div>
+
+              <!-- BIG RANDOMIZE PASSPORT BUTTON -->
+              <div class="pt-0.5">
+                <button type="button" onclick="randomizeSenegalPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-green-800 hover:from-emerald-600 hover:via-teal-600 hover:to-green-700 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-800/25 hover:shadow-emerald-800/40 border-2 border-emerald-400/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                  <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                    <i class="fa-solid fa-dice"></i>
+                  </div>
+                  <div class="text-left">
+                    <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                      <span>Générer un Profil Fictif</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Remplissage Instantané</span>
+                    </div>
+                    <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Générer identité sénégalaise, villes réelles, N° passeport et NIN</div>
+                  </div>
+                </button>
+              </div>
+
+              <!-- Sample Presets -->
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Préréglages Échantillons :</span>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <button type="button" onclick="loadSenegalPreset('reference')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">1. Réf. Guide</span>
+                    <i class="fa-solid fa-rotate-left text-[10px] text-emerald-600"></i>
+                  </button>
+                  <button type="button" onclick="loadSenegalPreset('amadou')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">2. Amadou D.</span>
+                    <i class="fa-solid fa-user-check text-[10px] text-emerald-600"></i>
+                  </button>
+                  <button type="button" onclick="loadSenegalPreset('fatou')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">3. Fatou N.</span>
+                    <i class="fa-solid fa-user-check text-[10px] text-emerald-600"></i>
+                  </button>
+                  <button type="button" onclick="loadSenegalPreset('cheikh')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span class="truncate">4. Cheikh S.</span>
+                    <i class="fa-solid fa-user-check text-[10px] text-emerald-600"></i>
+                  </button>
+                </div>
+              </div>
+
+              <form id="senPassDocForm" class="space-y-3.5 text-xs" onsubmit="event.preventDefault();">
+                <!-- Portrait Photo Upload & Presets -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <label class="block font-bold uppercase tracking-wider text-slate-600 text-[10px]">
+                      PHOTO D'IDENTITÉ / PORTRAIT
+                    </label>
+                    <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      Format OACI 35×45 mm
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="resetSenegalPhoto()" class="px-2 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-700 text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-2xs">
+                      <i class="fa-solid fa-image text-emerald-700"></i>
+                      <span>Photo Guide</span>
+                    </button>
+                    <button type="button" onclick="setSenegalPhoto('sample', '/assets/aistudio/somali_card_female_portrait.jpg')" class="px-2 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-2xs">
+                      <i class="fa-solid fa-user text-purple-600"></i>
+                      <span>Échantillon 2</span>
+                    </button>
+                    <label for="senPassPhotoInput" class="px-2 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 text-[11px] flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-2xs">
+                      <i class="fa-solid fa-upload text-blue-600"></i>
+                      <span>Téléverser</span>
+                    </label>
+                    <input type="file" id="senPassPhotoInput" accept="image/*" class="hidden">
+                  </div>
+                </div>
+
+                <!-- Nom / Surname & Prénom / Given Names -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="senPassInputSurname" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NOM / SURNAME</label>
+                    <input id="senPassInputSurname" type="text" value="KASSÉ" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white uppercase">
+                  </div>
+                  <div>
+                    <label for="senPassInputGiven" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">PRÉNOMS / GIVEN NAMES</label>
+                    <input id="senPassInputGiven" type="text" value="DIEYNABA" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white uppercase">
+                  </div>
+                </div>
+
+                <!-- Nationalité & Sexe -->
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-2">
+                    <label for="senPassInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NATIONALITÉ / NATIONALITY</label>
+                    <input id="senPassInputNationality" type="text" value="SÉNÉGALAISE" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs text-slate-900 bg-white uppercase">
+                  </div>
+                  <div>
+                    <label for="senPassInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">SEXE / SEX</label>
+                    <select id="senPassInputSex" onchange="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs text-slate-900 bg-white">
+                      <option value="F" selected>F (Féminin)</option>
+                      <option value="M">M (Masculin)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Date de naissance & Lieu de naissance -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="senPassInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE DE NAISSANCE / DOB</label>
+                    <input id="senPassInputDob" type="text" value="25 NOV / NOV 2001" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
+                  </div>
+                  <div>
+                    <label for="senPassInputPob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">LIEU DE NAISSANCE / POB</label>
+                    <input id="senPassInputPob" type="text" value="DOUMGA LAO" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white uppercase">
+                  </div>
+                </div>
+
+                <!-- N° Passeport & N° Personnel (NIN) -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="senPassInputPassNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">N° PASSEPORT / PASSPORT NO</label>
+                    <input id="senPassInputPassNo" type="text" value="A04163606" maxlength="10" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
+                  </div>
+                  <div>
+                    <label for="senPassInputPersonalNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">N° PERSONNEL / NIN</label>
+                    <input id="senPassInputPersonalNo" type="text" value="2312201200531" maxlength="15" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- Dates de délivrance & d'expiration -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="senPassInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE DÉLIVRANCE / ISSUE</label>
+                    <input id="senPassInputIssueDate" type="text" value="19 OCT / OCT 2024" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
+                  </div>
+                  <div>
+                    <label for="senPassInputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE EXPIRATION / EXPIRY</label>
+                    <input id="senPassInputExpiryDate" type="text" value="18 OCT / OCT 2029" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
+                  </div>
+                </div>
+
+                <!-- Autorité & Signature -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="senPassInputAuthority" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">AUTORITÉ / AUTHORITY</label>
+                    <input id="senPassInputAuthority" type="text" value="MINT/DGPN/DPETV" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white uppercase">
+                  </div>
+                  <div>
+                    <label for="senPassInputSignature" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">SIGNATURE DU TITULAIRE</label>
+                    <input id="senPassInputSignature" type="text" value="Dieynaba" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-serif italic font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- Passport Codes (Type & Country Code) -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="senPassInputType" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">TYPE</label>
+                    <input id="senPassInputType" type="text" value="P" oninput="updateSenPreview()" class="w-full px-2 py-1 border rounded font-mono-code text-xs bg-white uppercase text-center font-bold">
+                  </div>
+                  <div>
+                    <label for="senPassInputCountryCode" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">CODE DU PAYS / COUNTRY CODE</label>
+                    <input id="senPassInputCountryCode" type="text" value="SEN" oninput="updateSenPreview()" class="w-full px-2 py-1 border rounded font-mono-code text-xs bg-white uppercase text-center font-bold">
+                  </div>
+                </div>
+
+                <!-- Copy Credential Record -->
+                <div class="pt-1">
+                  <button type="button" onclick="copySenegalSpecimenData()" class="w-full py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer transition-all border border-slate-200">
+                    <i class="fa-solid fa-copy"></i>
+                    <span>Copier la Notice du Passeport Fictif</span>
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <!-- Right Column: Live Document Preview Area -->
+            <section class="lg:col-span-7 flex flex-col items-center print-area-wrapper min-w-0">
+              <div class="w-full max-w-[620px] space-y-4">
+                
+                <!-- Format Mode Indicator -->
+                <div class="flex items-center justify-between text-xs px-1 text-slate-500 no-print">
+                  <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span>RÉPUBLIQUE DU SÉNÉGAL · PASSEPORT BIOMÉTRIQUE</span>
+                  </div>
+                  <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    Format Livret OACI · 88 × 125 mm
+                  </span>
+                </div>
+
+                <!-- ================= 1. FULL PASSPORT BOOKLET SPREAD VIEW (MATCHING REFERENCE IMAGE) ================= -->
+                <div id="sen-view-spread" class="block w-full">
+                  <div id="senegal-passport-spread" class="senegal-passport-spread-bg w-full rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none flex flex-col relative">
+                    
+                    <!-- ====== PAGE 1: INSIDE COVER / OBSERVATION PAGE ====== -->
+                    <div id="senegal-spread-page1" class="senegal-page1-bg relative w-full aspect-[1.48/1] p-3 sm:p-5 border-b border-slate-300 overflow-hidden flex flex-col justify-between">
+                      <!-- Watermark "SAMPLE — NOT VALID" -->
+                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
+                        <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
+                          <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
+                            SAMPLE — NOT VALID
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Faint Background Watermark Page Number "1" on right -->
+                      <div class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 font-serif text-[70px] sm:text-[90px] font-black text-slate-400/[0.12] pointer-events-none select-none">
+                        1
+                      </div>
+
+                      <div class="relative z-10 flex h-full items-stretch justify-between gap-3">
+                        
+                        <!-- Left Margin: Vertical Bilingual Text (ECOWAS / CEDEAO) -->
+                        <div class="flex items-center gap-1 shrink-0 pl-1">
+                          <!-- ECOWAS / CEDEAO French & English Column -->
+                          <div class="font-bold text-slate-700 text-[6.5px] sm:text-[8px] leading-tight select-none uppercase tracking-wider" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                            <span>COMMUNAUTE ECONOMIQUE DES ETATS DE L'AFRIQUE DE L'OUEST</span>
+                            <span class="text-slate-500 font-medium ml-1">ECONOMIC COMMUNITY OF WEST AFRICAN STATES</span>
+                          </div>
+
+                          <!-- République du Sénégal Column -->
+                          <div class="font-black text-slate-900 text-[9px] sm:text-[11px] leading-none select-none uppercase tracking-wider pl-1" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                            <span>REPUBLIQUE DU SENEGAL</span>
+                            <span class="text-slate-500 text-[8px] sm:text-[9.5px] font-bold ml-1">REPUBLIC OF SENEGAL</span>
+                          </div>
+                        </div>
+
+                        <!-- Center: Official Circular Seal of Senegal -->
+                        <div class="my-auto flex flex-col items-center justify-center shrink-0">
+                          <div class="w-24 sm:w-32 h-24 sm:h-32 rounded-full p-1 border-2 border-[#831843]/40 bg-white/70 shadow-xs flex items-center justify-center relative">
+                            <!-- Circular SVG Seal of Senegal -->
+                            <svg viewBox="0 0 160 160" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="80" cy="80" r="76" fill="none" stroke="#be185d" stroke-width="1.8" stroke-dasharray="3 2"/>
+                              <circle cx="80" cy="80" r="71" fill="#fffdfa" stroke="#831843" stroke-width="1.8"/>
+                              <circle cx="80" cy="80" r="50" fill="#fdf2f8" stroke="#831843" stroke-width="1.2"/>
+                              <!-- Central Map Silhouette of Senegal -->
+                              <path d="M 60 70 Q 56 65 52 75 Q 46 82 54 90 Q 64 96 74 94 Q 86 96 98 88 Q 112 84 108 72 Q 102 64 90 66 Q 80 62 70 66 Z" fill="#f472b6" fill-opacity="0.5" stroke="#9d174d" stroke-width="1.5"/>
+                              <!-- Seal Top Arc Text -->
+                              <path id="sealTopArc" d="M 28 80 A 52 52 0 0 1 132 80" fill="none"/>
+                              <text font-size="9.5" font-family="'Inter', sans-serif" font-weight="900" fill="#831843" letter-spacing="1.5">
+                                <textPath href="#sealTopArc" startOffset="50%" text-anchor="middle">REPUBLIQUE DU SENEGAL</textPath>
+                              </text>
+                              <!-- Seal Bottom Arc Text: Motto -->
+                              <path id="sealBottomArc" d="M 132 80 A 52 52 0 0 1 28 80" fill="none"/>
+                              <text font-size="7.5" font-family="'Inter', sans-serif" font-weight="700" fill="#831843" letter-spacing="1">
+                                <textPath href="#sealBottomArc" startOffset="50%" text-anchor="middle">★ un peuple • un but • une foi ★</textPath>
+                              </text>
+                            </svg>
+                          </div>
+                        </div>
+
+                        <!-- Right Section: PASSEPORT Title, Passport Number, Page Count -->
+                        <div class="flex flex-col justify-center items-start space-y-1.5 sm:space-y-2 pr-2 sm:pr-4">
+                          <div>
+                            <div class="text-slate-950 font-black text-lg sm:text-2xl tracking-wider leading-none">PASSEPORT</div>
+                            <div class="text-slate-600 text-xs sm:text-sm font-medium italic leading-tight">Passport</div>
+                          </div>
+
+                          <div class="pt-1">
+                            <div id="senPage1PassNo" class="font-mono-code font-black text-red-700 text-sm sm:text-base tracking-widest leading-none">
+                              A 04163606
+                            </div>
+                          </div>
+
+                          <div class="pt-2 text-[8px] sm:text-[9.5px] text-slate-600 leading-tight">
+                            <div class="font-bold text-slate-800">Ce passeport contient 32 pages</div>
+                            <div class="italic text-slate-500">This passport contains 32 pages</div>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <!-- Booklet Crease / Center Spine Shadow -->
+                    <div class="w-full h-3 bg-gradient-to-b from-stone-400/25 via-stone-300/40 to-stone-400/25 senegal-crease z-20"></div>
+
+                    <!-- ====== PAGE 2: BIOMETRIC DATAPAGE ====== -->
+                    <div id="senegal-spread-datapage" class="senegal-datapage-bg relative w-full aspect-[1.48/1] p-3 sm:p-5 overflow-hidden flex flex-col justify-between text-slate-900">
+                      <!-- Watermark "SAMPLE — NOT VALID" -->
+                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
+                        <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
+                          <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
+                            SAMPLE — NOT VALID
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Center Stylized Watermark Text "REPUBLIQUE DU SENEGAL" -->
+                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.14]">
+                        <span class="font-black text-rose-800 text-2xl sm:text-4xl tracking-widest uppercase transform -rotate-12">
+                          REPUBLIQUE DU SENEGAL
+                        </span>
+                      </div>
+
+                      <!-- Top Header Line -->
+                      <div class="relative z-10 w-full text-center pb-1 border-b border-emerald-900/10">
+                        <div class="font-black text-slate-950 text-xs sm:text-sm md:text-base tracking-wider uppercase">
+                          REPUBLIQUE DU SENEGAL
+                        </div>
+                      </div>
+
+                      <!-- Subheader: Passeport / Passport, Type, Country code, Passport No. -->
+                      <div class="relative z-10 flex items-baseline justify-between text-[7px] sm:text-[8.5px] border-b border-emerald-900/10 pb-1">
+                        <div class="text-slate-700 font-bold leading-tight">
+                          <span>Passeport /</span>
+                          <span class="text-slate-500 italic ml-0.5">Passport</span>
+                        </div>
+                        <div class="flex items-center gap-4 sm:gap-6 font-mono-code font-bold">
+                          <div>
+                            <span class="text-slate-500 font-sans text-[6.5px] sm:text-[7.5px] block font-semibold leading-none">Type / Type</span>
+                            <span id="senPreviewType" class="text-slate-900 text-[9px] sm:text-[11px]">P</span>
+                          </div>
+                          <div>
+                            <span class="text-slate-500 font-sans text-[6.5px] sm:text-[7.5px] block font-semibold leading-none">Code du pays / Country code</span>
+                            <span id="senPreviewCountryCode" class="text-slate-900 text-[9px] sm:text-[11px]">SEN</span>
+                          </div>
+                          <div>
+                            <span class="text-slate-500 font-sans text-[6.5px] sm:text-[7.5px] block font-semibold leading-none">N° Passeport / Passport No.</span>
+                            <span id="senPreviewPassNo" class="text-slate-950 text-[10px] sm:text-xs font-black">A04163606</span>
+                          </div>
+                        </div>
+                        <!-- Top-Right Optical Security Emblem / Hologram Box -->
+                        <div class="w-8 sm:w-10 h-5 sm:h-6 rounded-xs overflow-hidden border border-amber-500/50 bg-gradient-to-tr from-emerald-500/30 via-yellow-400/40 to-rose-500/30 shadow-2xs flex items-center justify-center shrink-0">
+                          <svg viewBox="0 0 60 40" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <polygon points="30,8 33,16 42,16 35,21 38,30 30,24 22,30 25,21 18,16 27,16" fill="#ca8a04" fill-opacity="0.7"/>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <!-- Main Bio-Data Row: Portrait (Left), Data Fields (Center), Ghost & NIN (Right) -->
+                      <div class="relative z-10 flex items-stretch justify-between gap-2.5 sm:gap-3.5 my-auto pt-1">
+                        
+                        <!-- Left: Bearer Portrait Photo Box (35x45mm ratio) -->
+                        <div class="flex flex-col items-center shrink-0 w-24 sm:w-28 md:w-32">
+                          <div class="w-full aspect-[3/3.9] rounded-xs overflow-hidden border border-slate-300 bg-white shadow-xs relative">
+                            <!-- Reference Image Portrait (Clipped to face from guide) -->
+                            <div class="sen-photo-ref-container w-full h-full overflow-hidden relative">
+                              <img src="/assets/aistudio/1_cce2ce96.png" class="absolute w-[380%] max-w-none left-[-18%] top-[-242%] pointer-events-none select-none" alt="Photo de référence">
+                            </div>
+                            <!-- Custom User Uploaded Photo (Hidden by default) -->
+                            <img alt="Portrait Titulaire" class="sen-photo-custom-img hidden w-full h-full object-cover">
+                          </div>
+                        </div>
+
+                        <!-- Center: Biographical Details -->
+                        <div class="flex-1 min-w-0 space-y-1 text-[7px] sm:text-[8px] md:text-[8.5px] leading-tight">
+                          <!-- Nom / Name -->
+                          <div>
+                            <span class="text-slate-500 font-semibold block leading-none">Nom / Name</span>
+                            <span id="senPreviewSurname" class="font-black text-slate-950 text-xs sm:text-sm md:text-base leading-tight block truncate uppercase">KASSÉ</span>
+                          </div>
+
+                          <!-- Prénoms / Given Names -->
+                          <div>
+                            <span class="text-slate-500 font-semibold block leading-none">Prénom / Given Names</span>
+                            <span id="senPreviewGiven" class="font-black text-slate-950 text-xs sm:text-sm md:text-base leading-tight block truncate uppercase">DIEYNABA</span>
+                          </div>
+
+                          <!-- Nationalité / Nationality -->
+                          <div>
+                            <span class="text-slate-500 font-semibold block leading-none">Nationalité / Nationality</span>
+                            <span id="senPreviewNationality" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">SÉNÉGALAISE</span>
+                          </div>
+
+                          <!-- Date de naissance / Date of birth -->
+                          <div>
+                            <span class="text-slate-500 font-semibold block leading-none">Date de naissance / Date of birth</span>
+                            <span id="senPreviewDob" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">25 NOV / NOV 2001</span>
+                          </div>
+
+                          <!-- Sexe / Sex & Lieu de naissance / Place of birth -->
+                          <div class="grid grid-cols-3 gap-1">
+                            <div>
+                              <span class="text-slate-500 font-semibold block leading-none">Sexe / Sex</span>
+                              <span id="senPreviewSex" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight block">F</span>
+                            </div>
+                            <div class="col-span-2">
+                              <span class="text-slate-500 font-semibold block leading-none">Lieu de naissance / Place of birth</span>
+                              <span id="senPreviewPob" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight block truncate uppercase">DOUMGA LAO</span>
+                            </div>
+                          </div>
+
+                          <!-- Date de délivrance / Date of issue -->
+                          <div>
+                            <span class="text-slate-500 font-semibold block leading-none">Date de délivrance / Date of issue</span>
+                            <span id="senPreviewIssueDate" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">19 OCT / OCT 2024</span>
+                          </div>
+
+                          <!-- Date d'expiration / Date of expiry -->
+                          <div>
+                            <span class="text-slate-500 font-semibold block leading-none">Date d'expiration / Date of expiry</span>
+                            <span id="senPreviewExpiryDate" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">18 OCT / OCT 2029</span>
+                          </div>
+                        </div>
+
+                        <!-- Right: Ghost Photo, N° personnel, Autorité & Signature -->
+                        <div class="flex flex-col justify-between shrink-0 w-24 sm:w-28 md:w-32 text-[7px] sm:text-[8px] leading-tight">
+                          <!-- Ghost Photo -->
+                          <div class="w-14 sm:w-16 h-18 sm:h-20 rounded-xs overflow-hidden border border-slate-300 bg-white/70 shadow-2xs relative ml-auto opacity-75">
+                            <div class="sen-ghost-ref-container w-full h-full overflow-hidden relative grayscale">
+                              <img src="/assets/aistudio/1_cce2ce96.png" class="absolute w-[380%] max-w-none left-[-18%] top-[-242%] pointer-events-none select-none" alt="Ghost">
+                            </div>
+                            <img alt="Ghost" class="sen-ghost-img hidden w-full h-full object-cover grayscale">
+                          </div>
+
+                          <!-- N° personnel / Personal No. -->
+                          <div class="mt-1">
+                            <span class="text-slate-500 font-semibold block leading-none text-[6.5px] sm:text-[7.5px]">N° personnel / Personal No.</span>
+                            <span id="senPreviewPersonalNo" class="font-mono-code font-black text-slate-950 text-[9px] sm:text-[10.5px] leading-none block truncate">2312201200531</span>
+                          </div>
+
+                          <!-- Autorité / Authority -->
+                          <div class="mt-1">
+                            <span class="text-slate-500 font-semibold block leading-none text-[6.5px] sm:text-[7.5px]">Autorité / Authority</span>
+                            <span id="senPreviewAuthority" class="font-bold text-slate-950 text-[8.5px] sm:text-[9.5px] leading-none block truncate">MINT/DGPN/DPETV</span>
+                          </div>
+
+                          <!-- Signature du titulaire -->
+                          <div class="mt-1.5 pt-1 border-t border-slate-200">
+                            <span class="text-slate-500 font-semibold block leading-none text-[6px] sm:text-[7px]">Signature du titulaire / Holder's signature</span>
+                            <span id="senPreviewSignature" class="font-serif italic font-bold text-xs sm:text-sm text-slate-800 leading-none block mt-0.5">Dieynaba</span>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <!-- Bottom MRZ (Machine Readable Zone - 2 Lines of 44 Characters) -->
+                      <div class="relative z-10 w-full bg-[#f8f7ee] border-t border-slate-300 px-3 py-1.5 font-mono-code text-[7.5px] sm:text-[9px] md:text-[10px] leading-tight tracking-[0.08em] sm:tracking-[0.14em] text-slate-900 mt-1">
+                        <div id="senMrzLine1" class="truncate font-extrabold">P&lt;SENKASSE&lt;&lt;DIEYNABA&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                        <div id="senMrzLine2" class="truncate font-extrabold">A041636060SEN0111252F29101832312201200531&lt;20</div>
+                      </div>
+
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- ================= 2. DATAPAGE ONLY VIEW ================= -->
+                <div id="sen-view-datapage" class="hidden w-full">
+                  <article id="senegal-datapage-card" class="senegal-datapage-bg relative w-full aspect-[1.48/1] rounded-2xl shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden flex flex-col justify-between text-slate-900 select-none">
+                    <!-- Watermark "SAMPLE — NOT VALID" -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
+                      <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
+                        <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
+                          SAMPLE — NOT VALID
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="relative z-10 w-full text-center pb-1 border-b border-emerald-900/10">
+                      <div class="font-black text-slate-950 text-sm sm:text-base md:text-lg tracking-wider uppercase">
+                        REPUBLIQUE DU SENEGAL
+                      </div>
+                    </div>
+
+                    <div class="relative z-10 flex items-baseline justify-between text-[8px] sm:text-[9.5px] border-b border-emerald-900/10 pb-1">
+                      <div class="text-slate-700 font-bold leading-tight">
+                        <span>Passeport /</span>
+                        <span class="text-slate-500 italic ml-0.5">Passport</span>
+                      </div>
+                      <div class="flex items-center gap-6 font-mono-code font-bold">
+                        <div>
+                          <span class="text-slate-500 font-sans text-[7px] sm:text-[8px] block font-semibold leading-none">Type</span>
+                          <span id="senSingleType" class="text-slate-900 text-xs">P</span>
+                        </div>
+                        <div>
+                          <span class="text-slate-500 font-sans text-[7px] sm:text-[8px] block font-semibold leading-none">Code</span>
+                          <span id="senSingleCountryCode" class="text-slate-900 text-xs">SEN</span>
+                        </div>
+                        <div>
+                          <span class="text-slate-500 font-sans text-[7px] sm:text-[8px] block font-semibold leading-none">N° Passeport</span>
+                          <span id="senSinglePassNo" class="text-slate-950 text-xs sm:text-sm font-black">A04163606</span>
+                        </div>
+                      </div>
+                      <div class="w-10 sm:w-12 h-6 sm:h-7 rounded-xs overflow-hidden border border-amber-500/50 bg-gradient-to-tr from-emerald-500/30 via-yellow-400/40 to-rose-500/30 shadow-2xs flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 60 40" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                          <polygon points="30,8 33,16 42,16 35,21 38,30 30,24 22,30 25,21 18,16 27,16" fill="#ca8a04" fill-opacity="0.7"/>
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div class="relative z-10 flex items-stretch justify-between gap-3 my-auto pt-1">
+                      <div class="flex flex-col items-center shrink-0 w-28 sm:w-34">
+                        <div class="w-full aspect-[3/3.9] rounded-xs overflow-hidden border border-slate-300 bg-white shadow-xs relative">
+                          <div class="sen-photo-ref-container w-full h-full overflow-hidden relative">
+                            <img src="/assets/aistudio/1_cce2ce96.png" class="absolute w-[380%] max-w-none left-[-18%] top-[-242%] pointer-events-none select-none" alt="Photo">
+                          </div>
+                          <img alt="Portrait" class="sen-photo-custom-img hidden w-full h-full object-cover">
+                        </div>
+                      </div>
+
+                      <div class="flex-1 min-w-0 space-y-1 text-[8px] sm:text-[9.5px] leading-tight">
+                        <div>
+                          <span class="text-slate-500 font-semibold block leading-none">Nom / Name</span>
+                          <span id="senSingleSurname" class="font-black text-slate-950 text-sm sm:text-base leading-tight block truncate uppercase">KASSÉ</span>
+                        </div>
+                        <div>
+                          <span class="text-slate-500 font-semibold block leading-none">Prénom / Given Names</span>
+                          <span id="senSingleGiven" class="font-black text-slate-950 text-sm sm:text-base leading-tight block truncate uppercase">DIEYNABA</span>
+                        </div>
+                        <div>
+                          <span class="text-slate-500 font-semibold block leading-none">Nationalité / Nationality</span>
+                          <span id="senSingleNationality" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">SÉNÉGALAISE</span>
+                        </div>
+                        <div>
+                          <span class="text-slate-500 font-semibold block leading-none">Date de naissance / Date of birth</span>
+                          <span id="senSingleDob" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">25 NOV / NOV 2001</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1">
+                          <div>
+                            <span class="text-slate-500 font-semibold block leading-none">Sexe</span>
+                            <span id="senSingleSex" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight block">F</span>
+                          </div>
+                          <div class="col-span-2">
+                            <span class="text-slate-500 font-semibold block leading-none">Lieu de naissance</span>
+                            <span id="senSinglePob" class="font-bold text-slate-950 text-xs sm:text-sm leading-tight block truncate uppercase">DOUMGA LAO</span>
+                          </div>
+                        </div>
+                        <div>
+                          <span class="text-slate-500 font-semibold block leading-none">Date de délivrance / Date of issue</span>
+                          <span id="senSingleIssueDate" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">19 OCT / OCT 2024</span>
+                        </div>
+                        <div>
+                          <span class="text-slate-500 font-semibold block leading-none">Date d'expiration / Date of expiry</span>
+                          <span id="senSingleExpiryDate" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm leading-tight block uppercase">18 OCT / OCT 2029</span>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-col justify-between shrink-0 w-28 sm:w-32 text-[8px] sm:text-[9px] leading-tight">
+                        <div class="w-16 sm:w-18 h-20 sm:h-22 rounded-xs overflow-hidden border border-slate-300 bg-white/70 shadow-2xs relative ml-auto opacity-75">
+                          <div class="sen-ghost-ref-container w-full h-full overflow-hidden relative grayscale">
+                            <img src="/assets/aistudio/1_cce2ce96.png" class="absolute w-[380%] max-w-none left-[-18%] top-[-242%] pointer-events-none select-none" alt="Ghost">
+                          </div>
+                          <img alt="Ghost" class="sen-ghost-img hidden w-full h-full object-cover grayscale">
+                        </div>
+                        <div class="mt-1">
+                          <span class="text-slate-500 font-semibold block leading-none text-[7px] sm:text-[8px]">N° personnel / Personal No.</span>
+                          <span id="senSinglePersonalNo" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs leading-none block truncate">2312201200531</span>
+                        </div>
+                        <div class="mt-1">
+                          <span class="text-slate-500 font-semibold block leading-none text-[7px] sm:text-[8px]">Autorité / Authority</span>
+                          <span id="senSingleAuthority" class="font-bold text-slate-950 text-[9px] sm:text-[10px] leading-none block truncate">MINT/DGPN/DPETV</span>
+                        </div>
+                        <div class="mt-1.5 pt-1 border-t border-slate-200">
+                          <span class="text-slate-500 font-semibold block leading-none text-[6.5px] sm:text-[7.5px]">Signature du titulaire</span>
+                          <span id="senSingleSignature" class="font-serif italic font-bold text-xs sm:text-sm text-slate-800 leading-none block mt-0.5">Dieynaba</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="relative z-10 w-full bg-[#f8f7ee] border-t border-slate-300 px-3 py-2 font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] leading-tight tracking-[0.1em] sm:tracking-[0.14em] text-slate-900 mt-1">
+                      <div id="senSingleMrzLine1" class="truncate font-extrabold">P&lt;SENKASSE&lt;&lt;DIEYNABA&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="senSingleMrzLine2" class="truncate font-extrabold">A041636060SEN0111252F29101832312201200531&lt;20</div>
+                    </div>
+                  </article>
+                </div>
+
+                <!-- ================= 3. OBSERVATION PAGE ONLY VIEW ================= -->
+                <div id="sen-view-page1" class="hidden w-full">
+                  <article id="senegal-page1-card" class="senegal-page1-bg relative w-full aspect-[1.48/1] rounded-2xl shadow-2xl border-2 border-slate-300 p-4 sm:p-6 overflow-hidden flex flex-col justify-between text-slate-900 select-none">
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
+                      <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
+                        <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
+                          SAMPLE — NOT VALID
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="relative z-10 flex h-full items-stretch justify-between gap-4">
+                      <div class="flex items-center gap-1.5 shrink-0 pl-1">
+                        <div class="font-bold text-slate-700 text-[8px] sm:text-[9.5px] leading-tight select-none uppercase tracking-wider" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                          <span>COMMUNAUTE ECONOMIQUE DES ETATS DE L'AFRIQUE DE L'OUEST</span>
+                          <span class="text-slate-500 font-medium ml-1">ECONOMIC COMMUNITY OF WEST AFRICAN STATES</span>
+                        </div>
+
+                        <div class="font-black text-slate-900 text-[11px] sm:text-sm leading-none select-none uppercase tracking-wider pl-1" style="writing-mode: vertical-rl; transform: rotate(180deg);">
+                          <span>REPUBLIQUE DU SENEGAL</span>
+                          <span class="text-slate-500 text-[9px] sm:text-xs font-bold ml-1">REPUBLIC OF SENEGAL</span>
+                        </div>
+                      </div>
+
+                      <div class="my-auto flex flex-col items-center justify-center shrink-0">
+                        <div class="w-32 sm:w-40 h-32 sm:h-40 rounded-full p-1.5 border-2 border-[#831843]/40 bg-white/70 shadow-xs flex items-center justify-center relative">
+                          <svg viewBox="0 0 160 160" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="80" cy="80" r="76" fill="none" stroke="#be185d" stroke-width="1.8" stroke-dasharray="3 2"/>
+                            <circle cx="80" cy="80" r="71" fill="#fffdfa" stroke="#831843" stroke-width="1.8"/>
+                            <circle cx="80" cy="80" r="50" fill="#fdf2f8" stroke="#831843" stroke-width="1.2"/>
+                            <path d="M 60 70 Q 56 65 52 75 Q 46 82 54 90 Q 64 96 74 94 Q 86 96 98 88 Q 112 84 108 72 Q 102 64 90 66 Q 80 62 70 66 Z" fill="#f472b6" fill-opacity="0.5" stroke="#9d174d" stroke-width="1.5"/>
+                            <path id="sealTopArc2" d="M 28 80 A 52 52 0 0 1 132 80" fill="none"/>
+                            <text font-size="9.5" font-family="'Inter', sans-serif" font-weight="900" fill="#831843" letter-spacing="1.5">
+                              <textPath href="#sealTopArc2" startOffset="50%" text-anchor="middle">REPUBLIQUE DU SENEGAL</textPath>
+                            </text>
+                            <path id="sealBottomArc2" d="M 132 80 A 52 52 0 0 1 28 80" fill="none"/>
+                            <text font-size="7.5" font-family="'Inter', sans-serif" font-weight="700" fill="#831843" letter-spacing="1">
+                              <textPath href="#sealBottomArc2" startOffset="50%" text-anchor="middle">★ un peuple • un but • une foi ★</textPath>
+                            </text>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-col justify-center items-start space-y-2 pr-4 sm:pr-6">
+                        <div>
+                          <div class="text-slate-950 font-black text-xl sm:text-3xl tracking-wider leading-none">PASSEPORT</div>
+                          <div class="text-slate-600 text-xs sm:text-base font-medium italic leading-tight">Passport</div>
+                        </div>
+
+                        <div class="pt-1.5">
+                          <div id="senSinglePage1PassNo" class="font-mono-code font-black text-red-700 text-base sm:text-lg tracking-widest leading-none">
+                            A 04163606
+                          </div>
+                        </div>
+
+                        <div class="pt-3 text-[9px] sm:text-xs text-slate-600 leading-tight">
+                          <div class="font-bold text-slate-800">Ce passeport contient 32 pages</div>
+                          <div class="italic text-slate-500">This passport contains 32 pages</div>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+
 
       <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY BANK LETTER & PDF) VIEW ================= -->
       <div id="proofofaccount-doc-view" class="hidden">
