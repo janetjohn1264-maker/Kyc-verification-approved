@@ -1537,7 +1537,18 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     // ================= REPUBLIC OF UGANDA REFUGEE IDENTITY CARD CONTROLLER =================
-    const defaultUgaPhoto = '/assets/aistudio/uganda_refugee_portrait.jpg';
+    const ugaMalePhotos = [
+      '/assets/aistudio/kenya_maisha_portrait_adan.jpg',
+      '/assets/aistudio/kenya_maisha_portrait_hassan.jpg',
+      '/assets/aistudio/somali_smart_id_portrait.jpg',
+      '/assets/aistudio/somali_nira_portrait.jpg',
+      '/assets/aistudio/uganda_refugee_portrait.jpg'
+    ];
+    const ugaFemalePhotos = [
+      '/assets/aistudio/somali_card_female_portrait.jpg',
+      '/assets/aistudio/ethiopia_fayda_portrait.jpg'
+    ];
+    const defaultUgaPhoto = '/assets/aistudio/kenya_maisha_portrait_adan.jpg';
 
     function initUgandaDefaultPhoto() {
       if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
@@ -1553,12 +1564,12 @@ var $ = window.$ || (id => document.getElementById(id));
       const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
       const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
 
-      setText('ugaPreviewName', getVal('ugaInputName', 'SULEYMAN ABDI SALAD').toUpperCase());
-      setText('ugaPreviewId', getVal('ugaInputId', 'H9B-00021428').toUpperCase());
-      setText('ugaPreviewNationality', getVal('ugaInputNationality', 'Somali'));
-      setText('ugaPreviewDob', getVal('ugaInputDob', '09-Sep-2001'));
-      setText('ugaPreviewIssue', getVal('ugaInputIssue', '25-Jul-2023'));
-      setText('ugaPreviewExpiry', getVal('ugaInputExpiry', '25-Jul-2028'));
+      setText('ugaPreviewName', getVal('ugaInputName', 'ISMAIL YUSUF WARSAME').toUpperCase());
+      setText('ugaPreviewId', getVal('ugaInputId', 'H9B-00481952').toUpperCase());
+      setText('ugaPreviewNationality', getVal('ugaInputNationality', 'South Sudanese'));
+      setText('ugaPreviewDob', getVal('ugaInputDob', '14-Mar-1996'));
+      setText('ugaPreviewIssue', getVal('ugaInputIssue', '12-May-2022'));
+      setText('ugaPreviewExpiry', getVal('ugaInputExpiry', '12-May-2027'));
       setText('ugaPreviewSex', getVal('ugaInputSex', 'Male'));
     }
 
@@ -1571,21 +1582,23 @@ var $ = window.$ || (id => document.getElementById(id));
       setVal('ugaInputIssue', '25-Jul-2023');
       setVal('ugaInputExpiry', '25-Jul-2028');
       setVal('ugaInputSex', 'Male');
-      resetUgandaPhoto();
+      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = '/assets/aistudio/uganda_refugee_portrait.jpg';
       updateUgandaPreview();
       showToast('Sample Restored', 'Restored Uganda Refugee Identity Card specimen data');
     }
 
     function randomizeUgandaRefugeeCard() {
-      const maleNames = ['SULEYMAN ABDI SALAD', 'HASSAN OMAR GUURE', 'KHALID ABDIRAHMAN ALI', 'ISMAIL YUSUF WARSAME', 'MUKHTAR DAUD ADEN', 'IBRAHIM HUSSEIN FARAH'];
+      const maleNames = ['ISMAIL YUSUF WARSAME', 'MUKHTAR DAUD ADEN', 'KHALID ABDIRAHMAN ALI', 'HASSAN OMAR GUURE', 'SULEYMAN ABDI SALAD', 'IBRAHIM HUSSEIN FARAH'];
       const femaleNames = ['FATUMA AHMED NUR', 'SAFIA DAHIR SHIRE', 'MARYAN OMAR ROBLE', 'DEEQA KHALID HASSAN', 'XALIIMO CALI JIBRIL'];
-      const nationalities = ['Somali', 'Congolese (DRC)', 'South Sudanese', 'Rwandan', 'Burundian', 'Eritrean'];
+      const nationalities = ['South Sudanese', 'Congolese (DRC)', 'Somali', 'Rwandan', 'Burundian', 'Eritrean'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
       const isMale = Math.random() > 0.4;
       const name = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
       const nat = nationalities[Math.floor(Math.random() * nationalities.length)];
       const idNum = 'H9B-' + String(Math.floor(10000000 + Math.random() * 90000000));
+      const pool = isMale ? ugaMalePhotos : ugaFemalePhotos;
+      const randomPhoto = pool[Math.floor(Math.random() * pool.length)];
 
       const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
       const bMonth = months[Math.floor(Math.random() * months.length)];
@@ -1606,6 +1619,7 @@ var $ = window.$ || (id => document.getElementById(id));
       setVal('ugaInputIssue', issueDate);
       setVal('ugaInputExpiry', expDate);
       setVal('ugaInputSex', isMale ? 'Male' : 'Female');
+      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = randomPhoto;
 
       updateUgandaPreview();
       showToast('Card Randomized!', `Generated Refugee Card for ${name}`);
@@ -10437,18 +10451,18 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <!-- Full Name -->
               <div>
                 <label for="ugaInputName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Name (Full Legal Name)</label>
-                <input id="ugaInputName" type="text" value="SULEYMAN ABDI SALAD" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+                <input id="ugaInputName" type="text" value="ISMAIL YUSUF WARSAME" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
               </div>
 
               <!-- Individual ID & Nationality -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label for="ugaInputId" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Individual ID</label>
-                  <input id="ugaInputId" type="text" value="H9B-00021428" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="ugaInputId" type="text" value="H9B-00481952" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
                 <div>
                   <label for="ugaInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nationality</label>
-                  <input id="ugaInputNationality" type="text" value="Somali" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
+                  <input id="ugaInputNationality" type="text" value="South Sudanese" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
                 </div>
               </div>
 
@@ -10456,11 +10470,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label for="ugaInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
-                  <input id="ugaInputDob" type="text" value="09-Sep-2001" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="ugaInputDob" type="text" value="14-Mar-1996" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
                 <div>
                   <label for="ugaInputExpiry" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Expiry Date</label>
-                  <input id="ugaInputExpiry" type="text" value="25-Jul-2028" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="ugaInputExpiry" type="text" value="12-May-2027" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
               </div>
 
@@ -10468,7 +10482,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label for="ugaInputIssue" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issuance Date</label>
-                  <input id="ugaInputIssue" type="text" value="25-Jul-2023" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="ugaInputIssue" type="text" value="12-May-2022" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
                 <div>
                   <label for="ugaInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sex</label>
@@ -10538,7 +10552,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <!-- Left: Portrait Photo Frame -->
                   <div class="col-span-4 sm:col-span-3.5 flex flex-col items-center">
                     <div class="w-full aspect-[3.1/4] max-w-[140px] bg-slate-200 border-2 border-slate-300 rounded-sm overflow-hidden shadow-sm relative">
-                      <img id="ugaPreviewPhoto" src="/assets/aistudio/uganda_refugee_portrait.jpg" alt="Refugee Photo" class="w-full h-full object-cover">
+                      <img id="ugaPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_adan.jpg" alt="Refugee Photo" class="w-full h-full object-cover">
                     </div>
                   </div>
 
@@ -10549,7 +10563,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <div class="col-span-12 flex items-baseline gap-2">
                       <span class="text-[10px] sm:text-[11px] font-bold text-slate-600 shrink-0">Name:</span>
                       <span id="ugaPreviewName" class="font-extrabold text-slate-950 text-xs sm:text-sm tracking-wide uppercase">
-                        SULEYMAN ABDI SALAD
+                        ISMAIL YUSUF WARSAME
                       </span>
                     </div>
 
@@ -10557,13 +10571,13 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <div class="col-span-6 flex flex-col">
                       <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Individual ID:</span>
                       <span id="ugaPreviewId" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm tracking-wide mt-0.5">
-                        H9B-00021428
+                        H9B-00481952
                       </span>
                     </div>
                     <div class="col-span-6 flex flex-col">
                       <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Nationality:</span>
                       <span id="ugaPreviewNationality" class="font-extrabold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        Somali
+                        South Sudanese
                       </span>
                     </div>
 
@@ -10571,13 +10585,13 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <div class="col-span-6 flex flex-col">
                       <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Date of Birth:</span>
                       <span id="ugaPreviewDob" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        09-Sep-2001
+                        14-Mar-1996
                       </span>
                     </div>
                     <div class="col-span-6 flex flex-col">
                       <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Expiry Date:</span>
                       <span id="ugaPreviewExpiry" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        25-Jul-2028
+                        12-May-2027
                       </span>
                     </div>
 
@@ -10585,7 +10599,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <div class="col-span-6 flex flex-col">
                       <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Issuance Date:</span>
                       <span id="ugaPreviewIssue" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        25-Jul-2023
+                        12-May-2022
                       </span>
                     </div>
                     <div class="col-span-6 flex flex-col">
@@ -13145,7 +13159,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
           </button>
           
           <!-- Button 2: Email Us -->
-          <a href="mailto:qalinle631@gmail.com?subject=Country%20or%20Document%20Request%20-%20KYC%20Approved&body=Hello%20KYC%20Approved%20Team%2C%0A%0AI%20am%20looking%20for%20the%20following%20country%20or%20document%3A%0A-%20Country%3A%20%0A-%20Document%20Type%3A%20%0A%0AThank%20you!" onclick="closeWelcomeModal()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors text-center cursor-pointer">
+          <a href="mailto:gavinarnold455@gmail.com?subject=Country%20or%20Document%20Request%20-%20KYC%20Approved&body=Hello%20KYC%20Approved%20Team%2C%0A%0AI%20am%20looking%20for%20the%20following%20country%20or%20document%3A%0A-%20Country%3A%20%0A-%20Document%20Type%3A%20%0A%0AThank%20you!" onclick="closeWelcomeModal()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors text-center cursor-pointer">
             <i class="fa-solid fa-envelope text-xs"></i>
             <span>Email Us</span>
           </a>
@@ -13187,12 +13201,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
             <i class="fa-solid fa-envelope text-blue-600 text-lg"></i>
             <div>
               <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Official Email</span>
-              <a href="mailto:qalinle631@gmail.com" class="font-bold text-slate-900 text-xs hover:text-blue-600">
-                qalinle631@gmail.com
+              <a href="mailto:gavinarnold455@gmail.com" class="font-bold text-slate-900 text-xs hover:text-blue-600">
+                gavinarnold455@gmail.com
               </a>
             </div>
           </div>
-          <button onclick="copyToClipboard('qalinle631@gmail.com', 'Email copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
+          <button onclick="copyToClipboard('gavinarnold455@gmail.com', 'Email copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
             <i class="fa-regular fa-copy"></i>
           </button>
         </div>
@@ -13203,12 +13217,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
             <i class="fa-solid fa-phone text-emerald-600 text-lg"></i>
             <div>
               <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone &amp; WhatsApp</span>
-              <a href="tel:+252615589321" class="font-bold text-slate-900 text-xs hover:text-emerald-600">
-                +252 615 589 321
+              <a href="tel:005365446" class="font-bold text-slate-900 text-xs hover:text-emerald-600">
+                005365446
               </a>
             </div>
           </div>
-          <button onclick="copyToClipboard('+252615589321', 'Phone copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
+          <button onclick="copyToClipboard('005365446', 'Phone copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
             <i class="fa-regular fa-copy"></i>
           </button>
         </div>
