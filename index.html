@@ -4366,20 +4366,20 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function resetSomDetailsToSample() {
-      if ($('somInputTracking')) $('somInputTracking').value = '228021103481';
-      if ($('somInputIdNo')) $('somInputIdNo').value = '63176452261';
-      if ($('somInputIssueDate')) $('somInputIssueDate').value = '16-05-2026';
-      if ($('somInputNameAfaran')) $('somInputNameAfaran').value = 'MAXAMED CABDUQADIR MAXAMED';
-      if ($('somInputFullName')) $('somInputFullName').value = 'MOHAMED ABDUKADIR MOHAMED';
-      if ($('somInputParent')) $('somInputParent').value = '';
+      if ($('somInputTracking')) $('somInputTracking').value = '492018573912';
+      if ($('somInputIdNo')) $('somInputIdNo').value = '85194026384';
+      if ($('somInputIssueDate')) $('somInputIssueDate').value = '08-04-2026';
+      if ($('somInputNameAfaran')) $('somInputNameAfaran').value = 'XASAN CALI WARSAME YUUSUF';
+      if ($('somInputFullName')) $('somInputFullName').value = 'HASSAN ALI WARSAME YUSUF';
+      if ($('somInputParent')) $('somInputParent').value = 'CALI WARSAME YUUSUF';
       if ($('somInputSex')) $('somInputSex').value = 'MALE';
-      if ($('somInputDob')) $('somInputDob').value = '31-05-1995';
-      if ($('somInputPob')) $('somInputPob').value = 'XUDUR, SOMALIA';
+      if ($('somInputDob')) $('somInputDob').value = '19-09-1996';
+      if ($('somInputPob')) $('somInputPob').value = 'MUQDISHO, SOMALIA';
       if ($('somInputCountry')) $('somInputCountry').value = 'SOMALIA';
-      if ($('somInputAddress')) $('somInputAddress').value = 'BULLOW, XUDUR, BAKOOL, SOMALIA';
+      if ($('somInputAddress')) $('somInputAddress').value = 'HODAN, MUQDISHO, BANAADIR, SOMALIA';
       resetSomPhoto();
       updateSomPreview();
-      showToast('Sample Restored', 'Somali NIRA document details reset to exact sample');
+      showToast('Sample Restored', 'Somali NIRA document details reset to default sample');
     }
 
     // Somalia NIRA Live Preview
@@ -4417,10 +4417,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       const idCheck = calculateIcaoCheckDigit(cleanId.slice(0, 9));
       const line1 = `IPSO${cleanId}`.padEnd(30, '<').substring(0, 30);
 
-      const dobYYMMDD = dateToYYMMDD(dob, '950531');
+      const dobYYMMDD = dateToYYMMDD(dob, '960919');
       const dobCheck = calculateIcaoCheckDigit(dobYYMMDD);
       const sexChar = sex.startsWith('F') ? 'F' : 'M';
-      const expYYMMDD = dateToYYMMDD(issueDate, '260516');
+      const expYYMMDD = dateToYYMMDD(issueDate, '260408');
       const expCheck = calculateIcaoCheckDigit(expYYMMDD);
       const line2 = `${dobYYMMDD}${dobCheck}${sexChar}${expYYMMDD}${expCheck}SOM<<<<<<<<<<<4`.padEnd(30, '<').substring(0, 30);
 
@@ -4558,18 +4558,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     function resetSomPassDetailsToSample() {
       if ($('somPassInputType')) $('somPassInputType').value = 'P';
       if ($('somPassInputCountry')) $('somPassInputCountry').value = 'SOM';
-      if ($('somPassInputNumber')) $('somPassInputNumber').value = 'P00724085';
-      if ($('somPassInputName')) $('somPassInputName').value = 'MAXAMED CABDIQADIR MAXAMED';
-      if ($('somPassInputMother')) $('somPassInputMother').value = 'FARTUN ADEN RONOW';
-      if ($('somPassInputNid')) $('somPassInputNid').value = '29505057463496';
+      if ($('somPassInputNumber')) $('somPassInputNumber').value = 'P00849261';
+      if ($('somPassInputName')) $('somPassInputName').value = 'CABDIRAXMAAN CUMAR WARSAME';
+      if ($('somPassInputMother')) $('somPassInputMother').value = 'DEEQA OMAR ROBLE';
+      if ($('somPassInputNid')) $('somPassInputNid').value = '29708149583210';
       if ($('somPassInputNationality')) $('somPassInputNationality').value = 'SOMALI';
-      if ($('somPassInputOccupation')) $('somPassInputOccupation').value = 'STUDENT';
-      if ($('somPassInputDob')) $('somPassInputDob').value = '05 May 1995';
-      if ($('somPassInputIssuePlace')) $('somPassInputIssuePlace').value = 'BAIDOA';
+      if ($('somPassInputOccupation')) $('somPassInputOccupation').value = 'BUSINESSMAN';
+      if ($('somPassInputDob')) $('somPassInputDob').value = '14 Aug 1997';
+      if ($('somPassInputIssuePlace')) $('somPassInputIssuePlace').value = 'MOGADISHU';
       if ($('somPassInputSex')) $('somPassInputSex').value = 'MALE';
-      if ($('somPassInputBirthPlace')) $('somPassInputBirthPlace').value = 'HUDUR';
-      if ($('somPassInputIssueDate')) $('somPassInputIssueDate').value = '21 Apr 2018';
-      if ($('somPassInputExpiryDate')) $('somPassInputExpiryDate').value = '20 Apr 2023';
+      if ($('somPassInputBirthPlace')) $('somPassInputBirthPlace').value = 'MOGADISHU';
+      if ($('somPassInputIssueDate')) $('somPassInputIssueDate').value = '18 Jun 2021';
+      if ($('somPassInputExpiryDate')) $('somPassInputExpiryDate').value = '17 Jun 2026';
       if ($('somPassInputAuthority')) $('somPassInputAuthority').value = 'SOMALI GOVERNMENT';
       if ($('somPassWatermarkText')) $('somPassWatermarkText').value = 'SPECIMEN';
       if ($('somPassShowWatermark')) $('somPassShowWatermark').checked = false;
@@ -4579,18 +4579,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function randomizeSomaliaPassport() {
-      const maleNames = ['MAXAMED CABDIQADIR MAXAMED', 'AHMED XASAN CALI', 'CABDIRAXMAAN CUMAR WARSAME', 'ISMAACIIL YUUSUF FAARAX', 'KHALID SHIRE GUULEED'];
-      const femaleNames = ['FARTUN ADEN RONOW', 'MARYAN MAXAMUD GELLE', 'SAFIA DAHIR CILMI', 'XALIIMO CALI NUUR'];
-      const mothers = ['FARTUN ADEN RONOW', 'MARYAN ABDI WARSAME', 'SAFIA HASSAN GEDI', 'DEEQA OMAR ROBLE', 'FADUMA ALI JIBRIL'];
+      const maleNames = ['CABDIRAXMAAN CUMAR WARSAME', 'AXMED XASAN CALI', 'ISMAACIIL YUUSUF FAARAX', 'KHAALID SHIRE GUULEED', 'JAAMAC CUSMAAN DIRIE', 'CILMI AADAN ROOBLE'];
+      const femaleNames = ['FARTUN ADEN RONOW', 'MARYAN MAXAMUD GELLE', 'SAFIA DAHIR CILMI', 'XALIIMO CALI NUUR', 'DEEQA OMAR ROBLE'];
+      const mothers = ['DEEQA OMAR ROBLE', 'MARYAN ABDI WARSAME', 'SAFIA HASSAN GEDI', 'FARTUN ADEN RONOW', 'FADUMA ALI JIBRIL'];
       const cities = ['MOGADISHU', 'BAIDOA', 'HUDUR', 'HARGEYSA', 'KISMAYO', 'BOSASO', 'GAROWE'];
-      const occupations = ['STUDENT', 'BUSINESSMAN', 'CIVIL SERVANT', 'ENGINEER', 'TEACHER', 'TRADER', 'CONSULTANT'];
+      const occupations = ['BUSINESSMAN', 'STUDENT', 'CIVIL SERVANT', 'ENGINEER', 'TEACHER', 'TRADER', 'CONSULTANT'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
       const isMale = Math.random() > 0.4;
       const name = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
       const mother = mothers[Math.floor(Math.random() * mothers.length)];
       const passNo = 'P' + String(Math.floor(10000000 + Math.random() * 90000000));
-      const nid = '295' + String(Math.floor(10000000000 + Math.random() * 90000000000));
+      const nid = '297' + String(Math.floor(10000000000 + Math.random() * 90000000000));
       const occ = occupations[Math.floor(Math.random() * occupations.length)];
 
       const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
@@ -4746,13 +4746,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function resetSomPassIdCardToSample() {
-      if ($('somPassIdInputName')) $('somPassIdInputName').value = 'Shufti Ahmed Mahammud';
-      if ($('somPassIdInputFather')) $('somPassIdInputFather').value = 'Hameed Ahmed';
-      if ($('somPassIdInputSex')) $('somPassIdInputSex').value = 'Female';
-      if ($('somPassIdInputDob')) $('somPassIdInputDob').value = '22-02-1980';
-      if ($('somPassIdInputIdNo')) $('somPassIdInputIdNo').value = '23654789221';
-      if ($('somPassIdInputIssue')) $('somPassIdInputIssue').value = '15-11-2022';
-      if ($('somPassIdInputExpiry')) $('somPassIdInputExpiry').value = '12-06-2027';
+      if ($('somPassIdInputName')) $('somPassIdInputName').value = 'CABDIRAXMAAN CUMAR WARSAME';
+      if ($('somPassIdInputFather')) $('somPassIdInputFather').value = 'CUMAR WARSAME';
+      if ($('somPassIdInputSex')) $('somPassIdInputSex').value = 'Male';
+      if ($('somPassIdInputDob')) $('somPassIdInputDob').value = '14-08-1997';
+      if ($('somPassIdInputIdNo')) $('somPassIdInputIdNo').value = '29708149583210';
+      if ($('somPassIdInputIssue')) $('somPassIdInputIssue').value = '18-06-2021';
+      if ($('somPassIdInputExpiry')) $('somPassIdInputExpiry').value = '17-06-2026';
       resetSomPassIdPhoto();
       updateSomPassIdCardPreview();
       showToast('Sample Restored', 'Restored Somali Passport Identity Card reference details');
@@ -7597,32 +7597,32 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="grid grid-cols-3 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Tracking Number</label>
-                  <input id="somInputTracking" type="text" value="228021103481" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somInputTracking" type="text" value="492018573912" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Identity Number</label>
-                  <input id="somInputIdNo" type="text" value="63176452261" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somInputIdNo" type="text" value="85194026384" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issue Date</label>
-                  <input id="somInputIssueDate" type="text" value="16-05-2026" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somInputIssueDate" type="text" value="08-04-2026" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
               </div>
 
               <!-- Names -->
               <div>
                 <label class="block font-bold uppercase text-slate-600 mb-1">Magaca oo Afaran (Somali Full Name)</label>
-                <input id="somInputNameAfaran" type="text" value="MAXAMED CABDUQADIR MAXAMED" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+                <input id="somInputNameAfaran" type="text" value="XASAN CALI WARSAME YUUSUF" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
               </div>
               <div>
                 <label class="block font-bold uppercase text-slate-600 mb-1">Full Name (English Transliteration)</label>
-                <input id="somInputFullName" type="text" value="MOHAMED ABDUKADIR MOHAMED" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+                <input id="somInputFullName" type="text" value="HASSAN ALI WARSAME YUSUF" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
               </div>
 
               <!-- Parent / Guardian -->
               <div>
                 <label class="block font-bold uppercase text-slate-600 mb-1">Waalid ama Dan-Dhawre / Parent or Guardian</label>
-                <input id="somInputParent" type="text" value="" placeholder="Optional Parent or Guardian" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                <input id="somInputParent" type="text" value="CALI WARSAME YUUSUF" placeholder="Optional Parent or Guardian" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
               </div>
 
               <!-- Sex, DOB, Place of Birth -->
@@ -7636,11 +7636,11 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
-                  <input id="somInputDob" type="text" value="31-05-1995" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somInputDob" type="text" value="19-09-1996" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth</label>
-                  <input id="somInputPob" type="text" value="XUDUR, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somInputPob" type="text" value="MUQDISHO, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
               </div>
 
@@ -7652,7 +7652,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 </div>
                 <div class="col-span-2">
                   <label class="block font-bold uppercase text-slate-600 mb-1">Current Address / Degaanka</label>
-                  <input id="somInputAddress" type="text" value="BULLOW, XUDUR, BAKOOL, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somInputAddress" type="text" value="HODAN, MUQDISHO, BANAADIR, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
               </div>
 
@@ -7662,10 +7662,16 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <button type="button" onclick="window.print()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Certificate</button>
               </div>
 
-              <button type="button" onclick="resetSomDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                <i class="fa-solid fa-arrows-rotate text-slate-500 text-xs"></i>
-                <span>Reset to Exact Sample Details</span>
-              </button>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="randomizeSomaliaIdCard()" class="py-2 px-3 bg-sky-50 text-sky-800 hover:bg-sky-100 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors border border-sky-200 cursor-pointer">
+                  <i class="fa-solid fa-dice text-xs"></i>
+                  <span>Randomize</span>
+                </button>
+                <button type="button" onclick="resetSomDetailsToSample()" class="py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-arrows-rotate text-slate-500 text-xs"></i>
+                  <span>Reset Sample</span>
+                </button>
+              </div>
             </form>
           </section>
 
@@ -7925,7 +7931,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                           LAMBARKA RAAD RAACA / <span class="font-arabic font-normal">رقم التتبع</span> / TRACKING NUMBER
                         </div>
                         <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
-                          <span id="somPreviewTracking">228021103481</span>
+                          <span id="somPreviewTracking">492018573912</span>
                         </div>
                       </div>
 
@@ -7935,7 +7941,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                           LAMBARKA AQOONSIGA / <span class="font-arabic font-normal">رقم الهوية</span> / IDENTITY NUMBER
                         </div>
                         <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
-                          <span id="somPreviewIdNo">63176452261</span>
+                          <span id="somPreviewIdNo">85194026384</span>
                         </div>
                       </div>
 
@@ -7945,7 +7951,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                           TAARIIKHDA LA BIXIYAY / <span class="font-arabic font-normal">تاريخ الإصدار</span> / ISSUE DATE
                         </div>
                         <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
-                          <span id="somPreviewIssueDate">16-05-2026</span>
+                          <span id="somPreviewIssueDate">08-04-2026</span>
                         </div>
                       </div>
                     </div>
@@ -7966,13 +7972,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Magaca oo Afaran</div>
                           <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 tracking-wide uppercase truncate">
-                            <span id="somPreviewNameAfaran">MAXAMED CABDUQADIR MAXAMED</span>
+                            <span id="somPreviewNameAfaran">XASAN CALI WARSAME YUUSUF</span>
                           </div>
                         </div>
                         <div>
                           <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Full Name</div>
                           <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 tracking-wide uppercase truncate">
-                            <span id="somPreviewFullName">MOHAMED ABDUKADIR MOHAMED</span>
+                            <span id="somPreviewFullName">HASSAN ALI WARSAME YUSUF</span>
                           </div>
                         </div>
                       </div>
@@ -7988,7 +7994,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                       </div>
                       <div class="pl-5 sm:pl-5.5">
                         <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 uppercase min-h-[28px] flex items-center">
-                          <span id="somPreviewParent"></span>
+                          <span id="somPreviewParent">CALI WARSAME YUUSUF</span>
                         </div>
                       </div>
                     </div>
@@ -8011,13 +8017,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div class="col-span-4">
                           <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Taariikhda Dhalashada / <span class="font-arabic">تاريخ الميلاد</span> / Date of Birth</div>
                           <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold font-mono-code text-slate-900 text-center">
-                            <span id="somPreviewDob">31-05-1995</span>
+                            <span id="somPreviewDob">19-09-1996</span>
                           </div>
                         </div>
                         <div class="col-span-5">
                           <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Goobta Dhalashada / <span class="font-arabic">مكان الميلاد</span> / Place of Birth</div>
                           <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold text-slate-900 text-center uppercase">
-                            <span id="somPreviewPob">XUDUR, SOMALIA</span>
+                            <span id="somPreviewPob">MUQDISHO, SOMALIA</span>
                           </div>
                         </div>
                       </div>
@@ -8041,8 +8047,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Degaanka / <span class="font-arabic">العنوان</span> / Address</div>
                           <div class="bg-white border border-slate-300/80 px-2.5 py-1.5 text-xs sm:text-[13px] font-bold text-slate-900 uppercase min-h-[46px] leading-relaxed whitespace-pre-line">
-                            <span id="somPreviewAddress">BULLOW
-XUDUR, BAKOOL, SOMALIA</span>
+                            <span id="somPreviewAddress">HODAN
+MUQDISHO, BANAADIR, SOMALIA</span>
                           </div>
                         </div>
                       </div>
@@ -8155,25 +8161,25 @@ XUDUR, BAKOOL, SOMALIA</span>
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Passport No</label>
-                  <input id="somPassInputNumber" type="text" value="P00724085" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                  <input id="somPassInputNumber" type="text" value="P00849261" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
                 </div>
               </div>
 
               <!-- Full Name (Magaca / الاسم) -->
               <div>
                 <label class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Name</label>
-                <input id="somPassInputName" type="text" value="MAXAMED CABDIQADIR MAXAMED" oninput="updateSomPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+                <input id="somPassInputName" type="text" value="CABDIRAXMAAN CUMAR WARSAME" oninput="updateSomPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
               </div>
 
               <!-- Mother's Name & NID -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Magaca Hooyada (Mother)</label>
-                  <input id="somPassInputMother" type="text" value="FARTUN ADEN RONOW" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somPassInputMother" type="text" value="DEEQA OMAR ROBLE" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NID (National ID)</label>
-                  <input id="somPassInputNid" type="text" value="29505057463496" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputNid" type="text" value="29708149583210" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
               </div>
 
@@ -8185,7 +8191,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Shaqada / Occupation</label>
-                  <input id="somPassInputOccupation" type="text" value="STUDENT" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somPassInputOccupation" type="text" value="BUSINESSMAN" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
               </div>
 
@@ -8193,11 +8199,11 @@ XUDUR, BAKOOL, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth (Dhalashada)</label>
-                  <input id="somPassInputDob" type="text" value="05 May 1995" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputDob" type="text" value="14 Aug 1997" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Issue (Meesha Bixiyey)</label>
-                  <input id="somPassInputIssuePlace" type="text" value="BAIDOA" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somPassInputIssuePlace" type="text" value="MOGADISHU" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
               </div>
 
@@ -8212,7 +8218,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth (Goobta Dhalashada)</label>
-                  <input id="somPassInputBirthPlace" type="text" value="HUDUR" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somPassInputBirthPlace" type="text" value="MOGADISHU" oninput="updateSomPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
               </div>
 
@@ -8220,11 +8226,11 @@ XUDUR, BAKOOL, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Issue (la Bixiyey)</label>
-                  <input id="somPassInputIssueDate" type="text" value="21 Apr 2018" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputIssueDate" type="text" value="18 Jun 2021" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry (Dhacayo)</label>
-                  <input id="somPassInputExpiryDate" type="text" value="20 Apr 2023" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputExpiryDate" type="text" value="17 Jun 2026" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
               </div>
 
@@ -8292,13 +8298,13 @@ XUDUR, BAKOOL, SOMALIA</span>
               <!-- Full Name (Magaca / الاسم) -->
               <div>
                 <label for="somPassIdInputName" class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Name</label>
-                <input id="somPassIdInputName" type="text" value="Shufti Ahmed Mahammud" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+                <input id="somPassIdInputName" type="text" value="CABDIRAXMAAN CUMAR WARSAME" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
               </div>
 
               <!-- Father's Name (Magaca Aabbaha / اسم الأب) -->
               <div>
                 <label for="somPassIdInputFather" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Magaca Aabbaha / اسم الأب / Father's Name</label>
-                <input id="somPassIdInputFather" type="text" value="Hameed Ahmed" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                <input id="somPassIdInputFather" type="text" value="CUMAR WARSAME" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
               </div>
 
               <!-- Sex & Date of Birth -->
@@ -8306,31 +8312,31 @@ XUDUR, BAKOOL, SOMALIA</span>
                 <div>
                   <label for="somPassIdInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Jinsiga / Sex</label>
                   <select id="somPassIdInputSex" onchange="updateSomPassIdCardPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
-                    <option value="Female" selected>Female</option>
-                    <option value="Male">Male</option>
+                    <option value="Male" selected>Male</option>
+                    <option value="Female">Female</option>
                   </select>
                 </div>
                 <div>
                   <label for="somPassIdInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda Dhalashada / Date of Birth</label>
-                  <input id="somPassIdInputDob" type="text" value="22-02-1980" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="somPassIdInputDob" type="text" value="14-08-1997" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
               </div>
 
               <!-- Identity Number (Lambarka aqoonsiga / رقم الهوية) -->
               <div>
                 <label for="somPassIdInputIdNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Lambarka aqoonsiga / Identity Number</label>
-                <input id="somPassIdInputIdNo" type="text" value="23654789221" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white text-slate-900">
+                <input id="somPassIdInputIdNo" type="text" value="29708149583210" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white text-slate-900">
               </div>
 
               <!-- Date of Issue & Date of Expiry -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label for="somPassIdInputIssue" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda la bixiyay / Issue Date</label>
-                  <input id="somPassIdInputIssue" type="text" value="15-11-2022" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="somPassIdInputIssue" type="text" value="18-06-2021" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
                 <div>
                   <label for="somPassIdInputExpiry" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda uu dhacayo / Expiry Date</label>
-                  <input id="somPassIdInputExpiry" type="text" value="12-06-2027" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="somPassIdInputExpiry" type="text" value="17-06-2026" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
               </div>
 
@@ -8375,7 +8381,7 @@ XUDUR, BAKOOL, SOMALIA</span>
 
                       <!-- Dynamic Perforated Passport Number Overlay on Top-Left of Page 3 -->
                       <div class="absolute left-6 top-8 pointer-events-none transform -rotate-90 origin-top-left font-mono-code text-xs sm:text-sm font-black tracking-[0.35em] text-slate-900/40 select-none">
-                        <span id="somPassPerforatedNumber">P00724085</span>
+                        <span id="somPassPerforatedNumber">P00849261</span>
                       </div>
 
                       <!-- Page Number 3 indicator badge -->
@@ -8427,7 +8433,7 @@ XUDUR, BAKOOL, SOMALIA</span>
                         <div class="col-span-4 border-l border-slate-300 pl-1.5 flex items-center justify-between">
                           <div>
                             <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Passport No</span>
-                            <span id="somPassSpreadNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00724085</span>
+                            <span id="somPassSpreadNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00849261</span>
                           </div>
                           <span class="text-amber-800 text-lg sm:text-xl font-bold pr-1">★</span>
                         </div>
@@ -8443,16 +8449,16 @@ XUDUR, BAKOOL, SOMALIA</span>
                         <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
                           <div>
                             <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca / الاسم / Name</span>
-                            <span id="somPassSpreadName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">MAXAMED CABDIQADIR MAXAMED</span>
+                            <span id="somPassSpreadName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">CABDIRAXMAAN CUMAR WARSAME</span>
                           </div>
                           <div class="grid grid-cols-12 gap-1 items-start">
                             <div class="col-span-7">
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca Hooyada / Mother's Name</span>
-                              <span id="somPassSpreadMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">FARTUN ADEN RONOW</span>
+                              <span id="somPassSpreadMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">DEEQA OMAR ROBLE</span>
                             </div>
                             <div class="col-span-5">
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">NID:</span>
-                              <span id="somPassSpreadNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">29505057463496</span>
+                              <span id="somPassSpreadNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">29708149583210</span>
                             </div>
                           </div>
                           <div class="grid grid-cols-2 gap-1">
@@ -8462,17 +8468,17 @@ XUDUR, BAKOOL, SOMALIA</span>
                             </div>
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Shaqada / Occupation</span>
-                              <span id="somPassSpreadOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">STUDENT</span>
+                              <span id="somPassSpreadOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">BUSINESSMAN</span>
                             </div>
                           </div>
                           <div class="grid grid-cols-2 gap-1">
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda Dhalashada / Date of Birth</span>
-                              <span id="somPassSpreadDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">05 May 1995</span>
+                              <span id="somPassSpreadDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">14 Aug 1997</span>
                             </div>
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Bixiyey / Place of Issue</span>
-                              <span id="somPassSpreadIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">BAIDOA</span>
+                              <span id="somPassSpreadIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">MOGADISHU</span>
                             </div>
                           </div>
                           <div class="grid grid-cols-2 gap-1">
@@ -8482,13 +8488,13 @@ XUDUR, BAKOOL, SOMALIA</span>
                             </div>
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Dhaleshada / Place of Birth</span>
-                              <span id="somPassSpreadBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">HUDUR</span>
+                              <span id="somPassSpreadBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">MOGADISHU</span>
                             </div>
                           </div>
                           <div class="grid grid-cols-2 gap-1">
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda la Bixiyey / Date of Issue</span>
-                              <span id="somPassSpreadIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">21 Apr 2018</span>
+                              <span id="somPassSpreadIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">18 Jun 2021</span>
                             </div>
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Xafiiska / Authority</span>
@@ -8498,12 +8504,12 @@ XUDUR, BAKOOL, SOMALIA</span>
                           <div class="grid grid-cols-2 gap-1 pt-0.5">
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda uu Dhacayo / Expiry</span>
-                              <span id="somPassSpreadExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">20 Apr 2023</span>
+                              <span id="somPassSpreadExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">17 Jun 2026</span>
                             </div>
                             <div>
                               <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Saxiixa / Signature</span>
                               <div class="border-b border-slate-400 mt-2 h-3 flex items-end">
-                                <span class="text-[8px] italic text-slate-400 font-mono-code select-none">M. Cabdiqadir</span>
+                                <span class="text-[8px] italic text-slate-400 font-mono-code select-none">C. Cumar Warsame</span>
                               </div>
                             </div>
                           </div>
@@ -8512,8 +8518,8 @@ XUDUR, BAKOOL, SOMALIA</span>
 
                       <!-- MRZ on Spread -->
                       <div class="mt-2.5 pt-1.5 border-t-2 border-slate-400 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-950 leading-snug overflow-x-auto relative z-10">
-                        <div id="somPassSpreadMrzLine1">P&lt;SOMMAXAMED&lt;&lt;MAXAMED&lt;CABDIQADIR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                        <div id="somPassSpreadMrzLine2">P007240853SOM9505058M23042072950505746349672</div>
+                        <div id="somPassSpreadMrzLine1">P&lt;SOMWARSAME&lt;&lt;CABDIRAXMAAN&lt;CUMAR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                        <div id="somPassSpreadMrzLine2">P008492614SOM9708148M2606173297081495832104</div>
                       </div>
 
                     </div>
