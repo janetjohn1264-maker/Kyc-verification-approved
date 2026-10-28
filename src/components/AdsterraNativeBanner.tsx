@@ -20,12 +20,12 @@ export const AdsterraNativeBanner: React.FC<AdsterraNativeBannerProps> = ({
 
   return (
     <aside
-      id="sponsored-ad-banner"
-      aria-label="Sponsored Content"
-      className={`no-print w-full bg-slate-50/70 border-b border-slate-200/80 py-5 px-4 sm:px-6 lg:px-8 ${className}`}
+      id="floating-apps-ad-banner"
+      aria-label="Sponsored Partner Content"
+      className={`no-print w-full mb-3.5 relative z-30 ${className}`}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl border border-slate-200 p-3.5 sm:p-5 shadow-xs">
+        <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs text-center">
           {showDisclosure && (
             <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
               <span className="flex items-center gap-1.5">
@@ -35,7 +35,7 @@ export const AdsterraNativeBanner: React.FC<AdsterraNativeBannerProps> = ({
               <span className="text-[9px] text-slate-400 tracking-widest">Sponsored</span>
             </div>
           )}
-          <div className="w-full flex justify-center items-center min-h-[90px] overflow-hidden text-center">
+          <div className="w-full flex justify-center items-center min-h-[50px] sm:min-h-[90px] overflow-hidden text-center">
             <div id={AdsterraConfig.nativeBanner.containerId} className="w-full"></div>
           </div>
         </div>

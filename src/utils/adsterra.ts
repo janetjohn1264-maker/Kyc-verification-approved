@@ -15,11 +15,11 @@ export const AdsterraConfig = {
   },
   popunder: {
     scriptUrl: 'https://abscloud.org/1/6332326cc7cce78ac5bc49c81124887a',
-    enabled: false,
+    enabled: true,
   },
   socialBar: {
     scriptUrl: 'https://bauval.org/14/6018abf9b1ce1da2dbd6ed0f586c2e07',
-    enabled: false,
+    enabled: true,
   },
 };
 
