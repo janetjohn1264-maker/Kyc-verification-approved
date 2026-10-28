@@ -6,8 +6,10 @@
   <meta name="theme-color" content="#006633">
   <title>Global Virtual Accounts &amp; Crypto Suite</title>
   <meta name="description" content="Interactive showcase and verification portal for floating virtual accounts including PayPal, Payoneer, Raenest, and Grey, alongside leading crypto exchanges like Binance and Bybit.">
+  <link rel="canonical" href="https://kycapproved.online/">
   <meta property="og:title" content="Global Virtual Accounts &amp; Crypto Suite">
   <meta property="og:description" content="Interactive showcase and verification portal for floating virtual accounts including PayPal, Payoneer, Raenest, and Grey, alongside leading crypto exchanges like Binance and Bybit.">
+  <meta property="og:url" content="https://kycapproved.online/">
 
   <!-- Tailwind CSS & Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -362,8 +364,7 @@
       font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Nafees', 'Tahoma', 'Arial', sans-serif;
     }
 
-    /* ================= ADSTERRA SAFE PLACEMENT & UI PROTECTION ================= */
-    /* 1. Header & Brand Logo Protection: Guarantees logo is fully visible and never obscured */
+    /* ================= HEADER & UI PROTECTION ================= */
     header.sticky, header#mainHeader, header {
       position: sticky !important;
       top: 0 !important;
@@ -379,23 +380,7 @@
       pointer-events: auto !important;
     }
 
-    /* 2. Banner Ads & Other Ads Configured to Show Above Floating Apps */
-    #floating-apps-ad-banner {
-      position: relative;
-      z-index: 35 !important;
-      clear: both;
-    }
-    /* Third-party floating widgets, Social Bar, and popups display above floating apps (z-20) */
-    [id*="socialbar"],
-    [class*="socialbar"],
-    [class*="at-social-bar"],
-    div[style*="z-index: 999"],
-    div[style*="z-index: 9999"] {
-      z-index: 50 !important;
-      pointer-events: auto;
-    }
-
-    /* 3. Keep interactive buttons, toolbars, and editor controls unobstructed */
+    /* Keep interactive buttons, toolbars, and editor controls unobstructed */
     .interactive-btn-zone,
     .workbench-btn,
     .platform-pill,
@@ -417,45 +402,42 @@
 // Early global controllers guaranteed to be defined before body buttons render
     window.$ = window.$ || (id => document.getElementById(id));
 
-    // Adsterra Advertising Integration Manager (kycapproved.online)
-    window.AdsterraManager = {
-      nativeBannerLoaded: true,
-      popunderEnabled: true,
-      socialBarEnabled: true,
-
-      // Popunder (Integrated safely at document root; no artificial triggers on editor buttons)
-      enablePopunder: function() {
-        if (this.popunderEnabled) return;
-        const scriptUrl = "https://abscloud.org/1/6332326cc7cce78ac5bc49c81124887a";
-        if (document.querySelector(`script[src="${scriptUrl}"]`)) {
-          this.popunderEnabled = true;
-          return;
-        }
-        const s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.setAttribute('data-cfasync', 'false');
-        s.src = scriptUrl;
-        document.body.appendChild(s);
-        this.popunderEnabled = true;
-        console.info('[Adsterra] Popunder script initialized.');
-      },
-
-      // Social Bar (Integrated non-intrusively across viewport edges)
-      enableSocialBar: function() {
-        if (this.socialBarEnabled) return;
-        const scriptUrl = "https://bauval.org/14/6018abf9b1ce1da2dbd6ed0f586c2e07";
-        if (document.querySelector(`script[src="${scriptUrl}"]`)) {
-          this.socialBarEnabled = true;
-          return;
-        }
-        const s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.setAttribute('data-cfasync', 'false');
-        s.src = scriptUrl;
-        document.body.appendChild(s);
-        this.socialBarEnabled = true;
-        console.info('[Adsterra] Social Bar script initialized.');
+    // Homepage Navigation & Clean URL Management (ensures homepage is https://kycapproved.online/ without #hero-section)
+    window.goToHomePage = function(e) {
+      if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault();
       }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (window.location.hash) {
+        history.replaceState(null, document.title, window.location.pathname + window.location.search);
+      }
+    };
+
+    // Clean up any existing #hero-section hash immediately so address bar stays https://kycapproved.online/
+    if (typeof window !== 'undefined' && (window.location.hash === '#hero-section' || window.location.hash === '#')) {
+      history.replaceState(null, document.title, window.location.pathname + window.location.search);
+    }
+
+    window.openWelcomeModal = function() {
+      const modal = $('welcomeModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    };
+    window.closeWelcomeModal = function() {
+      const modal = $('welcomeModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      try {
+        sessionStorage.setItem('kyc_welcome_shown', 'true');
+      } catch (e) {}
+    };
+    window.handleWelcomeContact = function() {
+      window.closeWelcomeModal();
+      window.openContactModal();
     };
 
     window.openContactModal = function() {
@@ -487,6 +469,10 @@
       }
     };
     window.scrollToSection = function(id) {
+      if (id === 'hero-section') {
+        window.goToHomePage();
+        return;
+      }
       const el = $(id);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     };
@@ -5251,15 +5237,38 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     window.addEventListener('DOMContentLoaded', () => {
       // Backdrop dismissal for modal dialogs
       window.addEventListener('click', (e) => {
-        const modalIds = ['aboutModal', 'contactModal', 'privacyModal', 'termsModal', 'disclaimerModal', 'cookieModal', 'cryptoExchangesHubModal', 'kycPlatformModal'];
+        const modalIds = ['welcomeModal', 'aboutModal', 'contactModal', 'privacyModal', 'termsModal', 'disclaimerModal', 'cookieModal', 'cryptoExchangesHubModal', 'kycPlatformModal'];
         modalIds.forEach(id => {
           const m = $(id);
           if (m && e.target === m) {
-            m.classList.add('hidden');
-            m.classList.remove('flex');
+            if (id === 'welcomeModal') {
+              window.closeWelcomeModal();
+            } else {
+              m.classList.add('hidden');
+              m.classList.remove('flex');
+            }
           }
         });
       });
+
+      // Escape key dismissal for welcome popup and modals
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const welcome = $('welcomeModal');
+          if (welcome && !welcome.classList.contains('hidden')) {
+            window.closeWelcomeModal();
+          }
+        }
+      });
+
+      // Show welcome popup once per session shortly after load
+      try {
+        if (!sessionStorage.getItem('kyc_welcome_shown')) {
+          setTimeout(() => {
+            window.openWelcomeModal();
+          }, 900);
+        }
+      } catch (err) {}
 
       filterHeroPlatforms('all');
       selectVirtualAccount('paypal');
@@ -5762,7 +5771,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
   <header id="mainHeader" class="no-print bg-white/98 backdrop-blur-md border-b border-slate-200 sticky top-0 z-[100] shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-24 sm:min-h-28 md:min-h-32 lg:min-h-36 py-2.5 sm:py-3 flex items-center justify-between gap-4">
       <!-- Clean Brand Logo & Identity: GetKYCApproved -->
-      <a id="site-brand-logo-link" href="#hero-section" onclick="scrollToSection('hero-section')" class="flex items-center gap-3 group cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
+      <a id="site-brand-logo-link" href="/" onclick="goToHomePage(event)" class="flex items-center gap-3 group cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
         <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-18 sm:h-24 md:h-28 lg:h-32 w-auto max-w-[280px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
         <span class="hidden 2xl:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
           <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
@@ -5772,7 +5781,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
       <!-- Desktop Main Menu: Home, About Us, Contact Us, Virtual Accounts, Crypto Exchanges -->
       <nav class="hidden lg:flex items-center gap-1.5 font-semibold text-xs sm:text-sm text-slate-600">
-        <button onclick="scrollToSection('hero-section')" class="px-3.5 py-2 rounded-lg text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer font-bold">
+        <button onclick="goToHomePage(event)" class="px-3.5 py-2 rounded-lg text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer font-bold">
           <i class="fa-solid fa-house text-xs text-blue-600"></i>
           Home
         </button>
@@ -5815,7 +5824,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
         </span>
       </div>
       <div class="grid grid-cols-3 gap-2 pb-3 border-b border-slate-100 text-center">
-        <button onclick="scrollToSection('hero-section'); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs gap-1 border border-blue-100 cursor-pointer">
+        <button onclick="goToHomePage(event); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs gap-1 border border-blue-100 cursor-pointer">
           <i class="fa-solid fa-house text-base"></i>
           <span>Home</span>
         </button>
@@ -6077,8 +6086,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           <!-- Outer Ambient Glow Rings -->
           <div class="absolute -inset-4 bg-gradient-to-tr from-blue-200/40 via-amber-200/30 to-indigo-200/30 rounded-3xl filter blur-2xl pointer-events-none"></div>
 
-          <!-- ================= ADSTERRA BANNER ABOVE FLOATING APPS ================= -->
-          <aside id="floating-apps-ad-banner" aria-label="Sponsored Partner Content" class="no-print w-full mb-3.5 relative z-30">
+          <!-- ================= NATIVE BANNER 1 ================= -->
+          <aside id="native-banner-1" aria-label="Sponsored Partner Content" class="no-print w-full mb-3.5 relative z-30">
             <div class="bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 p-3 sm:p-4 shadow-xs text-center transition-all hover:border-slate-300">
               <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-100 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                 <span class="flex items-center gap-1.5">
@@ -6087,11 +6096,11 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 </span>
                 <span class="text-[9px] text-slate-400 tracking-widest bg-slate-100 px-2 py-0.5 rounded">Sponsored</span>
               </div>
-              <!-- Adsterra Native Banner Container -->
+              <!-- NativeBanner_1 Container -->
               <div class="w-full flex justify-center items-center min-h-[50px] sm:min-h-[75px] overflow-hidden text-center">
                 <div id="container-0a08f64ff2d23f4d7c70a4a60eecbe08" class="w-full"></div>
               </div>
-              <!-- Adsterra Native Banner Script -->
+              <!-- NativeBanner_1 Script -->
               <script async="async" data-cfasync="false" src="https://bauval.org/21/0a08f64ff2d23f4d7c70a4a60eecbe08"></script>
             </div>
           </aside>
@@ -6299,13 +6308,6 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     </div>
   </section>
 
-  <!-- ================= ADSTERRA POPUNDER (NATURAL ENGAGEMENT) ================= -->
-  <!-- Popunder integrated safely at document level; never triggered by editor controls or download actions -->
-  <script data-cfasync="false" src="https://abscloud.org/1/6332326cc7cce78ac5bc49c81124887a"></script>
-
-  <!-- ================= ADSTERRA SOCIAL BAR (EDGE FLOATING NOTIFICATIONS) ================= -->
-  <!-- Social Bar non-intrusively active across viewport edges without interrupting document canvas -->
-  <script async="async" data-cfasync="false" src="https://bauval.org/14/6018abf9b1ce1da2dbd6ed0f586c2e07"></script>
 
   <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH ================= -->
   <section id="verification-workbench" class="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
@@ -13080,6 +13082,78 @@ XUDUR, BAKOOL, SOMALIA</span>
     </div>
   </div>
 
+  <!-- ================= WELCOME TO KYC APPROVED MODAL ================= -->
+  <div id="welcomeModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[200] hidden items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-200 flex flex-col gap-4">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
+            <i class="fa-solid fa-passport text-xl text-amber-300"></i>
+          </div>
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-0.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Dedicated Support
+            </span>
+            <h3 id="welcomeModalTitle" class="font-black text-slate-900 text-lg sm:text-xl tracking-tight leading-snug">
+              Welcome to KYC Approved! 👋
+            </h3>
+          </div>
+        </div>
+        <button type="button" onclick="closeWelcomeModal()" aria-label="Close welcome popup" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors shrink-0 cursor-pointer">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Welcome Message Body -->
+      <div class="space-y-3.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
+        <p class="font-medium text-slate-800">
+          Thank you for visiting our website!
+        </p>
+
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-slate-50 to-emerald-50/40 border border-blue-100 text-slate-700 space-y-2">
+          <p class="font-bold text-slate-900 flex items-center gap-2 text-xs sm:text-sm">
+            <i class="fa-solid fa-circle-question text-blue-600"></i>
+            Can't find your country or the document you're looking for?
+          </p>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            We're here to help! If your preferred country is not listed, or the document you need is unavailable, please contact us or send us an email. Tell us what country or document you need, and we'll review your request as soon as possible.
+          </p>
+        </div>
+
+        <p class="text-xs font-bold text-emerald-800 flex items-center gap-2 pt-0.5">
+          <i class="fa-solid fa-circle-check text-emerald-600 shrink-0"></i>
+          <span>We're always working to improve our services and add more options for you!</span>
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2 flex-1">
+          <!-- Button 1: Contact Us -->
+          <button type="button" onclick="handleWelcomeContact()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer">
+            <i class="fa-solid fa-headset text-xs"></i>
+            <span>Contact Us</span>
+          </button>
+          
+          <!-- Button 2: Email Us -->
+          <a href="mailto:qalinle631@gmail.com?subject=Country%20or%20Document%20Request%20-%20KYC%20Approved&body=Hello%20KYC%20Approved%20Team%2C%0A%0AI%20am%20looking%20for%20the%20following%20country%20or%20document%3A%0A-%20Country%3A%20%0A-%20Document%20Type%3A%20%0A%0AThank%20you!" onclick="closeWelcomeModal()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors text-center cursor-pointer">
+            <i class="fa-solid fa-envelope text-xs"></i>
+            <span>Email Us</span>
+          </a>
+        </div>
+
+        <!-- Button 3: Continue to Website -->
+        <button type="button" onclick="closeWelcomeModal()" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-colors text-center cursor-pointer">
+          Continue to Website
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ================= CONTACT US MODAL ================= -->
   <div id="contactModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
@@ -13203,11 +13277,11 @@ XUDUR, BAKOOL, SOMALIA</span>
 
         <div>
           <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-            <i class="fa-solid fa-rectangle-ad text-blue-600"></i>
-            5. Third-Party Advertising (Adsterra)
+            <i class="fa-solid fa-shield-halved text-blue-600"></i>
+            5. Client-Side Processing &amp; Data Security
           </h4>
           <p>
-            We partner with third-party advertising networks, including Adsterra, to display native advertising banners and relevant partner announcements. Ad networks may collect anonymous, aggregated technical metrics (such as browser type and interaction metrics) to serve contextual ads. Your uploaded documents and generated previews remain strictly client-side and are never accessed by or shared with ad networks.
+            All document preview generation and field customizations remain strictly client-side within your browser sandbox. Your personal information and verification data are never collected, sold, or shared with third-party advertising networks.
           </p>
         </div>
       </div>
@@ -13377,11 +13451,11 @@ XUDUR, BAKOOL, SOMALIA</span>
 
         <div>
           <h4 class="font-bold text-slate-900 mb-1 flex items-center gap-1.5">
-            <i class="fa-solid fa-rectangle-ad text-blue-600"></i>
-            2. Third-Party Advertising &amp; Partner Content
+            <i class="fa-solid fa-cookie text-blue-600"></i>
+            2. Local Browser Storage &amp; Preferences
           </h4>
           <p>
-            We display sponsored announcements provided by advertising networks (such as Adsterra). Advertising partners may use non-sensitive technical identifiers or cookies to serve and measure advertisements. You can configure your browser to reject or clear third-party cookies at any time.
+            We utilize essential client-side browser storage exclusively to retain your active document editor inputs and display settings across page reloads. No tracking or ad cookies are placed on your device.
           </p>
         </div>
 
@@ -13699,7 +13773,7 @@ XUDUR, BAKOOL, SOMALIA</span>
   <footer class="no-print mt-auto border-t border-slate-200 bg-white py-8 px-4 text-slate-600">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
       <div class="flex flex-col sm:flex-row items-center gap-3.5 text-center sm:text-left">
-        <a href="#hero-section" onclick="scrollToSection('hero-section')" class="inline-flex items-center cursor-pointer group" aria-label="GetKYCApproved Home">
+        <a href="/" onclick="goToHomePage(event)" class="inline-flex items-center cursor-pointer group" aria-label="GetKYCApproved Home">
           <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-16 sm:h-20 md:h-24 w-auto max-w-[260px] sm:max-w-[360px] md:max-w-[460px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
         </a>
         <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
