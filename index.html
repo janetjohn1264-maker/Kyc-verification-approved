@@ -1538,6 +1538,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
     // ================= REPUBLIC OF UGANDA REFUGEE IDENTITY CARD CONTROLLER =================
     const ugaMalePhotos = [
+      '/assets/aistudio/image_03cac193.png',
       '/assets/aistudio/kenya_maisha_portrait_adan.jpg',
       '/assets/aistudio/kenya_maisha_portrait_hassan.jpg',
       '/assets/aistudio/somali_smart_id_portrait.jpg',
@@ -1548,7 +1549,7 @@ var $ = window.$ || (id => document.getElementById(id));
       '/assets/aistudio/somali_card_female_portrait.jpg',
       '/assets/aistudio/ethiopia_fayda_portrait.jpg'
     ];
-    const defaultUgaPhoto = '/assets/aistudio/kenya_maisha_portrait_adan.jpg';
+    const defaultUgaPhoto = '/assets/aistudio/image_03cac193.png';
 
     function initUgandaDefaultPhoto() {
       if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
@@ -1582,7 +1583,7 @@ var $ = window.$ || (id => document.getElementById(id));
       setVal('ugaInputIssue', '25-Jul-2023');
       setVal('ugaInputExpiry', '25-Jul-2028');
       setVal('ugaInputSex', 'Male');
-      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = '/assets/aistudio/uganda_refugee_portrait.jpg';
+      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
       updateUgandaPreview();
       showToast('Sample Restored', 'Restored Uganda Refugee Identity Card specimen data');
     }
@@ -2861,17 +2862,20 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     }
 
     // ================= KENYA NATIONAL ID (MAISHA NAMBA 3RD GEN) CONTROLLER =================
-    const defaultKidPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
-    const defaultKidGhostSrc = '/assets/aistudio/uk_bearer_ghost.png';
+    const defaultKidPhotoSrc = '/assets/aistudio/kenya_maisha_portrait_kariuki.jpg';
+    const defaultKidGhostSrc = '/assets/aistudio/kenya_maisha_ghost_kariuki.png';
+    const defaultKidSigSrc = '/assets/aistudio/kenya_bearer_signature_clean.png';
 
     function initKidDefaultPhoto() {
       if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
       if ($('kidGhostPhoto')) $('kidGhostPhoto').src = defaultKidGhostSrc;
+      if ($('kidBearerSignature')) $('kidBearerSignature').src = defaultKidSigSrc;
     }
 
     function resetKidPhoto() {
       if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
       if ($('kidGhostPhoto')) $('kidGhostPhoto').src = defaultKidGhostSrc;
+      if ($('kidBearerSignature')) $('kidBearerSignature').src = defaultKidSigSrc;
       if ($('kidPhotoInput')) $('kidPhotoInput').value = '';
       showToast('Photo Reset', 'Restored Kenya Maisha ID reference specimen portrait');
     }
@@ -2942,25 +2946,25 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     // Kenya National ID (Maisha Namba) Live Preview & Dynamic MRZ Generator
     function updateKidPreview() {
       // Front details
-      const surname = ($('kidInputSurname')?.value || 'ADAN').toUpperCase();
-      const givenName = ($('kidInputGivenName')?.value || 'ABDIRAHMAN MOHAMED').toUpperCase();
-      const idNo = ($('kidInputIdNo')?.value || '223136390').replace(/[^0-9]/g, '');
-      const serialNo = ($('kidInputSerial')?.value || '256970356').replace(/[^0-9]/g, '');
+      const surname = ($('kidInputSurname')?.value || 'KARIUKI').toUpperCase();
+      const givenName = ($('kidInputGivenName')?.value || 'JAMES KANAKE').toUpperCase();
+      const idNo = ($('kidInputIdNo')?.value || '36620107').replace(/[^0-9]/g, '');
+      const serialNo = ($('kidInputSerial')?.value || '705346763').replace(/[^0-9]/g, '');
       const sex = ($('kidInputSex')?.value || 'MALE').toUpperCase();
       const nationality = ($('kidInputNationality')?.value || 'KEN').toUpperCase();
-      const dob = $('kidInputDob')?.value || '01. 07. 2004';
-      const pob = ($('kidInputPob')?.value || 'MANDERA EAST').toUpperCase();
-      const expiry = $('kidInputExpiry')?.value || '27. 02. 2035';
-      const place = ($('kidInputPlace')?.value || 'KHALALIYO').toUpperCase();
+      const dob = $('kidInputDob')?.value || '21. 06. 1999';
+      const pob = ($('kidInputPob')?.value || 'NYERI CENTRAL').toUpperCase();
+      const expiry = $('kidInputExpiry')?.value || '15. 02. 2034';
+      const place = ($('kidInputPlace')?.value || 'HDM CITY SQUARE').toUpperCase();
 
       // Back details
-      const dateIssue = $('kidInputDateIssue')?.value || '28. 02. 2025';
-      const backSerial = ($('kidInputBackSerial')?.value || '24314P237429').toUpperCase();
-      const county = ($('kidInputCounty')?.value || 'MANDERA').toUpperCase();
-      const subCounty = ($('kidInputSubCounty')?.value || 'MANDERA EAST').toUpperCase();
-      const division = ($('kidInputDivision')?.value || 'KHALALIYO').toUpperCase();
-      const location = ($('kidInputLocation')?.value || 'GINGO').toUpperCase();
-      const subLocation = ($('kidInputSubLocation')?.value || 'MEYGAAG').toUpperCase();
+      const dateIssue = $('kidInputDateIssue')?.value || '25. 07. 2024';
+      const backSerial = ($('kidInputBackSerial')?.value || '24163P049059').toUpperCase();
+      const county = ($('kidInputCounty')?.value || 'NYERI').toUpperCase();
+      const subCounty = ($('kidInputSubCounty')?.value || 'MATHIRA WEST').toUpperCase();
+      const division = ($('kidInputDivision')?.value || 'KIRIMUKUYU').toUpperCase();
+      const location = ($('kidInputLocation')?.value || 'ICHUGA').toUpperCase();
+      const subLocation = ($('kidInputSubLocation')?.value || 'ICHUGA').toUpperCase();
 
       // Update Front card elements
       if ($('kidPreviewSurname')) $('kidPreviewSurname').textContent = surname;
@@ -2983,18 +2987,18 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
       if ($('kidPreviewLocation')) $('kidPreviewLocation').textContent = location;
       if ($('kidPreviewSubLocation')) $('kidPreviewSubLocation').textContent = subLocation;
 
-      // Calculate & update 3-line TD1 Machine Readable Zone (MRZ)
+      // Calculate & update 3-line TD1 Machine Readable Zone (MRZ) - 1:1 match to reference specimen
       const cleanId = idNo.padEnd(9, '<').substring(0, 9);
       const idCheck = calculateIcaoCheckDigit(cleanId);
-      let mrz1 = `IDKEN${cleanId}${idCheck}<091<0912<<<<<<<`.padEnd(30, '<').substring(0, 30);
+      let mrz1 = `IDKEN${cleanId}${idCheck}<197<4715<<<<<<`.padEnd(30, '<').substring(0, 30);
 
-      const dobYYMMDD = dateToYYMMDD(dob, '040701');
+      const dobYYMMDD = dateToYYMMDD(dob, '990621');
       const dobCheck = calculateIcaoCheckDigit(dobYYMMDD);
       const sexChar = sex.startsWith('F') ? 'F' : 'M';
-      const expYYMMDD = dateToYYMMDD(expiry, '350227');
+      const expYYMMDD = dateToYYMMDD(expiry, '340215');
       const expCheck = calculateIcaoCheckDigit(expYYMMDD);
       const cleanSerial = serialNo.padEnd(9, '<').substring(0, 9);
-      let mrz2 = `${dobYYMMDD}${dobCheck}${sexChar}${expYYMMDD}${expCheck}${nationality}${cleanSerial}038`.padEnd(30, '<').substring(0, 30);
+      let mrz2 = `${dobYYMMDD}${dobCheck}${sexChar}${expYYMMDD}${expCheck}${nationality}${cleanSerial}030`.padEnd(30, '<').substring(0, 30);
 
       const cleanSur = surname.replace(/[^A-Z]/g, '<');
       const cleanGiv = givenName.trim().replace(/\s+/g, '<').replace(/[^A-Z<]/g, '');
@@ -3006,24 +3010,24 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     }
 
     function resetKidDetailsToSample() {
-      if ($('kidInputSurname')) $('kidInputSurname').value = 'ADAN';
-      if ($('kidInputGivenName')) $('kidInputGivenName').value = 'ABDIRAHMAN MOHAMED';
-      if ($('kidInputIdNo')) $('kidInputIdNo').value = '223136390';
-      if ($('kidInputSerial')) $('kidInputSerial').value = '256970356';
+      if ($('kidInputSurname')) $('kidInputSurname').value = 'KARIUKI';
+      if ($('kidInputGivenName')) $('kidInputGivenName').value = 'JAMES KANAKE';
+      if ($('kidInputIdNo')) $('kidInputIdNo').value = '36620107';
+      if ($('kidInputSerial')) $('kidInputSerial').value = '705346763';
       if ($('kidInputSex')) $('kidInputSex').value = 'MALE';
       if ($('kidInputNationality')) $('kidInputNationality').value = 'KEN';
-      if ($('kidInputDob')) $('kidInputDob').value = '01. 07. 2004';
-      if ($('kidInputPob')) $('kidInputPob').value = 'MANDERA EAST';
-      if ($('kidInputExpiry')) $('kidInputExpiry').value = '27. 02. 2035';
-      if ($('kidInputPlace')) $('kidInputPlace').value = 'KHALALIYO';
+      if ($('kidInputDob')) $('kidInputDob').value = '21. 06. 1999';
+      if ($('kidInputPob')) $('kidInputPob').value = 'NYERI CENTRAL';
+      if ($('kidInputExpiry')) $('kidInputExpiry').value = '15. 02. 2034';
+      if ($('kidInputPlace')) $('kidInputPlace').value = 'HDM CITY SQUARE';
 
-      if ($('kidInputDateIssue')) $('kidInputDateIssue').value = '28. 02. 2025';
-      if ($('kidInputBackSerial')) $('kidInputBackSerial').value = '24314P237429';
-      if ($('kidInputCounty')) $('kidInputCounty').value = 'MANDERA';
-      if ($('kidInputSubCounty')) $('kidInputSubCounty').value = 'MANDERA EAST';
-      if ($('kidInputDivision')) $('kidInputDivision').value = 'KHALALIYO';
-      if ($('kidInputLocation')) $('kidInputLocation').value = 'GINGO';
-      if ($('kidInputSubLocation')) $('kidInputSubLocation').value = 'MEYGAAG';
+      if ($('kidInputDateIssue')) $('kidInputDateIssue').value = '25. 07. 2024';
+      if ($('kidInputBackSerial')) $('kidInputBackSerial').value = '24163P049059';
+      if ($('kidInputCounty')) $('kidInputCounty').value = 'NYERI';
+      if ($('kidInputSubCounty')) $('kidInputSubCounty').value = 'MATHIRA WEST';
+      if ($('kidInputDivision')) $('kidInputDivision').value = 'KIRIMUKUYU';
+      if ($('kidInputLocation')) $('kidInputLocation').value = 'ICHUGA';
+      if ($('kidInputSubLocation')) $('kidInputSubLocation').value = 'ICHUGA';
 
       resetKidPhoto();
       updateKidPreview();
@@ -7004,11 +7008,11 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Surname</label>
-                    <input id="kidInputSurname" type="text" value="ADAN" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputSurname" type="text" value="KARIUKI" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Given Name</label>
-                    <input id="kidInputGivenName" type="text" value="ABDIRAHMAN MOHAMED" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputGivenName" type="text" value="JAMES KANAKE" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -7016,11 +7020,11 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">ID Number</label>
-                    <input id="kidInputIdNo" type="text" value="223136390" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputIdNo" type="text" value="36620107" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Serial No (Left Edge)</label>
-                    <input id="kidInputSerial" type="text" value="256970356" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputSerial" type="text" value="705346763" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -7039,7 +7043,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
-                    <input id="kidInputDob" type="text" value="01. 07. 2004" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputDob" type="text" value="21. 06. 1999" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -7047,15 +7051,15 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <div class="grid grid-cols-3 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth</label>
-                    <input id="kidInputPob" type="text" value="MANDERA EAST" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputPob" type="text" value="NYERI CENTRAL" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry</label>
-                    <input id="kidInputExpiry" type="text" value="27. 02. 2035" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputExpiry" type="text" value="15. 02. 2034" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Issue</label>
-                    <input id="kidInputPlace" type="text" value="KHALALIYO" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputPlace" type="text" value="HDM CITY SQUARE" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
               </div>
@@ -7072,37 +7076,37 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Issue</label>
-                    <input id="kidInputDateIssue" type="text" value="28. 02. 2025" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputDateIssue" type="text" value="25. 07. 2024" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Back Serial (Left Edge)</label>
-                    <input id="kidInputBackSerial" type="text" value="24314P237429" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="kidInputBackSerial" type="text" value="24163P049059" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">County</label>
-                    <input id="kidInputCounty" type="text" value="MANDERA" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputCounty" type="text" value="NYERI" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sub-County</label>
-                    <input id="kidInputSubCounty" type="text" value="MANDERA EAST" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputSubCounty" type="text" value="MATHIRA WEST" oninput="updateKidPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
 
                 <div class="grid grid-cols-3 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Division</label>
-                    <input id="kidInputDivision" type="text" value="KHALALIYO" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputDivision" type="text" value="KIRIMUKUYU" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Location</label>
-                    <input id="kidInputLocation" type="text" value="GINGO" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputLocation" type="text" value="ICHUGA" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sub-Location</label>
-                    <input id="kidInputSubLocation" type="text" value="MEYGAAG" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="kidInputSubLocation" type="text" value="ICHUGA" oninput="updateKidPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
               </div>
@@ -7157,12 +7161,31 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                   <!-- Fine Microprint Top Security Boundary Line -->
                   <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-emerald-600 via-red-600 to-emerald-600 opacity-60"></div>
 
-                  <!-- Central Radiating Rosette Guilloche Watermark -->
-                  <div class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-30">
-                    <svg viewBox="0 0 300 200" class="w-full h-full text-emerald-800" fill="none">
-                      <circle cx="150" cy="90" r="70" stroke="rgba(239, 68, 68, 0.25)" stroke-width="0.8" stroke-dasharray="2 2"/>
-                      <circle cx="150" cy="90" r="50" stroke="rgba(16, 185, 129, 0.3)" stroke-width="0.8"/>
-                      <circle cx="150" cy="90" r="30" stroke="rgba(245, 158, 11, 0.25)" stroke-width="0.6"/>
+                  <!-- Authentic Radiating Guilloche Rosettes and Arc Waves emanating from Coat of Arms -->
+                  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                    <svg viewBox="0 0 530 334" class="w-full h-full" fill="none">
+                      <!-- Radiating arcs from top center -->
+                      <g opacity="0.45">
+                        <circle cx="265" cy="30" r="40" stroke="#f43f5e" stroke-width="0.8" stroke-dasharray="3 3"/>
+                        <circle cx="265" cy="30" r="60" stroke="#10b981" stroke-width="0.8"/>
+                        <circle cx="265" cy="30" r="85" stroke="#f43f5e" stroke-width="0.9" stroke-dasharray="4 2"/>
+                        <circle cx="265" cy="30" r="110" stroke="#059669" stroke-width="1"/>
+                        <circle cx="265" cy="30" r="140" stroke="#fb7185" stroke-width="0.9"/>
+                        <circle cx="265" cy="30" r="175" stroke="#10b981" stroke-width="1.1" stroke-dasharray="5 3"/>
+                        <circle cx="265" cy="30" r="215" stroke="#e11d48" stroke-width="0.9"/>
+                        <circle cx="265" cy="30" r="260" stroke="#047857" stroke-width="1.2"/>
+                        <circle cx="265" cy="30" r="310" stroke="#10b981" stroke-width="1"/>
+                        <circle cx="265" cy="30" r="370" stroke="#059669" stroke-width="1.1"/>
+                        <!-- Radiating fan lines -->
+                        <path d="M 265,30 L 0,100 M 265,30 L 0,160 M 265,30 L 0,220 M 265,30 L 0,280 M 265,30 L 50,334 M 265,30 L 120,334 M 265,30 L 190,334 M 265,30 L 265,334 M 265,30 L 340,334 M 265,30 L 410,334 M 265,30 L 480,334 M 265,30 L 530,280 M 265,30 L 530,220 M 265,30 L 530,160 M 265,30 L 530,100" stroke="#10b981" stroke-width="0.6" opacity="0.35"/>
+                      </g>
+                      <!-- Wavy security ribbons across photo area -->
+                      <g opacity="0.3">
+                        <path d="M 10,130 C 50,110 90,150 140,130 S 220,110 280,140" stroke="#059669" stroke-width="1.5" fill="none"/>
+                        <path d="M 10,160 C 50,140 90,180 140,160 S 220,140 280,170" stroke="#059669" stroke-width="1.5" fill="none"/>
+                        <path d="M 10,190 C 50,170 90,210 140,190 S 220,170 280,200" stroke="#059669" stroke-width="1.5" fill="none"/>
+                        <path d="M 10,220 C 50,200 90,240 140,220 S 220,200 280,230" stroke="#059669" stroke-width="1.5" fill="none"/>
+                      </g>
                     </svg>
                   </div>
 
@@ -7191,13 +7214,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                       <h3 class="text-[8.5px] sm:text-[10.5px] font-extrabold tracking-wide text-[#0f3d2e] uppercase font-sans">
                         NATIONAL IDENTITY CARD
                       </h3>
-                      <!-- Smart Card Biometric Chip Symbol (Dark Green Badge with White Icon) -->
-                      <div class="mt-1 bg-[#0e3e28] px-1.5 py-0.5 rounded-[3px] shadow-2xs flex items-center justify-center">
-                        <svg viewBox="0 0 28 14" class="w-5 sm:w-6 h-2.5 sm:h-3">
-                          <circle cx="14" cy="7" r="3" fill="none" stroke="#f1f5f9" stroke-width="1.5"/>
-                          <circle cx="14" cy="7" r="1.1" fill="#f1f5f9"/>
-                          <line x1="1" y1="7" x2="11" y2="7" stroke="#f1f5f9" stroke-width="1.5"/>
-                          <line x1="17" y1="7" x2="27" y2="7" stroke="#f1f5f9" stroke-width="1.5"/>
+                      <!-- ICAO Biometric Smartcard Emblem (Matching Reference Specimen) -->
+                      <div class="mt-1 flex items-center justify-end">
+                        <svg viewBox="0 0 38 20" class="w-7 sm:w-8 h-3.5 sm:h-4">
+                          <rect x="1" y="1" width="36" height="18" rx="2.5" fill="#0f172a" />
+                          <line x1="1" y1="10" x2="37" y2="10" stroke="#ffffff" stroke-width="2.2" />
+                          <circle cx="19" cy="10" r="5.2" fill="#0f172a" stroke="#ffffff" stroke-width="2.2" />
+                          <circle cx="19" cy="10" r="2" fill="#ffffff" />
                         </svg>
                       </div>
                     </div>
@@ -7208,18 +7231,19 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                     
                     <!-- Vertical Serial Number along far-left border (Reads top-to-bottom as in reference) -->
                     <div class="col-span-1 flex items-center justify-center h-full">
-                      <div class="transform rotate-90 origin-center whitespace-nowrap text-[9px] sm:text-[11px] font-black font-mono-code text-slate-800 tracking-wider">
-                        <span id="kidPreviewSerial">256970356</span>
+                      <div class="transform -rotate-90 origin-center whitespace-nowrap text-[8.5px] sm:text-[10.5px] font-black font-mono-code text-slate-800 tracking-wider">
+                        <span id="kidPreviewSerial">705346763</span>
                       </div>
                     </div>
 
                     <!-- Bearer Portrait Photo -->
                     <div class="col-span-4 flex flex-col items-center">
-                      <div class="w-full aspect-[3.2/4.1] rounded-lg overflow-hidden border border-slate-400/90 shadow-sm relative bg-slate-200">
+                      <div class="w-full aspect-[3.2/4.1] rounded-lg overflow-hidden border border-slate-300/80 shadow-xs relative bg-slate-200">
                         <!-- Specimen reference photo of bearer -->
-                        <img id="kidPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover">
-                        <!-- Overlay wavy guilloche curves on shoulder/bottom for authentic security blend -->
-                        <div class="absolute inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-emerald-600/30 via-transparent to-transparent"></div>
+                        <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_kariuki.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                        <!-- Authentic wavy security guilloche overlay on portrait -->
+                        <div class="absolute inset-0 pointer-events-none opacity-45 mix-blend-multiply bg-[repeating-radial-gradient(ellipse_at_30%_50%,transparent_0,transparent_6px,rgba(16,185,129,0.22)_7px,transparent_8px)]"></div>
+                        <div class="absolute inset-0 pointer-events-none opacity-30 mix-blend-color-burn bg-[repeating-linear-gradient(45deg,transparent_0,transparent_5px,rgba(244,63,94,0.2)_6px,transparent_7px)]"></div>
                       </div>
                     </div>
 
@@ -7230,7 +7254,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                       <div>
                         <span class="block text-[7.5px] sm:text-[8.5px] font-bold uppercase text-slate-500 leading-none">SURNAME</span>
                         <div id="kidPreviewSurname" class="font-black text-slate-900 text-xs sm:text-[14px] uppercase tracking-wide leading-tight">
-                          ADAN
+                          KARIUKI
                         </div>
                       </div>
 
@@ -7238,36 +7262,43 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                       <div>
                         <span class="block text-[7.5px] sm:text-[8.5px] font-bold uppercase text-slate-500 leading-none">GIVEN NAME</span>
                         <div id="kidPreviewGiven" class="font-black text-slate-900 text-[11px] sm:text-[13px] uppercase tracking-wide leading-tight">
-                          ABDIRAHMAN MOHAMED
+                          JAMES KANAKE
                         </div>
                       </div>
 
-                      <!-- 3. Sex, Nationality, Date of Birth -->
-                      <div class="grid grid-cols-12 gap-1 items-start relative">
-                        <!-- Holographic circular seal behind sex & nationality -->
-                        <div class="absolute -left-1 -top-1 w-16 h-8 rounded-full bg-gradient-to-r from-red-400/10 via-emerald-400/15 to-transparent pointer-events-none"></div>
-
+                      <!-- 3. Sex, Flag Badge, Nationality, Date of Birth -->
+                      <div class="grid grid-cols-12 gap-1 items-end relative">
                         <div class="col-span-3">
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SEX</span>
                           <div id="kidPreviewSex" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] uppercase">
                             MALE
                           </div>
                         </div>
-                        <div class="col-span-4">
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">NATIONALITY</span>
+                        <div class="col-span-2 flex items-center justify-center pb-0.5">
+                          <!-- Kenya Flag Oval Watermark -->
+                          <div class="w-6 h-4 rounded-full overflow-hidden border border-slate-300/80 shadow-2xs flex flex-col opacity-90">
+                            <div class="h-[32%] bg-[#0a0a0a]"></div>
+                            <div class="h-[6%] bg-white"></div>
+                            <div class="h-[24%] bg-[#bb1919]"></div>
+                            <div class="h-[6%] bg-white"></div>
+                            <div class="h-[32%] bg-[#006600]"></div>
+                          </div>
+                        </div>
+                        <div class="col-span-3">
+                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">NATION-ALITY</span>
                           <div id="kidPreviewNationality" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] uppercase">
                             KEN
                           </div>
                         </div>
-                        <div class="col-span-5 text-left">
+                        <div class="col-span-4 text-left pl-1">
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF BIRTH</span>
                           <div id="kidPreviewDob" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] font-mono-code">
-                            01. 07. 2004
+                            21. 06. 1999
                           </div>
                         </div>
                       </div>
 
-                      <!-- 4. Lower Section: Left Side Details + Right Column (Maisha Logo & X X X below Date of Birth) -->
+                      <!-- 4. Lower Section: Left Side Details + Right Column (Maisha Logo & Signature below Date of Birth) -->
                       <div class="grid grid-cols-12 gap-1 items-start pt-0.5">
                         <!-- Left Details (Place of Birth, ID Number, Expiry, Place of Issue) -->
                         <div class="col-span-7 space-y-1 leading-tight">
@@ -7275,7 +7306,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                           <div>
                             <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF BIRTH</span>
                             <div id="kidPreviewPob" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                              MANDERA EAST
+                              NYERI CENTRAL
                             </div>
                           </div>
 
@@ -7283,7 +7314,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                           <div>
                             <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">ID NUMBER</span>
                             <div id="kidPreviewIdNo" class="font-black text-slate-950 text-[13px] sm:text-[16px] font-mono-code tracking-wider">
-                              223136390
+                              36620107
                             </div>
                           </div>
 
@@ -7291,7 +7322,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                           <div>
                             <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF EXPIRY</span>
                             <div id="kidPreviewExpiry" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] font-mono-code">
-                              27. 02. 2035
+                              15. 02. 2034
                             </div>
                           </div>
 
@@ -7299,17 +7330,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                           <div>
                             <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF ISSUE</span>
                             <div id="kidPreviewPlace" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] uppercase">
-                              KHALALIYO
+                              HDM CITY SQUARE
                             </div>
                           </div>
                         </div>
 
-                        <!-- Right Column: Located directly under Date of Birth -->
-                        <div class="col-span-5 flex flex-col items-center justify-start text-center pt-0.5 pointer-events-none">
+                        <!-- Right Column: Located directly under Date of Birth (Maisha Logo + Bearer Signature) -->
+                        <div class="col-span-5 flex flex-col items-center justify-start text-center pt-0.5">
                           <img src="/assets/aistudio/kenya_maisha_logo.png" alt="Maisha Namba Logo" class="h-10 sm:h-12 w-auto max-w-full object-contain mix-blend-multiply drop-shadow-2xs">
-                          <span class="text-[9px] sm:text-[11px] font-black text-slate-800 tracking-[0.45em] mt-1 font-mono-code">
-                            X X X
-                          </span>
+                          <!-- Bearer Signature -->
+                          <div class="h-5 sm:h-6 w-20 sm:w-24 flex items-center justify-center mt-1">
+                            <img id="kidBearerSignature" src="/assets/aistudio/kenya_bearer_signature_clean.png" alt="Bearer Signature" class="h-full w-auto object-contain mix-blend-multiply">
+                          </div>
                         </div>
                       </div>
 
@@ -7356,7 +7388,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <!-- Vertical Left Serial -->
                         <div class="w-3 flex items-center justify-center pt-8">
                           <div class="transform -rotate-90 origin-center whitespace-nowrap text-[8.5px] sm:text-[10px] font-black font-mono-code text-slate-800 tracking-wider">
-                            <span id="kidPreviewBackSerial">24314P237429</span>
+                            <span id="kidPreviewBackSerial">24163P049059</span>
                           </div>
                         </div>
 
@@ -7380,7 +7412,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">COUNTY</span>
                           <div id="kidPreviewCounty" class="font-black text-slate-900 text-xs sm:text-[13.5px] uppercase">
-                            MANDERA
+                            NYERI
                           </div>
                         </div>
 
@@ -7388,7 +7420,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SUB-COUNTY</span>
                           <div id="kidPreviewSubCounty" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] uppercase">
-                            MANDERA EAST
+                            MATHIRA WEST
                           </div>
                         </div>
 
@@ -7396,7 +7428,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DIVISION</span>
                           <div id="kidPreviewDivision" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            KHALALIYO
+                            KIRIMUKUYU
                           </div>
                         </div>
 
@@ -7404,7 +7436,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">LOCATION</span>
                           <div id="kidPreviewLocation" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            GINGO
+                            ICHUGA
                           </div>
                         </div>
 
@@ -7412,7 +7444,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SUB-LOCATION</span>
                           <div id="kidPreviewSubLocation" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            MEYGAAG
+                            ICHUGA
                           </div>
                         </div>
                       </div>
@@ -7423,13 +7455,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div>
                           <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF ISSUE</span>
                           <div id="kidPreviewDateIssue" class="font-black text-slate-900 text-[11px] sm:text-[13px] font-mono-code">
-                            28. 02. 2025
+                            25. 07. 2024
                           </div>
                         </div>
 
                         <!-- Ghost Secondary Portrait -->
                         <div class="w-10 sm:w-12 aspect-[3.2/4] rounded border border-slate-300/80 overflow-hidden shadow-2xs bg-slate-100 relative">
-                          <img id="kidGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
+                          <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_kariuki.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
                         </div>
 
                         <!-- Principal Registrar Signature -->
@@ -7455,9 +7487,9 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
                     <!-- 3-Line Machine Readable Zone (MRZ) - Exact ICAO 9303 TD1 Specification -->
                     <div class="font-mono-code text-[9.5px] sm:text-[11.5px] font-bold text-slate-950 tracking-[0.14em] sm:tracking-[0.16em] leading-tight text-center">
-                      <div id="kidPreviewMrz1">IDKEN2231363903&lt;091&lt;0912&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                      <div id="kidPreviewMrz2">0407012M3502273KEN256970356038</div>
-                      <div id="kidPreviewMrz3">ADAN&lt;&lt;ABDIRAHMAN&lt;MOHAMED&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="kidPreviewMrz1">IDKEN36620107&lt;1&lt;197&lt;4715&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="kidPreviewMrz2">9906219M3402155KEN705346763030</div>
+                      <div id="kidPreviewMrz3">KARIUKI&lt;&lt;JAMES&lt;KANAKE&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
                     </div>
                   </div>
 
@@ -10552,7 +10584,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <!-- Left: Portrait Photo Frame -->
                   <div class="col-span-4 sm:col-span-3.5 flex flex-col items-center">
                     <div class="w-full aspect-[3.1/4] max-w-[140px] bg-slate-200 border-2 border-slate-300 rounded-sm overflow-hidden shadow-sm relative">
-                      <img id="ugaPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_adan.jpg" alt="Refugee Photo" class="w-full h-full object-cover">
+                      <img id="ugaPreviewPhoto" src="/assets/aistudio/image_03cac193.png" alt="Refugee Photo" class="w-full h-full object-cover">
                     </div>
                   </div>
 
