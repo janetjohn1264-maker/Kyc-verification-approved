@@ -1282,6 +1282,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const pakistanDocView = $('pakistan-doc-view');
       const seychellesDocView = $('seychelles-doc-view');
       const senegalPassView = $('senegal-passport-view');
+      const drcPassView = $('drcongo-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
@@ -1297,10 +1298,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (pakistanDocView) pakistanDocView.classList.add('hidden');
       if (seychellesDocView) seychellesDocView.classList.add('hidden');
       if (senegalPassView) senegalPassView.classList.add('hidden');
+      if (drcPassView) drcPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'drcongo') {
+        if (drcPassView) drcPassView.classList.remove('hidden');
       } else if (currentCountry === 'senegal') {
         if (senegalPassView) senegalPassView.classList.remove('hidden');
       } else if (currentCountry === 'seychelles') {
