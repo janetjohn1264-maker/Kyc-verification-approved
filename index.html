@@ -1235,7 +1235,8 @@ var $ = window.$ || (id => document.getElementById(id));
         uk: 'United Kingdom',
         uganda: 'Uganda',
         pakistan: 'Pakistan',
-        seychelles: 'Seychelles'
+        seychelles: 'Seychelles',
+        drcongo: 'Democratic Republic of the Congo'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -1405,6 +1406,15 @@ var $ = window.$ || (id => document.getElementById(id));
           bank: 'Nouvobanq / Clear Junction Global',
           dotColor: 'bg-sky-600',
           badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+        },
+        drcongo: {
+          name: 'DR Congo',
+          fullName: 'Democratic Republic of the Congo',
+          city: 'Kinshasa',
+          address: 'AV SANKURU N°1, Q/CAMP MUNGANGA, ONGALIEMA, KINSHASA, COD REP DEM CONGO',
+          bank: 'Rawbank / Clear Junction Global',
+          dotColor: 'bg-indigo-600',
+          badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
         }
       };
 
