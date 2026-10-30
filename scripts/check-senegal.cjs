@@ -59,9 +59,9 @@ const containerIds = [
 
 // ---- 2. Exact reference specimen values / design strings ------------------
 const referenceValues = [
-  'REPUBLIQUE DU SENEGAL',
+  'RÉPUBLIQUE DU SÉNÉGAL',
   'CEDEAO',
-  'PASSEPORT BIOMETRIQUE',
+  'PASSEPORT BIOMÉTRIQUE',
   'KASSE',
   'DIEYNABA',
   'A04163606',
