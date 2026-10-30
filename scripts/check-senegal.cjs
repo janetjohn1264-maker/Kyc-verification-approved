@@ -96,7 +96,7 @@ files.forEach((file) => {
   });
 
   // ---- 5. Stale ids from the previous passport booklet must be gone ------
-  ['senPreview', 'senSingle', 'senPage1PassNo'].forEach((stale) => {
+  ['senPreview', 'senPage1PassNo', 'senSpreadPassNo'].forEach((stale) => {
     if (html.includes(stale)) {
       out(`stale Senegal id prefix "${stale}" still referenced (use data-sen)`);
     }
