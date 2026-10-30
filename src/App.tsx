@@ -18,6 +18,7 @@ function App() {
   const [saved, setSaved] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [detectedText, setDetectedText] = useState<string[] | null>(null)
+  const [country, setCountry] = useState("DRC")
 
   const update = (key: keyof typeof defaultContent, value: string) => {
     setDetectedText(null)
@@ -26,6 +27,17 @@ function App() {
   }
 
   const previewStyle = useMemo(() => ({ "--accent": content.accent } as React.CSSProperties), [content.accent])
+  const isSouthAfrica = country === "RSA"
+  const specimenImage = isSouthAfrica ? "/assets/aistudio/south_africa_identity_card_reference.jpeg" : "/assets/aistudio/drc_passport_reference.jpg"
+  const specimenAlt = isSouthAfrica ? "Static Republic of South Africa identity card reference specimen" : "Static Democratic Republic of the Congo passport reference specimen"
+  const specimenLabel = isSouthAfrica ? "South Africa identity card reference specimen" : "Passport reference specimen"
+
+  const randomizeSpecimen = () => {
+    setDetectedText(isSouthAfrica
+      ? ["REPUBLIC OF SOUTH AFRICA", "IDENTITY CARD", "SURNAME: MASHEGO", "FORENAMES: REBECCA", "DATE OF BIRTH: 19/03/1984", "ID NUMBER: 930802 0123 08 7", "NATIONALITY: ZAF"]
+      : ["REPUBLIC OF DEMOCRATIC CONGO", "PASSPORT / PASSEPORT", "SURNAME: MINAFFET", "GIVEN NAMES: ESTHER NADINE", "NATIONALITY: CONGOLAISE", "DATE OF BIRTH: 02/08/1991", "PASSPORT NO: DEMO-044743"])
+    document.getElementById("passport-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
 
   return (
     <div className="app-shell">
@@ -43,12 +55,13 @@ function App() {
       <main className="main-content">
         <header className="topbar"><button className="menu-button" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={21} /></button><div className="breadcrumbs"><span>Workspace</span><span>/</span><strong>Passport verification</strong></div><div className="topbar-actions"><span className="status-dot">Live</span><button className="avatar-button" aria-label="Open account menu">JD</button></div></header>
         <div className="page-wrap">
-          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and see changes instantly in the live preview.</p></div><div className="heading-actions"><button className="randomize-button" onClick={() => { setDetectedText(["REPUBLIC OF DEMOCRATIC CONGO", "PASSPORT / PASSEPORT", "SURNAME: MINAFFET", "GIVEN NAMES: ESTHER NADINE", "NATIONALITY: CONGOLAISE", "DATE OF BIRTH: 02/08/1991", "PASSPORT NO: DEMO-044743"]); document.getElementById("passport-editor")?.scrollIntoView({ behavior: "smooth", block: "start" }) }}><FileText size={17} /> Randomize</button><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => setSaved(true)}><Save size={17} /> {saved ? "Changes saved" : "Save changes"}</button></div></section>
+          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and see changes instantly in the live preview.</p></div><div className="heading-actions"><button className="randomize-button" onClick={randomizeSpecimen}><FileText size={17} /> Randomize</button><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => setSaved(true)}><Save size={17} /> {saved ? "Changes saved" : "Save changes"}</button></div></section>
 
           <div className="editor-layout" id="passport-editor">
             <section className="editor-panel" aria-label="Editor controls">
               <div className="panel-header"><div><h2>Screen content</h2><p>Customize the content shown to applicants.</p></div><span className="live-pill"><span /> Live</span></div>
               <div className="form-stack">
+                <label>Country / document<select value={country} onChange={(event) => { setCountry(event.target.value); setDetectedText(null) }}><option value="DRC">Democratic Republic of the Congo — Passport</option><option value="RSA">Republic of South Africa — Identity card</option></select></label>
                 <label>Screen title<input value={content.title} onChange={(event) => update("title", event.target.value)} /></label>
                 <label>Description<textarea rows={3} value={content.subtitle} onChange={(event) => update("subtitle", event.target.value)} /></label>
                 <label>Primary button label<input value={content.button} onChange={(event) => update("button", event.target.value)} /></label>
@@ -58,7 +71,7 @@ function App() {
               <div className="editor-note"><CheckCircle2 size={17} /><span>Your changes are reflected in the preview automatically.</span></div>
             </section>
 
-            <section className="preview-column"><div className="preview-heading"><div><h2>Live preview</h2><p>This is what applicants will see.</p></div><div className="device-toggle"><button className="selected">Desktop</button><button>Mobile</button></div></div><div className="preview-frame"><div className="preview-browser"><span /><span /><span /><small>verify.kyc.app/passport</small></div><div className="preview-page" style={previewStyle}><div className="preview-nav"><div className="preview-logo"><div className="logo-shield"><ShieldCheck size={14} /></div><strong>KYC Verify</strong></div><span>Need help?</span></div><div className="verification-card"><div className="card-icon"><FileText size={24} /></div><div className="step-label">STEP 1 OF 3</div><h3>{content.title}</h3><p>{content.subtitle}</p><div className="document-placeholder static-passport"><img className="passport-reference-image" src="/assets/aistudio/drc_passport_reference.jpg" alt="Static Democratic Republic of the Congo passport reference specimen" /><div className="placeholder-copy"><strong>Passport reference specimen</strong><span>This static reference is preserved exactly as provided.</span></div></div>{detectedText && <section className="detected-text" aria-live="polite"><div className="detected-text-heading"><strong>Detected specimen text</strong><span>OCR preview</span></div><div className="detected-text-list">{detectedText.map((line) => <span key={line}>{line}</span>)}</div></section>}<button className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button><div className="secure-note"><ShieldCheck size={14} /> Your information is encrypted and secure</div></div><div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span></div></div></div></section>
+            <section className="preview-column"><div className="preview-heading"><div><h2>Live preview</h2><p>This is what applicants will see.</p></div><div className="device-toggle"><button className="selected">Desktop</button><button>Mobile</button></div></div><div className="preview-frame"><div className="preview-browser"><span /><span /><span /><small>verify.kyc.app/passport</small></div><div className="preview-page" style={previewStyle}><div className="preview-nav"><div className="preview-logo"><div className="logo-shield"><ShieldCheck size={14} /></div><strong>KYC Verify</strong></div><span>Need help?</span></div><div className="verification-card"><div className="card-icon"><FileText size={24} /></div><div className="step-label">STEP 1 OF 3</div><h3>{content.title}</h3><p>{content.subtitle}</p><div className="document-placeholder static-passport"><img className="passport-reference-image" src={specimenImage} alt={specimenAlt} /><div className="placeholder-copy"><strong>{specimenLabel}</strong><span>This static reference is preserved exactly as provided.</span></div></div>{detectedText && <section className="detected-text" aria-live="polite"><div className="detected-text-heading"><strong>Detected specimen text</strong><span>OCR preview</span></div><div className="detected-text-list">{detectedText.map((line) => <span key={line}>{line}</span>)}</div></section>}<button className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button><div className="secure-note"><ShieldCheck size={14} /> Your information is encrypted and secure</div></div><div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span></div></div></div></section>
           </div>
         </div>
       </main>
