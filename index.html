@@ -2913,8 +2913,14 @@ var $ = window.$ || (id => document.getElementById(id));
         : maleGiven[Math.floor(Math.random() * maleGiven.length)];
       const pob = places[Math.floor(Math.random() * places.length)];
 
-      const passNum = 'A0' + String(Math.floor(1000000 + Math.random() * 9000000));
+      const rnd = (min, max) => Math.floor(min + Math.random() * (max - min));
+      const passNum = '2 ' + rnd(10, 99) + ' ' + rnd(10000000, 99999999) + ' ' + rnd(10000, 99999) + ' ' + rnd(1, 9);
       const nin = '2' + String(Math.floor(100000000000 + Math.random() * 900000000000));
+      const height = rnd(155, 191) + ' cm';
+      const addresses = ['KEUR MASSAR QRT AINOUMADY', 'SICAP LIBERTÉ 6', 'CITÉ KEUR GORGUI', 'GRAND YOFF', 'OUAKAM', 'PARCELLES ASSAINIES U15', 'POINT E', 'HANN MARISTES'];
+      const address = addresses[Math.floor(Math.random() * addresses.length)];
+      const centres = ['COMMISSARIAT DE MALIKA', 'COMMISSARIAT CENTRAL DAKAR', 'COMMISSARIAT DE OUAKAM', 'COMMISSARIAT DE GRAND YOFF', 'COMMISSARIAT DE THIÈS'];
+      const centre = centres[Math.floor(Math.random() * centres.length)];
 
       const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
       const bMonth = months[Math.floor(Math.random() * months.length)];
@@ -2924,8 +2930,8 @@ var $ = window.$ || (id => document.getElementById(id));
       const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
       const iMonth = months[Math.floor(Math.random() * months.length)];
       const iYear = String(Math.floor(2022 + Math.random() * 3));
-      const issueDate = `${iDay} ${iMonth} ${iYear}`;
-      const expDate = `${iDay} ${iMonth} ${parseInt(iYear, 10) + 5}`;
+      const issueDate = `${iDay}/${String(months.indexOf(iMonth) + 1).padStart(2, '0')}/${iYear}`;
+      const expDate = `${iDay}/${String(months.indexOf(iMonth) + 1).padStart(2, '0')}/${parseInt(iYear, 10) + 10}`;
 
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('senPassInputSurname', surname);
@@ -2938,8 +2944,10 @@ var $ = window.$ || (id => document.getElementById(id));
       setVal('senPassInputPersonalNo', nin);
       setVal('senPassInputIssueDate', issueDate);
       setVal('senPassInputExpiryDate', expDate);
-      setVal('senPassInputAuthority', 'MINT/DGPN/DPETV');
-      setVal('senPassInputSignature', given.charAt(0) + '. ' + surname);
+      setVal('senPassInputHeight', height);
+      setVal('senPassInputAddress', address);
+      setVal('senPassInputAuthority', centre);
+      setVal('senPassInputSignature', given.charAt(0) + '. ' + surname.charAt(0) + surname.slice(1).toLowerCase());
 
       updateSenPreview();
       showToast('Profil Généré', `Données fictives créées pour ${given} ${surname}`);
@@ -12724,9 +12732,9 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <div>
                   <h2 class="text-base font-bold flex items-center gap-2 text-slate-900">
                     <i class="fa-solid fa-passport text-emerald-700"></i>
-                    <span>Éditeur du Passeport Sénégalais</span>
+                    <span>Éditeur de la Carte d'Identité CEDEAO · Sénégal</span>
                   </h2>
-                  <p class="text-xs text-slate-500 mt-0.5">Édition des données signalétiques et spécimen fictif du passeport.</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Édition des données signalétiques et spécimen fictif de la carte d'identité CEDEAO.</p>
                 </div>
                 <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200 font-mono-code">
                   SEN · CEDEAO
@@ -12804,11 +12812,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label for="senPassInputSurname" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NOM / SURNAME</label>
-                    <input id="senPassInputSurname" type="text" value="KASSÉ" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white uppercase">
+                    <input id="senPassInputSurname" type="text" value="DIOP" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white uppercase">
                   </div>
                   <div>
                     <label for="senPassInputGiven" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">PRÉNOMS / GIVEN NAMES</label>
-                    <input id="senPassInputGiven" type="text" value="DIEYNABA" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white uppercase">
+                    <input id="senPassInputGiven" type="text" value="AICHA SAMBA" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white uppercase">
                   </div>
                 </div>
 
@@ -12835,15 +12843,27 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   </div>
                   <div>
                     <label for="senPassInputPob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">LIEU DE NAISSANCE / POB</label>
-                    <input id="senPassInputPob" type="text" value="DOUMGA LAO" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white uppercase">
+                    <input id="senPassInputPob" type="text" value="DAKAR" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white uppercase">
+                  </div>
+                </div>
+
+                <!-- Taille (cm) & Adresse du domicile -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="senPassInputHeight" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">TAILLE / HEIGHT (CM)</label>
+                    <input id="senPassInputHeight" type="text" value="167 cm" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  </div>
+                  <div>
+                    <label for="senPassInputAddress" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">ADRESSE DU DOMICILE</label>
+                    <input id="senPassInputAddress" type="text" value="KEUR MASSAR QRT AINOUMADY" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white uppercase">
                   </div>
                 </div>
 
                 <!-- N° Passeport & N° Personnel (NIN) -->
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label for="senPassInputPassNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">N° PASSEPORT / PASSPORT NO</label>
-                    <input id="senPassInputPassNo" type="text" value="A04163606" maxlength="10" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
+                    <label for="senPassInputPassNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">N° DE LA CARTE D'IDENTITÉ</label>
+                    <input id="senPassInputPassNo" type="text" value="2 01 20030215 00023 7" maxlength="25" oninput="updateSenPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
                   </div>
                   <div>
                     <label for="senPassInputPersonalNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">N° PERSONNEL / NIN</label>
@@ -12854,8 +12874,8 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <!-- Dates de délivrance & d'expiration -->
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label for="senPassInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE DÉLIVRANCE / ISSUE</label>
-                    <input id="senPassInputIssueDate" type="text" value="19 OCT / OCT 2024" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
+                    <label for="senPassInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE DE DÉLIVRANCE / ISSUE</label>
+                    <input id="senPassInputIssueDate" type="text" value="08/04/2021" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white uppercase">
                   </div>
                   <div>
                     <label for="senPassInputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE EXPIRATION / EXPIRY</label>
@@ -12866,12 +12886,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <!-- Autorité & Signature -->
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label for="senPassInputAuthority" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">AUTORITÉ / AUTHORITY</label>
-                    <input id="senPassInputAuthority" type="text" value="MINT/DGPN/DPETV" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white uppercase">
+                    <label for="senPassInputAuthority" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">CENTRE D'ENLIVRANCE / AUTHORITY</label>
+                    <input id="senPassInputAuthority" type="text" value="COMMISSARIAT DE MALIKA" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white uppercase">
                   </div>
                   <div>
                     <label for="senPassInputSignature" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">SIGNATURE DU TITULAIRE</label>
-                    <input id="senPassInputSignature" type="text" value="Dieynaba" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-serif italic font-bold text-xs bg-white">
+                    <input id="senPassInputSignature" type="text" value="Aïcha Samba" oninput="updateSenPreview()" class="w-full px-2 py-1.5 border rounded font-serif italic font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -12905,10 +12925,10 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <div class="flex items-center justify-between text-xs px-1 text-slate-500 no-print">
                   <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
-                    <span>RÉPUBLIQUE DU SÉNÉGAL · PASSEPORT BIOMÉTRIQUE</span>
+                    <span>RÉPUBLIQUE DU SÉNÉGAL · CARTE D'IDENTITÉ CEDEAO</span>
                   </div>
                   <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    Format Livret OACI · 88 × 125 mm
+                    Format Carte CEDEAO · 85,6 × 54 mm
                   </span>
                 </div>
 
