@@ -45,7 +45,7 @@ function check(file) {
     'OP1123637',
     'MIEZI',
     'MINGI',
-    'CARMII',
+    'CARMI',
     'KINSHASA',
     '23/04/2000',
     'CONGOLAISE',
@@ -57,9 +57,25 @@ function check(file) {
     'ETUDIANT',
     'RÉPUBLIQUE DÉMOCRATIQUE DU CONGO',
     'DEMOCRATIC REPUBLIC OF THE CONGO',
-    'P<CODMIEZI<<MINGI<CARMII',
-    'OP11236378COD0004237M2707211',
+    'P<CODMIEZI<<CARMI<MINGI',
+    'OP11236378COD0004237M270721110619112',
   ];
+  // --- two-page spread structure (endorsement page above, data page below) ---
+  const structure = [
+    ['endorsement page', /id="drcEndorsementPage"/],
+    ['biometric data page', /id="drcDataPage"/],
+    ['vertical passport number on the endorsement page', /id="drcOutPassNoVertical"/],
+    ['vertical writing mode for the passport number', /writing-mode:\s*vertical-rl/],
+    ['main portrait element', /id="drcOutPhotoMain"/],
+    ['secondary ghost portrait element', /id="drcOutPhotoSecondary"/],
+    ['bearer signature element', /id="drcOutSignature"/],
+    ['address block element', /id="drcOutAddress"/],
+    ['profession element', /id="drcOutProfession"/],
+  ];
+  for (const [name, re] of structure) {
+    if (!re.test(html)) problems.push(prefix + 'missing ' + name);
+  }
+
   for (const value of specimenValues) {
     if (!html.includes(value)) problems.push(prefix + 'missing specimen value ' + JSON.stringify(value));
   }
