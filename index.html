@@ -1694,9 +1694,29 @@ var $ = window.$ || (id => document.getElementById(id));
       const signature = $('drcOutSignature');
       if (signature && signature.getAttribute('src') !== DRC_SIGNATURE) signature.setAttribute('src', DRC_SIGNATURE);
 
-      const mrz = isDrcSpecimen(fields) ? DRC_SPECIMEN_MRZ : buildDrcMrz(fields);
-      drcSetText('drcMrzLine1', mrz.line1);
-      drcSetText('drcMrzLine2', mrz.line2);
+      const panel = $('drcDemoFields');
+      if (panel) {
+        const labels = {
+          surname: 'Name', postname: 'Postname', givenNames: 'Given names',
+          passNo: 'Demo document reference', personalNo: 'Demo personal reference',
+          dob: 'Date of birth', sex: 'Sex', nationality: 'Nationality',
+          pob: 'Place of birth', issue: 'Issue date', expiry: 'Expiry date',
+          authority: 'Authority', profession: 'Profession', address: 'Address'
+        };
+        panel.replaceChildren();
+        Object.entries(labels).forEach(function ([key, label]) {
+          const row = document.createElement('div');
+          row.className = 'min-w-0 rounded-lg bg-slate-50 p-3';
+          const term = document.createElement('dt');
+          term.className = 'text-xs font-semibold text-slate-500';
+          term.textContent = label;
+          const value = document.createElement('dd');
+          value.className = 'mt-1 text-sm font-bold text-slate-800 whitespace-pre-line break-words';
+          value.textContent = fields[key] || '—';
+          row.append(term, value);
+          panel.append(row);
+        });
+      }
     }
 
     function setDrcFieldValues(data) {
@@ -1755,8 +1775,8 @@ var $ = window.$ || (id => document.getElementById(id));
         surname: pick(surnames),
         postname: pick(postnoms),
         givenNames: pick(givens) + ' ' + pick(givens),
-        passNo: 'OP' + digits(7),
-        personalNo: digits(9),
+        passNo: 'DEMO-' + digits(6),
+        personalNo: 'TEST-' + digits(6),
         dob: iso(birthYear, birthMonth, birthDay),
         sex: sex,
         nationality: 'CONGOLAISE',
@@ -13074,8 +13094,8 @@ MUQDISHO, BANAADIR, SOMALIA</span>
           <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
             <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
               <div>
-                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-indigo-700"></i> DR Congo Passport Builder</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Passeport biométrique · RDC / COD — edit every field on the data page.</p>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-indigo-700"></i> DR Congo Demo Editor</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Edit demo data below. Your original passport image stays unchanged.</p>
               </div>
               <span class="text-xs bg-indigo-50 text-indigo-800 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">COD</span>
             </div>
@@ -13090,7 +13110,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <span>Randomize Card</span>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
                   </div>
-                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Congolese passport data, numbers &amp; MRZ</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional demo data for the separate live panel</div>
                 </div>
               </button>
             </div>
@@ -13207,7 +13227,11 @@ COD REP DEM CONGO</textarea>
 
 
 
-            <p class="text-[11px] text-slate-400 text-center leading-snug">Reference specimen reproduction · Cameroon-style guilloche data page with bilingual French/English captions, dual portrait and TD3 machine readable zone.</p>
+            <section id="drc-demo-preview" class="rounded-xl border-2 border-amber-300 bg-white p-4 shadow-sm" aria-labelledby="drcDemoTitle">
+              <h2 id="drcDemoTitle" class="text-sm font-black text-amber-900">DEMO — not an identity document</h2>
+              <p class="mt-1 mb-4 text-xs text-slate-600">Live data preview. Randomize or edit the form to update this panel. The uploaded passport above is never modified.</p>
+              <dl id="drcDemoFields" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></dl>
+            </section>
           </section>
         </main>
       </div>
