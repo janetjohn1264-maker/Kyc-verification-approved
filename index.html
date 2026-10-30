@@ -1786,6 +1786,10 @@ var $ = window.$ || (id => document.getElementById(id));
         profession: pick(professions),
         address: pick(streets) + ' N°' + (1 + Math.floor(Math.random() * 90)) + ' ' + pick(quartiers) + '\n' + city + '\nCOD REP DEM CONGO'
       });
+
+      // setDrcFieldValues() already re-rendered the preview; make sure the user
+      // actually sees it (the DR Congo view may still be hidden).
+      revealDrcPreview();
     }
 
     function resetDrcPhoto() {
