@@ -57,7 +57,7 @@ function check(file) {
     'ETUDIANT',
     'RÉPUBLIQUE DÉMOCRATIQUE DU CONGO',
     'DEMOCRATIC REPUBLIC OF THE CONGO',
-    'P<CODMIEZI<<MINGI<CARMII',
+    'P<CODMIEZI<<CARMI<MINGI',
     'OP11236378COD0004237M270721110619112',
   ];
   // --- two-page spread structure (endorsement page above, data page below) ---
