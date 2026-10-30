@@ -1158,6 +1158,29 @@ var $ = window.$ || (id => document.getElementById(id));
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      } else if (countryKey === 'drcongo') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-indigo-700 bg-gradient-to-br from-indigo-50/90 via-indigo-50/30 to-white text-slate-900 shadow-md ring-2 ring-indigo-600/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-indigo-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateDrcPreview === 'function') updateDrcPreview();
       }
 
       const countryStyles = {
@@ -1205,6 +1228,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50 via-white to-sky-50/50 text-sky-950 text-left shadow-sm ring-2 ring-sky-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-sky-600"
+        },
+        drcongo: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-indigo-700 bg-gradient-to-br from-indigo-50 via-white to-sky-50/60 text-indigo-950 text-left shadow-sm ring-2 ring-indigo-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-indigo-50/40 hover:border-indigo-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-indigo-700"
         }
       };
 
@@ -1230,7 +1258,8 @@ var $ = window.$ || (id => document.getElementById(id));
         uk: 'United Kingdom',
         uganda: 'Uganda',
         pakistan: 'Pakistan',
-        seychelles: 'Seychelles'
+        seychelles: 'Seychelles',
+        drcongo: 'Democratic Republic of the Congo'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -1253,6 +1282,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const pakistanDocView = $('pakistan-doc-view');
       const seychellesDocView = $('seychelles-doc-view');
       const senegalPassView = $('senegal-passport-view');
+      const drcPassView = $('drcongo-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
@@ -1268,10 +1298,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (pakistanDocView) pakistanDocView.classList.add('hidden');
       if (seychellesDocView) seychellesDocView.classList.add('hidden');
       if (senegalPassView) senegalPassView.classList.add('hidden');
+      if (drcPassView) drcPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'drcongo') {
+        if (drcPassView) drcPassView.classList.remove('hidden');
       } else if (currentCountry === 'senegal') {
         if (senegalPassView) senegalPassView.classList.remove('hidden');
       } else if (currentCountry === 'seychelles') {
@@ -1303,6 +1336,343 @@ var $ = window.$ || (id => document.getElementById(id));
       } else {
         if (kenyaPassView) kenyaPassView.classList.remove('hidden');
       }
+    }
+
+    // ================= DEMOCRATIC REPUBLIC OF THE CONGO PASSPORT CONTROLLER =================
+    const DRC_DEFAULT_PHOTO = '/assets/aistudio/drc_passport_portrait.jpg';
+    const DRC_SIGNATURE = '/assets/aistudio/drc_passport_signature.png';
+
+    // Exact values printed on the reference specimen supplied by the user.
+    const DRC_SPECIMEN = {
+      surname: 'MIEZI',
+      postname: 'MINGI',
+      givenNames: 'CARMII',
+      passNo: 'OP1123637',
+      personalNo: '110619112',
+      dob: '2000-04-23',
+      sex: 'M',
+      nationality: 'CONGOLAISE',
+      pob: 'KINSHASA',
+      issue: '2022-07-22',
+      expiry: '2027-07-21',
+      authority: 'MINAFFET',
+      profession: 'ETUDIANT',
+      address: 'AV SANKURU N°1 C/AMP MUNGANGA ONGALIEMA\nKINSHASA\nCOD REP DEM CONGO'
+    };
+
+    // The specimen MRZ as printed on the reference document (ICAO TD3). Its composite
+    // check digit differs by one from a freshly computed value, so the literal strings
+    // are used while every field still matches the specimen and recalculated on edits.
+    const DRC_SPECIMEN_MRZ = {
+      line1: 'P<CODMIEZI<<MINGI<CARMII<<<<<<<<<<<<<<<<<<<<',
+      line2: 'OP11236378COD0004237M270721110619112<<<<<68'
+    };
+
+    function drcSetText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = value == null || value === '' ? '—' : value;
+    }
+
+    function drcMrzClean(value) {
+      return String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim();
+    }
+
+    function drcCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        let v = 0;
+        if (ch === '<') v = 0;
+        else if (ch >= '0' && ch <= '9') v = ch.charCodeAt(0) - 48;
+        else v = ch.charCodeAt(0) - 55;
+        sum += v * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function drcPadMrz(value, length) {
+      const clean = String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9]/g, '');
+      return (clean + '<'.repeat(length)).slice(0, length);
+    }
+
+    function drcMrzDate(isoDate) {
+      const digits = String(isoDate || '').replace(/[^0-9]/g, '');
+      if (digits.length < 8) return '<<<<<<';
+      return digits.slice(2, 8);
+    }
+
+    function drcFormatDate(isoDate) {
+      const digits = String(isoDate || '').replace(/[^0-9]/g, '');
+      if (digits.length < 8) return '—';
+      return digits.slice(6, 8) + '/' + digits.slice(4, 6) + '/' + digits.slice(0, 4);
+    }
+
+    function readDrcFields() {
+      const input = id => {
+        const el = $(id);
+        return el ? String(el.value || '').trim() : '';
+      };
+      return {
+        surname: input('drcInputSurname'),
+        postname: input('drcInputPostname'),
+        givenNames: input('drcInputGivenNames'),
+        passNo: input('drcInputPassNo'),
+        personalNo: input('drcInputPersonalNo'),
+        dob: input('drcInputDob'),
+        sex: (input('drcInputSex') || 'M'),
+        nationality: input('drcInputNationality'),
+        pob: input('drcInputPob'),
+        issue: input('drcInputIssue'),
+        expiry: input('drcInputExpiry'),
+        authority: input('drcInputAuthority'),
+        profession: input('drcInputProfession'),
+        address: input('drcInputAddress')
+      };
+    }
+
+    function buildDrcMrz(fields) {
+      const surname = drcMrzClean(fields.surname).replace(/ /g, '<');
+      const givenNames = drcMrzClean(fields.givenNames).replace(/ /g, '<');
+      const personal = drcPadMrz(drcMrzClean(fields.personalNo), 14);
+      const passNo = drcPadMrz(drcMrzClean(fields.passNo), 9);
+      const dob = drcMrzDate(fields.dob);
+      const expiry = drcMrzDate(fields.expiry);
+      const sex = drcMrzClean(fields.sex).slice(0, 1) || 'M';
+
+      const line1 = drcPadMrz('P<' + 'COD' + surname + '<<' + givenNames, 44);
+
+      const passCheck = drcCheckDigit(passNo);
+      const dobCheck = drcCheckDigit(dob);
+      const expiryCheck = drcCheckDigit(expiry);
+      const personalCheck = drcCheckDigit(personal);
+
+      const line2Base = passNo + passCheck + 'COD' + dob + dobCheck + sex + expiry + expiryCheck + personal;
+      // Composite check digit spans line 1 chars 1-10 / 14-43 and line 2 chars 1-10, 14-20, 22-43.
+      const compositeSource = line1.slice(0, 10) + line1.slice(13, 43) +
+        line2Base.slice(0, 10) + line2Base.slice(13, 20) + line2Base.slice(21, 43);
+      const line2 = line2Base + personalCheck + drcCheckDigit(compositeSource);
+
+      return { line1: line1, line2: line2 };
+    }
+
+    function isDrcSpecimen(fields) {
+      const keys = ['surname', 'postname', 'givenNames', 'passNo', 'personalNo', 'sex', 'nationality', 'pob', 'authority', 'profession'];
+      for (let i = 0; i < keys.length; i++) {
+        if (drcMrzClean(fields[keys[i]]) !== drcMrzClean(DRC_SPECIMEN[keys[i]])) return false;
+      }
+      if (String(fields.dob || '') !== DRC_SPECIMEN.dob) return false;
+      if (String(fields.issue || '') !== DRC_SPECIMEN.issue) return false;
+      if (String(fields.expiry || '') !== DRC_SPECIMEN.expiry) return false;
+      if (String(fields.address || '').replace(/\s+/g, ' ').toUpperCase() !== DRC_SPECIMEN.address.replace(/\s+/g, ' ').toUpperCase()) return false;
+      return true;
+    }
+
+    function updateDrcPreview() {
+      const fields = readDrcFields();
+
+      drcSetText('drcOutAddress', fields.address ? fields.address.toUpperCase() : DRC_SPECIMEN.address);
+      drcSetText('drcOutProfession', (fields.profession || '—').toUpperCase());
+      drcSetText('drcOutType', 'P');
+      drcSetText('drcOutCode', 'COD');
+      drcSetText('drcOutPassNo', (fields.passNo || '—').toUpperCase());
+      drcSetText('drcOutSurname', (fields.surname || '—').toUpperCase());
+      drcSetText('drcOutPostname', (fields.postname || '—').toUpperCase());
+      drcSetText('drcOutGivenNames', (fields.givenNames || '—').toUpperCase());
+      drcSetText('drcOutDob', drcFormatDate(fields.dob));
+      drcSetText('drcOutSex', (fields.sex || 'M').toUpperCase());
+      drcSetText('drcOutNationality', (fields.nationality || 'CONGOLAISE').toUpperCase());
+      drcSetText('drcOutPob', (fields.pob || '—').toUpperCase());
+      drcSetText('drcOutIssue', drcFormatDate(fields.issue));
+      drcSetText('drcOutExpiry', drcFormatDate(fields.expiry));
+      drcSetText('drcOutPersonalNo', fields.personalNo || '—');
+      drcSetText('drcOutAuthority', (fields.authority || 'MINAFFET').toUpperCase());
+
+      const signature = $('drcOutSignature');
+      if (signature && signature.getAttribute('src') !== DRC_SIGNATURE) signature.setAttribute('src', DRC_SIGNATURE);
+
+      const mrz = isDrcSpecimen(fields) ? DRC_SPECIMEN_MRZ : buildDrcMrz(fields);
+      drcSetText('drcMrzLine1', mrz.line1);
+      drcSetText('drcMrzLine2', mrz.line2);
+    }
+
+    function setDrcFieldValues(data) {
+      const map = {
+        drcInputSurname: 'surname',
+        drcInputPostname: 'postname',
+        drcInputGivenNames: 'givenNames',
+        drcInputPassNo: 'passNo',
+        drcInputPersonalNo: 'personalNo',
+        drcInputDob: 'dob',
+        drcInputSex: 'sex',
+        drcInputNationality: 'nationality',
+        drcInputPob: 'pob',
+        drcInputIssue: 'issue',
+        drcInputExpiry: 'expiry',
+        drcInputAuthority: 'authority',
+        drcInputProfession: 'profession',
+        drcInputAddress: 'address'
+      };
+      Object.keys(map).forEach(function (id) {
+        const el = $(id);
+        if (el) el.value = data[map[id]] == null ? '' : data[map[id]];
+      });
+      updateDrcPreview();
+    }
+
+    function resetDrcPassportSpecimen() {
+      setDrcFieldValues(DRC_SPECIMEN);
+      resetDrcPhoto();
+    }
+
+    function randomizeDrcPassport() {
+      const surnames = ['KABILA', 'MUKENDI', 'TSHIBANGU', 'ILUNGA', 'MABELE', 'NGOMA', 'BWANGA', 'KALALA', 'MWAMBA', 'LUKAMBA'];
+      const postnoms = ['KABASELE', 'MWANZA', 'BOKAMBA', 'LUBAMBA', 'NSIMBA', 'TSHISEKEDI', 'MAKONGA', 'BOFANDO'];
+      const givens = ['JEAN', 'PATRICE', 'GRACE', 'DIEUDONNE', 'CHANTAL', 'SERGE', 'ESTHER', 'FISTON', 'NADINE', 'JUNIOR', 'PLACIDE', 'CARINE'];
+      const professions = ['ETUDIANT', 'COMMERCANT', 'AGENT DE L\'ETAT', 'ENSEIGNANT', 'INFIRMIER', 'MENAGERE'];
+      const cities = ['KINSHASA', 'LUBUMBASHI', 'MBUJI-MAYI', 'KISANGANI', 'MATADI', 'GOMA', 'BUKAVU', 'KANANGA'];
+      const streets = ['AV SANKURU', 'AV KASAVUBU', 'AV LUMUMBA', 'AV DE LA PAIX', 'AV MOBUTU', 'AV KIMBANGU'];
+      const quartiers = ['Q/CAMP MUNGANGA ONGALIEMA', 'Q/KINTAMBO', 'Q/LIMETE', 'Q/GOMBE', 'Q/NGALIEMA', 'Q/MATETE'];
+      const pick = list => list[Math.floor(Math.random() * list.length)];
+      const pad = (n, len) => String(n).padStart(len, '0');
+      const digits = len => { let out = ''; for (let i = 0; i < len; i++) out += String(Math.floor(Math.random() * 10)); return out; };
+
+      const sex = Math.random() < 0.5 ? 'M' : 'F';
+      const city = pick(cities);
+      const birthYear = 1970 + Math.floor(Math.random() * 34);
+      const birthMonth = 1 + Math.floor(Math.random() * 12);
+      const birthDay = 1 + Math.floor(Math.random() * 28);
+      const issueYear = 2020 + Math.floor(Math.random() * 5);
+      const issueMonth = 1 + Math.floor(Math.random() * 12);
+      const issueDay = 1 + Math.floor(Math.random() * 28);
+      const expiryYear = issueYear + 5;
+      const iso = (y, m, d) => y + '-' + pad(m, 2) + '-' + pad(d, 2);
+
+      setDrcFieldValues({
+        surname: pick(surnames),
+        postname: pick(postnoms),
+        givenNames: pick(givens) + ' ' + pick(givens),
+        passNo: 'OP' + digits(7),
+        personalNo: digits(9),
+        dob: iso(birthYear, birthMonth, birthDay),
+        sex: sex,
+        nationality: 'CONGOLAISE',
+        pob: city,
+        issue: iso(issueYear, issueMonth, issueDay),
+        expiry: iso(expiryYear, issueMonth, issueDay),
+        authority: 'MINAFFET',
+        profession: pick(professions),
+        address: pick(streets) + ' N°' + (1 + Math.floor(Math.random() * 90)) + ' ' + pick(quartiers) + '\n' + city + '\nCOD REP DEM CONGO'
+      });
+    }
+
+    function resetDrcPhoto() {
+      ['drcOutPhotoMain', 'drcOutPhotoSecondary'].forEach(function (id) {
+        const el = $(id);
+        if (el) el.setAttribute('src', DRC_DEFAULT_PHOTO);
+      });
+      const input = $('drcPassPhotoInput');
+      if (input) input.value = '';
+    }
+
+    function initDrcPassport() {
+      const input = $('drcPassPhotoInput');
+      if (input && !input.dataset.drcWired) {
+        input.dataset.drcWired = '1';
+        input.addEventListener('change', function (evt) {
+          const file = evt.target.files && evt.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const src = e.target.result;
+            ['drcOutPhotoMain', 'drcOutPhotoSecondary'].forEach(function (id) {
+              const el = $(id);
+              if (el) el.setAttribute('src', src);
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      updateDrcPreview();
+    }
+
+    function drcSpecimenText() {
+      const fields = readDrcFields();
+      const mrz = isDrcSpecimen(fields) ? DRC_SPECIMEN_MRZ : buildDrcMrz(fields);
+      return [
+        'RÉPUBLIQUE DÉMOCRATIQUE DU CONGO / DEMOCRATIC REPUBLIC OF THE CONGO',
+        'PASSEPORT / PASSPORT',
+        'Type: P',
+        'Pays émetteur / Issuing country: COD',
+        'N° de passeport / Passport No: ' + (fields.passNo || ''),
+        'Nom / Name: ' + (fields.surname || ''),
+        'Postnom / Postname: ' + (fields.postname || ''),
+        'Prénoms / Given names: ' + (fields.givenNames || ''),
+        'Date de naissance / Date of birth: ' + drcFormatDate(fields.dob),
+        'Sexe / Sex: ' + (fields.sex || ''),
+        'Lieu de naissance / Place of birth: ' + (fields.pob || ''),
+        'Nationalité / Nationality: ' + (fields.nationality || ''),
+        'Date de délivrance / Date of issue: ' + drcFormatDate(fields.issue),
+        'Date d\'expiration / Date of expiry: ' + drcFormatDate(fields.expiry),
+        'Autorité émettrice / Issuing authority: ' + (fields.authority || ''),
+        'N° personnel / Personal No: ' + (fields.personalNo || ''),
+        'Profession / d occupation: ' + (fields.profession || ''),
+        'Adresse / adress: ' + String(fields.address || '').replace(/\n/g, ', '),
+        '',
+        mrz.line1,
+        mrz.line2
+      ].join('\n');
+    }
+
+    function copyDrcSpecimenData() {
+      const text = drcSpecimenText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          showToast('Copied', 'DR Congo passport details copied to clipboard.');
+        }).catch(function () {
+          showToast('Copy Failed', 'Clipboard permission was denied.');
+        });
+      } else {
+        showToast('Copy Failed', 'Clipboard is not available in this browser.');
+      }
+    }
+
+    function downloadDrcPassPNG() {
+      const card = $('drc-passport-card');
+      if (!card) return;
+      if (typeof html2canvas !== 'function') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution DR Congo passport PNG');
+      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
+        const link = document.createElement('a');
+        link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Ready!', 'DR Congo passport PNG generated successfully');
+      }).catch(function () {
+        showToast('Download Error', 'Could not export passport image');
+      });
+    }
+
+    function printDrcPassport() {
+      window.print();
+    }
+
+    window.updateDrcPreview = updateDrcPreview;
+    window.randomizeDrcPassport = randomizeDrcPassport;
+    window.resetDrcPassportSpecimen = resetDrcPassportSpecimen;
+    window.resetDrcPhoto = resetDrcPhoto;
+    window.copyDrcSpecimenData = copyDrcSpecimenData;
+    window.downloadDrcPassPNG = downloadDrcPassPNG;
+    window.printDrcPassport = printDrcPassport;
+    window.initDrcPassport = initDrcPassport;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDrcPassport);
+    } else {
+      initDrcPassport();
     }
 
     // ================= PROOF OF ACCOUNT & ADDRESS (GREY BANK LETTER & PDF) CONTROLLER =================
@@ -1400,6 +1770,15 @@ var $ = window.$ || (id => document.getElementById(id));
           bank: 'Nouvobanq / Clear Junction Global',
           dotColor: 'bg-sky-600',
           badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+        },
+        drcongo: {
+          name: 'DR Congo',
+          fullName: 'Democratic Republic of the Congo',
+          city: 'Kinshasa',
+          address: 'AV SANKURU N°1, Q/CAMP MUNGANGA, ONGALIEMA, KINSHASA, COD REP DEM CONGO',
+          bank: 'Rawbank / Clear Junction Global',
+          dotColor: 'bg-indigo-600',
+          badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
         }
       };
 
@@ -6723,6 +7102,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Seychelles</div>
                 <div class="text-[10px] font-medium text-slate-500">National Identity Card</div>
+              </div>
+            </button>
+
+            <!-- Democratic Republic of the Congo -->
+            <button type="button" id="country-btn-drcongo" onclick="switchVerificationCountry('drcongo')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇨🇩</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">DR Congo</div>
+                <div class="text-[10px] font-medium text-slate-500">Passeport Biométrique (COD)</div>
               </div>
             </button>
           </div>
@@ -12773,6 +13164,266 @@ MUQDISHO, BANAADIR, SOMALIA</span>
         </main>
       </div>
 
+
+      <!-- ================= STEP 3H-2: DEMOCRATIC REPUBLIC OF THE CONGO PASSPORT VIEW ================= -->
+      <div id="drcongo-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-indigo-700"></i> DR Congo Passport Builder</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Passeport biométrique · RDC / COD — edit every field on the data page.</p>
+              </div>
+              <span class="text-xs bg-indigo-50 text-indigo-800 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">COD</span>
+            </div>
+
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeDrcPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-500 hover:from-indigo-500 hover:via-blue-500 hover:to-sky-400 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Congolese passport data, numbers &amp; MRZ</div>
+                </div>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Nom / Name</label>
+                <input id="drcInputSurname" type="text" value="MIEZI" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Postnom / Postname</label>
+                <input id="drcInputPostname" type="text" value="MINGI" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Prénoms / Given names</label>
+                <input id="drcInputGivenNames" type="text" value="CARMII" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">N° de passeport / Passport No</label>
+                <input id="drcInputPassNo" type="text" value="OP1123637" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-mono font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">N° personnel / Personal No</label>
+                <input id="drcInputPersonalNo" type="text" value="110619112" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-mono font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Date de naissance / Date of birth</label>
+                <input id="drcInputDob" type="date" value="2000-04-23" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Sexe / Sex</label>
+                <select id="drcInputSex" onchange="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+                  <option value="M" selected>M</option>
+                  <option value="F">F</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Nationalité / Nationality</label>
+                <input id="drcInputNationality" type="text" value="CONGOLAISE" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Lieu de naissance / Place of birth</label>
+                <input id="drcInputPob" type="text" value="KINSHASA" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Date de délivrance / Issue</label>
+                <input id="drcInputIssue" type="date" value="2022-07-22" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Date d'expiration / Expiry</label>
+                <input id="drcInputExpiry" type="date" value="2027-07-21" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Autorité émettrice / Authority</label>
+                <input id="drcInputAuthority" type="text" value="MINAFFET" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Profession / d occupation</label>
+                <input id="drcInputProfession" type="text" value="ETUDIANT" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Adresse / adress (3 lignes)</label>
+                <textarea id="drcInputAddress" rows="3" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-xs font-semibold text-slate-800 leading-snug focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">AV SANKURU N°1 C/AMP MUNGANGA ONGALIEMA
+KINSHASA
+COD REP DEM CONGO</textarea>
+              </div>
+            </div>
+
+            <div class="pt-1 border-t border-slate-100 space-y-2.5">
+              <label class="block text-[11px] font-bold text-slate-600">Photo du titulaire / Bearer photo</label>
+              <div class="flex items-center gap-2 flex-wrap">
+                <label class="px-3.5 py-2 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer inline-flex items-center gap-2">
+                  <i class="fa-solid fa-upload"></i> Upload photo
+                  <input id="drcPassPhotoInput" type="file" accept="image/*" class="hidden">
+                </label>
+                <button type="button" onclick="resetDrcPhoto()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors cursor-pointer inline-flex items-center gap-2">
+                  <i class="fa-solid fa-rotate-left"></i> Reset photo
+                </button>
+              </div>
+              <p class="text-[10px] text-slate-400 leading-snug">The uploaded photo is used for both the large and the secondary portrait, exactly like the reference specimen.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 pt-1">
+              <button type="button" onclick="resetDrcPassportSpecimen()" class="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-file-circle-check"></i> Load reference specimen
+              </button>
+              <button type="button" onclick="copyDrcSpecimenData()" class="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-copy"></i> Copy data
+              </button>
+              <button type="button" onclick="downloadDrcPassPNG()" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-download"></i> Download PNG
+              </button>
+              <button type="button" onclick="printDrcPassport()" class="px-3 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-print"></i> Print
+              </button>
+            </div>
+          </section>
+
+          <!-- Passport Preview -->
+          <section class="lg:col-span-7 space-y-4">
+            <div class="flex items-center justify-between gap-3 no-print">
+              <div class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-indigo-700"></i> Data page preview
+              </div>
+              <a href="/assets/aistudio/drc_passport_reference.jpg" download="drc_passport_reference.jpg" class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-image"></i> Reference specimen (JPG)
+              </a>
+            </div>
+
+            <article id="drc-passport-card" class="relative w-full max-w-[520px] mx-auto rounded-xl shadow-2xl border-2 border-rose-200/80 overflow-hidden select-none text-[#241a4d]" style="aspect-ratio: 443 / 607; container-type: inline-size; background: radial-gradient(circle at 82% 58%, rgba(148,163,184,0.20) 0 34%, rgba(148,163,184,0) 62%), repeating-radial-gradient(circle at 22% 18%, rgba(236,146,158,0.16) 0 1px, rgba(236,146,158,0) 1px 8px), repeating-linear-gradient(112deg, rgba(244,164,174,0.16) 0 1px, rgba(244,164,174,0) 1px 9px), linear-gradient(158deg, #fdf3ec 0%, #fbe8e6 46%, #fcf0e9 100%);">
+              <!-- security watermark (DRC coat of arms silhouette) -->
+              <div class="absolute inset-0 pointer-events-none opacity-[0.10] flex items-center justify-center" aria-hidden="true">
+                <i class="fa-solid fa-shield-halved" style="font-size: 46cqw;"></i>
+              </div>
+              <!-- right perforation column -->
+              <div class="absolute top-0 right-0 h-full w-[3.4%] pointer-events-none" aria-hidden="true" style="background-image: radial-gradient(circle, rgba(90,70,120,0.55) 0 22%, rgba(90,70,120,0) 24%); background-size: 100% 3.2%;"></div>
+              <!-- gold holographic patch -->
+              <div class="absolute pointer-events-none rounded-full shadow-inner" aria-hidden="true" style="top: 58%; right: 5.5%; width: 11cqw; height: 11cqw; background: conic-gradient(from 20deg, #fde68a, #f0abfc, #a5b4fc, #fcd34d, #fdba74, #fde68a); opacity: 0.85;"></div>
+
+              <div class="relative h-full flex flex-col">
+                <!-- Top block: address, profession, bearer signature -->
+                <div class="px-[5%] pt-[3.6%]">
+                  <div class="font-bold uppercase tracking-[0.1em] text-[#4b3a86]" style="font-size: 1.55cqw;">Adresse / adress</div>
+                  <div id="drcOutAddress" class="mt-[0.4%] font-black uppercase leading-[1.28] tracking-tight whitespace-pre-line" style="font-size: 1.92cqw;">AV SANKURU N°1 C/AMP MUNGANGA ONGALIEMA
+KINSHASA
+COD REP DEM CONGO</div>
+                  <div class="mt-[2.4%] font-bold uppercase tracking-[0.1em] text-[#4b3a86]" style="font-size: 1.55cqw;">Profession / d occupation</div>
+                  <div id="drcOutProfession" class="font-black uppercase tracking-tight" style="font-size: 1.92cqw;">ETUDIANT</div>
+                  <div class="mt-[2.4%] font-bold uppercase tracking-[0.1em] text-[#4b3a86]" style="font-size: 1.55cqw;">Signature du titulaire / Signature of bearer</div>
+                  <img id="drcOutSignature" src="/assets/aistudio/drc_passport_signature.png" alt="Signature of bearer" class="mt-[0.4%] object-contain object-left" style="height: 7cqw; width: auto;">
+                </div>
+
+                <!-- Bilingual country band -->
+                <div class="mt-auto bg-gradient-to-r from-fuchsia-400 via-indigo-600 to-indigo-900 px-[2%] py-[1.1%] text-center">
+                  <div class="font-black uppercase text-white leading-tight tracking-[0.06em]" style="font-size: 1.72cqw;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO - DEMOCRATIC REPUBLIC OF THE CONGO</div>
+                </div>
+
+                <!-- Details -->
+                <div class="flex-1 px-[4%] pt-[2.2%] pb-[1.5%] flex flex-col">
+                  <!-- Header row -->
+                  <div class="flex items-start gap-[1.5%]">
+                    <div class="w-[25%] shrink-0">
+                      <div class="font-black uppercase leading-none tracking-tight" style="font-size: 2.9cqw;">PASSEPORT</div>
+                      <div class="font-semibold italic leading-tight text-[#4b3a86]" style="font-size: 1.8cqw;">Passport</div>
+                    </div>
+                    <div class="w-[15%] shrink-0">
+                      <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Type /<br>Type</div>
+                      <div id="drcOutType" class="font-black leading-tight" style="font-size: 2.1cqw;">P</div>
+                    </div>
+                    <div class="w-[24%] shrink-0">
+                      <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Pays émetteur /<br>Issuing country</div>
+                      <div id="drcOutCode" class="font-black leading-tight" style="font-size: 2.1cqw;">COD</div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">N° de passeport /<br>Passport No</div>
+                      <div id="drcOutPassNo" class="font-black leading-tight tracking-wide" style="font-size: 2.1cqw;">OP1123637</div>
+                    </div>
+                  </div>
+
+                  <!-- Body: photo | personal fields | secondary photo + right column -->
+                  <div class="mt-[1.8%] flex items-start gap-[2%] flex-1">
+                    <!-- Large portrait -->
+                    <div class="w-[26%] shrink-0 border border-[#b9a8cb] bg-white p-[2px] shadow-sm">
+                      <img id="drcOutPhotoMain" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Bearer photograph" class="w-full object-cover object-top" style="height: 33cqw; filter: grayscale(0.15) contrast(1.04);">
+                    </div>
+
+                    <!-- Personal fields -->
+                    <div class="w-[35%] shrink-0 space-y-[1.4%]">
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Nom / Name</div>
+                        <div id="drcOutSurname" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.95cqw;">MIEZI</div>
+                      </div>
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Postnom / Postname</div>
+                        <div id="drcOutPostname" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.95cqw;">MINGI</div>
+                      </div>
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Prénoms / Given names</div>
+                        <div id="drcOutGivenNames" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.95cqw;">CARMII</div>
+                      </div>
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Date de naissance / Date of birth</div>
+                        <div id="drcOutDob" class="font-black leading-tight" style="font-size: 1.95cqw;">23/04/2000</div>
+                      </div>
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Nationalité / Nationality</div>
+                        <div id="drcOutNationality" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.95cqw;">CONGOLAISE</div>
+                      </div>
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Date de délivrance / Date of issue</div>
+                        <div id="drcOutIssue" class="font-black leading-tight" style="font-size: 1.95cqw;">22/07/2022</div>
+                      </div>
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Date d'expiration / Date of expiry</div>
+                        <div id="drcOutExpiry" class="font-black leading-tight" style="font-size: 1.95cqw;">21/07/2027</div>
+                      </div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div class="flex-1 flex flex-col">
+                      <div>
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Sexe / Sex</div>
+                        <div id="drcOutSex" class="font-black leading-tight" style="font-size: 1.95cqw;">M</div>
+                      </div>
+                      <div class="mt-[4%] border border-[#b9a8cb] bg-white p-[2px] shadow-sm">
+                        <img id="drcOutPhotoSecondary" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Secondary photograph" class="w-full object-cover object-top" style="height: 24cqw; filter: grayscale(0.2) contrast(1.02);">
+                      </div>
+                      <div class="mt-[4%]">
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Lieu de naissance / Place of birth</div>
+                        <div id="drcOutPob" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.95cqw;">KINSHASA</div>
+                      </div>
+                      <div class="mt-[3%]">
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">N° personnel / Personal N°</div>
+                        <div id="drcOutPersonalNo" class="font-black leading-tight tracking-tight" style="font-size: 1.95cqw;">110619112</div>
+                      </div>
+                      <div class="mt-[3%]">
+                        <div class="font-bold uppercase leading-tight text-[#4b3a86]" style="font-size: 1.3cqw;">Autorité émettrice / Issuing authority</div>
+                        <div id="drcOutAuthority" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.95cqw;">MINAFFET</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- MRZ -->
+                <div class="bg-white/75 border-t border-rose-200/80 px-[3%] flex flex-col justify-center" style="height: 12.5cqw;">
+                  <div id="drcMrzLine1" class="font-mono whitespace-nowrap overflow-hidden leading-tight tracking-[0.02em] text-[#1b1436]" style="font-size: 2.95cqw;">P&lt;CODMIEZI&lt;&lt;MINGI&lt;CARMII&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                  <div id="drcMrzLine2" class="font-mono whitespace-nowrap overflow-hidden leading-tight tracking-[0.02em] text-[#1b1436]" style="font-size: 2.95cqw;">OP11236378COD0004237M270721110619112&lt;&lt;&lt;&lt;&lt;68</div>
+                </div>
+              </div>
+            </article>
+
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Reference specimen reproduction · Cameroon-style guilloche data page with bilingual French/English captions, dual portrait and TD3 machine readable zone.</p>
+          </section>
+        </main>
+      </div>
 
       <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY BANK LETTER & PDF) VIEW ================= -->
       <div id="proofofaccount-doc-view" class="hidden">
