@@ -3062,98 +3062,119 @@ var $ = window.$ || (id => document.getElementById(id));
       updateSenMRZ(surname, given, passNo, countryCode, dob, sex, expiryDate, personalNo);
     }
 
+    // Numero de passeport espace comme sur la page 1 du specimen : A 04163606
+    function formatSenPassNo(passNo) {
+      const raw = String(passNo || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (/^[A-Z]\d{8}$/.test(raw)) return raw.charAt(0) + ' ' + raw.slice(1);
+      return raw;
+    }
+
+    // Cle de controle ICAO 9303 (7-3-1) : passages de l'alphabet MRZ
+    function mrzCheckDigit(str) {
+      const values = { '<': 0 };
+      for (let d = 0; d <= 9; d += 1) values[String(d)] = d;
+      for (let c = 0; c < 26; c += 1) values[String.fromCharCode(65 + c)] = 10 + c;
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i += 1) {
+        const v = values[str.charAt(i)];
+        sum += (v === undefined ? 0 : v) * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function mrzDateParts(raw, fbYY, fbMM, fbDD) {
+      const months = { JAN: '01', FEB: '02', FEV: '02', MAR: '03', APR: '04', AVR: '04', MAY: '05', MAI: '05', JUN: '06', JUIN: '06', JUL: '07', JUIL: '07', AUG: '08', AOU: '08', AOUT: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
+      const m = String(raw || '').toUpperCase().match(/(\d{1,2})\s*[\/\-.\s]\s*([A-Z]{3,4})[\s\/A-Z]*?(\d{4})/);
+      if (!m) return { dd: fbDD, mm: fbMM, yy: fbYY };
+      return {
+        dd: m[1].padStart(2, '0'),
+        mm: months[m[2].slice(0, 3)] || fbMM,
+        yy: m[3].slice(-2)
+      };
+    }
+
     function updateSenMRZ(surname, given, passNo, countryCode, dobRaw, sex, expiryRaw, personalNo) {
-      // 2 Lines of 44 Characters (ICAO TD-3 Standard)
-      // Line 1: P<SENKASSE<<DIEYNABA<<<<<<<<<<<<<<<<<<<<<<<<<<
-      const sClean = (surname || 'KASSE').replace(/[^A-Z]/g, '<');
-      const gClean = (given || 'DIEYNABA').replace(/[^A-Z]/g, '<');
-      const cCode = (countryCode || 'SEN').substring(0, 3).padEnd(3, '<');
-      let line1 = ('P<' + cCode + sClean + '<<' + gClean).padEnd(44, '<').substring(0, 44);
+      // Deux lignes de 44 caracteres (OACI / ICAO 9303 TD-3)
+      // Ligne 1 : P<SENKASSE<<DIEYNABA<<<<<<<<<<<<<<<<<<<<<<<<<<
+      // Ligne 2 : A041636060SEN0111252F29101832312201200531<2<...
+      const sClean = String(surname || 'KASSE').toUpperCase().replace(/[^A-Z]/g, '<');
+      const gClean = String(given || 'DIEYNABA').toUpperCase().replace(/[^A-Z<]/g, '<');
+      const cCode = String(countryCode || 'SEN').toUpperCase().replace(/[^A-Z]/g, '').padEnd(3, '<').substring(0, 3);
+      const line1 = ('P<' + cCode + sClean + '<<' + gClean).padEnd(44, '<').substring(0, 44);
 
-      // Line 2: A041636060SEN0111252F29101832312201200531<20
-      const pClean = (passNo || 'A04163606').replace(/[^A-Z0-9]/g, '').padEnd(9, '<').substring(0, 9);
-      
-      // Compute fictional dates:
-      let bYY = '01', bMM = '11', bDD = '25';
-      const mMatch = dobRaw.match(/(\d{1,2})\s*([A-Za-z]{3})[\s/A-Za-z]*(\d{4})/);
-      if (mMatch) {
-        bDD = mMatch[1].padStart(2, '0');
-        bYY = mMatch[3].slice(-2);
-        const months = { JAN: '01', FEB: '02', FEV: '02', MAR: '03', APR: '04', AVR: '04', MAY: '05', MAI: '05', JUN: '06', JUIN: '06', JUL: '07', JUIL: '07', AUG: '08', AOU: '08', AOUT: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
-        bMM = months[mMatch[2].toUpperCase()] || '11';
-      }
+      const pClean = String(passNo || 'A04163606').toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(9, '<').substring(0, 9);
+      const pCheck = mrzCheckDigit(pClean);
 
-      let eYY = '29', eMM = '10', eDD = '18';
-      const eMatch = expiryRaw.match(/(\d{1,2})\s*([A-Za-z]{3})[\s/A-Za-z]*(\d{4})/);
-      if (eMatch) {
-        eDD = eMatch[1].padStart(2, '0');
-        eYY = eMatch[3].slice(-2);
-        const months = { JAN: '01', FEB: '02', FEV: '02', MAR: '03', APR: '04', AVR: '04', MAY: '05', MAI: '05', JUN: '06', JUIN: '06', JUL: '07', JUIL: '07', AUG: '08', AOU: '08', AOUT: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
-        eMM = months[eMatch[2].toUpperCase()] || '10';
-      }
+      const dobParts = mrzDateParts(dobRaw, '01', '11', '25');
+      const dobField = dobParts.yy + dobParts.mm + dobParts.dd;
+      const dobCheck = mrzCheckDigit(dobField);
 
-      const sChar = (sex || 'F').charAt(0).toUpperCase();
-      const persClean = (personalNo || '2312201200531').replace(/[^0-9]/g, '').padEnd(14, '<').substring(0, 14);
+      const expParts = mrzDateParts(expiryRaw, '29', '10', '18');
+      const expField = expParts.yy + expParts.mm + expParts.dd;
+      const expCheck = mrzCheckDigit(expField);
 
-      let line2 = (pClean + '0' + cCode + bYY + bMM + bDD + '2' + sChar + eYY + eMM + eDD + '83' + persClean + '<20').padEnd(44, '<').substring(0, 44);
+      const sChar = String(sex || 'F').toUpperCase().charAt(0) === 'M' ? 'M' : 'F';
 
-      ['senMrzLine1', 'senSingleMrzLine1'].forEach(id => setText(id, line1));
-      ['senMrzLine2', 'senSingleMrzLine2'].forEach(id => setText(id, line2));
+      const persClean = String(personalNo || '2312201200531').replace(/[^0-9]/g, '').padEnd(14, '<').substring(0, 14);
+      const persCheck = mrzCheckDigit(persClean);
 
-      function setText(id, text) {
-        const el = $(id);
-        if (el) el.textContent = text;
-      }
+      const head = pClean + pCheck + cCode + dobField + dobCheck + sChar + expField + expCheck;
+      const tail = persClean + persCheck;
+      const composite = mrzCheckDigit(head + tail);
+      const line2 = (head + tail + composite).padEnd(44, '<').substring(0, 44);
+
+      const setText = (el, text) => { if (el) el.textContent = text; };
+      document.querySelectorAll('[data-mrz="1"]').forEach(el => setText(el, line1));
+      document.querySelectorAll('[data-mrz="2"]').forEach(el => setText(el, line2));
+      ['senMrzLine1', 'senSingleMrzLine1'].forEach(id => setText($(id), line1));
+      ['senMrzLine2', 'senSingleMrzLine2'].forEach(id => setText($(id), line2));
     }
 
     function randomizeSenegalPassport() {
-      const surnames = ['KASSÉ', 'DIALLO', 'NDIAYE', 'SARR', 'BA', 'FALL', 'DIOP', 'GUEYE', 'FAYE', 'SOW', 'SY', 'CISSE', 'TOURE', 'MBACKE', 'WADE', 'SECK'];
-      const femaleGiven = ['DIEYNABA', 'FATOU', 'AÏSSATOU', 'MARIAMA', 'AMINATA', 'KHADY', 'RAMATOULAYE', 'NOGAYE', 'NDEYE FAMA', 'MAME DIARRA'];
+      const surnames = ['KASSE', 'DIALLO', 'NDIAYE', 'SARR', 'BA', 'FALL', 'DIOP', 'GUEYE', 'FAYE', 'SOW', 'SY', 'CISSE', 'TOURE', 'MBACKE', 'WADE', 'SECK'];
+      const femaleGiven = ['DIEYNABA', 'FATOU', 'AISSATOU', 'MARIAMA', 'AMINATA', 'KHADY', 'RAMATOULAYE', 'NOGAYE', 'NDEYE FAMA', 'MAME DIARRA'];
       const maleGiven = ['AMADOU', 'CHEIKH', 'MOUHAMADOU', 'IBRAHIMA', 'MAMADOU', 'BABACAR', 'OUSMANE', 'ABDOULAYE', 'ALIOUNE', 'MALICK'];
-      const places = ['DOUMGA LAO', 'DAKAR', 'THIÈS', 'SAINT-LOUIS', 'KAOLACK', 'ZIGUINCHOR', 'TOUBA', 'TAMBACOUNDA', 'MBOUR', 'KOLDA', 'LOUGA'];
+      const places = ['DOUMGA LAO', 'DAKAR', 'THIES', 'SAINT-LOUIS', 'KAOLACK', 'ZIGUINCHOR', 'TOUBA', 'TAMBACOUNDA', 'MBOUR', 'KOLDA', 'LOUGA'];
+      // "25 NOV / NOV 2001" : mois bilingue comme sur le specimen
       const months = ['JAN / JAN', 'FEV / FEB', 'MAR / MAR', 'AVR / APR', 'MAI / MAY', 'JUIN / JUN', 'JUIL / JUL', 'AOUT / AUG', 'SEP / SEP', 'OCT / OCT', 'NOV / NOV', 'DEC / DEC'];
 
       const isFemale = Math.random() > 0.45;
       const surname = surnames[Math.floor(Math.random() * surnames.length)];
-      const given = isFemale 
+      const given = isFemale
         ? femaleGiven[Math.floor(Math.random() * femaleGiven.length)]
         : maleGiven[Math.floor(Math.random() * maleGiven.length)];
       const pob = places[Math.floor(Math.random() * places.length)];
 
       const rnd = (min, max) => Math.floor(min + Math.random() * (max - min));
-      const passNum = '2 ' + rnd(10, 99) + ' ' + rnd(10000000, 99999999) + ' ' + rnd(10000, 99999) + ' ' + rnd(1, 9);
+      // Passeport senegalais : 1 lettre + 8 chiffres (ex. A04163606)
+      const passNum = 'A' + String(rnd(1000000, 99999999)).padStart(8, '0');
       const nin = '2' + String(Math.floor(100000000000 + Math.random() * 900000000000));
-      const height = rnd(155, 191) + ' cm';
-      const addresses = ['KEUR MASSAR QRT AINOUMADY', 'SICAP LIBERTÉ 6', 'CITÉ KEUR GORGUI', 'GRAND YOFF', 'OUAKAM', 'PARCELLES ASSAINIES U15', 'POINT E', 'HANN MARISTES'];
-      const address = addresses[Math.floor(Math.random() * addresses.length)];
-      const centres = ['COMMISSARIAT DE MALIKA', 'COMMISSARIAT CENTRAL DAKAR', 'COMMISSARIAT DE OUAKAM', 'COMMISSARIAT DE GRAND YOFF', 'COMMISSARIAT DE THIÈS'];
-      const centre = centres[Math.floor(Math.random() * centres.length)];
+      const authority = 'MINT/DGPN/DPETV';
 
-      const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const bMonth = months[Math.floor(Math.random() * months.length)];
-      const bYear = String(Math.floor(1985 + Math.random() * 20));
-      const dob = `${bDay} ${bMonth} ${bYear}`;
+      const bMonthIdx = rnd(0, 12);
+      const bDay = String(rnd(1, 29)).padStart(2, '0');
+      const bYear = String(rnd(1968, 2006));
+      const dob = `${bDay} ${months[bMonthIdx]} ${bYear}`;
 
-      const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const iMonth = months[Math.floor(Math.random() * months.length)];
-      const iYear = String(Math.floor(2022 + Math.random() * 3));
-      const issueDate = `${iDay}/${String(months.indexOf(iMonth) + 1).padStart(2, '0')}/${iYear}`;
-      const expDate = `${iDay}/${String(months.indexOf(iMonth) + 1).padStart(2, '0')}/${parseInt(iYear, 10) + 10}`;
+      const iMonthIdx = rnd(0, 12);
+      const iDay = String(rnd(1, 29)).padStart(2, '0');
+      const iYear = rnd(2022, 2025);
+      const issueDate = `${iDay} ${months[iMonthIdx]} ${iYear}`;
+      const expiryDate = `${iDay} ${months[iMonthIdx]} ${iYear + 5}`;
 
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('senPassInputSurname', surname);
       setVal('senPassInputGiven', given);
-      setVal('senPassInputNationality', 'SÉNÉGALAISE');
+      setVal('senPassInputNationality', 'SENEGALAISE');
       setVal('senPassInputSex', isFemale ? 'F' : 'M');
       setVal('senPassInputDob', dob);
       setVal('senPassInputPob', pob);
       setVal('senPassInputPassNo', passNum);
       setVal('senPassInputPersonalNo', nin);
       setVal('senPassInputIssueDate', issueDate);
-      setVal('senPassInputExpiryDate', expDate);
-      setVal('senPassInputHeight', height);
-      setVal('senPassInputAddress', address);
-      setVal('senPassInputAuthority', centre);
+      setVal('senPassInputExpiryDate', expiryDate);
+      setVal('senPassInputAuthority', authority);
       setVal('senPassInputSignature', given.charAt(0) + '. ' + surname.charAt(0) + surname.slice(1).toLowerCase());
 
       updateSenPreview();
