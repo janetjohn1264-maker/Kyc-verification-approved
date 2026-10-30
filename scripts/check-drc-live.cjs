@@ -136,13 +136,26 @@ const run = async () => {
   }
 
   // ---- 7. View switching shows the live preview -------------------------
-  if (typeof window.selectCountry === 'function') {
-    window.selectCountry('senegal');
-    window.selectCountry('drcongo');
-  }
   const view = $('drcongo-passport-view');
-  assert(!!view && !view.classList.contains('hidden'), 'DR Congo view stays hidden after selecting the country');
-  assert(clicked > 0, 'randomize button was never clicked');
+  if (typeof window.switchVerificationCountry === 'function') {
+    window.switchVerificationCountry('senegal');
+    window.switchVerificationCountry('drcongo');
+    assert(!!view && !view.classList.contains('hidden'), 'DR Congo view stays hidden after selecting the country');
+
+    // The user-facing requirement: with the view hidden, clicking Randomize
+    // must bring the live preview editor on screen.
+    if (view) {
+      view.classList.add('hidden');
+      randomizeBtn.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+      clicked += 1;
+      assert(!view.classList.contains('hidden'), 'clicking Randomize Card did not reveal the DR Congo live preview');
+      assert(text('drcOutSurname') === $('drcInputSurname').value.trim().toUpperCase(), 'preview did not refresh when revealed by Randomize Card');
+      const l1 = text('drcMrzLine1');
+      assert(l1 && l1.startsWith('P<COD') && l1.length === 44, `MRZ line 1 "${l1}" is not a valid 44-char TD3 line after being revealed`);
+    }
+  } else {
+    fail('window.switchVerificationCountry is not a global function');
+  }
 };
 
 run()
