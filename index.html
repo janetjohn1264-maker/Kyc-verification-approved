@@ -1593,8 +1593,27 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function drcPadMrz(value, length) {
-      const clean = String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9]/g, '');
+      // Keep the '<' filler already present in the value: it is the ICAO TD3
+      // separator, so stripping it would glue the name fields together.
+      const clean = String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9<]/g, '');
       return (clean + '<'.repeat(length)).slice(0, length);
+    }
+
+    // Bring the live preview into view when the holder data is regenerated, so
+    // clicking "Randomize Card" always shows the updated data page + MRZ.
+    function revealDrcPreview() {
+      const view = $('drcongo-passport-view');
+      if (view && view.classList.contains('hidden') && typeof switchVerificationCountry === 'function') {
+        switchVerificationCountry('drcongo');
+      }
+      const card = $('drc-passport-card');
+      if (card && typeof card.scrollIntoView === 'function') {
+        try {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (err) {
+          card.scrollIntoView();
+        }
+      }
     }
 
     function drcMrzDate(isoDate) {
