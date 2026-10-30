@@ -1499,7 +1499,7 @@ var $ = window.$ || (id => document.getElementById(id));
     const DRC_SPECIMEN = {
       surname: 'MIEZI',
       postname: 'MINGI',
-      givenNames: 'CARMII',
+      givenNames: 'CARMI',
       passNo: 'OP1123637',
       personalNo: '110619112',
       dob: '2000-04-23',
@@ -1510,14 +1510,14 @@ var $ = window.$ || (id => document.getElementById(id));
       expiry: '2027-07-21',
       authority: 'MINAFFET',
       profession: 'ETUDIANT',
-      address: 'AV SANKURU N°1 C/AMP MUNGANGA ONGALIEMA\nKINSHASA\nCOD REP DEM CONGO'
+      address: 'AV SANKURU N°01 Q/CAMP MUNGANGA C/NGALIEMA\nKINSHASA\nCOD REP DEM CONGO'
     };
 
     // The specimen MRZ as printed on the reference document (ICAO TD3). Its composite
     // check digit differs by one from a freshly computed value, so the literal strings
     // are used while every field still matches the specimen and recalculated on edits.
     const DRC_SPECIMEN_MRZ = {
-      line1: 'P<CODMIEZI<<MINGI<CARMII<<<<<<<<<<<<<<<<<<<<',
+      line1: 'P<CODMIEZI<<CARMI<MINGI<<<<<<<<<<<<<<<<<<<<<',
       line2: 'OP11236378COD0004237M270721110619112<<<<<68'
     };
 
@@ -1587,13 +1587,14 @@ var $ = window.$ || (id => document.getElementById(id));
     function buildDrcMrz(fields) {
       const surname = drcMrzClean(fields.surname).replace(/ /g, '<');
       const givenNames = drcMrzClean(fields.givenNames).replace(/ /g, '<');
+      const postname = drcMrzClean(fields.postname).replace(/ /g, '<');
       const personal = drcPadMrz(drcMrzClean(fields.personalNo), 14);
       const passNo = drcPadMrz(drcMrzClean(fields.passNo), 9);
       const dob = drcMrzDate(fields.dob);
       const expiry = drcMrzDate(fields.expiry);
       const sex = drcMrzClean(fields.sex).slice(0, 1) || 'M';
 
-      const line1 = drcPadMrz('P<' + 'COD' + surname + '<<' + givenNames, 44);
+      const line1 = drcPadMrz('P<' + 'COD' + surname + '<<' + givenNames + '<' + postname, 44);
 
       const passCheck = drcCheckDigit(passNo);
       const dobCheck = drcCheckDigit(dob);
@@ -1629,6 +1630,7 @@ var $ = window.$ || (id => document.getElementById(id));
       drcSetText('drcOutType', 'P');
       drcSetText('drcOutCode', 'COD');
       drcSetText('drcOutPassNo', (fields.passNo || '—').toUpperCase());
+      drcSetText('drcOutPassNoVertical', (fields.passNo || '—').toUpperCase());
       drcSetText('drcOutSurname', (fields.surname || '—').toUpperCase());
       drcSetText('drcOutPostname', (fields.postname || '—').toUpperCase());
       drcSetText('drcOutGivenNames', (fields.givenNames || '—').toUpperCase());
@@ -13198,7 +13200,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </div>
               <div class="col-span-2">
                 <label class="block text-[11px] font-bold text-slate-600 mb-1">Prénoms / Given names</label>
-                <input id="drcInputGivenNames" type="text" value="CARMII" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
+                <input id="drcInputGivenNames" type="text" value="CARMI" oninput="updateDrcPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-400">
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-slate-600 mb-1">N° de passeport / Passport No</label>
