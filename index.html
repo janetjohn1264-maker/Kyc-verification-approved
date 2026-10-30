@@ -2919,7 +2919,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
     // Senegal Passport State & Controllers
     var senCurrentViewMode = 'spread';
-    var senCurrentPhotoSrc = '/assets/aistudio/1_cce2ce96.png';
+    var senCurrentPhotoSrc = '/assets/aistudio/senegal_passport_portrait.jpg';
     var senIsCustomPhoto = false;
 
     function setSenegalViewMode(mode) {
@@ -2968,7 +2968,7 @@ var $ = window.$ || (id => document.getElementById(id));
     function setSenegalPhoto(type, url) {
       if (type === 'reference') {
         senIsCustomPhoto = false;
-        senCurrentPhotoSrc = '/assets/aistudio/1_cce2ce96.png';
+        senCurrentPhotoSrc = '/assets/aistudio/senegal_passport_portrait.jpg';
       } else {
         senIsCustomPhoto = true;
         senCurrentPhotoSrc = url || '/assets/aistudio/somali_card_female_portrait.jpg';
@@ -2979,7 +2979,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function resetSenegalPhoto() {
       senIsCustomPhoto = false;
-      senCurrentPhotoSrc = '/assets/aistudio/1_cce2ce96.png';
+      senCurrentPhotoSrc = '/assets/aistudio/senegal_passport_portrait.jpg';
       const fileInput = $('senPassPhotoInput');
       if (fileInput) fileInput.value = '';
       updateSenPhotoDisplay();
@@ -3025,37 +3025,41 @@ var $ = window.$ || (id => document.getElementById(id));
         document.querySelectorAll('[data-sen="' + key + '"]').forEach(el => { el.textContent = val; });
       };
 
-      const surname = getVal('senPassInputSurname', 'DIOP').toUpperCase();
-      const given = getVal('senPassInputGiven', 'AICHA SAMBA').toUpperCase();
+      const surname = getVal('senPassInputSurname', 'KASSE').toUpperCase();
+      const given = getVal('senPassInputGiven', 'DIEYNABA').toUpperCase();
       const nationality = getVal('senPassInputNationality', 'SENEGALAISE').toUpperCase();
-      const dob = getVal('senPassInputDob', '15/02/2003').toUpperCase();
+      const dob = getVal('senPassInputDob', '25 NOV / NOV 2001').toUpperCase();
       const sex = getVal('senPassInputSex', 'F').toUpperCase();
-      const height = getVal('senPassInputHeight', '167 cm');
-      const pob = getVal('senPassInputPob', 'DAKAR').toUpperCase();
-      const cardNo = getVal('senPassInputPassNo', '2 01 20030215 00023 7');
+      const pob = getVal('senPassInputPob', 'DOUMGA LAO').toUpperCase();
+      const passNo = getVal('senPassInputPassNo', 'A04163606').toUpperCase();
       const personalNo = getVal('senPassInputPersonalNo', '2312201200531');
-      const issueDate = getVal('senPassInputIssueDate', '08/04/2021').toUpperCase();
+      const issueDate = getVal('senPassInputIssueDate', '19 OCT / OCT 2024').toUpperCase();
       const expiryDate = getVal('senPassInputExpiryDate', '18 OCT / OCT 2029').toUpperCase();
-      const authority = getVal('senPassInputAuthority', 'COMMISSARIAT DE MALIKA').toUpperCase();
-      const address = getVal('senPassInputAddress', 'KEUR MASSAR QRT AINOUMADY').toUpperCase();
-      const signature = getVal('senPassInputSignature', 'Aïcha Samba');
+      const authority = getVal('senPassInputAuthority', 'MINT/DGPN/DPETV').toUpperCase();
+      const signature = getVal('senPassInputSignature', 'Dieynaba');
       const passType = getVal('senPassInputType', 'P').toUpperCase();
       const countryCode = getVal('senPassInputCountryCode', 'SEN').toUpperCase();
 
-      // ===== CARTE D'IDENTITE CEDEAO fields (all card instances share these keys) =====
-      setField('cardno', cardNo);
-      setField('given', given);
+      // ===== PASSEPORT BIOMETRIQUE CEDEAO (toutes les pages partagent ces cles) =====
+      setField('type', passType);
+      setField('ccode', countryCode);
+      setField('passno', passNo);
+      setField('personal', personalNo);
       setField('surname', surname);
+      setField('given', given);
+      setField('nationality', nationality);
       setField('sex', sex);
-      setField('height', height);
+      setField('dob', dob);
       setField('pob', pob);
-      setField('issue', issueDate);
       setField('authority', authority);
-      setField('address', address);
+      setField('issue', issueDate);
+      setField('expiry', expiryDate);
       setField('signature', signature);
+      // Page 1 (endossement CEDEAO) : numero de passeport espace comme sur le specimen
+      setField('pageno', formatSenPassNo(passNo));
 
       updateSenPhotoDisplay();
-      updateSenMRZ(surname, given, cardNo, countryCode, dob, sex, expiryDate, personalNo);
+      updateSenMRZ(surname, given, passNo, countryCode, dob, sex, expiryDate, personalNo);
     }
 
     function updateSenMRZ(surname, given, passNo, countryCode, dobRaw, sex, expiryRaw, personalNo) {
