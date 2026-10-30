@@ -160,6 +160,24 @@ files.forEach((file) => {
     if (html.includes(stale)) out(`stale identity-card reference "${stale}" still present`);
   });
 
+  // ---- 6b. Randomize control must exist and be wired --------------------
+  const randomizeCalls = [...html.matchAll(/onclick="randomizeSenegalPassport\(\)"/g)];
+  if (randomizeCalls.length < 2) {
+    out(`expected a randomize button in both the controls and the toolbar, found ${randomizeCalls.length} trigger(s)`);
+  }
+  if (!html.includes('id="sen-randomize-btn"')) out('missing toolbar randomize button #sen-randomize-btn');
+  if (!/function randomizeSenegalPassport\(/.test(html)) out('missing randomizeSenegalPassport() implementation');
+  if (!/window\.randomizeSenegalPassport = randomizeSenegalPassport/.test(html)) {
+    out('randomizeSenegalPassport() is not exported on window');
+  }
+  ['senPassInputSurname', 'senPassInputGiven', 'senPassInputDob', 'senPassInputPob', 'senPassInputPassNo', 'senPassInputPersonalNo', 'senPassInputIssueDate', 'senPassInputExpiryDate']
+    .forEach((id) => {
+      if (!html.includes(`'${id}'`)) out(`randomizeSenegalPassport() does not populate ${id}`);
+    });
+  if (!/onclick="loadSenegalPreset\('reference'\)"/.test(html)) {
+    out("missing a control that restores the exact reference specimen (loadSenegalPreset('reference'))");
+  }
+
   // ---- 7. Passport portrait asset must be referenced ---------------------
   const portraitRefs = [...html.matchAll(/assets\/aistudio\/(senegal_passport_portrait\.jpg)/g)];
   if (portraitRefs.length < 3) {
