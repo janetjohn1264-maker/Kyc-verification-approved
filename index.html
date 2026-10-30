@@ -1628,12 +1628,12 @@ var $ = window.$ || (id => document.getElementById(id));
       const text = drcSpecimenText();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(function () {
-          notify('Passport data copied to clipboard.');
+          showToast('Copied', 'DR Congo passport details copied to clipboard.');
         }).catch(function () {
-          notify('Copy failed — clipboard permission denied.');
+          showToast('Copy Failed', 'Clipboard permission was denied.');
         });
       } else {
-        notify('Clipboard is not available in this browser.');
+        showToast('Copy Failed', 'Clipboard is not available in this browser.');
       }
     }
 
@@ -1641,24 +1641,33 @@ var $ = window.$ || (id => document.getElementById(id));
       const card = $('drc-passport-card');
       if (!card) return;
       if (typeof html2canvas !== 'function') {
-        notify('Image export is unavailable right now.');
+        showToast('Export Error', 'Rendering engine unavailable');
         return;
       }
-      notify('Rendering passport image…');
+      showToast('Generating PNG...', 'Rendering high-resolution DR Congo passport PNG');
       html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
         const link = document.createElement('a');
         link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
-        notify('Passport PNG downloaded.');
+        showToast('Ready!', 'DR Congo passport PNG generated successfully');
       }).catch(function () {
-        notify('Could not render the passport image.');
+        showToast('Download Error', 'Could not export passport image');
       });
     }
 
     function printDrcPassport() {
       window.print();
     }
+
+    window.updateDrcPreview = updateDrcPreview;
+    window.randomizeDrcPassport = randomizeDrcPassport;
+    window.resetDrcPassportSpecimen = resetDrcPassportSpecimen;
+    window.resetDrcPhoto = resetDrcPhoto;
+    window.copyDrcSpecimenData = copyDrcSpecimenData;
+    window.downloadDrcPassPNG = downloadDrcPassPNG;
+    window.printDrcPassport = printDrcPassport;
+    window.initDrcPassport = initDrcPassport;
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initDrcPassport);
