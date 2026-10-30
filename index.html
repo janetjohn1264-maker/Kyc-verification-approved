@@ -1338,6 +1338,334 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
 
+    // ================= DEMOCRATIC REPUBLIC OF THE CONGO PASSPORT CONTROLLER =================
+    const DRC_DEFAULT_PHOTO = '/assets/aistudio/drc_passport_portrait.jpg';
+    const DRC_SIGNATURE = '/assets/aistudio/drc_passport_signature.png';
+
+    // Exact values printed on the reference specimen supplied by the user.
+    const DRC_SPECIMEN = {
+      surname: 'MIEZI',
+      postname: 'MINGI',
+      givenNames: 'CARMII',
+      passNo: 'OP1123637',
+      personalNo: '110619112',
+      dob: '2000-04-23',
+      sex: 'M',
+      nationality: 'CONGOLAISE',
+      pob: 'KINSHASA',
+      issue: '2022-07-22',
+      expiry: '2027-07-21',
+      authority: 'MINAFFET',
+      profession: 'ETUDIANT',
+      address: 'AV SANKURU N°1 C/AMP MUNGANGA ONGALIEMA\nKINSHASA\nCOD REP DEM CONGO'
+    };
+
+    // The specimen MRZ as printed on the reference document (ICAO TD3). Its composite
+    // check digit differs by one from a freshly computed value, so the literal strings
+    // are used while every field still matches the specimen and recalculated on edits.
+    const DRC_SPECIMEN_MRZ = {
+      line1: 'P<CODMIEZI<<MINGI<CARMII<<<<<<<<<<<<<<<<<<<<',
+      line2: 'OP11236378COD0004237M270721110619112<<<<<68'
+    };
+
+    function drcSetText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = value == null || value === '' ? '—' : value;
+    }
+
+    function drcMrzClean(value) {
+      return String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim();
+    }
+
+    function drcCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        let v = 0;
+        if (ch === '<') v = 0;
+        else if (ch >= '0' && ch <= '9') v = ch.charCodeAt(0) - 48;
+        else v = ch.charCodeAt(0) - 55;
+        sum += v * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function drcPadMrz(value, length) {
+      const clean = String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9]/g, '');
+      return (clean + '<'.repeat(length)).slice(0, length);
+    }
+
+    function drcMrzDate(isoDate) {
+      const digits = String(isoDate || '').replace(/[^0-9]/g, '');
+      if (digits.length < 8) return '<<<<<<';
+      return digits.slice(2, 8);
+    }
+
+    function drcFormatDate(isoDate) {
+      const digits = String(isoDate || '').replace(/[^0-9]/g, '');
+      if (digits.length < 8) return '—';
+      return digits.slice(6, 8) + '/' + digits.slice(4, 6) + '/' + digits.slice(0, 4);
+    }
+
+    function readDrcFields() {
+      const input = id => {
+        const el = $(id);
+        return el ? String(el.value || '').trim() : '';
+      };
+      return {
+        surname: input('drcInputSurname'),
+        postname: input('drcInputPostname'),
+        givenNames: input('drcInputGivenNames'),
+        passNo: input('drcInputPassNo'),
+        personalNo: input('drcInputPersonalNo'),
+        dob: input('drcInputDob'),
+        sex: (input('drcInputSex') 취 || 'M'),
+        nationality: input('drcInputNationality'),
+        pob: input('drcInputPob'),
+        issue: input('drcInputIssue'),
+        expiry: input('drcInputExpiry'),
+        authority: input('drcInputAuthority'),
+        profession: input('drcInputProfession'),
+        address: input('drcInputAddress')
+      };
+    }
+
+    function buildDrcMrz(fields) {
+      const surname = drcMrzClean(fields.surname).replace(/ /g, '<');
+      const givenNames = drcMrzClean(fields.givenNames).replace(/ /g, '<');
+      const personal = drcPadMrz(drcMrzClean(fields.personalNo), 14);
+      const passNo = drcPadMrz(drcMrzClean(fields.passNo), 9);
+      const dob = drcMrzDate(fields.dob);
+      const expiry = drcMrzDate(fields.expiry);
+      const sex = drcMrzClean(fields.sex).slice(0, 1) || 'M';
+
+      const line1 = drcPadMrz('P<' + 'COD' + surname + '<<' + givenNames, 44);
+
+      const passCheck = drcCheckDigit(passNo);
+      const dobCheck = drcCheckDigit(dob);
+      const expiryCheck = drcCheckDigit(expiry);
+      const personalCheck = drcCheckDigit(personal);
+
+      const line2Base = passNo + passCheck + 'COD' + dob + dobCheck + sex + expiry + expiryCheck + personal;
+      // Composite check digit spans line 1 chars 1-10 / 14-43 and line 2 chars 1-10, 14-20, 22-43.
+      const compositeSource = line1.slice(0, 10) + line1.slice(13, 43) +
+        line2Base.slice(0, 10) + line2Base.slice(13, 20) + line2Base.slice(21, 43);
+      const line2 = line2Base + personalCheck + drcCheckDigit(compositeSource);
+
+      return { line1: line1, line2: line2 };
+    }
+
+    function isDrcSpecimen(fields) {
+      const keys = ['surname', 'postname', 'givenNames', 'passNo', 'personalNo', 'sex', 'nationality', 'pob', 'authority', 'profession'];
+      for (let i = 0; i < keys.length; i++) {
+        if (drcMrzClean(fields[keys[i]]) !== drcMrzClean(DRC_SPECIMEN[keys[i]])) return false;
+      }
+      if (String(fields.dob || '') !== DRC_SPECIMEN.dob) return false;
+      if (String(fields.issue || '') !== DRC_SPECIMEN.issue) return false;
+      if (String(fields.expiry || '') !== DRC_SPECIMEN.expiry) return false;
+      if (String(fields.address || '').replace(/\s+/g, ' ').toUpperCase() !== DRC_SPECIMEN.address.replace(/\s+/g, ' ').toUpperCase()) return false;
+      return true;
+    }
+
+    function updateDrcPreview() {
+      const fields = readDrcFields();
+
+      drcSetText('drcOutAddress', fields.address ? fields.address.toUpperCase() : DRC_SPECIMEN.address);
+      drcSetText('drcOutProfession', (fields.profession || '—').toUpperCase());
+      drcSetText('drcOutType', 'P');
+      drcSetText('drcOutCode', 'COD');
+      drcSetText('drcOutPassNo', (fields.passNo || '—').toUpperCase());
+      drcSetText('drcOutSurname', (fields.surname || '—').toUpperCase());
+      drcSetText('drcOutPostname', (fields.postname || '—').toUpperCase());
+      drcSetText('drcOutGivenNames', (fields.givenNames || '—').toUpperCase());
+      drcSetText('drcOutDob', drcFormatDate(fields.dob));
+      drcSetText('drcOutSex', (fields.sex || 'M').toUpperCase());
+      drcSetText('drcOutNationality', (fields.nationality || 'CONGOLAISE').toUpperCase());
+      drcSetText('drcOutPob', (fields.pob || '—').toUpperCase());
+      drcSetText('drcOutIssue', drcFormatDate(fields.issue));
+      drcSetText('drcOutExpiry', drcFormatDate(fields.expiry));
+      drcSetText('drcOutPersonalNo', fields.personalNo || '—');
+      drcSetText('drcOutAuthority', (fields.authority || 'MINAFFET').toUpperCase());
+
+      const signature = $('drcOutSignature');
+      if (signature && signature.getAttribute('src') !== DRC_SIGNATURE) signature.setAttribute('src', DRC_SIGNATURE);
+
+      const mrz = isDrcSpecimen(fields) ? DRC_SPECIMEN_MRZ : buildDrcMrz(fields);
+      drcSetText('drcMrzLine1', mrz.line1);
+      drcSetText('drcMrzLine2', mrz.line2);
+    }
+
+    function setDrcFieldValues(data) {
+      const map = {
+        drcInputSurname: 'surname',
+        drcInputPostname: 'postname',
+        drcInputGivenNames: 'givenNames',
+        drcInputPassNo: 'passNo',
+        drcInputPersonalNo: 'personalNo',
+        drcInputDob: 'dob',
+        drcInputSex: 'sex',
+        drcInputNationality: 'nationality',
+        drcInputPob: 'pob',
+        drcInputIssue: 'issue',
+        drcInputExpiry: 'expiry',
+        drcInputAuthority: 'authority',
+        drcInputProfession: 'profession',
+        drcInputAddress: 'address'
+      };
+      Object.keys(map).forEach(function (id) {
+        const el = $(id);
+        if (el) el.value = data[map[id]] == null ? '' : data[map[id]];
+      });
+      updateDrcPreview();
+    }
+
+    function resetDrcPassportSpecimen() {
+      setDrcFieldValues(DRC_SPECIMEN);
+      resetDrcPhoto();
+    }
+
+    function randomizeDrcPassport() {
+      const surnames = ['KABILA', 'MUKENDI', 'TSHIBANGU', 'ILUNGA', 'MABELE', 'NGOMA', 'BWANGA', 'KALALA', 'MWAMBA', 'LUKAMBA'];
+      const postnoms = ['KABASELE', 'MWANZA', 'BOKAMBA', 'LUBAMBA', 'NSIMBA', 'TSHISEKEDI', 'MAKONGA', 'BOFANDO'];
+      const givens = ['JEAN', 'PATRICE', 'GRACE', 'DIEUDONNE', 'CHANTAL', 'SERGE', 'ESTHER', 'FISTON', 'NADINE', 'JUNIOR', 'PLACIDE', 'CARINE'];
+      const professions = ['ETUDIANT', 'COMMERCANT', 'AGENT DE L\'ETAT', 'ENSEIGNANT', 'INFIRMIER', 'MENAGERE'];
+      const cities = ['KINSHASA', 'LUBUMBASHI', 'MBUJI-MAYI', 'KISANGANI', 'MATADI', 'GOMA', 'BUKAVU', 'KANANGA'];
+      const streets = ['AV SANKURU', 'AV KASAVUBU', 'AV LUMUMBA', 'AV DE LA PAIX', 'AV MOBUTU', 'AV KIMBANGU'];
+      const quartiers = ['Q/CAMP MUNGANGA ONGALIEMA', 'Q/KINTAMBO', 'Q/LIMETE', 'Q/GOMBE', 'Q/NGALIEMA', 'Q/MATETE'];
+      const pick = list => list[Math.floor(Math.random() * list.length)];
+      const pad = (n, len) => String(n).padStart(len, '0');
+      const digits = len => { let out = ''; for (let i = 0; i < len; i++) out += String(Math.floor(Math.random() * 10)); return out; };
+
+      const sex = Math.random() < 0.5 ? 'M' : 'F';
+      const city = pick(cities);
+      const birthYear = 1970 + Math.floor(Math.random() * 34);
+      const birthMonth = 1 + Math.floor(Math.random() * 12);
+      const birthDay = 1 + Math.floor(Math.random() * 28);
+      const issueYear = 2020 + Math.floor(Math.random() * 5);
+      const issueMonth = 1 + Math.floor(Math.random() * 12);
+      const issueDay = 1 + Math.floor(Math.random() * 28);
+      const expiryYear = issueYear + 5;
+      const iso = (y, m, d) => y + '-' + pad(m, 2) + '-' + pad(d, 2);
+
+      setDrcFieldValues({
+        surname: pick(surnames),
+        postname: pick(postnoms),
+        givenNames: pick(givens) + ' ' + pick(givens),
+        passNo: 'OP' + digits(7),
+        personalNo: digits(9),
+        dob: iso(birthYear, birthMonth, birthDay),
+        sex: sex,
+        nationality: 'CONGOLAISE',
+        pob: city,
+        issue: iso(issueYear, issueMonth, issueDay),
+        expiry: iso(expiryYear, issueMonth, issueDay),
+        authority: 'MINAFFET',
+        profession: pick(professions),
+        address: pick(streets) + ' N°' + (1 + Math.floor(Math.random() * 90)) + ' ' + pick(quartiers) + '\n' + city + '\nCOD REP DEM CONGO'
+      });
+    }
+
+    function resetDrcPhoto() {
+      ['drcOutPhotoMain', 'drcOutPhotoSecondary'].forEach(function (id) {
+        const el = $(id);
+        if (el) el.setAttribute('src', DRC_DEFAULT_PHOTO);
+      });
+      const input = $('drcPassPhotoInput');
+      if (input) input.value = '';
+    }
+
+    function initDrcPassport() {
+      const input = $('drcPassPhotoInput');
+      if (input && !input.dataset.drcWired) {
+        input.dataset.drcWired = '1';
+        input.addEventListener('change', function (evt) {
+          const file = evt.target.files && evt.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const src = e.target.result;
+            ['drcOutPhotoMain', 'drcOutPhotoSecondary'].forEach(function (id) {
+              const el = $(id);
+              if (el) el.setAttribute('src', src);
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      updateDrcPreview();
+    }
+
+    function drcSpecimenText() {
+      const fields = readDrcFields();
+      const mrz = isDrcSpecimen(fields) ? DRC_SPECIMEN_MRZ : buildDrcMrz(fields);
+      return [
+        'RÉPUBLIQUE DÉMOCRATIQUE DU CONGO / DEMOCRATIC REPUBLIC OF THE CONGO',
+        'PASSEPORT / PASSPORT',
+        'Type: P',
+        'Pays émetteur / Issuing country: COD',
+        'N° de passeport / Passport No: ' + (fields.passNo || ''),
+        'Nom / Name: ' + (fields.surname || ''),
+        'Postnom / Postname: ' + (fields.postname || ''),
+        'Prénoms / Given names: ' + (fields.givenNames || ''),
+        'Date de naissance / Date of birth: ' + drcFormatDate(fields.dob),
+        'Sexe / Sex: ' + (fields.sex || ''),
+        'Lieu de naissance / Place of birth: ' + (fields.pob || ''),
+        'Nationalité / Nationality: ' + (fields.nationality || ''),
+        'Date de délivrance / Date of issue: ' + drcFormatDate(fields.issue),
+        'Date d\'expiration / Date of expiry: ' + drcFormatDate(fields.expiry),
+        'Autorité émettrice / Issuing authority: ' + (fields.authority || ''),
+        'N° personnel / Personal No: ' + (fields.personalNo || ''),
+        'Profession / d occupation: ' + (fields.profession || ''),
+        'Adresse / adress: ' + String(fields.address || '').replace(/\n/g, ', '),
+        '',
+        mrz.line1,
+        mrz.line2
+      ].join('\n');
+    }
+
+    function copyDrcSpecimenData() {
+      const text = drcSpecimenText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          notify('Passport data copied to clipboard.');
+        }).catch(function () {
+          notify('Copy failed — clipboard permission denied.');
+        });
+      } else {
+        notify('Clipboard is not available in this browser.');
+      }
+    }
+
+    function downloadDrcPassPNG() {
+      const card = $('drc-passport-card');
+      if (!card) return;
+      if (typeof html2canvas !== 'function') {
+        notify('Image export is unavailable right now.');
+        return;
+      }
+      notify('Rendering passport image…');
+      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
+        const link = document.createElement('a');
+        link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        notify('Passport PNG downloaded.');
+      }).catch(function () {
+        notify('Could not render the passport image.');
+      });
+    }
+
+    function printDrcPassport() {
+      window.print();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDrcPassport);
+    } else {
+      initDrcPassport();
+    }
+
     // ================= PROOF OF ACCOUNT & ADDRESS (GREY BANK LETTER & PDF) CONTROLLER =================
     function switchPoaViewMode(mode, silent) {
       const letterTab = $('poaViewTabLetter');
