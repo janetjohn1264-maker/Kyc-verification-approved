@@ -3184,9 +3184,9 @@ var $ = window.$ || (id => document.getElementById(id));
     function loadSenegalPreset(presetKey) {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       if (presetKey === 'reference') {
-        setVal('senPassInputSurname', 'KASSÉ');
+        setVal('senPassInputSurname', 'KASSE');
         setVal('senPassInputGiven', 'DIEYNABA');
-        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputNationality', 'SENEGALAISE');
         setVal('senPassInputSex', 'F');
         setVal('senPassInputDob', '25 NOV / NOV 2001');
         setVal('senPassInputPob', 'DOUMGA LAO');
@@ -3200,7 +3200,7 @@ var $ = window.$ || (id => document.getElementById(id));
       } else if (presetKey === 'amadou') {
         setVal('senPassInputSurname', 'DIALLO');
         setVal('senPassInputGiven', 'AMADOU');
-        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputNationality', 'SENEGALAISE');
         setVal('senPassInputSex', 'M');
         setVal('senPassInputDob', '14 JUIN / JUN 1993');
         setVal('senPassInputPob', 'DAKAR');
@@ -3213,7 +3213,7 @@ var $ = window.$ || (id => document.getElementById(id));
       } else if (presetKey === 'fatou') {
         setVal('senPassInputSurname', 'NDIAYE');
         setVal('senPassInputGiven', 'FATOU');
-        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputNationality', 'SENEGALAISE');
         setVal('senPassInputSex', 'F');
         setVal('senPassInputDob', '08 SEP / SEP 1998');
         setVal('senPassInputPob', 'SAINT-LOUIS');
@@ -3226,10 +3226,10 @@ var $ = window.$ || (id => document.getElementById(id));
       } else if (presetKey === 'cheikh') {
         setVal('senPassInputSurname', 'SARR');
         setVal('senPassInputGiven', 'CHEIKH');
-        setVal('senPassInputNationality', 'SÉNÉGALAISE');
+        setVal('senPassInputNationality', 'SENEGALAISE');
         setVal('senPassInputSex', 'M');
         setVal('senPassInputDob', '03 DEC / DEC 1990');
-        setVal('senPassInputPob', 'THIÈS');
+        setVal('senPassInputPob', 'THIES');
         setVal('senPassInputPassNo', 'A03918274');
         setVal('senPassInputPersonalNo', '1092837461928');
         setVal('senPassInputIssueDate', '15 MAI / MAY 2022');
@@ -3290,9 +3290,9 @@ var $ = window.$ || (id => document.getElementById(id));
       const text = [
         "RÉPUBLIQUE DU SÉNÉGAL — PASSEPORT BIOMÉTRIQUE (CEDEAO / ECOWAS)",
         "STATUT: SAMPLE — NOT VALID (Spécimen Éducatif Fictif)",
-        "Nom / Surname: " + getVal('senPassInputSurname', 'KASSÉ'),
+        "Nom / Surname: " + getVal('senPassInputSurname', 'KASSE'),
         "Prénoms / Given Names: " + getVal('senPassInputGiven', 'DIEYNABA'),
-        "Nationalité / Nationality: " + getVal('senPassInputNationality', 'SÉNÉGALAISE'),
+        "Nationalité / Nationality: " + getVal('senPassInputNationality', 'SENEGALAISE'),
         "Date de naissance: " + getVal('senPassInputDob', '25 NOV / NOV 2001'),
         "Sexe: " + getVal('senPassInputSex', 'F'),
         "Lieu de naissance: " + getVal('senPassInputPob', 'DOUMGA LAO'),
