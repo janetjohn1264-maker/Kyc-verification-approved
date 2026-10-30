@@ -83,7 +83,8 @@ const referenceValues = [
 ];
 
 // Static MRZ (ICAO TD-3, 44 characters per line) rendered before JS runs.
-const REFERENCE_MRZ_1 = 'P<SENKASSE<<DIEYNABA' + '<'.repeat(44 - 22);
+const REFERENCE_MRZ_1_HEAD = 'P<SENKASSE<<DIEYNABA';
+const REFERENCE_MRZ_1 = REFERENCE_MRZ_1_HEAD + '<'.repeat(44 - REFERENCE_MRZ_1_HEAD.length);
 const REFERENCE_MRZ_2_PREFIX = 'A041636060SEN0111252F2910183';
 
 files.forEach((file) => {
