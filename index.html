@@ -2818,51 +2818,41 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function updateSenPreview() {
       const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value.trim() : fb);
-      const setText = (id, val) => {
-        const el = $(id);
-        if (el) el.textContent = val;
+      const setField = (key, val) => {
+        document.querySelectorAll('[data-sen="' + key + '"]').forEach(el => { el.textContent = val; });
       };
 
-      const surname = getVal('senPassInputSurname', 'KASSE').toUpperCase();
-      const given = getVal('senPassInputGiven', 'DIEYNABA').toUpperCase();
+      const surname = getVal('senPassInputSurname', 'DIOP').toUpperCase();
+      const given = getVal('senPassInputGiven', 'AICHA SAMBA').toUpperCase();
       const nationality = getVal('senPassInputNationality', 'SENEGALAISE').toUpperCase();
-      const dob = getVal('senPassInputDob', '25 NOV / NOV 2001').toUpperCase();
+      const dob = getVal('senPassInputDob', '15/02/2003').toUpperCase();
       const sex = getVal('senPassInputSex', 'F').toUpperCase();
-      const pob = getVal('senPassInputPob', 'DOUMGA LAO').toUpperCase();
-      const passNo = getVal('senPassInputPassNo', 'A04163606').toUpperCase();
+      const height = getVal('senPassInputHeight', '167 cm');
+      const pob = getVal('senPassInputPob', 'DAKAR').toUpperCase();
+      const cardNo = getVal('senPassInputPassNo', '2 01 20030215 00023 7');
       const personalNo = getVal('senPassInputPersonalNo', '2312201200531');
-      const issueDate = getVal('senPassInputIssueDate', '19 OCT / OCT 2024').toUpperCase();
+      const issueDate = getVal('senPassInputIssueDate', '08/04/2021').toUpperCase();
       const expiryDate = getVal('senPassInputExpiryDate', '18 OCT / OCT 2029').toUpperCase();
-      const authority = getVal('senPassInputAuthority', 'MINT/DGPN/DPETV').toUpperCase();
-      const signature = getVal('senPassInputSignature', 'Dieynaba');
+      const authority = getVal('senPassInputAuthority', 'COMMISSARIAT DE MALIKA').toUpperCase();
+      const address = getVal('senPassInputAddress', 'KEUR MASSAR QRT AINOUMADY').toUpperCase();
+      const signature = getVal('senPassInputSignature', 'Aïcha Samba');
       const passType = getVal('senPassInputType', 'P').toUpperCase();
       const countryCode = getVal('senPassInputCountryCode', 'SEN').toUpperCase();
 
-      // Formatted Passport Number with Space for Page 1 (e.g. "A 04163606")
-      const passNoSpaced = passNo.length > 1 ? passNo.charAt(0) + ' ' + passNo.substring(1) : passNo;
-
-      // Update Page 1 Elements
-      setText('senPage1PassNo', passNoSpaced);
-      setText('senSinglePage1PassNo', passNoSpaced);
-
-      // Update Datapage Elements (Spread & Single Datapage)
-      ['senPreviewSurname', 'senSingleSurname'].forEach(id => setText(id, surname));
-      ['senPreviewGiven', 'senSingleGiven'].forEach(id => setText(id, given));
-      ['senPreviewNationality', 'senSingleNationality'].forEach(id => setText(id, nationality));
-      ['senPreviewDob', 'senSingleDob'].forEach(id => setText(id, dob));
-      ['senPreviewSex', 'senSingleSex'].forEach(id => setText(id, sex));
-      ['senPreviewPob', 'senSinglePob'].forEach(id => setText(id, pob));
-      ['senPreviewPassNo', 'senSinglePassNo'].forEach(id => setText(id, passNo));
-      ['senPreviewPersonalNo', 'senSinglePersonalNo'].forEach(id => setText(id, personalNo));
-      ['senPreviewIssueDate', 'senSingleIssueDate'].forEach(id => setText(id, issueDate));
-      ['senPreviewExpiryDate', 'senSingleExpiryDate'].forEach(id => setText(id, expiryDate));
-      ['senPreviewAuthority', 'senSingleAuthority'].forEach(id => setText(id, authority));
-      ['senPreviewSignature', 'senSingleSignature'].forEach(id => setText(id, signature));
-      ['senPreviewType', 'senSingleType'].forEach(id => setText(id, passType));
-      ['senPreviewCountryCode', 'senSingleCountryCode'].forEach(id => setText(id, countryCode));
+      // ===== CARTE D'IDENTITE CEDEAO fields (all card instances share these keys) =====
+      setField('cardno', cardNo);
+      setField('given', given);
+      setField('surname', surname);
+      setField('sex', sex);
+      setField('height', height);
+      setField('pob', pob);
+      setField('issue', issueDate);
+      setField('authority', authority);
+      setField('address', address);
+      setField('signature', signature);
 
       updateSenPhotoDisplay();
-      updateSenMRZ(surname, given, passNo, countryCode, dob, sex, expiryDate, personalNo);
+      updateSenMRZ(surname, given, cardNo, countryCode, dob, sex, expiryDate, personalNo);
     }
 
     function updateSenMRZ(surname, given, passNo, countryCode, dobRaw, sex, expiryRaw, personalNo) {
