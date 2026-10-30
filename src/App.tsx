@@ -41,9 +41,9 @@ function App() {
       <main className="main-content">
         <header className="topbar"><button className="menu-button" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={21} /></button><div className="breadcrumbs"><span>Workspace</span><span>/</span><strong>Passport verification</strong></div><div className="topbar-actions"><span className="status-dot">Live</span><button className="avatar-button" aria-label="Open account menu">JD</button></div></header>
         <div className="page-wrap">
-          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and see changes instantly in the live preview.</p></div><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => setSaved(true)}><Save size={17} /> {saved ? "Changes saved" : "Save changes"}</button></section>
+          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and see changes instantly in the live preview.</p></div><div className="heading-actions"><button className="randomize-button" onClick={() => document.getElementById("passport-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })}><FileText size={17} /> Randomize</button><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => setSaved(true)}><Save size={17} /> {saved ? "Changes saved" : "Save changes"}</button></div></section>
 
-          <div className="editor-layout">
+          <div className="editor-layout" id="passport-editor">
             <section className="editor-panel" aria-label="Editor controls">
               <div className="panel-header"><div><h2>Screen content</h2><p>Customize the content shown to applicants.</p></div><span className="live-pill"><span /> Live</span></div>
               <div className="form-stack">
