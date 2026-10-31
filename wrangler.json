@@ -1,6 +1,0 @@
-{
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "kyc-verification-approved",
-  "pages_build_output_dir": "dist",
-  "compatibility_date": "2026-10-27"
-}

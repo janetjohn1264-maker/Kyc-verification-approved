@@ -1,6 +1,0 @@
-{
-  "name": "Global Virtual Accounts & Crypto Suite",
-  "description": "Interactive showcase and verification portal for floating virtual accounts including PayPal, Payoneer, Raenest, and Grey, alongside leading crypto exchanges like Binance and Bybit.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

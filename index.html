@@ -19,585 +19,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #ffffff;
-      color: #0f172a;
-    }
-    .font-mono-code {
-      font-family: 'JetBrains Mono', monospace;
-    }
-    .font-arabic {
-      font-family: 'Amiri', serif;
-    }
-    .font-urdu {
-      font-family: 'Noto Nastaliq Urdu', 'Amiri', serif;
-    }
-    .font-ethiopic {
-      font-family: 'Noto Sans Ethiopic', 'Inter', sans-serif;
-    }
-
-    /* Ethiopian National ID (Fayda) Security Background Pattern */
-    .ethiopia-fayda-bg {
-      background-color: #f7faf6;
-      background-image: 
-        radial-gradient(ellipse at 80% 50%, rgba(245, 197, 66, 0.22) 0%, transparent 60%),
-        radial-gradient(ellipse at 15% 45%, rgba(45, 212, 191, 0.22) 0%, transparent 55%),
-        radial-gradient(circle at 50% 15%, rgba(34, 197, 94, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 18% 85%, rgba(244, 63, 94, 0.10) 0%, transparent 45%),
-        radial-gradient(circle at 82% 80%, rgba(202, 138, 4, 0.12) 0%, transparent 45%),
-        repeating-radial-gradient(circle at 78% 50%, transparent 0, transparent 8px, rgba(202, 138, 4, 0.04) 9px, transparent 10px),
-        repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.035) 0px, rgba(16, 185, 129, 0.035) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(202, 138, 4, 0.03) 0px, rgba(202, 138, 4, 0.03) 1px, transparent 1px, transparent 6px);
-    }
-
-    /* Kenya Passport Security Background Pattern */
-    .kenya-passport-bg {
-      background-color: #f6faf6;
-      background-image: 
-        radial-gradient(circle at 85% 25%, rgba(234, 179, 8, 0.15) 0%, transparent 40%),
-        radial-gradient(circle at 15% 75%, rgba(0, 102, 51, 0.12) 0%, transparent 45%),
-        linear-gradient(to right, rgba(0, 102, 51, 0.04) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0, 102, 51, 0.04) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 16px 16px, 16px 16px;
-    }
-
-    /* Somali Republic Passport Security Background Pattern */
-    .somali-passport-bg {
-      background-color: #faf7ee;
-      background-image: 
-        radial-gradient(circle at 80% 25%, rgba(217, 119, 6, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 20% 70%, rgba(13, 148, 136, 0.10) 0%, transparent 45%),
-        radial-gradient(circle at 55% 55%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(202, 138, 4, 0.035) 3px, rgba(202, 138, 4, 0.035) 4px),
-        repeating-linear-gradient(90deg, transparent, transparent 6px, rgba(13, 148, 136, 0.03) 6px, rgba(13, 148, 136, 0.03) 7px);
-    }
-
-    /* Kenya National ID (Maisha Namba) Security Background Patterns */
-    .kenya-maisha-front-bg {
-      background-color: #f7faf7;
-      background-image: 
-        radial-gradient(ellipse at 50% 8%, rgba(244, 63, 94, 0.22) 0%, rgba(251, 113, 133, 0.12) 35%, transparent 68%),
-        radial-gradient(circle at 18% 70%, rgba(16, 185, 129, 0.25) 0%, transparent 52%),
-        radial-gradient(circle at 82% 70%, rgba(16, 185, 129, 0.22) 0%, transparent 52%),
-        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.10) 0%, transparent 42%),
-        repeating-radial-gradient(circle at 50% 10%, transparent 0, transparent 4px, rgba(239, 68, 68, 0.05) 5px, transparent 6px),
-        repeating-radial-gradient(circle at 20% 70%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.06) 7px, transparent 8px),
-        repeating-radial-gradient(circle at 80% 70%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.06) 7px, transparent 8px);
-    }
-
-    .kenya-maisha-back-bg {
-      background-color: #f8faf8;
-      background-image: 
-        radial-gradient(ellipse at 75% 25%, rgba(16, 185, 129, 0.18) 0%, transparent 55%),
-        radial-gradient(ellipse at 35% 45%, rgba(239, 68, 68, 0.14) 0%, transparent 55%),
-        radial-gradient(circle at 20% 35%, rgba(217, 119, 6, 0.12) 0%, transparent 40%),
-        repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.035) 0px, rgba(16, 185, 129, 0.035) 1px, transparent 1px, transparent 8px),
-        repeating-radial-gradient(circle at 75% 30%, transparent 0, transparent 10px, rgba(16, 185, 129, 0.05) 11px, transparent 12px);
-    }
-
-    /* Specimen Watermark Suppressed (Removed on All Pages) */
-    .sample-watermark {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-
-    #imageModal { overscroll-behavior: contain; }
-    #modalPreviewImg { touch-action: pan-y; -webkit-user-select: none; user-select: none; }
-
-    @media print {
-      @page { size: A4 portrait; margin: 10mm; }
-      body { background: #fff!important; padding: 0!important; margin: 0!important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-      .no-print, #imageModal, #toast, header, footer { display: none!important; }
-      body > main, .print-area-wrapper { display: block!important; width: 100%!important; padding: 0!important; margin: 0!important; }
-      #passport-card, #somalia-passport-card, #somalia-passport-spread, #somalia-passport-id-card, #senegal-passport-spread, #senegal-datapage-card, #senegal-page1-card { width: 100%!important; max-width: 135mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
-      #somalia-card { width: 100%!important; max-width: 175mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
-      #somali-smart-id-card { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #ethiopia-fayda-card { width: 100%!important; max-width: 160mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
-      #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-    }
-
-    /* Seychelles National Identity Card Security Backgrounds */
-    .seychelles-id-front-bg {
-      background-color: #f7f9fb;
-      background-image: 
-        radial-gradient(ellipse at 15% 45%, rgba(251, 146, 60, 0.24) 0%, transparent 60%),
-        radial-gradient(circle at 85% 55%, rgba(56, 189, 248, 0.15) 0%, transparent 55%),
-        repeating-linear-gradient(45deg, rgba(203, 213, 225, 0.28) 0px, rgba(203, 213, 225, 0.28) 1px, transparent 1px, transparent 5px),
-        repeating-linear-gradient(-45deg, rgba(203, 213, 225, 0.22) 0px, rgba(203, 213, 225, 0.22) 1px, transparent 1px, transparent 5px);
-    }
-
-    .seychelles-id-back-bg {
-      background-color: #f6f8fa;
-      background-image: 
-        radial-gradient(ellipse at 20% 40%, rgba(249, 115, 22, 0.22) 0%, transparent 60%),
-        radial-gradient(circle at 80% 50%, rgba(148, 163, 184, 0.18) 0%, transparent 55%),
-        repeating-linear-gradient(60deg, rgba(203, 213, 225, 0.25) 0px, rgba(203, 213, 225, 0.25) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-60deg, rgba(203, 213, 225, 0.20) 0px, rgba(203, 213, 225, 0.20) 1px, transparent 1px, transparent 6px);
-    }
-
-    /* Pakistan National Identity Card (Smart NIC - NADRA) Security Background */
-    
-    /* Pakistan National Identity Card (CNIC / SNIC) - 1:1 Match to Reference Specimen */
-    
-    /* Republic of Senegal Biometric Passport (CEDEAO / ECOWAS) Security Patterns */
-    .senegal-passport-spread-bg {
-      background-color: #fbfaf5;
-      background-image: 
-        radial-gradient(ellipse at 80% 20%, rgba(234, 179, 8, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.10) 0%, transparent 45%),
-        radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.06) 0%, transparent 40%),
-        repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.02) 0px, rgba(16, 185, 129, 0.02) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(234, 179, 8, 0.02) 0px, rgba(234, 179, 8, 0.02) 1px, transparent 1px, transparent 6px);
-    }
-
-    .senegal-page1-bg {
-      background-color: #faf8f2;
-      background-image: 
-        radial-gradient(ellipse at 50% 50%, rgba(244, 114, 182, 0.12) 0%, transparent 60%),
-        radial-gradient(circle at 80% 25%, rgba(56, 189, 248, 0.10) 0%, transparent 50%),
-        radial-gradient(circle at 20% 75%, rgba(250, 204, 21, 0.10) 0%, transparent 50%),
-        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, rgba(168, 85, 247, 0.025) 9px, transparent 10px),
-        repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(16, 185, 129, 0.025) 3px, rgba(16, 185, 129, 0.025) 4px);
-    }
-
-    .senegal-datapage-bg {
-      background-color: #fcfbf7;
-      background-image: 
-        radial-gradient(ellipse at 85% 20%, rgba(16, 185, 129, 0.14) 0%, transparent 55%),
-        radial-gradient(circle at 18% 75%, rgba(239, 68, 68, 0.09) 0%, transparent 50%),
-        radial-gradient(circle at 50% 45%, rgba(245, 158, 11, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 75% 75%, rgba(56, 189, 248, 0.10) 0%, transparent 45%),
-        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.03) 7px, transparent 8px),
-        repeating-linear-gradient(45deg, rgba(16, 185, 129, 0.03) 0px, rgba(16, 185, 129, 0.03) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(234, 179, 8, 0.025) 0px, rgba(234, 179, 8, 0.025) 1px, transparent 1px, transparent 6px);
-    }
-
-    .senegal-crease {
-      box-shadow: inset 0 -8px 12px -6px rgba(0, 0, 0, 0.15), inset 0 8px 12px -6px rgba(0, 0, 0, 0.15);
-    }
-
-    .pakistan-cnic-front-bg {
-      background-color: #eef6ed;
-      background-image: 
-        radial-gradient(ellipse at 85% 75%, rgba(34, 197, 94, 0.16) 0%, transparent 55%),
-        radial-gradient(circle at 15% 25%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(20, 83, 45, 0.06) 0%, transparent 60%),
-        repeating-radial-gradient(circle at 80% 85%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.04) 7px, transparent 8px),
-        repeating-radial-gradient(circle at 15% 15%, transparent 0, transparent 8px, rgba(16, 185, 129, 0.035) 9px, transparent 10px),
-        repeating-linear-gradient(65deg, rgba(5, 150, 105, 0.03) 0px, rgba(5, 150, 105, 0.03) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-65deg, rgba(16, 185, 129, 0.025) 0px, rgba(16, 185, 129, 0.025) 1px, transparent 1px, transparent 6px);
-    }
-
-    .pakistan-cnic-back-bg {
-      background-color: #eef6ed;
-      background-image: 
-        radial-gradient(ellipse at 75% 30%, rgba(34, 197, 94, 0.14) 0%, transparent 55%),
-        radial-gradient(circle at 25% 70%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(20, 83, 45, 0.05) 0%, transparent 60%),
-        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, rgba(16, 185, 129, 0.03) 9px, transparent 10px),
-        repeating-linear-gradient(45deg, rgba(5, 150, 105, 0.03) 0px, rgba(5, 150, 105, 0.03) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(16, 185, 129, 0.025) 0px, rgba(16, 185, 129, 0.025) 1px, transparent 1px, transparent 6px);
-    }
-
-    .pakistan-showcase-canvas {
-      background-color: #a48f6c;
-      background-image: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
-    }
-
-    .shadow-cnic-cast {
-      box-shadow: 20px 24px 38px rgba(0, 0, 0, 0.36), 6px 8px 14px rgba(0, 0, 0, 0.20);
-    }
-
-    .pakistan-snic-bg {
-      background-color: #f3f8f3;
-      background-image: 
-        radial-gradient(ellipse at 85% 75%, rgba(34, 197, 94, 0.16) 0%, transparent 55%),
-        radial-gradient(circle at 15% 25%, rgba(16, 185, 129, 0.14) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(20, 83, 45, 0.05) 0%, transparent 60%),
-        repeating-radial-gradient(circle at 80% 85%, transparent 0, transparent 6px, rgba(16, 185, 129, 0.04) 7px, transparent 8px),
-        repeating-radial-gradient(circle at 15% 15%, transparent 0, transparent 8px, rgba(16, 185, 129, 0.035) 9px, transparent 10px),
-        repeating-linear-gradient(65deg, rgba(5, 150, 105, 0.03) 0px, rgba(5, 150, 105, 0.03) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-65deg, rgba(16, 185, 129, 0.025) 0px, rgba(16, 185, 129, 0.025) 1px, transparent 1px, transparent 6px);
-    }
-
-    /* Uganda Refugee Identity Card Security Pattern */
-    .uganda-refugee-bg {
-      background-color: #f8fafc;
-      background-image: 
-        radial-gradient(ellipse at 80% 25%, rgba(245, 158, 11, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 18% 75%, rgba(239, 68, 68, 0.10) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(202, 138, 4, 0.08) 0%, transparent 45%),
-        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, rgba(14, 165, 233, 0.03) 9px, transparent 10px),
-        repeating-linear-gradient(45deg, rgba(202, 138, 4, 0.02) 0px, rgba(202, 138, 4, 0.02) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(239, 68, 68, 0.02) 0px, rgba(239, 68, 68, 0.02) 1px, transparent 1px, transparent 6px);
-    }
-
-    /* Nigeria National Identity Card (NIMC) Security Pattern */
-    .nigeria-nimc-bg {
-      background-color: #f6faf6;
-      background-image: 
-        radial-gradient(ellipse at 80% 25%, rgba(22, 163, 74, 0.18) 0%, transparent 55%),
-        radial-gradient(circle at 18% 70%, rgba(34, 197, 94, 0.16) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(22, 163, 74, 0.09) 0%, transparent 45%),
-        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, rgba(22, 163, 74, 0.04) 9px, transparent 10px),
-        repeating-linear-gradient(45deg, rgba(22, 163, 74, 0.035) 0px, rgba(22, 163, 74, 0.035) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(22, 163, 74, 0.035) 0px, rgba(22, 163, 74, 0.035) 1px, transparent 1px, transparent 6px);
-    }
-
-    /* Nigeria e-Passport Security Background Pattern */
-    .nigeria-passport-bg {
-      background-color: #fbfbf4;
-      background-image: 
-        radial-gradient(ellipse at 85% 20%, rgba(22, 163, 74, 0.16) 0%, transparent 55%),
-        radial-gradient(circle at 18% 75%, rgba(34, 197, 94, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 50% 45%, rgba(202, 138, 4, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 75% 80%, rgba(16, 185, 129, 0.10) 0%, transparent 45%),
-        repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 6px, rgba(22, 163, 74, 0.035) 7px, transparent 8px),
-        repeating-linear-gradient(45deg, rgba(21, 128, 61, 0.03) 0px, rgba(21, 128, 61, 0.03) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-45deg, rgba(202, 138, 4, 0.025) 0px, rgba(202, 138, 4, 0.025) 1px, transparent 1px, transparent 6px);
-    }
-
-    /* Somali Republic Polycarbonate Smart National ID Background (Exact Match to Official Specimen) */
-    .somali-smart-id-bg {
-      background-color: #f2fadc;
-      background-image: 
-        radial-gradient(ellipse at 85% 20%, rgba(132, 204, 22, 0.28) 0%, transparent 55%),
-        radial-gradient(circle at 18% 75%, rgba(34, 197, 94, 0.22) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(234, 179, 8, 0.18) 0%, transparent 45%),
-        repeating-linear-gradient(45deg, rgba(132, 204, 22, 0.045) 0px, rgba(132, 204, 22, 0.045) 1px, transparent 1px, transparent 5px),
-        repeating-linear-gradient(-45deg, rgba(34, 197, 94, 0.04) 0px, rgba(34, 197, 94, 0.04) 1px, transparent 1px, transparent 5px);
-    }
-
-    /* Somali Passport Identity Card (Waraqadda Aqoonsiga) Reference Background */
-    .somali-pass-idcard-bg {
-      background-color: #f0f9fd;
-      background-image: 
-        radial-gradient(ellipse at 15% 45%, rgba(14, 165, 233, 0.16) 0%, transparent 60%),
-        radial-gradient(circle at 85% 25%, rgba(56, 189, 248, 0.14) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(224, 242, 254, 0.45) 0%, transparent 70%),
-        repeating-linear-gradient(60deg, rgba(14, 165, 233, 0.035) 0px, rgba(14, 165, 233, 0.035) 1px, transparent 1px, transparent 6px),
-        repeating-linear-gradient(-60deg, rgba(2, 132, 199, 0.03) 0px, rgba(2, 132, 199, 0.03) 1px, transparent 1px, transparent 6px);
-    }
-
-    /* Somali Republic Driving License Security Background Pattern */
-    .somali-driver-license-bg {
-      background-color: #f8fafc;
-      background-image: 
-        radial-gradient(ellipse at 85% 30%, rgba(14, 165, 233, 0.12) 0%, transparent 55%),
-        radial-gradient(circle at 15% 75%, rgba(59, 130, 246, 0.10) 0%, transparent 45%),
-        radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
-        repeating-linear-gradient(45deg, rgba(14, 165, 233, 0.025) 0px, rgba(14, 165, 233, 0.025) 1px, transparent 1px, transparent 7px),
-        repeating-linear-gradient(-45deg, rgba(2, 132, 199, 0.02) 0px, rgba(2, 132, 199, 0.02) 1px, transparent 1px, transparent 7px);
-    }
-
-    /* United Kingdom (British Citizen) Passport Security Background Pattern */
-    .uk-passport-bg {
-      background-color: #fdfaf3;
-      background-image: 
-        radial-gradient(ellipse at 50% 28%, rgba(249, 115, 22, 0.14) 0%, transparent 60%),
-        radial-gradient(circle at 82% 65%, rgba(245, 158, 11, 0.16) 0%, transparent 45%),
-        radial-gradient(circle at 18% 75%, rgba(202, 138, 4, 0.10) 0%, transparent 50%),
-        radial-gradient(circle at 65% 85%, rgba(234, 88, 12, 0.09) 0%, transparent 40%),
-        repeating-radial-gradient(circle at 55% 45%, transparent 0, transparent 6px, rgba(217, 119, 6, 0.035) 7px, transparent 8px),
-        repeating-linear-gradient(45deg, rgba(234, 88, 12, 0.025) 0px, rgba(234, 88, 12, 0.025) 1px, transparent 1px, transparent 7px),
-        repeating-linear-gradient(-45deg, rgba(217, 119, 6, 0.025) 0px, rgba(217, 119, 6, 0.025) 1px, transparent 1px, transparent 7px);
-    }
-
-    /* Floating Showcase Animations */
-    @keyframes floatSlow {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
-    }
-    @keyframes floatReverse {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(8px); }
-    }
-    @keyframes pulseSoft {
-      0%, 100% { opacity: 0.95; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.02); }
-    }
-    .animate-float-slow {
-      animation: floatSlow 4s ease-in-out infinite;
-    }
-    .animate-float-reverse {
-      animation: floatReverse 5s ease-in-out infinite;
-    }
-    .animate-pulse-soft {
-      animation: pulseSoft 3s ease-in-out infinite;
-    }
-    @keyframes floatDiagonal {
-      0%, 100% { transform: translate(0px, 0px); }
-      50% { transform: translate(6px, -8px); }
-    }
-    @keyframes floatDiagonalAlt {
-      0%, 100% { transform: translate(0px, 0px); }
-      50% { transform: translate(-6px, 8px); }
-    }
-    .animate-float-diag {
-      animation: floatDiagonal 4.5s ease-in-out infinite;
-    }
-    .animate-float-diag-alt {
-      animation: floatDiagonalAlt 5.5s ease-in-out infinite;
-    }
-
-    /* Clean Light-Mode Glass Cards with Brand Contrast */
-    .glass-light-card {
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(226, 232, 240, 0.95);
-      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .glass-light-card:hover {
-      box-shadow: 0 20px 35px -8px rgba(15, 23, 42, 0.14), 0 10px 15px -4px rgba(15, 23, 42, 0.06);
-      transform: translateY(-3px) scale(1.02);
-    }
-    .font-urdu {
-      font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Jameel Noori Nastaleeq', 'Nafees', 'Tahoma', 'Arial', sans-serif;
-    }
-
-    /* ================= HEADER & UI PROTECTION ================= */
-    header.sticky, header#mainHeader, header {
-      position: sticky !important;
-      top: 0 !important;
-      z-index: 999999 !important;
-      isolation: isolate;
-      background-color: rgba(255, 255, 255, 0.98) !important;
-    }
-    #site-brand-logo-link,
-    header a[aria-label="GetKYCApproved Home"],
-    header img[src*="getkycapproved"] {
-      position: relative !important;
-      z-index: 1000000 !important;
-      pointer-events: auto !important;
-    }
-
-    /* Keep interactive buttons, toolbars, and editor controls unobstructed */
-    .interactive-btn-zone,
-    .workbench-btn,
-    .platform-pill,
-    #pakistan-id-section button,
-    #editor-controls,
-    .editor-toolbar,
-    button[onclick*="download"],
-    button[onclick*="print"],
-    button[onclick*="randomize"],
-    button[onclick*="selectVirtualAccount"],
-    button[onclick*="applyQuickKycPreset"] {
-      position: relative !important;
-      z-index: 30 !important;
-      pointer-events: auto !important;
-    }
-
-    /* ===== Republic of Senegal Biometric Passport — reference-matched (CEDEAO booklet) ===== */
-    .sen-pp-spread { display: flex; flex-direction: column; gap: 14px; }
-    .sen-pp-page {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 768 / 501;
-      border-radius: 6px;
-      overflow: hidden;
-      container-type: inline-size;
-      border: 1px solid #cfc9bb;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.65), 0 14px 28px -22px rgba(15,23,42,.75);
-      color: #1f2937;
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-    .sen-pp-page::after {
-      content: "";
-      position: absolute; inset: 0;
-      pointer-events: none;
-      background-image:
-        repeating-linear-gradient(90deg, rgba(255,255,255,.28) 0 1px, transparent 1px 3px),
-        repeating-linear-gradient(0deg, rgba(255,255,255,.22) 0 1px, transparent 1px 3px);
-      mix-blend-mode: soft-light;
-      opacity: .55;
-    }
-
-    /* ---------- PAGE 1 — CEDEAO / ECOWAS endorsement page (rotated layout) ---------- */
-    .sen-pp-p1 {
-      background-color: #fbeef1;
-      background-image:
-        repeating-radial-gradient(circle at 50% 46%, rgba(190, 58, 92, .10) 0 0.9px, transparent 0.9px 7px),
-        repeating-linear-gradient(30deg, rgba(205, 92, 120, .09) 0 1px, transparent 1px 6px),
-        repeating-linear-gradient(-30deg, rgba(205, 92, 120, .09) 0 1px, transparent 1px 6px),
-        radial-gradient(ellipse at 50% 38%, rgba(255,255,255,.70) 0%, rgba(255,255,255,0) 62%),
-        radial-gradient(ellipse at 92% 92%, rgba(226, 132, 155, .35) 0%, rgba(255,255,255,0) 55%),
-        linear-gradient(118deg, #fdf5f6 0%, #fbe9ed 46%, #f7dde5 100%);
-    }
-    .sen-pp-p1-inner { position: absolute; inset: 0; display: flex; padding: 4.2cqw 3.6cqw; gap: 3.2cqw; }
-    .sen-pp-vtext { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
-    .sen-pp-p1-eco {
-      display: flex; flex-direction: column; justify-content: center; gap: 1.6cqw;
-      color: #9d2449; font-weight: 700; letter-spacing: .06em;
-    }
-    .sen-pp-p1-eco .fr { font-size: 1.85cqw; }
-    .sen-pp-p1-eco .en { font-size: 1.35cqw; color: #b2476d; letter-spacing: .05em; }
-    .sen-pp-p1-mid {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 2.2cqw; text-align: center;
-    }
-    .sen-pp-p1-seal { width: 20cqw; height: 20cqw; }
-    .sen-pp-p1-rep {
-      writing-mode: vertical-rl; transform: rotate(180deg);
-      font-family: Georgia, "Times New Roman", serif;
-      font-weight: 700; font-size: 5.1cqw; letter-spacing: .10em; color: #8f1f3f;
-    }
-    .sen-pp-p1-rep-en {
-      writing-mode: vertical-rl; transform: rotate(180deg);
-      font-size: 1.75cqw; letter-spacing: .22em; color: #a94661; font-weight: 700;
-    }
-    .sen-pp-p1-right {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 2cqw; text-align: center;
-    }
-    .sen-pp-p1-title {
-      writing-mode: vertical-rl; transform: rotate(180deg);
-      font-weight: 800; font-size: 2.5cqw; letter-spacing: .42em; color: #8f1f3f;
-    }
-    .sen-pp-p1-no {
-      writing-mode: vertical-rl; transform: rotate(180deg);
-      font-family: "Courier New", monospace; font-weight: 800;
-      font-size: 3.05cqw; letter-spacing: .14em; color: #231f20;
-    }
-    .sen-pp-p1-pages {
-      writing-mode: vertical-rl; transform: rotate(180deg);
-      font-size: 1.35cqw; letter-spacing: .04em; color: #57534e; line-height: 1.35;
-    }
-    .sen-pp-p1-page-no {
-      position: absolute; right: 2.2cqw; bottom: 1.8cqw;
-      font-size: 1.6cqw; font-weight: 700; color: #8f1f3f;
-    }
-    .sen-pp-p1-ghost-band {
-      position: absolute; inset: auto 0 0 0; height: 12%;
-      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 45%, rgba(255,255,255,0) 100%);
-      pointer-events: none;
-    }
-
-    /* ---------- DATA PAGE — biometric data page ---------- */
-    .sen-pp-data {
-      background-color: #e8f4f1;
-      background-image:
-        repeating-radial-gradient(ellipse at 50% 50%, rgba(20, 120, 120, .075) 0 1px, transparent 1px 9px),
-        repeating-linear-gradient(96deg, rgba(24, 130, 120, .07) 0 1.2px, transparent 1.2px 8px),
-        repeating-linear-gradient(84deg, rgba(140, 170, 40, .07) 0 1px, transparent 1px 7px),
-        radial-gradient(ellipse at 78% 22%, rgba(120, 200, 190, .55) 0%, rgba(255,255,255,0) 58%),
-        radial-gradient(ellipse at 12% 82%, rgba(170, 210, 150, .45) 0%, rgba(255,255,255,0) 60%),
-        linear-gradient(132deg, #e4f3f2 0%, #dcefee 38%, #e6f2e6 68%, #eef6e2 100%);
-    }
-    .sen-pp-ribbon {
-      position: absolute; left: -6%; top: 8%; width: 40%; height: 74%;
-      transform: rotate(-7deg);
-      background: linear-gradient(84deg,
-        rgba(253, 231, 35, .85) 0%,
-        rgba(140, 205, 40, .85) 26%,
-        rgba(30, 165, 90, .72) 58%,
-        rgba(253, 231, 35, .60) 100%);
-      filter: blur(5px) saturate(1.15);
-      opacity: .62;
-      pointer-events: none;
-      mix-blend-mode: multiply;
-    }
-    .sen-pp-ovd {
-      position: absolute; right: 3.2cqw; top: 2.4cqw;
-      width: 13cqw; height: 13cqw; border-radius: 1.2cqw;
-      background:
-        radial-gradient(circle at 32% 28%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 45%),
-        conic-gradient(from 210deg, #f3d98a, #e7be5e, #f7ecc4, #d9ac4a, #f6e6b0, #c9973f, #f3d98a);
-      box-shadow: inset 0 0 0 1px rgba(180,140,60,.55), 0 1px 4px rgba(120,90,20,.28);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-    }
-    .sen-pp-ovd svg { width: 82%; height: 82%; opacity: .55; }
-    .sen-pp-bio {
-      position: absolute; right: 3.2cqw; top: 16.4cqw;
-      width: 5.4cqw; height: 3.4cqw;
-      border: 1px solid #0f5132; border-radius: .4cqw;
-      display: flex; align-items: center; justify-content: center; gap: .35cqw;
-      background: rgba(255,255,255,.35);
-    }
-    .sen-pp-bio i { display: block; width: .55cqw; background: #0f5132; border-radius: .5cqw; }
-    .sen-pp-bio .c { width: 1.15cqw; height: 1.15cqw; border: 1.4px solid #0f5132; border-radius: 50%; background: transparent; }
-    .sen-pp-data-grid {
-      position: absolute; inset: 0; display: grid;
-      grid-template-columns: 25.5% 1fr;
-      gap: 2.6cqw;
-      padding: 3.1cqw 3.4cqw 1.6cqw;
-    }
-    .sen-pp-doclabel {
-      font-size: 1.05cqw; letter-spacing: .10em; text-transform: uppercase;
-      color: #0f766e; font-weight: 800; margin-bottom: .5cqw;
-    }
-    .sen-pp-doclabel .en { display: block; color: #3f7f78; font-size: .95cqw; letter-spacing: .08em; }
-    .sen-pp-photo {
-      position: relative; width: 100%; aspect-ratio: 196 / 229;
-      border-radius: .5cqw; overflow: hidden;
-      box-shadow: 0 2px 8px rgba(15,23,42,.28), inset 0 0 0 1px rgba(255,255,255,.55);
-      background: #dfe9e6;
-    }
-    .sen-pp-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; display: block; }
-    .sen-pp-sign-box { margin-top: 1.5cqw; }
-    .sen-pp-sign-label {
-      font-size: .9cqw; letter-spacing: .07em; text-transform: uppercase;
-      color: #0f766e; font-weight: 700;
-    }
-    .sen-pp-sign {
-      font-family: "Segoe Script", "Bradley Hand", "Brush Script MT", cursive;
-      font-size: 2.05cqw; color: #1e2a44; line-height: 1.35;
-      border-bottom: .12cqw solid rgba(15, 118, 110, .5);
-      padding-bottom: .25cqw; margin-top: .35cqw; min-height: 2.3cqw;
-    }
-    .sen-pp-fields {
-      display: grid; grid-template-columns: 1fr 1fr;
-      column-gap: 2.2cqw; row-gap: 1.25cqw; align-content: start;
-    }
-    .sen-pp-field { min-width: 0; }
-    .sen-pp-field.full { grid-column: 1 / -1; }
-    .sen-pp-field .lbl {
-      display: block;
-      font-size: .95cqw; letter-spacing: .055em; text-transform: uppercase;
-      color: #0f766e; font-weight: 700; line-height: 1.2;
-    }
-    .sen-pp-field .lbl em { font-style: normal; color: #4f8f88; font-size: .88cqw; letter-spacing: .03em; }
-    .sen-pp-field .val {
-      display: block;
-      font-size: 1.62cqw; font-weight: 800; color: #14202e;
-      letter-spacing: .015em; line-height: 1.25;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .sen-pp-field .val.mono { font-family: "Courier New", ui-monospace, monospace; letter-spacing: .04em; }
-    .sen-pp-ghost {
-      position: absolute; right: 16.5cqw; bottom: 12.5cqw;
-      width: 12.5cqw; aspect-ratio: 130 / 192;
-      border-radius: .4cqw; overflow: hidden;
-      opacity: .30; filter: grayscale(.35) contrast(.9) blur(.35px);
-      box-shadow: inset 0 0 0 1px rgba(15,118,110,.35);
-      pointer-events: none;
-    }
-    .sen-pp-ghost img { width: 100%; height: 100%; object-fit: cover; }
-    .sen-pp-mrz {
-      position: absolute; left: 3.4cqw; right: 3.4cqw; bottom: 1.35cqw;
-      padding: .9cqw .55cqw .3cqw;
-      border-top: .1cqw solid rgba(15, 118, 110, .35);
-      background: rgba(255,255,255,.42);
-      font-family: "OCR B", "Courier New", ui-monospace, monospace;
-      font-size: 1.62cqw; font-weight: 700; letter-spacing: .085em;
-      color: #14202e; line-height: 1.32; white-space: nowrap; overflow: hidden;
-    }
-    .sen-pp-mrz div { overflow: hidden; text-overflow: clip; }
-    .sen-pp-crease {
-      box-shadow: inset 0 -10px 14px -8px rgba(0,0,0,.18), inset 0 10px 14px -8px rgba(0,0,0,.18);
-    }
-  </style>
+  <style>body{color:#0f172a;background:#fff;font-family:Inter,sans-serif}.font-mono-code{font-family:JetBrains Mono,monospace}.font-arabic{font-family:Amiri,serif}.font-ethiopic{font-family:Noto Sans Ethiopic,Inter,sans-serif}.ethiopia-fayda-bg{background-color:#f7faf6;background-image:radial-gradient(at 80%,#f5c54238 0%,#0000 60%),radial-gradient(at 15% 45%,#2dd4bf38 0%,#0000 55%),radial-gradient(circle at 50% 15%,#22c55e1f 0%,#0000 50%),radial-gradient(circle at 18% 85%,#f43f5e1a 0%,#0000 45%),radial-gradient(circle at 82% 80%,#ca8a041f 0%,#0000 45%),repeating-radial-gradient(circle at 78%,#0000 0 8px,#ca8a040a 9px,#0000 10px),repeating-linear-gradient(45deg,#10b98109 0 1px,#0000 1px 6px),repeating-linear-gradient(-45deg,#ca8a0408 0 1px,#0000 1px 6px)}.kenya-passport-bg{background-color:#f6faf6;background-image:radial-gradient(circle at 85% 25%,#eab30826 0%,#0000 40%),radial-gradient(circle at 15% 75%,#0066331f 0%,#0000 45%),linear-gradient(90deg,#0066330a 1px,#0000 1px),linear-gradient(#0066330a 1px,#0000 1px);background-size:100% 100%,100% 100%,16px 16px,16px 16px}.somali-passport-bg{background-color:#faf7ee;background-image:radial-gradient(circle at 80% 25%,#d977061f 0%,#0000 45%),radial-gradient(circle at 20% 70%,#0d94881a 0%,#0000 45%),radial-gradient(circle at 55% 55%,#3b82f614 0%,#0000 40%),repeating-linear-gradient(0deg,#0000,#0000 3px,#ca8a0409 3px 4px),repeating-linear-gradient(90deg,#0000,#0000 6px,#0d948808 6px 7px)}.kenya-maisha-front-bg{background-color:#f7faf7;background-image:radial-gradient(at 50% 8%,#f43f5e38 0%,#fb71851f 35%,#0000 68%),radial-gradient(circle at 18% 70%,#10b98140 0%,#0000 52%),radial-gradient(circle at 82% 70%,#10b98138 0%,#0000 52%),radial-gradient(circle,#f59e0b1a 0%,#0000 42%),repeating-radial-gradient(circle at 50% 10%,#0000 0 4px,#ef44440d 5px,#0000 6px),repeating-radial-gradient(circle at 20% 70%,#0000 0 6px,#10b9810f 7px,#0000 8px),repeating-radial-gradient(circle at 80% 70%,#0000 0 6px,#10b9810f 7px,#0000 8px)}.kenya-maisha-back-bg{background-color:#f8faf8;background-image:radial-gradient(at 75% 25%,#10b9812e 0%,#0000 55%),radial-gradient(at 35% 45%,#ef444424 0%,#0000 55%),radial-gradient(circle at 20% 35%,#d977061f 0%,#0000 40%),repeating-linear-gradient(45deg,#10b98109 0 1px,#0000 1px 8px),repeating-radial-gradient(circle at 75% 30%,#0000 0 10px,#10b9810d 11px,#0000 12px)}.sample-watermark{visibility:hidden!important;opacity:0!important;pointer-events:none!important;display:none!important}#imageModal{overscroll-behavior:contain}#modalPreviewImg{touch-action:pan-y;-webkit-user-select:none;user-select:none}@media print{@page{size:A4 portrait;margin:10mm}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:#fff!important;margin:0!important;padding:0!important}.no-print,#imageModal,#toast,header,footer{display:none!important}body>main,.print-area-wrapper{width:100%!important;margin:0!important;padding:0!important;display:block!important}#passport-card,#somalia-passport-card,#somalia-passport-spread,#somalia-passport-id-card,#senegal-passport-spread,#senegal-datapage-card,#senegal-page1-card{width:100%!important;max-width:135mm!important;box-shadow:none!important;border:1px solid #94a3b8!important;margin:0 auto!important}#somalia-card{width:100%!important;max-width:175mm!important;box-shadow:none!important;border:1px solid #94a3b8!important;margin:0 auto!important}#somali-smart-id-card{page-break-inside:avoid;width:100%!important;max-width:135mm!important;box-shadow:none!important;border:1px solid #94a3b8!important;margin:10px auto!important}#ethiopia-fayda-card{width:100%!important;max-width:160mm!important;box-shadow:none!important;border:1px solid #94a3b8!important;margin:0 auto!important}#kenya-id-front,#kenya-id-back{page-break-inside:avoid;width:100%!important;max-width:135mm!important;box-shadow:none!important;border:1px solid #94a3b8!important;margin:10px auto!important}#somalia-driverlicense-card,#nigeria-id-card,#nigeria-passport-card,#uk-passport-card,#uganda-refugee-card,#pakistan-id-card,#seychelles-id-front,#seychelles-id-back{page-break-inside:avoid;width:100%!important;max-width:140mm!important;box-shadow:none!important;border:1px solid #94a3b8!important;margin:10px auto!important}}.seychelles-id-front-bg{background-color:#f7f9fb;background-image:radial-gradient(at 15% 45%,#fb923c3d 0%,#0000 60%),radial-gradient(circle at 85% 55%,#38bdf826 0%,#0000 55%),repeating-linear-gradient(45deg,#cbd5e147 0 1px,#0000 1px 5px),repeating-linear-gradient(-45deg,#cbd5e138 0 1px,#0000 1px 5px)}.seychelles-id-back-bg{background-color:#f6f8fa;background-image:radial-gradient(at 20% 40%,#f9731638 0%,#0000 60%),radial-gradient(circle at 80%,#94a3b82e 0%,#0000 55%),repeating-linear-gradient(60deg,#cbd5e140 0 1px,#0000 1px 6px),repeating-linear-gradient(-60deg,#cbd5e133 0 1px,#0000 1px 6px)}.senegal-passport-spread-bg{background-color:#fbfaf5;background-image:radial-gradient(at 80% 20%,#eab3081f 0%,#0000 50%),radial-gradient(circle at 20% 80%,#10b9811a 0%,#0000 45%),radial-gradient(circle,#ef44440f 0%,#0000 40%),repeating-linear-gradient(45deg,#10b98105 0 1px,#0000 1px 6px),repeating-linear-gradient(-45deg,#eab30805 0 1px,#0000 1px 6px)}.senegal-page1-bg{background-color:#faf8f2;background-image:radial-gradient(#f472b61f 0%,#0000 60%),radial-gradient(circle at 80% 25%,#38bdf81a 0%,#0000 50%),radial-gradient(circle at 20% 75%,#facc151a 0%,#0000 50%),repeating-radial-gradient(circle,#0000 0 8px,#a855f706 9px,#0000 10px),repeating-linear-gradient(0deg,#0000,#0000 3px,#10b98106 3px 4px)}.senegal-datapage-bg{background-color:#fcfbf7;background-image:radial-gradient(at 85% 20%,#10b98124 0%,#0000 55%),radial-gradient(circle at 18% 75%,#ef444417 0%,#0000 50%),radial-gradient(circle at 50% 45%,#f59e0b1f 0%,#0000 55%),radial-gradient(circle at 75% 75%,#38bdf81a 0%,#0000 45%),repeating-radial-gradient(circle,#0000 0 6px,#10b98108 7px,#0000 8px),repeating-linear-gradient(45deg,#10b98108 0 1px,#0000 1px 6px),repeating-linear-gradient(-45deg,#eab30806 0 1px,#0000 1px 6px)}.senegal-crease{box-shadow:inset 0 -8px 12px -6px #00000026,inset 0 8px 12px -6px #00000026}.pakistan-cnic-front-bg{background-color:#eef6ed;background-image:radial-gradient(at 85% 75%,#22c55e29 0%,#0000 55%),radial-gradient(circle at 15% 25%,#10b98126 0%,#0000 50%),radial-gradient(#14532d0f 0%,#0000 60%),repeating-radial-gradient(circle at 80% 85%,#0000 0 6px,#10b9810a 7px,#0000 8px),repeating-radial-gradient(circle at 15% 15%,#0000 0 8px,#10b98109 9px,#0000 10px),repeating-linear-gradient(65deg,#05966908 0 1px,#0000 1px 6px),repeating-linear-gradient(-65deg,#10b98106 0 1px,#0000 1px 6px)}.pakistan-cnic-back-bg{background-color:#eef6ed;background-image:radial-gradient(at 75% 30%,#22c55e24 0%,#0000 55%),radial-gradient(circle at 25% 70%,#10b9811f 0%,#0000 50%),radial-gradient(#14532d0d 0%,#0000 60%),repeating-radial-gradient(circle,#0000 0 8px,#10b98108 9px,#0000 10px),repeating-linear-gradient(45deg,#05966908 0 1px,#0000 1px 6px),repeating-linear-gradient(-45deg,#10b98106 0 1px,#0000 1px 6px)}.pakistan-showcase-canvas{background-color:#a48f6c;background-image:radial-gradient(circle at 50% 30%,#ffffff1f 0%,#0000 70%)}.shadow-cnic-cast{box-shadow:20px 24px 38px #0000005c,6px 8px 14px #0003}.pakistan-snic-bg{background-color:#f3f8f3;background-image:radial-gradient(at 85% 75%,#22c55e29 0%,#0000 55%),radial-gradient(circle at 15% 25%,#10b98124 0%,#0000 50%),radial-gradient(#14532d0d 0%,#0000 60%),repeating-radial-gradient(circle at 80% 85%,#0000 0 6px,#10b9810a 7px,#0000 8px),repeating-radial-gradient(circle at 15% 15%,#0000 0 8px,#10b98109 9px,#0000 10px),repeating-linear-gradient(65deg,#05966908 0 1px,#0000 1px 6px),repeating-linear-gradient(-65deg,#10b98106 0 1px,#0000 1px 6px)}.uganda-refugee-bg{background-color:#f8fafc;background-image:radial-gradient(at 80% 25%,#f59e0b1f 0%,#0000 55%),radial-gradient(circle at 18% 75%,#ef44441a 0%,#0000 50%),radial-gradient(circle,#ca8a0414 0%,#0000 45%),repeating-radial-gradient(circle,#0000 0 8px,#0ea5e908 9px,#0000 10px),repeating-linear-gradient(45deg,#ca8a0405 0 1px,#0000 1px 6px),repeating-linear-gradient(-45deg,#ef444405 0 1px,#0000 1px 6px)}.nigeria-nimc-bg{background-color:#f6faf6;background-image:radial-gradient(at 80% 25%,#16a34a2e 0%,#0000 55%),radial-gradient(circle at 18% 70%,#22c55e29 0%,#0000 50%),radial-gradient(circle,#16a34a17 0%,#0000 45%),repeating-radial-gradient(circle,#0000 0 8px,#16a34a0a 9px,#0000 10px),repeating-linear-gradient(45deg,#16a34a09 0 1px,#0000 1px 6px),repeating-linear-gradient(-45deg,#16a34a09 0 1px,#0000 1px 6px)}.nigeria-passport-bg{background-color:#fbfbf4;background-image:radial-gradient(at 85% 20%,#16a34a29 0%,#0000 55%),radial-gradient(circle at 18% 75%,#22c55e26 0%,#0000 50%),radial-gradient(circle at 50% 45%,#ca8a041f 0%,#0000 55%),radial-gradient(circle at 75% 80%,#10b9811a 0%,#0000 45%),repeating-radial-gradient(circle,#0000 0 6px,#16a34a09 7px,#0000 8px),repeating-linear-gradient(45deg,#15803d08 0 1px,#0000 1px 6px),repeating-linear-gradient(-45deg,#ca8a0406 0 1px,#0000 1px 6px)}.somali-smart-id-bg{background-color:#f2fadc;background-image:radial-gradient(at 85% 20%,#84cc1647 0%,#0000 55%),radial-gradient(circle at 18% 75%,#22c55e38 0%,#0000 50%),radial-gradient(circle,#eab3082e 0%,#0000 45%),repeating-linear-gradient(45deg,#84cc160b 0 1px,#0000 1px 5px),repeating-linear-gradient(-45deg,#22c55e0a 0 1px,#0000 1px 5px)}.somali-pass-idcard-bg{background-color:#f0f9fd;background-image:radial-gradient(at 15% 45%,#0ea5e929 0%,#0000 60%),radial-gradient(circle at 85% 25%,#38bdf824 0%,#0000 50%),radial-gradient(circle,#e0f2fe73 0%,#0000 70%),repeating-linear-gradient(60deg,#0ea5e909 0 1px,#0000 1px 6px),repeating-linear-gradient(-60deg,#0284c708 0 1px,#0000 1px 6px)}.somali-driver-license-bg{background-color:#f8fafc;background-image:radial-gradient(at 85% 30%,#0ea5e91f 0%,#0000 55%),radial-gradient(circle at 15% 75%,#3b82f61a 0%,#0000 45%),radial-gradient(circle,#f59e0b14 0%,#0000 50%),repeating-linear-gradient(45deg,#0ea5e906 0 1px,#0000 1px 7px),repeating-linear-gradient(-45deg,#0284c705 0 1px,#0000 1px 7px)}.uk-passport-bg{background-color:#fdfaf3;background-image:radial-gradient(at 50% 28%,#f9731624 0%,#0000 60%),radial-gradient(circle at 82% 65%,#f59e0b29 0%,#0000 45%),radial-gradient(circle at 18% 75%,#ca8a041a 0%,#0000 50%),radial-gradient(circle at 65% 85%,#ea580c17 0%,#0000 40%),repeating-radial-gradient(circle at 55% 45%,#0000 0 6px,#d9770609 7px,#0000 8px),repeating-linear-gradient(45deg,#ea580c06 0 1px,#0000 1px 7px),repeating-linear-gradient(-45deg,#d9770606 0 1px,#0000 1px 7px)}@keyframes floatSlow{0%,to{transform:translateY(0)}50%{transform:translateY(-8px)}}@keyframes floatReverse{0%,to{transform:translateY(0)}50%{transform:translateY(8px)}}@keyframes pulseSoft{0%,to{opacity:.95;transform:scale(1)}50%{opacity:1;transform:scale(1.02)}}.animate-float-slow{animation:4s ease-in-out infinite floatSlow}.animate-float-reverse{animation:5s ease-in-out infinite floatReverse}.animate-pulse-soft{animation:3s ease-in-out infinite pulseSoft}@keyframes floatDiagonal{0%,to{transform:translate(0)}50%{transform:translate(6px,-8px)}}@keyframes floatDiagonalAlt{0%,to{transform:translate(0)}50%{transform:translate(-6px,8px)}}.animate-float-diag{animation:4.5s ease-in-out infinite floatDiagonal}.animate-float-diag-alt{animation:5.5s ease-in-out infinite floatDiagonalAlt}.glass-light-card{-webkit-backdrop-filter:blur(14px);background:#fffffff5;border:1px solid #e2e8f0f2;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:0 10px 25px -5px #0f172a14,0 8px 10px -6px #0f172a0a}.glass-light-card:hover{transform:translateY(-3px)scale(1.02);box-shadow:0 20px 35px -8px #0f172a24,0 10px 15px -4px #0f172a0f}.font-urdu{font-family:Noto Nastaliq Urdu,Urdu Typesetting,Jameel Noori Nastaleeq,Nafees,Tahoma,Arial,sans-serif}header.sticky,header#mainHeader,header{isolation:isolate;z-index:999999!important;background-color:#fffffffa!important;position:sticky!important;top:0!important}#site-brand-logo-link,header a[aria-label=GetKYCApproved\ Home],header img[src*=getkycapproved]{z-index:1000000!important;pointer-events:auto!important;position:relative!important}.interactive-btn-zone,.workbench-btn,.platform-pill,#pakistan-id-section button,#editor-controls,.editor-toolbar,button[onclick*=download],button[onclick*=print],button[onclick*=randomize],button[onclick*=selectVirtualAccount],button[onclick*=applyQuickKycPreset]{z-index:30!important;pointer-events:auto!important;position:relative!important}.sen-pp-spread{flex-direction:column;gap:14px;display:flex}.sen-pp-page{aspect-ratio:768/501;color:#1f2937;-webkit-font-smoothing:antialiased;border:1px solid #cfc9bb;border-radius:6px;width:100%;font-family:Helvetica Neue,Arial,sans-serif;position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px #ffffffa6,0 14px 28px -22px #0f172abf;container-type:inline-size}.sen-pp-page:after{content:"";pointer-events:none;mix-blend-mode:soft-light;opacity:.55;background-image:repeating-linear-gradient(90deg,#ffffff47 0 1px,#0000 1px 3px),repeating-linear-gradient(0deg,#ffffff38 0 1px,#0000 1px 3px);position:absolute;inset:0}.sen-pp-p1{background-color:#fbeef1;background-image:repeating-radial-gradient(circle at 50% 46%,#be3a5c1a 0 .9px,#0000 .9px 7px),repeating-linear-gradient(30deg,#cd5c7817 0 1px,#0000 1px 6px),repeating-linear-gradient(-30deg,#cd5c7817 0 1px,#0000 1px 6px),radial-gradient(at 50% 38%,#ffffffb3 0%,#fff0 62%),radial-gradient(at 92% 92%,#e2849b59 0%,#fff0 55%),linear-gradient(118deg,#fdf5f6 0%,#fbe9ed 46%,#f7dde5 100%)}.sen-pp-p1-inner{gap:3.2cqw;padding:4.2cqw 3.6cqw;display:flex;position:absolute;inset:0}.sen-pp-vtext{writing-mode:vertical-rl;white-space:nowrap;transform:rotate(180deg)}.sen-pp-p1-eco{color:#9d2449;letter-spacing:.06em;flex-direction:column;justify-content:center;gap:1.6cqw;font-weight:700;display:flex}.sen-pp-p1-eco .fr{font-size:1.85cqw}.sen-pp-p1-eco .en{color:#b2476d;letter-spacing:.05em;font-size:1.35cqw}.sen-pp-p1-mid{text-align:center;flex-direction:column;flex:1;justify-content:center;align-items:center;gap:2.2cqw;display:flex}.sen-pp-p1-seal{width:20cqw;height:20cqw}.sen-pp-p1-rep{writing-mode:vertical-rl;letter-spacing:.1em;color:#8f1f3f;font-family:Georgia,Times New Roman,serif;font-size:5.1cqw;font-weight:700;transform:rotate(180deg)}.sen-pp-p1-rep-en{writing-mode:vertical-rl;letter-spacing:.22em;color:#a94661;font-size:1.75cqw;font-weight:700;transform:rotate(180deg)}.sen-pp-p1-right{text-align:center;flex-direction:column;justify-content:center;align-items:center;gap:2cqw;display:flex}.sen-pp-p1-title{writing-mode:vertical-rl;letter-spacing:.42em;color:#8f1f3f;font-size:2.5cqw;font-weight:800;transform:rotate(180deg)}.sen-pp-p1-no{writing-mode:vertical-rl;letter-spacing:.14em;color:#231f20;font-family:Courier New,monospace;font-size:3.05cqw;font-weight:800;transform:rotate(180deg)}.sen-pp-p1-pages{writing-mode:vertical-rl;letter-spacing:.04em;color:#57534e;font-size:1.35cqw;line-height:1.35;transform:rotate(180deg)}.sen-pp-p1-page-no{color:#8f1f3f;font-size:1.6cqw;font-weight:700;position:absolute;bottom:1.8cqw;right:2.2cqw}.sen-pp-p1-ghost-band{pointer-events:none;background:linear-gradient(90deg,#fff0 0%,#ffffff8c 45%,#fff0 100%);height:12%;position:absolute;inset:auto 0 0}.sen-pp-data{background-color:#e8f4f1;background-image:repeating-radial-gradient(#14787813 0 1px,#0000 1px 9px),repeating-linear-gradient(96deg,#18827812 0 1.2px,#0000 1.2px 8px),repeating-linear-gradient(84deg,#8caa2812 0 1px,#0000 1px 7px),radial-gradient(at 78% 22%,#78c8be8c 0%,#fff0 58%),radial-gradient(at 12% 82%,#aad29673 0%,#fff0 60%),linear-gradient(132deg,#e4f3f2 0%,#dcefee 38%,#e6f2e6 68%,#eef6e2 100%)}.sen-pp-ribbon{filter:blur(5px)saturate(1.15);opacity:.62;pointer-events:none;mix-blend-mode:multiply;background:linear-gradient(84deg,#fde723d9 0%,#8ccd28d9 26%,#1ea55ab8 58%,#fde72399 100%);width:40%;height:74%;position:absolute;top:8%;left:-6%;transform:rotate(-7deg)}.sen-pp-ovd{background:radial-gradient(circle at 32% 28%,#fffffff2 0%,#fff0 45%),conic-gradient(from 210deg,#f3d98a,#e7be5e,#f7ecc4,#d9ac4a,#f6e6b0,#c9973f,#f3d98a);border-radius:1.2cqw;justify-content:center;align-items:center;width:13cqw;height:13cqw;display:flex;position:absolute;top:2.4cqw;right:3.2cqw;overflow:hidden;box-shadow:inset 0 0 0 1px #b48c3c8c,0 1px 4px #785a1447}.sen-pp-ovd svg{opacity:.55;width:82%;height:82%}.sen-pp-bio{background:#ffffff59;border:1px solid #0f5132;border-radius:.4cqw;justify-content:center;align-items:center;gap:.35cqw;width:5.4cqw;height:3.4cqw;display:flex;position:absolute;top:16.4cqw;right:3.2cqw}.sen-pp-bio i{background:#0f5132;border-radius:.5cqw;width:.55cqw;display:block}.sen-pp-bio .c{background:0 0;border:1.4px solid #0f5132;border-radius:50%;width:1.15cqw;height:1.15cqw}.sen-pp-data-grid{grid-template-columns:25.5% 1fr;gap:2.6cqw;padding:3.1cqw 3.4cqw 1.6cqw;display:grid;position:absolute;inset:0}.sen-pp-doclabel{letter-spacing:.1em;text-transform:uppercase;color:#0f766e;margin-bottom:.5cqw;font-size:1.05cqw;font-weight:800}.sen-pp-doclabel .en{color:#3f7f78;letter-spacing:.08em;font-size:.95cqw;display:block}.sen-pp-photo{aspect-ratio:196/229;background:#dfe9e6;border-radius:.5cqw;width:100%;position:relative;overflow:hidden;box-shadow:0 2px 8px #0f172a47,inset 0 0 0 1px #ffffff8c}.sen-pp-photo img{object-fit:cover;object-position:50% 22%;width:100%;height:100%;display:block}.sen-pp-sign-box{margin-top:1.5cqw}.sen-pp-sign-label{letter-spacing:.07em;text-transform:uppercase;color:#0f766e;font-size:.9cqw;font-weight:700}.sen-pp-sign{color:#1e2a44;border-bottom:.12cqw solid #0f766e80;min-height:2.3cqw;margin-top:.35cqw;padding-bottom:.25cqw;font-family:Segoe Script,Bradley Hand,Brush Script MT,cursive;font-size:2.05cqw;line-height:1.35}.sen-pp-fields{grid-template-columns:1fr 1fr;align-content:start;gap:1.25cqw 2.2cqw;display:grid}.sen-pp-field{min-width:0}.sen-pp-field.full{grid-column:1/-1}.sen-pp-field .lbl{letter-spacing:.055em;text-transform:uppercase;color:#0f766e;font-size:.95cqw;font-weight:700;line-height:1.2;display:block}.sen-pp-field .lbl em{color:#4f8f88;letter-spacing:.03em;font-size:.88cqw;font-style:normal}.sen-pp-field .val{color:#14202e;letter-spacing:.015em;white-space:nowrap;text-overflow:ellipsis;font-size:1.62cqw;font-weight:800;line-height:1.25;display:block;overflow:hidden}.sen-pp-field .val.mono{letter-spacing:.04em;font-family:Courier New,ui-monospace,monospace}.sen-pp-ghost{aspect-ratio:130/192;opacity:.3;filter:grayscale(.35)contrast(.9)blur(.35px);pointer-events:none;border-radius:.4cqw;width:12.5cqw;position:absolute;bottom:12.5cqw;right:16.5cqw;overflow:hidden;box-shadow:inset 0 0 0 1px #0f766e59}.sen-pp-ghost img{object-fit:cover;width:100%;height:100%}.sen-pp-mrz{letter-spacing:.085em;color:#14202e;white-space:nowrap;background:#ffffff6b;border-top:.1cqw solid #0f766e59;padding:.9cqw .55cqw .3cqw;font-family:OCR B,Courier New,ui-monospace,monospace;font-size:1.62cqw;font-weight:700;line-height:1.32;position:absolute;bottom:1.35cqw;left:3.4cqw;right:3.4cqw;overflow:hidden}.sen-pp-mrz div{text-overflow:clip;overflow:hidden}.sen-pp-crease{box-shadow:inset 0 -10px 14px -8px #0000002e,inset 0 10px 14px -8px #0000002e}</style>
 
   <script>
 // Early global controllers guaranteed to be defined before body buttons render
@@ -6418,7 +5840,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-24 sm:min-h-28 md:min-h-32 lg:min-h-36 py-2.5 sm:py-3 flex items-center justify-between gap-4">
       <!-- Clean Brand Logo & Identity: GetKYCApproved -->
       <a id="site-brand-logo-link" href="/" onclick="goToHomePage(event)" class="flex items-center gap-3 group cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
-        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-18 sm:h-24 md:h-28 lg:h-32 w-auto max-w-[280px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
+        <img src="./assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-18 sm:h-24 md:h-28 lg:h-32 w-auto max-w-[280px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
         <span class="hidden 2xl:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
           <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
           <span>VERIFIED</span>
@@ -6463,7 +5885,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     <!-- Mobile Navigation Drawer / Dropdown Panel -->
     <div id="mobileNavDrawer" class="hidden lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-xl px-4 py-4 space-y-3 shadow-xl transition-all animate-in slide-in-from-top-3 duration-200">
       <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-14 sm:h-16 w-auto max-w-[240px] sm:max-w-[300px] object-contain">
+        <img src="./assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-14 sm:h-16 w-auto max-w-[240px] sm:max-w-[300px] object-contain">
         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
           <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
           <span>VERIFIED</span>
@@ -7478,7 +6900,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                   <!-- Photo Container Left -->
                   <div class="col-span-4 flex flex-col items-center">
                     <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                      <img id="previewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
+                      <img id="previewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
                     </div>
                   </div>
 
@@ -7843,7 +7265,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
                     <!-- Center: Kenya Coat of Arms -->
                     <div class="w-12 h-10 sm:w-14 sm:h-12 flex items-center justify-center shrink-0 -mt-0.5">
-                      <img src="/assets/aistudio/kenya_coat_of_arms.png" alt="Republic of Kenya Coat of Arms" class="h-full w-auto object-contain mix-blend-multiply drop-shadow-xs">
+                      <img src="./assets/aistudio/kenya_coat_of_arms.png" alt="Republic of Kenya Coat of Arms" class="h-full w-auto object-contain mix-blend-multiply drop-shadow-xs">
                     </div>
 
                     <!-- Right Title & ICAO Smart Chip Icon -->
@@ -7880,7 +7302,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                     <div class="col-span-4 flex flex-col items-center">
                       <div class="w-full aspect-[3.2/4.1] rounded-lg overflow-hidden border border-slate-300/80 shadow-xs relative bg-slate-200">
                         <!-- Specimen reference photo of bearer -->
-                        <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_kariuki.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                        <img id="kidPreviewPhoto" src="./assets/aistudio/kenya_maisha_portrait_kariuki.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
                         <!-- Authentic wavy security guilloche overlay on portrait -->
                         <div class="absolute inset-0 pointer-events-none opacity-45 mix-blend-multiply bg-[repeating-radial-gradient(ellipse_at_30%_50%,transparent_0,transparent_6px,rgba(16,185,129,0.22)_7px,transparent_8px)]"></div>
                         <div class="absolute inset-0 pointer-events-none opacity-30 mix-blend-color-burn bg-[repeating-linear-gradient(45deg,transparent_0,transparent_5px,rgba(244,63,94,0.2)_6px,transparent_7px)]"></div>
@@ -7977,10 +7399,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
                         <!-- Right Column: Located directly under Date of Birth (Maisha Logo + Bearer Signature) -->
                         <div class="col-span-5 flex flex-col items-center justify-start text-center pt-0.5">
-                          <img src="/assets/aistudio/kenya_maisha_logo.png" alt="Maisha Namba Logo" class="h-10 sm:h-12 w-auto max-w-full object-contain mix-blend-multiply drop-shadow-2xs">
+                          <img src="./assets/aistudio/kenya_maisha_logo.png" alt="Maisha Namba Logo" class="h-10 sm:h-12 w-auto max-w-full object-contain mix-blend-multiply drop-shadow-2xs">
                           <!-- Bearer Signature -->
                           <div class="h-5 sm:h-6 w-20 sm:w-24 flex items-center justify-center mt-1">
-                            <img id="kidBearerSignature" src="/assets/aistudio/kenya_bearer_signature_clean.png" alt="Bearer Signature" class="h-full w-auto object-contain mix-blend-multiply">
+                            <img id="kidBearerSignature" src="./assets/aistudio/kenya_bearer_signature_clean.png" alt="Bearer Signature" class="h-full w-auto object-contain mix-blend-multiply">
                           </div>
                         </div>
                       </div>
@@ -8036,12 +7458,12 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                         <div class="flex-1 flex flex-col items-center space-y-1.5">
                           <!-- Maasai Shield & Crossed Spears with G and K -->
                           <div class="w-14 sm:w-16 h-8 sm:h-9 flex items-center justify-center">
-                            <img src="/assets/aistudio/kenya_gk_emblem.png" alt="GK Maasai Shield" class="h-full w-auto object-contain mix-blend-multiply">
+                            <img src="./assets/aistudio/kenya_gk_emblem.png" alt="GK Maasai Shield" class="h-full w-auto object-contain mix-blend-multiply">
                           </div>
 
                           <!-- Metallic Gold Smartcard Chip (ISO 7816) -->
                           <div class="w-13 sm:w-16 aspect-[1.15/1] rounded-lg shadow-sm border border-amber-800/40 overflow-hidden">
-                            <img src="/assets/aistudio/kenya_chip_gold.png" alt="Gold Contact Chip" class="w-full h-full object-cover">
+                            <img src="./assets/aistudio/kenya_chip_gold.png" alt="Gold Contact Chip" class="w-full h-full object-cover">
                           </div>
                         </div>
                       </div>
@@ -8101,7 +7523,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
                         <!-- Ghost Secondary Portrait -->
                         <div class="w-10 sm:w-12 aspect-[3.2/4] rounded border border-slate-300/80 overflow-hidden shadow-2xs bg-slate-100 relative">
-                          <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_kariuki.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
+                          <img id="kidGhostPhoto" src="./assets/aistudio/kenya_maisha_ghost_kariuki.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
                         </div>
 
                         <!-- Principal Registrar Signature -->
@@ -8110,7 +7532,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                             PRINCIPAL REGISTRAR'S SIGN.
                           </span>
                           <div class="h-6 sm:h-7 w-20 sm:w-24 flex items-center justify-end mt-0.5">
-                            <img src="/assets/aistudio/kenya_registrar_signature.png" alt="Principal Registrar Signature" class="h-full w-auto object-contain mix-blend-multiply">
+                            <img src="./assets/aistudio/kenya_registrar_signature.png" alt="Principal Registrar Signature" class="h-full w-auto object-contain mix-blend-multiply">
                           </div>
                         </div>
                       </div>
@@ -8383,7 +7805,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
                   <!-- Central Coat of Arms Security Watermark (Teal / Cyan tinted as in real card) -->
                   <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.22] z-0 translate-x-5 sm:translate-x-8">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-60 sm:w-76 h-auto filter hue-rotate-165 saturate-200">
+                    <img src="./assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-60 sm:w-76 h-auto filter hue-rotate-165 saturate-200">
                   </div>
 
                   <!-- TOP ROW: National ID on Left, Centered Official Header, 8-Lobed Silver Metallic Rosette on Right -->
@@ -8519,7 +7941,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                     <div class="w-24 sm:w-28 md:w-32 shrink-0 flex flex-col items-center">
                       <!-- Bearer Portrait Photo (Exact image of Mohamed Ali Abdullahi) -->
                       <div class="w-full aspect-[3/3.8] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
-                        <img id="somSmartIdPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="somSmartIdPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Gender Field (Directly under the photo as in the reference card) -->
@@ -8545,7 +7967,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                   
                   <!-- Subtle Central Coat of Arms Security Watermark -->
                   <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] z-0">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-80 h-auto filter grayscale">
+                    <img src="./assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-80 h-auto filter grayscale">
                   </div>
                   <!-- Subtle botanical/leaf watermark pattern on the right side matching screenshot -->
                   <div class="absolute top-28 right-2 w-48 h-48 pointer-events-none opacity-[0.05] z-0">
@@ -8558,7 +7980,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                   <header class="relative z-10 flex items-center justify-between gap-2 sm:gap-3 pb-1">
                     <!-- Left: NIRA Seal -->
                     <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
-                      <img src="/assets/aistudio/somali_nira_left_seal.png" alt="NIRA Seal" class="w-full h-full object-contain">
+                      <img src="./assets/aistudio/somali_nira_left_seal.png" alt="NIRA Seal" class="w-full h-full object-contain">
                     </div>
 
                     <!-- Center: Official Hierarchy Header in Navy Blue (Exact wording and fonts) -->
@@ -8585,7 +8007,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
                     <!-- Right: Somali Coat of Arms -->
                     <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
-                      <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
+                      <img src="./assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
                     </div>
                   </header>
 
@@ -8605,7 +8027,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                     <!-- Left: Framed Applicant Photo (Exact match) -->
                     <div class="col-span-4 sm:col-span-3 flex justify-center">
                       <div class="w-24 sm:w-28 aspect-[3.2/4] p-1 bg-white border border-slate-300 shadow-xs relative">
-                        <img id="somPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Applicant Photo" class="w-full h-full object-cover">
+                        <img id="somPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Applicant Photo" class="w-full h-full object-cover">
                       </div>
                     </div>
 
@@ -8746,7 +8168,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <footer class="relative z-10 mt-4 pt-2 flex items-end justify-between gap-4">
                     <div class="flex-1 space-y-1">
                       <div class="h-10 sm:h-12 flex items-end">
-                        <img src="/assets/aistudio/somali_nira_signature.png" alt="Registrar General Signature" class="h-9 sm:h-11 w-auto object-contain">
+                        <img src="./assets/aistudio/somali_nira_signature.png" alt="Registrar General Signature" class="h-9 sm:h-11 w-auto object-contain">
                       </div>
                       <div class="text-[7.5px] sm:text-[8.5px] font-black text-slate-900 uppercase tracking-tight">
                         DIIWAANHAYAHA GUUD EE AQOONSIGA QARANKA / <span class="font-arabic font-normal">المسجل العام للهوية الوطنية</span> / REGISTRAR GENERAL OF NATIONAL ID
@@ -8758,7 +8180,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     </div>
                     <div class="shrink-0 flex flex-col items-center justify-end">
                       <div class="w-16 h-16 sm:w-20 sm:h-20 p-0.5 bg-white border border-slate-300 shadow-2xs">
-                        <img src="/assets/aistudio/somali_nira_qrcode.png" alt="NIRA QR Code" class="w-full h-full object-contain">
+                        <img src="./assets/aistudio/somali_nira_qrcode.png" alt="NIRA QR Code" class="w-full h-full object-contain">
                       </div>
                     </div>
                   </footer>
@@ -9063,7 +8485,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <!-- UPPER PAGE: PAGE 3 OBSERVATIONS & SIGNATURE -->
                     <div class="relative w-full aspect-[1.45/1] overflow-hidden border-b-2 border-dashed border-slate-400">
                       <!-- Background image of Page 3 Observations -->
-                      <img src="/assets/aistudio/somali_passport_obs_page.jpg" alt="Page 3 Observations" class="w-full h-full object-cover">
+                      <img src="./assets/aistudio/somali_passport_obs_page.jpg" alt="Page 3 Observations" class="w-full h-full object-cover">
 
                       <!-- Dynamic Perforated Passport Number Overlay on Top-Left of Page 3 -->
                       <div class="absolute left-6 top-8 pointer-events-none transform -rotate-90 origin-top-left font-mono-code text-xs sm:text-sm font-black tracking-[0.35em] text-slate-900/40 select-none">
@@ -9100,7 +8522,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <div class="grid grid-cols-12 gap-1 items-center pb-2 mb-2 border-b border-slate-300 relative z-10 text-[9px] sm:text-[10px]">
                         <div class="col-span-4 flex items-center gap-2">
                           <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
-                            <img src="/assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-full h-full object-contain">
+                            <img src="./assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-full h-full object-contain">
                           </div>
                           <div class="leading-none">
                             <div class="font-black text-slate-950 text-[10px] sm:text-[11px] tracking-wider">BAASABOOR</div>
@@ -9129,7 +8551,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
                         <div class="col-span-4 flex flex-col items-center">
                           <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                            <img id="somPassPreviewPhotoSpread" src="/assets/aistudio/uk_bearer_portrait.png" alt="" class="w-full h-full object-cover">
+                            <img id="somPassPreviewPhotoSpread" src="./assets/aistudio/uk_bearer_portrait.png" alt="" class="w-full h-full object-cover">
                           </div>
                         </div>
                         <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
@@ -9250,7 +8672,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                   <!-- Central Faint Coat of Arms Security Watermark -->
                   <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.09] z-0 translate-x-4">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 h-auto filter grayscale">
+                    <img src="./assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 h-auto filter grayscale">
                   </div>
 
                   <!-- Faint Pink / Magenta Rosette Watermark (Top-Right of center) -->
@@ -9265,7 +8687,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <div class="relative z-10 flex items-start justify-between gap-2 pb-1">
                     <!-- Left: Somali Coat of Arms -->
                     <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 flex items-center justify-center">
-                      <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
+                      <img src="./assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
                     </div>
 
                     <!-- Center: 5 Official Header Lines -->
@@ -9305,7 +8727,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                       <!-- Lenticular Oval Ghost Portrait Lens -->
                       <div class="w-11 sm:w-13 h-7 sm:h-8 rounded-[50%] overflow-hidden border border-slate-400/80 shadow-2xs relative bg-slate-200 flex items-center justify-center">
-                        <img id="somPassIdCardGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="" class="w-full h-full object-cover filter grayscale contrast-125 opacity-70">
+                        <img id="somPassIdCardGhostPhoto" src="./assets/aistudio/uk_bearer_ghost.png" alt="" class="w-full h-full object-cover filter grayscale contrast-125 opacity-70">
                         <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(90deg, rgba(0,0,0,0.18) 0px, rgba(0,0,0,0.18) 1px, transparent 1px, transparent 3px);"></div>
                       </div>
                     </div>
@@ -9389,12 +8811,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <div class="col-span-3 sm:col-span-3 flex flex-col items-center">
                       <!-- Bearer Portrait Photo -->
                       <div class="w-full aspect-[3/3.7] rounded-sm overflow-hidden border border-slate-300 shadow-xs bg-slate-100 relative">
-                        <img id="somPassIdCardPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="somPassIdCardPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Holder's Signature block directly under photo -->
                       <div class="w-full mt-1.5">
-                        <img src="/assets/aistudio/somali_card_signature_block.png" alt="Holder's Signature" class="w-full h-auto object-contain">
+                        <img src="./assets/aistudio/somali_card_signature_block.png" alt="Holder's Signature" class="w-full h-auto object-contain">
                       </div>
                     </div>
 
@@ -9537,7 +8959,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                   <!-- Central Coat of Arms Security Hologram / Watermark -->
                   <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.07] z-0">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 h-auto filter grayscale">
+                    <img src="./assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 h-auto filter grayscale">
                   </div>
 
                   <!-- Curved Holographic SOMALIA Ribbon on Right -->
@@ -9557,7 +8979,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                     <!-- Center: Somali National Coat of Arms -->
                     <div class="w-9 h-9 sm:w-11 sm:h-11 shrink-0 flex items-center justify-center px-1">
-                      <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="Coat of Arms" class="w-full h-full object-contain drop-shadow-xs">
+                      <img src="./assets/aistudio/somali_nira_coat_of_arms.png" alt="Coat of Arms" class="w-full h-full object-contain drop-shadow-xs">
                     </div>
 
                     <!-- Right: Department of Motor Vehicles / International Permit -->
@@ -9579,12 +9001,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <!-- Left: Bearer Photo & Signature -->
                     <div class="w-24 sm:w-28 shrink-0 flex flex-col items-center justify-between">
                       <div class="w-full aspect-[3/3.8] rounded-lg overflow-hidden border border-slate-300/90 shadow-sm bg-slate-200 relative">
-                        <img id="somLicPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Driver Portrait" class="w-full h-full object-cover">
+                        <img id="somLicPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Driver Portrait" class="w-full h-full object-cover">
                       </div>
                       
                       <!-- Holder Signature -->
                       <div class="w-full mt-1.5 pt-1 border-t border-slate-300 text-center flex items-center justify-center h-8">
-                        <img id="somLicPreviewSignature" src="/assets/aistudio/somali_nira_signature.png" alt="Signature" class="max-h-7 max-w-full object-contain filter contrast-125">
+                        <img id="somLicPreviewSignature" src="./assets/aistudio/somali_nira_signature.png" alt="Signature" class="max-h-7 max-w-full object-contain filter contrast-125">
                       </div>
                     </div>
 
@@ -9643,7 +9065,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         <!-- Secondary Ghost Portrait -->
                         <div class="flex items-center gap-1.5 opacity-80">
                           <div class="w-10 h-12 rounded overflow-hidden border border-slate-300/70 bg-slate-100 shadow-2xs">
-                            <img id="somLicGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover filter contrast-110">
+                            <img id="somLicGhostPhoto" src="./assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover filter contrast-110">
                           </div>
                         </div>
                       </div>
@@ -9832,7 +9254,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <header class="flex justify-between items-center relative z-10">
                   <!-- Left: Ethiopian Flag (Clean Crisp Rectangle matching reference) -->
                   <div class="w-14 sm:w-18 aspect-[1.62/1] rounded-xs shadow-xs overflow-hidden border border-slate-300/80 shrink-0">
-                    <img src="/assets/aistudio/ethiopia_flag.png" alt="Ethiopian Flag" class="w-full h-full object-cover">
+                    <img src="./assets/aistudio/ethiopia_flag.png" alt="Ethiopian Flag" class="w-full h-full object-cover">
                   </div>
 
                   <!-- Center: Bilingual Titles -->
@@ -9871,7 +9293,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <!-- Left: Bearer Portrait -->
                   <div class="col-span-4 flex flex-col items-center">
                     <div id="ethPortraitContainer" class="w-full aspect-[3.1/3.9] rounded-2xl overflow-hidden shadow-xs relative bg-transparent flex items-center justify-center">
-                      <img id="ethPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Fayda Bearer Photo" class="w-full h-full object-cover rounded-2xl">
+                      <img id="ethPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Fayda Bearer Photo" class="w-full h-full object-cover rounded-2xl">
                     </div>
                   </div>
 
@@ -10179,7 +9601,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   
                   <!-- Background Watermark Nigerian Coat of Arms -->
                   <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.14] overflow-hidden">
-                    <img src="/assets/aistudio/nigeria_coat_of_arms_watermark.png" alt="" class="w-[280px] sm:w-[320px] h-auto object-contain">
+                    <img src="./assets/aistudio/nigeria_coat_of_arms_watermark.png" alt="" class="w-[280px] sm:w-[320px] h-auto object-contain">
                   </div>
 
                   <!-- Card Header: Country & Title -->
@@ -10198,7 +9620,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <!-- Left: Microchip and Arrow Indicator -->
                     <div class="flex items-center gap-1.5 shrink-0 pt-2">
                       <span class="text-black text-xs font-bold">◄</span>
-                      <img src="/assets/aistudio/nigeria_chip_exact.png" alt="Smart Chip" class="w-11 sm:w-13 h-auto object-contain drop-shadow-xs">
+                      <img src="./assets/aistudio/nigeria_chip_exact.png" alt="Smart Chip" class="w-11 sm:w-13 h-auto object-contain drop-shadow-xs">
                     </div>
 
                     <!-- Center: Structured Bio-Data Typography -->
@@ -10250,9 +9672,9 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <!-- Right: Large Bearer Portrait Photo + Overlaid Signature -->
                     <div class="relative shrink-0 pt-0.5">
                       <div class="w-24 sm:w-28 md:w-32 aspect-[3/4] rounded-md overflow-hidden border border-slate-300 shadow-sm bg-white">
-                        <img id="ngaPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover">
+                        <img id="ngaPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover">
                       </div>
-                      <img id="ngaPreviewSignature" src="/assets/aistudio/nigeria_signature.png" alt="Signature" class="absolute -bottom-2 -left-6 w-24 sm:w-28 h-auto pointer-events-none drop-shadow-xs object-contain">
+                      <img id="ngaPreviewSignature" src="./assets/aistudio/nigeria_signature.png" alt="Signature" class="absolute -bottom-2 -left-6 w-24 sm:w-28 h-auto pointer-events-none drop-shadow-xs object-contain">
                     </div>
                   </div>
 
@@ -10262,10 +9684,10 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <!-- Bottom-Left: Ghost Oval, NIMC Logo, NGA Hologram -->
                     <div class="flex items-center gap-2 shrink-0">
                       <div class="w-9 sm:w-11 h-12 sm:h-14 rounded-[50%] overflow-hidden border border-emerald-700/60 grayscale contrast-125 opacity-80 shrink-0 bg-white/40 shadow-xs">
-                        <img id="ngaGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover">
+                        <img id="ngaGhostPhoto" src="./assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover">
                       </div>
-                      <img src="/assets/aistudio/nigeria_nimc_logo.png" alt="NIMC" class="h-6 sm:h-7 w-auto object-contain">
-                      <img src="/assets/aistudio/nigeria_nga_hologram_exact.png" alt="Hologram" class="h-6 sm:h-7 w-auto object-contain drop-shadow-xs">
+                      <img src="./assets/aistudio/nigeria_nimc_logo.png" alt="NIMC" class="h-6 sm:h-7 w-auto object-contain">
+                      <img src="./assets/aistudio/nigeria_nga_hologram_exact.png" alt="Hologram" class="h-6 sm:h-7 w-auto object-contain drop-shadow-xs">
                     </div>
 
                     <!-- Center-Bottom: Large 16-Digit Card Number -->
@@ -10511,14 +9933,14 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     
                     <!-- Background Watermark Coat of Arms -->
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.07] overflow-hidden">
-                      <img src="/assets/aistudio/nigeria_coat_of_arms_watermark.png" alt="" class="w-[320px] h-[320px] object-contain">
+                      <img src="./assets/aistudio/nigeria_coat_of_arms_watermark.png" alt="" class="w-[320px] h-[320px] object-contain">
                     </div>
 
                     <!-- Header -->
                     <header class="flex justify-between items-center pb-1.5 mb-1.5 border-b border-emerald-900/25 relative z-10">
                       <!-- Left: Nigerian Coat of Arms -->
                       <div class="w-8 h-8 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center">
-                        <img src="/assets/aistudio/nigeria_coat_of_arms.png" alt="Coat of Arms" class="w-full h-full object-contain drop-shadow-xs">
+                        <img src="./assets/aistudio/nigeria_coat_of_arms.png" alt="Coat of Arms" class="w-full h-full object-contain drop-shadow-xs">
                       </div>
 
                       <!-- Center: Official Country Title -->
@@ -10533,7 +9955,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                       <!-- Right: e-Passport Contactless Microchip Logo -->
                       <div class="w-7 h-7 sm:w-8 sm:h-8 shrink-0 flex items-center justify-center">
-                        <img src="/assets/aistudio/nigeria_chip_exact.png" alt="e-Passport Chip" class="w-full h-full object-contain">
+                        <img src="./assets/aistudio/nigeria_chip_exact.png" alt="e-Passport Chip" class="w-full h-full object-contain">
                       </div>
                     </header>
 
@@ -10562,11 +9984,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <!-- Left Column: Primary Portrait + Ghost + Hologram + Signature -->
                       <div class="col-span-4 flex flex-col items-center space-y-1.5">
                         <div class="relative w-full aspect-[3.2/4] bg-slate-200 border-2 border-emerald-900/40 rounded overflow-hidden shadow-sm flex items-center justify-center">
-                          <img id="ngaPassPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
+                          <img id="ngaPassPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
                           
                           <!-- Hologram Overlay on Photo Corner -->
                           <div class="absolute bottom-1 right-1 w-6 h-6 sm:w-7 sm:h-7 pointer-events-none">
-                            <img src="/assets/aistudio/nigeria_nga_hologram_exact.png" alt="NGA Hologram" class="w-full h-full object-contain drop-shadow">
+                            <img src="./assets/aistudio/nigeria_nga_hologram_exact.png" alt="NGA Hologram" class="w-full h-full object-contain drop-shadow">
                           </div>
                         </div>
 
@@ -10574,13 +9996,13 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         <div class="w-full flex items-center justify-between gap-1 pt-0.5">
                           <!-- Small Ghost Photo -->
                           <div class="w-9 h-11 bg-slate-100 border border-emerald-400/80 rounded overflow-hidden shadow-2xs shrink-0">
-                            <img id="ngaPassGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-75">
+                            <img id="ngaPassGhostPhoto" src="./assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-75">
                           </div>
 
                           <!-- Signature container -->
                           <div class="flex-1 text-center">
                             <div class="h-6 flex items-center justify-center overflow-hidden">
-                              <img id="ngaPassPreviewSig" src="/assets/aistudio/nigeria_signature_exact.png" alt="Signature" class="h-full object-contain">
+                              <img id="ngaPassPreviewSig" src="./assets/aistudio/nigeria_signature_exact.png" alt="Signature" class="h-full object-contain">
                             </div>
                             <span class="block text-[6.5px] text-slate-500 font-bold uppercase leading-none mt-0.5">Holder's Signature</span>
                           </div>
@@ -10665,7 +10087,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <!-- 2. OFFICIAL NIS 2-PAGE SPECIMEN SPREAD VIEW (ACCESSIBLE VIA TAB) -->
                 <div id="ngaPassSpecimenSpreadWrap" class="hidden w-full space-y-3">
                   <div class="relative w-full rounded-2xl shadow-xl border-2 border-emerald-900/30 overflow-hidden bg-slate-100 group">
-                    <img src="/assets/aistudio/69630175_2557795237596924_14262306489761792_n_a6b46ae8.jpg" alt="Official Federal Republic of Nigeria Standard Passport Specimen" class="w-full h-auto object-cover">
+                    <img src="./assets/aistudio/69630175_2557795237596924_14262306489761792_n_a6b46ae8.jpg" alt="Official Federal Republic of Nigeria Standard Passport Specimen" class="w-full h-auto object-cover">
                     
                     <div class="absolute bottom-2.5 right-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10.5px] px-2.5 py-1 rounded-lg font-mono-code font-bold flex items-center gap-1.5 shadow-md">
                       <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -10955,7 +10377,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                       <!-- Portrait Frame -->
                       <div class="w-full aspect-[3.2/4] max-w-[150px] bg-slate-200 border border-slate-400 rounded-xs overflow-hidden shadow-sm flex items-center justify-center relative">
-                        <img id="ukPassPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
+                        <img id="ukPassPreviewPhoto" src="./assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Bottom Decorative Spiral Scrolls -->
@@ -11036,7 +10458,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                             Holder's signature/Signature du titulaire (10)
                           </span>
                           <div class="h-8 sm:h-10 w-full flex items-center justify-center">
-                            <img id="ukPassPreviewSig" src="/assets/aistudio/uk_bond_sig_clean_alpha.png" alt="James Bond Signature" class="max-h-full max-w-[120px] object-contain">
+                            <img id="ukPassPreviewSig" src="./assets/aistudio/uk_bond_sig_clean_alpha.png" alt="James Bond Signature" class="max-h-full max-w-[120px] object-contain">
                           </div>
                         </div>
                       </div>
@@ -11200,13 +10622,13 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 
                 <!-- Security Pattern Watermark Overlay -->
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] z-0">
-                  <img src="/assets/aistudio/uganda_coat_of_arms.png" alt="Uganda Crest Watermark" class="w-72 h-72 object-contain grayscale">
+                  <img src="./assets/aistudio/uganda_coat_of_arms.png" alt="Uganda Crest Watermark" class="w-72 h-72 object-contain grayscale">
                 </div>
 
                 <!-- CARD HEADER: Coat of Arms + Country & Title -->
                 <header class="relative z-10 flex items-center gap-4 border-b border-slate-200/90 pb-2.5">
                   <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
-                    <img src="/assets/aistudio/uganda_coat_of_arms.png" alt="Coat of Arms of Uganda" class="w-full h-full object-contain drop-shadow-2xs">
+                    <img src="./assets/aistudio/uganda_coat_of_arms.png" alt="Coat of Arms of Uganda" class="w-full h-full object-contain drop-shadow-2xs">
                   </div>
                   <div class="leading-tight">
                     <h2 class="font-extrabold text-base sm:text-lg md:text-xl text-slate-900 tracking-tight">
@@ -11224,7 +10646,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <!-- Left: Portrait Photo Frame -->
                   <div class="col-span-4 sm:col-span-3.5 flex flex-col items-center">
                     <div class="w-full aspect-[3.1/4] max-w-[140px] bg-slate-200 border-2 border-slate-300 rounded-sm overflow-hidden shadow-sm relative">
-                      <img id="ugaPreviewPhoto" src="/assets/aistudio/image_03cac193.png" alt="Refugee Photo" class="w-full h-full object-cover">
+                      <img id="ugaPreviewPhoto" src="./assets/aistudio/image_03cac193.png" alt="Refugee Photo" class="w-full h-full object-cover">
                     </div>
                   </div>
 
@@ -11711,7 +11133,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <div class="relative z-10 flex items-start justify-between gap-1 pl-1.5 sm:pl-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
                           <!-- Pakistan Green State Emblem (Exact reference) -->
-                          <img src="/assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-7 sm:w-9 h-auto object-contain shrink-0 drop-shadow-2xs">
+                          <img src="./assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-7 sm:w-9 h-auto object-contain shrink-0 drop-shadow-2xs">
                           <div>
                             <div class="flex items-baseline gap-1.5 flex-wrap">
                               <span class="text-[#0d4022] font-black text-sm sm:text-base md:text-lg tracking-wider leading-none">PAKISTAN</span>
@@ -11724,7 +11146,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         </div>
 
                         <!-- Right Flag Badge (Exact reference) -->
-                        <img src="/assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-8 sm:w-10 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
+                        <img src="./assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-8 sm:w-10 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
                       </div>
 
                       <!-- Middle & Data Section: Chip + Grid Fields + Portrait -->
@@ -11732,10 +11154,10 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         
                         <!-- Left: Gold Chip & Ghost Avatar with 68413 Track watermark -->
                         <div class="flex flex-col items-center gap-1.5 shrink-0 w-10 sm:w-12">
-                          <img src="/assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
+                          <img src="./assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
                           <!-- Ghost / Secondary Avatar with 68413 watermark -->
                           <div class="w-8 sm:w-9 h-auto flex items-center justify-center">
-                            <img src="/assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
+                            <img src="./assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
                           </div>
                         </div>
 
@@ -11800,11 +11222,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         <!-- Right: Portrait Frame with Reference Photo & Signature -->
                         <div class="flex flex-col items-center shrink-0 w-20 sm:w-24">
                           <div class="w-full aspect-[3/3.85] rounded-md overflow-hidden border border-white bg-white shadow-xs">
-                            <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
+                            <img src="./assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
                           </div>
                           <!-- Holder's Signature -->
                           <div class="w-full text-center mt-0.5">
-                            <img src="/assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-5 sm:h-6.5 w-auto object-contain mx-auto">
+                            <img src="./assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-5 sm:h-6.5 w-auto object-contain mx-auto">
                             <div id="pakShowcaseSignature" class="pak-sig-text hidden font-serif italic font-bold text-xs sm:text-sm text-slate-800 leading-none">Sobia Bashir</div>
                             <div class="text-[6px] sm:text-[7px] text-[#406852] font-medium leading-none mt-0.5">Holder's Signature</div>
                           </div>
@@ -11968,7 +11390,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         <!-- Top Header Bar -->
                         <div class="relative z-10 flex items-start justify-between gap-1 pl-1.5 sm:pl-2">
                           <div class="flex items-center gap-1.5 sm:gap-2">
-                            <img src="/assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-7 sm:w-9 h-auto object-contain shrink-0 drop-shadow-2xs">
+                            <img src="./assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-7 sm:w-9 h-auto object-contain shrink-0 drop-shadow-2xs">
                             <div>
                               <div class="flex items-baseline gap-1.5 flex-wrap">
                                 <span class="text-[#0d4022] font-black text-sm sm:text-base md:text-lg tracking-wider leading-none">PAKISTAN</span>
@@ -11980,16 +11402,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                             </div>
                           </div>
 
-                          <img src="/assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-8 sm:w-10 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
+                          <img src="./assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-8 sm:w-10 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
                         </div>
 
                         <!-- Middle Grid -->
                         <div class="relative z-10 flex items-center justify-between gap-2 my-auto pl-1 sm:pl-2 pt-0.5">
                           <!-- Left: Gold Chip & Ghost Avatar -->
                           <div class="flex flex-col items-center gap-1.5 shrink-0 w-10 sm:w-12">
-                            <img src="/assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
+                            <img src="./assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
                             <div class="w-8 sm:w-9 h-auto flex items-center justify-center">
-                              <img src="/assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
+                              <img src="./assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
                             </div>
                           </div>
 
@@ -12052,10 +11474,10 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                           <div class="flex flex-col items-center shrink-0 w-20 sm:w-24">
                             <div class="w-full aspect-[3/3.85] rounded-md overflow-hidden border border-white bg-white shadow-xs">
-                              <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
+                              <img src="./assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
                             </div>
                             <div class="w-full text-center mt-0.5">
-                              <img src="/assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-5 sm:h-6.5 w-auto object-contain mx-auto">
+                              <img src="./assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-5 sm:h-6.5 w-auto object-contain mx-auto">
                               <div id="pakPreviewSignature" class="pak-sig-text hidden font-serif italic font-bold text-xs sm:text-sm text-slate-800 leading-none">Sobia Bashir</div>
                               <div class="text-[6px] sm:text-[7px] text-[#406852] font-medium leading-none mt-0.5">Holder's Signature</div>
                             </div>
@@ -12192,7 +11614,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                     <div class="relative z-10 flex items-start justify-between gap-2 pl-2 sm:pl-3">
                       <div class="flex items-center gap-2">
-                        <img src="/assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-8 sm:w-11 h-auto object-contain shrink-0 drop-shadow-2xs">
+                        <img src="./assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-8 sm:w-11 h-auto object-contain shrink-0 drop-shadow-2xs">
                         <div>
                           <div class="flex items-baseline gap-2 flex-wrap">
                             <span class="text-[#0d4022] font-black text-base sm:text-xl tracking-wider leading-none">PAKISTAN</span>
@@ -12204,15 +11626,15 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         </div>
                       </div>
 
-                      <img src="/assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-10 sm:w-12 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
+                      <img src="./assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-10 sm:w-12 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
                     </div>
 
                     <div class="relative z-10 flex items-center justify-between gap-3 my-auto pl-2 sm:pl-3 pt-1">
                       <!-- Left: Gold Chip & Ghost Avatar -->
                       <div class="flex flex-col items-center gap-2 shrink-0 w-12 sm:w-14">
-                        <img src="/assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
+                        <img src="./assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
                         <div class="w-9 sm:w-11 h-auto flex items-center justify-center">
-                          <img src="/assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
+                          <img src="./assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
                         </div>
                       </div>
 
@@ -12271,10 +11693,10 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                       <div class="flex flex-col items-center shrink-0 w-24 sm:w-28">
                         <div class="w-full aspect-[3/3.85] rounded-md overflow-hidden border border-white bg-white shadow-xs">
-                          <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
+                          <img src="./assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
                         </div>
                         <div class="w-full text-center mt-1">
-                          <img src="/assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-6 sm:h-7.5 w-auto object-contain mx-auto">
+                          <img src="./assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-6 sm:h-7.5 w-auto object-contain mx-auto">
                           <div id="pakSingleFrontSignature" class="pak-sig-text hidden font-serif italic font-bold text-sm sm:text-base text-slate-800 leading-none">Sobia Bashir</div>
                           <div class="text-[7px] sm:text-[8px] text-[#406852] font-medium leading-none mt-0.5">Holder's Signature</div>
                         </div>
@@ -12409,7 +11831,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       </a>
                     </div>
                     <div class="rounded-xl overflow-hidden border border-slate-200 bg-stone-100 flex items-center justify-center p-2 shadow-inner">
-                      <img src="/assets/aistudio/1792952087537_9a2ef351.jpg" alt="Pakistan CNIC Reference Specimen" class="max-w-full h-auto rounded-lg shadow-md">
+                      <img src="./assets/aistudio/1792952087537_9a2ef351.jpg" alt="Pakistan CNIC Reference Specimen" class="max-w-full h-auto rounded-lg shadow-md">
                     </div>
                   </div>
                 </div>
@@ -12635,7 +12057,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       
                       <!-- Top Decorative Motif Band -->
                       <div class="absolute top-0 left-0 right-0 h-3 sm:h-3.5 md:h-4 overflow-hidden pointer-events-none opacity-90">
-                        <img src="/assets/aistudio/seychelles_top_border.png" alt="" class="w-full h-full object-cover">
+                        <img src="./assets/aistudio/seychelles_top_border.png" alt="" class="w-full h-full object-cover">
                       </div>
 
                       <!-- Header: SEYCHELLES NATIONAL IDENTITY CARD -->
@@ -12692,11 +12114,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         <!-- Right: Photo with Black Frame & Signature Below -->
                         <div class="flex flex-col items-center shrink-0 w-22 sm:w-26 md:w-30">
                           <div class="w-full aspect-[3/3.8] rounded-xs overflow-hidden border-2 border-slate-950 bg-white shadow-xs">
-                            <img id="sycPreviewPhoto" src="/assets/aistudio/seychelles_portrait_exact.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
+                            <img id="sycPreviewPhoto" src="./assets/aistudio/seychelles_portrait_exact.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
                           </div>
                           <div class="relative w-full flex flex-col items-center mt-1">
                             <span class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">Signature</span>
-                            <img id="sycPreviewSignature" src="/assets/aistudio/seychelles_holder_sig.png" alt="Signature" class="h-5 sm:h-6 md:h-7 w-auto object-contain mix-blend-multiply mt-0.5">
+                            <img id="sycPreviewSignature" src="./assets/aistudio/seychelles_holder_sig.png" alt="Signature" class="h-5 sm:h-6 md:h-7 w-auto object-contain mix-blend-multiply mt-0.5">
                           </div>
                         </div>
 
@@ -12704,7 +12126,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                       <!-- Bottom Row: 1D Linear Barcode -->
                       <div class="relative z-10 pt-1">
-                        <img src="/assets/aistudio/seychelles_barcode_clean.png" alt="Card Barcode" class="h-6 sm:h-7 md:h-8 w-auto max-w-[200px] sm:max-w-[240px] object-contain mix-blend-multiply">
+                        <img src="./assets/aistudio/seychelles_barcode_clean.png" alt="Card Barcode" class="h-6 sm:h-7 md:h-8 w-auto max-w-[200px] sm:max-w-[240px] object-contain mix-blend-multiply">
                       </div>
 
                     </article>
@@ -12724,13 +12146,13 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         
                         <!-- Left: Contact Microchip -->
                         <div class="shrink-0 pt-2 sm:pt-3">
-                          <img src="/assets/aistudio/seychelles_chip_exact.png" alt="Smart Chip" class="w-10 sm:w-12 md:w-14 h-auto object-contain rounded-xs shadow-xs drop-shadow-2xs">
+                          <img src="./assets/aistudio/seychelles_chip_exact.png" alt="Smart Chip" class="w-10 sm:w-12 md:w-14 h-auto object-contain rounded-xs shadow-xs drop-shadow-2xs">
                         </div>
 
                         <!-- Center: Ghost Photo with ID Number -->
                         <div class="flex flex-col items-center">
                           <div class="w-12 sm:w-14 md:w-16 aspect-[3/3.8] rounded-xs overflow-hidden opacity-85">
-                            <img id="sycPreviewGhost" src="/assets/aistudio/seychelles_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover">
+                            <img id="sycPreviewGhost" src="./assets/aistudio/seychelles_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover">
                           </div>
                           <span id="sycPreviewGhostId" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider mt-0.5">79271098712</span>
                         </div>
@@ -12739,7 +12161,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         <div class="flex flex-col items-end text-right">
                           <span class="text-[7px] sm:text-[8px] text-slate-600 font-medium leading-tight">Authority / Autorité</span>
                           <span class="text-[7.5px] sm:text-[8.5px] font-black text-slate-900 leading-tight">NATIONAL IDENTIFICATION AUTHORITY</span>
-                          <img src="/assets/aistudio/seychelles_auth_signature_exact.png" alt="Authority Signature" class="h-7 sm:h-9 md:h-11 w-auto object-contain mix-blend-multiply mt-0.5">
+                          <img src="./assets/aistudio/seychelles_auth_signature_exact.png" alt="Authority Signature" class="h-7 sm:h-9 md:h-11 w-auto object-contain mix-blend-multiply mt-0.5">
                         </div>
 
                       </div>
@@ -12952,7 +12374,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <div>
                       <div class="sen-pp-doclabel">Passeport<span class="en">Passport</span></div>
                       <div class="sen-pp-photo">
-                        <img class="sen-photo-ref-container" src="/assets/aistudio/senegal_passport_portrait.jpg" alt="Portrait du titulaire">
+                        <img class="sen-photo-ref-container" src="./assets/aistudio/senegal_passport_portrait.jpg" alt="Portrait du titulaire">
                         <img class="sen-photo-custom-img hidden" alt="Portrait du titulaire">
                       </div>
                       <div class="sen-pp-sign-box">
@@ -12977,7 +12399,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     </div>
                   </div>
                   <div class="sen-pp-ghost">
-                    <img class="sen-ghost-ref-container" src="/assets/aistudio/senegal_passport_ghost.jpg" alt="">
+                    <img class="sen-ghost-ref-container" src="./assets/aistudio/senegal_passport_ghost.jpg" alt="">
                     <img class="sen-ghost-img hidden" alt="">
                   </div>
                   <div class="sen-pp-mrz">
@@ -13002,7 +12424,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <div>
                     <div class="sen-pp-doclabel">Passeport<span class="en">Passport</span></div>
                     <div class="sen-pp-photo">
-                      <img class="sen-photo-ref-container" src="/assets/aistudio/senegal_passport_portrait.jpg" alt="Portrait du titulaire">
+                      <img class="sen-photo-ref-container" src="./assets/aistudio/senegal_passport_portrait.jpg" alt="Portrait du titulaire">
                       <img class="sen-photo-custom-img hidden" alt="Portrait du titulaire">
                     </div>
                     <div class="sen-pp-sign-box">
@@ -13027,7 +12449,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   </div>
                 </div>
                 <div class="sen-pp-ghost">
-                  <img class="sen-ghost-ref-container" src="/assets/aistudio/senegal_passport_ghost.jpg" alt="">
+                  <img class="sen-ghost-ref-container" src="./assets/aistudio/senegal_passport_ghost.jpg" alt="">
                   <img class="sen-ghost-img hidden" alt="">
                 </div>
                 <div class="sen-pp-mrz">
@@ -13271,7 +12693,7 @@ COD REP DEM CONGO</div>
                   <div class="mt-[6%]">
                     <div class="font-bold uppercase tracking-[0.13em] text-[#3f5f8f]" style="font-size: 1.5cqw;">Signature du titulaire / Signature of bearer</div>
                     <div class="mt-[1.4%] w-[62%] border-b border-[#a9b4cd] pb-[0.8cqw]">
-                      <img id="drcOutSignature" src="/assets/aistudio/drc_passport_signature.png" alt="Signature of bearer" class="object-contain object-left" style="height: 8.4cqw; width: auto;">
+                      <img id="drcOutSignature" src="./assets/aistudio/drc_passport_signature.png" alt="Signature of bearer" class="object-contain object-left" style="height: 8.4cqw; width: auto;">
                     </div>
                   </div>
 
@@ -13337,7 +12759,7 @@ COD REP DEM CONGO</div>
                     <!-- main monochrome portrait with security ghosting overprint -->
                     <div class="shrink-0" style="width: 27%;">
                       <div class="relative border border-[#9fb0c9] shadow-sm overflow-hidden" style="background:#fff; padding: 2px;">
-                        <img id="drcOutPhotoMain" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Bearer photograph" class="w-full object-cover object-top" style="height: 32cqw; filter: grayscale(1) contrast(1.08);">
+                        <img id="drcOutPhotoMain" src="./assets/aistudio/drc_passport_portrait.jpg" alt="Bearer photograph" class="w-full object-cover object-top" style="height: 32cqw; filter: grayscale(1) contrast(1.08);">
                         <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: repeating-linear-gradient(102deg, rgba(255,255,255,0.22) 0 1px, rgba(255,255,255,0) 1px 5px);"></div>
                         <div class="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden="true" style="transform: rotate(-13deg);">
                           <span class="font-black uppercase text-white" style="font-size: 2.5cqw; letter-spacing: 0.16em; opacity: 0.34; text-shadow: 0 0 1px rgba(0,0,0,0.5);">COD·RDC·COD</span>
@@ -13390,7 +12812,7 @@ COD REP DEM CONGO</div>
                       </div>
 
                       <div class="relative mt-[2.4cqw] border border-[#9fb0c9] shadow-sm overflow-hidden" style="padding: 2px; background: rgba(255,255,255,0.55);">
-                        <img id="drcOutPhotoSecondary" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Secondary ghost photograph" class="w-full object-cover object-top" style="height: 23cqw; filter: grayscale(1) contrast(1.02); opacity: 0.62; mix-blend-mode: luminosity;">
+                        <img id="drcOutPhotoSecondary" src="./assets/aistudio/drc_passport_portrait.jpg" alt="Secondary ghost photograph" class="w-full object-cover object-top" style="height: 23cqw; filter: grayscale(1) contrast(1.02); opacity: 0.62; mix-blend-mode: luminosity;">
                         <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: conic-gradient(from 210deg, rgba(253,230,138,0.42), rgba(240,171,252,0.40), rgba(165,180,252,0.42), rgba(252,211,77,0.36), rgba(253,186,116,0.40), rgba(253,230,138,0.42)); opacity: 0.55; mix-blend-mode: overlay;"></div>
                         <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: repeating-linear-gradient(0deg, rgba(255,255,255,0.30) 0 1px, rgba(255,255,255,0) 1px 4px); opacity: 0.8;"></div>
                       </div>
@@ -13597,7 +13019,7 @@ COD REP DEM CONGO</div>
               <article id="proof-of-account-card" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden font-sans max-w-2xl mx-auto transition-all">
                 <!-- Header Banner -->
                 <div class="w-full relative overflow-hidden bg-black text-white select-none">
-                  <img src="/assets/aistudio/proof_of_account_header.png" alt="Proof of Account - Grey" class="w-full h-auto object-cover block">
+                  <img src="./assets/aistudio/proof_of_account_header.png" alt="Proof of Account - Grey" class="w-full h-auto object-cover block">
                 </div>
 
                 <!-- Letter Body -->
@@ -13709,14 +13131,14 @@ COD REP DEM CONGO</div>
                         <span>Page 1: Account Confirmation</span>
                         <a href="/assets/aistudio/proof_of_account_page_1.png" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full PNG &rarr;</a>
                       </div>
-                      <img src="/assets/aistudio/proof_of_account_page_1.png" alt="Proof of Account Page 1" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
+                      <img src="./assets/aistudio/proof_of_account_page_1.png" alt="Proof of Account Page 1" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
                     </div>
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                       <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
                         <span>Page 2: Delaware Registration Notice</span>
                         <a href="/assets/aistudio/proof_of_account_page_2.png" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full PNG &rarr;</a>
                       </div>
-                      <img src="/assets/aistudio/proof_of_account_page_2.png" alt="Proof of Account Page 2" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
+                      <img src="./assets/aistudio/proof_of_account_page_2.png" alt="Proof of Account Page 2" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
                     </div>
                   </div>
                 </div>
@@ -14472,7 +13894,7 @@ COD REP DEM CONGO</div>
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
       <div class="flex flex-col sm:flex-row items-center gap-3.5 text-center sm:text-left">
         <a href="/" onclick="goToHomePage(event)" class="inline-flex items-center cursor-pointer group" aria-label="GetKYCApproved Home">
-          <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-16 sm:h-20 md:h-24 w-auto max-w-[260px] sm:max-w-[360px] md:max-w-[460px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
+          <img src="./assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-16 sm:h-20 md:h-24 w-auto max-w-[260px] sm:max-w-[360px] md:max-w-[460px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
         </a>
         <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
         <div class="text-slate-500 font-medium">
