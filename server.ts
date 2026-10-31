@@ -136,11 +136,27 @@ function loadStore(): void {
       const raw = fs.readFileSync(STORE_FILE, 'utf8');
       const parsed = JSON.parse(raw) as Partial<OgadsStore>;
       const def = createDefaultStore();
+      let loadedTrackingLink = parsed.config?.trackingLink || def.config.trackingLink || 'https://trkoffer.net/cl/i/n616e4';
+      if (loadedTrackingLink === 'https://trkoffer.net/cl/i/n6164e') {
+        loadedTrackingLink = 'https://trkoffer.net/cl/i/n616e4';
+      }
+      let loadedSecret = parsed.config?.postbackSecret ?? def.config.postbackSecret ?? '';
+      if (loadedSecret.includes('secret=')) {
+        try {
+          const u = new URL(loadedSecret);
+          const extracted = u.searchParams.get('secret');
+          if (extracted) loadedSecret = extracted.trim();
+        } catch {
+          const m = loadedSecret.match(/[?&]secret=([^&]+)/);
+          if (m && m[1]) loadedSecret = decodeURIComponent(m[1]).trim();
+        }
+      }
       store = {
         config: {
           ...def.config,
           ...(parsed.config || {}),
-          trackingLink: parsed.config?.trackingLink || def.config.trackingLink || 'https://trkoffer.net/cl/i/n616e4',
+          trackingLink: loadedTrackingLink,
+          postbackSecret: loadedSecret,
         },
         stats: {
           ...def.stats,
@@ -159,6 +175,7 @@ function loadStore(): void {
       if (process.env.OGADS_API_KEY && !store.config.apiKey) {
         store.config.apiKey = process.env.OGADS_API_KEY;
       }
+      saveStore();
     } else {
       saveStore();
     }
@@ -290,7 +307,7 @@ function requireAdminAuth(req: Request, res: Response, next: NextFunction): void
   next();
 }
 
-const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string }> = {
+const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string; allowInlineImg?: boolean }> = {
   '/assets/aistudio/proof_of_account.pdf': {
     fileId: 'proof-of-account-pdf',
     fileName: 'proof_of_account.pdf',
@@ -299,31 +316,88 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileId: 'proof-of-account-pdf',
     fileName: 'proof_of_account__1__3c9d9253.pdf',
   },
+  '/assets/aistudio/drc_passport_reference.jpg': {
+    fileId: 'drcongo-reference-jpg',
+    fileName: 'drc_passport_reference.jpg',
+  },
+  '/assets/aistudio/pakistan_cnic_specimen.jpg': {
+    fileId: 'pakistan-specimen-jpg',
+    fileName: 'pakistan_cnic_specimen.jpg',
+  },
+  '/assets/aistudio/1792952087537_9a2ef351.jpg': {
+    fileId: 'pakistan-specimen-jpg',
+    fileName: 'pakistan-cnic-specimen.jpg',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/proof_of_account_page_1.png': {
+    fileId: 'proof-of-account-png',
+    fileName: 'proof_of_account_page_1.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/proof_of_account_page_2.png': {
+    fileId: 'proof-of-account-png',
+    fileName: 'proof_of_account_page_2.png',
+    allowInlineImg: true,
+  },
 };
+
+interface GeneratedExportRecord {
+  exportId: string;
+  lockId: string;
+  sessionId: string;
+  fileId: string;
+  fileName: string;
+  buffer: Buffer;
+  createdAt: number;
+  expiresAt: number;
+  downloadAuthToken: string;
+}
+
+const generatedExports = new Map<string, GeneratedExportRecord>();
+
+function cleanupExpiredExports(): void {
+  const now = Date.now();
+  for (const [id, rec] of generatedExports.entries()) {
+    if (now > rec.expiresAt) {
+      generatedExports.delete(id);
+    }
+  }
+}
 
 async function startServer() {
   const app = express();
 
-  app.use(express.json({ limit: '2mb' }));
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ limit: '15mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 
-  // Protect direct PDF file downloads unless authorized with a valid unlock token
+  // Protect direct PDF & specimen file downloads unless authorized with a valid unlock token
   app.use((req: Request, res: Response, next: NextFunction) => {
     const cleanPath = req.path;
-    if (PROTECTED_STATIC_ASSETS[cleanPath]) {
-      const token = (req.query.token as string) || '';
-      const lockId = (req.query.lockId as string) || '';
-      const lock = lockId ? store.locks[lockId] : undefined;
-      if (lock) {
-        refreshLockExpiration(lock);
-      }
-      if (!lock || lock.status !== 'unlocked' || !lock.downloadAuthToken || !safeEqual(lock.downloadAuthToken, token)) {
-        res.status(403).json({
-          error: 'Download Locked',
-          message: 'Direct access to this verification document is protected by the OGAds Content Locker. Please complete an eligible offer on the verification portal to unlock this download.',
-          trackingLink: store.config.trackingLink,
-        });
-        return;
+    const rule = PROTECTED_STATIC_ASSETS[cleanPath];
+    if (rule) {
+      const fetchDest = String(req.headers['sec-fetch-dest'] || '').toLowerCase();
+      const acceptHeader = String(req.headers['accept'] || '').toLowerCase();
+      const isInlineSubresource =
+        rule.allowInlineImg &&
+        req.query.download === undefined &&
+        (fetchDest === 'image' || (acceptHeader.includes('image/') && !acceptHeader.includes('text/html')));
+
+      if (!isInlineSubresource) {
+        const token = (req.query.token as string) || '';
+        const lockId = (req.query.lockId as string) || '';
+        const lock = lockId ? store.locks[lockId] : undefined;
+        if (lock) {
+          refreshLockExpiration(lock);
+        }
+        if (!lock || lock.status !== 'unlocked' || !lock.downloadAuthToken || !safeEqual(lock.downloadAuthToken, token)) {
+          res.status(403).json({
+            error: 'Download Locked',
+            message:
+              'Access to this verification document export is protected by the OGAds Content Locker. Please complete an eligible offer on the verification portal to unlock this download.',
+            trackingLink: store.config.trackingLink,
+          });
+          return;
+        }
       }
     }
     next();
@@ -853,6 +927,149 @@ async function startServer() {
     res.download(resolvedFile, lock.fileName);
   });
 
+  // 7B. Authorize & Register Generated PNG Export (Server-controlled PNG export gate)
+  app.post('/api/ogads/export-png', (req: Request, res: Response) => {
+    cleanupExpiredExports();
+    const sessionId = getOrCreateVisitorSession(req, res);
+    const lockId = typeof req.body?.lockId === 'string' ? req.body.lockId.trim() : '';
+    const token = typeof req.body?.token === 'string' ? req.body.token.trim() : '';
+    const rawFileName = typeof req.body?.fileName === 'string' ? req.body.fileName.trim() : '';
+    const imageDataUrl = typeof req.body?.imageDataUrl === 'string' ? req.body.imageDataUrl.trim() : '';
+
+    const lock = store.locks[lockId];
+    if (!lock || lock.sessionId !== sessionId) {
+      res.status(403).json({
+        ok: false,
+        authorized: false,
+        error: 'Export Locked: Valid visitor lock session required. Please complete an eligible OGAds offer to unlock PNG export.',
+        trackingLink: store.config.trackingLink,
+      });
+      return;
+    }
+
+    refreshLockExpiration(lock);
+
+    if (lock.status !== 'unlocked' || !lock.downloadAuthToken) {
+      res.status(403).json({
+        ok: false,
+        authorized: false,
+        status: lock.status,
+        error:
+          lock.status === 'expired'
+            ? 'Your time-limited unlock session has expired. Please complete an eligible OGAds offer to unlock PNG export again.'
+            : 'Export Locked: OGAds offer conversion verification has not been completed for this document.',
+        trackingLink: store.config.trackingLink,
+      });
+      return;
+    }
+
+    if (!safeEqual(lock.downloadAuthToken, token)) {
+      res.status(403).json({
+        ok: false,
+        authorized: false,
+        error: 'Invalid or forged export authorization token.',
+      });
+      return;
+    }
+
+    const prefix = 'data:image/png;base64,';
+    if (!imageDataUrl.startsWith(prefix) || imageDataUrl.length <= prefix.length) {
+      res.status(400).json({
+        ok: false,
+        authorized: false,
+        error: 'Invalid PNG image payload.',
+      });
+      return;
+    }
+
+    const base64Data = imageDataUrl.slice(prefix.length);
+    const buffer = Buffer.from(base64Data, 'base64');
+    // Verify PNG magic bytes (89 50 4E 47 0D 0A 1A 0A)
+    if (buffer.length < 8 || buffer[0] !== 0x89 || buffer[1] !== 0x50 || buffer[2] !== 0x4e || buffer[3] !== 0x47) {
+      res.status(400).json({
+        ok: false,
+        authorized: false,
+        error: 'Rejected: Uploaded payload is not a valid PNG binary.',
+      });
+      return;
+    }
+
+    const safeFileName = (rawFileName || lock.fileName || `${lock.fileId}.png`).replace(/[^a-zA-Z0-9_.-]/g, '_');
+    const exportId = 'exp_' + crypto.randomBytes(16).toString('hex');
+    const expiresAt = Math.min(lock.expiresAt || Date.now() + 15 * 60 * 1000, Date.now() + 15 * 60 * 1000);
+
+    generatedExports.set(exportId, {
+      exportId,
+      lockId: lock.lockId,
+      sessionId: lock.sessionId,
+      fileId: lock.fileId,
+      fileName: safeFileName.endsWith('.png') ? safeFileName : `${safeFileName}.png`,
+      buffer,
+      createdAt: Date.now(),
+      expiresAt,
+      downloadAuthToken: lock.downloadAuthToken,
+    });
+
+    lock.downloadCount += 1;
+    lock.lastDownloadedAt = Date.now();
+    store.stats.totalUnlockedDownloads += 1;
+    saveStore();
+
+    const downloadUrl = `/api/ogads/export-download/${encodeURIComponent(exportId)}?token=${encodeURIComponent(token)}&sessionId=${encodeURIComponent(sessionId)}`;
+
+    res.json({
+      ok: true,
+      authorized: true,
+      exportId,
+      lockId: lock.lockId,
+      fileName: safeFileName,
+      expiresAt,
+      downloadUrl,
+    });
+  });
+
+  // 7C. Server-Authorized Generated PNG File Download Endpoint
+  app.get('/api/ogads/export-download/:exportId', (req: Request, res: Response) => {
+    cleanupExpiredExports();
+    const sessionId = getOrCreateVisitorSession(req, res);
+    const exportId = req.params.exportId;
+    const token = typeof req.query.token === 'string' ? req.query.token.trim() : '';
+
+    const record = generatedExports.get(exportId);
+    if (!record) {
+      res.status(403).json({
+        error: 'Export Expired or Not Found',
+        message: 'This generated PNG export does not exist or its time-limited authorization has expired.',
+      });
+      return;
+    }
+
+    const lock = store.locks[record.lockId];
+    if (lock) {
+      refreshLockExpiration(lock);
+    }
+
+    if (
+      record.sessionId !== sessionId ||
+      !lock ||
+      lock.status !== 'unlocked' ||
+      !lock.downloadAuthToken ||
+      !safeEqual(lock.downloadAuthToken, token) ||
+      Date.now() > record.expiresAt
+    ) {
+      res.status(403).json({
+        error: 'Export Unauthorized',
+        message: 'Valid, non-expired OGAds conversion authorization is required to download this generated PNG file.',
+      });
+      return;
+    }
+
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', `attachment; filename="${record.fileName}"`);
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.send(record.buffer);
+  });
+
   // 8. Admin Authentication & Setup Status
   app.get('/api/ogads/admin/status', (req: Request, res: Response) => {
     const token = extractAdminToken(req);
@@ -1023,7 +1240,18 @@ async function startServer() {
     if (wantNewSecret) {
       store.config.postbackSecret = 'ogsec_' + crypto.randomBytes(16).toString('hex');
     } else if (typeof body.postbackSecret === 'string' && body.postbackSecret.trim()) {
-      store.config.postbackSecret = body.postbackSecret.trim();
+      let cleanSecret = body.postbackSecret.trim();
+      if (cleanSecret.includes('secret=')) {
+        try {
+          const u = new URL(cleanSecret);
+          const extracted = u.searchParams.get('secret');
+          if (extracted) cleanSecret = extracted.trim();
+        } catch {
+          const m = cleanSecret.match(/[?&]secret=([^&]+)/);
+          if (m && m[1]) cleanSecret = decodeURIComponent(m[1]).trim();
+        }
+      }
+      store.config.postbackSecret = cleanSecret;
     }
 
     if (typeof body.apiKey === 'string' && body.apiKey.trim()) {

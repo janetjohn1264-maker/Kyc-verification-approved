@@ -3493,20 +3493,31 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     }
 
     // ================= KENYA NATIONAL ID (MAISHA NAMBA 3RD GEN) CONTROLLER =================
-    const defaultKidPhotoSrc = '/assets/aistudio/kenya_maisha_portrait_kariuki.jpg';
-    const defaultKidGhostSrc = '/assets/aistudio/kenya_maisha_ghost_kariuki.png';
+    const defaultKidPhotoSrc = '/assets/aistudio/kenya_maisha_portrait_exact.png';
+    const defaultKidGhostSrc = '/assets/aistudio/kenya_maisha_ghost_exact.png';
     const defaultKidSigSrc = '/assets/aistudio/kenya_bearer_signature_clean.png';
 
     function initKidDefaultPhoto() {
-      if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
-      if ($('kidGhostPhoto')) $('kidGhostPhoto').src = defaultKidGhostSrc;
+      const p = $('kidPreviewPhoto');
+      const g = $('kidGhostPhoto');
+      const o = $('kidPortraitSecurityOverlay');
+      if (p) {
+        p.src = defaultKidPhotoSrc;
+        p.style.borderRadius = '0';
+        p.style.filter = 'none';
+      }
+      if (g) {
+        g.src = defaultKidGhostSrc;
+        g.style.borderRadius = '0';
+        g.style.opacity = '1';
+        g.style.mixBlendMode = 'normal';
+      }
+      if (o) o.classList.add('hidden');
       if ($('kidBearerSignature')) $('kidBearerSignature').src = defaultKidSigSrc;
     }
 
     function resetKidPhoto() {
-      if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = defaultKidPhotoSrc;
-      if ($('kidGhostPhoto')) $('kidGhostPhoto').src = defaultKidGhostSrc;
-      if ($('kidBearerSignature')) $('kidBearerSignature').src = defaultKidSigSrc;
+      initKidDefaultPhoto();
       if ($('kidPhotoInput')) $('kidPhotoInput').value = '';
       showToast('Photo Reset', 'Restored Kenya Maisha ID reference specimen portrait');
     }
@@ -6109,8 +6120,21 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           if (file) {
             const reader = new FileReader();
             reader.onload = ev => {
-              if ($('kidPreviewPhoto')) $('kidPreviewPhoto').src = ev.target.result;
-              if ($('kidGhostPhoto')) $('kidGhostPhoto').src = ev.target.result;
+              const p = $('kidPreviewPhoto');
+              const g = $('kidGhostPhoto');
+              const o = $('kidPortraitSecurityOverlay');
+              if (p) {
+                p.src = ev.target.result;
+                p.style.borderRadius = '46% 46% 40% 40% / 50% 50% 44% 44%';
+                p.style.filter = 'contrast(0.96) saturate(0.85)';
+              }
+              if (g) {
+                g.src = ev.target.result;
+                g.style.borderRadius = '44% 44% 38% 38% / 48% 48% 42% 42%';
+                g.style.opacity = '0.78';
+                g.style.mixBlendMode = 'multiply';
+              }
+              if (o) o.classList.remove('hidden');
               showToast('Photo Updated', 'Custom portrait photo applied to Kenya Maisha ID');
             };
             reader.readAsDataURL(file);
@@ -7849,197 +7873,51 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                   <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR-80 · 85.6 × 53.98 mm</span>
                 </div>
 
-                <article id="kenya-id-front" class="kenya-maisha-front-bg relative w-full aspect-[1.586/1] rounded-2xl p-4 sm:p-5 shadow-2xl border-2 border-slate-300 text-slate-900 overflow-hidden select-none">
-                  
-                  <!-- Fine Microprint Top Security Boundary Line -->
-                  <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-emerald-600 via-red-600 to-emerald-600 opacity-60"></div>
+                <article id="kenya-id-front" class="relative w-full rounded-[14px] shadow-2xl border border-slate-300/90 text-[#161a18] overflow-hidden select-none" style="aspect-ratio: 495 / 309; container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7f2;">
+                  <!-- Exact Reference Background Plate (Headers, Coat of Arms, Guilloche Rosettes, Flag Oval, Field Labels, Maisha Logo & Signature) -->
+                  <img src="/assets/aistudio/kenya_maisha_front_plate.png" alt="Republic of Kenya National Identity Card Front Background" class="absolute inset-0 w-full h-full object-cover pointer-events-none select-none">
 
-                  <!-- Authentic Radiating Guilloche Rosettes and Arc Waves emanating from Coat of Arms -->
-                  <div class="absolute inset-0 pointer-events-none overflow-hidden">
-                    <svg viewBox="0 0 530 334" class="w-full h-full" fill="none">
-                      <!-- Radiating arcs from top center -->
-                      <g opacity="0.45">
-                        <circle cx="265" cy="30" r="40" stroke="#f43f5e" stroke-width="0.8" stroke-dasharray="3 3"/>
-                        <circle cx="265" cy="30" r="60" stroke="#10b981" stroke-width="0.8"/>
-                        <circle cx="265" cy="30" r="85" stroke="#f43f5e" stroke-width="0.9" stroke-dasharray="4 2"/>
-                        <circle cx="265" cy="30" r="110" stroke="#059669" stroke-width="1"/>
-                        <circle cx="265" cy="30" r="140" stroke="#fb7185" stroke-width="0.9"/>
-                        <circle cx="265" cy="30" r="175" stroke="#10b981" stroke-width="1.1" stroke-dasharray="5 3"/>
-                        <circle cx="265" cy="30" r="215" stroke="#e11d48" stroke-width="0.9"/>
-                        <circle cx="265" cy="30" r="260" stroke="#047857" stroke-width="1.2"/>
-                        <circle cx="265" cy="30" r="310" stroke="#10b981" stroke-width="1"/>
-                        <circle cx="265" cy="30" r="370" stroke="#059669" stroke-width="1.1"/>
-                        <!-- Radiating fan lines -->
-                        <path d="M 265,30 L 0,100 M 265,30 L 0,160 M 265,30 L 0,220 M 265,30 L 0,280 M 265,30 L 50,334 M 265,30 L 120,334 M 265,30 L 190,334 M 265,30 L 265,334 M 265,30 L 340,334 M 265,30 L 410,334 M 265,30 L 480,334 M 265,30 L 530,280 M 265,30 L 530,220 M 265,30 L 530,160 M 265,30 L 530,100" stroke="#10b981" stroke-width="0.6" opacity="0.35"/>
-                      </g>
-                      <!-- Wavy security ribbons across photo area -->
-                      <g opacity="0.3">
-                        <path d="M 10,130 C 50,110 90,150 140,130 S 220,110 280,140" stroke="#059669" stroke-width="1.5" fill="none"/>
-                        <path d="M 10,160 C 50,140 90,180 140,160 S 220,140 280,170" stroke="#059669" stroke-width="1.5" fill="none"/>
-                        <path d="M 10,190 C 50,170 90,210 140,190 S 220,170 280,200" stroke="#059669" stroke-width="1.5" fill="none"/>
-                        <path d="M 10,220 C 50,200 90,240 140,220 S 220,200 280,230" stroke="#059669" stroke-width="1.5" fill="none"/>
-                      </g>
-                    </svg>
+                  <!-- Bearer Portrait Photo (Aligned 1:1 with Reference Portrait Coordinates) -->
+                  <div class="absolute overflow-hidden" style="left: 8.8889%; top: 33.9806%; width: 28.4848%; height: 61.8123%;">
+                    <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_exact.png" alt="Bearer Portrait" class="w-full h-full object-cover">
+                    <!-- Wavy security guilloche overlay (shown when custom photo is uploaded) -->
+                    <div id="kidPortraitSecurityOverlay" class="hidden absolute inset-0 pointer-events-none opacity-45 mix-blend-multiply bg-[repeating-radial-gradient(ellipse_at_30%_50%,transparent_0,transparent_6px,rgba(16,185,129,0.25)_7px,transparent_8px)]"></div>
                   </div>
 
-                  <!-- TOP HEADER BAR -->
-                  <header class="flex items-start justify-between relative z-10 pb-1">
-                    <!-- Left Title -->
-                    <div class="leading-tight">
-                      <h2 class="text-[10px] sm:text-[12px] font-black tracking-wide text-[#0f3d2e] uppercase font-sans">
-                        JAMHURI YA KENYA
-                      </h2>
-                      <h3 class="text-[9px] sm:text-[11px] font-extrabold tracking-wide text-[#0f3d2e] uppercase font-sans">
-                        REPUBLIC OF KENYA
-                      </h3>
-                    </div>
-
-                    <!-- Center: Kenya Coat of Arms -->
-                    <div class="w-12 h-10 sm:w-14 sm:h-12 flex items-center justify-center shrink-0 -mt-0.5">
-                      <img src="/assets/aistudio/kenya_coat_of_arms.png" alt="Republic of Kenya Coat of Arms" class="h-full w-auto object-contain mix-blend-multiply drop-shadow-xs">
-                    </div>
-
-                    <!-- Right Title & ICAO Smart Chip Icon -->
-                    <div class="text-right leading-tight flex flex-col items-end">
-                      <h2 class="text-[9.5px] sm:text-[11.5px] font-black tracking-wide text-[#0f3d2e] uppercase font-sans">
-                        KITAMBULISHO CHA TAIFA
-                      </h2>
-                      <h3 class="text-[8.5px] sm:text-[10.5px] font-extrabold tracking-wide text-[#0f3d2e] uppercase font-sans">
-                        NATIONAL IDENTITY CARD
-                      </h3>
-                      <!-- ICAO Biometric Smartcard Emblem (Matching Reference Specimen) -->
-                      <div class="mt-1 flex items-center justify-end">
-                        <svg viewBox="0 0 38 20" class="w-7 sm:w-8 h-3.5 sm:h-4">
-                          <rect x="1" y="1" width="36" height="18" rx="2.5" fill="#0f172a" />
-                          <line x1="1" y1="10" x2="37" y2="10" stroke="#ffffff" stroke-width="2.2" />
-                          <circle cx="19" cy="10" r="5.2" fill="#0f172a" stroke="#ffffff" stroke-width="2.2" />
-                          <circle cx="19" cy="10" r="2" fill="#ffffff" />
-                        </svg>
-                      </div>
-                    </div>
-                  </header>
-
-                  <!-- CARD MAIN BODY -->
-                  <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10 mt-1">
-                    
-                    <!-- Vertical Serial Number along far-left border (Reads top-to-bottom as in reference) -->
-                    <div class="col-span-1 flex items-center justify-center h-full">
-                      <div class="transform -rotate-90 origin-center whitespace-nowrap text-[8.5px] sm:text-[10.5px] font-black font-mono-code text-slate-800 tracking-wider">
-                        <span id="kidPreviewSerial">705346763</span>
-                      </div>
-                    </div>
-
-                    <!-- Bearer Portrait Photo -->
-                    <div class="col-span-4 flex flex-col items-center">
-                      <div class="w-full aspect-[3.2/4.1] rounded-lg overflow-hidden border border-slate-300/80 shadow-xs relative bg-slate-200">
-                        <!-- Specimen reference photo of bearer -->
-                        <img id="kidPreviewPhoto" src="/assets/aistudio/kenya_maisha_portrait_kariuki.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
-                        <!-- Authentic wavy security guilloche overlay on portrait -->
-                        <div class="absolute inset-0 pointer-events-none opacity-45 mix-blend-multiply bg-[repeating-radial-gradient(ellipse_at_30%_50%,transparent_0,transparent_6px,rgba(16,185,129,0.22)_7px,transparent_8px)]"></div>
-                        <div class="absolute inset-0 pointer-events-none opacity-30 mix-blend-color-burn bg-[repeating-linear-gradient(45deg,transparent_0,transparent_5px,rgba(244,63,94,0.2)_6px,transparent_7px)]"></div>
-                      </div>
-                    </div>
-
-                    <!-- Personal Information Data Fields -->
-                    <div class="col-span-7 space-y-1 text-left leading-tight pl-1">
-                      
-                      <!-- 1. Surname -->
-                      <div>
-                        <span class="block text-[7.5px] sm:text-[8.5px] font-bold uppercase text-slate-500 leading-none">SURNAME</span>
-                        <div id="kidPreviewSurname" class="font-black text-slate-900 text-xs sm:text-[14px] uppercase tracking-wide leading-tight">
-                          KARIUKI
-                        </div>
-                      </div>
-
-                      <!-- 2. Given Name -->
-                      <div>
-                        <span class="block text-[7.5px] sm:text-[8.5px] font-bold uppercase text-slate-500 leading-none">GIVEN NAME</span>
-                        <div id="kidPreviewGiven" class="font-black text-slate-900 text-[11px] sm:text-[13px] uppercase tracking-wide leading-tight">
-                          JAMES KANAKE
-                        </div>
-                      </div>
-
-                      <!-- 3. Sex, Flag Badge, Nationality, Date of Birth -->
-                      <div class="grid grid-cols-12 gap-1 items-end relative">
-                        <div class="col-span-3">
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SEX</span>
-                          <div id="kidPreviewSex" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] uppercase">
-                            MALE
-                          </div>
-                        </div>
-                        <div class="col-span-2 flex items-center justify-center pb-0.5">
-                          <!-- Kenya Flag Oval Watermark -->
-                          <div class="w-6 h-4 rounded-full overflow-hidden border border-slate-300/80 shadow-2xs flex flex-col opacity-90">
-                            <div class="h-[32%] bg-[#0a0a0a]"></div>
-                            <div class="h-[6%] bg-white"></div>
-                            <div class="h-[24%] bg-[#bb1919]"></div>
-                            <div class="h-[6%] bg-white"></div>
-                            <div class="h-[32%] bg-[#006600]"></div>
-                          </div>
-                        </div>
-                        <div class="col-span-3">
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">NATION-ALITY</span>
-                          <div id="kidPreviewNationality" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] uppercase">
-                            KEN
-                          </div>
-                        </div>
-                        <div class="col-span-4 text-left pl-1">
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF BIRTH</span>
-                          <div id="kidPreviewDob" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] font-mono-code">
-                            21. 06. 1999
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- 4. Lower Section: Left Side Details + Right Column (Maisha Logo & Signature below Date of Birth) -->
-                      <div class="grid grid-cols-12 gap-1 items-start pt-0.5">
-                        <!-- Left Details (Place of Birth, ID Number, Expiry, Place of Issue) -->
-                        <div class="col-span-7 space-y-1 leading-tight">
-                          <!-- Place of Birth -->
-                          <div>
-                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF BIRTH</span>
-                            <div id="kidPreviewPob" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                              NYERI CENTRAL
-                            </div>
-                          </div>
-
-                          <!-- ID Number -->
-                          <div>
-                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">ID NUMBER</span>
-                            <div id="kidPreviewIdNo" class="font-black text-slate-950 text-[13px] sm:text-[16px] font-mono-code tracking-wider">
-                              36620107
-                            </div>
-                          </div>
-
-                          <!-- Date of Expiry -->
-                          <div>
-                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF EXPIRY</span>
-                            <div id="kidPreviewExpiry" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] font-mono-code">
-                              15. 02. 2034
-                            </div>
-                          </div>
-
-                          <!-- Place of Issue -->
-                          <div>
-                            <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">PLACE OF ISSUE</span>
-                            <div id="kidPreviewPlace" class="font-black text-slate-900 text-[10px] sm:text-[11.5px] uppercase">
-                              HDM CITY SQUARE
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Right Column: Located directly under Date of Birth (Maisha Logo + Bearer Signature) -->
-                        <div class="col-span-5 flex flex-col items-center justify-start text-center pt-0.5">
-                          <img src="/assets/aistudio/kenya_maisha_logo.png" alt="Maisha Namba Logo" class="h-10 sm:h-12 w-auto max-w-full object-contain mix-blend-multiply drop-shadow-2xs">
-                          <!-- Bearer Signature -->
-                          <div class="h-5 sm:h-6 w-20 sm:w-24 flex items-center justify-center mt-1">
-                            <img id="kidBearerSignature" src="/assets/aistudio/kenya_bearer_signature_clean.png" alt="Bearer Signature" class="h-full w-auto object-contain mix-blend-multiply">
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
+                  <!-- Vertical Left-Edge Serial Number (705346763 reading bottom-to-top) -->
+                  <div class="absolute flex items-center justify-center pointer-events-none" style="left: 3.55%; top: 56.5%; transform: translate(-50%, -50%) rotate(-90deg);">
+                    <span id="kidPreviewSerial" class="font-bold whitespace-nowrap text-[#1e2320]" style="font-family: 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-size: 1.82cqw; letter-spacing: 0.04em; line-height: 1;">705346763</span>
                   </div>
+
+                  <!-- 1. SURNAME -->
+                  <div id="kidPreviewSurname" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 40.3%; top: 28.5%; font-size: 3.32cqw; line-height: 1; letter-spacing: 0.025em; transform: scaleX(0.88); transform-origin: left top;">KARIUKI</div>
+
+                  <!-- 2. GIVEN NAME -->
+                  <div id="kidPreviewGiven" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 40.8%; top: 38.2%; font-size: 3.22cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.86); transform-origin: left top;">JAMES KANAKE</div>
+
+                  <!-- 3. SEX -->
+                  <div id="kidPreviewSex" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 40.0%; top: 47.9%; font-size: 3.22cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.86); transform-origin: left top;">MALE</div>
+
+                  <!-- 4. NATIONALITY -->
+                  <div id="kidPreviewNationality" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 55.8%; top: 47.9%; font-size: 3.22cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.86); transform-origin: left top;">KEN</div>
+
+                  <!-- 5. DATE OF BIRTH -->
+                  <div id="kidPreviewDob" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 73.4%; top: 47.9%; font-size: 3.22cqw; line-height: 1; letter-spacing: 0.015em; transform: scaleX(0.86); transform-origin: left top;">21. 06. 1999</div>
+
+                  <!-- 6. PLACE OF BIRTH -->
+                  <div id="kidPreviewPob" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 40.3%; top: 57.6%; font-size: 3.22cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.86); transform-origin: left top;">NYERI CENTRAL</div>
+
+                  <!-- 7. ID NUMBER -->
+                  <div id="kidPreviewIdNo" class="absolute font-bold uppercase text-[#141816] whitespace-nowrap" style="left: 40.3%; top: 67.0%; font-size: 3.42cqw; line-height: 1; letter-spacing: 0.025em; transform: scaleX(0.88); transform-origin: left top;">36620107</div>
+
+                  <!-- 8. DATE OF EXPIRY -->
+                  <div id="kidPreviewExpiry" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 40.3%; top: 76.7%; font-size: 3.28cqw; line-height: 1; letter-spacing: 0.015em; transform: scaleX(0.86); transform-origin: left top;">15. 02. 2034</div>
+
+                  <!-- 9. PLACE OF ISSUE -->
+                  <div id="kidPreviewPlace" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 40.5%; top: 86.7%; font-size: 3.22cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.86); transform-origin: left top;">HDM CITY SQUARE</div>
+
+                  <!-- Bearer Signature Element (Preserved for DOM compatibility; native signature rendered on plate) -->
+                  <img id="kidBearerSignature" src="/assets/aistudio/kenya_bearer_signature_clean.png" alt="Bearer Signature" class="absolute opacity-0 pointer-events-none" style="left: 75.5%; top: 87.7%; width: 11.5%; height: 4.8%;">
                 </article>
               </div>
 
@@ -8053,139 +7931,42 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                   <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO TD1 · 3-LINE MRZ</span>
                 </div>
 
-                <article id="kenya-id-back" class="kenya-maisha-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-2xl border-2 border-slate-300 text-slate-900 overflow-hidden select-none flex flex-col justify-between">
-                  
-                  <!-- Mount Kenya Silhouette and Geographic Contour Background -->
-                  <div class="absolute inset-x-0 top-0 h-[65%] pointer-events-none opacity-45 overflow-hidden">
-                    <svg viewBox="0 0 500 220" class="w-full h-full text-emerald-800" preserveAspectRatio="none">
-                      <!-- Mount Kenya Jagged Peaks Silhouette -->
-                      <polygon points="120,180 200,90 230,120 280,55 310,95 360,40 400,105 450,70 500,160 500,220 100,220" fill="rgba(16, 185, 129, 0.18)"/>
-                      <polygon points="260,110 280,55 310,95 360,40 380,80" fill="rgba(255, 255, 255, 0.45)"/>
-                      <!-- Geographic Contour Curves -->
-                      <path d="M 0,140 Q 150,110 300,150 T 500,130" stroke="rgba(16, 185, 129, 0.3)" stroke-width="1.2" fill="none"/>
-                      <path d="M 0,170 Q 200,140 350,180 T 500,160" stroke="rgba(239, 68, 68, 0.2)" stroke-width="1" fill="none"/>
-                      <!-- Circular Guilloche Rosettes -->
-                      <circle cx="160" cy="170" r="30" stroke="rgba(16, 185, 129, 0.25)" stroke-width="0.8" fill="none"/>
-                      <circle cx="240" cy="175" r="30" stroke="rgba(16, 185, 129, 0.25)" stroke-width="0.8" fill="none"/>
-                      <circle cx="320" cy="175" r="30" stroke="rgba(16, 185, 129, 0.25)" stroke-width="0.8" fill="none"/>
-                      <circle cx="400" cy="170" r="30" stroke="rgba(16, 185, 129, 0.25)" stroke-width="0.8" fill="none"/>
-                    </svg>
+                <article id="kenya-id-back" class="relative w-full rounded-[14px] shadow-2xl border border-slate-300/90 text-[#161a18] overflow-hidden select-none" style="aspect-ratio: 495 / 315; container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif; background-color: #f6f8f6;">
+                  <!-- Exact Reference Background Plate (GK Shield, Gold Contact Chip, Mount Kenya Silhouette, Kenya Map, Field Labels & Registrar Signature) -->
+                  <img src="/assets/aistudio/kenya_maisha_back_plate.png" alt="Republic of Kenya National Identity Card Back Background" class="absolute inset-0 w-full h-full object-cover pointer-events-none select-none">
+
+                  <!-- Vertical Left-Edge Serial Number (24163P049059 reading bottom-to-top) -->
+                  <div class="absolute flex items-center justify-center pointer-events-none" style="left: 4.24%; top: 42.2%; transform: translate(-50%, -50%) rotate(-90deg);">
+                    <span id="kidPreviewBackSerial" class="font-bold whitespace-nowrap text-[#191d1b]" style="font-family: 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif; font-size: 2.15cqw; letter-spacing: 0.045em; line-height: 1;">24163P049059</span>
                   </div>
 
-                  <!-- TOP CONTENT AREA (Administration, Chip, Ghost Portrait, Registrar Sign) -->
-                  <div class="p-3.5 sm:p-4.5 relative z-10">
-                    <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start">
-                      
-                      <!-- Left Column: Vertical serial, Maasai Shield G-K, Gold Smartcard Chip -->
-                      <div class="col-span-3 sm:col-span-3 flex items-start gap-1 sm:gap-1.5">
-                        <!-- Vertical Left Serial -->
-                        <div class="w-3 flex items-center justify-center pt-8">
-                          <div class="transform -rotate-90 origin-center whitespace-nowrap text-[8.5px] sm:text-[10px] font-black font-mono-code text-slate-800 tracking-wider">
-                            <span id="kidPreviewBackSerial">24163P049059</span>
-                          </div>
-                        </div>
+                  <!-- 1. COUNTY -->
+                  <div id="kidPreviewCounty" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 28.3%; top: 12.1%; font-size: 2.65cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.85); transform-origin: left top;">NYERI</div>
 
-                        <!-- Shield & Chip Container -->
-                        <div class="flex-1 flex flex-col items-center space-y-1.5">
-                          <!-- Maasai Shield & Crossed Spears with G and K -->
-                          <div class="w-14 sm:w-16 h-8 sm:h-9 flex items-center justify-center">
-                            <img src="/assets/aistudio/kenya_gk_emblem.png" alt="GK Maasai Shield" class="h-full w-auto object-contain mix-blend-multiply">
-                          </div>
+                  <!-- 2. SUB-COUNTY -->
+                  <div id="kidPreviewSubCounty" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 28.3%; top: 21.9%; font-size: 2.65cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.85); transform-origin: left top;">MATHIRA WEST</div>
 
-                          <!-- Metallic Gold Smartcard Chip (ISO 7816) -->
-                          <div class="w-13 sm:w-16 aspect-[1.15/1] rounded-lg shadow-sm border border-amber-800/40 overflow-hidden">
-                            <img src="/assets/aistudio/kenya_chip_gold.png" alt="Gold Contact Chip" class="w-full h-full object-cover">
-                          </div>
-                        </div>
-                      </div>
+                  <!-- 3. DIVISION -->
+                  <div id="kidPreviewDivision" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 28.3%; top: 31.8%; font-size: 2.65cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.85); transform-origin: left top;">KIRIMUKUYU</div>
 
-                      <!-- Middle Column: Administrative Details -->
-                      <div class="col-span-5 sm:col-span-5 space-y-1 sm:space-y-1.5 text-left leading-tight pl-1 sm:pl-2">
-                        <!-- COUNTY -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">COUNTY</span>
-                          <div id="kidPreviewCounty" class="font-black text-slate-900 text-xs sm:text-[13.5px] uppercase">
-                            NYERI
-                          </div>
-                        </div>
+                  <!-- 4. LOCATION -->
+                  <div id="kidPreviewLocation" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 28.5%; top: 41.9%; font-size: 2.65cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.85); transform-origin: left top;">ICHUGA</div>
 
-                        <!-- SUB-COUNTY -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SUB-COUNTY</span>
-                          <div id="kidPreviewSubCounty" class="font-black text-slate-900 text-[10.5px] sm:text-[12.5px] uppercase">
-                            MATHIRA WEST
-                          </div>
-                        </div>
+                  <!-- 5. SUB-LOCATION -->
+                  <div id="kidPreviewSubLocation" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 28.5%; top: 51.5%; font-size: 2.65cqw; line-height: 1; letter-spacing: 0.02em; transform: scaleX(0.85); transform-origin: left top;">ICHUGA</div>
 
-                        <!-- DIVISION -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DIVISION</span>
-                          <div id="kidPreviewDivision" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            KIRIMUKUYU
-                          </div>
-                        </div>
+                  <!-- 6. DATE OF ISSUE -->
+                  <div id="kidPreviewDateIssue" class="absolute font-bold uppercase text-[#171b19] whitespace-nowrap" style="left: 65.8%; top: 12.1%; font-size: 2.65cqw; line-height: 1; letter-spacing: 0.015em; transform: scaleX(0.85); transform-origin: left top;">25. 07. 2024</div>
 
-                        <!-- LOCATION -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">LOCATION</span>
-                          <div id="kidPreviewLocation" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            ICHUGA
-                          </div>
-                        </div>
-
-                        <!-- SUB-LOCATION -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">SUB-LOCATION</span>
-                          <div id="kidPreviewSubLocation" class="font-black text-slate-900 text-[10.5px] sm:text-[12px] uppercase">
-                            ICHUGA
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Right Column: Date of Issue, Ghost Portrait, Registrar Sign -->
-                      <div class="col-span-4 sm:col-span-4 flex flex-col items-end text-right space-y-1 sm:space-y-1.5">
-                        <!-- Date of Issue -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[8px] font-bold uppercase text-slate-500 leading-none">DATE OF ISSUE</span>
-                          <div id="kidPreviewDateIssue" class="font-black text-slate-900 text-[11px] sm:text-[13px] font-mono-code">
-                            25. 07. 2024
-                          </div>
-                        </div>
-
-                        <!-- Ghost Secondary Portrait -->
-                        <div class="w-10 sm:w-12 aspect-[3.2/4] rounded border border-slate-300/80 overflow-hidden shadow-2xs bg-slate-100 relative">
-                          <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_kariuki.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-80 mix-blend-multiply">
-                        </div>
-
-                        <!-- Principal Registrar Signature -->
-                        <div class="flex flex-col items-end">
-                          <span class="block text-[6.5px] sm:text-[7.5px] font-black uppercase text-slate-600 tracking-tight leading-none">
-                            PRINCIPAL REGISTRAR'S SIGN.
-                          </span>
-                          <div class="h-6 sm:h-7 w-20 sm:w-24 flex items-center justify-end mt-0.5">
-                            <img src="/assets/aistudio/kenya_registrar_signature.png" alt="Principal Registrar Signature" class="h-full w-auto object-contain mix-blend-multiply">
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
+                  <!-- 7. Ghost Secondary Portrait -->
+                  <div class="absolute overflow-hidden" style="left: 65.4545%; top: 19.6825%; width: 13.3333%; height: 26.3492%;">
+                    <img id="kidGhostPhoto" src="/assets/aistudio/kenya_maisha_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover">
                   </div>
 
-                  <!-- BOTTOM MRZ AREA -->
-                  <div class="w-full bg-white pt-1.5 pb-2 px-3 sm:px-4 border-t border-slate-300/90 relative z-10">
-                    <!-- Microprint Divider Line -->
-                    <div class="text-[5.5px] sm:text-[6.5px] font-bold text-slate-500 uppercase tracking-widest text-center truncate mb-1">
-                      REPUBLIC OF KENYA · JAMHURI YA KENYA · REPUBLIC OF KENYA · JAMHURI YA KENYA · REPUBLIC OF KENYA
-                    </div>
-
-                    <!-- 3-Line Machine Readable Zone (MRZ) - Exact ICAO 9303 TD1 Specification -->
-                    <div class="font-mono-code text-[9.5px] sm:text-[11.5px] font-bold text-slate-950 tracking-[0.14em] sm:tracking-[0.16em] leading-tight text-center">
-                      <div id="kidPreviewMrz1">IDKEN36620107&lt;1&lt;197&lt;4715&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                      <div id="kidPreviewMrz2">9906219M3402155KEN705346763030</div>
-                      <div id="kidPreviewMrz3">KARIUKI&lt;&lt;JAMES&lt;KANAKE&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                    </div>
-                  </div>
-
+                  <!-- 8. 3-Line Machine Readable Zone (MRZ) - Exact ICAO 9303 TD1 Specification -->
+                  <div id="kidPreviewMrz1" class="absolute font-mono-code font-bold text-[#1a1e1c] whitespace-nowrap" style="left: 6.87%; top: 68.3%; font-size: 3.15cqw; letter-spacing: 0.255em; line-height: 1;">IDKEN36620107&lt;1&lt;197&lt;4715&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                  <div id="kidPreviewMrz2" class="absolute font-mono-code font-bold text-[#1a1e1c] whitespace-nowrap" style="left: 6.87%; top: 76.2%; font-size: 3.15cqw; letter-spacing: 0.255em; line-height: 1;">9906219M3402155KEN705346763030</div>
+                  <div id="kidPreviewMrz3" class="absolute font-mono-code font-bold text-[#1a1e1c] whitespace-nowrap" style="left: 6.87%; top: 84.3%; font-size: 3.15cqw; letter-spacing: 0.255em; line-height: 1;">KARIUKI&lt;&lt;JAMES&lt;KANAKE&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
                 </article>
               </div>
 
@@ -13276,199 +13057,325 @@ COD REP DEM CONGO</textarea>
               </a>
             </div>
 
-            <article id="drc-passport-card" class="relative w-full max-w-[520px] mx-auto rounded-xl shadow-2xl border-2 border-rose-200/80 overflow-hidden select-none text-[#241a4d]" style="aspect-ratio: 443 / 1214; container-type: inline-size; background: linear-gradient(180deg, #fdf4ee 0%, #fbe9e7 49.3%, #edf2fb 50.7%, #e8f0fa 100%);">
-              <!-- ============ PAGE 1 · ENDORSEMENT / ADDRESS PAGE ============ -->
-              <section id="drcEndorsementPage" class="absolute inset-x-0 top-0 overflow-hidden" style="height: 50%; container-type: inline-size; background:
-                  radial-gradient(circle at 76% 40%, rgba(129,168,214,0.30) 0 30%, rgba(129,168,214,0) 62%),
-                  radial-gradient(circle at 12% 82%, rgba(240,170,180,0.26) 0 34%, rgba(240,170,180,0) 66%),
-                  repeating-radial-gradient(circle at 26% 12%, rgba(232,138,152,0.20) 0 1px, rgba(232,138,152,0) 1px 7px),
-                  repeating-radial-gradient(circle at 84% 74%, rgba(116,152,199,0.18) 0 1px, rgba(116,152,199,0) 1px 9px),
-                  repeating-linear-gradient(114deg, rgba(244,164,174,0.18) 0 1px, rgba(244,164,174,0) 1px 10px),
-                  repeating-linear-gradient(24deg, rgba(150,180,220,0.16) 0 1px, rgba(150,180,220,0) 1px 11px),
-                  linear-gradient(158deg, #fdf6f0 0%, #fbe9e7 52%, #f0f3fb 100%);">
-                <!-- faint national emblem watermark (leopard head + spear + shield) -->
-                <div class="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden="true" style="opacity: 0.085;">
-                  <i class="fa-solid fa-shield-halved text-[#3b5a86]" style="font-size: 62cqw;"></i>
-                </div>
-                <div class="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden="true" style="opacity: 0.07;">
-                  <i class="fa-solid fa-paw text-[#2f4f7d]" style="font-size: 26cqw;"></i>
-                </div>
-                <!-- fine guilloche hairline frame -->
-                <div class="absolute pointer-events-none rounded-[1.2cqw]" aria-hidden="true" style="inset: 3.2cqw; border: 1px solid rgba(140,110,160,0.35);"></div>
-                <div class="absolute pointer-events-none rounded-[1.2cqw]" aria-hidden="true" style="inset: 4.4cqw; border: 1px solid rgba(140,110,160,0.22);"></div>
+            <article id="drc-passport-card" class="relative w-full max-w-[520px] mx-auto rounded-md shadow-2xl border border-slate-300/90 overflow-hidden select-none text-[#16161d]" style="/* aspect-ratio: 443 / 1214 */ aspect-ratio: 443 / 607; container-type: inline-size; font-family: Arial, Helvetica, sans-serif; background: #f7f5f0;">
+              <!-- ============ PAGE 1 · ENDORSEMENT / ADDRESS PAGE (TOP HALF) ============ -->
+              <section id="drcEndorsementPage" class="absolute inset-x-0 top-0 overflow-hidden" style="height: 49.5%; container-type: inline-size; background:
+                  radial-gradient(circle at 28% 18%, rgba(168,184,218,0.42) 0%, rgba(168,184,218,0.16) 16%, rgba(168,184,218,0) 34%),
+                  radial-gradient(circle at 86% 28%, rgba(196,144,174,0.22) 0%, rgba(196,144,174,0) 38%),
+                  linear-gradient(152deg, rgba(244,195,208,0) 38%, rgba(238,176,195,0.34) 58%, rgba(242,190,206,0.42) 78%, rgba(247,225,232,0.25) 100%),
+                  linear-gradient(90deg, #f3f7f2 0%, #f8f6f4 14%, #faf6f5 68%, #f2eef2 100%);">
 
-                <!-- vertical passport number on the right-hand margin -->
-                <div class="absolute top-[5%] right-[3.5%] pointer-events-none flex flex-col items-center" aria-hidden="true">
-                  <div id="drcOutPassNoVertical" class="font-mono font-bold tracking-[0.24em] text-[#2a2150]" style="writing-mode: vertical-rl; font-size: 2.5cqw; letter-spacing: 0.3em;">OP1123637</div>
-                  <div class="mt-[1.6cqw] flex flex-col items-center gap-[0.7cqw]" style="opacity: 0.5;">
-                    <span style="display:block; width:0.5cqw; height:0.5cqw; border-radius:9999px; background: rgba(70,58,110,0.7);"></span>
-                    <span style="display:block; width:0.5cqw; height:0.5cqw; border-radius:9999px; background: rgba(70,58,110,0.7);"></span>
-                    <span style="display:block; width:0.5cqw; height:0.5cqw; border-radius:9999px; background: rgba(70,58,110,0.7);"></span>
-                    <span style="display:block; width:0.5cqw; height:0.5cqw; border-radius:9999px; background: rgba(70,58,110,0.7);"></span>
-                  </div>
+                <!-- Fine SVG Guilloche Background, Security Rosette, Conical Tusk & Rearing Leopard -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 443 300" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- Left edge vertical security micro-banner -->
+                  <g opacity="0.22" fill="#8fa89b" font-size="6.5" font-weight="700" letter-spacing="1.2">
+                    <text x="12" y="285" transform="rotate(-90 12 285)">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO • PASSEPORT</text>
+                    <text x="21" y="285" transform="rotate(-90 21 285)">DEMOCRATIC REPUBLIC OF THE CONGO • PASSPORT</text>
+                  </g>
+
+                  <!-- Diagonal pink/rose guilloche waves across lower-right -->
+                  <g fill="none" stroke="#e59bb2" stroke-width="0.55" opacity="0.45">
+                    <path d="M 110 300 Q 230 190 443 240" />
+                    <path d="M 120 300 Q 240 196 443 248" />
+                    <path d="M 130 300 Q 250 202 443 256" />
+                    <path d="M 140 300 Q 260 208 443 264" />
+                    <path d="M 150 300 Q 270 214 443 272" />
+                    <path d="M 160 300 Q 280 220 443 280" />
+                    <path d="M 170 300 Q 290 226 443 288" />
+                    <path d="M 85 295 L 330 295 M 95 280 L 295 298" stroke="#c38da4" stroke-width="0.5" />
+                    <path d="M 185 160 L 315 285" stroke="#9d8999" stroke-width="0.7" opacity="0.55" />
+                  </g>
+
+                  <!-- Concentric circular guilloche arcs radiating on right half -->
+                  <g fill="none" stroke="#8c96a8" stroke-width="0.45" opacity="0.38">
+                    <circle cx="385" cy="95" r="52" />
+                    <circle cx="385" cy="95" r="57" />
+                    <circle cx="385" cy="95" r="62" />
+                    <circle cx="385" cy="95" r="67" />
+                    <circle cx="385" cy="95" r="72" />
+                    <circle cx="385" cy="95" r="77" />
+                    <circle cx="385" cy="95" r="82" />
+                    <circle cx="385" cy="95" r="87" />
+                    <circle cx="385" cy="95" r="92" />
+                    <circle cx="385" cy="95" r="97" />
+                    <circle cx="385" cy="95" r="102" />
+                    <circle cx="385" cy="95" r="107" />
+                  </g>
+
+                  <!-- Upper-left bluish-lavender security rosette watermark behind "Adresse / address :" -->
+                  <g transform="translate(126, 52)" opacity="0.46">
+                    <polygon points="0,-38 11,-32 24,-33 28,-21 38,-12 33,0 38,12 28,21 24,33 11,32 0,38 -11,32 -24,33 -28,21 -38,12 -33,0 -38,-12 -28,-21 -24,-33 -11,-32" fill="#b8c4de" stroke="#7c8eb5" stroke-width="0.8" />
+                    <polygon points="0,-30 9,-25 19,-26 22,-16 30,-9 26,0 30,9 22,16 19,26 9,25 0,30 -9,25 -19,26 -22,16 -30,9 -26,0 -30,-9 -22,-16 -19,-26 -9,-25" fill="none" stroke="#6d80ab" stroke-width="0.6" stroke-dasharray="1.5 1" />
+                    <circle cx="0" cy="0" r="21" fill="#cbd5ea" stroke="#7588b2" stroke-width="0.6" />
+                    <circle cx="0" cy="0" r="14" fill="none" stroke="#6478a4" stroke-width="0.5" />
+                    <circle cx="0" cy="0" r="7" fill="none" stroke="#6478a4" stroke-width="0.5" />
+                  </g>
+
+                  <!-- Center-right golden-ochre horizontal conical horn / tusk motif -->
+                  <g opacity="0.48">
+                    <path d="M 206 164 C 245 160, 305 144, 355 122 L 364 176 C 310 176, 248 173, 206 169 Z" fill="#dfc99c" stroke="#b89b67" stroke-width="0.6" />
+                    <path d="M 212 165 L 356 130 M 214 166 L 358 138 M 216 167 L 360 146 M 218 168 L 361 154 M 220 168 L 362 162 M 222 169 L 363 170" stroke="#a68952" stroke-width="0.45" />
+                    <circle cx="204" cy="166.5" r="7.5" fill="none" stroke="#b89b67" stroke-width="0.7" />
+                    <circle cx="195" cy="166.5" r="4.5" fill="none" stroke="#b89b67" stroke-width="0.6" />
+                  </g>
+
+                  <!-- Right-side mauve/rose-violet rearing spotted leopard silhouette -->
+                  <g transform="translate(344, 14)" opacity="0.62">
+                    <path d="M 42 2 C 35 2, 30 7, 30 14 C 30 18, 32 22, 29 26 C 22 22, 16 17, 11 19 C 7 21, 9 28, 16 34 C 21 38, 25 42, 22 50 C 16 62, 10 76, 10 92 C 10 106, 16 116, 22 128 C 25 136, 22 148, 19 158 C 17 164, 21 168, 26 165 C 31 160, 35 146, 36 135 C 40 138, 43 152, 46 166 C 48 172, 53 171, 54 165 C 55 152, 50 134, 48 122 C 56 128, 66 138, 70 152 C 72 158, 67 166, 62 169 C 67 172, 75 166, 76 155 C 77 140, 66 124, 54 114 C 55 96, 56 76, 52 58 C 60 52, 68 42, 73 32 C 76 26, 71 22, 66 27 C 61 33, 55 41, 49 44 C 47 36, 48 26, 51 18 C 54 10, 49 2, 42 2 Z" fill="#c18da8" />
+                    <!-- Darker rosette spots inside the rearing leopard -->
+                    <g fill="#9b6684" opacity="0.65">
+                      <circle cx="39" cy="12" r="2.2" />
+                      <circle cx="44" cy="18" r="2" />
+                      <circle cx="35" cy="36" r="2.8" />
+                      <circle cx="43" cy="42" r="2.6" />
+                      <circle cx="30" cy="52" r="3" />
+                      <circle cx="40" cy="56" r="3.2" />
+                      <circle cx="47" cy="64" r="2.6" />
+                      <circle cx="24" cy="66" r="3.2" />
+                      <circle cx="34" cy="72" r="3.4" />
+                      <circle cx="44" cy="78" r="3" />
+                      <circle cx="20" cy="82" r="3.2" />
+                      <circle cx="31" cy="88" r="3.5" />
+                      <circle cx="42" cy="94" r="3.2" />
+                      <circle cx="22" cy="98" r="3" />
+                      <circle cx="34" cy="104" r="3.2" />
+                      <circle cx="45" cy="108" r="2.8" />
+                      <circle cx="27" cy="116" r="2.8" />
+                      <circle cx="38" cy="120" r="2.6" />
+                      <circle cx="30" cy="134" r="2.4" />
+                      <circle cx="46" cy="138" r="2.4" />
+                    </g>
+                  </g>
+                </svg>
+
+                <!-- Vertical laser-perforated passport number on the right margin (reading bottom-to-top) -->
+                <div class="absolute right-[4.2%] top-[24%] bottom-[11%] pointer-events-none flex items-center justify-center" aria-hidden="true">
+                  <div id="drcOutPassNoVertical" class="font-mono font-bold text-[#2b222c]" style="writing-mode: vertical-rl; transform: rotate(180deg); font-size: 4.1cqw; letter-spacing: 0.22em; opacity: 0.82; text-shadow: 0 0 0.4px rgba(43,34,44,0.65); filter: contrast(1.15);">OP1123637</div>
                 </div>
 
-                <div class="relative h-full flex flex-col px-[6%] pt-[8%] pb-[7%] pr-[15%]">
-                  <div>
-                    <div class="font-bold uppercase tracking-[0.13em] text-[#3f5f8f]" style="font-size: 1.5cqw;">Adresse / Address</div>
-                    <div id="drcOutAddress" class="mt-[1%] font-black uppercase leading-[1.3] tracking-tight whitespace-pre-line" style="font-size: 2.1cqw;">AV SANKURU N°01 Q/CAMP MUNGANGA C/NGALIEMA
+                <!-- Endorsement Page Text & Signature Content -->
+                <div class="relative h-full w-full">
+                  <!-- Adresse / address : -->
+                  <div class="absolute" style="left: 11.2%; top: 13.5%; right: 16%;">
+                    <div class="font-semibold tracking-[0.01em] text-[#2b547e]" style="font-size: 2.35cqw; line-height: 1.15;">Adresse / address :</div>
+                    <div id="drcOutAddress" class="mt-[1.4cqw] ml-[1.2cqw] font-extrabold uppercase text-[#17171c] whitespace-pre-line tracking-[0.01em]" style="font-size: 2.38cqw; line-height: 1.95;">AV SANKURU N°01 Q/CAMP MUNGANGA C/NGALIEMA
 KINSHASA
 COD REP DEM CONGO</div>
                   </div>
 
-                  <div class="mt-[6%]">
-                    <div class="font-bold uppercase tracking-[0.13em] text-[#3f5f8f]" style="font-size: 1.5cqw;">Profession / Occupation</div>
-                    <div id="drcOutProfession" class="mt-[0.6%] font-black uppercase tracking-tight" style="font-size: 2.1cqw;">ETUDIANT</div>
+                  <!-- Profession / occupation : -->
+                  <div class="absolute" style="left: 10.6%; top: 49.2%; right: 20%;">
+                    <div class="font-semibold tracking-[0.01em] text-[#2b547e]" style="font-size: 2.35cqw; line-height: 1.15;">Profession / occupation :</div>
+                    <div id="drcOutProfession" class="mt-[1.2cqw] ml-[1.8cqw] font-extrabold uppercase text-[#17171c] tracking-[0.02em]" style="font-size: 2.42cqw; line-height: 1.2;">ETUDIANT</div>
                   </div>
 
-                  <div class="mt-[6%]">
-                    <div class="font-bold uppercase tracking-[0.13em] text-[#3f5f8f]" style="font-size: 1.5cqw;">Signature du titulaire / Signature of bearer</div>
-                    <div class="mt-[1.4%] w-[62%] border-b border-[#a9b4cd] pb-[0.8cqw]">
-                      <img id="drcOutSignature" src="/assets/aistudio/drc_passport_signature.png" alt="Signature of bearer" class="object-contain object-left" style="height: 8.4cqw; width: auto;">
+                  <!-- Signature du titulaire / Signature of bearer -->
+                  <div class="absolute" style="left: 10.4%; top: 66.5%; width: 58%;">
+                    <div class="font-semibold tracking-[0.01em] text-[#2b547e]" style="font-size: 2.15cqw; line-height: 1.15;">Signature du titulaire / Signature of bearer</div>
+                    <div class="mt-[0.6cqw] ml-[3.2cqw] overflow-hidden" style="height: 10.5cqw;">
+                      <img id="drcOutSignature" src="/assets/aistudio/drc_passport_signature.png" alt="Signature of bearer" class="object-contain object-left-bottom" style="height: 13.5cqw; width: auto; margin-top: -3.2cqw; mix-blend-mode: multiply; filter: contrast(1.25);">
                     </div>
-                  </div>
-
-                  <div class="mt-auto flex items-end justify-between gap-[3%]" style="opacity: 0.7;">
-                    <div class="font-semibold uppercase tracking-[0.18em] text-[#4b5c80]" style="font-size: 1.15cqw;">République Démocratique du Congo · Page d'endossement</div>
-                    <div class="font-mono font-bold text-[#4b5c80]" style="font-size: 1.15cqw;">COD</div>
                   </div>
                 </div>
               </section>
 
-              <!-- page fold -->
-              <div class="absolute left-0 right-0 pointer-events-none z-10" aria-hidden="true" style="top: 50%; height: 0.5cqw; transform: translateY(-50%); background: linear-gradient(180deg, rgba(120,100,150,0.45), rgba(255,255,255,0.85) 55%, rgba(120,100,150,0.38));"></div>
+              <!-- Center Booklet Spine / Page Fold -->
+              <div class="absolute left-0 right-0 pointer-events-none z-20" aria-hidden="true" style="top: 49.5%; height: 1%; background: linear-gradient(180deg, rgba(160,145,155,0.55) 0%, rgba(110,98,108,0.85) 45%, rgba(245,242,246,0.9) 75%, rgba(185,178,198,0.5) 100%);"></div>
 
-              <!-- ============ PAGE 2 · BIOMETRIC DATA PAGE ============ -->
-              <section id="drcDataPage" class="absolute inset-x-0 bottom-0 overflow-hidden flex flex-col" style="height: 50%; container-type: inline-size; background:
-                  radial-gradient(circle at 50% 46%, rgba(126,166,212,0.34) 0 26%, rgba(126,166,212,0) 58%),
-                  radial-gradient(circle at 88% 12%, rgba(240,166,178,0.24) 0 26%, rgba(240,166,178,0) 58%),
-                  repeating-radial-gradient(circle at 50% 48%, rgba(116,152,199,0.20) 0 1px, rgba(116,152,199,0) 1px 6px),
-                  repeating-radial-gradient(circle at 18% 84%, rgba(232,138,152,0.18) 0 1px, rgba(232,138,152,0) 1px 8px),
-                  repeating-linear-gradient(114deg, rgba(244,164,174,0.16) 0 1px, rgba(244,164,174,0) 1px 9px),
-                  repeating-linear-gradient(66deg, rgba(150,180,220,0.16) 0 1px, rgba(150,180,220,0) 1px 10px),
-                  linear-gradient(158deg, #fbf1ec 0%, #f7ecef 48%, #eef4fb 100%);">
-                <!-- central emblem watermark (leopard / spears / shield) -->
-                <div class="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden="true" style="opacity: 0.10;">
-                  <i class="fa-solid fa-shield-halved text-[#35608f]" style="font-size: 74cqw;"></i>
-                </div>
-                <div class="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden="true" style="opacity: 0.08;">
-                  <i class="fa-solid fa-paw text-[#2c5583]" style="font-size: 30cqw;"></i>
-                </div>
-                <div class="absolute inset-0 pointer-events-none flex items-center justify-center gap-[24cqw]" aria-hidden="true" style="opacity: 0.07;">
-                  <i class="fa-solid fa-location-arrow text-[#2c5583]" style="font-size: 22cqw; transform: rotate(-18deg);"></i>
-                  <i class="fa-solid fa-location-arrow text-[#2c5583]" style="font-size: 22cqw; transform: rotate(198deg);"></i>
+              <!-- ============ PAGE 2 · BIOMETRIC DATA PAGE (BOTTOM HALF) ============ -->
+              <section id="drcDataPage" class="absolute inset-x-0 bottom-0 overflow-hidden flex flex-col" style="height: 49.5%; container-type: inline-size; background:
+                  linear-gradient(180deg,
+                    #d8dcf2 0%,
+                    #cfd5ee 6.5%,
+                    #f8edd6 7.5%,
+                    #fbf3dc 17%,
+                    #f7e6df 36%,
+                    #eef2f6 64%,
+                    #ebeae2 82%,
+                    #ecebe4 100%);">
+
+                <!-- Data Page Fine Guilloche Waves & Central DRC Coat of Arms SVG -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 443 300" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- Subtle horizontal security wave lines across middle band -->
+                  <g fill="none" stroke="#d8b998" stroke-width="0.45" opacity="0.45">
+                    <path d="M 0 38 Q 110 32 220 38 T 443 36" />
+                    <path d="M 0 44 Q 110 38 220 44 T 443 42" />
+                    <path d="M 0 50 Q 110 44 220 50 T 443 48" />
+                    <path d="M 0 56 Q 110 50 220 56 T 443 54" />
+                  </g>
+                  <g fill="none" stroke="#deb4be" stroke-width="0.45" opacity="0.42">
+                    <path d="M 0 90 Q 140 78 280 92 T 443 88" />
+                    <path d="M 0 102 Q 140 90 280 104 T 443 100" />
+                    <path d="M 0 114 Q 140 102 280 116 T 443 112" />
+                    <path d="M 0 126 Q 140 114 280 128 T 443 124" />
+                  </g>
+
+                  <!-- Central DRC National Emblem (Teal Guilloche Medallion + Leopard + Tusk + Spear + JUSTICE PAIX TRAVAIL Scroll) -->
+                  <g transform="translate(258, 138)" opacity="0.72">
+                    <!-- Outer scalloped cyan-teal guilloche halo -->
+                    <circle cx="0" cy="-2" r="64" fill="#a8dce7" opacity="0.42" />
+                    <circle cx="0" cy="-2" r="59" fill="none" stroke="#5da8b8" stroke-width="1.1" stroke-dasharray="3 1.5" />
+                    <circle cx="0" cy="-2" r="54" fill="#bce6ee" opacity="0.45" stroke="#4f9bab" stroke-width="0.7" />
+                    <circle cx="0" cy="-2" r="48" fill="none" stroke="#5da8b8" stroke-width="0.6" stroke-dasharray="2 2" />
+
+                    <!-- Left curved elephant tusk -->
+                    <path d="M -32 34 C -48 10, -48 -24, -26 -48 C -36 -20, -34 8, -20 30 Z" fill="#f7f2e4" stroke="#5b5346" stroke-width="1" />
+
+                    <!-- Right upright crossed spear -->
+                    <line x1="22" y1="36" x2="38" y2="-36" stroke="#5b5346" stroke-width="1.6" />
+                    <path d="M 38 -36 L 31 -22 L 37 -24 L 41 -20 Z" fill="#d8c39e" stroke="#4a4338" stroke-width="0.9" />
+                    <path d="M 33 -18 C 42 -26, 44 -40, 38 -49 C 29 -42, 27 -28, 33 -18 Z" fill="#e6d6b8" stroke="#5b5346" stroke-width="0.9" />
+
+                    <!-- Central roaring leopard head -->
+                    <path d="M -18 -24 C -22 -30, -14 -36, -9 -30 C -4 -33, 4 -33, 9 -30 C 14 -36, 22 -30, 18 -24 C 23 -14, 22 2, 14 14 C 8 21, -8 21, -14 14 C -22 2, -23 -14, -18 -24 Z" fill="#e5c49a" stroke="#6e5034" stroke-width="0.9" />
+                    <!-- Leopard facial markings & spots -->
+                    <g fill="#6e4f35" opacity="0.8">
+                      <ellipse cx="-7" cy="-12" rx="2.4" ry="1.6" />
+                      <ellipse cx="7" cy="-12" rx="2.4" ry="1.6" />
+                      <polygon points="0,-4 -3.5,1 3.5,1" fill="#8c584c" />
+                      <path d="M -6 6 Q 0 3 6 6 Q 4 12 0 12 Q -4 12 -6 6 Z" fill="#a85d55" />
+                      <circle cx="-12" cy="-20" r="1.4" />
+                      <circle cx="12" cy="-20" r="1.4" />
+                      <circle cx="0" cy="-23" r="1.5" />
+                      <circle cx="-14" cy="-6" r="1.5" />
+                      <circle cx="14" cy="-6" r="1.5" />
+                      <circle cx="-11" cy="4" r="1.4" />
+                      <circle cx="11" cy="4" r="1.4" />
+                    </g>
+
+                    <!-- Crossed palm/laurel branches above scroll -->
+                    <path d="M -26 22 Q 0 32 26 22" fill="none" stroke="#5d8268" stroke-width="1.8" />
+
+                    <!-- Bottom motto scroll: JUSTICE - PAIX - TRAVAIL -->
+                    <path d="M -52 10 L -24 38 L 24 38 L 52 10 L 44 4 L 20 28 L -20 28 L -44 4 Z" fill="#efe6d5" stroke="#6b6254" stroke-width="0.9" />
+                    <text x="0" y="36" text-anchor="middle" font-size="6.5" font-weight="800" fill="#4a453c" letter-spacing="1.2">PAIX</text>
+                    <text x="-35" y="23" text-anchor="middle" font-size="5.2" font-weight="800" fill="#4a453c" transform="rotate(42 -35 23)">JUSTICE</text>
+                    <text x="35" y="23" text-anchor="middle" font-size="5.2" font-weight="800" fill="#4a453c" transform="rotate(-42 35 23)">TRAVAIL</text>
+                  </g>
+                </svg>
+
+                <!-- Top Bilingual Country Header Band -->
+                <div class="relative w-full flex items-center justify-center" style="height: 6.8%; padding: 0 2%;">
+                  <div class="font-extrabold uppercase text-[#1e2258] tracking-[0.015em] whitespace-nowrap" style="font-size: 2.02cqw; line-height: 1;">
+                    RÉPUBLIQUE DÉMOCRATIQUE DU CONGO - DEMOCRATIC REPUBLIC OF THE CONGO
+                  </div>
                 </div>
 
-                <!-- bilingual country band -->
-                <div class="relative bg-gradient-to-r from-sky-500 via-indigo-700 to-indigo-900 px-[2.5%] py-[1.05cqw] text-center">
-                  <div class="font-black uppercase text-white leading-tight tracking-[0.05em]" style="font-size: 1.68cqw;">RÉPUBLIQUE DÉMOCRATIQUE DU CONGO - DEMOCRATIC REPUBLIC OF THE CONGO</div>
-                </div>
-
-                <div class="relative flex-1 flex flex-col px-[3.6%] pt-[1.6%] pb-[1.2%]">
-                  <!-- header row: PASSEPORT + type / issuing country / passport no -->
-                  <div class="flex items-start gap-[3%]">
-                    <div class="shrink-0">
-                      <div class="font-black uppercase leading-none tracking-tight" style="font-size: 2.95cqw;">PASSEPORT</div>
-                      <div class="font-semibold italic leading-tight text-[#3f5f8f]" style="font-size: 1.85cqw;">Passport</div>
-                    </div>
-                    <div class="shrink-0">
-                      <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Type /<br>Type</div>
-                      <div id="drcOutType" class="font-black leading-tight" style="font-size: 2.1cqw;">P</div>
-                    </div>
-                    <div class="shrink-0">
-                      <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Pays émetteur /<br>Issuing country</div>
-                      <div id="drcOutCode" class="font-black leading-tight tracking-wide" style="font-size: 2.1cqw;">COD</div>
-                    </div>
-                    <div class="shrink-0">
-                      <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">N° de passeport /<br>Passport n°</div>
-                      <div id="drcOutPassNo" class="font-black leading-tight tracking-wide" style="font-size: 2.1cqw;">OP1123637</div>
-                    </div>
+                <!-- Main Data Page Body (Absolute-positioned to match exact coordinates of reference specimen) -->
+                <div class="relative flex-1 w-full">
+                  <!-- Subheader Left: PASSEPORT * PASSPORT -->
+                  <div class="absolute flex items-center gap-[0.6cqw] font-bold uppercase text-[#544d36]" style="left: 4.7%; top: 3.6%; font-size: 1.92cqw; letter-spacing: 0.02em;">
+                    <span>PASSEPORT</span>
+                    <span style="font-size: 1.55cqw; line-height: 1;">&#9733;</span>
+                    <span>PASSPORT</span>
                   </div>
 
-                  <!-- body: photo | personal fields | secondary ghost photo + right column -->
-                  <div class="mt-[1.8%] flex items-start gap-[2.2%] flex-1">
-                    <!-- main monochrome portrait with security ghosting overprint -->
-                    <div class="shrink-0" style="width: 27%;">
-                      <div class="relative border border-[#9fb0c9] shadow-sm overflow-hidden" style="background:#fff; padding: 2px;">
-                        <img id="drcOutPhotoMain" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Bearer photograph" class="w-full object-cover object-top" style="height: 32cqw; filter: grayscale(1) contrast(1.08);">
-                        <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: repeating-linear-gradient(102deg, rgba(255,255,255,0.22) 0 1px, rgba(255,255,255,0) 1px 5px);"></div>
-                        <div class="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden="true" style="transform: rotate(-13deg);">
-                          <span class="font-black uppercase text-white" style="font-size: 2.5cqw; letter-spacing: 0.16em; opacity: 0.34; text-shadow: 0 0 1px rgba(0,0,0,0.5);">COD·RDC·COD</span>
-                        </div>
-                        <div class="absolute inset-x-0 bottom-0 pointer-events-none" aria-hidden="true" style="height: 34%; background: linear-gradient(180deg, rgba(90,140,200,0), rgba(90,140,200,0.18));"></div>
-                      </div>
-                    </div>
-
-                    <!-- personal fields -->
-                    <div class="shrink-0 space-y-[1.5cqw]" style="width: 34%;">
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Nom / Name</div>
-                        <div id="drcOutSurname" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.98cqw;">MIEZI</div>
-                      </div>
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Postnom / Postname</div>
-                        <div id="drcOutPostname" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.98cqw;">MINGI</div>
-                      </div>
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Prénoms / Given names</div>
-                        <div id="drcOutGivenNames" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.98cqw;">CARMI</div>
-                      </div>
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Date de naissance / Date of birth</div>
-                        <div id="drcOutDob" class="font-black leading-tight" style="font-size: 1.98cqw;">23/04/2000</div>
-                      </div>
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Nationalité / Nationality</div>
-                        <div id="drcOutNationality" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.98cqw;">CONGOLAISE</div>
-                      </div>
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Lieu de naissance / Place of birth</div>
-                        <div id="drcOutPob" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.98cqw;">KINSHASA</div>
-                      </div>
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Date de délivrance / Date of issue</div>
-                        <div id="drcOutIssue" class="font-black leading-tight" style="font-size: 1.98cqw;">22/07/2022</div>
-                      </div>
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Date d'expiration / Date of expiry</div>
-                        <div id="drcOutExpiry" class="font-black leading-tight" style="font-size: 1.98cqw;">21/07/2027</div>
-                      </div>
-                    </div>
-
-                    <!-- right column: sex + secondary ghost photo over the emblem -->
-                    <div class="flex-1 flex flex-col">
-                      <div>
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Sexe / Sex</div>
-                        <div id="drcOutSex" class="font-black leading-tight" style="font-size: 1.98cqw;">M</div>
-                      </div>
-
-                      <div class="relative mt-[2.4cqw] border border-[#9fb0c9] shadow-sm overflow-hidden" style="padding: 2px; background: rgba(255,255,255,0.55);">
-                        <img id="drcOutPhotoSecondary" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Secondary ghost photograph" class="w-full object-cover object-top" style="height: 23cqw; filter: grayscale(1) contrast(1.02); opacity: 0.62; mix-blend-mode: luminosity;">
-                        <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: conic-gradient(from 210deg, rgba(253,230,138,0.42), rgba(240,171,252,0.40), rgba(165,180,252,0.42), rgba(252,211,77,0.36), rgba(253,186,116,0.40), rgba(253,230,138,0.42)); opacity: 0.55; mix-blend-mode: overlay;"></div>
-                        <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: repeating-linear-gradient(0deg, rgba(255,255,255,0.30) 0 1px, rgba(255,255,255,0) 1px 4px); opacity: 0.8;"></div>
-                      </div>
-
-                      <div class="mt-[2.4cqw]">
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">N° personnel / Personal n°</div>
-                        <div id="drcOutPersonalNo" class="font-black leading-tight tracking-tight" style="font-size: 1.98cqw;">110619112</div>
-                      </div>
-                      <div class="mt-[2.4cqw]">
-                        <div class="font-bold uppercase leading-tight text-[#3f5f8f]" style="font-size: 1.22cqw;">Autorité émetteur / Issuing authority</div>
-                        <div id="drcOutAuthority" class="font-black uppercase leading-tight tracking-tight" style="font-size: 1.98cqw;">MINAFFET</div>
-                      </div>
-                    </div>
+                  <!-- Header Columns: Type | Pays émetteur | N° de passeport -->
+                  <div class="absolute" style="left: 33.4%; top: 0.6%;">
+                    <div class="font-semibold text-[#2d537a] leading-none" style="font-size: 1.42cqw;">Type / Type</div>
+                    <div id="drcOutType" class="font-extrabold text-[#16161d] leading-none mt-[0.7cqw] ml-[2.1cqw]" style="font-size: 2.05cqw;">P</div>
                   </div>
 
-                  <!-- MRZ -->
-                  <div class="mt-[1.4cqw] bg-white/80 border-t border-rose-200/80" style="padding: 0.9cqw 1.4cqw;">
-                    <div id="drcMrzLine1" class="font-mono whitespace-nowrap overflow-hidden leading-tight tracking-[0.02em] text-[#1b1436]" style="font-size: 2.55cqw;">P&lt;CODMIEZI&lt;&lt;CARMI&lt;MINGI&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                    <div id="drcMrzLine2" class="font-mono whitespace-nowrap overflow-hidden leading-tight tracking-[0.02em] text-[#1b1436]" style="font-size: 2.55cqw;">OP11236378COD0004237M270721110619112&lt;&lt;&lt;&lt;&lt;&lt;68</div>
+                  <div class="absolute" style="left: 43.3%; top: 0.6%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Pays émetteur / Issuing country</div>
+                    <div id="drcOutCode" class="font-extrabold text-[#16161d] leading-none mt-[0.7cqw] ml-[3.4cqw]" style="font-size: 2.05cqw;">COD</div>
+                  </div>
+
+                  <div class="absolute" style="left: 67.0%; top: 0.6%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">N° de passeport / Passport n°</div>
+                    <div id="drcOutPassNo" class="font-extrabold text-[#16161d] leading-none mt-[0.7cqw] ml-[2.4cqw] tracking-[0.02em]" style="font-size: 2.12cqw;">OP1123637</div>
+                  </div>
+
+                  <!-- Main Left Bearer Portrait (#drcOutPhotoMain) -->
+                  <div class="absolute overflow-hidden" style="left: 5.6%; top: 15.8%; width: 24.4%; height: 62.5%;">
+                    <img id="drcOutPhotoMain" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Bearer photograph" class="w-full h-full object-cover object-top" style="filter: contrast(1.03) brightness(1.01); mix-blend-mode: multiply;">
+                    <!-- Subtle horizontal guilloche security lines over bottom of portrait -->
+                    <div class="absolute inset-x-0 bottom-0 pointer-events-none" aria-hidden="true" style="height: 28%; background: repeating-linear-gradient(176deg, rgba(255,255,255,0.28) 0 1px, rgba(255,255,255,0) 1px 4px);"></div>
+                  </div>
+
+                  <!-- Center Column Personal Fields (7 stacked fields matching the reference image) -->
+                  <!-- 1. Nom / Name -->
+                  <div class="absolute" style="left: 33.4%; top: 7.8%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Nom / Name</div>
+                    <div id="drcOutSurname" class="font-extrabold uppercase text-[#16161d] leading-none mt-[0.45cqw] ml-[2.2cqw]" style="font-size: 2.05cqw;">MIEZI</div>
+                  </div>
+
+                  <!-- 2. Postnom / Postname -->
+                  <div class="absolute" style="left: 33.4%; top: 18.8%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Postnom / Postname</div>
+                    <div id="drcOutPostname" class="font-extrabold uppercase text-[#16161d] leading-none mt-[0.45cqw] ml-[2.2cqw]" style="font-size: 2.05cqw;">MINGI</div>
+                  </div>
+
+                  <!-- 3. Prénoms / Given names -->
+                  <div class="absolute" style="left: 33.4%; top: 29.8%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Prénoms / Given names</div>
+                    <div id="drcOutGivenNames" class="font-extrabold uppercase text-[#16161d] leading-none mt-[0.45cqw] ml-[2.2cqw]" style="font-size: 2.05cqw;">CARMI</div>
+                  </div>
+
+                  <!-- 4. Date de naissance / Date of birth -->
+                  <div class="absolute" style="left: 33.4%; top: 41.2%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Date de naissance / Date of birth</div>
+                    <div id="drcOutDob" class="font-extrabold text-[#16161d] leading-none mt-[0.5cqw] ml-[2.2cqw]" style="font-size: 2.02cqw;">23/04/2000</div>
+                  </div>
+
+                  <!-- 5. Nationalité / Nationality -->
+                  <div class="absolute" style="left: 33.4%; top: 50.8%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Nationalité / Nationality</div>
+                    <div id="drcOutNationality" class="font-extrabold uppercase text-[#16161d] leading-none mt-[0.5cqw] ml-[2.2cqw]" style="font-size: 2.02cqw;">CONGOLAISE</div>
+                  </div>
+
+                  <!-- 6. Date de délivrance / Date of issue -->
+                  <div class="absolute" style="left: 33.4%; top: 60.4%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Date de délivrance / Date of issue</div>
+                    <div id="drcOutIssue" class="font-extrabold text-[#16161d] leading-none mt-[0.5cqw] ml-[2.2cqw]" style="font-size: 2.02cqw;">22/07/2022</div>
+                  </div>
+
+                  <!-- 7. Date d'expiration / Date of expiry -->
+                  <div class="absolute" style="left: 33.4%; top: 69.8%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Date d'expiration / Date of expiry</div>
+                    <div id="drcOutExpiry" class="font-extrabold text-[#16161d] leading-none mt-[0.5cqw] ml-[2.2cqw]" style="font-size: 2.02cqw;">21/07/2027</div>
+                  </div>
+
+                  <!-- Right Column: Sexe / Sex + Secondary Ghost Portrait + Lieu de naissance + N° personnel + Autorité émetteur -->
+                  <!-- Sexe / Sex (Aligned with Nom / Name) -->
+                  <div class="absolute" style="left: 67.0%; top: 7.8%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Sexe / Sex</div>
+                    <div id="drcOutSex" class="font-extrabold uppercase text-[#16161d] leading-none mt-[0.45cqw] ml-[1.8cqw]" style="font-size: 2.05cqw;">M</div>
+                  </div>
+
+                  <!-- Secondary Ghost Portrait (#drcOutPhotoSecondary) -->
+                  <div class="absolute overflow-hidden" style="left: 72.2%; top: 17.5%; width: 14.8%; height: 32.5%;">
+                    <img id="drcOutPhotoSecondary" src="/assets/aistudio/drc_passport_portrait.jpg" alt="Secondary ghost photograph" class="w-full h-full object-cover object-top" style="filter: grayscale(0.25) contrast(1.04) brightness(1.04); opacity: 0.88; mix-blend-mode: multiply;">
+                  </div>
+
+                  <!-- Lieu de naissance / Place of birth (Below secondary photo, aligned with Nationalité) -->
+                  <div class="absolute" style="left: 67.0%; top: 50.8%; right: 3%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Lieu de naissance / Place of birth</div>
+                    <div id="drcOutPob" class="font-extrabold uppercase text-[#16161d] leading-none mt-[0.5cqw] ml-[8.5cqw]" style="font-size: 2.02cqw;">KINSHASA</div>
+                  </div>
+
+                  <!-- N° personnel / Personal n° (Aligned with Date de délivrance) -->
+                  <div class="absolute" style="left: 67.0%; top: 60.4%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">N° personnel / Personal n°</div>
+                    <div id="drcOutPersonalNo" class="font-extrabold text-[#16161d] leading-none mt-[0.5cqw] ml-[1.8cqw] tracking-[0.02em]" style="font-size: 2.02cqw;">110619112</div>
+                  </div>
+
+                  <!-- Autorité émetteur / Issuing authority (Aligned with Date d'expiration) -->
+                  <div class="absolute" style="left: 67.0%; top: 69.8%;">
+                    <div class="font-semibold text-[#2d537a] leading-none whitespace-nowrap" style="font-size: 1.42cqw;">Autorité émetteur / Issuing authority</div>
+                    <div id="drcOutAuthority" class="font-extrabold uppercase text-[#16161d] leading-none mt-[0.5cqw] ml-[1.8cqw]" style="font-size: 2.02cqw;">MINAFFET</div>
+                  </div>
+
+                  <!-- Bottom Machine Readable Zone (MRZ) -->
+                  <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center" style="height: 19.5%; padding-left: 4.6%; padding-right: 4.2%;">
+                    <div id="drcMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#14141a]" style="font-size: 2.72cqw; letter-spacing: 0.095em; line-height: 1.45;">P&lt;CODMIEZI&lt;&lt;CARMI&lt;MINGI&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                    <div id="drcMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#14141a]" style="font-size: 2.72cqw; letter-spacing: 0.095em; line-height: 1.45;">OP11236378COD0004237M270721110619112&lt;&lt;&lt;&lt;&lt;&lt;68</div>
                   </div>
                 </div>
               </section>
             </article>
 
-            <p class="text-[11px] text-slate-400 text-center leading-snug">Reference specimen reproduction · Cameroon-style guilloche data page with bilingual French/English captions, dual portrait and TD3 machine readable zone.</p>
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Reference specimen reproduction · DR Congo biometric passport spread (443 × 607 proportions) with bilingual French/English captions, dual portrait, national emblem, and TD3 machine readable zone.</p>
           </section>
         </main>
       </div>
@@ -14977,6 +14884,7 @@ COD REP DEM CONGO</div>
       const OFFICIAL_OGADS_LINK = 'https://trkoffer.net/cl/i/n616e4';
       const SESSION_STORAGE_KEY = 'ogads_visitor_session_v1';
       const LOCK_MAP_STORAGE_KEY = 'ogads_file_locks_v1';
+      const UNLOCK_REQUIRED_MESSAGE = 'Download Locked: Please complete an eligible OGAds verification offer to unlock and save this demo document.';
 
       function getOrCreateVisitorSessionId() {
         try {
@@ -15011,6 +14919,9 @@ COD REP DEM CONGO</div>
 
       const visitorSessionId = getOrCreateVisitorSessionId();
       const origDownloadFns = {};
+      const origHtml2Canvas = typeof window.html2canvas === 'function' ? window.html2canvas.bind(window) : null;
+      const origWindowPrint = typeof window.print === 'function' ? window.print.bind(window) : null;
+
       let publicOgadsConfig = {
         trackingLink: OFFICIAL_OGADS_LINK,
         lockerId: 'n616e4',
@@ -15024,16 +14935,17 @@ COD REP DEM CONGO</div>
       let activeLockState = null;
       let pollIntervalId = null;
       let authorizedExecutionBypass = false;
+      let currentAuthorizedContext = null;
 
-      // Catalog of all downloadable verification files in the project
+      // Complete catalog of every downloadable / exportable verification file in the project
       const FILE_CATALOG = {
         'kenya-passport-png': {
           fileId: 'kenya-passport-png',
-          fileName: 'kenya-passport.png',
+          fileName: 'kenya-passport-demo.png',
           docTitle: 'Republic of Kenya — Biometric Passport (HD PNG)',
           country: 'kenya',
           docType: 'passport',
-          fnName: 'downloadPassportPNG'
+          fnName: 'exportKenyaPassportPNG'
         },
         'kenya-passport-print': {
           fileId: 'kenya-passport-print',
@@ -15041,106 +14953,138 @@ COD REP DEM CONGO</div>
           docTitle: 'Republic of Kenya — Biometric Passport (Print / PDF)',
           country: 'kenya',
           docType: 'passport',
-          fnName: 'printPassport'
+          fnName: 'printKenyaPassportDoc'
         },
         'kenya-id-front-png': {
           fileId: 'kenya-id-front-png',
-          fileName: 'kenya-maisha-id-front.png',
+          fileName: 'kenya-maisha-id-front-demo.png',
           docTitle: 'Kenya Maisha Namba National ID — Front Side (PNG)',
           country: 'kenya',
           docType: 'idcard',
-          fnName: 'downloadKenyaIdPNG',
-          fnArgs: ['front']
+          fnName: 'downloadKidFrontPNG'
         },
         'kenya-id-back-png': {
           fileId: 'kenya-id-back-png',
-          fileName: 'kenya-maisha-id-back.png',
+          fileName: 'kenya-maisha-id-back-demo.png',
           docTitle: 'Kenya Maisha Namba National ID — Back Side (PNG)',
           country: 'kenya',
           docType: 'idcard',
-          fnName: 'downloadKenyaIdPNG',
-          fnArgs: ['back']
+          fnName: 'downloadKidBackPNG'
         },
         'kenya-id-both-png': {
           fileId: 'kenya-id-both-png',
-          fileName: 'kenya-maisha-id-both.png',
+          fileName: 'kenya-maisha-id-both-demo.png',
           docTitle: 'Kenya Maisha Namba National ID — Front & Back (PNG)',
           country: 'kenya',
           docType: 'idcard',
-          fnName: 'downloadKenyaIdPNG',
-          fnArgs: ['both']
+          fnName: 'downloadKidBothPNG'
+        },
+        'somalia-smart-id-png': {
+          fileId: 'somalia-smart-id-png',
+          fileName: 'somalia-snid-smart-card-demo.png',
+          docTitle: 'Federal Republic of Somalia — SNID Smart ID Card (HD PNG)',
+          country: 'somalia',
+          docType: 'idcard',
+          fnName: 'downloadSomSmartIdPNG'
         },
         'somalia-id-png': {
           fileId: 'somalia-id-png',
-          fileName: 'somalia-national-id.png',
-          docTitle: 'Federal Republic of Somalia — National ID Card (HD PNG)',
+          fileName: 'somalia-national-id-demo.png',
+          docTitle: 'Federal Republic of Somalia — NIRA National ID Card (HD PNG)',
           country: 'somalia',
           docType: 'idcard',
-          fnName: 'downloadSomaliaPNG'
+          fnName: 'downloadSomPNG'
         },
         'somalia-passport-png': {
           fileId: 'somalia-passport-png',
-          fileName: 'somalia-passport.png',
-          docTitle: 'Federal Republic of Somalia — e-Passport (HD PNG)',
+          fileName: 'somalia-epassport-demo.png',
+          docTitle: 'Federal Republic of Somalia — Biometric e-Passport (HD PNG)',
           country: 'somalia',
           docType: 'passport',
-          fnName: 'downloadSomaliaPassportPNG'
+          fnName: 'downloadSomPassPNG'
+        },
+        'somalia-pass-id-png': {
+          fileId: 'somalia-pass-id-png',
+          fileName: 'somalia-passport-id-card-demo.png',
+          docTitle: 'Federal Republic of Somalia — Passport Card Specimen (HD PNG)',
+          country: 'somalia',
+          docType: 'passport',
+          fnName: 'downloadSomPassIdCardPNG'
         },
         'somalia-dl-png': {
           fileId: 'somalia-dl-png',
-          fileName: 'somalia-drivers-license.png',
-          docTitle: 'Somalia International Driver\'s License (HD PNG)',
+          fileName: 'somalia-drivers-license-demo.png',
+          docTitle: 'Federal Republic of Somalia — Driver\'s License (HD PNG)',
           country: 'somalia',
           docType: 'driverlicense',
-          fnName: 'downloadSomaliaDlPNG'
+          fnName: 'downloadSomLicPNG'
         },
         'ethiopia-id-png': {
           fileId: 'ethiopia-id-png',
-          fileName: 'ethiopia-fayda-id.png',
-          docTitle: 'Federal Democratic Republic of Ethiopia — Fayda Digital ID (PNG)',
+          fileName: 'ethiopia-fayda-id-demo.png',
+          docTitle: 'Federal Democratic Republic of Ethiopia — Fayda National ID (PNG)',
           country: 'ethiopia',
           docType: 'idcard',
-          fnName: 'downloadEthiopiaPNG'
+          fnName: 'downloadEthPNG'
         },
         'nigeria-id-png': {
           fileId: 'nigeria-id-png',
-          fileName: 'nigeria-nin-id.png',
-          docTitle: 'Federal Republic of Nigeria — National Identity Card (PNG)',
+          fileName: 'nigeria-nin-id-demo.png',
+          docTitle: 'Federal Republic of Nigeria — NIMC National ID Card (PNG)',
           country: 'nigeria',
           docType: 'idcard',
-          fnName: 'downloadNigeriaPNG'
+          fnName: 'downloadNgaCardPNG'
         },
         'nigeria-passport-png': {
           fileId: 'nigeria-passport-png',
-          fileName: 'nigeria-passport.png',
-          docTitle: 'Federal Republic of Nigeria — e-Passport (HD PNG)',
+          fileName: 'nigeria-epassport-demo.png',
+          docTitle: 'Federal Republic of Nigeria — ICAO e-Passport (HD PNG)',
           country: 'nigeria',
           docType: 'passport',
-          fnName: 'downloadNigeriaPassportPNG'
+          fnName: 'downloadNgaPassportPNG'
         },
         'uk-passport-png': {
           fileId: 'uk-passport-png',
-          fileName: 'uk-british-passport.png',
+          fileName: 'uk-british-passport-demo.png',
           docTitle: 'United Kingdom — British Biometric Passport (HD PNG)',
           country: 'uk',
           docType: 'passport',
-          fnName: 'downloadUkPassportPNG'
+          fnName: 'downloadUkPassPNG'
         },
         'uganda-refugee-png': {
           fileId: 'uganda-refugee-png',
-          fileName: 'uganda-refugee-id-card.png',
-          docTitle: 'Republic of Uganda — Refugee Identity Card (HD PNG)',
+          fileName: 'uganda-refugee-id-card-demo.png',
+          docTitle: 'Republic of Uganda — OPM Refugee Identity Card (HD PNG)',
           country: 'uganda',
           docType: 'refugeecard',
-          fnName: 'downloadUgandaRefugeePNG'
+          fnName: 'downloadUgandaPNG'
         },
-        'pakistan-id-png': {
-          fileId: 'pakistan-id-png',
-          fileName: 'pakistan-nadra-cnic.png',
-          docTitle: 'Islamic Republic of Pakistan — NADRA Smart CNIC (HD PNG)',
+        'pakistan-id-front-png': {
+          fileId: 'pakistan-id-front-png',
+          fileName: 'pakistan-nadra-cnic-front-demo.png',
+          docTitle: 'Islamic Republic of Pakistan — NADRA Smart CNIC Front (HD PNG)',
           country: 'pakistan',
           docType: 'idcard',
-          fnName: 'downloadPakistanPNG'
+          fnName: 'downloadPakCardPNG',
+          fnArgs: ['pakistan-id-card']
+        },
+        'pakistan-id-back-png': {
+          fileId: 'pakistan-id-back-png',
+          fileName: 'pakistan-nadra-cnic-back-demo.png',
+          docTitle: 'Islamic Republic of Pakistan — NADRA Smart CNIC Back (HD PNG)',
+          country: 'pakistan',
+          docType: 'idcard',
+          fnName: 'downloadPakCardPNG',
+          fnArgs: ['pakistan-id-back']
+        },
+        'pakistan-id-both-png': {
+          fileId: 'pakistan-id-both-png',
+          fileName: 'pakistan-nadra-cnic-both-demo.png',
+          docTitle: 'Islamic Republic of Pakistan — NADRA Smart CNIC Front & Back (HD PNG)',
+          country: 'pakistan',
+          docType: 'idcard',
+          fnName: 'downloadPakCardPNG',
+          fnArgs: []
         },
         'pakistan-specimen-jpg': {
           fileId: 'pakistan-specimen-jpg',
@@ -15152,15 +15096,15 @@ COD REP DEM CONGO</div>
         },
         'seychelles-id-png': {
           fileId: 'seychelles-id-png',
-          fileName: 'seychelles-national-id.png',
+          fileName: 'seychelles-national-id-demo.png',
           docTitle: 'Republic of Seychelles — National Identity Card (HD PNG)',
           country: 'seychelles',
           docType: 'idcard',
-          fnName: 'downloadSeychellesPNG'
+          fnName: 'downloadSycCardPNG'
         },
         'senegal-passport-png': {
           fileId: 'senegal-passport-png',
-          fileName: 'senegal-passport.png',
+          fileName: 'senegal-passport-demo.png',
           docTitle: 'Republic of Senegal — ECOWAS Biometric Passport (HD PNG)',
           country: 'senegal',
           docType: 'passport',
@@ -15168,7 +15112,7 @@ COD REP DEM CONGO</div>
         },
         'drcongo-passport-png': {
           fileId: 'drcongo-passport-png',
-          fileName: 'drcongo-passport.png',
+          fileName: 'drcongo-passport-demo.png',
           docTitle: 'Democratic Republic of the Congo — Biometric Passport (HD PNG)',
           country: 'drcongo',
           docType: 'passport',
@@ -15192,28 +15136,28 @@ COD REP DEM CONGO</div>
         },
         'proof-of-account-png': {
           fileId: 'proof-of-account-png',
-          fileName: 'Proof-of-Address-and-Account.png',
+          fileName: 'Proof-of-Address-and-Account-Demo.png',
           docTitle: 'Official Proof of Address & Account Confirmation (HD PNG)',
           country: 'all',
           docType: 'proofofaccount',
-          fnName: 'downloadPoaPNG'
+          fnName: 'downloadProofOfAccountPNG'
         }
       };
 
       function resolveActiveFileKey() {
         const c = (typeof currentCountry !== 'undefined' && currentCountry) ? currentCountry : 'kenya';
         const d = (typeof currentDocType !== 'undefined' && currentDocType) ? currentDocType : 'passport';
-        if (d === 'proofofaccount') return 'proof-of-account-pdf';
+        if (d === 'proofofaccount') return 'proof-of-account-png';
         if (c === 'drcongo') return 'drcongo-passport-png';
         if (c === 'senegal') return 'senegal-passport-png';
         if (c === 'seychelles') return 'seychelles-id-png';
-        if (c === 'pakistan') return 'pakistan-id-png';
+        if (c === 'pakistan') return 'pakistan-id-both-png';
         if (c === 'uganda' || d === 'refugeecard') return 'uganda-refugee-png';
         if (c === 'uk') return 'uk-passport-png';
         if (d === 'driverlicense') return 'somalia-dl-png';
         if (c === 'nigeria') return d === 'passport' ? 'nigeria-passport-png' : 'nigeria-id-png';
         if (c === 'ethiopia') return 'ethiopia-id-png';
-        if (c === 'somalia') return d === 'idcard' ? 'somalia-id-png' : 'somalia-passport-png';
+        if (c === 'somalia') return d === 'idcard' ? 'somalia-smart-id-png' : 'somalia-passport-png';
         if (d === 'idcard') return 'kenya-id-both-png';
         return 'kenya-passport-png';
       }
@@ -15226,12 +15170,239 @@ COD REP DEM CONGO</div>
         return true;
       }
 
-      // Sync the top workbench banner & all download buttons on the page
+      function notifyUnlockRequired(item) {
+        if (typeof showToast === 'function') {
+          showToast(
+            'Download Locked — Offer Required',
+            item && item.docTitle
+              ? `Complete an eligible OGAds offer to unlock ${item.docTitle}.`
+              : UNLOCK_REQUIRED_MESSAGE,
+            true
+          );
+        }
+      }
+
+      // Stamp visible SAMPLE • DEMO SPECIMEN watermark onto any exported canvas
+      function stampDemoWatermarkOnCanvas(canvas) {
+        if (!canvas || typeof canvas.getContext !== 'function') return canvas;
+        try {
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return canvas;
+          const w = canvas.width || 600;
+          const h = canvas.height || 400;
+
+          ctx.save();
+          // Subtle diagonal SAMPLE / DEMO watermark across center
+          ctx.translate(w / 2, h / 2);
+          ctx.rotate(-Math.atan2(h, w) * 0.65);
+          const fontSize = Math.max(16, Math.round(Math.min(w, h) * 0.065));
+          ctx.font = `900 ${fontSize}px "Inter", "Arial", sans-serif`;
+          ctx.fillStyle = 'rgba(220, 38, 38, 0.16)';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+          ctx.lineWidth = Math.max(1, Math.round(fontSize * 0.06));
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const watermarkText = 'SAMPLE • DEMO SPECIMEN';
+          ctx.strokeText(watermarkText, 0, 0);
+          ctx.fillText(watermarkText, 0, 0);
+          ctx.restore();
+
+          // Bottom corner compliance badge
+          ctx.save();
+          const badgeH = Math.max(18, Math.round(h * 0.042));
+          const badgeFont = Math.max(10, Math.round(badgeH * 0.54));
+          ctx.font = `700 ${badgeFont}px "JetBrains Mono", monospace`;
+          const badgeLabel = 'SAMPLE / DEMO SPECIMEN — NOT AN OFFICIAL DOCUMENT';
+          const textMetrics = ctx.measureText(badgeLabel);
+          const badgeW = Math.min(w - 16, Math.ceil(textMetrics.width + 20));
+          const bx = w - badgeW - 8;
+          const by = h - badgeH - 8;
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
+          ctx.fillRect(bx, by, badgeW, badgeH);
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.65)';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(bx, by, badgeW, badgeH);
+          ctx.fillStyle = '#fde68a';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(badgeLabel, bx + badgeW / 2, by + badgeH / 2);
+          ctx.restore();
+        } catch (e) {}
+        return canvas;
+      }
+
+      // Ensure visible SAMPLE / DEMO markings on the live preview cards
+      function ensureVisibleSampleDemoMarkings() {
+        const wm = document.getElementById('sampleWatermark');
+        if (wm) {
+          wm.classList.remove('hidden');
+          wm.style.pointerEvents = 'none';
+        }
+        const previewIds = [
+          'passport-card',
+          'kenya-id-front',
+          'kenya-id-back',
+          'somali-smart-id-card',
+          'somalia-card',
+          'somalia-passport-spread',
+          'somalia-passport-id-card',
+          'somalia-driverlicense-card',
+          'ethiopia-fayda-card',
+          'nigeria-id-card',
+          'nigeria-passport-card',
+          'uk-passport-card',
+          'uganda-refugee-card',
+          'pakistan-id-card',
+          'pakistan-id-back',
+          'seychelles-id-front',
+          'senegal-passport-spread',
+          'drc-passport-card',
+          'proof-of-account-card'
+        ];
+        previewIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el || el.querySelector('.ogads-demo-specimen-tag')) return;
+          const computedPos = window.getComputedStyle(el).position;
+          if (computedPos === 'static') {
+            el.style.position = 'relative';
+          }
+          const badge = document.createElement('div');
+          badge.className = 'ogads-demo-specimen-tag pointer-events-none select-none';
+          badge.setAttribute('aria-hidden', 'true');
+          badge.style.cssText = 'position:absolute;bottom:4px;right:6px;z-index:45;padding:1px 6px;border-radius:3px;background:rgba(15,23,42,0.58);border:1px solid rgba(245,158,11,0.45);color:#fde68a;font-family:monospace;font-size:8px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;pointer-events:none;user-select:none;';
+          badge.textContent = 'SAMPLE • DEMO';
+          el.appendChild(badge);
+        });
+      }
+
+      // Custom server-authorized export handler for Kenya Passport (#downloadBtn)
+      async function exportKenyaPassportPNG() {
+        const card = document.getElementById('passport-card');
+        if (!card || !origHtml2Canvas) return;
+        const btn = document.getElementById('downloadBtn');
+        const originalHTML = btn ? btn.innerHTML : '';
+        if (btn) {
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Rendering HD PNG...';
+          btn.disabled = true;
+        }
+        try {
+          await document.fonts.ready;
+          const canvas = await window.html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            logging: false
+          });
+          const dataUrl = canvas.toDataURL('image/png');
+          const pNumEl = document.getElementById('input-passportNo');
+          const pNum = (pNumEl && pNumEl.value ? pNumEl.value : 'AK1093855').trim();
+          const fileName = `Kenya-Passport-${pNum}-DEMO.png`;
+
+          // Trigger server-verified download if available
+          const serverDownloadUrl = canvas._ogadsServerDownloadUrl || dataUrl;
+          const link = document.createElement('a');
+          link.download = fileName;
+          link.href = serverDownloadUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          const fallbackLink = document.getElementById('fallbackDownloadLink');
+          if (fallbackLink) {
+            fallbackLink.href = serverDownloadUrl;
+            fallbackLink.download = fileName;
+          }
+          if (typeof showToast === 'function') {
+            showToast('Passport Saved!', `Downloaded ${fileName}`);
+          }
+        } finally {
+          if (btn) {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+          }
+          if (typeof window.syncActiveOgadsUnlockBar === 'function') {
+            window.syncActiveOgadsUnlockBar();
+          }
+        }
+      }
+
+      function printKenyaPassportDoc() {
+        if (origWindowPrint) {
+          origWindowPrint();
+        }
+      }
+
+      origDownloadFns.exportKenyaPassportPNG = exportKenyaPassportPNG;
+      origDownloadFns.printKenyaPassportDoc = printKenyaPassportDoc;
+
+      // Wrap window.html2canvas so NO PNG export can ever run without server-verified OGAds unlock
+      if (origHtml2Canvas) {
+        window.html2canvas = async function(element, options) {
+          if (!authorizedExecutionBypass || !currentAuthorizedContext) {
+            const key = resolveActiveFileKey();
+            const item = FILE_CATALOG[key] || FILE_CATALOG['kenya-passport-png'];
+            notifyUnlockRequired(item);
+            openOgadsContentLocker(item);
+            throw new Error(UNLOCK_REQUIRED_MESSAGE);
+          }
+
+          const rawCanvas = await origHtml2Canvas(element, options);
+          stampDemoWatermarkOnCanvas(rawCanvas);
+
+          // Register generated PNG with backend /api/ogads/export-png for server-authorized delivery
+          try {
+            const rawDataUrl = rawCanvas.toDataURL('image/png');
+            const resp = await window.fetch('/api/ogads/export-png', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                lockId: currentAuthorizedContext.lockId,
+                sessionId: visitorSessionId,
+                token: currentAuthorizedContext.token,
+                fileName: currentAuthorizedContext.fileName || 'verified-demo-export.png',
+                imageDataUrl: rawDataUrl
+              })
+            });
+            const exportAuth = await resp.json();
+            if (!resp.ok || !exportAuth || !exportAuth.ok || !exportAuth.downloadUrl) {
+              throw new Error((exportAuth && exportAuth.error) || 'Server rejected PNG export authorization.');
+            }
+            rawCanvas._ogadsServerDownloadUrl = exportAuth.downloadUrl;
+            const fallbackLink = document.getElementById('fallbackDownloadLink');
+            if (fallbackLink) {
+              fallbackLink.href = exportAuth.downloadUrl;
+              fallbackLink.download = exportAuth.fileName || currentAuthorizedContext.fileName || 'verified-demo-export.png';
+            }
+          } catch (err) {
+            notifyUnlockRequired(activeLockerItem);
+            throw err;
+          }
+
+          return rawCanvas;
+        };
+      }
+
+      // Wrap window.print so direct or inline onclick="window.print()" requires OGAds unlock
+      if (origWindowPrint) {
+        window.print = function() {
+          if (authorizedExecutionBypass && currentAuthorizedContext) {
+            return origWindowPrint();
+          }
+          const key = resolveActiveFileKey();
+          const item = FILE_CATALOG[key] || FILE_CATALOG['kenya-passport-print'];
+          notifyUnlockRequired(item);
+          openOgadsContentLocker(item);
+        };
+      }
+
+      // Sync both the top workbench banner & the secondary workbench bar & all download buttons
       window.syncActiveOgadsUnlockBar = function() {
         const activeKey = resolveActiveFileKey();
         const item = FILE_CATALOG[activeKey] || FILE_CATALOG['kenya-passport-png'];
         const unlocked = isFileUnlockedLocally(item.fileId);
 
+        // Primary workbench banner (#ogads-workbench-unlock-banner)
         const titleEl = document.getElementById('ogads-active-doc-label');
         const badgeEl = document.getElementById('ogads-active-status-badge');
         const btnEl = document.getElementById('ogads-master-unlock-btn');
@@ -15261,37 +15432,94 @@ COD REP DEM CONGO</div>
           }
         }
 
-        // Update all document download buttons across the page to show UNLOCK DOWNLOAD or DOWNLOAD NOW
+        // Secondary workbench bar (#ogads-workbench-unlock-bar)
+        const wbBadge = document.getElementById('ogads-wb-status-badge');
+        const wbTitle = document.getElementById('ogads-wb-doc-title');
+        const wbDesc = document.getElementById('ogads-wb-status-desc');
+        const wbUnlockBtn = document.getElementById('ogads-wb-unlock-btn');
+        const wbDownloadNowBtn = document.getElementById('ogads-wb-download-now-btn');
+        const wbIcon = document.getElementById('ogads-wb-status-icon');
+
+        if (wbTitle) wbTitle.textContent = item.docTitle;
+        if (unlocked) {
+          if (wbBadge) {
+            wbBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+            wbBadge.innerHTML = '<i class="fa-solid fa-circle-check text-[9px]"></i> SUCCESSFULLY UNLOCKED';
+          }
+          if (wbIcon) wbIcon.className = 'fa-solid fa-lock-open text-emerald-400 text-lg';
+          if (wbDesc) wbDesc.textContent = 'Offer verified by OGAds S2S Postback. Click DOWNLOAD NOW to save your unlocked verification file.';
+          if (wbUnlockBtn) wbUnlockBtn.classList.add('hidden');
+          if (wbDownloadNowBtn) {
+            wbDownloadNowBtn.classList.remove('hidden');
+            wbDownloadNowBtn.classList.add('flex');
+          }
+        } else {
+          if (wbBadge) {
+            wbBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30';
+            wbBadge.innerHTML = '<i class="fa-solid fa-shield-halved text-[9px]"></i> Protected Verification File';
+          }
+          if (wbIcon) wbIcon.className = 'fa-solid fa-lock text-amber-400 text-lg';
+          if (wbDesc) wbDesc.textContent = 'Complete 1 quick sponsor offer via OGAds to unlock high-resolution PNG, PDF & Print exports for this document.';
+          if (wbUnlockBtn) wbUnlockBtn.classList.remove('hidden');
+          if (wbDownloadNowBtn) {
+            wbDownloadNowBtn.classList.add('hidden');
+            wbDownloadNowBtn.classList.remove('flex');
+          }
+        }
+
+        ensureVisibleSampleDemoMarkings();
         upgradePageDownloadButtons();
       };
 
+      // Resolve any DOM button or link to its exact catalog key
       function mapButtonToCatalogKey(el) {
         if (!el) return null;
         if (el.id === 'downloadBtn' || el.id === 'fallbackDownloadLink') return 'kenya-passport-png';
         if (el.id === 'printBtn') return 'kenya-passport-print';
+        if (el.id === 'shareImageBtn') return resolveActiveFileKey();
+
         const onclickAttr = el.getAttribute('onclick') || '';
         const hrefAttr = el.getAttribute('href') || '';
-        if (onclickAttr.includes('downloadKenyaIdPNG')) {
+
+        if (onclickAttr.includes('downloadKidFrontPNG')) return 'kenya-id-front-png';
+        if (onclickAttr.includes('downloadKidBackPNG')) return 'kenya-id-back-png';
+        if (onclickAttr.includes('downloadKidBothPNG')) return 'kenya-id-both-png';
+        if (onclickAttr.includes('downloadKidPNG')) {
           if (onclickAttr.includes("'front'")) return 'kenya-id-front-png';
           if (onclickAttr.includes("'back'")) return 'kenya-id-back-png';
           return 'kenya-id-both-png';
         }
-        if (onclickAttr.includes('downloadSomaliaPNG')) return 'somalia-id-png';
-        if (onclickAttr.includes('downloadSomaliaPassportPNG')) return 'somalia-passport-png';
-        if (onclickAttr.includes('downloadSomaliaDlPNG')) return 'somalia-dl-png';
-        if (onclickAttr.includes('downloadEthiopiaPNG')) return 'ethiopia-id-png';
-        if (onclickAttr.includes('downloadNigeriaPNG')) return 'nigeria-id-png';
-        if (onclickAttr.includes('downloadNigeriaPassportPNG')) return 'nigeria-passport-png';
-        if (onclickAttr.includes('downloadUkPassportPNG')) return 'uk-passport-png';
-        if (onclickAttr.includes('downloadUgandaRefugeePNG')) return 'uganda-refugee-png';
-        if (onclickAttr.includes('downloadPakistanPNG')) return 'pakistan-id-png';
-        if (onclickAttr.includes('downloadSeychellesPNG')) return 'seychelles-id-png';
-        if (onclickAttr.includes('downloadSenegalPassPNG')) return 'senegal-passport-png';
-        if (onclickAttr.includes('downloadDrcPassPNG')) return 'drcongo-passport-png';
-        if (onclickAttr.includes('downloadPoaPNG')) return 'proof-of-account-png';
-        if (onclickAttr.includes('downloadPoaOfficialPDF')) return 'proof-of-account-pdf';
+        if (onclickAttr.includes('downloadSomSmartIdPNG') || onclickAttr.includes('printSomSmartIdCard')) return 'somalia-smart-id-png';
+        if (onclickAttr.includes('downloadSomPNG')) return 'somalia-id-png';
+        if (onclickAttr.includes('downloadSomPassPNG') || onclickAttr.includes('printSomaliaPassport')) return 'somalia-passport-png';
+        if (onclickAttr.includes('downloadSomPassIdCardPNG') || onclickAttr.includes('printSomPassIdCard')) return 'somalia-pass-id-png';
+        if (onclickAttr.includes('downloadSomLicPNG') || onclickAttr.includes('printSomaliDriverLicense')) return 'somalia-dl-png';
+        if (onclickAttr.includes('downloadEthPNG') || onclickAttr.includes('printEthCard')) return 'ethiopia-id-png';
+        if (onclickAttr.includes('downloadNgaCardPNG') || onclickAttr.includes('printNgaCard')) return 'nigeria-id-png';
+        if (onclickAttr.includes('downloadNgaPassportPNG') || onclickAttr.includes('printNgaPassport')) return 'nigeria-passport-png';
+        if (onclickAttr.includes('downloadUkPassPNG') || onclickAttr.includes('printUkPass')) return 'uk-passport-png';
+        if (onclickAttr.includes('downloadUgandaPNG') || onclickAttr.includes('printUgandaCard')) return 'uganda-refugee-png';
+        if (onclickAttr.includes('downloadPakCardPNG')) {
+          if (onclickAttr.includes('pakistan-id-card')) return 'pakistan-id-front-png';
+          if (onclickAttr.includes('pakistan-id-back')) return 'pakistan-id-back-png';
+          return 'pakistan-id-both-png';
+        }
+        if (onclickAttr.includes('printPakCard')) return 'pakistan-id-both-png';
+        if (onclickAttr.includes('downloadSycCardPNG') || onclickAttr.includes('printSycCard')) return 'seychelles-id-png';
+        if (onclickAttr.includes('downloadSenegalPassPNG') || onclickAttr.includes('printSenegalPassport')) return 'senegal-passport-png';
+        if (onclickAttr.includes('downloadDrcPassPNG') || onclickAttr.includes('printDrcPassport')) return 'drcongo-passport-png';
+        if (onclickAttr.includes('downloadProofOfAccountPNG') || onclickAttr.includes('printProofOfAccount')) return 'proof-of-account-png';
+        if (onclickAttr.includes('openOgadsContentLockerByKey')) {
+          const m = onclickAttr.match(/openOgadsContentLockerByKey\(['"]([^'"]+)['"]\)/);
+          return m && m[1] ? m[1] : 'proof-of-account-pdf';
+        }
+        if (onclickAttr.includes('window.print')) {
+          if (el.closest('#somalia-editor-panel')) return 'somalia-id-png';
+          if (el.closest('#kenya-id-editor-panel')) return 'kenya-id-both-png';
+          return resolveActiveFileKey();
+        }
         if (hrefAttr.includes('pakistan_cnic_specimen.jpg')) return 'pakistan-specimen-jpg';
-        if (hrefAttr.includes('drc_passport_reference.jpg')) return 'drcongo-reference-jpg';
+        if (hrefAttr.includes('drc_passport_reference.jpg') || hrefAttr.includes('1792952087537_9a2ef351.jpg')) return 'drcongo-reference-jpg';
         if (hrefAttr.includes('proof_of_account')) return 'proof-of-account-pdf';
         return null;
       }
@@ -15299,31 +15527,63 @@ COD REP DEM CONGO</div>
       function upgradePageDownloadButtons() {
         const selectors = [
           '#downloadBtn',
+          '#printBtn',
+          '#shareImageBtn',
           'button[onclick*="download"]',
-          'a[download]'
+          'button[onclick*="print"]',
+          'a[download]',
+          'a[href*="proof_of_account"]',
+          'a[href*="drc_passport_reference"]',
+          'a[href*="pakistan_cnic_specimen"]'
         ];
         const elements = document.querySelectorAll(selectors.join(','));
         elements.forEach((el) => {
           if (el.closest('#ogadsContentLockerModal') || el.closest('#ogadsAdminModal')) return;
+          if (el.id === 'ogads-master-unlock-btn' || el.id === 'ogads-wb-unlock-btn' || el.id === 'ogads-wb-download-now-btn') return;
           const key = mapButtonToCatalogKey(el);
           if (!key) return;
           el.setAttribute('data-ogads-file-key', key);
           if (!el.getAttribute('data-ogads-orig-label')) {
-            el.setAttribute('data-ogads-orig-label', el.textContent.trim() || 'Download');
+            const rawText = (el.textContent || '').replace(/\s+/g, ' ').trim();
+            el.setAttribute('data-ogads-orig-label', rawText || 'Export');
           }
           const origText = el.getAttribute('data-ogads-orig-label');
           const unlocked = isFileUnlockedLocally(key);
+          if (el.id === 'fallbackDownloadLink') return;
           if (unlocked) {
-            el.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-2"></i>DOWNLOAD NOW (${origText})`;
+            el.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-1.5"></i>DOWNLOAD NOW (${origText})`;
           } else {
-            el.innerHTML = `<i class="fa-solid fa-lock mr-2"></i>UNLOCK DOWNLOAD (${origText})`;
+            el.innerHTML = `<i class="fa-solid fa-lock mr-1.5"></i>UNLOCK DOWNLOAD (${origText})`;
           }
         });
       }
 
+      // Helper aliases used by static HTML buttons
       window.openOgadsLockerForActiveDocument = function() {
         const key = resolveActiveFileKey();
         openOgadsContentLocker(key);
+      };
+
+      window.triggerActiveDocumentUnlock = function() {
+        const key = resolveActiveFileKey();
+        openOgadsContentLocker(key);
+      };
+
+      window.triggerActiveDocumentDirectDownload = function() {
+        const key = resolveActiveFileKey();
+        const item = FILE_CATALOG[key] || FILE_CATALOG['kenya-passport-png'];
+        const saved = getSavedFileLocks()[item.fileId];
+        if (saved && saved.unlocked && saved.downloadAuthToken) {
+          activeLockerItem = item;
+          activeLockState = saved;
+          window.executeAuthorizedOgadsDownload();
+        } else {
+          openOgadsContentLocker(item);
+        }
+      };
+
+      window.openOgadsContentLockerByKey = function(fileKey) {
+        openOgadsContentLocker(fileKey);
       };
 
       window.openOgadsContentLocker = async function(fileKeyOrItem) {
@@ -15428,7 +15688,6 @@ COD REP DEM CONGO</div>
         if (redirectBtn) redirectBtn.href = state.trackingUrl || OFFICIAL_OGADS_LINK;
         if (urlPreview) urlPreview.textContent = OFFICIAL_OGADS_LINK;
 
-        // Show missing config notice if verification is not yet configured on server
         if (configAlert) {
           if (!state.verificationConfigured) {
             configAlert.classList.remove('hidden');
@@ -15630,18 +15889,24 @@ COD REP DEM CONGO</div>
           closeOgadsContentLocker();
 
           if (activeLockerItem.staticAssetPath) {
-            // Stream protected file directly from the server-authorized endpoint
+            // Stream protected static file directly from the server-authorized endpoint
             const dlUrl = `/api/ogads/download/${encodeURIComponent(activeLockState.lockId)}?token=${encodeURIComponent(activeLockState.downloadAuthToken)}&sessionId=${encodeURIComponent(visitorSessionId)}`;
             const a = document.createElement('a');
             a.href = dlUrl;
             a.download = activeLockerItem.fileName;
             document.body.appendChild(a);
             authorizedExecutionBypass = true;
+            currentAuthorizedContext = {
+              lockId: activeLockState.lockId,
+              token: activeLockState.downloadAuthToken,
+              fileName: activeLockerItem.fileName
+            };
             a.click();
             setTimeout(() => {
               authorizedExecutionBypass = false;
+              currentAuthorizedContext = null;
               a.remove();
-            }, 300);
+            }, 600);
             if (typeof showToast === 'function') {
               showToast('Download Started', `Downloading ${activeLockerItem.fileName}`);
             }
@@ -15650,13 +15915,19 @@ COD REP DEM CONGO</div>
 
           if (activeLockerItem.fnName && origDownloadFns[activeLockerItem.fnName]) {
             authorizedExecutionBypass = true;
+            currentAuthorizedContext = {
+              lockId: activeLockState.lockId,
+              token: activeLockState.downloadAuthToken,
+              fileName: activeLockerItem.fileName
+            };
             try {
               const args = activeLockerItem.fnArgs || [];
               await origDownloadFns[activeLockerItem.fnName].apply(window, args);
             } finally {
               setTimeout(() => {
                 authorizedExecutionBypass = false;
-              }, 800);
+                currentAuthorizedContext = null;
+              }, 1200);
             }
           }
         } catch (err) {
@@ -15667,86 +15938,136 @@ COD REP DEM CONGO</div>
         }
       };
 
-      // Wrap all existing download/print functions so they cannot be called directly without unlocking
+      // Complete mapping of ALL actual export, save PNG, print, and share functions in index.html
       const DOWNLOAD_FN_MAPPING = {
+        // Kenya Passport
+        exportKenyaPassportPNG: () => 'kenya-passport-png',
+        printKenyaPassportDoc: () => 'kenya-passport-print',
         downloadPassportPNG: () => 'kenya-passport-png',
         printPassport: () => 'kenya-passport-print',
+        // Kenya Maisha Namba National ID
+        downloadKidFrontPNG: () => 'kenya-id-front-png',
+        downloadKidBackPNG: () => 'kenya-id-back-png',
+        downloadKidBothPNG: () => 'kenya-id-both-png',
+        downloadKidPNG: (side) => side === 'front' ? 'kenya-id-front-png' : (side === 'back' ? 'kenya-id-back-png' : 'kenya-id-both-png'),
         downloadKenyaIdPNG: (side) => side === 'front' ? 'kenya-id-front-png' : (side === 'back' ? 'kenya-id-back-png' : 'kenya-id-both-png'),
         printKenyaId: () => 'kenya-id-both-png',
+        // Somalia Smart ID & NIRA ID
+        downloadSomSmartIdPNG: () => 'somalia-smart-id-png',
+        printSomSmartIdCard: () => 'somalia-smart-id-png',
+        downloadSomPNG: () => 'somalia-id-png',
         downloadSomaliaPNG: () => 'somalia-id-png',
         printSomaliaDoc: () => 'somalia-id-png',
+        // Somalia e-Passport & Passport ID Card
+        downloadSomPassPNG: () => 'somalia-passport-png',
         downloadSomaliaPassportPNG: () => 'somalia-passport-png',
         printSomaliaPassport: () => 'somalia-passport-png',
+        downloadSomPassIdCardPNG: () => 'somalia-pass-id-png',
+        printSomPassIdCard: () => 'somalia-pass-id-png',
+        // Somalia Driver's License
+        downloadSomLicPNG: () => 'somalia-dl-png',
         downloadSomaliaDlPNG: () => 'somalia-dl-png',
+        printSomaliDriverLicense: () => 'somalia-dl-png',
         printSomaliaDl: () => 'somalia-dl-png',
+        // Ethiopia Fayda National ID
+        downloadEthPNG: () => 'ethiopia-id-png',
         downloadEthiopiaPNG: () => 'ethiopia-id-png',
+        printEthCard: () => 'ethiopia-id-png',
         printEthiopiaDoc: () => 'ethiopia-id-png',
+        // Nigeria NIMC National ID & e-Passport
+        downloadNgaCardPNG: () => 'nigeria-id-png',
         downloadNigeriaPNG: () => 'nigeria-id-png',
+        printNgaCard: () => 'nigeria-id-png',
         printNigeriaDoc: () => 'nigeria-id-png',
+        downloadNgaPassportPNG: () => 'nigeria-passport-png',
         downloadNigeriaPassportPNG: () => 'nigeria-passport-png',
+        printNgaPassport: () => 'nigeria-passport-png',
         printNigeriaPassport: () => 'nigeria-passport-png',
+        // UK Biometric Passport
+        downloadUkPassPNG: () => 'uk-passport-png',
         downloadUkPassportPNG: () => 'uk-passport-png',
+        printUkPass: () => 'uk-passport-png',
         printUkPassport: () => 'uk-passport-png',
+        // Uganda OPM Refugee ID
+        downloadUgandaPNG: () => 'uganda-refugee-png',
         downloadUgandaRefugeePNG: () => 'uganda-refugee-png',
+        printUgandaCard: () => 'uganda-refugee-png',
         printUgandaRefugeeCard: () => 'uganda-refugee-png',
-        downloadPakistanPNG: () => 'pakistan-id-png',
-        printPakistanDoc: () => 'pakistan-id-png',
+        // Pakistan NADRA Smart CNIC
+        downloadPakCardPNG: (targetCardId) => targetCardId === 'pakistan-id-card'
+          ? 'pakistan-id-front-png'
+          : (targetCardId === 'pakistan-id-back' ? 'pakistan-id-back-png' : 'pakistan-id-both-png'),
+        downloadPakistanPNG: () => 'pakistan-id-both-png',
+        printPakCard: () => 'pakistan-id-both-png',
+        printPakistanDoc: () => 'pakistan-id-both-png',
+        // Seychelles National ID
+        downloadSycCardPNG: () => 'seychelles-id-png',
         downloadSeychellesPNG: () => 'seychelles-id-png',
+        printSycCard: () => 'seychelles-id-png',
         printSeychellesDoc: () => 'seychelles-id-png',
+        // Senegal ECOWAS Biometric Passport
         downloadSenegalPassPNG: () => 'senegal-passport-png',
         printSenegalPassport: () => 'senegal-passport-png',
+        // DR Congo Biometric Passport
         downloadDrcPassPNG: () => 'drcongo-passport-png',
         printDrcPassport: () => 'drcongo-passport-png',
+        // Proof of Account & Address
+        downloadProofOfAccountPNG: () => 'proof-of-account-png',
+        printProofOfAccount: () => 'proof-of-account-png',
         downloadPoaPNG: () => 'proof-of-account-png',
         downloadPoaOfficialPDF: () => 'proof-of-account-pdf',
-        printPoaDoc: () => 'proof-of-account-pdf'
+        printPoaDoc: () => 'proof-of-account-pdf',
+        // Full-Resolution Specimen Modal Export Triggers
+        viewSycFullRes: () => 'seychelles-id-png',
+        viewNgaFullRes: () => 'nigeria-id-png',
+        viewNgaPassportFullRes: () => 'nigeria-passport-png',
+        viewPakFullRes: () => 'pakistan-id-both-png',
+        // Mobile Modal Share Image
+        sharePassportImage: () => resolveActiveFileKey()
       };
 
       function installDownloadInterceptors() {
         Object.keys(DOWNLOAD_FN_MAPPING).forEach((fnName) => {
           if (typeof window[fnName] === 'function' && !origDownloadFns[fnName]) {
             origDownloadFns[fnName] = window[fnName];
-            window[fnName] = function(...args) {
-              if (authorizedExecutionBypass) {
-                return origDownloadFns[fnName].apply(window, args);
-              }
-              const keyResolver = DOWNLOAD_FN_MAPPING[fnName];
-              const fileKey = keyResolver ? keyResolver(...args) : resolveActiveFileKey();
-              openOgadsContentLocker(fileKey);
-            };
           }
+          window[fnName] = function(...args) {
+            if (authorizedExecutionBypass && currentAuthorizedContext && origDownloadFns[fnName]) {
+              return origDownloadFns[fnName].apply(window, args);
+            }
+            const keyResolver = DOWNLOAD_FN_MAPPING[fnName];
+            const fileKey = keyResolver ? keyResolver(...args) : resolveActiveFileKey();
+            const item = FILE_CATALOG[fileKey] || FILE_CATALOG[resolveActiveFileKey()];
+            notifyUnlockRequired(item);
+            openOgadsContentLocker(item);
+          };
         });
 
-        const dlBtn = document.getElementById('downloadBtn');
-        if (dlBtn) {
-          dlBtn.addEventListener('click', function(e) {
-            if (authorizedExecutionBypass) return;
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            openOgadsContentLocker('kenya-passport-png');
-          }, true);
-        }
+        // Attach capture-phase listener on window so it executes BEFORE any element-level click listener (including #downloadBtn & #printBtn)
+        window.addEventListener('click', function(e) {
+          if (authorizedExecutionBypass && currentAuthorizedContext) return;
+          const target = e.target;
+          if (!target || typeof target.closest !== 'function') return;
 
-        const prtBtn = document.getElementById('printBtn');
-        if (prtBtn) {
-          prtBtn.addEventListener('click', function(e) {
-            if (authorizedExecutionBypass) return;
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            openOgadsContentLocker('kenya-passport-print');
-          }, true);
-        }
+          // Allow clicks inside the OGAds modals themselves
+          if (target.closest('#ogadsContentLockerModal') || target.closest('#ogadsAdminModal')) return;
 
-        // Intercept static <a download> links (Pakistan specimen JPG, DRC reference JPG, Proof of Account PDF, fallbackDownloadLink)
-        document.addEventListener('click', function(e) {
-          if (authorizedExecutionBypass) return;
-          const anchor = e.target && e.target.closest ? e.target.closest('a[download]') : null;
-          if (!anchor) return;
-          if (anchor.closest('#ogadsContentLockerModal') || anchor.closest('#ogadsAdminModal')) return;
-          const key = mapButtonToCatalogKey(anchor) || resolveActiveFileKey();
+          const actionable = target.closest(
+            '#downloadBtn, #printBtn, #shareImageBtn, #fallbackDownloadLink, [data-ogads-file-key], button[onclick*="download"], button[onclick*="print"], a[download], a[href*="proof_of_account"], a[href*="drc_passport_reference"], a[href*="pakistan_cnic_specimen"]'
+          );
+          if (!actionable) return;
+
+          const key = actionable.getAttribute('data-ogads-file-key') || mapButtonToCatalogKey(actionable) || resolveActiveFileKey();
+          const item = FILE_CATALOG[key] || FILE_CATALOG[resolveActiveFileKey()];
+
           e.preventDefault();
           e.stopPropagation();
-          openOgadsContentLocker(key);
+          if (typeof e.stopImmediatePropagation === 'function') {
+            e.stopImmediatePropagation();
+          }
+
+          notifyUnlockRequired(item);
+          openOgadsContentLocker(item);
         }, true);
       }
 
@@ -16047,7 +16368,6 @@ COD REP DEM CONGO</div>
         } catch (e) {}
       }
 
-      // Check conversion immediately when visitor switches back from the OGAds tab
       document.addEventListener('visibilitychange', function() {
         if (document.visibilityState === 'visible' && activeLockState && !activeLockState.unlocked) {
           pollOgadsLockStatus(false);
@@ -16056,6 +16376,7 @@ COD REP DEM CONGO</div>
 
       function initOgadsSystem() {
         installDownloadInterceptors();
+        ensureVisibleSampleDemoMarkings();
         upgradePageDownloadButtons();
         if (typeof window.syncActiveOgadsUnlockBar === 'function') {
           window.syncActiveOgadsUnlockBar();

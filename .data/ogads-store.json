@@ -1,0 +1,23 @@
+{
+  "config": {
+    "trackingLink": "https://trkoffer.net/cl/i/n616e4",
+    "publisherId": "453817",
+    "lockerId": "n616e4",
+    "postbackSecret": "ogsec_ef800ff0036a44f92e40d42389eaa6d4",
+    "apiKey": "",
+    "allowedPostbackIps": "",
+    "minPayout": 0,
+    "unlockDurationMinutes": 60,
+    "adminPasswordHash": "9ded6a8bcb9c31d3ead3c45b01c541e682478644361c2c8597215d0730fc4b056bd9f9282590bd61025cbaf07e52ebd22d5c233ca84c3a9b5830a1bc9a4fc551",
+    "adminPasswordSalt": "4296ce246e05dc6ed19ba34bd3ce87aa",
+    "updatedAt": "2026-10-31T18:10:16.784Z"
+  },
+  "stats": {
+    "totalConversions": 0,
+    "totalUnlockedDownloads": 0,
+    "totalLockRequests": 0,
+    "totalOfferClicks": 0
+  },
+  "locks": {},
+  "conversions": []
+}
