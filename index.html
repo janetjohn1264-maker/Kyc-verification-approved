@@ -962,8 +962,9 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     // ================= DEMOCRATIC REPUBLIC OF THE CONGO PASSPORT CONTROLLER =================
-    const DRC_DEFAULT_PHOTO = '/assets/aistudio/drc_passport_portrait.jpg';
-    const DRC_SIGNATURE = '/assets/aistudio/drc_passport_signature.png';
+    // Passport images removed: no default portrait or signature asset is loaded.
+    const DRC_DEFAULT_PHOTO = '';
+    const DRC_SIGNATURE = '';
 
     // Exact values printed on the reference specimen supplied by the user.
     const DRC_SPECIMEN = {
@@ -1133,7 +1134,7 @@ var $ = window.$ || (id => document.getElementById(id));
       drcSetText('drcOutAuthority', (fields.authority || 'MINAFFET').toUpperCase());
 
       const signature = $('drcOutSignature');
-      if (signature && signature.getAttribute('src') !== DRC_SIGNATURE) signature.setAttribute('src', DRC_SIGNATURE);
+      if (signature && DRC_SIGNATURE && signature.getAttribute('src') !== DRC_SIGNATURE) signature.setAttribute('src', DRC_SIGNATURE);
 
       const mrz = isDrcSpecimen(fields) ? DRC_SPECIMEN_MRZ : buildDrcMrz(fields);
       drcSetText('drcMrzLine1', mrz.line1);
@@ -1217,7 +1218,8 @@ var $ = window.$ || (id => document.getElementById(id));
     function resetDrcPhoto() {
       ['drcOutPhotoMain', 'drcOutPhotoSecondary'].forEach(function (id) {
         const el = $(id);
-        if (el) el.setAttribute('src', DRC_DEFAULT_PHOTO);
+        if (el && DRC_DEFAULT_PHOTO) el.setAttribute('src', DRC_DEFAULT_PHOTO);
+        else if (el) el.removeAttribute('src');
       });
       const input = $('drcPassPhotoInput');
       if (input) input.value = '';
@@ -12640,9 +12642,6 @@ COD REP DEM CONGO</textarea>
               <div class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-id-card text-indigo-700"></i> Data page preview
               </div>
-              <a href="/assets/aistudio/drc_passport_reference.jpg" download="drc_passport_reference.jpg" class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 inline-flex items-center gap-1.5">
-                <i class="fa-solid fa-image"></i> Reference specimen (JPG)
-              </a>
             </div>
 
             <article id="drc-passport-card" class="relative w-full max-w-[520px] mx-auto rounded-xl shadow-2xl border-2 border-rose-200/80 overflow-hidden select-none text-[#241a4d]" style="aspect-ratio: 443 / 1214; container-type: inline-size; background: linear-gradient(180deg, #fdf4ee 0%, #fbe9e7 49.3%, #edf2fb 50.7%, #e8f0fa 100%);">
@@ -12693,7 +12692,7 @@ COD REP DEM CONGO</div>
                   <div class="mt-[6%]">
                     <div class="font-bold uppercase tracking-[0.13em] text-[#3f5f8f]" style="font-size: 1.5cqw;">Signature du titulaire / Signature of bearer</div>
                     <div class="mt-[1.4%] w-[62%] border-b border-[#a9b4cd] pb-[0.8cqw]">
-                      <img id="drcOutSignature" src="./assets/aistudio/drc_passport_signature.png" alt="Signature of bearer" class="object-contain object-left" style="height: 8.4cqw; width: auto;">
+                      <img id="drcOutSignature" alt="" class="object-contain object-left" style="height: 8.4cqw; width: auto;">
                     </div>
                   </div>
 
@@ -12759,7 +12758,7 @@ COD REP DEM CONGO</div>
                     <!-- main monochrome portrait with security ghosting overprint -->
                     <div class="shrink-0" style="width: 27%;">
                       <div class="relative border border-[#9fb0c9] shadow-sm overflow-hidden" style="background:#fff; padding: 2px;">
-                        <img id="drcOutPhotoMain" src="./assets/aistudio/drc_passport_portrait.jpg" alt="Bearer photograph" class="w-full object-cover object-top" style="height: 32cqw; filter: grayscale(1) contrast(1.08);">
+                        <img id="drcOutPhotoMain" alt="" class="w-full object-cover object-top" style="height: 32cqw; filter: grayscale(1) contrast(1.08);">
                         <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: repeating-linear-gradient(102deg, rgba(255,255,255,0.22) 0 1px, rgba(255,255,255,0) 1px 5px);"></div>
                         <div class="absolute inset-0 pointer-events-none flex items-center justify-center" aria-hidden="true" style="transform: rotate(-13deg);">
                           <span class="font-black uppercase text-white" style="font-size: 2.5cqw; letter-spacing: 0.16em; opacity: 0.34; text-shadow: 0 0 1px rgba(0,0,0,0.5);">COD·RDC·COD</span>
@@ -12812,7 +12811,7 @@ COD REP DEM CONGO</div>
                       </div>
 
                       <div class="relative mt-[2.4cqw] border border-[#9fb0c9] shadow-sm overflow-hidden" style="padding: 2px; background: rgba(255,255,255,0.55);">
-                        <img id="drcOutPhotoSecondary" src="./assets/aistudio/drc_passport_portrait.jpg" alt="Secondary ghost photograph" class="w-full object-cover object-top" style="height: 23cqw; filter: grayscale(1) contrast(1.02); opacity: 0.62; mix-blend-mode: luminosity;">
+                        <img id="drcOutPhotoSecondary" alt="" class="w-full object-cover object-top" style="height: 23cqw; filter: grayscale(1) contrast(1.02); opacity: 0.62; mix-blend-mode: luminosity;">
                         <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: conic-gradient(from 210deg, rgba(253,230,138,0.42), rgba(240,171,252,0.40), rgba(165,180,252,0.42), rgba(252,211,77,0.36), rgba(253,186,116,0.40), rgba(253,230,138,0.42)); opacity: 0.55; mix-blend-mode: overlay;"></div>
                         <div class="absolute inset-0 pointer-events-none" aria-hidden="true" style="background: repeating-linear-gradient(0deg, rgba(255,255,255,0.30) 0 1px, rgba(255,255,255,0) 1px 4px); opacity: 0.8;"></div>
                       </div>
