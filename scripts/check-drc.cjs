@@ -105,17 +105,18 @@ function check(file) {
     );
   }
 
-  // --- DRC assets referenced and present on disk ---
+  // --- DRC passport images intentionally removed from the view ---
+  // The section must render no portrait/signature/reference image assets.
   for (const asset of [
     'drc_passport_portrait.jpg',
     'drc_passport_signature.png',
     'drc_passport_reference.jpg',
   ]) {
-    if (!html.includes('/assets/aistudio/' + asset)) problems.push(prefix + 'asset not referenced: ' + asset);
-    const onDisk =
-      fs.existsSync(path.join('public', 'assets', 'aistudio', asset)) ||
-      fs.existsSync(path.join('dist', 'assets', 'aistudio', asset));
-    if (!onDisk) problems.push(prefix + 'asset file missing on disk: ' + asset);
+    if (html.includes('/assets/aistudio/' + asset)) problems.push(prefix + 'unexpected image reference: ' + asset);
+  }
+  for (const id of ['drcOutPhotoMain', 'drcOutPhotoSecondary', 'drcOutSignature']) {
+    const tag = html.match(new RegExp('<img[^>]*id="' + id + '"[^>]*>'));
+    if (tag && /\ssrc=/.test(tag[0])) problems.push(prefix + 'image element still has a src: ' + id);
   }
 }
 
@@ -136,4 +137,4 @@ if (problems.length) {
 console.log('DRC regression check passed for: ' + files.join(', '));
 console.log(' - country registration, view markup, controller wiring present');
 console.log(' - all reference specimen values present');
-console.log(' - all 10 country pills intact, DRC assets referenced and present');
+console.log(' - all 10 country pills intact, passport images removed from the view');
