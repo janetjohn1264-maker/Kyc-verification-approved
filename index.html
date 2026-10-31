@@ -1537,6 +1537,9 @@ var $ = window.$ || (id => document.getElementById(id));
       } else {
         if (kenyaPassView) kenyaPassView.classList.remove('hidden');
       }
+      if (typeof window.syncActiveOgadsUnlockBar === 'function') {
+        window.syncActiveOgadsUnlockBar();
+      }
     }
 
     // ================= DEMOCRATIC REPUBLIC OF THE CONGO PASSPORT CONTROLLER =================
@@ -6444,10 +6447,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           <i class="fa-solid fa-credit-card text-xs text-blue-600"></i>
           Virtual Accounts
         </button>
+        <button onclick="openOgadsAdminModal()" class="px-3 py-2 rounded-lg text-slate-800 bg-amber-50 hover:bg-amber-100 transition-colors flex items-center gap-1.5 font-bold border border-amber-300/80 cursor-pointer" title="OGAds Offerwall &amp; Postback Admin">
+          <i class="fa-solid fa-shield-halved text-xs text-amber-600"></i>
+          <span>OGAds Admin</span>
+        </button>
       </nav>
 
       <!-- Right Action & Mobile Controls -->
       <div class="flex items-center gap-2">
+        <button onclick="openOgadsAdminModal()" class="lg:hidden px-2.5 py-2 text-amber-900 hover:text-amber-950 bg-amber-50 rounded-xl border border-amber-300 text-xs font-bold flex items-center gap-1 cursor-pointer">
+          <i class="fa-solid fa-lock text-xs text-amber-600"></i>
+          <span>Admin</span>
+        </button>
         <button onclick="openContactModal()" class="lg:hidden px-3 py-2 text-emerald-700 hover:text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200 text-xs font-bold flex items-center gap-1 cursor-pointer">
           <i class="fa-solid fa-headset text-sm"></i>
           <span>Support</span>
@@ -6492,6 +6503,14 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
             <span>Virtual Accounts</span>
           </span>
           <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">PayPal · Payoneer · Grey</span>
+        </button>
+
+        <button onclick="openOgadsAdminModal(); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-amber-50/80 hover:bg-amber-100 text-amber-950 border border-amber-300/80 cursor-pointer">
+          <span class="flex items-center gap-2.5">
+            <i class="fa-solid fa-shield-halved text-amber-600 text-sm"></i>
+            <span>OGAds Offerwall &amp; Postback Admin</span>
+          </span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-200 text-amber-900">Settings &amp; Stats</span>
         </button>
 
       </div>
@@ -7364,6 +7383,40 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">DR Congo</div>
                 <div class="text-[10px] font-medium text-slate-500">Passeport Biométrique (COD)</div>
               </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= OGADS CONTENT LOCKER & DOWNLOAD UNLOCK BAR ================= -->
+      <div id="ogads-workbench-unlock-banner" class="no-print max-w-7xl mx-auto rounded-2xl border-2 border-amber-300/90 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 p-4 sm:p-5 text-white shadow-xl transition-all duration-300">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="flex items-start sm:items-center gap-3.5">
+            <div id="ogads-wb-status-icon-wrap" class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center text-xl shrink-0 shadow-inner">
+              <i id="ogads-wb-status-icon" class="fa-solid fa-lock"></i>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span id="ogads-wb-status-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-950 shadow-2xs flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield-halved text-[9px]"></i>
+                  <span>PROTECTED FILE · OFFER REQUIRED</span>
+                </span>
+                <span id="ogads-wb-doc-title" class="text-sm sm:text-base font-black text-white tracking-tight">Republic of Kenya — Biometric E-Passport (High-Res PNG)</span>
+              </div>
+              <p id="ogads-wb-status-desc" class="text-xs text-slate-300 mt-1 leading-relaxed">
+                Complete <strong class="text-amber-300">1 eligible sponsor offer</strong> via our official OGAds verification wall to unlock instant high-resolution download access for this document.
+              </p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button type="button" id="ogads-wb-unlock-btn" onclick="triggerActiveDocumentUnlock()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-300 hover:via-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer">
+              <i class="fa-solid fa-unlock-keyhole text-sm"></i>
+              <span>UNLOCK DOWNLOAD</span>
+            </button>
+            <button type="button" id="ogads-wb-download-now-btn" onclick="triggerActiveDocumentDirectDownload()" class="hidden w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-emerald-600/30 items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer">
+              <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
+              <span>DOWNLOAD NOW</span>
             </button>
           </div>
         </div>
@@ -13695,9 +13748,21 @@ COD REP DEM CONGO</div>
                   </div>
                 </div>
 
-                <!-- Embedded PDF Frame -->
-                <div class="w-full rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-inner">
-                  <iframe src="/assets/aistudio/proof_of_account__1__3c9d9253.pdf#toolbar=1" class="w-full h-[750px] border-0" title="Proof of Account PDF"></iframe>
+                <!-- Protected PDF Preview Banner -->
+                <div class="w-full rounded-xl overflow-hidden border-2 border-amber-300/80 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-300 flex items-center justify-center text-lg shrink-0">
+                      <i class="fa-solid fa-file-shield"></i>
+                    </div>
+                    <div>
+                      <div class="text-xs font-black uppercase tracking-wider text-amber-300">OGAds Protected Official PDF Document</div>
+                      <p class="text-xs text-slate-300 mt-0.5">Preview the high-resolution pages below. Click <strong>UNLOCK DOWNLOAD</strong> to complete 1 eligible offer and download the original 2-page PDF.</p>
+                    </div>
+                  </div>
+                  <button type="button" onclick="openOgadsContentLockerByKey('proof-of-account-pdf')" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shrink-0 flex items-center gap-2 shadow-md cursor-pointer transition-all">
+                    <i class="fa-solid fa-unlock-keyhole"></i>
+                    <span>UNLOCK DOWNLOAD PDF</span>
+                  </button>
                 </div>
 
                 <!-- High-Resolution Page Previews -->
@@ -14486,9 +14551,1524 @@ COD REP DEM CONGO</div>
         <button type="button" onclick="openCookieModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Cookie Policy</button>
         <button type="button" onclick="openContactModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Contact Us</button>
         <button type="button" onclick="openAboutModal()" class="hover:text-slate-900 transition-colors cursor-pointer">About Us</button>
+        <button type="button" onclick="openOgadsAdminModal()" class="inline-flex items-center gap-1.5 text-emerald-700 hover:text-emerald-900 font-bold transition-colors cursor-pointer"><i class="fa-solid fa-shield-halved"></i>OGAds Admin</button>
       </nav>
     </div>
   </footer>
 
+  <!-- ================= OGADS CONTENT LOCKER & DOWNLOAD UNLOCK MODAL ================= -->
+  <div id="ogadsContentLockerModal" class="no-print fixed inset-0 z-[90] hidden items-center justify-center bg-slate-950/85 backdrop-blur-md p-3 sm:p-5 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="ogadsLockerModalTitle">
+    <div class="w-full max-w-xl rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-white overflow-hidden my-auto transition-all duration-300">
+      <!-- Top Header Banner -->
+      <div class="bg-gradient-to-r from-slate-950 via-emerald-950 to-slate-900 px-5 py-4 sm:px-6 sm:py-5 border-b border-emerald-500/25 flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3.5 min-w-0">
+          <div id="ogadsLockerHeaderIconWrap" class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-400/35 flex items-center justify-center shrink-0 shadow-inner">
+            <i id="ogadsLockerHeaderIcon" class="fa-solid fa-lock text-emerald-400 text-xl"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <i class="fa-solid fa-shield-check"></i> OGAds Verification Gate
+              </span>
+              <span id="ogadsLockerStatusPill" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <i class="fa-solid fa-lock text-[9px]"></i> Locked
+              </span>
+            </div>
+            <h2 id="ogadsLockerModalTitle" class="text-base sm:text-lg font-extrabold text-white mt-1 truncate">Unlock Verification File Download</h2>
+          </div>
+        </div>
+        <button type="button" onclick="closeOgadsContentLocker()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors" aria-label="Close Content Locker">
+          <i class="fa-solid fa-xmark text-base"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 sm:p-6 space-y-4">
+        <!-- Selected File Summary Card -->
+        <div class="rounded-2xl bg-slate-800/90 border border-slate-700/80 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
+              <i class="fa-solid fa-file-shield text-lg"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Selected Verification File</div>
+              <div id="ogadsLockerFileTitle" class="text-sm sm:text-base font-extrabold text-white truncate">Republic of Kenya — Biometric Passport (HD PNG)</div>
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400 mt-0.5">
+                <span id="ogadsLockerFileName" class="font-mono text-emerald-300">kenya-passport.png</span>
+                <span>&bull;</span>
+                <span>Lock ID: <strong id="ogadsLockerLockIdDisplay" class="font-mono text-slate-200">Initializing...</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="shrink-0 flex sm:flex-col items-center sm:items-end justify-between gap-1 border-t sm:border-t-0 border-slate-700/70 pt-2 sm:pt-0">
+            <span class="text-[10px] uppercase tracking-wider font-bold text-slate-400">Security</span>
+            <span class="text-xs font-bold text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-server text-[10px]"></i> S2S Verified</span>
+          </div>
+        </div>
+
+        <!-- Missing Official Verification Configuration Notice (Shown when Postback Secret or Publisher ID is not yet configured) -->
+        <div id="ogadsLockerConfigMissingAlert" class="hidden rounded-2xl bg-amber-950/70 border border-amber-500/40 p-4 text-amber-100">
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg mt-0.5 shrink-0"></i>
+            <div class="text-xs space-y-1.5 leading-relaxed">
+              <div class="font-extrabold text-amber-200 uppercase tracking-wider">Official Conversion Verification Configuration Required</div>
+              <p id="ogadsLockerConfigMissingText" class="text-amber-100/90">
+                Downloads remain strictly locked until the administrator configures the required OGAds Publisher ID and Server-to-Server (S2S) Postback Secret in the OGAds Admin Dashboard.
+              </p>
+              <div class="pt-1">
+                <button type="button" onclick="openOgadsAdminModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-200 font-bold text-[11px] transition-colors cursor-pointer">
+                  <i class="fa-solid fa-sliders"></i> Configure OGAds Postback in Admin Dashboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Offer Instructions Box (Visible while locked / awaiting offer) -->
+        <div id="ogadsLockerInstructionsBox" class="rounded-2xl bg-slate-950/70 border border-slate-800 p-4 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check"></i> How to Unlock Your Download
+            </h3>
+            <span class="text-[11px] text-slate-400 font-medium">Instant Auto-Unlock</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            To protect high-resolution verification templates from automated abuse, please complete <strong>one (1) eligible sponsor offer</strong> from our official OGAds verification wall.
+          </p>
+          <ol class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <li class="rounded-xl bg-slate-900/90 border border-slate-800 p-3 flex flex-col gap-1">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">Step 1</span>
+              <span class="font-bold text-white">Click Unlock Button</span>
+              <span class="text-[11px] text-slate-400">Opens the official OGAds offerwall in a new secure tab.</span>
+            </li>
+            <li class="rounded-xl bg-slate-900/90 border border-slate-800 p-3 flex flex-col gap-1">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">Step 2</span>
+              <span class="font-bold text-white">Complete 1 Offer</span>
+              <span class="text-[11px] text-slate-400">Follow all instructions on a single free survey, app, or pin submit.</span>
+            </li>
+            <li class="rounded-xl bg-slate-900/90 border border-slate-800 p-3 flex flex-col gap-1">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">Step 3</span>
+              <span class="font-bold text-white">Download Unlocked</span>
+              <span class="text-[11px] text-slate-400">Our server verifies the OGAds postback and unlocks your exact file.</span>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Verification In Progress Indicator (Visible after clicking OGAds link) -->
+        <div id="ogadsLockerVerifyingBox" class="hidden rounded-2xl bg-sky-950/60 border border-sky-500/40 p-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 shrink-0 mt-0.5">
+                <i class="fa-solid fa-circle-notch fa-spin text-lg"></i>
+              </div>
+              <div>
+                <div class="text-xs font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-2">
+                  <span>Verification in Progress</span>
+                  <span class="inline-block w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+                </div>
+                <p id="ogadsLockerVerifyingText" class="text-xs text-slate-200 mt-1 leading-relaxed">
+                  Waiting for official OGAds Server-to-Server (S2S) conversion confirmation for your session. Keep this window open while completing your selected offer.
+                </p>
+                <div class="text-[11px] text-sky-300/80 mt-1.5 font-mono" id="ogadsLockerLastCheckText">
+                  Checking conversion status automatically every 4 seconds...
+                </div>
+              </div>
+            </div>
+            <button type="button" onclick="checkOgadsConversionNow()" class="shrink-0 px-3.5 py-2 rounded-xl bg-sky-500/20 hover:bg-sky-500/35 border border-sky-400/40 text-sky-200 text-xs font-extrabold cursor-pointer transition-colors flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-rotate"></i> Check Status Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Green SUCCESSFULLY UNLOCKED Notification (Visible only after genuine server-verified conversion) -->
+        <div id="ogadsLockerUnlockedBox" class="hidden rounded-2xl bg-emerald-950/80 border-2 border-emerald-500 p-5 shadow-lg shadow-emerald-950/50">
+          <div class="flex items-start gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center shrink-0 shadow-md">
+              <i class="fa-solid fa-circle-check text-2xl"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/25 border border-emerald-400/40 text-emerald-200 text-[11px] font-extrabold uppercase tracking-wider">
+                <i class="fa-solid fa-unlock-keyhole"></i> SUCCESSFULLY UNLOCKED
+              </div>
+              <h4 class="text-base sm:text-lg font-extrabold text-white mt-1">Conversion Verified — Your File is Ready!</h4>
+              <p class="text-xs text-emerald-100/90 mt-1 leading-relaxed">
+                OGAds confirmed your offer completion. Server-side download authorization has been granted for your session.
+              </p>
+              <div class="mt-2.5 flex flex-wrap items-center gap-3 text-[11px] text-emerald-200/90 font-mono">
+                <span id="ogadsLockerUnlockedOfferInfo">Verified Offer</span>
+                <span>&bull;</span>
+                <span id="ogadsLockerUnlockedExpiryInfo">Authorization valid for 60 minutes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Error / Retry Message Box -->
+        <div id="ogadsLockerErrorBox" class="hidden rounded-2xl bg-rose-950/75 border border-rose-500/40 p-4 text-rose-100">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-start gap-2.5">
+              <i class="fa-solid fa-circle-exclamation text-rose-400 text-base mt-0.5 shrink-0"></i>
+              <div class="text-xs leading-relaxed">
+                <div class="font-extrabold text-rose-200 uppercase tracking-wider">Verification Notice</div>
+                <p id="ogadsLockerErrorText" class="mt-0.5 text-rose-100/90">Unable to verify conversion yet. Please complete an eligible OGAds offer and try again.</p>
+              </div>
+            </div>
+            <button type="button" onclick="retryOgadsOfferRedirect()" class="shrink-0 px-3 py-1.5 rounded-lg bg-rose-500/25 hover:bg-rose-500/40 border border-rose-400/40 text-rose-100 text-xs font-bold cursor-pointer transition-colors">
+              Retry Offer
+            </button>
+          </div>
+        </div>
+
+        <!-- Primary Action Buttons -->
+        <div class="pt-1 space-y-2.5">
+          <!-- UNLOCK DOWNLOAD (Redirects to https://trkoffer.net/cl/i/n616e4) -->
+          <a id="ogadsLockerRedirectBtn" href="https://trkoffer.net/cl/i/n616e4" target="_blank" rel="noopener noreferrer" onclick="handleOgadsOfferClick(event)" class="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-emerald-950/60 flex items-center justify-center gap-2.5 cursor-pointer transition-all">
+            <i class="fa-solid fa-unlock-keyhole text-lg"></i>
+            <span id="ogadsLockerRedirectBtnLabel">UNLOCK DOWNLOAD — COMPLETE OFFER</span>
+            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-80"></i>
+          </a>
+
+          <!-- DOWNLOAD NOW (Shown ONLY when server confirms unlocked === true) -->
+          <button type="button" id="ogadsLockerDownloadNowBtn" onclick="executeAuthorizedOgadsDownload()" class="hidden w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-500 hover:from-emerald-300 hover:to-green-400 text-slate-950 font-extrabold text-sm sm:text-base shadow-xl shadow-emerald-900/60 items-center justify-center gap-2.5 cursor-pointer transition-all ring-2 ring-emerald-300/60">
+            <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+            <span>DOWNLOAD NOW</span>
+          </button>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-slate-400">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-link text-emerald-400"></i>
+              <span>Official Offerwall: <code id="ogadsLockerTrackingUrlPreview" class="text-slate-300 font-mono">https://trkoffer.net/cl/i/n616e4</code></span>
+            </span>
+            <button type="button" onclick="openOgadsAdminModal()" class="text-slate-400 hover:text-emerald-300 font-semibold cursor-pointer transition-colors">
+              <i class="fa-solid fa-gear mr-1"></i>Admin Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OGADS ADMIN DASHBOARD & CONFIGURATION MODAL ================= -->
+  <div id="ogadsAdminModal" class="no-print fixed inset-0 z-[95] hidden items-center justify-center bg-slate-950/85 backdrop-blur-md p-3 sm:p-5 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="ogadsAdminModalTitle">
+    <div class="w-full max-w-4xl rounded-3xl bg-slate-900 border border-slate-700/90 shadow-2xl text-white overflow-hidden my-auto">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-emerald-950 px-5 py-4 sm:px-6 sm:py-5 border-b border-slate-700 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 flex items-center justify-center text-emerald-400">
+            <i class="fa-solid fa-sliders text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Server-Side Security</span>
+              <span id="ogadsAdminHeaderStatusBadge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">Checking...</span>
+            </div>
+            <h2 id="ogadsAdminModalTitle" class="text-base sm:text-lg font-extrabold text-white mt-0.5">OGAds Content Locker &amp; Postback Admin Dashboard</h2>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" id="ogadsAdminLogoutBtn" onclick="logoutOgadsAdmin()" class="hidden px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold cursor-pointer transition-colors">
+            <i class="fa-solid fa-right-from-bracket mr-1"></i>Logout
+          </button>
+          <button type="button" onclick="closeOgadsAdminModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors" aria-label="Close Admin Modal">
+            <i class="fa-solid fa-xmark text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Admin Authentication Gate -->
+      <div id="ogadsAdminAuthView" class="p-6 sm:p-8 max-w-md mx-auto space-y-4">
+        <div class="text-center space-y-1.5">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-400 flex items-center justify-center mx-auto mb-2">
+            <i class="fa-solid fa-user-shield text-xl"></i>
+          </div>
+          <h3 id="ogadsAdminAuthHeading" class="text-base font-extrabold text-white">Administrator Authentication</h3>
+          <p id="ogadsAdminAuthSubtext" class="text-xs text-slate-400 leading-relaxed">
+            Enter your administrator password to manage OGAds offerwall credentials, postback secrets, and conversion logs.
+          </p>
+        </div>
+        <div id="ogadsAdminAuthError" class="hidden rounded-xl bg-rose-950/80 border border-rose-500/40 p-3 text-xs text-rose-200 font-medium"></div>
+        <div class="space-y-3">
+          <div>
+            <label for="ogadsAdminPasswordInput" class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">Admin Password</label>
+            <input type="password" id="ogadsAdminPasswordInput" placeholder="Enter admin password (min 6 characters)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500">
+          </div>
+          <button type="button" onclick="submitOgadsAdminLogin()" class="w-full py-3 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm cursor-pointer transition-colors">
+            <i class="fa-solid fa-key mr-1.5"></i>Access OGAds Admin Dashboard
+          </button>
+        </div>
+      </div>
+
+      <!-- Authenticated Admin Dashboard View -->
+      <div id="ogadsAdminDashboardView" class="hidden p-5 sm:p-6 space-y-6 max-h-[82vh] overflow-y-auto">
+        <!-- Top Metrics & Status Row -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-3.5">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Offerwall Status</div>
+            <div id="ogadsStatOfferwallStatus" class="text-sm font-extrabold text-emerald-400 mt-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check"></i> Active
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5 truncate">Link: trkoffer.net/cl/i/n616e4</div>
+          </div>
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-3.5">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Conversion Verification</div>
+            <div id="ogadsStatVerificationStatus" class="text-sm font-extrabold text-amber-400 mt-1 flex items-center gap-1.5">
+              <i class="fa-solid fa-clock"></i> Needs Secret
+            </div>
+            <div id="ogadsStatVerificationSub" class="text-[11px] text-slate-400 mt-0.5 truncate">S2S Postback Callback</div>
+          </div>
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-3.5">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Conversions</div>
+            <div id="ogadsStatTotalConversions" class="text-xl font-black text-white mt-0.5">0</div>
+            <div class="text-[11px] text-emerald-400 font-semibold">Verified S2S Leads</div>
+          </div>
+          <div class="rounded-2xl bg-slate-800/80 border border-slate-700 p-3.5">
+            <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Unlocked Downloads</div>
+            <div id="ogadsStatTotalDownloads" class="text-xl font-black text-white mt-0.5">0</div>
+            <div id="ogadsStatUnlockedSessions" class="text-[11px] text-sky-400 font-semibold">0 Unlocked Sessions</div>
+          </div>
+        </div>
+
+        <!-- Configuration Form & Postback Setup -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Left Column: OGAds Configuration Settings -->
+          <div class="lg:col-span-7 rounded-2xl bg-slate-950/60 border border-slate-800 p-4 sm:p-5 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                  <i class="fa-solid fa-gear text-emerald-400"></i> OGAds Offerwall &amp; Credentials Configuration
+                </h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">All secret credentials are stored exclusively on the server and never exposed to frontend JavaScript.</p>
+              </div>
+            </div>
+
+            <div id="ogadsAdminSaveNotice" class="hidden rounded-xl p-3 text-xs font-bold"></div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div class="sm:col-span-2">
+                <label for="ogadsCfgTrackingLink" class="block text-xs font-bold text-slate-300 mb-1">OGAds Tracking Link (Official)</label>
+                <input type="url" id="ogadsCfgTrackingLink" value="https://trkoffer.net/cl/i/n616e4" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-emerald-300 font-mono text-xs focus:outline-none focus:border-emerald-500">
+              </div>
+
+              <div>
+                <label for="ogadsCfgPublisherId" class="block text-xs font-bold text-slate-300 mb-1">OGAds Publisher ID <span class="text-amber-400">*</span></label>
+                <input type="text" id="ogadsCfgPublisherId" placeholder="e.g. 149823" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-emerald-500">
+              </div>
+
+              <div>
+                <label for="ogadsCfgLockerId" class="block text-xs font-bold text-slate-300 mb-1">OGAds Locker / Link ID</label>
+                <input type="text" id="ogadsCfgLockerId" value="n616e4" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500">
+              </div>
+
+              <div class="sm:col-span-2">
+                <div class="flex items-center justify-between mb-1">
+                  <label for="ogadsCfgPostbackSecret" class="block text-xs font-bold text-slate-300">Server-to-Server (S2S) Postback Secret Key <span class="text-amber-400">*</span></label>
+                  <button type="button" onclick="generateOgadsPostbackSecret()" class="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Generate Secure Secret
+                  </button>
+                </div>
+                <input type="password" id="ogadsCfgPostbackSecret" placeholder="Leave blank to keep existing secret, or generate new" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500">
+                <div id="ogadsCfgCurrentSecretPreview" class="text-[11px] text-slate-400 mt-1 font-mono">Current Secret: Not configured</div>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="ogadsCfgApiKey" class="block text-xs font-bold text-slate-300 mb-1">OGAds Publisher API Key (Optional — Server-Side Only)</label>
+                <input type="password" id="ogadsCfgApiKey" placeholder="Enter OGAds Bearer API Key (stored on server only)" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500">
+                <div id="ogadsCfgCurrentApiKeyPreview" class="text-[11px] text-slate-400 mt-1 font-mono">Current API Key: Not set</div>
+              </div>
+
+              <div>
+                <label for="ogadsCfgAllowedIps" class="block text-xs font-bold text-slate-300 mb-1">Allowed OGAds Postback IPs (Optional)</label>
+                <input type="text" id="ogadsCfgAllowedIps" placeholder="Comma-separated IPs (blank = allow all)" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono text-xs focus:outline-none focus:border-emerald-500">
+              </div>
+
+              <div>
+                <label for="ogadsCfgUnlockMinutes" class="block text-xs font-bold text-slate-300 mb-1">Unlock Duration (Minutes)</label>
+                <input type="number" id="ogadsCfgUnlockMinutes" value="60" min="5" max="1440" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-emerald-500">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="ogadsCfgRequireMinPayout" class="block text-xs font-bold text-slate-300 mb-1">Minimum Offer Payout ($ USD)</label>
+                <input type="number" id="ogadsCfgRequireMinPayout" value="0" min="0" step="0.01" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-3">
+              <button type="button" onclick="saveOgadsAdminConfig()" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm cursor-pointer transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Save OGAds Configuration
+              </button>
+              <button type="button" onclick="refreshOgadsAdminDashboard()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs cursor-pointer transition-colors flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate"></i> Refresh Data
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Official OGAds Postback Setup Instructions -->
+          <div class="lg:col-span-5 rounded-2xl bg-slate-950/60 border border-slate-800 p-4 sm:p-5 space-y-4 flex flex-col justify-between">
+            <div class="space-y-3">
+              <h3 class="text-sm font-extrabold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                <i class="fa-solid fa-satellite-dish text-sky-400"></i> Official OGAds Postback URL Setup
+              </h3>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Copy the global Postback URL below and paste it into your <strong>OGAds Publisher Dashboard &rarr; Postback Settings</strong> (or Content Locker Postback URL). OGAds will automatically replace the macros when a visitor completes an eligible offer:
+              </p>
+              <div class="rounded-xl bg-slate-900 border border-slate-700 p-3 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">S2S Postback Callback URL</span>
+                  <button type="button" onclick="copyOgadsPostbackUrl()" class="text-[11px] font-bold text-sky-400 hover:text-sky-300 cursor-pointer">
+                    <i class="fa-regular fa-copy mr-1"></i>Copy URL
+                  </button>
+                </div>
+                <div id="ogadsAdminPostbackUrlBox" class="text-[11px] font-mono text-slate-200 break-all bg-slate-950 p-2.5 rounded-lg border border-slate-800 select-all">
+                  https://.../api/ogads/postback?secret=YOUR_POSTBACK_SECRET&amp;aff_sub={aff_sub}&amp;aff_sub2={aff_sub2}&amp;aff_sub3={aff_sub3}&amp;aff_sub4={aff_sub4}&amp;offer_id={offer_id}&amp;offer_name={offer_name}&amp;payout={payout}&amp;session_ip={session_ip}&amp;country={country}
+                </div>
+              </div>
+
+              <div class="rounded-xl bg-slate-900/70 border border-slate-800 p-3 space-y-1.5 text-[11px] text-slate-300">
+                <div class="font-extrabold text-white uppercase tracking-wider text-[10px]">How Sub-ID Tracking Works</div>
+                <div><code class="text-emerald-300">{aff_sub}</code> &rarr; Unique Server Lock ID (<code class="text-slate-400">lock_...</code>)</div>
+                <div><code class="text-emerald-300">{aff_sub2}</code> &rarr; Selected Verification File ID</div>
+                <div><code class="text-emerald-300">{aff_sub3}</code> &rarr; Country &amp; Document Type</div>
+                <div><code class="text-emerald-300">{offer_id}</code> &rarr; OGAds Offer ID (Deduplicated)</div>
+              </div>
+            </div>
+
+            <div class="rounded-xl bg-emerald-950/40 border border-emerald-500/30 p-3 text-[11px] text-emerald-200 leading-relaxed">
+              <i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i>
+              <strong>Zero-Bypass Guarantee:</strong> Clicking the offer link never unlocks a file. Only a verified S2S callback with your secret key unlocks the visitor's specific file.
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Conversion Activity Table -->
+        <div class="rounded-2xl bg-slate-950/60 border border-slate-800 p-4 sm:p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-emerald-400"></i> Recent OGAds Conversion Activity
+            </h3>
+            <span class="text-[11px] text-slate-400">Real-time S2S Postback Log</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="border-b border-slate-800 text-[10px] uppercase tracking-wider text-slate-400">
+                  <th class="py-2 pr-3">Timestamp</th>
+                  <th class="py-2 px-3">Lock ID</th>
+                  <th class="py-2 px-3">Unlocked File</th>
+                  <th class="py-2 px-3">Offer ID &amp; Name</th>
+                  <th class="py-2 px-3">Payout</th>
+                  <th class="py-2 pl-3">Country / IP</th>
+                </tr>
+              </thead>
+              <tbody id="ogadsAdminConversionsTableBody" class="divide-y divide-slate-800/70 font-mono text-[11px]">
+                <tr>
+                  <td colspan="6" class="py-6 text-center text-slate-500 font-sans">No conversions recorded yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OGADS CONTENT LOCKER & DOWNLOAD UNLOCK CONTROLLER ================= -->
+  <script>
+    (function() {
+      const OFFICIAL_OGADS_LINK = 'https://trkoffer.net/cl/i/n616e4';
+      const SESSION_STORAGE_KEY = 'ogads_visitor_session_v1';
+      const LOCK_MAP_STORAGE_KEY = 'ogads_file_locks_v1';
+
+      function getOrCreateVisitorSessionId() {
+        try {
+          let sid = localStorage.getItem(SESSION_STORAGE_KEY);
+          if (!sid || !/^[a-zA-Z0-9_-]{12,80}$/.test(sid)) {
+            const rand = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+            sid = 'vs_' + Date.now().toString(36) + '_' + rand.slice(0, 18);
+            localStorage.setItem(SESSION_STORAGE_KEY, sid);
+          }
+          return sid;
+        } catch (e) {
+          return 'vs_mem_' + Date.now().toString(36) + '_fallback123456';
+        }
+      }
+
+      function getSavedFileLocks() {
+        try {
+          const raw = localStorage.getItem(LOCK_MAP_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+          return {};
+        }
+      }
+
+      function saveFileLockRecord(fileId, record) {
+        try {
+          const map = getSavedFileLocks();
+          map[fileId] = record;
+          localStorage.setItem(LOCK_MAP_STORAGE_KEY, JSON.stringify(map));
+        } catch (e) {}
+      }
+
+      const visitorSessionId = getOrCreateVisitorSessionId();
+      const origDownloadFns = {};
+      let publicOgadsConfig = {
+        trackingLink: OFFICIAL_OGADS_LINK,
+        lockerId: 'n616e4',
+        publisherConfigured: false,
+        verificationConfigured: false,
+        offerwallStatus: 'active',
+        unlockDurationMinutes: 60
+      };
+
+      let activeLockerItem = null;
+      let activeLockState = null;
+      let pollIntervalId = null;
+      let authorizedExecutionBypass = false;
+
+      // Catalog of all downloadable verification files in the project
+      const FILE_CATALOG = {
+        'kenya-passport-png': {
+          fileId: 'kenya-passport-png',
+          fileName: 'kenya-passport.png',
+          docTitle: 'Republic of Kenya — Biometric Passport (HD PNG)',
+          country: 'kenya',
+          docType: 'passport',
+          fnName: 'downloadPassportPNG'
+        },
+        'kenya-passport-print': {
+          fileId: 'kenya-passport-print',
+          fileName: 'kenya-passport-print.pdf',
+          docTitle: 'Republic of Kenya — Biometric Passport (Print / PDF)',
+          country: 'kenya',
+          docType: 'passport',
+          fnName: 'printPassport'
+        },
+        'kenya-id-front-png': {
+          fileId: 'kenya-id-front-png',
+          fileName: 'kenya-maisha-id-front.png',
+          docTitle: 'Kenya Maisha Namba National ID — Front Side (PNG)',
+          country: 'kenya',
+          docType: 'idcard',
+          fnName: 'downloadKenyaIdPNG',
+          fnArgs: ['front']
+        },
+        'kenya-id-back-png': {
+          fileId: 'kenya-id-back-png',
+          fileName: 'kenya-maisha-id-back.png',
+          docTitle: 'Kenya Maisha Namba National ID — Back Side (PNG)',
+          country: 'kenya',
+          docType: 'idcard',
+          fnName: 'downloadKenyaIdPNG',
+          fnArgs: ['back']
+        },
+        'kenya-id-both-png': {
+          fileId: 'kenya-id-both-png',
+          fileName: 'kenya-maisha-id-both.png',
+          docTitle: 'Kenya Maisha Namba National ID — Front & Back (PNG)',
+          country: 'kenya',
+          docType: 'idcard',
+          fnName: 'downloadKenyaIdPNG',
+          fnArgs: ['both']
+        },
+        'somalia-id-png': {
+          fileId: 'somalia-id-png',
+          fileName: 'somalia-national-id.png',
+          docTitle: 'Federal Republic of Somalia — National ID Card (HD PNG)',
+          country: 'somalia',
+          docType: 'idcard',
+          fnName: 'downloadSomaliaPNG'
+        },
+        'somalia-passport-png': {
+          fileId: 'somalia-passport-png',
+          fileName: 'somalia-passport.png',
+          docTitle: 'Federal Republic of Somalia — e-Passport (HD PNG)',
+          country: 'somalia',
+          docType: 'passport',
+          fnName: 'downloadSomaliaPassportPNG'
+        },
+        'somalia-dl-png': {
+          fileId: 'somalia-dl-png',
+          fileName: 'somalia-drivers-license.png',
+          docTitle: 'Somalia International Driver\'s License (HD PNG)',
+          country: 'somalia',
+          docType: 'driverlicense',
+          fnName: 'downloadSomaliaDlPNG'
+        },
+        'ethiopia-id-png': {
+          fileId: 'ethiopia-id-png',
+          fileName: 'ethiopia-fayda-id.png',
+          docTitle: 'Federal Democratic Republic of Ethiopia — Fayda Digital ID (PNG)',
+          country: 'ethiopia',
+          docType: 'idcard',
+          fnName: 'downloadEthiopiaPNG'
+        },
+        'nigeria-id-png': {
+          fileId: 'nigeria-id-png',
+          fileName: 'nigeria-nin-id.png',
+          docTitle: 'Federal Republic of Nigeria — National Identity Card (PNG)',
+          country: 'nigeria',
+          docType: 'idcard',
+          fnName: 'downloadNigeriaPNG'
+        },
+        'nigeria-passport-png': {
+          fileId: 'nigeria-passport-png',
+          fileName: 'nigeria-passport.png',
+          docTitle: 'Federal Republic of Nigeria — e-Passport (HD PNG)',
+          country: 'nigeria',
+          docType: 'passport',
+          fnName: 'downloadNigeriaPassportPNG'
+        },
+        'uk-passport-png': {
+          fileId: 'uk-passport-png',
+          fileName: 'uk-british-passport.png',
+          docTitle: 'United Kingdom — British Biometric Passport (HD PNG)',
+          country: 'uk',
+          docType: 'passport',
+          fnName: 'downloadUkPassportPNG'
+        },
+        'uganda-refugee-png': {
+          fileId: 'uganda-refugee-png',
+          fileName: 'uganda-refugee-id-card.png',
+          docTitle: 'Republic of Uganda — Refugee Identity Card (HD PNG)',
+          country: 'uganda',
+          docType: 'refugeecard',
+          fnName: 'downloadUgandaRefugeePNG'
+        },
+        'pakistan-id-png': {
+          fileId: 'pakistan-id-png',
+          fileName: 'pakistan-nadra-cnic.png',
+          docTitle: 'Islamic Republic of Pakistan — NADRA Smart CNIC (HD PNG)',
+          country: 'pakistan',
+          docType: 'idcard',
+          fnName: 'downloadPakistanPNG'
+        },
+        'pakistan-specimen-jpg': {
+          fileId: 'pakistan-specimen-jpg',
+          fileName: 'Pakistan-NADRA-CNIC-Specimen.jpg',
+          docTitle: 'Pakistan NADRA CNIC Official Reference Specimen (JPG)',
+          country: 'pakistan',
+          docType: 'idcard',
+          staticAssetPath: '/assets/aistudio/pakistan_cnic_specimen.jpg'
+        },
+        'seychelles-id-png': {
+          fileId: 'seychelles-id-png',
+          fileName: 'seychelles-national-id.png',
+          docTitle: 'Republic of Seychelles — National Identity Card (HD PNG)',
+          country: 'seychelles',
+          docType: 'idcard',
+          fnName: 'downloadSeychellesPNG'
+        },
+        'senegal-passport-png': {
+          fileId: 'senegal-passport-png',
+          fileName: 'senegal-passport.png',
+          docTitle: 'Republic of Senegal — ECOWAS Biometric Passport (HD PNG)',
+          country: 'senegal',
+          docType: 'passport',
+          fnName: 'downloadSenegalPassPNG'
+        },
+        'drcongo-passport-png': {
+          fileId: 'drcongo-passport-png',
+          fileName: 'drcongo-passport.png',
+          docTitle: 'Democratic Republic of the Congo — Biometric Passport (HD PNG)',
+          country: 'drcongo',
+          docType: 'passport',
+          fnName: 'downloadDrcPassPNG'
+        },
+        'drcongo-reference-jpg': {
+          fileId: 'drcongo-reference-jpg',
+          fileName: 'DRC-Passport-OP1123637-Reference.jpg',
+          docTitle: 'DR Congo Biometric Passport Reference Specimen (JPG)',
+          country: 'drcongo',
+          docType: 'passport',
+          staticAssetPath: '/assets/aistudio/drc_passport_reference.jpg'
+        },
+        'proof-of-account-pdf': {
+          fileId: 'proof-of-account-pdf',
+          fileName: 'Proof-of-Address-and-Account-Confirmation.pdf',
+          docTitle: 'Official Proof of Address & Account Confirmation (PDF)',
+          country: 'all',
+          docType: 'proofofaccount',
+          staticAssetPath: '/assets/aistudio/proof_of_account.pdf'
+        },
+        'proof-of-account-png': {
+          fileId: 'proof-of-account-png',
+          fileName: 'Proof-of-Address-and-Account.png',
+          docTitle: 'Official Proof of Address & Account Confirmation (HD PNG)',
+          country: 'all',
+          docType: 'proofofaccount',
+          fnName: 'downloadPoaPNG'
+        }
+      };
+
+      function resolveActiveFileKey() {
+        const c = (typeof currentCountry !== 'undefined' && currentCountry) ? currentCountry : 'kenya';
+        const d = (typeof currentDocType !== 'undefined' && currentDocType) ? currentDocType : 'passport';
+        if (d === 'proofofaccount') return 'proof-of-account-pdf';
+        if (c === 'drcongo') return 'drcongo-passport-png';
+        if (c === 'senegal') return 'senegal-passport-png';
+        if (c === 'seychelles') return 'seychelles-id-png';
+        if (c === 'pakistan') return 'pakistan-id-png';
+        if (c === 'uganda' || d === 'refugeecard') return 'uganda-refugee-png';
+        if (c === 'uk') return 'uk-passport-png';
+        if (d === 'driverlicense') return 'somalia-dl-png';
+        if (c === 'nigeria') return d === 'passport' ? 'nigeria-passport-png' : 'nigeria-id-png';
+        if (c === 'ethiopia') return 'ethiopia-id-png';
+        if (c === 'somalia') return d === 'idcard' ? 'somalia-id-png' : 'somalia-passport-png';
+        if (d === 'idcard') return 'kenya-id-both-png';
+        return 'kenya-passport-png';
+      }
+
+      function isFileUnlockedLocally(fileId) {
+        const locks = getSavedFileLocks();
+        const rec = locks[fileId];
+        if (!rec || !rec.unlocked || !rec.downloadAuthToken) return false;
+        if (rec.expiresAt && Date.now() > Number(rec.expiresAt)) return false;
+        return true;
+      }
+
+      // Sync the top workbench banner & all download buttons on the page
+      window.syncActiveOgadsUnlockBar = function() {
+        const activeKey = resolveActiveFileKey();
+        const item = FILE_CATALOG[activeKey] || FILE_CATALOG['kenya-passport-png'];
+        const unlocked = isFileUnlockedLocally(item.fileId);
+
+        const titleEl = document.getElementById('ogads-active-doc-label');
+        const badgeEl = document.getElementById('ogads-active-status-badge');
+        const btnEl = document.getElementById('ogads-master-unlock-btn');
+        const btnTextEl = document.getElementById('ogads-master-unlock-btn-text');
+
+        if (titleEl) {
+          titleEl.textContent = unlocked
+            ? `SUCCESSFULLY UNLOCKED: ${item.docTitle}`
+            : `Unlock Required: ${item.docTitle}`;
+        }
+        if (badgeEl) {
+          if (unlocked) {
+            badgeEl.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/25 text-emerald-200 border border-emerald-400/40';
+            badgeEl.innerHTML = '<i class="fa-solid fa-circle-check text-[9px]"></i> Successfully Unlocked';
+          } else {
+            badgeEl.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30';
+            badgeEl.innerHTML = '<i class="fa-solid fa-lock text-[9px]"></i> Locked — Offer Required';
+          }
+        }
+        if (btnEl && btnTextEl) {
+          if (unlocked) {
+            btnTextEl.textContent = 'DOWNLOAD NOW';
+            btnEl.className = 'w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-400 via-green-500 to-emerald-500 hover:from-emerald-300 hover:to-green-400 text-slate-950 font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2.5 cursor-pointer transition-all shrink-0 ring-2 ring-emerald-300/50';
+          } else {
+            btnTextEl.textContent = 'UNLOCK DOWNLOAD';
+            btnEl.className = 'w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold text-xs sm:text-sm uppercase tracking-wider shadow-lg shadow-emerald-950/50 flex items-center justify-center gap-2.5 cursor-pointer transition-all shrink-0';
+          }
+        }
+
+        // Update all document download buttons across the page to show UNLOCK DOWNLOAD or DOWNLOAD NOW
+        upgradePageDownloadButtons();
+      };
+
+      function mapButtonToCatalogKey(el) {
+        if (!el) return null;
+        if (el.id === 'downloadBtn' || el.id === 'fallbackDownloadLink') return 'kenya-passport-png';
+        if (el.id === 'printBtn') return 'kenya-passport-print';
+        const onclickAttr = el.getAttribute('onclick') || '';
+        const hrefAttr = el.getAttribute('href') || '';
+        if (onclickAttr.includes('downloadKenyaIdPNG')) {
+          if (onclickAttr.includes("'front'")) return 'kenya-id-front-png';
+          if (onclickAttr.includes("'back'")) return 'kenya-id-back-png';
+          return 'kenya-id-both-png';
+        }
+        if (onclickAttr.includes('downloadSomaliaPNG')) return 'somalia-id-png';
+        if (onclickAttr.includes('downloadSomaliaPassportPNG')) return 'somalia-passport-png';
+        if (onclickAttr.includes('downloadSomaliaDlPNG')) return 'somalia-dl-png';
+        if (onclickAttr.includes('downloadEthiopiaPNG')) return 'ethiopia-id-png';
+        if (onclickAttr.includes('downloadNigeriaPNG')) return 'nigeria-id-png';
+        if (onclickAttr.includes('downloadNigeriaPassportPNG')) return 'nigeria-passport-png';
+        if (onclickAttr.includes('downloadUkPassportPNG')) return 'uk-passport-png';
+        if (onclickAttr.includes('downloadUgandaRefugeePNG')) return 'uganda-refugee-png';
+        if (onclickAttr.includes('downloadPakistanPNG')) return 'pakistan-id-png';
+        if (onclickAttr.includes('downloadSeychellesPNG')) return 'seychelles-id-png';
+        if (onclickAttr.includes('downloadSenegalPassPNG')) return 'senegal-passport-png';
+        if (onclickAttr.includes('downloadDrcPassPNG')) return 'drcongo-passport-png';
+        if (onclickAttr.includes('downloadPoaPNG')) return 'proof-of-account-png';
+        if (onclickAttr.includes('downloadPoaOfficialPDF')) return 'proof-of-account-pdf';
+        if (hrefAttr.includes('pakistan_cnic_specimen.jpg')) return 'pakistan-specimen-jpg';
+        if (hrefAttr.includes('drc_passport_reference.jpg')) return 'drcongo-reference-jpg';
+        if (hrefAttr.includes('proof_of_account')) return 'proof-of-account-pdf';
+        return null;
+      }
+
+      function upgradePageDownloadButtons() {
+        const selectors = [
+          '#downloadBtn',
+          'button[onclick*="download"]',
+          'a[download]'
+        ];
+        const elements = document.querySelectorAll(selectors.join(','));
+        elements.forEach((el) => {
+          if (el.closest('#ogadsContentLockerModal') || el.closest('#ogadsAdminModal')) return;
+          const key = mapButtonToCatalogKey(el);
+          if (!key) return;
+          el.setAttribute('data-ogads-file-key', key);
+          if (!el.getAttribute('data-ogads-orig-label')) {
+            el.setAttribute('data-ogads-orig-label', el.textContent.trim() || 'Download');
+          }
+          const origText = el.getAttribute('data-ogads-orig-label');
+          const unlocked = isFileUnlockedLocally(key);
+          if (unlocked) {
+            el.innerHTML = `<i class="fa-solid fa-cloud-arrow-down mr-2"></i>DOWNLOAD NOW (${origText})`;
+          } else {
+            el.innerHTML = `<i class="fa-solid fa-lock mr-2"></i>UNLOCK DOWNLOAD (${origText})`;
+          }
+        });
+      }
+
+      window.openOgadsLockerForActiveDocument = function() {
+        const key = resolveActiveFileKey();
+        openOgadsContentLocker(key);
+      };
+
+      window.openOgadsContentLocker = async function(fileKeyOrItem) {
+        const item = typeof fileKeyOrItem === 'string'
+          ? (FILE_CATALOG[fileKeyOrItem] || FILE_CATALOG[resolveActiveFileKey()])
+          : (fileKeyOrItem || FILE_CATALOG[resolveActiveFileKey()]);
+
+        activeLockerItem = item;
+
+        const modal = document.getElementById('ogadsContentLockerModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+
+        const titleEl = document.getElementById('ogadsLockerFileTitle');
+        const nameEl = document.getElementById('ogadsLockerFileName');
+        const lockIdEl = document.getElementById('ogadsLockerLockIdDisplay');
+        const errorBox = document.getElementById('ogadsLockerErrorBox');
+        if (titleEl) titleEl.textContent = item.docTitle;
+        if (nameEl) nameEl.textContent = item.fileName;
+        if (lockIdEl) lockIdEl.textContent = 'Creating session...';
+        if (errorBox) errorBox.classList.add('hidden');
+
+        const savedMap = getSavedFileLocks();
+        const existingRec = savedMap[item.fileId];
+
+        try {
+          if (typeof window.fetch === 'function') {
+            const resp = await window.fetch('/api/ogads/lock-session', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sessionId: visitorSessionId,
+                fileId: item.fileId,
+                fileName: item.fileName,
+                docTitle: item.docTitle,
+                country: item.country,
+                docType: item.docType,
+                existingLockId: existingRec ? existingRec.lockId : undefined
+              })
+            });
+            const data = await resp.json();
+            if (data && data.ok) {
+              activeLockState = data;
+              if (data.verificationConfigured !== undefined) {
+                publicOgadsConfig.verificationConfigured = Boolean(data.verificationConfigured);
+              }
+              if (data.publisherConfigured !== undefined) {
+                publicOgadsConfig.publisherConfigured = Boolean(data.publisherConfigured);
+              }
+              saveFileLockRecord(item.fileId, {
+                lockId: data.lockId,
+                fileId: item.fileId,
+                trackingUrl: data.trackingUrl || OFFICIAL_OGADS_LINK,
+                status: data.status,
+                unlocked: Boolean(data.unlocked),
+                downloadAuthToken: data.downloadAuthToken || null,
+                expiresAt: data.expiresAt || null
+              });
+            }
+          }
+        } catch (err) {
+          activeLockState = {
+            lockId: existingRec ? existingRec.lockId : ('lock_local_' + Date.now().toString(36)),
+            trackingUrl: OFFICIAL_OGADS_LINK,
+            status: 'locked',
+            unlocked: false,
+            verificationConfigured: false
+          };
+        }
+
+        renderOgadsLockerModalState();
+        startOgadsStatusPolling();
+      };
+
+      function renderOgadsLockerModalState() {
+        if (!activeLockerItem) return;
+        const state = activeLockState || {
+          lockId: 'Pending',
+          trackingUrl: OFFICIAL_OGADS_LINK,
+          status: 'locked',
+          unlocked: false,
+          verificationConfigured: publicOgadsConfig.verificationConfigured
+        };
+
+        const lockIdEl = document.getElementById('ogadsLockerLockIdDisplay');
+        const statusPill = document.getElementById('ogadsLockerStatusPill');
+        const headerIcon = document.getElementById('ogadsLockerHeaderIcon');
+        const configAlert = document.getElementById('ogadsLockerConfigMissingAlert');
+        const instructionsBox = document.getElementById('ogadsLockerInstructionsBox');
+        const verifyingBox = document.getElementById('ogadsLockerVerifyingBox');
+        const unlockedBox = document.getElementById('ogadsLockerUnlockedBox');
+        const redirectBtn = document.getElementById('ogadsLockerRedirectBtn');
+        const redirectBtnLabel = document.getElementById('ogadsLockerRedirectBtnLabel');
+        const downloadNowBtn = document.getElementById('ogadsLockerDownloadNowBtn');
+        const urlPreview = document.getElementById('ogadsLockerTrackingUrlPreview');
+        const expiryInfo = document.getElementById('ogadsLockerUnlockedExpiryInfo');
+        const offerInfo = document.getElementById('ogadsLockerUnlockedOfferInfo');
+
+        if (lockIdEl) lockIdEl.textContent = state.lockId || 'Pending';
+        if (redirectBtn) redirectBtn.href = state.trackingUrl || OFFICIAL_OGADS_LINK;
+        if (urlPreview) urlPreview.textContent = OFFICIAL_OGADS_LINK;
+
+        // Show missing config notice if verification is not yet configured on server
+        if (configAlert) {
+          if (!state.verificationConfigured) {
+            configAlert.classList.remove('hidden');
+          } else {
+            configAlert.classList.add('hidden');
+          }
+        }
+
+        if (state.unlocked && state.downloadAuthToken) {
+          if (statusPill) {
+            statusPill.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/25 text-emerald-200 border border-emerald-400/40';
+            statusPill.innerHTML = '<i class="fa-solid fa-unlock text-[9px]"></i> UNLOCKED';
+          }
+          if (headerIcon) {
+            headerIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-xl';
+          }
+          if (instructionsBox) instructionsBox.classList.add('hidden');
+          if (verifyingBox) verifyingBox.classList.add('hidden');
+          if (unlockedBox) unlockedBox.classList.remove('hidden');
+          if (redirectBtn) redirectBtn.classList.add('hidden');
+          if (downloadNowBtn) {
+            downloadNowBtn.classList.remove('hidden');
+            downloadNowBtn.classList.add('flex');
+          }
+          if (offerInfo) {
+            offerInfo.textContent = state.offerName ? `Offer: ${state.offerName}` : 'Verified OGAds Offer';
+          }
+          if (expiryInfo && state.expiresAt) {
+            const minsLeft = Math.max(1, Math.round((Number(state.expiresAt) - Date.now()) / 60000));
+            expiryInfo.textContent = `Download permission expires in ${minsLeft} min`;
+          }
+        } else {
+          if (unlockedBox) unlockedBox.classList.add('hidden');
+          if (downloadNowBtn) {
+            downloadNowBtn.classList.add('hidden');
+            downloadNowBtn.classList.remove('flex');
+          }
+          if (redirectBtn) redirectBtn.classList.remove('hidden');
+          if (instructionsBox) instructionsBox.classList.remove('hidden');
+
+          if (state.status === 'awaiting_offer') {
+            if (statusPill) {
+              statusPill.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-500/25 text-sky-200 border border-sky-400/40';
+              statusPill.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-[9px]"></i> Verifying Offer';
+            }
+            if (verifyingBox) verifyingBox.classList.remove('hidden');
+            if (redirectBtnLabel) redirectBtnLabel.textContent = 'RE-OPEN OGADS OFFERWALL (https://trkoffer.net/cl/i/n616e4)';
+          } else {
+            if (statusPill) {
+              statusPill.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30';
+              statusPill.innerHTML = '<i class="fa-solid fa-lock text-[9px]"></i> Locked';
+            }
+            if (verifyingBox) verifyingBox.classList.add('hidden');
+            if (redirectBtnLabel) redirectBtnLabel.textContent = 'UNLOCK DOWNLOAD — COMPLETE OFFER';
+          }
+        }
+
+        if (typeof window.syncActiveOgadsUnlockBar === 'function') {
+          window.syncActiveOgadsUnlockBar();
+        }
+      }
+
+      window.closeOgadsContentLocker = function() {
+        const modal = document.getElementById('ogadsContentLockerModal');
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+        stopOgadsStatusPolling();
+      };
+
+      window.handleOgadsOfferClick = function() {
+        if (!activeLockState || !activeLockerItem) return;
+        activeLockState.status = 'awaiting_offer';
+        renderOgadsLockerModalState();
+
+        if (typeof window.fetch === 'function') {
+          window.fetch('/api/ogads/record-click', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lockId: activeLockState.lockId,
+              sessionId: visitorSessionId
+            })
+          }).then(r => r.json()).then(data => {
+            if (data && data.ok) {
+              activeLockState.status = 'awaiting_offer';
+              renderOgadsLockerModalState();
+            }
+          }).catch(() => {});
+        }
+      };
+
+      window.retryOgadsOfferRedirect = function() {
+        const errorBox = document.getElementById('ogadsLockerErrorBox');
+        if (errorBox) errorBox.classList.add('hidden');
+        const btn = document.getElementById('ogadsLockerRedirectBtn');
+        if (btn) btn.click();
+      };
+
+      function startOgadsStatusPolling() {
+        stopOgadsStatusPolling();
+        pollIntervalId = setInterval(() => {
+          pollOgadsLockStatus(false);
+        }, 4000);
+      }
+
+      function stopOgadsStatusPolling() {
+        if (pollIntervalId) {
+          clearInterval(pollIntervalId);
+          pollIntervalId = null;
+        }
+      }
+
+      window.checkOgadsConversionNow = function() {
+        pollOgadsLockStatus(true);
+      };
+
+      async function pollOgadsLockStatus(isManualCheck) {
+        if (!activeLockState || !activeLockState.lockId || !activeLockerItem) return;
+        if (typeof window.fetch !== 'function') return;
+
+        const lastCheckEl = document.getElementById('ogadsLockerLastCheckText');
+        if (lastCheckEl && isManualCheck) {
+          lastCheckEl.textContent = 'Checking server for verified OGAds S2S conversion...';
+        }
+
+        try {
+          const url = `/api/ogads/lock-status/${encodeURIComponent(activeLockState.lockId)}?sessionId=${encodeURIComponent(visitorSessionId)}`;
+          const resp = await window.fetch(url);
+          const data = await resp.json();
+          if (data && data.ok) {
+            const wasUnlocked = Boolean(activeLockState.unlocked);
+            activeLockState = Object.assign({}, activeLockState, data);
+            saveFileLockRecord(activeLockerItem.fileId, {
+              lockId: data.lockId,
+              fileId: activeLockerItem.fileId,
+              trackingUrl: data.trackingUrl || OFFICIAL_OGADS_LINK,
+              status: data.status,
+              unlocked: Boolean(data.unlocked),
+              downloadAuthToken: data.downloadAuthToken || null,
+              expiresAt: data.expiresAt || null
+            });
+            renderOgadsLockerModalState();
+
+            if (lastCheckEl) {
+              const nowStr = new Date().toLocaleTimeString();
+              lastCheckEl.textContent = `Last checked at ${nowStr} — Status: ${data.unlocked ? 'UNLOCKED' : 'Awaiting OGAds S2S postback'}`;
+            }
+
+            if (data.unlocked && !wasUnlocked) {
+              if (typeof showToast === 'function') {
+                showToast('SUCCESSFULLY UNLOCKED', `Offer verified! You can now download ${activeLockerItem.fileName}`);
+              }
+            } else if (isManualCheck && !data.unlocked) {
+              const errorBox = document.getElementById('ogadsLockerErrorBox');
+              const errorText = document.getElementById('ogadsLockerErrorText');
+              if (errorBox && errorText) {
+                errorBox.classList.remove('hidden');
+                errorText.textContent = !data.verificationConfigured
+                  ? 'Official OGAds conversion verification (Publisher ID & Postback Secret) is not yet configured in the Admin Dashboard. Downloads remain locked until configured.'
+                  : 'No completed conversion has been reported by OGAds for your session yet. Please complete an eligible offer from https://trkoffer.net/cl/i/n616e4.';
+              }
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Execute authorized download after server-side token verification
+      window.executeAuthorizedOgadsDownload = async function() {
+        if (!activeLockerItem || !activeLockState) return;
+        const errorBox = document.getElementById('ogadsLockerErrorBox');
+        const errorText = document.getElementById('ogadsLockerErrorText');
+
+        try {
+          const resp = await window.fetch('/api/ogads/authorize-download', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lockId: activeLockState.lockId,
+              sessionId: visitorSessionId,
+              token: activeLockState.downloadAuthToken
+            })
+          });
+          const auth = await resp.json();
+          if (!resp.ok || !auth || !auth.ok) {
+            if (errorBox && errorText) {
+              errorBox.classList.remove('hidden');
+              errorText.textContent = (auth && auth.error) || 'Download authorization failed or expired. Please complete an eligible OGAds offer.';
+            }
+            activeLockState.unlocked = false;
+            activeLockState.downloadAuthToken = null;
+            saveFileLockRecord(activeLockerItem.fileId, activeLockState);
+            renderOgadsLockerModalState();
+            return;
+          }
+
+          // Server confirmed authorization!
+          closeOgadsContentLocker();
+
+          if (activeLockerItem.staticAssetPath) {
+            // Stream protected file directly from the server-authorized endpoint
+            const dlUrl = `/api/ogads/download/${encodeURIComponent(activeLockState.lockId)}?token=${encodeURIComponent(activeLockState.downloadAuthToken)}&sessionId=${encodeURIComponent(visitorSessionId)}`;
+            const a = document.createElement('a');
+            a.href = dlUrl;
+            a.download = activeLockerItem.fileName;
+            document.body.appendChild(a);
+            authorizedExecutionBypass = true;
+            a.click();
+            setTimeout(() => {
+              authorizedExecutionBypass = false;
+              a.remove();
+            }, 300);
+            if (typeof showToast === 'function') {
+              showToast('Download Started', `Downloading ${activeLockerItem.fileName}`);
+            }
+            return;
+          }
+
+          if (activeLockerItem.fnName && origDownloadFns[activeLockerItem.fnName]) {
+            authorizedExecutionBypass = true;
+            try {
+              const args = activeLockerItem.fnArgs || [];
+              await origDownloadFns[activeLockerItem.fnName].apply(window, args);
+            } finally {
+              setTimeout(() => {
+                authorizedExecutionBypass = false;
+              }, 800);
+            }
+          }
+        } catch (err) {
+          if (errorBox && errorText) {
+            errorBox.classList.remove('hidden');
+            errorText.textContent = 'Server authorization check failed. Please retry.';
+          }
+        }
+      };
+
+      // Wrap all existing download/print functions so they cannot be called directly without unlocking
+      const DOWNLOAD_FN_MAPPING = {
+        downloadPassportPNG: () => 'kenya-passport-png',
+        printPassport: () => 'kenya-passport-print',
+        downloadKenyaIdPNG: (side) => side === 'front' ? 'kenya-id-front-png' : (side === 'back' ? 'kenya-id-back-png' : 'kenya-id-both-png'),
+        printKenyaId: () => 'kenya-id-both-png',
+        downloadSomaliaPNG: () => 'somalia-id-png',
+        printSomaliaDoc: () => 'somalia-id-png',
+        downloadSomaliaPassportPNG: () => 'somalia-passport-png',
+        printSomaliaPassport: () => 'somalia-passport-png',
+        downloadSomaliaDlPNG: () => 'somalia-dl-png',
+        printSomaliaDl: () => 'somalia-dl-png',
+        downloadEthiopiaPNG: () => 'ethiopia-id-png',
+        printEthiopiaDoc: () => 'ethiopia-id-png',
+        downloadNigeriaPNG: () => 'nigeria-id-png',
+        printNigeriaDoc: () => 'nigeria-id-png',
+        downloadNigeriaPassportPNG: () => 'nigeria-passport-png',
+        printNigeriaPassport: () => 'nigeria-passport-png',
+        downloadUkPassportPNG: () => 'uk-passport-png',
+        printUkPassport: () => 'uk-passport-png',
+        downloadUgandaRefugeePNG: () => 'uganda-refugee-png',
+        printUgandaRefugeeCard: () => 'uganda-refugee-png',
+        downloadPakistanPNG: () => 'pakistan-id-png',
+        printPakistanDoc: () => 'pakistan-id-png',
+        downloadSeychellesPNG: () => 'seychelles-id-png',
+        printSeychellesDoc: () => 'seychelles-id-png',
+        downloadSenegalPassPNG: () => 'senegal-passport-png',
+        printSenegalPassport: () => 'senegal-passport-png',
+        downloadDrcPassPNG: () => 'drcongo-passport-png',
+        printDrcPassport: () => 'drcongo-passport-png',
+        downloadPoaPNG: () => 'proof-of-account-png',
+        downloadPoaOfficialPDF: () => 'proof-of-account-pdf',
+        printPoaDoc: () => 'proof-of-account-pdf'
+      };
+
+      function installDownloadInterceptors() {
+        Object.keys(DOWNLOAD_FN_MAPPING).forEach((fnName) => {
+          if (typeof window[fnName] === 'function' && !origDownloadFns[fnName]) {
+            origDownloadFns[fnName] = window[fnName];
+            window[fnName] = function(...args) {
+              if (authorizedExecutionBypass) {
+                return origDownloadFns[fnName].apply(window, args);
+              }
+              const keyResolver = DOWNLOAD_FN_MAPPING[fnName];
+              const fileKey = keyResolver ? keyResolver(...args) : resolveActiveFileKey();
+              openOgadsContentLocker(fileKey);
+            };
+          }
+        });
+
+        const dlBtn = document.getElementById('downloadBtn');
+        if (dlBtn) {
+          dlBtn.addEventListener('click', function(e) {
+            if (authorizedExecutionBypass) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            openOgadsContentLocker('kenya-passport-png');
+          }, true);
+        }
+
+        const prtBtn = document.getElementById('printBtn');
+        if (prtBtn) {
+          prtBtn.addEventListener('click', function(e) {
+            if (authorizedExecutionBypass) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            openOgadsContentLocker('kenya-passport-print');
+          }, true);
+        }
+
+        // Intercept static <a download> links (Pakistan specimen JPG, DRC reference JPG, Proof of Account PDF, fallbackDownloadLink)
+        document.addEventListener('click', function(e) {
+          if (authorizedExecutionBypass) return;
+          const anchor = e.target && e.target.closest ? e.target.closest('a[download]') : null;
+          if (!anchor) return;
+          if (anchor.closest('#ogadsContentLockerModal') || anchor.closest('#ogadsAdminModal')) return;
+          const key = mapButtonToCatalogKey(anchor) || resolveActiveFileKey();
+          e.preventDefault();
+          e.stopPropagation();
+          openOgadsContentLocker(key);
+        }, true);
+      }
+
+      // ================= ADMIN DASHBOARD FUNCTIONS =================
+      const ADMIN_TOKEN_STORAGE_KEY = 'ogads_admin_token_v1';
+
+      function getAdminToken() {
+        try {
+          return sessionStorage.getItem(ADMIN_TOKEN_STORAGE_KEY) || '';
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function setAdminToken(token) {
+        try {
+          if (token) sessionStorage.setItem(ADMIN_TOKEN_STORAGE_KEY, token);
+          else sessionStorage.removeItem(ADMIN_TOKEN_STORAGE_KEY);
+        } catch (e) {}
+      }
+
+      window.openOgadsAdminModal = async function() {
+        const modal = document.getElementById('ogadsAdminModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        await checkOgadsAdminSession();
+      };
+
+      window.closeOgadsAdminModal = function() {
+        const modal = document.getElementById('ogadsAdminModal');
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      };
+
+      async function checkOgadsAdminSession() {
+        if (typeof window.fetch !== 'function') return;
+        try {
+          const token = getAdminToken();
+          const resp = await window.fetch('/api/ogads/admin/status', {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+          const data = await resp.json();
+          const authView = document.getElementById('ogadsAdminAuthView');
+          const dashView = document.getElementById('ogadsAdminDashboardView');
+          const logoutBtn = document.getElementById('ogadsAdminLogoutBtn');
+          const heading = document.getElementById('ogadsAdminAuthHeading');
+          const subtext = document.getElementById('ogadsAdminAuthSubtext');
+
+          if (data && data.authenticated) {
+            if (authView) authView.classList.add('hidden');
+            if (dashView) dashView.classList.remove('hidden');
+            if (logoutBtn) logoutBtn.classList.remove('hidden');
+            await refreshOgadsAdminDashboard();
+          } else {
+            if (authView) authView.classList.remove('hidden');
+            if (dashView) dashView.classList.add('hidden');
+            if (logoutBtn) logoutBtn.classList.add('hidden');
+            if (data && !data.passwordConfigured) {
+              if (heading) heading.textContent = 'Create OGAds Administrator Password';
+              if (subtext) subtext.textContent = 'Set an initial administrator password (minimum 6 characters) to secure your OGAds settings and postback secret.';
+            } else {
+              if (heading) heading.textContent = 'Administrator Authentication';
+              if (subtext) subtext.textContent = 'Enter your administrator password to manage OGAds offerwall credentials, postback secrets, and conversion logs.';
+            }
+          }
+        } catch (e) {}
+      }
+
+      window.submitOgadsAdminLogin = async function() {
+        const input = document.getElementById('ogadsAdminPasswordInput');
+        const errEl = document.getElementById('ogadsAdminAuthError');
+        const password = input ? input.value.trim() : '';
+        if (errEl) errEl.classList.add('hidden');
+
+        try {
+          const resp = await window.fetch('/api/ogads/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+          });
+          const data = await resp.json();
+          if (!resp.ok || !data || !data.ok) {
+            if (errEl) {
+              errEl.textContent = (data && data.error) || 'Invalid administrator password.';
+              errEl.classList.remove('hidden');
+            }
+            return;
+          }
+          setAdminToken(data.token);
+          if (input) input.value = '';
+          await checkOgadsAdminSession();
+        } catch (e) {
+          if (errEl) {
+            errEl.textContent = 'Failed to connect to authentication server.';
+            errEl.classList.remove('hidden');
+          }
+        }
+      };
+
+      window.logoutOgadsAdmin = async function() {
+        const token = getAdminToken();
+        try {
+          await window.fetch('/api/ogads/admin/logout', {
+            method: 'POST',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+        } catch (e) {}
+        setAdminToken('');
+        await checkOgadsAdminSession();
+      };
+
+      window.refreshOgadsAdminDashboard = async function() {
+        const token = getAdminToken();
+        if (!token || typeof window.fetch !== 'function') return;
+
+        try {
+          const resp = await window.fetch('/api/ogads/admin/dashboard', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (resp.status === 401) {
+            setAdminToken('');
+            await checkOgadsAdminSession();
+            return;
+          }
+          const data = await resp.json();
+          if (!data || !data.ok) return;
+
+          const cfg = data.config || {};
+          const stats = data.stats || {};
+
+          const linkInput = document.getElementById('ogadsCfgTrackingLink');
+          const pubInput = document.getElementById('ogadsCfgPublisherId');
+          const lockerInput = document.getElementById('ogadsCfgLockerId');
+          const ipsInput = document.getElementById('ogadsCfgAllowedIps');
+          const minsInput = document.getElementById('ogadsCfgUnlockMinutes');
+          const minPayoutInput = document.getElementById('ogadsCfgRequireMinPayout');
+          const secretPreview = document.getElementById('ogadsCfgCurrentSecretPreview');
+          const apiKeyPreview = document.getElementById('ogadsCfgCurrentApiKeyPreview');
+          const postbackBox = document.getElementById('ogadsAdminPostbackUrlBox');
+
+          if (linkInput) linkInput.value = cfg.trackingLink || OFFICIAL_OGADS_LINK;
+          if (pubInput) pubInput.value = cfg.publisherId || '';
+          if (lockerInput) lockerInput.value = cfg.lockerId || 'n616e4';
+          if (ipsInput) ipsInput.value = cfg.allowedIps || '';
+          if (minsInput) minsInput.value = cfg.unlockDurationMinutes || 60;
+          if (minPayoutInput) minPayoutInput.value = cfg.requireMinimumPayout || 0;
+          if (secretPreview) {
+            secretPreview.textContent = cfg.hasPostbackSecret
+              ? `Current Secret: ${cfg.postbackSecretPreview} (Configured)`
+              : 'Current Secret: Not configured (Required for S2S verification)';
+          }
+          if (apiKeyPreview) {
+            apiKeyPreview.textContent = cfg.hasApiKey
+              ? `Current API Key: ${cfg.apiKeyPreview} (Stored securely on server)`
+              : 'Current API Key: Not set';
+          }
+          if (postbackBox && data.postbackUrlTemplate) {
+            postbackBox.textContent = data.postbackUrlTemplate;
+          }
+
+          // Update status & stats cards
+          const headerBadge = document.getElementById('ogadsAdminHeaderStatusBadge');
+          const verifStat = document.getElementById('ogadsStatVerificationStatus');
+          const verifSub = document.getElementById('ogadsStatVerificationSub');
+          const totalConvEl = document.getElementById('ogadsStatTotalConversions');
+          const totalDlEl = document.getElementById('ogadsStatTotalDownloads');
+          const unlockedSessEl = document.getElementById('ogadsStatUnlockedSessions');
+
+          if (cfg.verificationConfigured && cfg.publisherConfigured) {
+            if (headerBadge) {
+              headerBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+              headerBadge.textContent = 'S2S Verification Ready';
+            }
+            if (verifStat) {
+              verifStat.className = 'text-sm font-extrabold text-emerald-400 mt-1 flex items-center gap-1.5';
+              verifStat.innerHTML = '<i class="fa-solid fa-shield-check"></i> Verified Active';
+            }
+            if (verifSub) verifSub.textContent = `Publisher #${cfg.publisherId}`;
+          } else {
+            if (headerBadge) {
+              headerBadge.className = 'text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30';
+              headerBadge.textContent = 'Configuration Needed';
+            }
+            if (verifStat) {
+              verifStat.className = 'text-sm font-extrabold text-amber-400 mt-1 flex items-center gap-1.5';
+              verifStat.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Setup Required';
+            }
+            if (verifSub) verifSub.textContent = 'Add Publisher ID & Secret';
+          }
+
+          if (totalConvEl) totalConvEl.textContent = String(stats.totalConversions || 0);
+          if (totalDlEl) totalDlEl.textContent = String(stats.totalUnlockedDownloads || 0);
+          if (unlockedSessEl) unlockedSessEl.textContent = `${stats.unlockedSessions || 0} Unlocked / ${stats.totalLockSessions || 0} Total Sessions`;
+
+          // Populate recent conversions table
+          const tbody = document.getElementById('ogadsAdminConversionsTableBody');
+          if (tbody) {
+            const list = data.recentConversions || [];
+            if (list.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-500 font-sans">No verified OGAds conversions recorded yet.</td></tr>';
+            } else {
+              tbody.innerHTML = list.map((c) => {
+                const timeStr = new Date(c.timestamp).toLocaleString();
+                const payoutStr = '$' + Number(c.payout || 0).toFixed(2);
+                return `<tr class="hover:bg-slate-900/50">
+                  <td class="py-2.5 pr-3 text-slate-300">${timeStr}</td>
+                  <td class="py-2.5 px-3 text-emerald-300">${c.lockId}</td>
+                  <td class="py-2.5 px-3 text-white font-sans font-semibold">${c.fileName || c.fileId}</td>
+                  <td class="py-2.5 px-3 text-slate-300">#${c.offerId} — ${c.offerName || 'OGAds Offer'}</td>
+                  <td class="py-2.5 px-3 text-emerald-400 font-bold">${payoutStr}</td>
+                  <td class="py-2.5 pl-3 text-slate-400">${c.country || '—'} (${c.ip || '—'})</td>
+                </tr>`;
+              }).join('');
+            }
+          }
+        } catch (e) {}
+      };
+
+      window.generateOgadsPostbackSecret = async function() {
+        await saveOgadsAdminConfig(true);
+      };
+
+      window.saveOgadsAdminConfig = async function(generateNewSecret) {
+        const token = getAdminToken();
+        if (!token) return;
+        const noticeEl = document.getElementById('ogadsAdminSaveNotice');
+        if (noticeEl) noticeEl.classList.add('hidden');
+
+        const payload = {
+          trackingLink: (document.getElementById('ogadsCfgTrackingLink')?.value || OFFICIAL_OGADS_LINK).trim(),
+          publisherId: (document.getElementById('ogadsCfgPublisherId')?.value || '').trim(),
+          lockerId: (document.getElementById('ogadsCfgLockerId')?.value || 'n616e4').trim(),
+          postbackSecret: (document.getElementById('ogadsCfgPostbackSecret')?.value || '').trim(),
+          apiKey: (document.getElementById('ogadsCfgApiKey')?.value || '').trim(),
+          allowedIps: (document.getElementById('ogadsCfgAllowedIps')?.value || '').trim(),
+          unlockDurationMinutes: Number(document.getElementById('ogadsCfgUnlockMinutes')?.value || 60),
+          requireMinimumPayout: Number(document.getElementById('ogadsCfgRequireMinPayout')?.value || 0),
+          generateNewSecret: Boolean(generateNewSecret)
+        };
+
+        try {
+          const resp = await window.fetch('/api/ogads/admin/config', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+          const data = await resp.json();
+          if (noticeEl) {
+            noticeEl.classList.remove('hidden');
+            if (resp.ok && data && data.ok) {
+              noticeEl.className = 'rounded-xl bg-emerald-950/80 border border-emerald-500/40 p-3 text-xs text-emerald-200 font-bold';
+              noticeEl.textContent = generateNewSecret
+                ? 'Generated new cryptographic S2S Postback Secret and updated Postback URL template!'
+                : 'OGAds configuration saved on server.';
+              const secInput = document.getElementById('ogadsCfgPostbackSecret');
+              const apiInput = document.getElementById('ogadsCfgApiKey');
+              if (secInput) secInput.value = '';
+              if (apiInput) apiInput.value = '';
+            } else {
+              noticeEl.className = 'rounded-xl bg-rose-950/80 border border-rose-500/40 p-3 text-xs text-rose-200 font-bold';
+              noticeEl.textContent = (data && data.error) || 'Failed to save configuration.';
+            }
+          }
+          await loadPublicOgadsConfig();
+          await refreshOgadsAdminDashboard();
+          if (activeLockerItem) renderOgadsLockerModalState();
+        } catch (e) {}
+      };
+
+      window.copyOgadsPostbackUrl = function() {
+        const box = document.getElementById('ogadsAdminPostbackUrlBox');
+        if (!box) return;
+        const text = box.textContent.trim();
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            if (typeof showToast === 'function') {
+              showToast('Postback URL Copied', 'Paste this S2S Postback URL in your OGAds Publisher Dashboard');
+            }
+          }).catch(() => {});
+        }
+      };
+
+      async function loadPublicOgadsConfig() {
+        if (typeof window.fetch !== 'function') return;
+        try {
+          const resp = await window.fetch('/api/ogads/public-config');
+          const data = await resp.json();
+          if (data && data.ok) {
+            publicOgadsConfig = Object.assign(publicOgadsConfig, data);
+          }
+        } catch (e) {}
+      }
+
+      // Check conversion immediately when visitor switches back from the OGAds tab
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && activeLockState && !activeLockState.unlocked) {
+          pollOgadsLockStatus(false);
+        }
+      });
+
+      function initOgadsSystem() {
+        installDownloadInterceptors();
+        upgradePageDownloadButtons();
+        if (typeof window.syncActiveOgadsUnlockBar === 'function') {
+          window.syncActiveOgadsUnlockBar();
+        }
+        loadPublicOgadsConfig();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initOgadsSystem);
+      } else {
+        initOgadsSystem();
+      }
+    })();
+  </script>
   </body>
 </html>
