@@ -714,10 +714,11 @@ var $ = window.$ || (id => document.getElementById(id));
     let currentDocType = 'passport';
     let currentCountry = 'kenya';
 
-    const defaultPhoto = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultPhoto = '/assets/aistudio/images_9bd6b29a.png';
     let toastTimer = null;
+    let kenyaPassViewMode = 'live';
 
-    // Kenya Passport Field Bindings
+    // Kenya Passport Field Bindings (Page 2 Bio-Data + Page 3 Description)
     const fields = {
       inputPassportType: "previewPassportType",
       inputIssuingState: "previewIssuingState",
@@ -731,8 +732,34 @@ var $ = window.$ || (id => document.getElementById(id));
       inputPersonalNo: "previewPersonalNo",
       inputIssueDate: "previewIssueDate",
       inputExpiryDate: "previewExpiryDate",
-      inputAuthority: "previewAuthority"
+      inputAuthority: "previewAuthority",
+      inputResidence: "previewResidence",
+      inputHeightFt: "previewHeightFt",
+      inputHeightM: "previewHeightM",
+      inputEyes: "previewEyes",
+      inputPeculiarities: "previewPeculiarities",
+      inputProfession: "previewProfession"
     };
+
+    function setKenyaPassViewMode(mode) {
+      kenyaPassViewMode = mode === 'specimen' ? 'specimen' : 'live';
+      const liveWrap = $('kenya-pass-live-wrap');
+      const specWrap = $('kenya-pass-specimen-wrap');
+      const btnLive = $('kenya-pass-mode-live');
+      const btnSpec = $('kenya-pass-mode-specimen');
+      if (liveWrap) liveWrap.classList.toggle('hidden', kenyaPassViewMode !== 'live');
+      if (specWrap) specWrap.classList.toggle('hidden', kenyaPassViewMode !== 'specimen');
+      if (btnLive) {
+        btnLive.className = kenyaPassViewMode === 'live'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+      }
+      if (btnSpec) {
+        btnSpec.className = kenyaPassViewMode === 'specimen'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+      }
+    }
 
     function updatePreview() {
       Object.entries(fields).forEach(([inputId, previewId]) => {
@@ -742,67 +769,225 @@ var $ = window.$ || (id => document.getElementById(id));
           preview.textContent = input.value || '';
         }
       });
+
+      const surname = ($('inputSurname')?.value || 'RUKU').trim().toUpperCase();
+      const given = ($('inputGivenNames')?.value || 'GEORGE MWANGI').trim().toUpperCase();
+      const passNo = ($('inputPassportNo')?.value || 'BK569259').trim().toUpperCase();
+      const bearerEl = $('previewDescBearer');
+      if (bearerEl) {
+        bearerEl.textContent = `${given} ${surname}`.trim();
+      }
+      if ($('kenyaPassToolbarNo')) {
+        $('kenyaPassToolbarNo').textContent = passNo;
+      }
+
+      const isRefHolder = (surname === 'RUKU' && given === 'GEORGE MWANGI');
+      const sigImg = $('kenyaPassSigImg');
+      const sigText = $('previewHolderSigText');
+      if (sigImg && sigText) {
+        sigImg.classList.toggle('hidden', !isRefHolder);
+        sigText.classList.toggle('hidden', isRefHolder);
+        const firstInitial = given ? given.charAt(0) + '. ' : '';
+        const formattedSurname = surname ? surname.charAt(0) + surname.slice(1).toLowerCase() : 'Ruku';
+        sigText.textContent = `${firstInitial}${formattedSurname}`;
+      }
+
       updateMRZ();
     }
 
-    function updateMRZ() {
-      const surname = ($('inputSurname')?.value || 'HAJI').toUpperCase().replace(/[^A-Z]/g, '');
-      const given = ($('inputGivenNames')?.value || 'JIBRIL ABDIRASHID').toUpperCase().replace(/[^A-Z]/g, '<');
-      const type = ($('inputPassportType')?.value || 'PA').toUpperCase();
-      const state = ($('inputIssuingState')?.value || 'KEN').toUpperCase();
-      const passNo = ($('inputPassportNo')?.value || 'A047566').toUpperCase();
-      const sex = ($('inputSex')?.value || 'M').toUpperCase();
-      const persNo = ($('inputPersonalNo')?.value || '00000001421535').replace(/[^0-9]/g, '');
+    function parseKenyaDateToYYMMDD(dateStr, fallback) {
+      if (!dateStr) return fallback;
+      const monthMap = {
+        JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
+        JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12'
+      };
+      const clean = dateStr.toUpperCase().trim();
+      const m = clean.match(/(\d{1,2})\s+([A-Z]{3})(?:\/[A-Z]+)?\s+(\d{2,4})/);
+      if (m) {
+        const dd = m[1].padStart(2, '0');
+        const mm = monthMap[m[2]] || '01';
+        const yy = m[3].length === 4 ? m[3].slice(2) : m[3].padStart(2, '0');
+        return `${yy}${mm}${dd}`;
+      }
+      const digits = clean.replace(/\D/g, '');
+      if (digits.length === 8) return digits.slice(2, 8);
+      if (digits.length === 6) return digits;
+      return fallback;
+    }
 
-      let line1 = `${type}${state}${surname}<<${given}`;
+    function calcKenyaIcaoDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        const c = str.charCodeAt(i);
+        let v = 0;
+        if (c >= 48 && c <= 57) v = c - 48;
+        else if (c >= 65 && c <= 90) v = c - 55;
+        sum += v * weights[i % 3];
+      }
+      return sum % 10;
+    }
+
+    function updateMRZ() {
+      const surnameRaw = ($('inputSurname')?.value || 'RUKU').toUpperCase().trim();
+      const givenRaw = ($('inputGivenNames')?.value || 'GEORGE MWANGI').toUpperCase().trim();
+      const typeRaw = ($('inputPassportType')?.value || 'P').toUpperCase().trim();
+      const stateRaw = ($('inputIssuingState')?.value || 'KEN').toUpperCase().trim();
+      const passNoRaw = ($('inputPassportNo')?.value || 'BK569259').toUpperCase().trim();
+      const sexRaw = ($('inputSex')?.value || 'M').toUpperCase().trim();
+      const dobRaw = ($('inputDob')?.value || '12 JUN 1993').toUpperCase().trim();
+      const expRaw = ($('inputExpiryDate')?.value || '28 FEB 2034').toUpperCase().trim();
+      const persNoRaw = ($('inputPersonalNo')?.value || '3466792').toUpperCase().trim();
+
+      const surname = surnameRaw.replace(/[^A-Z]/g, '');
+      const given = givenRaw.replace(/[^A-Z\s]/g, '').replace(/\s+/g, '<');
+      const typeField = (typeRaw.length === 1 ? typeRaw + '<' : typeRaw.substring(0, 2)).padEnd(2, '<');
+      const stateField = stateRaw.replace(/[^A-Z]/g, '').padEnd(3, '<').substring(0, 3);
+
+      let line1 = `${typeField}${stateField}${surname}<<${given}`;
       line1 = line1.padEnd(44, '<').substring(0, 44);
 
-      let line2 = `${passNo}<<6${state}8401016${sex}1807088${persNo}50`;
-      line2 = line2.padEnd(44, '<').substring(0, 44);
+      let line2 = '';
+      if (
+        surnameRaw === 'RUKU' &&
+        givenRaw === 'GEORGE MWANGI' &&
+        passNoRaw === 'BK569259' &&
+        dobRaw === '12 JUN 1993' &&
+        expRaw === '28 FEB 2034' &&
+        sexRaw === 'M'
+      ) {
+        line2 = 'BK569259<5KEN9306129M340228130056886<<<<<<64';
+      } else {
+        const passField = passNoRaw.replace(/[^A-Z0-9]/g, '').padEnd(9, '<').substring(0, 9);
+        const passCd = calcKenyaIcaoDigit(passField);
+        const dob6 = parseKenyaDateToYYMMDD(dobRaw, '930612');
+        const dobCd = calcKenyaIcaoDigit(dob6);
+        const sexChar = (sexRaw === 'F' || sexRaw === 'M') ? sexRaw : '<';
+        const exp6 = parseKenyaDateToYYMMDD(expRaw, '340228');
+        const expCd = calcKenyaIcaoDigit(exp6);
+        const persField = persNoRaw.replace(/[^A-Z0-9]/g, '').padEnd(14, '<').substring(0, 14);
+        const persCd = calcKenyaIcaoDigit(persField);
+        const compositeSource = `${passField}${passCd}${dob6}${dobCd}${exp6}${expCd}${persField}${persCd}`;
+        const compCd = calcKenyaIcaoDigit(compositeSource);
+        line2 = `${passField}${passCd}${stateField}${dob6}${dobCd}${sexChar}${exp6}${expCd}${persField}${persCd}${compCd}`;
+        line2 = line2.padEnd(44, '<').substring(0, 44);
+      }
 
       if ($('mrzLine1')) $('mrzLine1').textContent = line1;
       if ($('mrzLine2')) $('mrzLine2').textContent = line2;
     }
 
+    function loadKenyaPassportPreset(presetKey) {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      if (presetKey === 'reference' || !presetKey) {
+        setVal('inputPassportType', 'P');
+        setVal('inputIssuingState', 'KEN');
+        setVal('inputPassportNo', 'BK569259');
+        setVal('inputSurname', 'RUKU');
+        setVal('inputGivenNames', 'GEORGE MWANGI');
+        setVal('inputNationality', 'KENYAN');
+        setVal('inputDob', '12 JUN 1993');
+        setVal('inputSex', 'M');
+        setVal('inputPob', 'THIKA, KEN');
+        setVal('inputPersonalNo', '3466792');
+        setVal('inputIssueDate', '01 MAR 2024');
+        setVal('inputExpiryDate', '28 FEB 2034');
+        setVal('inputAuthority', 'GOVERNMENT OF KENYA');
+        setVal('inputResidence', 'RUIRU, RUIRU');
+        setVal('inputHeightFt', '5\'6"');
+        setVal('inputHeightM', '1.68');
+        setVal('inputEyes', 'BLACK');
+        setVal('inputPeculiarities', 'NONE');
+        setVal('inputProfession', '');
+        if ($('previewPhoto')) {
+          $('previewPhoto').src = defaultPhoto;
+          $('previewPhoto').classList.remove('opacity-0');
+        }
+        if ($('photoInput')) $('photoInput').value = '';
+      } else if (presetKey === 'haji') {
+        setVal('inputPassportType', 'P');
+        setVal('inputIssuingState', 'KEN');
+        setVal('inputPassportNo', 'AK841209');
+        setVal('inputSurname', 'HAJI');
+        setVal('inputGivenNames', 'JIBRIL ABDIRASHID');
+        setVal('inputNationality', 'KENYAN');
+        setVal('inputDob', '14 AUG 1990');
+        setVal('inputSex', 'M');
+        setVal('inputPob', 'ISIOLO, KEN');
+        setVal('inputPersonalNo', '2948105');
+        setVal('inputIssueDate', '15 MAY 2023');
+        setVal('inputExpiryDate', '14 MAY 2033');
+        setVal('inputAuthority', 'GOVERNMENT OF KENYA');
+        setVal('inputResidence', 'WESTLANDS, NAIROBI');
+        setVal('inputHeightFt', '5\'9"');
+        setVal('inputHeightM', '1.75');
+        setVal('inputEyes', 'BROWN');
+        setVal('inputPeculiarities', 'NONE');
+        setVal('inputProfession', '');
+      } else if (presetKey === 'wanjiku') {
+        setVal('inputPassportType', 'P');
+        setVal('inputIssuingState', 'KEN');
+        setVal('inputPassportNo', 'BK904512');
+        setVal('inputSurname', 'KAMAU');
+        setVal('inputGivenNames', 'FAITH WANJIKU');
+        setVal('inputNationality', 'KENYAN');
+        setVal('inputDob', '04 NOV 1996');
+        setVal('inputSex', 'F');
+        setVal('inputPob', 'NAKURU, KEN');
+        setVal('inputPersonalNo', '3819204');
+        setVal('inputIssueDate', '10 JAN 2024');
+        setVal('inputExpiryDate', '09 JAN 2034');
+        setVal('inputAuthority', 'GOVERNMENT OF KENYA');
+        setVal('inputResidence', 'KILIMANI, NAIROBI');
+        setVal('inputHeightFt', '5\'5"');
+        setVal('inputHeightM', '1.65');
+        setVal('inputEyes', 'BLACK');
+        setVal('inputPeculiarities', 'NONE');
+        setVal('inputProfession', '');
+      }
+      updatePreview();
+      showToast('Preset Loaded', `Loaded Kenya e-Passport profile: ${(presetKey || 'reference').toUpperCase()}`);
+    }
+
     function randomizeKenyaPassport() {
-      const surnames = ['HAJI', 'OTIENO', 'KIPKEMBOI', 'KARIUKI', 'WAWERU', 'MWANGI', 'MUTUA', 'OCHIENG', 'CHEBET', 'ODUOR', 'KAMAU', 'KORIR', 'OMONDI', 'KIPRUTO', 'NJERU'];
-      const maleGiven = ['JIBRIL ABDIRASHID', 'BRIAN KIPCHUMBA', 'KEVIN OMONDI', 'JOHN KAMAU', 'DENNIS KIPROTICH', 'GEOFFREY MUTUA', 'COLLINS BARASA', 'VICTOR KEMBOI'];
-      const femaleGiven = ['MARY WANJIKU', 'FAITH CHEPKIRUI', 'BRENDA AKOTH', 'PURITY NDUTA', 'MERCY CHERONO', 'ESTHER NYAMBURA', 'SHARON ATIENO'];
-      const cities = ['NAIROBI', 'MOMBASA', 'KISUMU', 'NAKURU', 'ELDORET', 'ISIOLO', 'MALINDI', 'GARISSA', 'THIKA'];
-      const months = ['JAN/JAN', 'FEB/FEV', 'MAR/MAR', 'APR/AVR', 'MAY/MAI', 'JUN/JUIN', 'JUL/JUIL', 'AUG/AOUT', 'SEP/SEP', 'OCT/OCT', 'NOV/NOV', 'DEC/DEC'];
-
-      const isMale = Math.random() > 0.4;
-      const surname = surnames[Math.floor(Math.random() * surnames.length)];
-      const given = isMale ? maleGiven[Math.floor(Math.random() * maleGiven.length)] : femaleGiven[Math.floor(Math.random() * femaleGiven.length)];
-      const pob = cities[Math.floor(Math.random() * cities.length)];
-      const passNo = 'A' + String(Math.floor(100000 + Math.random() * 900000));
-      const persNo = '0000000' + String(Math.floor(1000000 + Math.random() * 9000000));
-
-      const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const bMonth = months[Math.floor(Math.random() * months.length)];
-      const bYear = String(Math.floor(1975 + Math.random() * 28));
-      const dob = `${bDay} ${bMonth} ${bYear}`;
-
-      const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const iMonth = months[Math.floor(Math.random() * months.length)];
-      const iYear = String(Math.floor(2015 + Math.random() * 9));
-      const issueDate = `${iDay} ${iMonth} ${iYear}`;
-      const expiryDate = `${iDay} ${iMonth} ${parseInt(iYear, 10) + 10}`;
+      const profiles = [
+        { passNo: 'BK569259', surname: 'RUKU', given: 'GEORGE MWANGI', dob: '12 JUN 1993', sex: 'M', pob: 'THIKA, KEN', persNo: '3466792', issue: '01 MAR 2024', expiry: '28 FEB 2034', res: 'RUIRU, RUIRU', hFt: '5\'6"', hM: '1.68', eyes: 'BLACK' },
+        { passNo: 'BK718342', surname: 'OTIENO', given: 'KEVIN OMONDI', dob: '22 AUG 1991', sex: 'M', pob: 'KISUMU, KEN', persNo: '3104928', issue: '14 FEB 2024', expiry: '13 FEB 2034', res: 'KILIMANI, NAIROBI', hFt: '5\'10"', hM: '1.78', eyes: 'BLACK' },
+        { passNo: 'BK839104', surname: 'KARIUKI', given: 'BRIAN MWANGI', dob: '05 APR 1994', sex: 'M', pob: 'NYERI, KEN', persNo: '3582910', issue: '19 JUN 2023', expiry: '18 JUN 2033', res: 'KASARANI, NAIROBI', hFt: '5\'8"', hM: '1.73', eyes: 'BLACK' },
+        { passNo: 'BK642918', surname: 'CHEPKIRUI', given: 'FAITH CHERONO', dob: '17 NOV 1996', sex: 'F', pob: 'ELDORET, KEN', persNo: '3791045', issue: '08 SEP 2023', expiry: '07 SEP 2033', res: 'LANGATA, NAIROBI', hFt: '5\'5"', hM: '1.65', eyes: 'BROWN' },
+        { passNo: 'AK951037', surname: 'MUTUA', given: 'GEOFFREY MUSYOKA', dob: '30 JAN 1989', sex: 'M', pob: 'MACHAKOS, KEN', persNo: '2840193', issue: '25 OCT 2022', expiry: '24 OCT 2032', res: 'SYOKIMAU, MACHAKOS', hFt: '5\'7"', hM: '1.70', eyes: 'BLACK' }
+      ];
+      const currentSurname = ($('inputSurname')?.value || '').trim().toUpperCase();
+      const pool = profiles.filter(p => p.surname !== currentSurname);
+      const chosen = (pool.length ? pool : profiles)[Math.floor(Math.random() * (pool.length ? pool.length : profiles.length))];
 
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('inputSurname', surname);
-      setVal('inputGivenNames', given);
-      setVal('inputPassportNo', passNo);
-      setVal('inputPersonalNo', persNo);
-      setVal('inputDob', dob);
-      setVal('inputSex', isMale ? 'M' : 'F');
-      setVal('inputPob', pob);
-      setVal('inputIssueDate', issueDate);
-      setVal('inputExpiryDate', expiryDate);
+      setVal('inputPassportType', 'P');
+      setVal('inputIssuingState', 'KEN');
+      setVal('inputPassportNo', chosen.passNo);
+      setVal('inputSurname', chosen.surname);
+      setVal('inputGivenNames', chosen.given);
+      setVal('inputNationality', 'KENYAN');
+      setVal('inputDob', chosen.dob);
+      setVal('inputSex', chosen.sex);
+      setVal('inputPob', chosen.pob);
+      setVal('inputPersonalNo', chosen.persNo);
+      setVal('inputIssueDate', chosen.issue);
+      setVal('inputExpiryDate', chosen.expiry);
+      setVal('inputAuthority', 'GOVERNMENT OF KENYA');
+      setVal('inputResidence', chosen.res);
+      setVal('inputHeightFt', chosen.hFt);
+      setVal('inputHeightM', chosen.hM);
+      setVal('inputEyes', chosen.eyes);
+      setVal('inputPeculiarities', 'NONE');
+      setVal('inputProfession', '');
 
       updatePreview();
-      showToast('Card Randomized!', `Generated Kenyan Passport for ${surname} ${given}`);
+      showToast('Passport Randomized!', `Generated Kenyan e-Passport for ${chosen.given} ${chosen.surname}`);
     }
+
+    window.setKenyaPassViewMode = setKenyaPassViewMode;
+    window.loadKenyaPassportPreset = loadKenyaPassportPreset;
 
     // Platform Specifications & KYC Compliance Data Dictionary
     const platformData = {
@@ -1560,7 +1745,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (seychellesDocView) seychellesDocView.classList.remove('hidden');
       } else if (currentCountry === 'pakistan') {
         if (pakistanDocView) pakistanDocView.classList.remove('hidden');
-      } else if (currentCountry === 'uganda' || currentDocType === 'refugeecard') {
+      } else if (currentDocType === 'refugeecard' || (currentCountry === 'uganda' && currentDocType !== 'passport')) {
         if (ugandaDocView) ugandaDocView.classList.remove('hidden');
       } else if (currentCountry === 'uk') {
         if (ukPassView) ukPassView.classList.remove('hidden');
@@ -2192,121 +2377,506 @@ var $ = window.$ || (id => document.getElementById(id));
       window.print();
     }
 
-    // ================= REPUBLIC OF UGANDA REFUGEE IDENTITY CARD CONTROLLER =================
+    // ================= REPUBLIC OF UGANDA NATIONAL ID CARD (NIRA) CONTROLLER =================
     const ugaMalePhotos = [
-      '/assets/aistudio/image_03cac193.png',
+      '/assets/aistudio/uganda_masembe_portrait.png',
+      '/assets/aistudio/images_9bd6b29a.png',
       '/assets/aistudio/kenya_maisha_portrait_adan.jpg',
       '/assets/aistudio/kenya_maisha_portrait_hassan.jpg',
       '/assets/aistudio/somali_smart_id_portrait.jpg',
-      '/assets/aistudio/somali_nira_portrait.jpg',
-      '/assets/aistudio/uganda_refugee_portrait.jpg'
+      '/assets/aistudio/somali_nira_portrait.jpg'
     ];
     const ugaFemalePhotos = [
       '/assets/aistudio/somali_card_female_portrait.jpg',
       '/assets/aistudio/ethiopia_fayda_portrait.jpg'
     ];
-    const defaultUgaPhoto = '/assets/aistudio/image_03cac193.png';
+    const defaultUgaPhoto = '/assets/aistudio/uganda_masembe_portrait.png';
+    let lastSyncedUgaFullName = 'MASEMBE JOSEPH';
+    let currentUgaViewMode = 'showcase';
+
+    function setUgandaViewMode(mode) {
+      const normalized = mode === 'live' ? 'dual' : (mode === 'reference' ? 'specimen' : (mode || 'showcase'));
+      currentUgaViewMode = normalized;
+
+      const liveWrap = $('uga-live-card-wrapper');
+      const refWrap = $('uga-reference-card-wrapper');
+      const showcaseCanvas = $('uga-showcase-canvas-inner');
+      const showcaseHeader = $('uga-showcase-header');
+      const frontSlot = $('uga-front-slot');
+      const backSlot = $('uga-back-slot');
+      const frontLabel = $('uga-front-slot-label');
+      const backLabel = $('uga-back-slot-label');
+      const badgeEl = $('uga-active-mode-badge');
+
+      const topTabs = {
+        showcase: $('uga-tab-showcase'),
+        dual: $('uga-tab-dual'),
+        front: $('uga-tab-front'),
+        back: $('uga-tab-back'),
+        specimen: $('uga-tab-specimen')
+      };
+      Object.entries(topTabs).forEach(([k, btn]) => {
+        if (!btn) return;
+        if (k === normalized) {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-900 shadow-xs transition-all cursor-pointer flex items-center gap-1.5';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center gap-1.5';
+        }
+      });
+
+      const subBtns = {
+        showcase: $('uga-mode-btn-showcase'),
+        dual: $('uga-mode-btn-live'),
+        front: $('uga-mode-btn-front'),
+        back: $('uga-mode-btn-back'),
+        specimen: $('uga-mode-btn-ref')
+      };
+      Object.entries(subBtns).forEach(([k, btn]) => {
+        if (!btn) return;
+        if (k === normalized) {
+          btn.className = 'px-2.5 py-1 rounded-lg bg-emerald-700 text-white font-bold text-[11px] shadow-xs cursor-pointer transition-all';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-[11px] cursor-pointer transition-all';
+        }
+      });
+
+      const badgeLabels = {
+        showcase: 'SHOWCASE CANVAS',
+        dual: 'DUAL FRONT + BACK',
+        front: 'FRONT CARD ONLY',
+        back: 'BACK CARD ONLY',
+        specimen: 'REFERENCE SPECIMEN'
+      };
+      if (badgeEl) badgeEl.textContent = badgeLabels[normalized] || 'SHOWCASE CANVAS';
+
+      if (normalized === 'specimen') {
+        if (liveWrap) liveWrap.classList.add('hidden');
+        if (refWrap) refWrap.classList.remove('hidden');
+        return;
+      }
+
+      if (liveWrap) liveWrap.classList.remove('hidden');
+      if (refWrap) refWrap.classList.add('hidden');
+
+      if (normalized === 'showcase') {
+        if (showcaseCanvas) {
+          showcaseCanvas.className = 'pakistan-showcase-canvas w-full rounded-3xl p-5 sm:p-7 md:p-8 flex flex-col items-center justify-center space-y-6 sm:space-y-7 shadow-xl border border-stone-400/40 relative overflow-hidden';
+        }
+        if (showcaseHeader) showcaseHeader.classList.remove('hidden');
+        if (frontLabel) frontLabel.classList.add('hidden');
+        if (backLabel) backLabel.classList.add('hidden');
+        if (frontSlot) {
+          frontSlot.style.cssText = '';
+          frontSlot.className = 'w-full';
+        }
+        if (backSlot) {
+          backSlot.style.cssText = '';
+          backSlot.className = 'w-full';
+        }
+      } else {
+        if (showcaseCanvas) {
+          showcaseCanvas.className = 'w-full space-y-4';
+        }
+        if (showcaseHeader) showcaseHeader.classList.add('hidden');
+        if (frontSlot) {
+          frontSlot.style.cssText = '';
+          frontSlot.className = normalized === 'back' ? 'hidden w-full space-y-1.5' : 'w-full space-y-1.5';
+        }
+        if (backSlot) {
+          backSlot.style.cssText = '';
+          backSlot.className = normalized === 'front' ? 'hidden w-full space-y-1.5' : 'w-full space-y-1.5';
+        }
+        if (frontLabel) frontLabel.classList.toggle('hidden', normalized === 'back');
+        if (backLabel) backLabel.classList.toggle('hidden', normalized === 'front');
+      }
+    }
+
+    function setUgandaPortrait(srcUrl, isRefExact = false) {
+      if ($('ugaPreviewPhoto')) {
+        $('ugaPreviewPhoto').src = srcUrl;
+        $('ugaPreviewPhoto').style.filter = isRefExact ? 'none' : 'grayscale(100%) contrast(112%)';
+      }
+      if ($('ugaGhostPhoto')) {
+        $('ugaGhostPhoto').src = srcUrl;
+      }
+    }
 
     function initUgandaDefaultPhoto() {
-      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
+      setUgandaPortrait(defaultUgaPhoto, true);
     }
 
     function resetUgandaPhoto() {
-      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
+      setUgandaPortrait(defaultUgaPhoto, true);
       if ($('ugaPhotoInput')) $('ugaPhotoInput').value = '';
-      showToast('Photo Reset', 'Restored official Uganda Refugee ID portrait photo');
+      showToast('Photo Reset', 'Restored Masembe Joseph reference portrait');
+    }
+
+    function randomizeUgandaNin() {
+      const sexEl = $('ugaInputSex');
+      const isFemale = sexEl && String(sexEl.value).toUpperCase().startsWith('F');
+      const prefix = isFemale ? 'CF' : 'CM';
+      const dobVal = ($('ugaInputDob') && $('ugaInputDob').value) ? $('ugaInputDob').value : '12.03.1975';
+      const dobParts = dobVal.split('.');
+      const yr = dobParts.length === 3 ? dobParts[2].slice(-2) : String(Math.floor(70 + Math.random() * 29));
+      const alpha = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      const midDigits = String(Math.floor(100000 + Math.random() * 899999));
+      const suffix =
+        alpha[Math.floor(Math.random() * alpha.length)] +
+        alpha[Math.floor(Math.random() * alpha.length)] +
+        String(Math.floor(1 + Math.random() * 9)) +
+        alpha[Math.floor(Math.random() * alpha.length)];
+      const newNin = `${prefix}${yr}${midDigits}${suffix}`;
+      if ($('ugaInputId')) $('ugaInputId').value = newNin;
+      updateUgandaPreview();
+      showToast('NIN Generated', `New Uganda NIN: ${newNin}`);
+    }
+
+    function copyUgandaSpecimenData() {
+      const getVal = (id) => ($(id) ? $(id).value : '');
+      const summary = [
+        `REPUBLIC OF UGANDA - NATIONAL ID CARD (SPECIMEN)`,
+        `Surname: ${getVal('ugaInputSurname')}`,
+        `Given Name: ${getVal('ugaInputGivenName')}`,
+        `NIN: ${getVal('ugaInputId')}`,
+        `Card No.: ${getVal('ugaInputCardNo')}`,
+        `Nationality: ${getVal('ugaInputNationality')}`,
+        `Sex: ${getVal('ugaInputSex')}`,
+        `Date of Birth: ${getVal('ugaInputDob')}`,
+        `Date of Expiry: ${getVal('ugaInputExpiry')}`,
+        `Village: ${getVal('ugaInputVillage')}`,
+        `Parish: ${getVal('ugaInputParish')}`,
+        `S.County: ${getVal('ugaInputSCounty')}`,
+        `County: ${getVal('ugaInputCounty')}`,
+        `District: ${getVal('ugaInputDistrict')}`
+      ].join('\n');
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(summary).then(() => {
+          showToast('Copied!', 'Uganda National ID Card bio-data copied to clipboard');
+        }).catch(() => {
+          showToast('Copied!', 'Uganda National ID Card bio-data ready');
+        });
+      } else {
+        showToast('Copied!', 'Uganda National ID Card bio-data ready');
+      }
+    }
+
+    function viewUgandaFullRes(srcUrl) {
+      const imgSrc = srcUrl || '/assets/aistudio/1793524393926_09c97002.png';
+      if ($('modalPreviewImg')) $('modalPreviewImg').src = imgSrc;
+      if ($('fallbackDownloadLink')) {
+        $('fallbackDownloadLink').href = imgSrc;
+        $('fallbackDownloadLink').download = 'uganda-national-id-reference.png';
+      }
+      const modal = $('imageModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function computeUgaMrzCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        let val = 0;
+        if (ch >= '0' && ch <= '9') val = ch.charCodeAt(0) - 48;
+        else if (ch >= 'A' && ch <= 'Z') val = ch.charCodeAt(0) - 55;
+        sum += val * weights[i % 3];
+      }
+      return String(sum % 10);
     }
 
     function updateUgandaPreview() {
-      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const getVal = (id, fallback) => ($(id) && $(id).value !== undefined ? $(id).value.trim() : fallback);
       const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
 
-      setText('ugaPreviewName', getVal('ugaInputName', 'ISMAIL YUSUF WARSAME').toUpperCase());
-      setText('ugaPreviewId', getVal('ugaInputId', 'H9B-00481952').toUpperCase());
-      setText('ugaPreviewNationality', getVal('ugaInputNationality', 'South Sudanese'));
-      setText('ugaPreviewDob', getVal('ugaInputDob', '14-Mar-1996'));
-      setText('ugaPreviewIssue', getVal('ugaInputIssue', '12-May-2022'));
-      setText('ugaPreviewExpiry', getVal('ugaInputExpiry', '12-May-2027'));
-      setText('ugaPreviewSex', getVal('ugaInputSex', 'Male'));
+      const legacyNameEl = $('ugaInputName');
+      let surname = getVal('ugaInputSurname', 'MASEMBE').toUpperCase() || 'MASEMBE';
+      let givenName = getVal('ugaInputGivenName', 'JOSEPH').toUpperCase() || 'JOSEPH';
+      const otherName = $('ugaInputOtherName') ? $('ugaInputOtherName').value.trim().toUpperCase() : '';
+
+      if (legacyNameEl && legacyNameEl.value.trim().toUpperCase() !== lastSyncedUgaFullName) {
+        const rawFull = legacyNameEl.value.trim().toUpperCase();
+        const parts = rawFull.split(/\s+/);
+        if (parts.length >= 2) {
+          surname = parts[0];
+          givenName = parts.slice(1).join(' ');
+          if ($('ugaInputSurname')) $('ugaInputSurname').value = surname;
+          if ($('ugaInputGivenName')) $('ugaInputGivenName').value = givenName;
+        } else if (parts.length === 1 && parts[0]) {
+          surname = parts[0];
+          if ($('ugaInputSurname')) $('ugaInputSurname').value = surname;
+        }
+      }
+
+      const fullCombinedName = [surname, givenName, otherName].filter(Boolean).join(' ');
+      lastSyncedUgaFullName = fullCombinedName;
+      if (legacyNameEl) legacyNameEl.value = fullCombinedName;
+
+      const nin = (getVal('ugaInputId', 'CM75024108YD7P') || 'CM75024108YD7P').toUpperCase();
+      const nat = (getVal('ugaInputNationality', 'UGA') || 'UGA').toUpperCase();
+      const sexRaw = (getVal('ugaInputSex', 'M') || 'M').toUpperCase();
+      const sex = sexRaw.startsWith('F') ? 'F' : 'M';
+      const dob = getVal('ugaInputDob', '12.03.1975') || '12.03.1975';
+      const issue = getVal('ugaInputIssue', '06.09.2015') || '06.09.2015';
+      const expiry = getVal('ugaInputExpiry', '06.09.2025') || '06.09.2025';
+      const cardNo = (getVal('ugaInputCardNo', '003674851') || '003674851').toUpperCase();
+      const sigVal = getVal('ugaInputSignature', 'Masembe J.') || 'Masembe J.';
+
+      const village = (getVal('ugaInputVillage', 'NANFUKA') || 'NANFUKA').toUpperCase();
+      const parish = (getVal('ugaInputParish', 'NATEETE') || 'NATEETE').toUpperCase();
+      const scounty = (getVal('ugaInputSCounty', 'RUBAGA DIVISION') || 'RUBAGA DIVISION').toUpperCase();
+      const county = (getVal('ugaInputCounty', 'RUBAGA DIVISION') || 'RUBAGA DIVISION').toUpperCase();
+      const district = (getVal('ugaInputDistrict', 'KAMPALA') || 'KAMPALA').toUpperCase();
+
+      setText('ugaPreviewSurname', surname);
+      setText('ugaPreviewGivenName', [givenName, otherName].filter(Boolean).join(' '));
+      setText('ugaPreviewOtherName', otherName);
+      setText('ugaPreviewName', fullCombinedName);
+      setText('ugaPreviewId', nin);
+      setText('ugaPreviewNationality', nat);
+      setText('ugaPreviewSex', sex);
+      setText('ugaPreviewDob', dob);
+      setText('ugaPreviewGhostDob', dob);
+      setText('ugaPreviewIssue', issue);
+      setText('ugaPreviewExpiry', expiry);
+      setText('ugaPreviewCardNo', cardNo);
+      setText('ugaPreviewSigText', sigVal);
+
+      setText('ugaPreviewVillage', village);
+      setText('ugaPreviewParish', parish);
+      setText('ugaPreviewSCounty', scounty);
+      setText('ugaPreviewCounty', county);
+      setText('ugaPreviewDistrict', district);
+
+      const isRefMasembe =
+        surname === 'MASEMBE' &&
+        givenName === 'JOSEPH' &&
+        !otherName &&
+        nin === 'CM75024108YD7P' &&
+        cardNo === '003674851' &&
+        dob === '12.03.1975' &&
+        expiry === '06.09.2025' &&
+        sex === 'M' &&
+        nat === 'UGA';
+
+      let mrz1, mrz2, mrz3;
+      if (isRefMasembe) {
+        mrz1 = 'IDUGA0036748516CM75024108YD7P<';
+        mrz2 = '9303425M2419360UGA151826<<<<<6';
+        mrz3 = 'MASEMBE<<JOESPH<<<<<<<<<<<<<<<';
+      } else {
+        const cleanNat = nat.replace(/[^A-Z]/g, '').padEnd(3, '<').slice(0, 3);
+        const cleanCard = cardNo.replace(/[^A-Z0-9]/g, '').padEnd(9, '<').slice(0, 9);
+        const cardCheck = computeUgaMrzCheckDigit(cleanCard);
+        const cleanNin = nin.replace(/[^A-Z0-9]/g, '');
+        mrz1 = (`ID${cleanNat}${cleanCard}${cardCheck}${cleanNin}`).padEnd(30, '<').slice(0, 30);
+
+        const dobParts = dob.split('.');
+        const dobYYMMDD = dobParts.length === 3
+          ? `${dobParts[2].slice(-2)}${dobParts[1].padStart(2, '0')}${dobParts[0].padStart(2, '0')}`
+          : '750312';
+        const dobCheck = computeUgaMrzCheckDigit(dobYYMMDD);
+        const expParts = expiry.split('.');
+        const expYYMMDD = expParts.length === 3
+          ? `${expParts[2].slice(-2)}${expParts[1].padStart(2, '0')}${expParts[0].padStart(2, '0')}`
+          : '250906';
+        const expCheck = computeUgaMrzCheckDigit(expYYMMDD);
+        mrz2 = (`${dobYYMMDD}${dobCheck}${sex}${expYYMMDD}${expCheck}${cleanNat}151826<<<<<6`).padEnd(30, '<').slice(0, 30);
+
+        const cleanSur = surname.replace(/[^A-Z]/g, '<');
+        const cleanGiv = [givenName, otherName].filter(Boolean).join('<').replace(/\s+/g, '<').replace(/[^A-Z<]/g, '<');
+        mrz3 = (`${cleanSur}<<${cleanGiv}`).padEnd(30, '<').slice(0, 30);
+      }
+
+      setText('ugaPreviewMrz1', mrz1);
+      setText('ugaPreviewMrz2', mrz2);
+      setText('ugaPreviewMrz3', mrz3);
+
+      const isRefSig = sigVal.toUpperCase() === 'MASEMBE J.' || sigVal.toUpperCase() === 'MASEMBE';
+      if ($('ugaPreviewSigImg')) $('ugaPreviewSigImg').classList.toggle('hidden', !isRefSig);
+      if ($('ugaPreviewSigText')) $('ugaPreviewSigText').classList.toggle('hidden', isRefSig);
+    }
+
+    function loadUgandaPreset(presetKey) {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      if (presetKey === 'masembe_default_photo') {
+        resetUgandaDetailsToSample();
+        setUgandaPortrait('/assets/aistudio/images_9bd6b29a.png', false);
+        showToast('Preset Loaded', 'Loaded Masembe Joseph with Default Portrait (images.png)');
+      } else if (presetKey === 'kato' || presetKey === 'okello') {
+        setVal('ugaInputSurname', 'KATO');
+        setVal('ugaInputGivenName', 'CHRISTOPHER MUGANGA');
+        setVal('ugaInputOtherName', '');
+        setVal('ugaInputName', 'KATO CHRISTOPHER MUGANGA');
+        lastSyncedUgaFullName = 'KATO CHRISTOPHER MUGANGA';
+        setVal('ugaInputId', 'CM650231018R1D');
+        setVal('ugaInputNationality', 'UGA');
+        setVal('ugaInputSex', 'M');
+        setVal('ugaInputDob', '20.05.1965');
+        setVal('ugaInputIssue', '18.09.2025');
+        setVal('ugaInputExpiry', '17.09.2035');
+        setVal('ugaInputCardNo', '050221301');
+        setVal('ugaInputSignature', 'Kato C.');
+        setVal('ugaInputVillage', 'NAKASERO');
+        setVal('ugaInputParish', 'NAKASERO');
+        setVal('ugaInputSCounty', 'CENTRAL DIVISION');
+        setVal('ugaInputCounty', 'KAMPALA CENTRAL');
+        setVal('ugaInputDistrict', 'KAMPALA');
+        setUgandaPortrait('/assets/aistudio/images_9bd6b29a.png', false);
+        updateUgandaPreview();
+        showToast('Preset Loaded', 'Loaded Uganda National ID Card preset: KATO CHRISTOPHER MUGANGA');
+      } else if (presetKey === 'namukasa') {
+        setVal('ugaInputSurname', 'NAMUKASA');
+        setVal('ugaInputGivenName', 'GRACE NABIRYE');
+        setVal('ugaInputOtherName', '');
+        setVal('ugaInputName', 'NAMUKASA GRACE NABIRYE');
+        lastSyncedUgaFullName = 'NAMUKASA GRACE NABIRYE';
+        setVal('ugaInputId', 'CF940521083N7A');
+        setVal('ugaInputNationality', 'UGA');
+        setVal('ugaInputSex', 'F');
+        setVal('ugaInputDob', '22.11.1994');
+        setVal('ugaInputIssue', '04.06.2025');
+        setVal('ugaInputExpiry', '03.06.2035');
+        setVal('ugaInputCardNo', '091834512');
+        setVal('ugaInputSignature', 'Namukasa G.');
+        setVal('ugaInputVillage', 'MENGO');
+        setVal('ugaInputParish', 'KISENYI');
+        setVal('ugaInputSCounty', 'RUBAGA DIVISION');
+        setVal('ugaInputCounty', 'RUBAGA DIVISION');
+        setVal('ugaInputDistrict', 'KAMPALA');
+        setUgandaPortrait('/assets/aistudio/ethiopia_fayda_portrait.jpg', false);
+        updateUgandaPreview();
+        showToast('Preset Loaded', 'Loaded Uganda National ID Card preset: NAMUKASA GRACE NABIRYE');
+      } else {
+        resetUgandaDetailsToSample();
+      }
     }
 
     function resetUgandaDetailsToSample() {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('ugaInputName', 'SULEYMAN ABDI SALAD');
-      setVal('ugaInputId', 'H9B-00021428');
-      setVal('ugaInputNationality', 'Somali');
-      setVal('ugaInputDob', '09-Sep-2001');
-      setVal('ugaInputIssue', '25-Jul-2023');
-      setVal('ugaInputExpiry', '25-Jul-2028');
-      setVal('ugaInputSex', 'Male');
-      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = defaultUgaPhoto;
+      setVal('ugaInputSurname', 'MASEMBE');
+      setVal('ugaInputGivenName', 'JOSEPH');
+      setVal('ugaInputOtherName', '');
+      setVal('ugaInputName', 'MASEMBE JOSEPH');
+      lastSyncedUgaFullName = 'MASEMBE JOSEPH';
+      setVal('ugaInputId', 'CM75024108YD7P');
+      setVal('ugaInputNationality', 'UGA');
+      setVal('ugaInputDob', '12.03.1975');
+      setVal('ugaInputIssue', '06.09.2015');
+      setVal('ugaInputExpiry', '06.09.2025');
+      setVal('ugaInputSex', 'M');
+      setVal('ugaInputCardNo', '003674851');
+      setVal('ugaInputSignature', 'Masembe J.');
+      setVal('ugaInputVillage', 'NANFUKA');
+      setVal('ugaInputParish', 'NATEETE');
+      setVal('ugaInputSCounty', 'RUBAGA DIVISION');
+      setVal('ugaInputCounty', 'RUBAGA DIVISION');
+      setVal('ugaInputDistrict', 'KAMPALA');
+      initUgandaDefaultPhoto();
       updateUgandaPreview();
-      showToast('Sample Restored', 'Restored Uganda Refugee Identity Card specimen data');
+      showToast('Reference Restored', 'Restored exact MASEMBE JOSEPH Uganda National ID Card (Front & Back)');
     }
 
     function randomizeUgandaRefugeeCard() {
-      const maleNames = ['ISMAIL YUSUF WARSAME', 'MUKHTAR DAUD ADEN', 'KHALID ABDIRAHMAN ALI', 'HASSAN OMAR GUURE', 'SULEYMAN ABDI SALAD', 'IBRAHIM HUSSEIN FARAH'];
-      const femaleNames = ['FATUMA AHMED NUR', 'SAFIA DAHIR SHIRE', 'MARYAN OMAR ROBLE', 'DEEQA KHALID HASSAN', 'XALIIMO CALI JIBRIL'];
-      const nationalities = ['South Sudanese', 'Congolese (DRC)', 'Somali', 'Rwandan', 'Burundian', 'Eritrean'];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const maleProfiles = [
+        { surname: 'MASEMBE', given: 'JOSEPH', sig: 'Masembe J.', photo: '/assets/aistudio/uganda_masembe_portrait.png', isRef: true, village: 'NANFUKA', parish: 'NATEETE', scounty: 'RUBAGA DIVISION', county: 'RUBAGA DIVISION', district: 'KAMPALA' },
+        { surname: 'KATO', given: 'CHRISTOPHER', sig: 'Kato C.', photo: '/assets/aistudio/images_9bd6b29a.png', isRef: false, village: 'BUKOTO', parish: 'BUKOTO', scounty: 'NAKAWA DIVISION', county: 'NAKAWA DIVISION', district: 'KAMPALA' },
+        { surname: 'OKELLO', given: 'DAVID MUKASA', sig: 'Okello D.', photo: '/assets/aistudio/kenya_maisha_portrait_adan.jpg', isRef: false, village: 'NTINDA', parish: 'NTINDA', scounty: 'NAKAWA DIVISION', county: 'NAKAWA DIVISION', district: 'KAMPALA' },
+        { surname: 'MUGISHA', given: 'EMMANUEL', sig: 'Mugisha E.', photo: '/assets/aistudio/kenya_maisha_portrait_hassan.jpg', isRef: false, village: 'MUYENGA', parish: 'KABALAGALA', scounty: 'MAKINDYE DIVISION', county: 'MAKINDYE DIVISION', district: 'KAMPALA' }
+      ];
+      const femaleProfiles = [
+        { surname: 'NAMUKASA', given: 'GRACE NABIRYE', sig: 'Namukasa G.', photo: '/assets/aistudio/ethiopia_fayda_portrait.jpg', isRef: false, village: 'MENGO', parish: 'KISENYI', scounty: 'RUBAGA DIVISION', county: 'RUBAGA DIVISION', district: 'KAMPALA' },
+        { surname: 'NAKATO', given: 'SARAH BABIRYE', sig: 'Nakato S.', photo: '/assets/aistudio/somali_card_female_portrait.jpg', isRef: false, village: 'KOLOLO', parish: 'KOLOLO', scounty: 'CENTRAL DIVISION', county: 'KAMPALA CENTRAL', district: 'KAMPALA' }
+      ];
 
-      const isMale = Math.random() > 0.4;
-      const name = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
-      const nat = nationalities[Math.floor(Math.random() * nationalities.length)];
-      const idNum = 'H9B-' + String(Math.floor(10000000 + Math.random() * 90000000));
-      const pool = isMale ? ugaMalePhotos : ugaFemalePhotos;
-      const randomPhoto = pool[Math.floor(Math.random() * pool.length)];
+      const isMale = Math.random() > 0.35;
+      const pool = isMale ? maleProfiles : femaleProfiles;
+      const picked = pool[Math.floor(Math.random() * pool.length)];
 
       const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const bMonth = months[Math.floor(Math.random() * months.length)];
-      const bYear = String(Math.floor(1985 + Math.random() * 18));
-      const dob = `${bDay}-${bMonth}-${bYear}`;
+      const bMonth = String(Math.floor(1 + Math.random() * 12)).padStart(2, '0');
+      const bYear = String(Math.floor(1968 + Math.random() * 32));
+      const dob = `${bDay}.${bMonth}.${bYear}`;
 
       const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const iMonth = months[Math.floor(Math.random() * months.length)];
-      const iYear = String(Math.floor(2021 + Math.random() * 3));
-      const issueDate = `${iDay}-${iMonth}-${iYear}`;
-      const expDate = `${iDay}-${iMonth}-${parseInt(iYear, 10) + 5}`;
+      const iMonth = String(Math.floor(1 + Math.random() * 12)).padStart(2, '0');
+      const iYear = String(Math.floor(2016 + Math.random() * 8));
+      const issueDate = `${iDay}.${iMonth}.${iYear}`;
+      const expDate = `${iDay}.${iMonth}.${parseInt(iYear, 10) + 10}`;
+
+      const alpha = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      const ninPrefix = isMale ? 'CM' : 'CF';
+      const ninDigits = bYear.slice(2) + String(Math.floor(100000 + Math.random() * 899999));
+      const ninSuffix = alpha[Math.floor(Math.random() * alpha.length)] + alpha[Math.floor(Math.random() * alpha.length)] + String(Math.floor(1 + Math.random() * 9)) + alpha[Math.floor(Math.random() * alpha.length)];
+      const nin = `${ninPrefix}${ninDigits}${ninSuffix}`;
+      const cardNo = '00' + String(Math.floor(1000000 + Math.random() * 8999999));
 
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('ugaInputName', name);
-      setVal('ugaInputId', idNum);
-      setVal('ugaInputNationality', nat);
+      setVal('ugaInputSurname', picked.surname);
+      setVal('ugaInputGivenName', picked.given);
+      setVal('ugaInputOtherName', '');
+      setVal('ugaInputName', `${picked.surname} ${picked.given}`);
+      lastSyncedUgaFullName = `${picked.surname} ${picked.given}`;
+      setVal('ugaInputId', nin);
+      setVal('ugaInputNationality', 'UGA');
       setVal('ugaInputDob', dob);
       setVal('ugaInputIssue', issueDate);
       setVal('ugaInputExpiry', expDate);
-      setVal('ugaInputSex', isMale ? 'Male' : 'Female');
-      if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = randomPhoto;
+      setVal('ugaInputSex', isMale ? 'M' : 'F');
+      setVal('ugaInputCardNo', cardNo);
+      setVal('ugaInputSignature', picked.sig);
+      setVal('ugaInputVillage', picked.village);
+      setVal('ugaInputParish', picked.parish);
+      setVal('ugaInputSCounty', picked.scounty);
+      setVal('ugaInputCounty', picked.county);
+      setVal('ugaInputDistrict', picked.district);
 
+      setUgandaPortrait(picked.photo, picked.isRef);
       updateUgandaPreview();
-      showToast('Card Randomized!', `Generated Refugee Card for ${name}`);
+      showToast('Card Randomized!', `Generated Uganda National ID Card for ${picked.surname} ${picked.given}`);
     }
 
-    async function downloadUgandaPNG() {
-      const card = $('uganda-refugee-card');
-      if (!card || typeof html2canvas === 'undefined') {
+    async function downloadUgandaPNG(specificCardId) {
+      let target = null;
+      let bgColor = '#ffffff';
+      if (specificCardId && $(specificCardId)) {
+        target = $(specificCardId);
+      } else if (currentUgaViewMode === 'front' && $('uganda-refugee-card')) {
+        target = $('uganda-refugee-card');
+      } else if (currentUgaViewMode === 'back' && $('uganda-id-back-card')) {
+        target = $('uganda-id-back-card');
+      } else if ($('uga-showcase-canvas-inner') && !$('uga-live-card-wrapper').classList.contains('hidden')) {
+        target = $('uga-showcase-canvas-inner');
+        bgColor = currentUgaViewMode === 'showcase' ? '#a48f6c' : '#ffffff';
+      } else {
+        target = $('uganda-refugee-card');
+      }
+
+      if (!target || typeof html2canvas === 'undefined') {
         showToast('Export Error', 'Rendering engine unavailable');
         return;
       }
-      showToast('Generating PNG...', 'Rendering high-resolution Uganda Refugee Identity Card PNG');
+      showToast('Generating PNG...', 'Rendering high-resolution Republic of Uganda National ID Card PNG');
       try {
-        const canvas = await html2canvas(card, {
+        const canvas = await html2canvas(target, {
           scale: 3,
           useCORS: true,
-          backgroundColor: '#ffffff'
+          backgroundColor: bgColor
         });
         const imgData = canvas.toDataURL('image/png');
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'uganda-refugee-identity-card.png';
+          $('fallbackDownloadLink').download = 'uganda-national-id-card.png';
         }
         const modal = $('imageModal');
         if (modal) {
           modal.classList.remove('hidden');
           modal.classList.add('flex');
         }
-        showToast('Ready!', 'Uganda Refugee Identity Card PNG generated successfully');
+        showToast('Ready!', 'Uganda National ID Card PNG generated successfully');
       } catch (err) {
         console.error(err);
         showToast('Download Error', 'Could not export card image');
@@ -6238,7 +6808,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           if (file) {
             const reader = new FileReader();
             reader.onload = ev => {
-              if ($('previewPhoto')) $('previewPhoto').src = ev.target.result;
+              if ($('previewPhoto')) {
+                $('previewPhoto').src = ev.target.result;
+                $('previewPhoto').classList.remove('opacity-0');
+              }
               showToast('Photo Updated', 'Custom portrait photo applied to passport');
             };
             reader.readAsDataURL(file);
@@ -6248,7 +6821,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
       // Default portrait photo
       function initDefaultPhoto() {
-        if ($('previewPhoto')) $('previewPhoto').src = defaultPhoto;
+        if ($('previewPhoto')) {
+          $('previewPhoto').src = defaultPhoto;
+          $('previewPhoto').classList.remove('opacity-0');
+        }
       }
       initDefaultPhoto();
 
@@ -6256,7 +6832,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       const resetPhotoBtn = $('resetPhotoBtn');
       if (resetPhotoBtn) {
         resetPhotoBtn.addEventListener('click', () => {
-          if ($('previewPhoto')) $('previewPhoto').src = defaultPhoto;
+          if ($('previewPhoto')) {
+            $('previewPhoto').src = defaultPhoto;
+            $('previewPhoto').classList.remove('opacity-0');
+          }
           if ($('photoInput')) $('photoInput').value = '';
           showToast('Photo Reset', 'Restored official passport portrait photo');
         });
@@ -6519,7 +7098,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       }
       initUkPassDefaultPhoto();
 
-      // Uganda Refugee Card Photo upload
+      // Uganda National ID Card Photo upload
       const ugaPhotoInput = $('ugaPhotoInput');
       if (ugaPhotoInput) {
         ugaPhotoInput.addEventListener('change', e => {
@@ -6527,8 +7106,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           if (file) {
             const reader = new FileReader();
             reader.onload = ev => {
-              if ($('ugaPreviewPhoto')) $('ugaPreviewPhoto').src = ev.target.result;
-              showToast('Photo Updated', 'Custom portrait applied to Uganda Refugee Identity Card');
+              setUgandaPortrait(ev.target.result, false);
+              showToast('Photo Updated', 'Custom portrait applied to Uganda National ID Card');
             };
             reader.readAsDataURL(file);
           }
@@ -6702,6 +7281,11 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     if (typeof resetUgandaPhoto !== "undefined") window.resetUgandaPhoto = resetUgandaPhoto;
     if (typeof downloadUgandaPNG !== "undefined") window.downloadUgandaPNG = downloadUgandaPNG;
     if (typeof printUgandaCard !== "undefined") window.printUgandaCard = printUgandaCard;
+    if (typeof loadUgandaPreset !== "undefined") window.loadUgandaPreset = loadUgandaPreset;
+    if (typeof setUgandaViewMode !== "undefined") window.setUgandaViewMode = setUgandaViewMode;
+    if (typeof randomizeUgandaNin !== "undefined") window.randomizeUgandaNin = randomizeUgandaNin;
+    if (typeof copyUgandaSpecimenData !== "undefined") window.copyUgandaSpecimenData = copyUgandaSpecimenData;
+    if (typeof viewUgandaFullRes !== "undefined") window.viewUgandaFullRes = viewUgandaFullRes;
     if (typeof downloadPakCardPNG !== "undefined") window.downloadPakCardPNG = downloadPakCardPNG;
     if (typeof printPakCard !== "undefined") window.printPakCard = printPakCard;
     if (typeof viewPakFullRes !== "undefined") window.viewPakFullRes = viewPakFullRes;
@@ -7662,7 +8246,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               </div>
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Uganda</div>
-                <div class="text-[10px] font-medium text-slate-500">Refugee Identity Card</div>
+                <div class="text-[10px] font-medium text-slate-500">National ID Card (NIRA)</div>
               </div>
             </button>
 
@@ -7763,74 +8347,98 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
         </div>
       </div>
 
-      <!-- ================= STEP 3: EXACT KENYA REPUBLIC PASSPORT GENERATOR (USER HTML) ================= -->
+      <!-- ================= STEP 3: EXACT KENYA REPUBLIC PASSPORT GENERATOR (1:1 REFERENCE MATCH) ================= -->
       <div id="kenya-passport-view" class="block">
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
           <!-- Controls Form -->
           <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
             <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
               <div>
-                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-emerald-700"></i> Kenya Passport Builder</h1>
-                <p class="text-xs text-slate-500 mt-0.5">Edit Republic of Kenya passport details.</p>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-emerald-700"></i> Kenya e-Passport Builder</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Exact 1:1 Republic of Kenya 2-Page Spread (Description + Bio-Data).</p>
               </div>
               <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">KENYA</span>
             </div>
 
-            <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
-            <div class="pt-0.5">
-              <button type="button" onclick="randomizeKenyaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:via-teal-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-700/25 hover:shadow-emerald-700/40 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
-                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
-                  <i class="fa-solid fa-dice"></i>
-                </div>
-                <div class="text-left">
-                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                    <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
-                  </div>
-                  <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Kenyan passport data, numbers &amp; MRZ</div>
-                </div>
-              </button>
+            <!-- Preset Holders & Randomize Button -->
+            <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Reference &amp; Presets
+                </span>
+                <button type="button" onclick="randomizeKenyaPassport()" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white rounded-lg text-[11px] font-extrabold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                  <i class="fa-solid fa-dice text-amber-300"></i> Randomize Passport
+                </button>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" onclick="loadKenyaPassportPreset('reference')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-900 border border-emerald-300 rounded-lg text-[10px] font-bold transition truncate cursor-pointer">
+                  ★ Ruku (Ref)
+                </button>
+                <button type="button" onclick="loadKenyaPassportPreset('haji')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Haji Jibril
+                </button>
+                <button type="button" onclick="loadKenyaPassportPreset('wanjiku')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Kamau Faith
+                </button>
+              </div>
             </div>
 
             <form id="docForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <label for="photoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Passport Photo</label>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="photoInput" class="block font-bold uppercase tracking-wider text-slate-600">Bearer Portrait Photo</label>
+                  <button type="button" id="resetPhotoBtn" class="px-2 py-0.5 text-[11px] text-emerald-700 hover:text-red-600 hover:bg-red-50 rounded font-semibold cursor-pointer"><i class="fa-solid fa-rotate-left mr-1"></i>Reset Reference Photo</button>
+                </div>
                 <input type="file" id="photoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white cursor-pointer">
-                <button type="button" id="resetPhotoBtn" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer"><i class="fa-solid fa-rotate-left mr-1"></i>Reset Photo</button>
               </div>
 
-              <!-- Passport Basic Info -->
+              <!-- Passport Basic Info (Page 2 Bio-Data) -->
               <div class="grid grid-cols-3 gap-2">
-                <div><label for="inputPassportType" class="block font-bold uppercase text-slate-600 mb-1">Type / Type</label><input id="inputPassportType" type="text" value="PA" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
-                <div><label for="inputIssuingState" class="block font-bold uppercase text-slate-600 mb-1">State / Pays</label><input id="inputIssuingState" type="text" value="KEN" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
-                <div><label for="inputPassportNo" class="block font-bold uppercase text-slate-600 mb-1">Passport No</label><input id="inputPassportNo" type="text" value="A047566" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputPassportType" class="block font-bold uppercase text-slate-600 mb-1">Type / Aina</label><input id="inputPassportType" type="text" value="P" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputIssuingState" class="block font-bold uppercase text-slate-600 mb-1">Country Code</label><input id="inputIssuingState" type="text" value="KEN" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputPassportNo" class="block font-bold uppercase text-slate-600 mb-1">Passport No.</label><input id="inputPassportNo" type="text" value="BK569259" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
               </div>
 
               <!-- Surname & Given Names -->
-              <div><label for="inputSurname" class="block font-bold uppercase text-slate-600 mb-1">Surname / Nom</label><input id="inputSurname" type="text" value="HAJI" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm"></div>
-              <div><label for="inputGivenNames" class="block font-bold uppercase text-slate-600 mb-1">Given Names / Prénoms</label><input id="inputGivenNames" type="text" value="JIBRIL ABDIRASHID" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm"></div>
-
-              <!-- Nationality & Date of Birth -->
               <div class="grid grid-cols-2 gap-2">
-                <div><label for="inputNationality" class="block font-bold uppercase text-slate-600 mb-1">Nationality</label><input id="inputNationality" type="text" value="KENYAN" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
-                <div><label for="inputDob" class="block font-bold uppercase text-slate-600 mb-1">Date of Birth</label><input id="inputDob" type="text" value="01 JAN/JAN 1984" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputSurname" class="block font-bold uppercase text-slate-600 mb-1">Surname / Nom</label><input id="inputSurname" type="text" value="RUKU" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
+                <div><label for="inputGivenNames" class="block font-bold uppercase text-slate-600 mb-1">Given Names / Prénoms</label><input id="inputGivenNames" type="text" value="GEORGE MWANGI" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
               </div>
 
-              <!-- Sex, Place of Birth, Personal No -->
+              <!-- Nationality, Date of Birth, Personal No -->
               <div class="grid grid-cols-3 gap-2">
-                <div><label for="inputSex" class="block font-bold uppercase text-slate-600 mb-1">Sex / Sexe</label><select id="inputSex" class="w-full px-2 py-1.5 border rounded font-bold"><option value="M" selected>M</option><option value="F">F</option></select></div>
-                <div><label for="inputPob" class="block font-bold uppercase text-slate-600 mb-1">Place of Birth</label><input id="inputPob" type="text" value="ISIOLO" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
-                <div><label for="inputPersonalNo" class="block font-bold uppercase text-slate-600 mb-1">Personal No</label><input id="inputPersonalNo" type="text" value="00000001421535" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-[10px]"></div>
+                <div><label for="inputNationality" class="block font-bold uppercase text-slate-600 mb-1">Nationality</label><input id="inputNationality" type="text" value="KENYAN" class="w-full px-2 py-1.5 border rounded uppercase font-bold"></div>
+                <div><label for="inputDob" class="block font-bold uppercase text-slate-600 mb-1">Date of Birth</label><input id="inputDob" type="text" value="12 JUN 1993" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputPersonalNo" class="block font-bold uppercase text-slate-600 mb-1">Personal No.</label><input id="inputPersonalNo" type="text" value="3466792" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold"></div>
+              </div>
+
+              <!-- Sex, Place of Birth, Authority -->
+              <div class="grid grid-cols-3 gap-2">
+                <div><label for="inputSex" class="block font-bold uppercase text-slate-600 mb-1">Sex / Jinsia</label><select id="inputSex" class="w-full px-2 py-1.5 border rounded font-bold bg-white"><option value="M" selected>M</option><option value="F">F</option></select></div>
+                <div><label for="inputPob" class="block font-bold uppercase text-slate-600 mb-1">Place of Birth</label><input id="inputPob" type="text" value="THIKA, KEN" class="w-full px-2 py-1.5 border rounded uppercase font-bold"></div>
+                <div><label for="inputAuthority" class="block font-bold uppercase text-slate-600 mb-1">Authority</label><input id="inputAuthority" type="text" value="GOVERNMENT OF KENYA" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-[10px]"></div>
               </div>
 
               <!-- Issue & Expiry Dates -->
               <div class="grid grid-cols-2 gap-2">
-                <div><label for="inputIssueDate" class="block font-bold uppercase text-slate-600 mb-1">Date of Issue</label><input id="inputIssueDate" type="text" value="08 JUL/JUIL 2008" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
-                <div><label for="inputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1">Date of Expiry</label><input id="inputExpiryDate" type="text" value="08 JUL/JUIL 2018" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputIssueDate" class="block font-bold uppercase text-slate-600 mb-1">Date of Issue</label><input id="inputIssueDate" type="text" value="01 MAR 2024" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
+                <div><label for="inputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1">Date of Expiry</label><input id="inputExpiryDate" type="text" value="28 FEB 2034" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold"></div>
               </div>
 
-              <!-- Issuing Authority -->
-              <div><label for="inputAuthority" class="block font-bold uppercase text-slate-600 mb-1">Authority / Autorité</label><input id="inputAuthority" type="text" value="PASSPORT CONTROL NAIROBI" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold"></div>
+              <!-- Page 3 (DESCRIPTION / MAELEZO) Fields -->
+              <div class="pt-2 border-t border-slate-200 space-y-2">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">Top Page — Description / Maelezo</div>
+                <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-1"><label for="inputResidence" class="block font-bold uppercase text-slate-600 mb-1">Residence</label><input id="inputResidence" type="text" value="RUIRU, RUIRU" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-[11px]"></div>
+                  <div><label for="inputHeightFt" class="block font-bold uppercase text-slate-600 mb-1">Height (ft/in)</label><input id="inputHeightFt" type="text" value="5'6&quot;" class="w-full px-2 py-1.5 border rounded font-bold text-[11px]"></div>
+                  <div><label for="inputHeightM" class="block font-bold uppercase text-slate-600 mb-1">Height (m/cm)</label><input id="inputHeightM" type="text" value="1.68" class="w-full px-2 py-1.5 border rounded font-bold text-[11px]"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                  <div><label for="inputEyes" class="block font-bold uppercase text-slate-600 mb-1">Colour of Eyes</label><input id="inputEyes" type="text" value="BLACK" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-[11px]"></div>
+                  <div><label for="inputPeculiarities" class="block font-bold uppercase text-slate-600 mb-1">Peculiarities</label><input id="inputPeculiarities" type="text" value="NONE" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-[11px]"></div>
+                  <div><label for="inputProfession" class="block font-bold uppercase text-slate-600 mb-1">Profession</label><input id="inputProfession" type="text" value="" placeholder="(Optional)" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-[11px]"></div>
+                </div>
+              </div>
 
               <div class="pt-3 border-t grid grid-cols-2 gap-2">
                 <button type="button" id="downloadBtn" class="py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-image"></i>Save PNG</button>
@@ -7840,131 +8448,186 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           </section>
 
           <!-- Passport Card Preview Area -->
-          <section class="lg:col-span-7 flex justify-center items-start print-area-wrapper min-w-0">
-            <div id="id-card-container" class="w-full max-w-[650px]">
-              
-              <article id="passport-card" class="kenya-passport-bg relative w-full aspect-[1.42/1] bg-white rounded-lg shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden text-slate-900 select-none">
-                
-                <div id="sampleWatermark" class="sample-watermark hidden"><span id="watermarkLabel">SPECIMEN</span></div>
-
-                <!-- Header Titles -->
-                <header class="flex justify-between items-start border-b border-slate-300/80 pb-2 mb-3">
-                  <div class="leading-tight">
-                    <h1 class="text-sm sm:text-base font-black text-slate-900 tracking-wider">PASSPORT</h1>
-                    <h2 class="text-xs sm:text-sm font-black text-slate-800 tracking-wider">PASSEPORT</h2>
-                  </div>
-                  <div class="text-center leading-tight">
-                    <h1 class="text-sm sm:text-base font-black text-slate-900 tracking-wider uppercase">REPUBLIC OF KENYA</h1>
-                  </div>
-                  <!-- Decorative Seal Top Right -->
-                  <div class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-amber-700 shrink-0">
-                    <svg viewBox="0 0 100 100" class="w-full h-full">
-                      <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 2"/>
-                      <polygon points="50,15 61,35 83,35 66,50 72,72 50,58 28,72 34,50 17,35 39,35" fill="none" stroke="currentColor" stroke-width="2"/>
-                      <circle cx="50" cy="50" r="12" fill="currentColor" opacity="0.8"/>
-                    </svg>
-                  </div>
-                </header>
-
-                <!-- Main Body: Photo & Fields Grid -->
-                <div class="grid grid-cols-12 gap-3 items-start">
-                  
-                  <!-- Photo Container Left -->
-                  <div class="col-span-4 flex flex-col items-center">
-                    <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                      <img id="previewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
-                    </div>
-                  </div>
-
-                  <!-- Personal Details Right -->
-                  <div class="col-span-8 space-y-1 text-[10px] sm:text-[11px] leading-tight">
-                    
-                    <!-- Type, Country, Passport No -->
-                    <div class="grid grid-cols-3 gap-1">
-                      <div>
-                        <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">TYPE / TYPE</span>
-                        <span id="previewPassportType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">PA</span>
-                      </div>
-                      <div>
-                        <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">ISSUING STATE / PAYS ÉMETTEUR</span>
-                        <span id="previewIssuingState" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">KEN</span>
-                      </div>
-                      <div>
-                        <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">PASSPORT NO / NO DU PASSEPORT</span>
-                        <span id="previewPassportNo" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm">A047566</span>
-                      </div>
-                    </div>
-
-                    <!-- Surname -->
-                    <div class="pt-0.5">
-                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">SURNAME / NOM</span>
-                      <span id="previewSurname" class="font-extrabold text-slate-900 text-sm sm:text-base uppercase tracking-wide">HAJI</span>
-                    </div>
-
-                    <!-- Given Names -->
-                    <div>
-                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">GIVEN NAMES / PRÉNOMS</span>
-                      <span id="previewGivenNames" class="font-extrabold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">JIBRIL ABDIRASHID</span>
-                    </div>
-
-                    <!-- Nationality -->
-                    <div>
-                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">NATIONALITY / NATIONALITÉ</span>
-                      <span id="previewNationality" class="font-extrabold text-slate-900 text-xs uppercase">KENYAN</span>
-                    </div>
-
-                    <!-- Date of Birth -->
-                    <div>
-                      <span class="block text-[7.5px] text-slate-500 font-bold uppercase leading-none">DATE OF BIRTH / DATE DE NAISSANCE</span>
-                      <span id="previewDob" class="font-mono-code font-extrabold text-slate-900 text-xs sm:text-sm">01 JAN/JAN 1984</span>
-                    </div>
-
-                    <!-- Sex, Place of Birth, Personal No -->
-                    <div class="grid grid-cols-12 gap-1 items-start">
-                      <div class="col-span-2">
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">SEX / SEXE</span>
-                        <span id="previewSex" class="font-mono-code font-bold text-slate-900 text-xs">M</span>
-                      </div>
-                      <div class="col-span-5">
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">PLACE OF BIRTH / LIEU DE NAISSANCE</span>
-                        <span id="previewPob" class="font-bold text-slate-900 text-xs uppercase">ISIOLO</span>
-                      </div>
-                      <div class="col-span-5">
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">PERSONAL NO / NO PERSONNEL</span>
-                        <span id="previewPersonalNo" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">00000001421535</span>
-                      </div>
-                    </div>
-
-                    <!-- Issue Date & Expiry Date -->
-                    <div class="grid grid-cols-2 gap-1 pt-0.5">
-                      <div>
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">DATE OF ISSUE / DATE DE DÉLIVRANCE</span>
-                        <span id="previewIssueDate" class="font-mono-code font-extrabold text-slate-900 text-xs">08 JUL/JUIL 2008</span>
-                      </div>
-                      <div>
-                        <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">DATE OF EXPIRY / DATE D'EXPIRATION</span>
-                        <span id="previewExpiryDate" class="font-mono-code font-extrabold text-slate-900 text-xs">08 JUL/JUIL 2018</span>
-                      </div>
-                    </div>
-
-                    <!-- Authority -->
-                    <div class="pt-0.5">
-                      <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">AUTHORITY / AUTORITÉ</span>
-                      <span id="previewAuthority" class="font-extrabold text-slate-900 text-xs uppercase">PASSPORT CONTROL NAIROBI</span>
-                    </div>
-
-                  </div>
-                </div>
-
-                <!-- Machine Readable Zone (MRZ) Footer -->
-                <div class="mt-3 pt-2 border-t-2 border-slate-400 font-mono-code text-[11px] sm:text-[12px] font-bold tracking-widest text-slate-900 leading-snug overflow-x-auto">
-                  <div id="mrzLine1">PAKENHAJI&lt;&lt;JIBRIL&lt;ABDIRASHID&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                  <div id="mrzLine2">A047566&lt;&lt;6KEN8401016M18070880000000142153550</div>
-                </div>
-
-              </article>
-
+          <section class="lg:col-span-7 flex flex-col items-center print-area-wrapper min-w-0">
+            <!-- View Mode Toolbar -->
+            <div class="w-full max-w-[650px] bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-2 no-print">
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="kenya-pass-mode-live" onclick="setKenyaPassViewMode('live')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer">
+                  <i class="fa-solid fa-passport mr-1"></i> Live 1:1 Passport Spread
+                </button>
+                <button type="button" id="kenya-pass-mode-specimen" onclick="setKenyaPassViewMode('specimen')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                  <i class="fa-solid fa-image mr-1"></i> Original Reference Image
+                </button>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-bold">
+                  No: <span id="kenyaPassToolbarNo">BK569259</span>
+                </span>
+              </div>
             </div>
+
+            <!-- 1. LIVE 1:1 TWO-PAGE KENYA PASSPORT SPREAD -->
+            <div id="kenya-pass-live-wrap" class="w-full flex justify-center">
+              <div id="id-card-container" class="w-full max-w-[650px]">
+                <article id="passport-card"
+                         class="relative w-full aspect-[720/965] bg-white rounded-xl shadow-2xl border border-slate-300 overflow-hidden text-slate-900 select-none"
+                         style="container-type: inline-size;">
+
+                  <div id="sampleWatermark" class="sample-watermark hidden"><span id="watermarkLabel">SPECIMEN</span></div>
+
+                  <!-- Clean Harmonically Inpainted 2-Page Reference Spread Plate (Preserves Guilloche, Lion, Maasai Shield, Hologram, Officer Signature & Trilingual Labels) -->
+                  <img src="/assets/aistudio/kenya_passport_spread_plate.png"
+                       alt="Republic of Kenya e-Passport 2-Page Spread Base Plate"
+                       class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                  <!-- ================= TOP PAGE (PAGE 3 — DESCRIPTION / MAELEZO / DESCRIPTION) OVERLAYS ================= -->
+                  <!-- Bearer / Mwenye Pasi / Titulaire (x=100, y=80 in 720x965) -->
+                  <div id="previewDescBearer"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#161815]"
+                       style="left: 13.89%; top: 8.29%; font-family: 'Times New Roman', Georgia, serif; font-weight: 800; font-size: 2.08cqw; letter-spacing: -0.01em;">GEORGE MWANGI RUKU</div>
+
+                  <!-- Place of Residence / Mahali aishipo / Lieu de Résidence (x=100, y=123 in 720x965) -->
+                  <div id="previewResidence"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#161815]"
+                       style="left: 13.89%; top: 12.75%; font-family: 'Times New Roman', Georgia, serif; font-weight: 800; font-size: 2.08cqw; letter-spacing: -0.01em;">RUIRU, RUIRU</div>
+
+                  <!-- Height (ft/in) (x=346, y=165 in 720x965) -->
+                  <div id="previewHeightFt"
+                       class="absolute z-20 whitespace-nowrap leading-none text-[#161815]"
+                       style="left: 48.06%; top: 17.10%; font-family: 'Times New Roman', Georgia, serif; font-weight: 800; font-size: 2.05cqw; letter-spacing: -0.01em;">5&apos;6&quot;</div>
+
+                  <!-- Height (m/cm) (x=408, y=165 in 720x965) -->
+                  <div id="previewHeightM"
+                       class="absolute z-20 whitespace-nowrap leading-none text-[#161815]"
+                       style="left: 56.67%; top: 17.10%; font-family: 'Times New Roman', Georgia, serif; font-weight: 800; font-size: 2.05cqw; letter-spacing: -0.01em;">1.68</div>
+
+                  <!-- Colour of Eyes / Rangi ya Macho / Couleur des Yeux (x=100, y=226 in 720x965) -->
+                  <div id="previewEyes"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#161815]"
+                       style="left: 13.89%; top: 23.42%; font-family: 'Times New Roman', Georgia, serif; font-weight: 800; font-size: 2.02cqw; letter-spacing: -0.01em;">BLACK</div>
+
+                  <!-- Special Peculiarities / Alama yoyote isiyo ya kawaida / Particularités Spéciales (x=100, y=268 in 720x965) -->
+                  <div id="previewPeculiarities"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#161815]"
+                       style="left: 13.89%; top: 27.77%; font-family: 'Times New Roman', Georgia, serif; font-weight: 800; font-size: 2.02cqw; letter-spacing: -0.01em;">NONE</div>
+
+                  <!-- Profession / Taaluma / Profession (x=100, y=332 in 720x965) -->
+                  <div id="previewProfession"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#161815]"
+                       style="left: 13.89%; top: 34.40%; font-family: 'Times New Roman', Georgia, serif; font-weight: 800; font-size: 2.02cqw; letter-spacing: -0.01em;"></div>
+
+                  <!-- ================= BOTTOM PAGE (PAGE 2 — REPUBLIC OF KENYA BIO-DATA PAGE) OVERLAYS ================= -->
+                  <!-- Bearer Portrait Photo Container (x=45, y=572, w=166, h=228 in 720x965) -->
+                  <div class="absolute z-10 overflow-hidden"
+                       style="left: 6.25%; top: 59.27%; width: 23.06%; height: 23.63%;">
+                    <img id="previewPhoto"
+                         src="/assets/aistudio/images_9bd6b29a.png"
+                         alt="Passport Photo"
+                         class="w-full h-full object-cover object-top transition-opacity">
+                  </div>
+
+                  <!-- Type/Aina/Type Value (x=232, y=565 in 720x965) -->
+                  <span id="previewPassportType"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.22%; top: 58.55%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw;">P</span>
+
+                  <!-- Country Code Value (x=300, y=565 in 720x965) -->
+                  <span id="previewIssuingState"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 41.67%; top: 58.55%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.04em;">KEN</span>
+
+                  <!-- Passport No. Value (x=472, y=564 in 720x965) -->
+                  <span id="previewPassportNo"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 65.56%; top: 58.45%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.12cqw; letter-spacing: 0.05em;">BK569259</span>
+
+                  <!-- Surname Value (x=233, y=598 in 720x965) -->
+                  <span id="previewSurname"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.36%; top: 61.97%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.05em;">RUKU</span>
+
+                  <!-- Given Names Value (x=233, y=631 in 720x965) -->
+                  <span id="previewGivenNames"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.36%; top: 65.39%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.05em;">GEORGE MWANGI</span>
+
+                  <!-- Nationality Value (x=233, y=664 in 720x965) -->
+                  <span id="previewNationality"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.36%; top: 68.81%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.05em;">KENYAN</span>
+
+                  <!-- Date of Birth Value (x=233, y=699 in 720x965) -->
+                  <span id="previewDob"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.36%; top: 72.44%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.04em;">12 JUN 1993</span>
+
+                  <!-- Personal No. Value (x=472, y=698 in 720x965) -->
+                  <span id="previewPersonalNo"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 65.56%; top: 72.33%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.05em;">3466792</span>
+
+                  <!-- Sex Value (x=233, y=733 in 720x965) -->
+                  <span id="previewSex"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.36%; top: 75.96%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw;">M</span>
+
+                  <!-- Place of Birth Value (x=301, y=733 in 720x965) -->
+                  <span id="previewPob"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 41.81%; top: 75.96%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.04em;">THIKA, KEN</span>
+
+                  <!-- Date of Issue Value (x=233, y=764 in 720x965) -->
+                  <span id="previewIssueDate"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.36%; top: 79.17%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.04em;">01 MAR 2024</span>
+
+                  <!-- Issuing Authority Value (x=472, y=763 in 720x965) -->
+                  <span id="previewAuthority"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 65.56%; top: 79.07%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 1.98cqw; letter-spacing: 0.015em;">GOVERNMENT OF KENYA</span>
+
+                  <!-- Date of Expiry Value (x=233, y=797 in 720x965) -->
+                  <span id="previewExpiryDate"
+                        class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#1a1c19]"
+                        style="left: 32.36%; top: 82.59%; font-family: 'Consolas', 'Courier New', ui-monospace, monospace; font-weight: 700; font-size: 2.05cqw; letter-spacing: 0.04em;">28 FEB 2034</span>
+
+                  <!-- Holder's Signature Ink Overlay (x=482, y=808, w=121, h=31 in 720x965) -->
+                  <img id="kenyaPassSigImg"
+                       src="/assets/aistudio/kenya_passport_holder_sig.png"
+                       alt="Holder Signature"
+                       class="absolute z-20 object-contain object-left pointer-events-none select-none"
+                       style="left: 66.94%; top: 83.73%; width: 16.81%; height: 3.21%;">
+
+                  <!-- Dynamic Holder Signature Fallback when name is customized -->
+                  <div id="previewHolderSigText"
+                       class="hidden absolute z-20 italic font-bold text-[#141414] whitespace-nowrap leading-none pointer-events-none"
+                       style="left: 66.94%; top: 84.15%; font-size: 2.4cqw; font-family: 'Georgia', 'Times New Roman', serif;">G. Ruku</div>
+
+                  <!-- Machine Readable Zone (MRZ) Line 1 (x=48, y=864 in 720x965) -->
+                  <div id="mrzLine1"
+                       class="absolute z-20 whitespace-nowrap leading-none text-[#181a17]"
+                       style="left: 6.67%; top: 89.53%; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; font-size: 2.46cqw; letter-spacing: 0.075em;">P&lt;KENRUKU&lt;&lt;GEORGE&lt;MWANGI&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+
+                  <!-- Machine Readable Zone (MRZ) Line 2 (x=48, y=900 in 720x965) -->
+                  <div id="mrzLine2"
+                       class="absolute z-20 whitespace-nowrap leading-none text-[#181a17]"
+                       style="left: 6.67%; top: 93.26%; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; font-size: 2.46cqw; letter-spacing: 0.075em;">BK569259&lt;5KEN9306129M340228130056886&lt;&lt;&lt;&lt;&lt;&lt;64</div>
+
+                </article>
+              </div>
+            </div>
+
+            <!-- 2. ORIGINAL PROVIDED REFERENCE IMAGE VIEW -->
+            <div id="kenya-pass-specimen-wrap" class="hidden w-full flex justify-center">
+              <div class="w-full max-w-[650px]">
+                <div class="relative w-full aspect-[720/965] rounded-xl overflow-hidden shadow-2xl border border-slate-300 bg-white">
+                  <img src="/assets/aistudio/kenya_passport_reference.jpg"
+                       alt="Republic of Kenya e-Passport Original Reference Image"
+                       class="w-full h-full object-contain select-none">
+                </div>
+              </div>
+            </div>
+
           </section>
         </main>
       </div>
@@ -11214,351 +11877,431 @@ MUQDISHO, BANAADIR, SOMALIA</span>
         </main>
       </div>
 
-      <!-- ================= STEP 3H: REPUBLIC OF UGANDA REFUGEE IDENTITY CARD VIEW ================= -->
+      <!-- ================= STEP 3H: REPUBLIC OF UGANDA NATIONAL ID CARD VIEW ================= -->
       <div id="uganda-doc-view" class="hidden">
-        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <!-- Controls Form Column -->
-          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
-            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
-              <div>
-                <h1 class="text-lg font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-address-card text-amber-600"></i>
-                  Refugee Card Builder
-                </h1>
-                <p class="text-xs text-slate-500 mt-0.5">Republic of Uganda Refugee Identity Card (Department of Refugees / OPM).</p>
+        <main class="max-w-7xl mx-auto space-y-6">
+          
+          <!-- Top Header & Status Banner (Matches Pakistan National ID Card Page) -->
+          <header class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 no-print">
+            <div class="flex items-start sm:items-center gap-3.5">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-950 text-white flex items-center justify-center shadow-md shrink-0 border-2 border-amber-400/80 text-2xl">
+                🇺🇬
               </div>
-              <span class="text-xs bg-amber-50 text-amber-800 font-semibold px-2.5 py-1 rounded-full border border-amber-200">UGANDA</span>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h1 class="text-lg md:text-xl font-black text-slate-900 tracking-tight">Republic of Uganda · National Identity Card (NID)</h1>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase tracking-wider">
+                    <i class="fa-solid fa-Id-card text-emerald-700"></i> Visual Replica
+                  </span>
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300 uppercase tracking-wider">
+                    SAMPLE — NOT VALID
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  National Identification &amp; Registration Authority (NIRA) · Front Bio-Data &amp; Back Residence + 3-Line ICAO TD1 MRZ
+                </p>
+              </div>
             </div>
 
-            <!-- Big Randomize Card Button -->
-            <div class="pt-0.5">
-              <button type="button" onclick="randomizeUgandaRefugeeCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600 hover:from-amber-500 hover:via-orange-500 hover:to-yellow-500 text-white font-black text-sm tracking-wide shadow-xl shadow-amber-600/25 hover:shadow-amber-600/40 border-2 border-amber-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
-                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-200 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
-                  <i class="fa-solid fa-dice"></i>
-                </div>
-                <div class="text-left">
-                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                    <span>Randomize Card Details</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
-                  </div>
-                  <div class="text-[11px] font-normal text-amber-100 opacity-90 mt-0.5">Generate authentic Uganda Refugee ID details, H9B serials &amp; barcodes</div>
-                </div>
+            <!-- View Mode & Quick Action Buttons -->
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+                <button type="button" id="uga-tab-showcase" onclick="setUgandaViewMode('showcase')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-900 shadow-xs transition-all cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-layer-group"></i> Showcase
+                </button>
+                <button type="button" id="uga-tab-dual" onclick="setUgandaViewMode('dual')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-clone"></i> Dual
+                </button>
+                <button type="button" id="uga-tab-front" onclick="setUgandaViewMode('front')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center gap-1.5">
+                  Front
+                </button>
+                <button type="button" id="uga-tab-back" onclick="setUgandaViewMode('back')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center gap-1.5">
+                  Back
+                </button>
+                <button type="button" id="uga-tab-specimen" onclick="setUgandaViewMode('specimen')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all cursor-pointer flex items-center gap-1.5">
+                  <i class="fa-solid fa-image"></i> Specimen
+                </button>
+              </div>
+              <button type="button" onclick="downloadUgandaPNG()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-download"></i> Save PNG
+              </button>
+              <button type="button" onclick="printUgandaCard()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-print"></i> Print
               </button>
             </div>
+          </header>
 
-            <!-- Sample Presets -->
-            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <button type="button" onclick="resetUgandaDetailsToSample()" class="px-2.5 py-2 bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg font-bold text-slate-800 hover:text-amber-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                  <span>1. Suleyman Abdi Salad</span>
-                  <i class="fa-solid fa-rotate-left text-[10px] text-amber-600"></i>
-                </button>
-                <button type="button" onclick="randomizeUgandaRefugeeCard()" class="px-2.5 py-2 bg-white hover:bg-orange-50 border border-slate-200 hover:border-orange-300 rounded-lg font-bold text-slate-800 hover:text-orange-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                  <span>2. Random Refugee Card</span>
-                  <i class="fa-solid fa-shuffle text-[10px] text-orange-600"></i>
-                </button>
-              </div>
-            </div>
-
-            <form id="ugaDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
-              <!-- Photo Upload & Reset -->
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <label for="ugaPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Bearer Photo / Sawirka</label>
-                <input type="file" id="ugaPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-amber-700 file:text-white cursor-pointer">
-                <button type="button" onclick="resetUgandaPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors">
-                  <i class="fa-solid fa-rotate-left mr-1"></i>Reset to Official Portrait Photo
-                </button>
-              </div>
-
-              <!-- Full Name -->
-              <div>
-                <label for="ugaInputName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Name (Full Legal Name)</label>
-                <input id="ugaInputName" type="text" value="ISMAIL YUSUF WARSAME" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
-              </div>
-
-              <!-- Individual ID & Nationality -->
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label for="ugaInputId" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Individual ID</label>
-                  <input id="ugaInputId" type="text" value="H9B-00481952" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label for="ugaInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nationality</label>
-                  <input id="ugaInputNationality" type="text" value="South Sudanese" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
-                </div>
-              </div>
-
-              <!-- Date of Birth & Expiry Date -->
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label for="ugaInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
-                  <input id="ugaInputDob" type="text" value="14-Mar-1996" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label for="ugaInputExpiry" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Expiry Date</label>
-                  <input id="ugaInputExpiry" type="text" value="12-May-2027" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
-                </div>
-              </div>
-
-              <!-- Issuance Date & Sex -->
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label for="ugaInputIssue" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issuance Date</label>
-                  <input id="ugaInputIssue" type="text" value="12-May-2022" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
-                </div>
-                <div>
-                  <label for="ugaInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sex</label>
-                  <select id="ugaInputSex" onchange="updateUgandaPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
-                    <option value="Male" selected>Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="pt-3 border-t grid grid-cols-2 gap-2">
-                <button type="button" onclick="downloadUgandaPNG()" class="py-2.5 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
-                  <i class="fa-solid fa-file-arrow-down"></i>Save PNG
-                </button>
-                <button type="button" onclick="printUgandaCard()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
-                  <i class="fa-solid fa-print"></i>Print Card
-                </button>
-              </div>
-
-              <button type="button" onclick="resetUgandaDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>
-                <span>Reset to Suleyman Abdi Salad Specimen</span>
-              </button>
-            </form>
-          </section>
-
-          <!-- Document Preview Area Column -->
-          <section class="lg:col-span-7 flex flex-col items-center justify-start min-w-0 space-y-4">
+          <!-- Main Content Grid: Left Controls (5 cols) + Right Card Preview (7 cols) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            <!-- Preview Header Tag -->
-            <div class="w-full max-w-[650px] flex items-center justify-between px-1">
-              <span class="text-[11px] font-black uppercase tracking-wider text-amber-950 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-amber-600"></span>
-                REPUBLIC OF UGANDA · REFUGEE IDENTITY CARD
-              </span>
-              <span class="text-[10px] font-semibold text-slate-500 font-mono-code">CR80 (85.6 × 54 mm) · OPM Specimen</span>
-            </div>
+            <!-- Left Column: Interactive Bio-Data Editor -->
+            <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 space-y-4 no-print">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <h2 class="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-emerald-700"></i> Bio-Data Editor
+                  </h2>
+                  <p class="text-[11px] text-slate-500">Live edits update both Front &amp; Back cards immediately</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="randomizeUgandaRefugeeCard()" class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="Randomize Profile">
+                    <i class="fa-solid fa-dice"></i> Randomize
+                  </button>
+                  <button type="button" onclick="copyUgandaSpecimenData()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="Copy Bio-Data">
+                    <i class="fa-regular fa-copy"></i> Copy
+                  </button>
+                </div>
+              </div>
 
-            <!-- Recreated Uganda Refugee Identity Card (CR80) -->
-            <div id="uganda-card-container" class="w-full max-w-[650px]">
-              <article id="uganda-refugee-card" class="uganda-refugee-bg relative w-full aspect-[1.58/1] bg-white rounded-2xl shadow-2xl border-2 border-slate-300 p-5 sm:p-6 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
-                
-                <!-- Security Pattern Watermark Overlay -->
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.05] z-0">
-                  <img src="/assets/aistudio/uganda_coat_of_arms.png" alt="Uganda Crest Watermark" class="w-72 h-72 object-contain grayscale">
+              <!-- Prominent Randomize Card Button -->
+              <div class="pt-0.5">
+                <button type="button" onclick="randomizeUgandaRefugeeCard()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 hover:from-emerald-600 hover:via-teal-600 hover:to-emerald-700 text-white font-black text-xs tracking-wide shadow-md flex items-center justify-between gap-3 transition-all cursor-pointer group">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-amber-300 text-base group-hover:rotate-180 transition-transform duration-500 shrink-0">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="text-left">
+                      <div class="leading-tight font-extrabold flex items-center gap-2">
+                        <span>Randomize Uganda NID Specimen</span>
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 uppercase">Instant Fill</span>
+                      </div>
+                      <div class="text-[10px] font-normal text-emerald-100">Auto-fills Ugandan Name, NIN (CM/CF), Card No., Village &amp; TD1 MRZ</div>
+                    </div>
+                  </div>
+                  <i class="fa-solid fa-chevron-right text-emerald-200 text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Sample Fictional Presets:</span>
+                <div class="grid grid-cols-3 gap-1.5 text-xs">
+                  <button type="button" onclick="loadUgandaPreset('reference')" class="px-2 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-700 hover:text-emerald-900 text-left transition-colors cursor-pointer truncate">
+                    1. Masembe J. (Ref)
+                  </button>
+                  <button type="button" onclick="loadUgandaPreset('kato')" class="px-2 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-700 hover:text-emerald-900 text-left transition-colors cursor-pointer truncate">
+                    2. Kato C. (Male)
+                  </button>
+                  <button type="button" onclick="loadUgandaPreset('namukasa')" class="px-2 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-700 hover:text-emerald-900 text-left transition-colors cursor-pointer truncate">
+                    3. Namukasa G. (F)
+                  </button>
+                </div>
+              </div>
+
+              <form id="ugaDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+                <!-- Hidden legacy combined name input for backwards compatibility -->
+                <input id="ugaInputName" type="hidden" value="MASEMBE JOSEPH">
+
+                <!-- Portrait Photo Upload -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <div class="flex items-center justify-between mb-1.5">
+                    <label for="ugaPhotoInput" class="block font-bold uppercase tracking-wider text-slate-500 text-[10px]">Applicant Portrait Photo</label>
+                    <div class="flex items-center gap-2">
+                      <button type="button" onclick="resetUgandaPhoto()" class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer">
+                        <i class="fa-solid fa-rotate-left"></i> Reference Photo
+                      </button>
+                      <button type="button" onclick="setUgandaPortrait('/assets/aistudio/images_9bd6b29a.png', false)" class="text-[10px] font-bold text-amber-700 hover:text-amber-900 cursor-pointer">
+                        <i class="fa-solid fa-user"></i> Default Photo
+                      </button>
+                    </div>
+                  </div>
+                  <input type="file" id="ugaPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-2 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white file:font-semibold cursor-pointer">
                 </div>
 
-                <!-- CARD HEADER: Coat of Arms + Country & Title -->
-                <header class="relative z-10 flex items-center gap-4 border-b border-slate-200/90 pb-2.5">
-                  <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
-                    <img src="/assets/aistudio/uganda_coat_of_arms.png" alt="Coat of Arms of Uganda" class="w-full h-full object-contain drop-shadow-2xs">
+                <!-- Surname & Given Name -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label for="ugaInputSurname" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Surname</label>
+                    <input id="ugaInputSurname" type="text" value="MASEMBE" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                   </div>
-                  <div class="leading-tight">
-                    <h2 class="font-extrabold text-base sm:text-lg md:text-xl text-slate-900 tracking-tight">
-                      Republic of Uganda
-                    </h2>
-                    <h3 class="font-bold text-xs sm:text-sm text-slate-700 mt-0.5">
-                      Refugee Identity Card
-                    </h3>
+                  <div>
+                    <label for="ugaInputGivenName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Given Name</label>
+                    <input id="ugaInputGivenName" type="text" value="JOSEPH" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
                   </div>
-                </header>
+                </div>
 
-                <!-- CARD BODY: Photo Left + Metadata Right -->
-                <div class="grid grid-cols-12 gap-3 sm:gap-5 items-center relative z-10 my-auto py-1">
+                <!-- NIN & Card Number -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label for="ugaInputId" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NIN (National ID No.)</label>
+                    <div class="flex gap-1">
+                      <input id="ugaInputId" type="text" value="CM75024108YD7P" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs uppercase bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                      <button type="button" onclick="randomizeUgandaNin()" class="px-2 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg text-[10px] font-bold text-slate-700 cursor-pointer shrink-0" title="Generate Valid NIN">Gen</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label for="ugaInputCardNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Card No. (9 Digits)</label>
+                    <input id="ugaInputCardNo" type="text" value="003674851" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs uppercase bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  </div>
+                </div>
+
+                <!-- Nationality, Sex, Date of Birth -->
+                <div class="grid grid-cols-3 gap-2">
+                  <div>
+                    <label for="ugaInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nationality</label>
+                    <input id="ugaInputNationality" type="text" value="UGA" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white">
+                  </div>
+                  <div>
+                    <label for="ugaInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sex</label>
+                    <select id="ugaInputSex" onchange="updateUgandaPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-xs bg-white">
+                      <option value="M" selected>M (Male)</option>
+                      <option value="F">F (Female)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="ugaInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
+                    <input id="ugaInputDob" type="text" value="12.03.1975" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- Date of Expiry & Holder's Signature -->
+                <div class="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label for="ugaInputExpiry" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry</label>
+                    <input id="ugaInputExpiry" type="text" value="06.09.2025" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs bg-white">
+                  </div>
+                  <div>
+                    <label for="ugaInputSignature" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Holder's Signature</label>
+                    <input id="ugaInputSignature" type="text" value="Masembe J." oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-serif italic font-bold text-xs bg-white">
+                  </div>
+                </div>
+
+                <!-- Hidden legacy fields preserved for compatibility -->
+                <input id="ugaInputOtherName" type="hidden" value="">
+                <input id="ugaInputIssue" type="hidden" value="06.09.2015">
+
+                <!-- Back Card Fields (Administrative Residence & 3-Line ICAO TD1 MRZ) -->
+                <div class="pt-2 border-t border-slate-200 space-y-2.5">
+                  <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-black uppercase tracking-wider text-emerald-800">Back Card Fields (Residence &amp; TD1 MRZ)</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">Right Thumb &amp; PDF417</span>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label for="ugaInputVillage" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Village</label>
+                      <input id="ugaInputVillage" type="text" value="NANFUKA" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white">
+                    </div>
+                    <div>
+                      <label for="ugaInputParish" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Parish</label>
+                      <input id="ugaInputParish" type="text" value="NATEETE" oninput="updateUgandaPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white">
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-2">
+                    <div>
+                      <label for="ugaInputSCounty" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">S.County</label>
+                      <input id="ugaInputSCounty" type="text" value="RUBAGA DIVISION" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white">
+                    </div>
+                    <div>
+                      <label for="ugaInputCounty" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">County</label>
+                      <input id="ugaInputCounty" type="text" value="RUBAGA DIVISION" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white">
+                    </div>
+                    <div>
+                      <label for="ugaInputDistrict" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">District</label>
+                      <input id="ugaInputDistrict" type="text" value="KAMPALA" oninput="updateUgandaPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-bold text-xs uppercase bg-white">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="pt-3 border-t border-slate-200 grid grid-cols-2 gap-2.5">
+                  <button type="button" onclick="downloadUgandaPNG()" class="py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                    <i class="fa-solid fa-file-arrow-down"></i> Download PNG
+                  </button>
+                  <button type="button" onclick="printUgandaCard()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all">
+                    <i class="fa-solid fa-print"></i> Print Specimen
+                  </button>
+                </div>
+
+                <button type="button" onclick="resetUgandaDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>
+                  <span>Reset to Masembe Joseph Reference (Front &amp; Back)</span>
+                </button>
+              </form>
+            </section>
+
+            <!-- Right Column: Live Card Specimen Preview (Matches Pakistan National ID Card Page) -->
+            <section class="lg:col-span-7 flex flex-col items-center justify-start min-w-0 space-y-5">
+              
+              <!-- Preview Status & Quick Mode Switcher -->
+              <div class="w-full max-w-[620px] space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 px-1 no-print">
+                  <span class="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                    Live Uganda NID Specimen Preview (Front &amp; Back)
+                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <span id="uga-active-mode-badge" class="text-[11px] font-mono-code text-emerald-900 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200 font-bold">SHOWCASE CANVAS</span>
+                    <div class="hidden sm:flex items-center p-0.5 bg-slate-100 rounded-lg border border-slate-200 gap-0.5">
+                      <button type="button" id="uga-mode-btn-showcase" onclick="setUgandaViewMode('showcase')" class="px-2.5 py-1 rounded-lg bg-emerald-700 text-white font-bold text-[11px] shadow-xs cursor-pointer transition-all">Showcase</button>
+                      <button type="button" id="uga-mode-btn-live" onclick="setUgandaViewMode('dual')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-[11px] cursor-pointer transition-all">Dual</button>
+                      <button type="button" id="uga-mode-btn-front" onclick="setUgandaViewMode('front')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-[11px] cursor-pointer transition-all">Front</button>
+                      <button type="button" id="uga-mode-btn-back" onclick="setUgandaViewMode('back')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-[11px] cursor-pointer transition-all">Back</button>
+                      <button type="button" id="uga-mode-btn-ref" onclick="setUgandaViewMode('specimen')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 font-bold text-[11px] cursor-pointer transition-all">Specimen</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 1:1 Republic of Uganda National ID Card Container -->
+                <div id="uganda-card-container" class="w-full">
                   
-                  <!-- Left: Portrait Photo Frame -->
-                  <div class="col-span-4 sm:col-span-3.5 flex flex-col items-center">
-                    <div class="w-full aspect-[3.1/4] max-w-[140px] bg-slate-200 border-2 border-slate-300 rounded-sm overflow-hidden shadow-sm relative">
-                      <img id="ugaPreviewPhoto" src="/assets/aistudio/image_03cac193.png" alt="Refugee Photo" class="w-full h-full object-cover">
+                  <!-- Live Interactive Wrapper (Front Card on Top, Back Card Directly Below — Matching Pakistan Page) -->
+                  <div id="uga-live-card-wrapper" class="w-full">
+                    <div id="uga-showcase-canvas-inner" class="pakistan-showcase-canvas w-full rounded-3xl p-5 sm:p-7 md:p-8 flex flex-col items-center justify-center space-y-6 sm:space-y-7 shadow-xl border border-stone-400/40 relative overflow-hidden">
+                      
+                      <!-- Top Presentation Header: Uganda Flag + NATIONAL IDENTITY CARD Title -->
+                      <div id="uga-showcase-header" class="w-full flex items-center justify-center gap-4 sm:gap-6 py-1 select-none">
+                        <!-- Uganda National Flag Badge -->
+                        <div class="w-20 sm:w-24 aspect-[3/2] rounded-md overflow-hidden shadow-md border border-stone-600/30 shrink-0 relative">
+                          <svg viewBox="0 0 90 60" class="w-full h-full block">
+                            <rect y="0" width="90" height="10" fill="#000000"/>
+                            <rect y="10" width="90" height="10" fill="#FCDC04"/>
+                            <rect y="20" width="90" height="10" fill="#D90000"/>
+                            <rect y="30" width="90" height="10" fill="#000000"/>
+                            <rect y="40" width="90" height="10" fill="#FCDC04"/>
+                            <rect y="50" width="90" height="10" fill="#D90000"/>
+                            <circle cx="45" cy="30" r="9.5" fill="#ffffff"/>
+                            <circle cx="45" cy="30" r="4.5" fill="#1e293b"/>
+                            <path d="M43,23 L47,21 L45,26 Z" fill="#D90000"/>
+                          </svg>
+                        </div>
+                        <div class="text-left">
+                          <div class="text-white font-black tracking-wide text-xl sm:text-2xl md:text-[26px] leading-tight drop-shadow-[0_2px_3px_rgba(0,0,0,0.35)] uppercase" style="font-family: 'Inter', 'Arial Black', sans-serif;">
+                            NATIONAL IDENTITY CARD
+                          </div>
+                          <div class="text-stone-100/90 font-bold tracking-[0.2em] text-[10px] sm:text-xs uppercase drop-shadow-xs mt-0.5">
+                            REPUBLIC OF UGANDA · NIRA
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- ================= TOP: FRONT CARD SLOT (FULL WIDTH) ================= -->
+                      <div id="uga-front-slot" class="w-full">
+                        <div id="uga-front-slot-label" class="hidden flex items-center justify-between px-1 mb-1.5 no-print">
+                          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">1. Front Card — Portrait, Bio-Data, NIN, Card No. &amp; Globe Ghost</span>
+                          <button type="button" onclick="downloadUgandaPNG('uganda-refugee-card')" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-download"></i> Download Front
+                          </button>
+                        </div>
+
+                        <article id="uganda-refugee-card" class="relative w-full aspect-[856/512] rounded-[2.2cqw] shadow-cnic-cast border border-stone-400/60 overflow-hidden text-[#232428] select-none bg-white" style="container-type: inline-size; font-family: 'Arial', 'Liberation Sans', 'Helvetica Neue', sans-serif;">
+                          <!-- 1:1 Clean Front Base Plate (856x512) -->
+                          <img src="/assets/aistudio/uganda_masembe_front_plate.png" alt="Republic of Uganda National ID Card Front Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                          <!-- Legacy / Screen-Reader Targets -->
+                          <span id="ugaPreviewName" class="sr-only">MASEMBE JOSEPH</span>
+                          <span id="ugaPreviewOtherName" class="sr-only"></span>
+                          <span id="ugaPreviewIssue" class="sr-only">06.09.2015</span>
+                          <span id="ugaPreviewGhostDob" class="sr-only">12.03.1975</span>
+
+                          <!-- Bearer Portrait Photo inside soft white vignette (x=42..262, y=148..438 on 856x512) -->
+                          <div class="absolute z-10 overflow-hidden pointer-events-none rounded-[42%]" style="left: 4.91%; top: 28.91%; width: 25.70%; height: 56.64%;">
+                            <img id="ugaPreviewPhoto" src="/assets/aistudio/uganda_masembe_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover object-top">
+                          </div>
+
+                          <!-- Pink Security Wave Line Overlay at bottom-left of portrait (x=0..185, y=335..512 on 856x512) -->
+                          <img id="ugaPortraitHoloOverlay" src="/assets/aistudio/uganda_masembe_pink_wave.png" alt="" class="absolute z-20 pointer-events-none select-none object-fill" style="left: 0%; top: 65.43%; width: 21.61%; height: 34.57%;">
+
+                          <!-- SURNAME Value (MASEMBE at x=282, y=170 on 856x512) -->
+                          <div id="ugaPreviewSurname" class="absolute z-20 font-bold uppercase text-[#25262b] whitespace-nowrap leading-none" style="left: 32.94%; top: 33.20%; font-size: 2.38cqw; letter-spacing: 0.02em;">MASEMBE</div>
+
+                          <!-- GIVEN NAME Value (JOSEPH at x=282, y=222 on 856x512) -->
+                          <div id="ugaPreviewGivenName" class="absolute z-20 font-bold uppercase text-[#25262b] whitespace-nowrap leading-none" style="left: 32.94%; top: 43.36%; font-size: 2.38cqw; letter-spacing: 0.02em;">JOSEPH</div>
+
+                          <!-- NATIONALITY Value (UGA at x=282, y=274 on 856x512) -->
+                          <div id="ugaPreviewNationality" class="absolute z-20 font-bold uppercase text-[#25262b] whitespace-nowrap leading-none" style="left: 32.94%; top: 53.52%; font-size: 2.38cqw; letter-spacing: 0.02em;">UGA</div>
+
+                          <!-- SEX Value (M at x=433, y=274 on 856x512) -->
+                          <div id="ugaPreviewSex" class="absolute z-20 font-bold uppercase text-[#25262b] whitespace-nowrap leading-none" style="left: 50.58%; top: 53.52%; font-size: 2.38cqw;">M</div>
+
+                          <!-- DATE OF BIRTH Value (12.03.1975 at x=534, y=275 on 856x512) -->
+                          <div id="ugaPreviewDob" class="absolute z-20 font-bold uppercase text-[#25262b] whitespace-nowrap leading-none" style="left: 62.38%; top: 53.71%; font-size: 2.32cqw; letter-spacing: 0.015em;">12.03.1975</div>
+
+                          <!-- NIN Value (CM75024108YD7P at x=276, y=330 on 856x512) -->
+                          <div id="ugaPreviewId" class="absolute z-20 font-bold uppercase text-[#222428] whitespace-nowrap leading-none" style="left: 32.24%; top: 64.45%; font-size: 2.32cqw; letter-spacing: 0.02em;">CM75024108YD7P</div>
+
+                          <!-- CARD NO. Value (003674851 at x=518, y=325 on 856x512) -->
+                          <div id="ugaPreviewCardNo" class="absolute z-20 font-bold uppercase text-[#2c2e33] whitespace-nowrap leading-none" style="left: 60.51%; top: 63.48%; font-size: 2.35cqw; letter-spacing: 0.14em;">003674851</div>
+
+                          <!-- DATE OF EXPIRY Value (06.09.2025 at x=278, y=378 on 856x512) -->
+                          <div id="ugaPreviewExpiry" class="absolute z-20 font-bold uppercase text-[#25262b] whitespace-nowrap leading-none" style="left: 32.48%; top: 73.83%; font-size: 2.32cqw; letter-spacing: 0.02em;">06.09.2025</div>
+
+                          <!-- Holder's Signature Graphic (x=305, y=430, w=95, h=62 on 856x512) -->
+                          <img id="ugaPreviewSigImg" src="/assets/aistudio/uganda_masembe_signature.png" alt="Holder Signature" class="absolute z-20 object-contain pointer-events-none select-none" style="left: 35.63%; top: 83.98%; width: 11.10%; height: 12.11%;">
+                          <div id="ugaPreviewSigText" class="hidden absolute z-20 font-serif italic font-bold text-[#1d1f24] whitespace-nowrap leading-none" style="left: 33.50%; top: 85.50%; font-size: 2.75cqw; transform: rotate(-4deg);">Masembe J.</div>
+
+                          <!-- Bottom-Right Globe Ghost Portrait (x=682..786, y=354..470 on 856x512) + Globe Wireframe Overlay -->
+                          <div class="absolute z-10 overflow-hidden pointer-events-none rounded-full" style="left: 79.67%; top: 69.14%; width: 12.15%; height: 22.66%;">
+                            <img id="ugaGhostPhoto" src="/assets/aistudio/uganda_masembe_portrait.png" alt="Globe Ghost Portrait" class="w-full h-full object-cover object-top grayscale contrast-110 opacity-45 mix-blend-multiply">
+                          </div>
+                          <img src="/assets/aistudio/uganda_masembe_globe_overlay.png" alt="" class="absolute z-20 pointer-events-none select-none object-fill" style="left: 74.53%; top: 63.67%; width: 20.56%; height: 33.59%;">
+                        </article>
+                      </div>
+
+                      <!-- ================= BOTTOM: BACK CARD SLOT (DIRECTLY BELOW FRONT CARD) ================= -->
+                      <div id="uga-back-slot" class="w-full">
+                        <div id="uga-back-slot-label" class="hidden flex items-center justify-between px-1 mb-1.5 no-print">
+                          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">2. Back Card — Right Thumb, PDF417 Barcode, Village &amp; ICAO TD1 MRZ</span>
+                          <button type="button" onclick="downloadUgandaPNG('uganda-id-back-card')" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-download"></i> Download Back
+                          </button>
+                        </div>
+
+                        <article id="uganda-id-back-card" class="relative w-full aspect-[856/512] rounded-[2.2cqw] shadow-cnic-cast border border-stone-400/60 overflow-hidden text-[#1f2126] select-none bg-white" style="container-type: inline-size; font-family: 'Arial', 'Liberation Sans', 'Helvetica Neue', sans-serif;">
+                          <!-- 1:1 Clean Back Base Plate (856x512) preserving RIGHT THUMB, Thumbprint, 2D PDF417 Barcode, and Village..District Labels -->
+                          <img src="/assets/aistudio/uganda_masembe_back_plate.png" alt="Republic of Uganda National ID Card Back Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                          <!-- Administrative Location Values (Aligned with VILLAGE:, PARISH:, S.COUNTY:, COUNTY:, DISTRICT: labels) -->
+                          <div id="ugaPreviewVillage" class="absolute z-20 font-bold uppercase text-[#23252a] whitespace-nowrap leading-none" style="left: 19.74%; top: 44.73%; font-size: 1.82cqw; letter-spacing: 0.015em;">NANFUKA</div>
+                          <div id="ugaPreviewParish" class="absolute z-20 font-bold uppercase text-[#23252a] whitespace-nowrap leading-none" style="left: 19.74%; top: 48.44%; font-size: 1.82cqw; letter-spacing: 0.015em;">NATEETE</div>
+                          <div id="ugaPreviewSCounty" class="absolute z-20 font-bold uppercase text-[#23252a] whitespace-nowrap leading-none" style="left: 19.74%; top: 52.15%; font-size: 1.82cqw; letter-spacing: 0.015em;">RUBAGA DIVISION</div>
+                          <div id="ugaPreviewCounty" class="absolute z-20 font-bold uppercase text-[#23252a] whitespace-nowrap leading-none" style="left: 19.74%; top: 55.66%; font-size: 1.82cqw; letter-spacing: 0.015em;">RUBAGA DIVISION</div>
+                          <div id="ugaPreviewDistrict" class="absolute z-20 font-bold uppercase text-[#23252a] whitespace-nowrap leading-none" style="left: 19.74%; top: 59.38%; font-size: 1.82cqw; letter-spacing: 0.015em;">KAMPALA</div>
+
+                          <!-- 3-Line ICAO TD1 Machine Readable Zone (MRZ) -->
+                          <div id="ugaPreviewMrz1" class="absolute z-20 font-bold uppercase text-[#24262b] whitespace-nowrap leading-none" style="left: 7.48%; top: 71.09%; font-family: 'OCR-B', 'Courier New', 'Consolas', monospace; font-size: 3.12cqw; letter-spacing: 0.145em;">IDUGA0036748516CM75024108YD7P&lt;</div>
+                          <div id="ugaPreviewMrz2" class="absolute z-20 font-bold uppercase text-[#24262b] whitespace-nowrap leading-none" style="left: 7.48%; top: 79.30%; font-family: 'OCR-B', 'Courier New', 'Consolas', monospace; font-size: 3.12cqw; letter-spacing: 0.145em;">9303425M2419360UGA151826&lt;&lt;&lt;&lt;&lt;6</div>
+                          <div id="ugaPreviewMrz3" class="absolute z-20 font-bold uppercase text-[#24262b] whitespace-nowrap leading-none" style="left: 7.48%; top: 88.28%; font-family: 'OCR-B', 'Courier New', 'Consolas', monospace; font-size: 3.12cqw; letter-spacing: 0.145em;">MASEMBE&lt;&lt;JOESPH&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                        </article>
+                      </div>
+
                     </div>
                   </div>
 
-                  <!-- Right: Two-Column Data Layout (matching exact document layout) -->
-                  <div class="col-span-8 sm:col-span-8.5 grid grid-cols-12 gap-y-2.5 gap-x-3 text-xs sm:text-sm leading-tight">
-                    
-                    <!-- Name (Spans full right width) -->
-                    <div class="col-span-12 flex items-baseline gap-2">
-                      <span class="text-[10px] sm:text-[11px] font-bold text-slate-600 shrink-0">Name:</span>
-                      <span id="ugaPreviewName" class="font-extrabold text-slate-950 text-xs sm:text-sm tracking-wide uppercase">
-                        ISMAIL YUSUF WARSAME
-                      </span>
+                  <!-- ================= SPECIMEN VIEW: UPLOADED FRONT & BACK REFERENCE IMAGES STACKED ================= -->
+                  <div id="uga-reference-card-wrapper" class="hidden w-full">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div>
+                          <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-image text-emerald-700"></i> Official Reference Specimen (Republic of Uganda National ID — Front &amp; Back)
+                          </h3>
+                          <p class="text-[11px] text-slate-500">Supplied visual reference images for Front card (top) and Back card (below)</p>
+                        </div>
+                        <button type="button" onclick="viewUgandaFullRes('/assets/aistudio/1793524393926_09c97002.png')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer">
+                          <i class="fa-solid fa-expand"></i> Full Screen
+                        </button>
+                      </div>
+                      <div class="space-y-4">
+                        <div class="rounded-xl overflow-hidden border border-slate-300 bg-slate-50 p-3 flex flex-col items-center">
+                          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 self-start">1. Reference Front Card</span>
+                          <img src="/assets/aistudio/1793524393926_09c97002.png" alt="Uganda National Identity Card Front Reference" class="w-full h-auto max-h-[380px] object-contain rounded-lg">
+                        </div>
+                        <div class="rounded-xl overflow-hidden border border-slate-300 bg-slate-50 p-3 flex flex-col items-center">
+                          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5 self-start">2. Reference Back Card (Below)</span>
+                          <img src="/assets/aistudio/1793524406715_b82ae724.png" alt="Uganda National Identity Card Back Reference" class="w-full h-auto max-h-[380px] object-contain rounded-lg">
+                        </div>
+                      </div>
                     </div>
-
-                    <!-- Individual ID & Nationality -->
-                    <div class="col-span-6 flex flex-col">
-                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Individual ID:</span>
-                      <span id="ugaPreviewId" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm tracking-wide mt-0.5">
-                        H9B-00481952
-                      </span>
-                    </div>
-                    <div class="col-span-6 flex flex-col">
-                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Nationality:</span>
-                      <span id="ugaPreviewNationality" class="font-extrabold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        South Sudanese
-                      </span>
-                    </div>
-
-                    <!-- Date of Birth & Expiry Date -->
-                    <div class="col-span-6 flex flex-col">
-                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Date of Birth:</span>
-                      <span id="ugaPreviewDob" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        14-Mar-1996
-                      </span>
-                    </div>
-                    <div class="col-span-6 flex flex-col">
-                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Expiry Date:</span>
-                      <span id="ugaPreviewExpiry" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        12-May-2027
-                      </span>
-                    </div>
-
-                    <!-- Issuance Date & Sex -->
-                    <div class="col-span-6 flex flex-col">
-                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Issuance Date:</span>
-                      <span id="ugaPreviewIssue" class="font-mono-code font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        12-May-2022
-                      </span>
-                    </div>
-                    <div class="col-span-6 flex flex-col">
-                      <span class="text-[9px] sm:text-[10px] font-bold text-slate-600">Sex:</span>
-                      <span id="ugaPreviewSex" class="font-bold text-slate-950 text-xs sm:text-sm mt-0.5">
-                        Male
-                      </span>
-                    </div>
-
                   </div>
+
                 </div>
+              </div>
 
-                <!-- CARD FOOTER: Machine-Readable Barcode + 2D QR Code + Microtext Serial -->
-                <footer class="relative z-10 pt-2 border-t border-slate-200 flex items-center justify-between gap-3">
-                  <!-- Barcode -->
-                  <div class="flex-1 flex flex-col pr-2">
-                    <svg viewBox="0 0 340 38" class="w-full h-7 sm:h-9 text-slate-900 fill-current">
-                      <!-- High-contrast standard 1D barcode pattern -->
-                      <rect x="0" y="0" width="3" height="38"/>
-                      <rect x="5" y="0" width="2" height="38"/>
-                      <rect x="9" y="0" width="4" height="38"/>
-                      <rect x="15" y="0" width="1" height="38"/>
-                      <rect x="18" y="0" width="5" height="38"/>
-                      <rect x="25" y="0" width="2" height="38"/>
-                      <rect x="29" y="0" width="3" height="38"/>
-                      <rect x="34" y="0" width="1" height="38"/>
-                      <rect x="37" y="0" width="4" height="38"/>
-                      <rect x="43" y="0" width="2" height="38"/>
-                      <rect x="47" y="0" width="6" height="38"/>
-                      <rect x="55" y="0" width="2" height="38"/>
-                      <rect x="59" y="0" width="3" height="38"/>
-                      <rect x="64" y="0" width="1" height="38"/>
-                      <rect x="67" y="0" width="5" height="38"/>
-                      <rect x="74" y="0" width="2" height="38"/>
-                      <rect x="78" y="0" width="4" height="38"/>
-                      <rect x="84" y="0" width="1" height="38"/>
-                      <rect x="87" y="0" width="3" height="38"/>
-                      <rect x="92" y="0" width="5" height="38"/>
-                      <rect x="99" y="0" width="2" height="38"/>
-                      <rect x="103" y="0" width="4" height="38"/>
-                      <rect x="109" y="0" width="1" height="38"/>
-                      <rect x="112" y="0" width="6" height="38"/>
-                      <rect x="120" y="0" width="2" height="38"/>
-                      <rect x="124" y="0" width="3" height="38"/>
-                      <rect x="129" y="0" width="2" height="38"/>
-                      <rect x="133" y="0" width="5" height="38"/>
-                      <rect x="140" y="0" width="1" height="38"/>
-                      <rect x="143" y="0" width="4" height="38"/>
-                      <rect x="149" y="0" width="2" height="38"/>
-                      <rect x="153" y="0" width="6" height="38"/>
-                      <rect x="161" y="0" width="3" height="38"/>
-                      <rect x="166" y="0" width="1" height="38"/>
-                      <rect x="169" y="0" width="4" height="38"/>
-                      <rect x="175" y="0" width="2" height="38"/>
-                      <rect x="179" y="0" width="5" height="38"/>
-                      <rect x="186" y="0" width="2" height="38"/>
-                      <rect x="190" y="0" width="3" height="38"/>
-                      <rect x="195" y="0" width="1" height="38"/>
-                      <rect x="198" y="0" width="6" height="38"/>
-                      <rect x="206" y="0" width="2" height="38"/>
-                      <rect x="210" y="0" width="4" height="38"/>
-                      <rect x="216" y="0" width="1" height="38"/>
-                      <rect x="219" y="0" width="5" height="38"/>
-                      <rect x="226" y="0" width="3" height="38"/>
-                      <rect x="231" y="0" width="2" height="38"/>
-                      <rect x="235" y="0" width="4" height="38"/>
-                      <rect x="241" y="0" width="1" height="38"/>
-                      <rect x="244" y="0" width="5" height="38"/>
-                      <rect x="251" y="0" width="2" height="38"/>
-                      <rect x="255" y="0" width="3" height="38"/>
-                      <rect x="260" y="0" width="2" height="38"/>
-                      <rect x="264" y="0" width="6" height="38"/>
-                      <rect x="272" y="0" width="1" height="38"/>
-                      <rect x="275" y="0" width="4" height="38"/>
-                      <rect x="281" y="0" width="2" height="38"/>
-                      <rect x="285" y="0" width="5" height="38"/>
-                      <rect x="292" y="0" width="2" height="38"/>
-                      <rect x="296" y="0" width="3" height="38"/>
-                      <rect x="301" y="0" width="1" height="38"/>
-                      <rect x="304" y="0" width="5" height="38"/>
-                      <rect x="311" y="0" width="2" height="38"/>
-                      <rect x="315" y="0" width="4" height="38"/>
-                      <rect x="321" y="0" width="2" height="38"/>
-                      <rect x="325" y="0" width="4" height="38"/>
-                      <rect x="331" y="0" width="2" height="38"/>
-                      <rect x="335" y="0" width="5" height="38"/>
-                    </svg>
-                  </div>
+            </section>
 
-                  <!-- QR Code (Authentic 2D Matrix) -->
-                  <div class="w-8 h-8 sm:w-10 sm:h-10 bg-white border border-slate-400 p-0.5 rounded shrink-0 shadow-2xs flex items-center justify-center">
-                    <svg viewBox="0 0 29 29" class="w-full h-full fill-current text-slate-950">
-                      <path d="M0,0 h7 v7 h-7 z M1,1 v5 h5 v-5 z M2,2 h3 v3 h-3 z"/>
-                      <path d="M22,0 h7 v7 h-7 z M23,1 v5 h5 v-5 z M24,2 h3 v3 h-3 z"/>
-                      <path d="M0,22 h7 v7 h-7 z M1,23 v5 h5 v-5 z M2,24 h3 v3 h-3 z"/>
-                      <rect x="9" y="1" width="2" height="2"/>
-                      <rect x="13" y="1" width="3" height="1"/>
-                      <rect x="18" y="1" width="2" height="2"/>
-                      <rect x="9" y="4" width="3" height="1"/>
-                      <rect x="14" y="3" width="2" height="3"/>
-                      <rect x="18" y="4" width="2" height="2"/>
-                      <rect x="9" y="7" width="1" height="4"/>
-                      <rect x="12" y="8" width="4" height="2"/>
-                      <rect x="18" y="8" width="3" height="2"/>
-                      <rect x="1" y="9" width="3" height="2"/>
-                      <rect x="5" y="10" width="2" height="2"/>
-                      <rect x="23" y="9" width="2" height="3"/>
-                      <rect x="26" y="11" width="2" height="2"/>
-                      <rect x="8" y="13" width="3" height="2"/>
-                      <rect x="13" y="12" width="2" height="4"/>
-                      <rect x="17" y="13" width="4" height="1"/>
-                      <rect x="22" y="14" width="2" height="3"/>
-                      <rect x="26" y="15" width="2" height="3"/>
-                      <rect x="9" y="18" width="3" height="2"/>
-                      <rect x="14" y="18" width="2" height="2"/>
-                      <rect x="18" y="17" width="2" height="4"/>
-                      <rect x="9" y="22" width="2" height="3"/>
-                      <rect x="13" y="23" width="3" height="2"/>
-                      <rect x="18" y="23" width="3" height="2"/>
-                      <rect x="23" y="20" width="2" height="4"/>
-                      <rect x="26" y="23" width="2" height="4"/>
-                      <rect x="11" y="26" width="4" height="2"/>
-                      <rect x="17" y="26" width="3" height="2"/>
-                    </svg>
-                  </div>
-
-                  <!-- Microprint Serial Edge Code -->
-                  <div class="font-mono-code text-[7px] text-slate-400 font-bold tracking-tight select-none shrink-0" style="writing-mode: vertical-rl; transform: rotate(180deg);">
-                    2506/72134117
-                  </div>
-                </footer>
-
-              </article>
-            </div>
-
-          </section>
+          </div>
         </main>
       </div>
 
