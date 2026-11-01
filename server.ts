@@ -316,6 +316,26 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileId: 'proof-of-account-pdf',
     fileName: 'proof_of_account__1__3c9d9253.pdf',
   },
+  '/assets/aistudio/1793535919782_9b492622.jpg': {
+    fileId: 'bangladesh-reference-jpg',
+    fileName: 'bangladesh_passport_reference.jpg',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/bgd_passport_reference.png': {
+    fileId: 'bangladesh-reference-png',
+    fileName: 'bgd_passport_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/bgd_passport_clean_bg.png': {
+    fileId: 'bangladesh-clean-bg-png',
+    fileName: 'bgd_passport_clean_bg.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/bgd_passport_portrait.png': {
+    fileId: 'bangladesh-portrait-png',
+    fileName: 'bgd_passport_portrait.png',
+    allowInlineImg: true,
+  },
   '/assets/aistudio/drc_passport_reference.jpg': {
     fileId: 'drcongo-reference-jpg',
     fileName: 'drc_passport_reference.jpg',

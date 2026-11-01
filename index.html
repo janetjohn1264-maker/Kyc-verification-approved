@@ -120,7 +120,7 @@
       #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back, #drc-passport-card, #bangladesh-passport-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
     }
 
     /* Seychelles National Identity Card Security Backgrounds */
@@ -1457,6 +1457,28 @@ var $ = window.$ || (id => document.getElementById(id));
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      } else if (countryKey === 'bangladesh') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       } else if (countryKey === 'uganda') {
         currentDocType = 'refugeecard';
         const passTab = $('tab-doc-passport');
@@ -1686,6 +1708,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-indigo-700 bg-gradient-to-br from-indigo-50 via-white to-sky-50/60 text-indigo-950 text-left shadow-sm ring-2 ring-indigo-600/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-indigo-50/40 hover:border-indigo-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-indigo-700"
+        },
+        bangladesh: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50 via-white to-teal-50/60 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-emerald-700"
         }
       };
 
@@ -1714,7 +1741,8 @@ var $ = window.$ || (id => document.getElementById(id));
         uganda: 'Uganda',
         pakistan: 'Pakistan',
         seychelles: 'Seychelles',
-        drcongo: 'Democratic Republic of the Congo'
+        drcongo: 'Democratic Republic of the Congo',
+        bangladesh: 'Bangladesh'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -1741,6 +1769,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const saPassView = $('southafrica-passport-view');
       const usaPassView = $('usa-passport-view');
       const drcPassView = $('drcongo-passport-view');
+      const bgdPassView = $('bangladesh-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
@@ -1760,10 +1789,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (saPassView) saPassView.classList.add('hidden');
       if (usaPassView) usaPassView.classList.add('hidden');
       if (drcPassView) drcPassView.classList.add('hidden');
+      if (bgdPassView) bgdPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'bangladesh') {
+        if (bgdPassView) bgdPassView.classList.remove('hidden');
       } else if (currentCountry === 'drcongo') {
         if (drcPassView) drcPassView.classList.remove('hidden');
       } else if (currentCountry === 'usa') {
@@ -2170,6 +2202,404 @@ var $ = window.$ || (id => document.getElementById(id));
       document.addEventListener('DOMContentLoaded', initDrcPassport);
     } else {
       initDrcPassport();
+    }
+
+    // ================= PEOPLE'S REPUBLIC OF BANGLADESH E-PASSPORT CONTROLLER =================
+    const BGD_DEFAULT_PHOTO = '/assets/aistudio/bgd_passport_portrait.png';
+
+    const BGD_SPECIMEN = {
+      surname: 'HOSSAIN',
+      givenName: 'MD DELOWER',
+      fatherName: 'MD MOFIZUL ISLAM',
+      motherName: 'AMANA BEGUM',
+      spouseName: '',
+      permanentAddress: 'HOUSE # 57/59, ROAD # 31, BLOCK # D, PALLABI, PALLABI - 1216, DHAKA',
+      emergencyName: 'JAHIDUL ISLAM',
+      emergencyRelation: 'BROTHER',
+      emergencyAddress: 'HOUSE # 76, ROAD # 06, BLOCK-A, PALLABI, PALLABI - 1216, DHAKA',
+      emergencyPhone: '+8801616166031',
+      passNo: 'A06821716',
+      prevPassNo: 'BT0283556',
+      personalNo: '6902553657',
+      dob: '1997-05-23',
+      sex: 'M',
+      nationality: 'BANGLADESHI',
+      pob: 'BHOLA',
+      issue: '2023-01-31',
+      expiry: '2033-01-30',
+      authority: 'DIP/DHAKA'
+    };
+
+    const BGD_SPECIMEN_MRZ = {
+      line1: 'P<BGDHOSSAIN<<MD<DELOWER<<<<<<<<<<<<<<<<<<<<<<',
+      line2: 'A068217167BGD9705238M33013066902553657<<<<<<66'
+    };
+
+    function bgdSetText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = value == null || value === '' ? '—' : value;
+    }
+
+    function bgdMrzClean(value) {
+      return String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim();
+    }
+
+    function bgdCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        let v = 0;
+        if (ch === '<') v = 0;
+        else if (ch >= '0' && ch <= '9') v = ch.charCodeAt(0) - 48;
+        else v = ch.charCodeAt(0) - 55;
+        sum += v * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function bgdPadMrz(value, length) {
+      const clean = String(value == null ? '' : value).toUpperCase().replace(/[^A-Z0-9<]/g, '');
+      return (clean + '<'.repeat(length)).slice(0, length);
+    }
+
+    function revealBgdPreview() {
+      const view = $('bangladesh-passport-view');
+      if (view && view.classList.contains('hidden') && typeof switchVerificationCountry === 'function') {
+        switchVerificationCountry('bangladesh');
+      }
+      const card = $('bangladesh-passport-card');
+      if (card && typeof card.scrollIntoView === 'function') {
+        try {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (err) {
+          card.scrollIntoView();
+        }
+      }
+    }
+
+    function bgdMrzDate(isoDate) {
+      const digits = String(isoDate || '').replace(/[^0-9]/g, '');
+      if (digits.length < 8) return '<<<<<<';
+      return digits.slice(2, 8);
+    }
+
+    function bgdFormatDate(isoDate) {
+      if (!isoDate) return '—';
+      const m = String(isoDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return isoDate;
+      const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      const monthIdx = parseInt(m[2], 10) - 1;
+      return `${m[3]} ${months[monthIdx] || ''} ${m[1]}`;
+    }
+
+    function bgdFormatShortDob(isoDate) {
+      if (!isoDate) return '23.05.97';
+      const m = String(isoDate).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return '23.05.97';
+      return `${m[3]}.${m[2]}.${m[1].slice(2)}`;
+    }
+
+    function readBgdFields() {
+      const input = id => {
+        const el = $(id);
+        return el ? String(el.value || '').trim() : '';
+      };
+      return {
+        surname: input('bgdInputSurname'),
+        givenName: input('bgdInputGivenName'),
+        fatherName: input('bgdInputFatherName'),
+        motherName: input('bgdInputMotherName'),
+        spouseName: input('bgdInputSpouseName'),
+        permanentAddress: input('bgdInputPermanentAddress'),
+        emergencyName: input('bgdInputEmergencyName'),
+        emergencyRelation: input('bgdInputEmergencyRelation'),
+        emergencyAddress: input('bgdInputEmergencyAddress'),
+        emergencyPhone: input('bgdInputEmergencyPhone'),
+        passNo: input('bgdInputPassNo'),
+        prevPassNo: input('bgdInputPrevPassNo'),
+        personalNo: input('bgdInputPersonalNo'),
+        dob: input('bgdInputDob'),
+        sex: (input('bgdInputSex') || 'M'),
+        nationality: input('bgdInputNationality') || 'BANGLADESHI',
+        pob: input('bgdInputPob'),
+        issue: input('bgdInputIssue'),
+        expiry: input('bgdInputExpiry'),
+        authority: input('bgdInputAuthority') || 'DIP/DHAKA'
+      };
+    }
+
+    function buildBgdMrz(fields) {
+      const surname = bgdMrzClean(fields.surname).replace(/ /g, '<');
+      const givenName = bgdMrzClean(fields.givenName).replace(/ /g, '<');
+      const passNo = bgdPadMrz(bgdMrzClean(fields.passNo), 9);
+      const dob = bgdMrzDate(fields.dob);
+      const expiry = bgdMrzDate(fields.expiry);
+      const sex = bgdMrzClean(fields.sex).slice(0, 1) || 'M';
+      const personal = bgdPadMrz(bgdMrzClean(fields.personalNo), 14);
+
+      const line1 = bgdPadMrz('P<BGD' + surname + '<<' + givenName, 44);
+
+      const passCheck = bgdCheckDigit(passNo);
+      const dobCheck = bgdCheckDigit(dob);
+      const expiryCheck = bgdCheckDigit(expiry);
+      const personalCheck = bgdCheckDigit(personal);
+
+      const line2Base = passNo + passCheck + 'BGD' + dob + dobCheck + sex + expiry + expiryCheck + personal;
+      const compositeSource = passNo + passCheck + dob + dobCheck + expiry + expiryCheck + personal + personalCheck;
+      const line2 = line2Base + personalCheck + bgdCheckDigit(compositeSource);
+
+      return { line1: line1, line2: line2 };
+    }
+
+    function isBgdSpecimen(fields) {
+      const keys = ['surname', 'givenName', 'fatherName', 'motherName', 'passNo', 'prevPassNo', 'personalNo', 'sex', 'nationality', 'pob', 'authority'];
+      for (let i = 0; i < keys.length; i++) {
+        if (bgdMrzClean(fields[keys[i]]) !== bgdMrzClean(BGD_SPECIMEN[keys[i]])) return false;
+      }
+      if (String(fields.dob || '') !== BGD_SPECIMEN.dob) return false;
+      if (String(fields.issue || '') !== BGD_SPECIMEN.issue) return false;
+      if (String(fields.expiry || '') !== BGD_SPECIMEN.expiry) return false;
+      return true;
+    }
+
+    function updateBgdPreview() {
+      const fields = readBgdFields();
+
+      // Top Page
+      const fullName = (fields.givenName + ' ' + fields.surname).trim().toUpperCase() || 'MD DELOWER HOSSAIN';
+      bgdSetText('bgdOutTopName', fullName);
+      bgdSetText('bgdOutTopFather', (fields.fatherName || 'MD MOFIZUL ISLAM').toUpperCase());
+      bgdSetText('bgdOutTopMother', (fields.motherName || 'AMANA BEGUM').toUpperCase());
+      bgdSetText('bgdOutTopSpouse', fields.spouseName ? fields.spouseName.toUpperCase() : '—');
+      bgdSetText('bgdOutTopAddress', fields.permanentAddress || BGD_SPECIMEN.permanentAddress);
+      bgdSetText('bgdOutEmergName', (fields.emergencyName || 'JAHIDUL ISLAM').toUpperCase());
+      bgdSetText('bgdOutEmergRelation', (fields.emergencyRelation || 'BROTHER').toUpperCase());
+      bgdSetText('bgdOutEmergAddress', fields.emergencyAddress || BGD_SPECIMEN.emergencyAddress);
+      bgdSetText('bgdOutEmergPhone', fields.emergencyPhone || BGD_SPECIMEN.emergencyPhone);
+      
+      const passNoFormatted = (fields.passNo || 'A06821716').toUpperCase();
+      const passNoSpaced = passNoFormatted.split('').join(' ');
+      bgdSetText('bgdOutPerforatedPassNo', passNoSpaced);
+      bgdSetText('bgdOutBarcodeText', passNoSpaced);
+
+      // Bottom Page (Bio-data)
+      bgdSetText('bgdOutPassNo', passNoFormatted);
+      bgdSetText('bgdOutSurname', (fields.surname || 'HOSSAIN').toUpperCase());
+      bgdSetText('bgdOutGivenName', (fields.givenName || 'MD DELOWER').toUpperCase());
+      bgdSetText('bgdOutNationality', (fields.nationality || 'BANGLADESHI').toUpperCase());
+      bgdSetText('bgdOutPersonalNo', fields.personalNo || '6902553657');
+      bgdSetText('bgdOutPrevPassNo', fields.prevPassNo ? fields.prevPassNo.toUpperCase() : '—');
+      bgdSetText('bgdOutDob', bgdFormatDate(fields.dob));
+      bgdSetText('bgdOutSex', (fields.sex || 'M').toUpperCase());
+      bgdSetText('bgdOutPob', (fields.pob || 'BHOLA').toUpperCase());
+      bgdSetText('bgdOutIssue', bgdFormatDate(fields.issue));
+      bgdSetText('bgdOutExpiry', bgdFormatDate(fields.expiry));
+      bgdSetText('bgdOutAuthority', (fields.authority || 'DIP/DHAKA').toUpperCase());
+      bgdSetText('bgdOutGhostDob', bgdFormatShortDob(fields.dob));
+
+      const mrz = isBgdSpecimen(fields) ? BGD_SPECIMEN_MRZ : buildBgdMrz(fields);
+      bgdSetText('bgdMrzLine1', mrz.line1);
+      bgdSetText('bgdMrzLine2', mrz.line2);
+    }
+
+    function setBgdFieldValues(data) {
+      const map = {
+        bgdInputSurname: 'surname',
+        bgdInputGivenName: 'givenName',
+        bgdInputFatherName: 'fatherName',
+        bgdInputMotherName: 'motherName',
+        bgdInputSpouseName: 'spouseName',
+        bgdInputPermanentAddress: 'permanentAddress',
+        bgdInputEmergencyName: 'emergencyName',
+        bgdInputEmergencyRelation: 'emergencyRelation',
+        bgdInputEmergencyAddress: 'emergencyAddress',
+        bgdInputEmergencyPhone: 'emergencyPhone',
+        bgdInputPassNo: 'passNo',
+        bgdInputPrevPassNo: 'prevPassNo',
+        bgdInputPersonalNo: 'personalNo',
+        bgdInputDob: 'dob',
+        bgdInputSex: 'sex',
+        bgdInputNationality: 'nationality',
+        bgdInputPob: 'pob',
+        bgdInputIssue: 'issue',
+        bgdInputExpiry: 'expiry',
+        bgdInputAuthority: 'authority'
+      };
+      Object.keys(map).forEach(function (id) {
+        const el = $(id);
+        if (el) el.value = data[map[id]] == null ? '' : data[map[id]];
+      });
+      updateBgdPreview();
+    }
+
+    function resetBgdPassportSpecimen() {
+      setBgdFieldValues(BGD_SPECIMEN);
+      resetBgdPhoto();
+    }
+
+    function randomizeBgdPassport() {
+      const surnames = ['HOSSAIN', 'ISLAM', 'RAHMAN', 'AHMED', 'KHAN', 'CHOWDHURY', 'ALAM', 'HASAN', 'UDDIN', 'BEGUM'];
+      const givenFirsts = ['MD', 'MOHAMMAD', 'SYED', 'SHEIKH', 'KAZI', 'MST'];
+      const givenMiddles = ['DELOWER', 'KAMRUL', 'ARIFUR', 'TARIQUL', 'SHAHIDUL', 'ANISUR', 'FARHAN', 'NAZMUL', 'SAJID', 'TANVIR', 'RAFIQUL', 'ZAHID'];
+      const fatherNames = ['MD MOFIZUL ISLAM', 'MD ABDUL KARIM', 'MD RAFIQUL ALAM', 'MD SHAHJAHAN ALI', 'MD NURUL ISLAM', 'MD SIRAJUL HAQUE'];
+      const motherNames = ['AMANA BEGUM', 'FATEMA KHATUN', 'ROKEYA BEGUM', 'SHAHIDA AKTER', 'NASIMA PARVEEN', 'MORIOM NESA'];
+      const relations = ['BROTHER', 'FATHER', 'MOTHER', 'SPOUSE', 'UNCLE', 'COUSIN'];
+      const districts = ['DHAKA', 'BHOLA', 'CHITTAGONG', 'SYLHET', 'RAJSHAHI', 'KHULNA', 'BARISAL', 'COMILLA', 'MYMENSINGH', 'RANGPUR', 'BOGRA'];
+      const thanas = ['PALLABI', 'MIRPUR', 'UTTARA', 'GULSHAN', 'DHANMONDI', 'BANANI', 'MOHAMMADPUR', 'MOTIJHEEL'];
+      const pick = list => list[Math.floor(Math.random() * list.length)];
+      const pad = (n, len) => String(n).padStart(len, '0');
+      const digits = len => { let out = ''; for (let i = 0; i < len; i++) out += String(Math.floor(Math.random() * 10)); return out; };
+
+      const sex = Math.random() < 0.2 ? 'F' : 'M';
+      const surname = pick(surnames);
+      const given = pick(givenFirsts) + ' ' + pick(givenMiddles);
+      const district = pick(districts);
+      const thana = pick(thanas);
+      const road = 1 + Math.floor(Math.random() * 40);
+      const house = 1 + Math.floor(Math.random() * 99);
+      const postCode = 1200 + Math.floor(Math.random() * 30);
+      const address = `HOUSE # ${house}, ROAD # ${road}, BLOCK-A, ${thana}, ${thana} - ${postCode}, ${district}`;
+
+      const birthYear = 1980 + Math.floor(Math.random() * 24);
+      const birthMonth = 1 + Math.floor(Math.random() * 12);
+      const birthDay = 1 + Math.floor(Math.random() * 28);
+      const issueYear = 2021 + Math.floor(Math.random() * 4);
+      const issueMonth = 1 + Math.floor(Math.random() * 12);
+      const issueDay = 1 + Math.floor(Math.random() * 28);
+      const expiryYear = issueYear + 10;
+      const iso = (y, m, d) => y + '-' + pad(m, 2) + '-' + pad(d, 2);
+
+      setBgdFieldValues({
+        surname: surname,
+        givenName: given,
+        fatherName: pick(fatherNames),
+        motherName: pick(motherNames),
+        spouseName: '',
+        permanentAddress: address,
+        emergencyName: pick(givenFirsts) + ' ' + pick(givenMiddles) + ' ' + surname,
+        emergencyRelation: pick(relations),
+        emergencyAddress: address,
+        emergencyPhone: '+8801' + (3 + Math.floor(Math.random() * 6)) + digits(8),
+        passNo: 'A' + digits(8),
+        prevPassNo: 'BT' + digits(7),
+        personalNo: digits(10),
+        dob: iso(birthYear, birthMonth, birthDay),
+        sex: sex,
+        nationality: 'BANGLADESHI',
+        pob: district,
+        issue: iso(issueYear, issueMonth, issueDay),
+        expiry: iso(expiryYear, issueMonth, issueDay),
+        authority: 'DIP/DHAKA'
+      });
+
+      revealBgdPreview();
+    }
+
+    function resetBgdPhoto() {
+      ['bgdOutPhotoMain', 'bgdOutPhotoGhost', 'bgdOutPhotoMini'].forEach(function (id) {
+        const el = $(id);
+        if (el) el.setAttribute('src', BGD_DEFAULT_PHOTO);
+      });
+      const input = $('bgdPassPhotoInput');
+      if (input) input.value = '';
+    }
+
+    function initBgdPassport() {
+      const input = $('bgdPassPhotoInput');
+      if (input && !input.dataset.bgdWired) {
+        input.dataset.bgdWired = '1';
+        input.addEventListener('change', function (evt) {
+          const file = evt.target.files && evt.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const src = e.target.result;
+            ['bgdOutPhotoMain', 'bgdOutPhotoGhost', 'bgdOutPhotoMini'].forEach(function (id) {
+              const el = $(id);
+              if (el) el.setAttribute('src', src);
+            });
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      updateBgdPreview();
+    }
+
+    function bgdSpecimenText() {
+      const fields = readBgdFields();
+      const mrz = isBgdSpecimen(fields) ? BGD_SPECIMEN_MRZ : buildBgdMrz(fields);
+      return [
+        "PEOPLE'S REPUBLIC OF BANGLADESH / গণপ্রজাতন্ত্রী বাংলাদেশ",
+        'PASSPORT / পাসপোর্ট',
+        'Type: P  |  Country Code: BGD  |  Passport No: ' + (fields.passNo || ''),
+        'Surname / বংশগত নাম: ' + (fields.surname || ''),
+        'Given Name / প্রদত্ত নাম: ' + (fields.givenName || ''),
+        'Nationality: ' + (fields.nationality || ''),
+        'Personal No.: ' + (fields.personalNo || ''),
+        'Date of Birth: ' + bgdFormatDate(fields.dob),
+        'Sex: ' + (fields.sex || ''),
+        'Place of Birth: ' + (fields.pob || ''),
+        'Date of Issue: ' + bgdFormatDate(fields.issue),
+        'Date of Expiry: ' + bgdFormatDate(fields.expiry),
+        'Issuing Authority: ' + (fields.authority || ''),
+        'Permanent Address: ' + fields.permanentAddress,
+        'Emergency Contact: ' + fields.emergencyName + ' (' + fields.emergencyRelation + '), ' + fields.emergencyPhone,
+        '',
+        mrz.line1,
+        mrz.line2
+      ].join('\n');
+    }
+
+    function copyBgdSpecimenData() {
+      const text = bgdSpecimenText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          showToast('Copied', 'Bangladesh passport details copied to clipboard.');
+        }).catch(function () {
+          showToast('Copy Failed', 'Clipboard permission was denied.');
+        });
+      } else {
+        showToast('Copy Failed', 'Clipboard is not available in this browser.');
+      }
+    }
+
+    function downloadBgdPassPNG() {
+      const card = $('bangladesh-passport-card');
+      if (!card) return;
+      if (typeof html2canvas !== 'function') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Bangladesh passport spread PNG');
+      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+        const link = document.createElement('a');
+        link.download = 'bangladesh-passport-' + (readBgdFields().passNo || 'A06821716') + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Ready!', 'Bangladesh e-Passport PNG generated successfully');
+      }).catch(function () {
+        showToast('Download Error', 'Could not export passport image');
+      });
+    }
+
+    function printBgdPassport() {
+      window.print();
+    }
+
+    window.updateBgdPreview = updateBgdPreview;
+    window.randomizeBgdPassport = randomizeBgdPassport;
+    window.resetBgdPassportSpecimen = resetBgdPassportSpecimen;
+    window.resetBgdPhoto = resetBgdPhoto;
+    window.copyBgdSpecimenData = copyBgdSpecimenData;
+    window.downloadBgdPassPNG = downloadBgdPassPNG;
+    window.printBgdPassport = printBgdPassport;
+    window.initBgdPassport = initBgdPassport;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBgdPassport);
+    } else {
+      initBgdPassport();
     }
 
     // ================= PROOF OF ACCOUNT & ADDRESS (GREY BANK LETTER & PDF) CONTROLLER =================
@@ -7908,7 +8338,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       updatePakPreview();
       updateSycPreview();
       updateProofOfAccountPreview();
-      switchVerificationCountry('usa');
+      updateBgdPreview();
+      switchVerificationCountry('bangladesh');
     });
 
     // Explicit Window Bindings for all inline event handlers:
@@ -9037,6 +9468,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">DR Congo</div>
                 <div class="text-[10px] font-medium text-slate-500">Passeport Biométrique (COD)</div>
+              </div>
+            </button>
+
+            <!-- Bangladesh -->
+            <button type="button" id="country-btn-bangladesh" onclick="switchVerificationCountry('bangladesh')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇧🇩</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Bangladesh</div>
+                <div class="text-[10px] font-medium text-slate-500">e-Passport (ই-পাসপোর্ট / BGD)</div>
               </div>
             </button>
           </div>
@@ -15944,6 +16387,520 @@ COD REP DEM CONGO</div>
             </article>
 
             <p class="text-[11px] text-slate-400 text-center leading-snug">Reference specimen reproduction · DR Congo biometric passport spread (443 × 607 proportions) with bilingual French/English captions, dual portrait, national emblem, and TD3 machine readable zone.</p>
+          </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3H-3: PEOPLE'S REPUBLIC OF BANGLADESH E-PASSPORT VIEW ================= -->
+      <div id="bangladesh-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-emerald-700"></i> Bangladesh e-Passport Builder</h1>
+                <p class="text-xs text-slate-500 mt-0.5">গণপ্রজাতন্ত্রী বাংলাদেশ · Biometric e-Passport (BGD) — edit every data &amp; emergency field.</p>
+              </div>
+              <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">BGD</span>
+            </div>
+
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeBgdPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-600 hover:from-emerald-600 hover:via-teal-600 hover:to-emerald-500 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-700/25 hover:shadow-emerald-700/40 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Bangladeshi passport data, barcode &amp; TD3 MRZ</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Holder Identification -->
+            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2 pt-2 border-t border-slate-100">
+              <i class="fa-solid fa-user text-emerald-700"></i> 1. Bio-Data &amp; Holder Info
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">বংশগত নাম / Surname</label>
+                <input id="bgdInputSurname" type="text" value="HOSSAIN" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">প্রদত্ত নাম / Given Name</label>
+                <input id="bgdInputGivenName" type="text" value="MD DELOWER" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">পাসপোর্ট নং / Passport No.</label>
+                <input id="bgdInputPassNo" type="text" value="A06821716" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-mono font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">ব্যক্তিগত নং / Personal No.</label>
+                <input id="bgdInputPersonalNo" type="text" value="6902553657" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-mono font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">পূর্ববর্তী পাসপোর্ট নং / Prev. Pass No.</label>
+                <input id="bgdInputPrevPassNo" type="text" value="BT0283556" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-mono font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">জাতীয়তা / Nationality</label>
+                <input id="bgdInputNationality" type="text" value="BANGLADESHI" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">জন্ম তারিখ / Date of Birth</label>
+                <input id="bgdInputDob" type="date" value="1997-05-23" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">লিঙ্গ / Sex</label>
+                <select id="bgdInputSex" onchange="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+                  <option value="M" selected>M (Male)</option>
+                  <option value="F">F (Female)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">জন্মস্থান / Place of Birth</label>
+                <input id="bgdInputPob" type="text" value="BHOLA" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">প্রদানকারী কর্তৃপক্ষ / Authority</label>
+                <input id="bgdInputAuthority" type="text" value="DIP/DHAKA" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">প্রদানের তারিখ / Date of Issue</label>
+                <input id="bgdInputIssue" type="date" value="2023-01-31" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">মেয়াদোত্তীর্ণের তারিখ / Date of Expiry</label>
+                <input id="bgdInputExpiry" type="date" value="2033-01-30" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+            </div>
+
+            <!-- Parents & Permanent Address -->
+            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2 pt-2 border-t border-slate-100">
+              <i class="fa-solid fa-house-user text-emerald-700"></i> 2. Page 1: Family &amp; Permanent Address
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">পিতার নাম / Father's Name</label>
+                <input id="bgdInputFatherName" type="text" value="MD MOFIZUL ISLAM" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">মাতার নাম / Mother's Name</label>
+                <input id="bgdInputMotherName" type="text" value="AMANA BEGUM" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">স্বামীর/স্ত্রীর নাম / Spouse's Name (Optional)</label>
+                <input id="bgdInputSpouseName" type="text" value="" oninput="updateBgdPreview()" placeholder="Leave empty if unmarried" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">স্থায়ী ঠিকানা / Permanent Address</label>
+                <textarea id="bgdInputPermanentAddress" rows="2" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">HOUSE # 57/59, ROAD # 31, BLOCK # D, PALLABI, PALLABI - 1216, DHAKA</textarea>
+              </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2 pt-2 border-t border-slate-100">
+              <i class="fa-solid fa-phone-volume text-emerald-700"></i> 3. Emergency Contact Details
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Emergency Name</label>
+                <input id="bgdInputEmergencyName" type="text" value="JAHIDUL ISLAM" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Relationship</label>
+                <input id="bgdInputEmergencyRelation" type="text" value="BROTHER" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Emergency Address</label>
+                <textarea id="bgdInputEmergencyAddress" rows="2" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">HOUSE # 76, ROAD # 06, BLOCK-A, PALLABI, PALLABI - 1216, DHAKA</textarea>
+              </div>
+              <div class="col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Telephone No.</label>
+                <input id="bgdInputEmergencyPhone" type="text" value="+8801616166031" oninput="updateBgdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-sm font-mono font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400">
+              </div>
+            </div>
+
+            <!-- Portrait Photo Upload -->
+            <div class="pt-2 border-t border-slate-100">
+              <label class="block text-[11px] font-bold text-slate-600 mb-1.5 flex items-center justify-between">
+                <span>Passport Photo (Auto-synced across main &amp; ghost portraits)</span>
+                <button type="button" onclick="resetBgdPhoto()" class="text-[10px] text-emerald-700 hover:underline">Reset specimen photo</button>
+              </label>
+              <div class="flex items-center gap-3">
+                <input id="bgdPassPhotoInput" type="file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-slate-100">
+              <button type="button" onclick="resetBgdPassportSpecimen()" class="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-file-circle-check"></i> Load reference
+              </button>
+              <button type="button" onclick="copyBgdSpecimenData()" class="px-3 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-copy"></i> Copy data
+              </button>
+              <button type="button" onclick="downloadBgdPassPNG()" class="px-3 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-download"></i> Download PNG
+              </button>
+              <button type="button" onclick="printBgdPassport()" class="px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors cursor-pointer inline-flex items-center justify-center gap-2 no-print">
+                <i class="fa-solid fa-print"></i> Print
+              </button>
+            </div>
+          </section>
+
+          <!-- Passport Preview -->
+          <section class="lg:col-span-7 space-y-4">
+            <div class="flex items-center justify-between gap-3 no-print">
+              <div class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+                <i class="fa-solid fa-id-card text-emerald-700"></i> Authentic 2-Page Passport Spread Preview
+              </div>
+              <a href="/assets/aistudio/1793535919782_9b492622.jpg" download="bangladesh_passport_specimen.jpg" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-image"></i> Reference Photo (JPG)
+              </a>
+            </div>
+
+            <!-- CARD SPREAD -->
+            <article id="bangladesh-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1b1e23] bg-[#fbfbf9]" style="aspect-ratio: 623 / 863; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+              <!-- Underlay clean composite spread for exact micro-guilloche patterns -->
+              <img src="/assets/aistudio/bgd_passport_clean_bg.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
+
+              <!-- ============ PAGE 1: PERSONAL DATA & EMERGENCY CONTACT (TOP HALF) ============ -->
+              <section id="bgdTopPage" class="relative w-full overflow-hidden" style="height: 49.6%; container-type: inline-size; background: linear-gradient(180deg, #f7f9f7 0%, #fefefe 40%, #f6faf6 100%);">
+                <!-- SVG Guilloche Security Waves & Watermark -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 623 428" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- Fine Guilloche rosettes -->
+                  <g fill="none" stroke="#248658" stroke-width="0.4" opacity="0.16">
+                    <circle cx="311" cy="200" r="140" />
+                    <circle cx="311" cy="200" r="120" />
+                    <circle cx="311" cy="200" r="100" />
+                    <circle cx="311" cy="200" r="80" />
+                    <path d="M 0 60 Q 311 120 623 60" />
+                    <path d="M 0 100 Q 311 160 623 100" />
+                    <path d="M 0 140 Q 311 200 623 140" />
+                    <path d="M 0 180 Q 311 240 623 180" />
+                    <path d="M 0 220 Q 311 280 623 220" />
+                  </g>
+                  <!-- Central Watermark Seal -->
+                  <g transform="translate(420, 200)" opacity="0.12">
+                    <circle cx="0" cy="0" r="75" fill="none" stroke="#ba1c24" stroke-width="1.5" />
+                    <circle cx="0" cy="0" r="65" fill="#ba1c24" />
+                    <circle cx="0" cy="0" r="50" fill="none" stroke="#248658" stroke-width="2" />
+                  </g>
+                </svg>
+
+                <!-- Top Page Header -->
+                <div class="pt-[3.6%] text-center">
+                  <div class="text-[#248658] font-black uppercase tracking-wider" style="font-size: 2.8cqw; letter-spacing: 0.08em; text-shadow: 0 0.5px 0.5px rgba(0,0,0,0.05);">
+                    PERSONAL DATA AND EMERGENCY CONTACT
+                  </div>
+                </div>
+
+                <!-- Left Perforated Passport Number (Vertical Needle Punch) -->
+                <div class="absolute left-[3.2%] top-[10%] bottom-[8%] flex flex-col justify-between items-center pointer-events-none select-none z-10" style="width: 7%;">
+                  <div id="bgdOutPerforatedPassNo" class="font-mono font-bold tracking-[0.45em] text-slate-700/60" style="writing-mode: vertical-lr; transform: rotate(180deg); font-size: 2.6cqw; letter-spacing: 0.55em; text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 0 rgba(0,0,0,0.25);">
+                    A 0 6 8 2 1 7 1 6
+                  </div>
+                </div>
+
+                <!-- Top Page Data Content (Holder Family & Emergency Contact) -->
+                <div class="absolute inset-0 flex flex-col justify-start" style="padding-top: 10.5%; padding-left: 17%; padding-right: 28%; font-size: 2.05cqw; line-height: 1.35;">
+                  <!-- Name -->
+                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Name:</span>
+                    <span id="bgdOutTopName" class="col-span-8 font-black text-slate-900 tracking-tight" style="font-size: 2.1cqw;">MD DELOWER HOSSAIN</span>
+                  </div>
+                  <!-- Father's Name -->
+                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Father's Name:</span>
+                    <span id="bgdOutTopFather" class="col-span-8 font-bold text-slate-900">MD MOFIZUL ISLAM</span>
+                  </div>
+                  <!-- Mother's Name -->
+                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Mother's Name:</span>
+                    <span id="bgdOutTopMother" class="col-span-8 font-bold text-slate-900">AMANA BEGUM</span>
+                  </div>
+                  <!-- Spouse's Name -->
+                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Spouse's Name:</span>
+                    <span id="bgdOutTopSpouse" class="col-span-8 font-semibold text-slate-700">—</span>
+                  </div>
+                  <!-- Permanent Address -->
+                  <div class="grid grid-cols-12 gap-1 mb-[4.5%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Permanent Address:</span>
+                    <span id="bgdOutTopAddress" class="col-span-8 font-semibold text-slate-900 leading-snug" style="font-size: 1.85cqw;">HOUSE # 57/59, ROAD # 31, BLOCK # D, PALLABI, PALLABI - 1216, DHAKA</span>
+                  </div>
+
+                  <!-- Emergency Contact Sub-header -->
+                  <div class="font-bold text-slate-800 mb-[1.8%]" style="font-size: 2.0cqw;">
+                    Emergency Contact:
+                  </div>
+                  <!-- Emergency Name -->
+                  <div class="grid grid-cols-12 gap-1 mb-[1.5%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Name:</span>
+                    <span id="bgdOutEmergName" class="col-span-8 font-black text-slate-900">JAHIDUL ISLAM</span>
+                  </div>
+                  <!-- Relationship -->
+                  <div class="grid grid-cols-12 gap-1 mb-[1.5%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Relationship:</span>
+                    <span id="bgdOutEmergRelation" class="col-span-8 font-bold text-slate-900">BROTHER</span>
+                  </div>
+                  <!-- Emergency Address -->
+                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Address:</span>
+                    <span id="bgdOutEmergAddress" class="col-span-8 font-semibold text-slate-900 leading-snug" style="font-size: 1.85cqw;">HOUSE # 76, ROAD # 06, BLOCK-A, PALLABI, PALLABI - 1216, DHAKA</span>
+                  </div>
+                  <!-- Telephone No -->
+                  <div class="grid grid-cols-12 gap-1">
+                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Telephone No:</span>
+                    <span id="bgdOutEmergPhone" class="col-span-8 font-mono font-bold text-slate-900">+8801616166031</span>
+                  </div>
+                </div>
+
+                <!-- Right Side: Vertical Barcode, Seal, and QR code -->
+                <div class="absolute right-[3.5%] top-[14%] bottom-[6%] flex flex-col justify-between items-center" style="width: 24%;">
+                  <!-- Vertical 1D Barcode -->
+                  <div class="flex flex-col items-center">
+                    <div class="bg-white/70 px-1 py-1 rounded-xs flex items-center justify-center">
+                      <!-- Barcode simulation lines -->
+                      <div class="flex items-center h-[120px]" style="writing-mode: vertical-lr; transform: rotate(180deg);">
+                        <svg width="24" height="135" viewBox="0 0 28 150" fill="#000000">
+                          <rect x="0" y="0" width="2" height="150" />
+                          <rect x="3" y="0" width="1" height="150" />
+                          <rect x="6" y="0" width="3" height="150" />
+                          <rect x="11" y="0" width="1" height="150" />
+                          <rect x="14" y="0" width="2" height="150" />
+                          <rect x="18" y="0" width="4" height="150" />
+                          <rect x="23" y="0" width="1" height="150" />
+                          <rect x="25" y="0" width="2" height="150" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div id="bgdOutBarcodeText" class="font-mono font-bold text-[1.8cqw] tracking-[0.25em] text-slate-800 mt-1" style="writing-mode: vertical-lr; transform: rotate(180deg);">
+                      A 0 6 8 2 1 7 1 6
+                    </div>
+                  </div>
+
+                  <!-- QR Code / DataMatrix -->
+                  <div class="p-1 bg-white/90 rounded-xs border border-slate-300 shadow-xs mb-1">
+                    <svg width="46" height="46" viewBox="0 0 46 46" fill="#000000">
+                      <!-- Standard QR pattern representation -->
+                      <rect x="2" y="2" width="12" height="12" fill="none" stroke="#000" stroke-width="2.5" />
+                      <rect x="5.5" y="5.5" width="5" height="5" />
+                      <rect x="32" y="2" width="12" height="12" fill="none" stroke="#000" stroke-width="2.5" />
+                      <rect x="35.5" y="5.5" width="5" height="5" />
+                      <rect x="2" y="32" width="12" height="12" fill="none" stroke="#000" stroke-width="2.5" />
+                      <rect x="5.5" y="5.5" width="5" height="5" />
+                      <rect x="5.5" y="35.5" width="5" height="5" />
+                      <!-- Data modules -->
+                      <rect x="18" y="4" width="3" height="3" /><rect x="24" y="6" width="3" height="3" /><rect x="18" y="12" width="3" height="3" />
+                      <rect x="6" y="18" width="3" height="3" /><rect x="12" y="22" width="3" height="3" /><rect x="18" y="18" width="3" height="3" />
+                      <rect x="24" y="22" width="3" height="3" /><rect x="30" y="18" width="3" height="3" /><rect x="36" y="22" width="3" height="3" />
+                      <rect x="18" y="28" width="3" height="3" /><rect x="24" y="32" width="3" height="3" /><rect x="32" y="30" width="3" height="3" />
+                      <rect x="38" y="34" width="3" height="3" /><rect x="22" y="38" width="3" height="3" /><rect x="36" y="40" width="3" height="3" />
+                    </svg>
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ BOOKLET SEAM DIVIDER ============ -->
+              <div class="relative w-full h-[5px] bg-gradient-to-b from-[#b8c2b5]/70 via-[#e0e6de] to-[#c2ccbf]/80 border-y border-slate-300/80 shadow-inner flex items-center justify-around pointer-events-none z-20">
+                <div class="w-full h-[1px] border-b border-dashed border-slate-500/30"></div>
+              </div>
+
+              <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF) ============ -->
+              <section id="bgdDataPage" class="relative w-full overflow-hidden" style="height: 49.8%; container-type: inline-size; background: linear-gradient(180deg, #fbfbf9 0%, #f6f8f6 45%, #fbf9f6 100%);">
+                <!-- Guilloche patterns & Central Seal Watermark -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 623 430" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- Central Watermark Seal: গণপ্রজাতন্ত্রী বাংলাদেশ Emblem -->
+                  <g transform="translate(360, 160)" opacity="0.14">
+                    <circle cx="0" cy="0" r="70" fill="none" stroke="#1d6643" stroke-width="2" />
+                    <circle cx="0" cy="0" r="62" fill="none" stroke="#248658" stroke-width="0.8" stroke-dasharray="2 1" />
+                    <text x="0" y="5" text-anchor="middle" font-size="14" font-weight="900" fill="#1d6643" font-family="'Inter', sans-serif">গণপ্রজাতন্ত্রী বাংলাদেশ</text>
+                  </g>
+                  <!-- Fine Guilloche arcs -->
+                  <g fill="none" stroke="#248658" stroke-width="0.4" opacity="0.15">
+                    <circle cx="110" cy="180" r="90" />
+                    <circle cx="520" cy="160" r="90" />
+                    <path d="M 0 50 Q 311 0 623 50" />
+                    <path d="M 0 100 Q 311 50 623 100" />
+                    <path d="M 0 150 Q 311 100 623 150" />
+                    <path d="M 0 200 Q 311 150 623 200" />
+                    <path d="M 0 250 Q 311 200 623 250" />
+                  </g>
+                </svg>
+
+                <!-- Data Page Header -->
+                <div class="pt-[2.2%] px-[3.5%] flex items-start justify-between">
+                  <!-- Left: PASSPORT / পাসপোর্ট -->
+                  <div class="text-left leading-none">
+                    <div class="font-extrabold text-slate-800 tracking-wider" style="font-size: 2.7cqw;">PASSPORT</div>
+                    <div class="font-bold text-slate-600 mt-[1px]" style="font-size: 2.1cqw;">পাসপোর্ট</div>
+                  </div>
+                  <!-- Center-Right: গণপ্রজাতন্ত্রী বাংলাদেশ / PEOPLE'S REPUBLIC OF BANGLADESH -->
+                  <div class="text-right leading-tight">
+                    <div class="font-black text-[#1b6b45] tracking-tight" style="font-size: 2.9cqw;">
+                      গণপ্রজাতন্ত্রী বাংলাদেশ
+                    </div>
+                    <div class="font-extrabold text-[#ba1c24] uppercase tracking-wider" style="font-size: 2.5cqw;">
+                      PEOPLE'S REPUBLIC OF BANGLADESH
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Main Content Area: Bearer Portrait + Field Grid + Ghost Portrait -->
+                <div class="relative px-[3.2%] pt-[1.8%] flex items-start gap-[2%]">
+                  <!-- LEFT: Bearer Portrait Photo -->
+                  <div class="relative shrink-0 rounded-xs overflow-hidden border border-slate-400/90 shadow-md bg-slate-200" style="width: 28%; aspect-ratio: 35 / 45;">
+                    <img id="bgdOutPhotoMain" src="/assets/aistudio/bgd_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
+                    <!-- Subtle Corner Vignette -->
+                    <div class="absolute inset-0 ring-1 ring-inset ring-black/15 pointer-events-none"></div>
+                  </div>
+
+                  <!-- CENTER: Dual-language Data Grid -->
+                  <div class="grow grid grid-cols-12 gap-x-2 gap-y-[3px]" style="font-size: 1.8cqw; line-height: 1.25;">
+                    <!-- Row 1: Type / Country Code / Passport Number -->
+                    <div class="col-span-2">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">শ্রেণি / Type</div>
+                      <div id="bgdOutType" class="font-black text-slate-900 text-[2.1cqw]">P</div>
+                    </div>
+                    <div class="col-span-3">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">দেশ কোড / Country Code</div>
+                      <div id="bgdOutCode" class="font-black text-slate-900 text-[2.1cqw]">BGD</div>
+                    </div>
+                    <div class="col-span-7">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">পাসপোর্ট নং / Passport Number</div>
+                      <div id="bgdOutPassNo" class="font-mono font-black text-slate-900 text-[2.3cqw] tracking-wide">A06821716</div>
+                    </div>
+
+                    <!-- Row 2: Surname -->
+                    <div class="col-span-12 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">বংশগত নাম / Surname</div>
+                      <div id="bgdOutSurname" class="font-black text-slate-900 text-[2.35cqw] tracking-tight">HOSSAIN</div>
+                    </div>
+
+                    <!-- Row 3: Given Name -->
+                    <div class="col-span-12 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">প্রদত্ত নাম / Given Name</div>
+                      <div id="bgdOutGivenName" class="font-black text-slate-900 text-[2.35cqw] tracking-tight">MD DELOWER</div>
+                    </div>
+
+                    <!-- Row 4: Nationality / Personal No -->
+                    <div class="col-span-5 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">জাতীয়তা / Nationality</div>
+                      <div id="bgdOutNationality" class="font-black text-slate-900 text-[2.0cqw]">BANGLADESHI</div>
+                    </div>
+                    <div class="col-span-7 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">ব্যক্তিগত নং / Personal No.</div>
+                      <div id="bgdOutPersonalNo" class="font-mono font-bold text-slate-900 text-[2.0cqw]">6902553657</div>
+                    </div>
+
+                    <!-- Row 5: DOB / Previous Passport No -->
+                    <div class="col-span-5 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">জন্ম তারিখ / Date of Birth</div>
+                      <div id="bgdOutDob" class="font-bold text-slate-900 text-[1.9cqw]">23 MAY 1997</div>
+                    </div>
+                    <div class="col-span-7 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">পূর্ববর্তী পাসপোর্ট নং / Previous Passport No.</div>
+                      <div id="bgdOutPrevPassNo" class="font-mono font-bold text-slate-900 text-[1.9cqw]">BT0283556</div>
+                    </div>
+
+                    <!-- Row 6: Sex / Place of Birth -->
+                    <div class="col-span-3 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">লিঙ্গ / Sex</div>
+                      <div id="bgdOutSex" class="font-black text-slate-900 text-[2.0cqw]">M</div>
+                    </div>
+                    <div class="col-span-9 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">জন্মস্থান / Place of Birth</div>
+                      <div id="bgdOutPob" class="font-bold text-slate-900 text-[2.0cqw]">BHOLA</div>
+                    </div>
+
+                    <!-- Row 7: Date of Issue / Issuing Authority -->
+                    <div class="col-span-5 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">প্রদানের তারিখ / Date of Issue</div>
+                      <div id="bgdOutIssue" class="font-bold text-slate-900 text-[1.9cqw]">31 JAN 2023</div>
+                    </div>
+                    <div class="col-span-7 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">প্রদানকারী কর্তৃপক্ষ / Issuing Authority</div>
+                      <div id="bgdOutAuthority" class="font-bold text-slate-900 text-[1.9cqw]">DIP/DHAKA</div>
+                    </div>
+
+                    <!-- Row 8: Date of Expiry / Holder's Signature -->
+                    <div class="col-span-5 mt-[1px]">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">মেয়াদোত্তীর্ণের তারিখ / Date of Expiry</div>
+                      <div id="bgdOutExpiry" class="font-bold text-slate-900 text-[1.9cqw]">30 JAN 2033</div>
+                    </div>
+                    <div class="col-span-7 mt-[1px] relative">
+                      <div class="text-slate-500 font-semibold text-[1.4cqw]">স্বাক্ষর / Holder's Signature</div>
+                      <div class="h-[18px] flex items-center">
+                        <!-- Realistic bearer signature path -->
+                        <svg class="h-[16px] w-[90px] text-slate-800" viewBox="0 0 100 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M 6 18 C 12 6, 20 2, 28 14 C 32 20, 36 22, 44 10 C 50 4, 56 16, 68 12 C 78 8, 86 18, 96 14" />
+                          <path d="M 18 14 L 38 14" stroke-width="1.2" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- RIGHT: Tinted Mini Photo + Ghost Portrait + Flag -->
+                  <div class="shrink-0 flex flex-col items-center justify-between" style="width: 14%; height: 165px;">
+                    <!-- Small circular tinted portrait -->
+                    <div class="w-[38px] h-[48px] rounded-full overflow-hidden border border-red-900/40 shadow-xs relative bg-rose-950/20">
+                      <img id="bgdOutPhotoMini" src="/assets/aistudio/bgd_passport_portrait.png" alt="" class="w-full h-full object-cover mix-blend-multiply opacity-80" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
+                      <div class="absolute inset-0 bg-rose-900/40 mix-blend-color pointer-events-none"></div>
+                    </div>
+
+                    <!-- Ghost photo with laser-engraved DOB watermark -->
+                    <div class="relative w-[38px] h-[48px] rounded-xs overflow-hidden border border-slate-300 bg-slate-100 shadow-xs">
+                      <img id="bgdOutPhotoGhost" src="/assets/aistudio/bgd_passport_portrait.png" alt="" class="w-full h-full object-cover grayscale opacity-55 contrast-125" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
+                      <!-- DOB watermark engraved across bottom of ghost photo -->
+                      <div id="bgdOutGhostDob" class="absolute inset-x-0 bottom-0 text-center font-mono font-black text-slate-800 tracking-tighter" style="font-size: 1.5cqw; background: rgba(255,255,255,0.45); backdrop-filter: blur(0.5px);">
+                        23.05.97
+                      </div>
+                    </div>
+
+                    <!-- Specimen serial code -->
+                    <div class="font-mono font-bold text-slate-700 tracking-wider" style="font-size: 1.6cqw;">
+                      982450
+                    </div>
+
+                    <!-- Bangladesh National Flag (Green field with Red circle at slight angle) -->
+                    <div class="w-[32px] h-[19px] bg-[#006a4e] rounded-[1px] relative shadow-xs border border-black/20 flex items-center justify-center transform -rotate-1">
+                      <div class="w-[11px] h-[11px] rounded-full bg-[#f42a41] -translate-x-[1px]"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Holographic Optical Security Strip (Repeated BGD + Chip Icon + Wave Foil) -->
+                <div class="relative mx-[3.2%] mt-[2.5%] h-[14px] rounded-[2px] overflow-hidden border-y border-cyan-400/50 shadow-xs flex items-center justify-between px-2" style="background: linear-gradient(90deg, rgba(6,182,212,0.3) 0%, rgba(59,130,246,0.35) 20%, rgba(236,72,153,0.35) 45%, rgba(234,179,8,0.35) 70%, rgba(16,185,129,0.3) 100%);">
+                  <div class="flex items-center gap-4 text-[1.4cqw] font-mono font-black tracking-widest text-slate-800/80 uppercase">
+                    <span>★ BGD</span>
+                    <span>☲ BGD</span>
+                    <span>★ BGD</span>
+                    <span>☲ BGD</span>
+                    <span>★ BGD</span>
+                    <span>☲ BGD</span>
+                    <span>★ BGD</span>
+                  </div>
+                </div>
+
+                <!-- Machine Readable Zone (MRZ: ICAO Doc 9303 TD3 2 lines × 44 chars) -->
+                <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#fdfdfc]/80" style="height: 19.5%; padding-left: 3.5%; padding-right: 3.5%;">
+                  <div id="bgdMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                    P&lt;BGDHOSSAIN&lt;&lt;MD&lt;DELOWER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                  </div>
+                  <div id="bgdMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                    A068217167BGD9705238M33013066902553657&lt;&lt;&lt;&lt;&lt;&lt;66
+                  </div>
+                </div>
+              </section>
+            </article>
+
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic biometric passport reproduction · People's Republic of Bangladesh (গণপ্রজাতন্ত্রী বাংলাদেশ / BGD) 2-page spread matching reference specimen with dual-language bio-data, perforated needle passport number, Code 128 &amp; QR matrix, and ICAO Doc 9303 TD3 machine-readable zone.</p>
           </section>
         </main>
       </div>
