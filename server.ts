@@ -316,6 +316,36 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileId: 'proof-of-account-pdf',
     fileName: 'proof_of_account__1__3c9d9253.pdf',
   },
+  '/assets/aistudio/image_f62ff4c3.png': {
+    fileId: 'germany-reference-png',
+    fileName: 'germany_passport_reference_photo.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/germany_passport_reference.png': {
+    fileId: 'germany-reference-spread-png',
+    fileName: 'germany_passport_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/germany_passport_portrait.png': {
+    fileId: 'germany-portrait-png',
+    fileName: 'germany_passport_portrait.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/germany_passport_signature.png': {
+    fileId: 'germany-signature-png',
+    fileName: 'germany_passport_signature.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/germany_kinegram_patch.png': {
+    fileId: 'germany-kinegram-png',
+    fileName: 'germany_kinegram_patch.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/germany_coat_of_arms.png': {
+    fileId: 'germany-eagle-png',
+    fileName: 'germany_coat_of_arms.png',
+    allowInlineImg: true,
+  },
   '/assets/aistudio/1793535919782_9b492622.jpg': {
     fileId: 'bangladesh-reference-jpg',
     fileName: 'bangladesh_passport_reference.jpg',
