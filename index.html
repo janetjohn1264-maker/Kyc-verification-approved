@@ -3244,29 +3244,28 @@ var $ = window.$ || (id => document.getElementById(id));
     window.downloadSenegalPassPNG = downloadSenegalPassPNG;
     window.copySenegalSpecimenData = copySenegalSpecimenData;
 
-    // ================= NATIONAL IDENTITY CARD (REPUBLIC OF SOUTH AFRICA / SENEGAL ID VIEW) CONTROLLER =================
-    var zafCurrentViewMode = 'card';
+    // ================= NATIONAL IDENTITY CARD (RÉPUBLIQUE DU SÉNÉGAL — CARTE D'IDENTITÉ CEDEAO) CONTROLLER =================
+    var zafCurrentViewMode = 'live';
     var zafIsCustomPhoto = false;
-    var zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
+    var zafCurrentPhotoSrc = '/assets/aistudio/senegal_cedeao_portrait_exact.png';
 
     function setZafViewMode(mode) {
-      zafCurrentViewMode = mode || 'card';
-      const cardEl = $('zaf-view-card');
+      zafCurrentViewMode = (mode === 'specimen') ? 'specimen' : 'live';
+      const liveEl = $('zaf-view-live') || $('zaf-view-card');
       const specEl = $('zaf-view-specimen');
-      const btnCard = $('zaf-tab-card');
-      const btnSpec = $('zaf-tab-specimen');
-      if (cardEl) cardEl.classList.toggle('hidden', zafCurrentViewMode !== 'card');
+      const btnLive = $('zaf-mode-live') || $('zaf-tab-card');
+      const btnSpec = $('zaf-mode-specimen') || $('zaf-tab-specimen');
+      if (liveEl) liveEl.classList.toggle('hidden', zafCurrentViewMode !== 'live');
       if (specEl) specEl.classList.toggle('hidden', zafCurrentViewMode !== 'specimen');
-      [btnCard, btnSpec].forEach(b => {
-        if (b) {
-          b.classList.remove('bg-emerald-700', 'text-white', 'shadow-xs');
-          b.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100');
-        }
-      });
-      const activeBtn = zafCurrentViewMode === 'specimen' ? btnSpec : btnCard;
-      if (activeBtn) {
-        activeBtn.classList.add('bg-emerald-700', 'text-white', 'shadow-xs');
-        activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+      if (btnLive) {
+        btnLive.className = zafCurrentViewMode === 'live'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+      }
+      if (btnSpec) {
+        btnSpec.className = zafCurrentViewMode === 'specimen'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
       }
     }
 
@@ -3276,15 +3275,15 @@ var $ = window.$ || (id => document.getElementById(id));
         zafCurrentPhotoSrc = customUrl;
       } else {
         zafIsCustomPhoto = false;
-        zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
+        zafCurrentPhotoSrc = '/assets/aistudio/senegal_cedeao_portrait_exact.png';
       }
       updateZafIdPreview();
-      showToast('Portrait Updated', zafIsCustomPhoto ? 'Applied custom bearer portrait' : 'Restored reference portrait of Lebohang Rebecca Mashego');
+      showToast('Portrait Updated', zafIsCustomPhoto ? 'Applied custom bearer portrait' : 'Restored reference portrait of Ousseynou Bodian');
     }
 
     function resetZafIdPhoto() {
       zafIsCustomPhoto = false;
-      zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
+      zafCurrentPhotoSrc = '/assets/aistudio/senegal_cedeao_portrait_exact.png';
       const inp = $('zafPhotoInput');
       if (inp) inp.value = '';
       updateZafIdPreview();
@@ -3295,29 +3294,46 @@ var $ = window.$ || (id => document.getElementById(id));
       const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value.trim() : fb);
       const setText = (id, val) => { const el = $(id); if (el) el.textContent = val; };
 
-      const surname = getVal('zafInputSurname', 'MASHEGO').toUpperCase();
-      const forenames = getVal('zafInputForenames', 'LEBOHANG REBECCA').toUpperCase();
-      const dob = getVal('zafInputDob', '1993 08 24').toUpperCase();
-      const idNumber = getVal('zafInputIdNumber', '930824 0123 08 7').toUpperCase();
-      const nationality = getVal('zafInputNationality', 'ZAF').toUpperCase();
-      const gender = getVal('zafInputGender', 'F').toUpperCase();
-      const issueDate = getVal('zafInputIssueDate', '2022-11-10');
-      const sigName = getVal('zafInputSignature', 'L. Mashego');
+      const idNumber = getVal('zafInputIdNumber', '1 02 19910828 00011 3');
+      const forenames = getVal('zafInputForenames', 'OUSSEYNOU').toUpperCase();
+      const surname = getVal('zafInputSurname', 'BODIAN').toUpperCase();
+      const dob = getVal('zafInputDob', '28/08/1991');
+      const gender = getVal('zafInputGender', 'M').toUpperCase();
+      const height = getVal('zafInputHeight', '190 cm');
+      const pob = getVal('zafInputPob', 'GUIDEL BAMBADINKA').toUpperCase();
+      const issueDate = getVal('zafInputIssueDate', '16/05/2019');
+      const expiryDate = getVal('zafInputExpiryDate', '15/05/2029');
+      const regCenter = getVal('zafInputRegCenter', 'COMM. DE PIKINE').toUpperCase();
+      const address = getVal('zafInputAddress', 'GUINAW RAILS').toUpperCase();
+      const sigName = getVal('zafInputSignature', 'O. Bodian');
 
-      setText('zafPreviewSurname', surname);
-      setText('zafPreviewForenames', forenames);
-      setText('zafPreviewDob', dob);
       setText('zafPreviewIdNumber', idNumber);
-      setText('zafPreviewNationality', nationality);
+      setText('zafToolbarIdNum', idNumber);
+      setText('zafPreviewForenames', forenames);
+      setText('zafPreviewSurname', surname);
+      setText('zafPreviewDob', dob);
       setText('zafPreviewGender', gender);
+      setText('zafPreviewHeight', height);
+      setText('zafPreviewPob', pob);
       setText('zafPreviewIssueDate', issueDate);
+      setText('zafPreviewExpiryDate', expiryDate);
+      setText('zafPreviewRegCenter', regCenter);
+      setText('zafPreviewAddress', address);
       setText('zafPreviewSignature', sigName);
+      setText('zafPreviewGhostDob', dob);
 
       document.querySelectorAll('.zaf-avatar-img').forEach(img => {
-        img.src = zafIsCustomPhoto ? zafCurrentPhotoSrc : '/assets/aistudio/zaf_id_portrait_exact.png';
+        img.src = zafIsCustomPhoto ? zafCurrentPhotoSrc : '/assets/aistudio/senegal_cedeao_portrait_exact.png';
       });
+      const ghostWrap = $('zafGhostCustomWrap');
+      const ghostImg = $('zafPreviewGhostPhoto');
+      if (ghostWrap && ghostImg) {
+        ghostImg.src = zafIsCustomPhoto ? zafCurrentPhotoSrc : '/assets/aistudio/senegal_cedeao_ghost_exact.png';
+        const isCustomGhost = zafIsCustomPhoto || dob !== '28/08/1991';
+        ghostWrap.classList.toggle('hidden', !isCustomGhost);
+      }
 
-      const isCustomSig = sigName && sigName !== 'L. Mashego';
+      const isCustomSig = sigName && sigName !== 'O. Bodian';
       document.querySelectorAll('.zaf-sig-img').forEach(img => {
         img.classList.toggle('hidden', Boolean(isCustomSig));
       });
@@ -3329,58 +3345,77 @@ var $ = window.$ || (id => document.getElementById(id));
     function loadZafIdPreset(presetKey) {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       if (presetKey === 'reference' || !presetKey) {
-        setVal('zafInputSurname', 'MASHEGO');
-        setVal('zafInputForenames', 'LEBOHANG REBECCA');
-        setVal('zafInputDob', '1993 08 24');
-        setVal('zafInputIdNumber', '930824 0123 08 7');
-        setVal('zafInputNationality', 'ZAF');
-        setVal('zafInputGender', 'F');
-        setVal('zafInputIssueDate', '2022-11-10');
-        setVal('zafInputSignature', 'L. Mashego');
-        zafIsCustomPhoto = false;
-        zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
-      } else if (presetKey === 'sipho') {
-        setVal('zafInputSurname', 'NDLOVU');
-        setVal('zafInputForenames', 'SIPHO MANDLA');
-        setVal('zafInputDob', '1989 04 15');
-        setVal('zafInputIdNumber', '890415 5182 08 4');
-        setVal('zafInputNationality', 'ZAF');
+        setVal('zafInputIdNumber', '1 02 19910828 00011 3');
+        setVal('zafInputForenames', 'OUSSEYNOU');
+        setVal('zafInputSurname', 'BODIAN');
+        setVal('zafInputDob', '28/08/1991');
         setVal('zafInputGender', 'M');
-        setVal('zafInputIssueDate', '2023-06-18');
-        setVal('zafInputSignature', 'S. Ndlovu');
-      } else if (presetKey === 'thandiwe') {
-        setVal('zafInputSurname', 'KHUMALO');
-        setVal('zafInputForenames', 'THANDIWE GRACE');
-        setVal('zafInputDob', '1997 11 03');
-        setVal('zafInputIdNumber', '971103 0429 08 1');
-        setVal('zafInputNationality', 'ZAF');
+        setVal('zafInputHeight', '190 cm');
+        setVal('zafInputPob', 'GUIDEL BAMBADINKA');
+        setVal('zafInputIssueDate', '16/05/2019');
+        setVal('zafInputExpiryDate', '15/05/2029');
+        setVal('zafInputRegCenter', 'COMM. DE PIKINE');
+        setVal('zafInputAddress', 'GUINAW RAILS');
+        setVal('zafInputSignature', 'O. Bodian');
+        zafIsCustomPhoto = false;
+        zafCurrentPhotoSrc = '/assets/aistudio/senegal_cedeao_portrait_exact.png';
+      } else if (presetKey === 'sipho' || presetKey === 'amadou') {
+        setVal('zafInputIdNumber', '1 01 19880412 00248 7');
+        setVal('zafInputForenames', 'AMADOU LAMINE');
+        setVal('zafInputSurname', 'DIALLO');
+        setVal('zafInputDob', '12/04/1988');
+        setVal('zafInputGender', 'M');
+        setVal('zafInputHeight', '182 cm');
+        setVal('zafInputPob', 'DAKAR PLATEAU');
+        setVal('zafInputIssueDate', '04/09/2020');
+        setVal('zafInputExpiryDate', '03/09/2030');
+        setVal('zafInputRegCenter', 'COMM. DE DAKAR');
+        setVal('zafInputAddress', 'MEDINA RUE 22');
+        setVal('zafInputSignature', 'A. Diallo');
+      } else if (presetKey === 'thandiwe' || presetKey === 'fatou') {
+        setVal('zafInputIdNumber', '2 04 19951123 00109 4');
+        setVal('zafInputForenames', 'FATOU BINETOU');
+        setVal('zafInputSurname', 'NDIAYE');
+        setVal('zafInputDob', '23/11/1995');
         setVal('zafInputGender', 'F');
-        setVal('zafInputIssueDate', '2024-02-14');
-        setVal('zafInputSignature', 'T. Khumalo');
+        setVal('zafInputHeight', '171 cm');
+        setVal('zafInputPob', 'SAINT-LOUIS');
+        setVal('zafInputIssueDate', '18/02/2021');
+        setVal('zafInputExpiryDate', '17/02/2031');
+        setVal('zafInputRegCenter', 'COMM. DE PARCELLES');
+        setVal('zafInputAddress', 'PARCELLES ASSAINIES U14');
+        setVal('zafInputSignature', 'F. Ndiaye');
       }
       updateZafIdPreview();
-      showToast('Preset Loaded', `Loaded identity card profile: ${presetKey.toUpperCase()}`);
+      showToast('Preset Loaded', `Loaded Senegal CEDEAO ID card profile: ${(presetKey || 'reference').toUpperCase()}`);
     }
 
     function randomizeZafIdCard() {
       const profiles = [
-        { surname: 'MASHEGO', forenames: 'LEBOHANG REBECCA', dob: '1993 08 24', id: '930824 0123 08 7', nat: 'ZAF', gender: 'F', issue: '2022-11-10', sig: 'L. Mashego' },
-        { surname: 'NDLOVU', forenames: 'SIPHO MANDLA', dob: '1989 04 15', id: '890415 5182 08 4', nat: 'ZAF', gender: 'M', issue: '2023-06-18', sig: 'S. Ndlovu' },
-        { surname: 'KHUMALO', forenames: 'THANDIWE GRACE', dob: '1997 11 03', id: '971103 0429 08 1', nat: 'ZAF', gender: 'F', issue: '2024-02-14', sig: 'T. Khumalo' },
-        { surname: 'MOKOENA', forenames: 'KAGISO TEBOGO', dob: '1991 02 19', id: '910219 5304 08 9', nat: 'ZAF', gender: 'M', issue: '2023-09-25', sig: 'K. Mokoena' }
+        { id: '1 02 19910828 00011 3', forenames: 'OUSSEYNOU', surname: 'BODIAN', dob: '28/08/1991', gender: 'M', height: '190 cm', pob: 'GUIDEL BAMBADINKA', issue: '16/05/2019', expiry: '15/05/2029', center: 'COMM. DE PIKINE', address: 'GUINAW RAILS', sig: 'O. Bodian' },
+        { id: '1 01 19880412 00248 7', forenames: 'AMADOU LAMINE', surname: 'DIALLO', dob: '12/04/1988', gender: 'M', height: '182 cm', pob: 'DAKAR PLATEAU', issue: '04/09/2020', expiry: '03/09/2030', center: 'COMM. DE DAKAR', address: 'MEDINA RUE 22', sig: 'A. Diallo' },
+        { id: '2 04 19951123 00109 4', forenames: 'FATOU BINETOU', surname: 'NDIAYE', dob: '23/11/1995', gender: 'F', height: '171 cm', pob: 'SAINT-LOUIS', issue: '18/02/2021', expiry: '17/02/2031', center: 'COMM. DE PARCELLES', address: 'PARCELLES ASSAINIES U14', sig: 'F. Ndiaye' },
+        { id: '1 03 19930615 00084 2', forenames: 'CHEIKH TIDIANE', surname: 'SARR', dob: '15/06/1993', gender: 'M', height: '185 cm', pob: 'THIES NORD', issue: '11/07/2022', expiry: '10/07/2032', center: 'COMM. DE THIES', address: 'RANDOUULENE NORD', sig: 'C. Sarr' },
+        { id: '2 01 19980309 00317 6', forenames: 'AMINATA', surname: 'FALL', dob: '09/03/1998', gender: 'F', height: '168 cm', pob: 'ZIGUINCHOR', issue: '25/01/2023', expiry: '24/01/2033', center: 'COMM. DE GUEDIAWAYE', address: 'GOLF SUD', sig: 'A. Fall' }
       ];
-      const p = profiles[Math.floor(Math.random() * profiles.length)];
+      const currentSurname = ($('zafInputSurname') && $('zafInputSurname').value) ? $('zafInputSurname').value.trim().toUpperCase() : '';
+      const pool = profiles.filter(item => item.surname !== currentSurname);
+      const p = (pool.length ? pool : profiles)[Math.floor(Math.random() * (pool.length ? pool.length : profiles.length))];
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('zafInputSurname', p.surname);
-      setVal('zafInputForenames', p.forenames);
-      setVal('zafInputDob', p.dob);
       setVal('zafInputIdNumber', p.id);
-      setVal('zafInputNationality', p.nat);
+      setVal('zafInputForenames', p.forenames);
+      setVal('zafInputSurname', p.surname);
+      setVal('zafInputDob', p.dob);
       setVal('zafInputGender', p.gender);
+      setVal('zafInputHeight', p.height);
+      setVal('zafInputPob', p.pob);
       setVal('zafInputIssueDate', p.issue);
+      setVal('zafInputExpiryDate', p.expiry);
+      setVal('zafInputRegCenter', p.center);
+      setVal('zafInputAddress', p.address);
       setVal('zafInputSignature', p.sig);
       updateZafIdPreview();
-      showToast('Profile Randomized', `Generated fictional ID card data for ${p.forenames} ${p.surname}`);
+      showToast('Profile Randomized', `Generated CEDEAO ID card data for ${p.forenames} ${p.surname}`);
     }
 
     function printZafCard() {
@@ -3391,7 +3426,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const targetEl = $('senegal-id-card');
       if (!targetEl) return;
       try {
-        showToast('Rendering...', 'Generating high-resolution PNG of National Identity Card...');
+        showToast('Rendering...', 'Generating high-resolution PNG of Senegal CEDEAO Identity Card...');
         const canvas = await html2canvas(targetEl, {
           scale: 3,
           useCORS: true,
@@ -3403,14 +3438,14 @@ var $ = window.$ || (id => document.getElementById(id));
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'national-identity-card-specimen.png';
+          $('fallbackDownloadLink').download = 'senegal-cedeao-identity-card-specimen.png';
         }
         const modal = $('imageModal');
         if (modal) {
           modal.classList.remove('hidden');
           modal.classList.add('flex');
         }
-        showToast('Ready!', 'National Identity Card PNG generated');
+        showToast('Ready!', 'Senegal CEDEAO Identity Card PNG generated');
       } catch (err) {
         console.error('html2canvas error:', err);
       }
@@ -3419,18 +3454,22 @@ var $ = window.$ || (id => document.getElementById(id));
     function copyZafSpecimenData() {
       const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value : fb);
       const text = [
-        "REPUBLIC OF SOUTH AFRICA — IDENTITY CARD (SPECIMEN)",
-        "SURNAME: " + getVal('zafInputSurname', 'MASHEGO'),
-        "FORENAMES: " + getVal('zafInputForenames', 'LEBOHANG REBECCA'),
-        "DATE OF BIRTH: " + getVal('zafInputDob', '1993 08 24'),
-        "ID NUMBER: " + getVal('zafInputIdNumber', '930824 0123 08 7'),
-        "NATIONALITY: " + getVal('zafInputNationality', 'ZAF'),
-        "GENDER: " + getVal('zafInputGender', 'F'),
-        "DATE OF ISSUE: " + getVal('zafInputIssueDate', '2022-11-10')
+        "REPUBLIQUE DU SENEGAL — CARTE D'IDENTITE CEDEAO (SPECIMEN)",
+        "N° DE LA CARTE D'IDENTITE: " + getVal('zafInputIdNumber', '1 02 19910828 00011 3'),
+        "PRENOMS: " + getVal('zafInputForenames', 'OUSSEYNOU'),
+        "NOM: " + getVal('zafInputSurname', 'BODIAN'),
+        "DATE DE NAISSANCE: " + getVal('zafInputDob', '28/08/1991'),
+        "SEXE: " + getVal('zafInputGender', 'M'),
+        "TAILLE: " + getVal('zafInputHeight', '190 cm'),
+        "LIEU DE NAISSANCE: " + getVal('zafInputPob', 'GUIDEL BAMBADINKA'),
+        "DATE DE DELIVRANCE: " + getVal('zafInputIssueDate', '16/05/2019'),
+        "DATE D'EXPIRATION: " + getVal('zafInputExpiryDate', '15/05/2029'),
+        "CENTRE D'ENREGISTREMENT: " + getVal('zafInputRegCenter', 'COMM. DE PIKINE'),
+        "ADRESSE DU DOMICILE: " + getVal('zafInputAddress', 'GUINAW RAILS')
       ].join('\n');
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-          showToast('Copied!', 'Identity card specimen data copied to clipboard');
+          showToast('Copied!', 'Senegal CEDEAO identity card data copied to clipboard');
         });
       }
     }
@@ -12679,13 +12718,13 @@ MUQDISHO, BANAADIR, SOMALIA</span>
           <!-- ================= EDITOR CONTROLS ================= -->
           <section class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
             <header class="flex items-start gap-3 pb-3 border-b border-slate-100">
-              <span class="text-2xl p-2 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center shrink-0">🇿🇦</span>
+              <span class="text-2xl p-2 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center shrink-0">🇸🇳</span>
               <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-1.5">
-                  <h1 class="text-base font-bold text-slate-900">National Identity Card</h1>
-                  <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">REPUBLIC OF SOUTH AFRICA</span>
+                  <h1 class="text-base font-bold text-slate-900">Carte d&apos;Identité CEDEAO</h1>
+                  <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">REPUBLIQUE DU SENEGAL</span>
                 </div>
-                <p class="text-[11px] text-slate-500 mt-0.5">Exact 1:1 Reference Layout • Smart Identity Card (ZAF) • Live Editor</p>
+                <p class="text-[11px] text-slate-500 mt-0.5">Exact 1:1 Reference Layout • ECOWAS Identity Card • Live Editor</p>
               </div>
             </header>
 
@@ -12711,18 +12750,18 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </div>
               <div class="grid grid-cols-3 gap-1.5 pt-0.5">
                 <button type="button" onclick="loadZafIdPreset('reference')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-800 border border-emerald-300 rounded-lg text-[10px] font-bold transition truncate cursor-pointer">
-                  ★ Mashego (Ref)
+                  ★ Bodian (Ref)
                 </button>
                 <button type="button" onclick="loadZafIdPreset('sipho')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
-                  Ndlovu Sipho
+                  Diallo Amadou
                 </button>
                 <button type="button" onclick="loadZafIdPreset('thandiwe')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
-                  Khumalo Thandiwe
+                  Ndiaye Fatou
                 </button>
               </div>
             </div>
 
-            <form id="zafIdForm" class="space-y-3" onsubmit="event.preventDefault();">
+            <form id="zafIdForm" class="space-y-2.5" onsubmit="event.preventDefault();">
               <!-- Portrait Upload -->
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
                 <div class="flex items-center justify-between">
@@ -12734,55 +12773,77 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </div>
               </div>
 
-              <!-- Surname & Forenames -->
-              <div class="grid grid-cols-1 gap-2.5">
+              <!-- N° de la carte d'identité -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">N° de la carte d&apos;identité</label>
+                <input type="text" id="zafInputIdNumber" value="1 02 19910828 00011 3" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+              </div>
+
+              <!-- Prenoms & Nom -->
+              <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Surname</label>
-                  <input type="text" id="zafInputSurname" value="MASHEGO" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Prenoms</label>
+                  <input type="text" id="zafInputForenames" value="OUSSEYNOU" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
                 <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Forenames</label>
-                  <input type="text" id="zafInputForenames" value="LEBOHANG REBECCA" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Nom</label>
+                  <input type="text" id="zafInputSurname" value="BODIAN" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
               </div>
 
-              <!-- Date of Birth & ID Number -->
-              <div class="grid grid-cols-2 gap-2.5">
+              <!-- Date de naissance, Sexe, Taille -->
+              <div class="grid grid-cols-3 gap-2">
                 <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Date of Birth</label>
-                  <input type="text" id="zafInputDob" value="1993 08 24" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date de naissance</label>
+                  <input type="text" id="zafInputDob" value="28/08/1991" oninput="updateZafIdPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
                 <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">ID Number</label>
-                  <input type="text" id="zafInputIdNumber" value="930824 0123 08 7" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
-                </div>
-              </div>
-
-              <!-- Nationality & Gender -->
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Nationality</label>
-                  <input type="text" id="zafInputNationality" value="ZAF" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Gender</label>
-                  <select id="zafInputGender" onchange="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-white">
-                    <option value="F" selected>F (Female)</option>
-                    <option value="M">M (Male)</option>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Sexe</label>
+                  <select id="zafInputGender" onchange="updateZafIdPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-white">
+                    <option value="M" selected>M</option>
+                    <option value="F">F</option>
                   </select>
                 </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Taille</label>
+                  <input type="text" id="zafInputHeight" value="190 cm" oninput="updateZafIdPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
               </div>
 
-              <!-- Signature & Date of Issue -->
-              <div class="grid grid-cols-2 gap-2.5">
+              <!-- Lieu de naissance -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Lieu de naissance</label>
+                <input type="text" id="zafInputPob" value="GUIDEL BAMBADINKA" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+              </div>
+
+              <!-- Date de délivrance & Date d'expiration -->
+              <div class="grid grid-cols-2 gap-2">
                 <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Signature</label>
-                  <input type="text" id="zafInputSignature" value="L. Mashego" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date de délivrance</label>
+                  <input type="text" id="zafInputIssueDate" value="16/05/2019" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
                 <div>
-                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Date of Issue</label>
-                  <input type="text" id="zafInputIssueDate" value="2022-11-10" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date d&apos;expiration</label>
+                  <input type="text" id="zafInputExpiryDate" value="15/05/2029" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
+              </div>
+
+              <!-- Centre d'enregistrement & Adresse du domicile -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Centre d&apos;enregistrement</label>
+                  <input type="text" id="zafInputRegCenter" value="COMM. DE PIKINE" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Adresse du domicile</label>
+                  <input type="text" id="zafInputAddress" value="GUINAW RAILS" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Signature -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Signature du titulaire</label>
+                <input type="text" id="zafInputSignature" value="O. Bodian" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none">
               </div>
 
               <!-- Action Buttons -->
@@ -12814,77 +12875,112 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </div>
               <div class="flex items-center gap-2">
                 <span class="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold">
-                  ID: <span id="zafToolbarIdNum">930824 0123 08 7</span>
+                  N°: <span id="zafToolbarIdNum">1 02 19910828 00011 3</span>
                 </span>
               </div>
             </div>
 
-            <!-- 1. LIVE INTERACTIVE 1:1 NATIONAL IDENTITY CARD -->
+            <!-- 1. LIVE INTERACTIVE 1:1 NATIONAL IDENTITY CARD (SENEGAL CEDEAO / ECOWAS) -->
             <div id="zaf-view-live" class="w-full flex flex-col items-center">
-              <div class="w-full max-w-[740px] p-2 sm:p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl border border-slate-700/80">
+              <div class="w-full max-w-[740px] p-2 sm:p-4 bg-gradient-to-br from-[#4a2538] via-[#3c1d2c] to-[#2e1521] rounded-3xl shadow-2xl border border-[#63324b]">
                 <article id="senegal-id-card"
-                         class="relative w-full aspect-[856/540] rounded-[20px] overflow-hidden shadow-xl select-none bg-[#e8f0e6]"
-                         style="container-type: inline-size; font-family: 'Inter', 'Arial', sans-serif;">
+                         class="relative w-full aspect-[856/540] rounded-[22px] overflow-hidden shadow-xl select-none bg-[#ede7dc]"
+                         style="container-type: inline-size; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;">
 
-                  <!-- Clean Rectified Reference Card Background Plate (Flag, Coat of Arms, Embossed Seal, Protea, Nautilus, Guilloche & Static Labels) -->
-                  <img src="/assets/aistudio/zaf_id_front_plate.png"
-                       alt="Republic of South Africa Identity Card Base Plate"
+                  <!-- Clean Rectified Reference Card Background Plate (CEDEAO Emblem, Outlined REPUBLIQUE DU SENEGAL Header, Flag, Guilloche & Static French Labels) -->
+                  <img src="/assets/aistudio/senegal_cedeao_front_plate.png"
+                       alt="République du Sénégal Carte d'Identité CEDEAO Base Plate"
                        class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                  <!-- Bearer Portrait Photo (Exact Reference Coordinates: x=52, y=298, w=190, h=209 in 856x540) -->
+                  <!-- Bearer Portrait Photo (Exact Reference Coordinates: x=38, y=195, w=212, h=248 in 856x540) -->
                   <div class="absolute z-10 overflow-hidden"
-                       style="left: 6.07%; top: 55.19%; width: 22.20%; height: 38.70%;">
+                       style="left: 4.44%; top: 36.11%; width: 24.77%; height: 45.93%;">
                     <img id="zafPreviewPhoto"
-                         src="/assets/aistudio/zaf_id_portrait_exact.png"
+                         src="/assets/aistudio/senegal_cedeao_portrait_exact.png"
                          alt="Identity Card Holder Portrait"
-                         class="zaf-avatar-img w-full h-full object-cover object-top">
+                         class="zaf-avatar-img w-full h-full object-cover object-top"
+                         style="filter: grayscale(100%) contrast(1.03);">
                   </div>
 
-                  <!-- SURNAME Value (Exact Reference Coordinates: x=275, y=162 in 856x540) -->
-                  <div id="zafPreviewSurname"
-                       class="absolute z-20 font-medium uppercase tracking-[0.025em] text-[#17211b] whitespace-nowrap leading-none"
-                       style="left: 32.13%; top: 30.00%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">MASHEGO</div>
+                  <!-- Ghost Portrait Overlay in Right Oval when custom photo or custom DOB is active (x=706, y=282, w=92, h=112 in 856x540) -->
+                  <div id="zafGhostCustomWrap"
+                       class="hidden absolute z-10 overflow-hidden rounded-full flex items-center justify-center bg-[#eceae4]"
+                       style="left: 82.48%; top: 52.22%; width: 10.75%; height: 20.74%;">
+                    <img id="zafPreviewGhostPhoto"
+                         src="/assets/aistudio/senegal_cedeao_ghost_exact.png"
+                         alt="Ghost Portrait"
+                         class="w-full h-full object-cover object-top opacity-75"
+                         style="filter: grayscale(100%) contrast(1.08);">
+                    <div id="zafPreviewGhostDob"
+                         class="absolute bottom-[9%] inset-x-0 text-center font-bold tracking-tight text-[#2b2926]/85 whitespace-nowrap leading-none pointer-events-none"
+                         style="font-size: 1.75cqw; font-family: 'Arial Narrow', 'Inter', Arial, sans-serif;">28/08/1991</div>
+                  </div>
 
-                  <!-- FORENAMES Value (Exact Reference Coordinates: x=274, y=224 in 856x540) -->
-                  <div id="zafPreviewForenames"
-                       class="absolute z-20 font-medium uppercase tracking-[0.025em] text-[#17211b] whitespace-nowrap leading-none"
-                       style="left: 32.01%; top: 41.48%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">LEBOHANG REBECCA</div>
-
-                  <!-- DATE OF BIRTH Value (Exact Reference Coordinates: x=277, y=287 in 856x540) -->
-                  <div id="zafPreviewDob"
-                       class="absolute z-20 font-medium tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
-                       style="left: 32.36%; top: 53.15%; font-size: 3.05cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">1993 08 24</div>
-
-                  <!-- ID NUMBER Value (Exact Reference Coordinates: x=508, y=287 in 856x540) -->
+                  <!-- N° de la carte d'identité Value (Exact Reference Coordinates: x=272, y=132 in 856x540) -->
                   <div id="zafPreviewIdNumber"
-                       class="absolute z-20 font-medium tracking-[0.025em] text-[#17211b] whitespace-nowrap leading-none"
-                       style="left: 59.35%; top: 53.15%; font-size: 3.05cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">930824 0123 08 7</div>
+                       class="absolute z-20 font-bold tracking-[0.02em] text-[#262320] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 24.44%; font-size: 2.38cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">1 02 19910828 00011 3</div>
 
-                  <!-- NATIONALITY Value (Exact Reference Coordinates: x=273, y=349 in 856x540) -->
-                  <div id="zafPreviewNationality"
-                       class="absolute z-20 font-medium uppercase tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
-                       style="left: 31.89%; top: 64.63%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">ZAF</div>
+                  <!-- Prenoms Value (Exact Reference Coordinates: x=272, y=182 in 856x540) -->
+                  <div id="zafPreviewForenames"
+                       class="absolute z-20 font-bold uppercase tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 33.70%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">OUSSEYNOU</div>
 
-                  <!-- GENDER Value (Exact Reference Coordinates: x=509, y=349 in 856x540) -->
+                  <!-- Nom Value (Exact Reference Coordinates: x=272, y=230 in 856x540) -->
+                  <div id="zafPreviewSurname"
+                       class="absolute z-20 font-bold uppercase tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 42.59%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">BODIAN</div>
+
+                  <!-- Date de naissance Value (Exact Reference Coordinates: x=272, y=279 in 856x540) -->
+                  <div id="zafPreviewDob"
+                       class="absolute z-20 font-bold tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 51.67%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">28/08/1991</div>
+
+                  <!-- Sexe Value (Exact Reference Coordinates: x=502, y=278 in 856x540) -->
                   <div id="zafPreviewGender"
-                       class="absolute z-20 font-medium uppercase tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
-                       style="left: 59.46%; top: 64.63%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">F</div>
+                       class="absolute z-20 font-bold uppercase tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 58.64%; top: 51.48%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">M</div>
 
-                  <!-- HOLDER SIGNATURE (Exact Reference Transparent Ink Overlay: x=284, y=428, w=234, h=72 in 856x540) -->
-                  <img src="/assets/aistudio/zaf_id_signature_transparent.png"
-                       alt="Holder Signature L. Mashego"
-                       class="zaf-sig-img absolute z-20 object-contain object-left pointer-events-none select-none"
-                       style="left: 33.18%; top: 79.26%; width: 27.34%; height: 13.33%;">
+                  <!-- Taille Value (Exact Reference Coordinates: x=600, y=278 in 856x540) -->
+                  <div id="zafPreviewHeight"
+                       class="absolute z-20 font-bold tracking-[0.015em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 70.09%; top: 51.48%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">190 cm</div>
 
-                  <!-- Custom Signature Text Fallback when edited away from 'L. Mashego' -->
-                  <div id="zafPreviewSignature"
-                       class="zaf-sig-text hidden absolute z-20 italic text-[#181818] whitespace-nowrap leading-none pointer-events-none"
-                       style="left: 33.53%; top: 80.74%; font-size: 3.85cqw; font-family: 'Georgia', 'Times New Roman', serif;">L. Mashego</div>
+                  <!-- Lieu de naissance Value (Exact Reference Coordinates: x=272, y=329 in 856x540) -->
+                  <div id="zafPreviewPob"
+                       class="absolute z-20 font-bold uppercase tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 60.93%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">GUIDEL BAMBADINKA</div>
 
-                  <!-- DATE OF ISSUE Value (Exact Reference Coordinates: x=629, y=482 in 856x540) -->
+                  <!-- Date de délivrance Value (Exact Reference Coordinates: x=272, y=378 in 856x540) -->
                   <div id="zafPreviewIssueDate"
-                       class="absolute z-20 font-medium tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
-                       style="left: 73.48%; top: 89.26%; font-size: 3.00cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">2022-11-10</div>
+                       class="absolute z-20 font-bold tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 70.00%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">16/05/2019</div>
+
+                  <!-- Date d'expiration Value (Exact Reference Coordinates: x=500, y=375 in 856x540) -->
+                  <div id="zafPreviewExpiryDate"
+                       class="absolute z-20 font-bold tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 58.41%; top: 69.44%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">15/05/2029</div>
+
+                  <!-- Centre d'enregistrement Value (Exact Reference Coordinates: x=272, y=426 in 856x540) -->
+                  <div id="zafPreviewRegCenter"
+                       class="absolute z-20 font-bold uppercase tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 78.89%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">COMM. DE PIKINE</div>
+
+                  <!-- Adresse du domicile Value (Exact Reference Coordinates: x=272, y=475 in 856x540) -->
+                  <div id="zafPreviewAddress"
+                       class="absolute z-20 font-bold uppercase tracking-[0.02em] text-[#282522] whitespace-nowrap leading-none"
+                       style="left: 31.78%; top: 87.96%; font-size: 2.34cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 700;">GUINAW RAILS</div>
+
+                  <!-- HOLDER SIGNATURE (Exact Reference Transparent Ink Overlay below Portrait: x=104, y=448, w=76, h=56 in 856x540) -->
+                  <img src="/assets/aistudio/senegal_cedeao_signature_transparent.png"
+                       alt="Holder Signature O. Bodian"
+                       class="zaf-sig-img absolute z-20 object-contain object-center pointer-events-none select-none"
+                       style="left: 12.15%; top: 82.96%; width: 8.88%; height: 10.37%;">
+
+                  <!-- Custom Signature Text Fallback when edited away from 'O. Bodian' -->
+                  <div id="zafPreviewSignature"
+                       class="zaf-sig-text hidden absolute z-20 italic text-[#1e1c1a] whitespace-nowrap leading-none pointer-events-none"
+                       style="left: 10.50%; top: 85.50%; font-size: 2.55cqw; font-family: 'Georgia', 'Times New Roman', serif;">O. Bodian</div>
 
                 </article>
               </div>
@@ -12892,15 +12988,15 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
             <!-- 2. ORIGINAL PROVIDED REFERENCE IMAGE VIEW -->
             <div id="zaf-view-specimen" class="hidden w-full flex flex-col items-center">
-              <div class="w-full max-w-[520px] bg-white p-4 rounded-3xl shadow-lg border border-slate-200">
+              <div class="w-full max-w-[540px] bg-white p-4 rounded-3xl shadow-lg border border-slate-200">
                 <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
                   <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-check-double text-emerald-600"></i> Attached Reference Image (1:1 Source)
                   </span>
-                  <span class="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">REPUBLIC OF SOUTH AFRICA</span>
+                  <span class="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">REPUBLIQUE DU SENEGAL</span>
                 </div>
-                <img src="/assets/aistudio/south_africa_identity_card_reference.jpeg"
-                     alt="Original Reference National Identity Card"
+                <img src="/assets/aistudio/images__4__8c8f98c9.jpeg"
+                     alt="Original Reference Senegal National Identity Card (CEDEAO)"
                      class="w-full h-auto rounded-2xl border border-slate-200 shadow-sm">
               </div>
             </div>

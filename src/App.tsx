@@ -29,12 +29,15 @@ function App() {
   const previewStyle = useMemo(() => ({ "--accent": content.accent } as React.CSSProperties), [content.accent])
   const isSouthAfrica = country === "RSA"
   const isPapuaNewGuinea = country === "PNG"
-  const specimenImage = isSouthAfrica ? "/assets/aistudio/south_africa_identity_card_reference.jpeg" : isPapuaNewGuinea ? "/assets/aistudio/png_national_id_reference.jpg" : "/assets/aistudio/drc_passport_reference.jpg"
-  const specimenAlt = isSouthAfrica ? "Static Republic of South Africa identity card reference specimen" : isPapuaNewGuinea ? "Static Independent State of Papua New Guinea national identity card reference specimen" : "Static Democratic Republic of the Congo passport reference specimen"
-  const specimenLabel = isSouthAfrica ? "South Africa identity card reference specimen" : isPapuaNewGuinea ? "Papua New Guinea national ID reference specimen" : "Passport reference specimen"
+  const isSenegal = country === "SEN"
+  const specimenImage = isSenegal ? "/assets/aistudio/senegal_cedeao_rectified_ref.png" : isSouthAfrica ? "/assets/aistudio/south_africa_identity_card_reference.jpeg" : isPapuaNewGuinea ? "/assets/aistudio/png_national_id_reference.jpg" : "/assets/aistudio/drc_passport_reference.jpg"
+  const specimenAlt = isSenegal ? "Static Republic of Senegal ECOWAS identity card reference specimen" : isSouthAfrica ? "Static Republic of South Africa identity card reference specimen" : isPapuaNewGuinea ? "Static Independent State of Papua New Guinea national identity card reference specimen" : "Static Democratic Republic of the Congo passport reference specimen"
+  const specimenLabel = isSenegal ? "Senegal CEDEAO identity card reference specimen" : isSouthAfrica ? "South Africa identity card reference specimen" : isPapuaNewGuinea ? "Papua New Guinea national ID reference specimen" : "Passport reference specimen"
 
   const randomizeSpecimen = () => {
-    if (isPapuaNewGuinea) {
+    if (isSenegal) {
+      setDetectedText(["REPUBLIQUE DU SENEGAL", "CARTE D'IDENTITE CEDEAO", "N° DE LA CARTE D'IDENTITE: 1 02 19910828 00011 3", "PRENOMS: OUSSEYNOU", "NOM: BODIAN", "DATE DE NAISSANCE: 28/08/1991", "SEXE: M", "TAILLE: 190 cm", "LIEU DE NAISSANCE: GUIDEL BAMBADINKA", "DATE DE DELIVRANCE: 16/05/2019", "DATE D'EXPIRATION: 15/05/2029", "CENTRE D'ENREGISTREMENT: COMM. DE PIKINE", "ADRESSE DU DOMICILE: GUINAW RAILS"])
+    } else if (isPapuaNewGuinea) {
       setDetectedText(["INDEPENDENT STATE OF PAPUA NEW GUINEA", "NATIONAL IDENTITY CARD", "SURNAME: MAREW", "GIVEN NAMES: THEODORE", "DATE OF BIRTH: 10-10-2000", "GENDER: Male", "NID No: 1330003246", "DATE OF ISSUE: 17-02-2021", "DATE OF EXPIRY: 17-02-2031"])
     } else {
       setDetectedText(isSouthAfrica
@@ -66,7 +69,7 @@ function App() {
             <section className="editor-panel" aria-label="Editor controls">
               <div className="panel-header"><div><h2>Screen content</h2><p>Customize the content shown to applicants.</p></div><span className="live-pill"><span /> Live</span></div>
               <div className="form-stack">
-                <label>Country / document<select value={country} onChange={(event) => { setCountry(event.target.value); setDetectedText(null) }}><option value="DRC">Democratic Republic of the Congo — Passport</option><option value="RSA">Republic of South Africa — Identity card</option><option value="PNG">Independent State of Papua New Guinea — National ID Card</option></select></label>
+                <label>Country / document<select value={country} onChange={(event) => { setCountry(event.target.value); setDetectedText(null) }}><option value="SEN">Republic of Senegal — National Identity Card (CEDEAO)</option><option value="DRC">Democratic Republic of the Congo — Passport</option><option value="RSA">Republic of South Africa — Identity card</option><option value="PNG">Independent State of Papua New Guinea — National ID Card</option></select></label>
                 <label>Screen title<input value={content.title} onChange={(event) => update("title", event.target.value)} /></label>
                 <label>Description<textarea rows={3} value={content.subtitle} onChange={(event) => update("subtitle", event.target.value)} /></label>
                 <label>Primary button label<input value={content.button} onChange={(event) => update("button", event.target.value)} /></label>
