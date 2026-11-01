@@ -316,6 +316,36 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileId: 'proof-of-account-pdf',
     fileName: 'proof_of_account__1__3c9d9253.pdf',
   },
+  '/assets/aistudio/image_f5a855c3.png': {
+    fileId: 'ghana-reference-png',
+    fileName: 'ghana_passport_reference_photo.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ghana_passport_reference.png': {
+    fileId: 'ghana-reference-spread-png',
+    fileName: 'ghana_passport_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ghana_passport_portrait.png': {
+    fileId: 'ghana-portrait-png',
+    fileName: 'ghana_passport_portrait.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ghana_passport_signature.png': {
+    fileId: 'ghana-signature-png',
+    fileName: 'ghana_passport_signature.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ghana_passport_ghost.png': {
+    fileId: 'ghana-ghost-portrait-png',
+    fileName: 'ghana_passport_ghost.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ghana_passport_barcode.png': {
+    fileId: 'ghana-barcode-png',
+    fileName: 'ghana_passport_barcode.png',
+    allowInlineImg: true,
+  },
   '/assets/aistudio/image_939e0f4a.png': {
     fileId: 'canada-reference-png',
     fileName: 'canada_passport_reference_photo.png',

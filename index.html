@@ -120,7 +120,7 @@
       #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back, #drc-passport-card, #bangladesh-passport-card, #germany-passport-card, #canada-passport-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back, #drc-passport-card, #bangladesh-passport-card, #germany-passport-card, #canada-passport-card, #ghana-passport-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
     }
 
     /* Seychelles National Identity Card Security Backgrounds */
@@ -1479,6 +1479,29 @@ var $ = window.$ || (id => document.getElementById(id));
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+      } else if (countryKey === 'ghana') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateGhaPreview === 'function') updateGhaPreview();
       } else if (countryKey === 'canada') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -1768,6 +1791,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-red-600 bg-gradient-to-br from-red-50 via-white to-red-50/50 text-red-950 text-left shadow-sm ring-2 ring-red-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-red-600"
+        },
+        ghana: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-amber-500 bg-gradient-to-br from-amber-50 via-white to-emerald-50/50 text-amber-950 text-left shadow-sm ring-2 ring-amber-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-amber-500"
         }
       };
 
@@ -1799,7 +1827,8 @@ var $ = window.$ || (id => document.getElementById(id));
         drcongo: 'Democratic Republic of the Congo',
         bangladesh: 'Bangladesh',
         germany: 'Germany',
-        canada: 'Canada'
+        canada: 'Canada',
+        ghana: 'Ghana'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -1829,6 +1858,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const bgdPassView = $('bangladesh-passport-view');
       const deuPassView = $('germany-passport-view');
       const canPassView = $('canada-passport-view');
+      const ghaPassView = $('ghana-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
@@ -1851,10 +1881,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (bgdPassView) bgdPassView.classList.add('hidden');
       if (deuPassView) deuPassView.classList.add('hidden');
       if (canPassView) canPassView.classList.add('hidden');
+      if (ghaPassView) ghaPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'ghana') {
+        if (ghaPassView) ghaPassView.classList.remove('hidden');
       } else if (currentCountry === 'canada') {
         if (canPassView) canPassView.classList.remove('hidden');
       } else if (currentCountry === 'germany') {
@@ -3402,6 +3435,357 @@ var $ = window.$ || (id => document.getElementById(id));
       document.addEventListener('DOMContentLoaded', initCanPassport);
     } else {
       initCanPassport();
+    }
+
+    // ================= REPUBLIC OF GHANA / PASSPORT · PASSEPORT (GHA) E-PASSPORT CONTROLLER =================
+    const GHA_DEFAULT_PHOTO = '/assets/aistudio/ghana_passport_portrait.png';
+    const GHA_SIGNATURE = '/assets/aistudio/ghana_passport_signature.png';
+    const GHA_GHOST = '/assets/aistudio/ghana_passport_ghost.png';
+    const GHA_BARCODE = '/assets/aistudio/ghana_passport_barcode.png';
+
+    const GHA_SPECIMEN = {
+      surname: 'OPOKU',
+      givenNames: 'EBENEZER',
+      passNo: 'G2866330',
+      dob: '1999-10-11',
+      sex: 'M',
+      nationality: 'GHANAIAN',
+      pob: 'ACCRA',
+      issue: '2020-04-23',
+      expiry: '2030-04-22',
+      placeOfIssue: 'ACCRA',
+      authority: 'PASSPORT OFFICE'
+    };
+
+    const GHA_SPECIMEN_MRZ = {
+      line1: 'P<GHAOPOKU<<EBENEZER<<<<<<<<<<<<<<<<<<<<<<<<',
+      line2: 'G2866330<0GHA9910115M3004227<<<<<<<<<<<<<<<0'
+    };
+
+    function ghaSetText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = (value == null ? '' : String(value));
+    }
+
+    const GHA_MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+    function ghaFormatDate(isoStr) {
+      if (!isoStr) return '';
+      const parts = String(isoStr).split('-');
+      if (parts.length !== 3) return String(isoStr).toUpperCase();
+      const yr = parts[0];
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const day = parts[2];
+      const mStr = GHA_MONTHS[mIdx] || 'JAN';
+      return `${day} ${mStr} ${yr}`;
+    }
+
+    function ghaIcaoWeight(char, pos) {
+      const weights = [7, 3, 1];
+      const w = weights[pos % 3];
+      const code = char.charCodeAt(0);
+      let val = 0;
+      if (code >= 48 && code <= 57) {
+        val = code - 48;
+      } else if (code >= 65 && code <= 90) {
+        val = code - 55;
+      } else {
+        val = 0;
+      }
+      return val * w;
+    }
+
+    function ghaCalculateCheckDigit(str) {
+      const clean = String(str || '').toUpperCase().replace(/[^A-Z0-9<]/g, '');
+      let sum = 0;
+      for (let i = 0; i < clean.length; i++) {
+        sum += ghaIcaoWeight(clean[i], i);
+      }
+      return sum % 10;
+    }
+
+    function ghaMrzClean(str) {
+      return String(str || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    function revealGhaPreview() {
+      const view = $('ghana-passport-view');
+      if (view && view.classList.contains('hidden') && typeof switchVerificationCountry === 'function') {
+        switchVerificationCountry('ghana');
+      }
+      const card = $('ghana-passport-card');
+      if (card && typeof card.scrollIntoView === 'function') {
+        try {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } catch (_) {
+          card.scrollIntoView();
+        }
+      }
+    }
+
+    function buildGhaMrz(fields) {
+      // Line 1: P<GHA + Surname + << + Given Names + < padding to 44
+      const surname = ghaMrzClean(fields.surname || '');
+      const given = ghaMrzClean(fields.givenNames || '');
+      const nameField = `${surname}<<${given}`;
+      const line1 = ('P<GHA' + nameField + '<'.repeat(44)).slice(0, 44);
+
+      // Line 2: PassNo(9) + CheckDigit(1) + GHA(3) + DOB(6) + CheckDigit(1) + Sex(1) + Expiry(6) + CheckDigit(1) + Optional(14) + CheckDigit(1)
+      const passClean = ghaMrzClean(fields.passNo || 'G2866330').slice(0, 9);
+      const passPad = (passClean + '<'.repeat(9)).slice(0, 9);
+      const passCheck = ghaCalculateCheckDigit(passPad);
+
+      const dobParts = String(fields.dob || '1999-10-11').split('-');
+      const dobStr = (dobParts.length === 3)
+        ? (dobParts[0].slice(-2) + dobParts[1] + dobParts[2])
+        : '991011';
+      const dobCheck = ghaCalculateCheckDigit(dobStr);
+
+      let sexChar = '<';
+      const rawSex = String(fields.sex || '').toUpperCase();
+      if (rawSex.includes('M')) sexChar = 'M';
+      else if (rawSex.includes('F')) sexChar = 'F';
+
+      const expParts = String(fields.expiry || '2030-04-22').split('-');
+      const expStr = (expParts.length === 3)
+        ? (expParts[0].slice(-2) + expParts[1] + expParts[2])
+        : '300422';
+      const expCheck = ghaCalculateCheckDigit(expStr);
+
+      const optionalField = '<'.repeat(15);
+      const compStr = passPad + passCheck + dobStr + dobCheck + expStr + expCheck + optionalField;
+      const compositeCheck = ghaCalculateCheckDigit(compStr);
+
+      const line2 = (passPad + passCheck + 'GHA' + dobStr + dobCheck + sexChar + expStr + expCheck + optionalField + compositeCheck + '<'.repeat(44)).slice(0, 44);
+      return { line1, line2 };
+    }
+
+    function readGhaFields() {
+      return {
+        surname: $('ghaInpSurname') ? $('ghaInpSurname').value.trim() : GHA_SPECIMEN.surname,
+        givenNames: $('ghaInpGivenNames') ? $('ghaInpGivenNames').value.trim() : GHA_SPECIMEN.givenNames,
+        passNo: $('ghaInpPassNo') ? $('ghaInpPassNo').value.trim() : GHA_SPECIMEN.passNo,
+        dob: $('ghaInpDob') ? $('ghaInpDob').value : GHA_SPECIMEN.dob,
+        sex: $('ghaInpSex') ? $('ghaInpSex').value.trim() : GHA_SPECIMEN.sex,
+        nationality: $('ghaInpNationality') ? $('ghaInpNationality').value.trim() : GHA_SPECIMEN.nationality,
+        pob: $('ghaInpPob') ? $('ghaInpPob').value.trim() : GHA_SPECIMEN.pob,
+        issue: $('ghaInpIssue') ? $('ghaInpIssue').value : GHA_SPECIMEN.issue,
+        expiry: $('ghaInpExpiry') ? $('ghaInpExpiry').value : GHA_SPECIMEN.expiry,
+        placeOfIssue: $('ghaInpPlaceOfIssue') ? $('ghaInpPlaceOfIssue').value.trim() : GHA_SPECIMEN.placeOfIssue,
+        authority: $('ghaInpAuthority') ? $('ghaInpAuthority').value.trim() : GHA_SPECIMEN.authority
+      };
+    }
+
+    function isGhaSpecimen(fields) {
+      const keys = ['surname', 'givenNames', 'passNo', 'sex', 'nationality', 'pob', 'placeOfIssue', 'authority'];
+      for (let i = 0; i < keys.length; i++) {
+        if (ghaMrzClean(fields[keys[i]]) !== ghaMrzClean(GHA_SPECIMEN[keys[i]])) return false;
+      }
+      if (String(fields.dob || '') !== GHA_SPECIMEN.dob) return false;
+      if (String(fields.issue || '') !== GHA_SPECIMEN.issue) return false;
+      if (String(fields.expiry || '') !== GHA_SPECIMEN.expiry) return false;
+      return true;
+    }
+
+    function updateGhaPreview() {
+      const fields = readGhaFields();
+      const passClean = (fields.passNo || 'G2866330').toUpperCase();
+      const spacedPass = passClean.split('').join(' ');
+
+      // Header controls & serial numbers
+      ghaSetText('ghaOutPassNoHeader', passClean);
+      ghaSetText('ghaOutPassNoPage3Perforated', spacedPass);
+
+      // Page 2 Data Fields
+      ghaSetText('ghaOutSurname', (fields.surname || 'OPOKU').toUpperCase());
+      ghaSetText('ghaOutGivenNames', (fields.givenNames || 'EBENEZER').toUpperCase());
+      ghaSetText('ghaOutNationality', (fields.nationality || 'GHANAIAN').toUpperCase());
+      ghaSetText('ghaOutDob', ghaFormatDate(fields.dob));
+      ghaSetText('ghaOutSex', (fields.sex || 'M').toUpperCase());
+      ghaSetText('ghaOutPob', (fields.pob || 'ACCRA').toUpperCase());
+      ghaSetText('ghaOutIssue', ghaFormatDate(fields.issue));
+      ghaSetText('ghaOutExpiry', ghaFormatDate(fields.expiry));
+      ghaSetText('ghaOutPlaceOfIssue', (fields.placeOfIssue || 'ACCRA').toUpperCase());
+      ghaSetText('ghaOutAuthority', (fields.authority || 'PASSPORT OFFICE').toUpperCase());
+
+      // MRZ
+      const mrz = isGhaSpecimen(fields) ? GHA_SPECIMEN_MRZ : buildGhaMrz(fields);
+      ghaSetText('ghaMrzLine1', mrz.line1);
+      ghaSetText('ghaMrzLine2', mrz.line2);
+    }
+
+    function setGhaFieldValues(data) {
+      const map = {
+        ghaInpSurname: data.surname,
+        ghaInpGivenNames: data.givenNames,
+        ghaInpPassNo: data.passNo,
+        ghaInpDob: data.dob,
+        ghaInpSex: data.sex,
+        ghaInpNationality: data.nationality,
+        ghaInpPob: data.pob,
+        ghaInpIssue: data.issue,
+        ghaInpExpiry: data.expiry,
+        ghaInpPlaceOfIssue: data.placeOfIssue,
+        ghaInpAuthority: data.authority
+      };
+      Object.keys(map).forEach(id => {
+        const el = $(id);
+        if (el && map[id] !== undefined) el.value = map[id];
+      });
+      updateGhaPreview();
+    }
+
+    function resetGhaPassportSpecimen() {
+      setGhaFieldValues(GHA_SPECIMEN);
+      resetGhaPhoto();
+    }
+
+    function randomizeGhaPassport() {
+      const surnames = ['MENSAH', 'OSEI', 'OWUSU', 'BOATENG', 'APPIAH', 'AGYEMANG', 'DARKO', 'FRIMPONG', 'ASANTE', 'OPOKU', 'ADDO', 'BONSU', 'KWARTENG', 'AMOAH', 'BAAH', 'SARPONG', 'ASARE', 'TWUMASI', 'YEBOAH', 'DANQUAH', 'QUAYE', 'LAMPTEY', 'ACKON', 'AGYAPONG'];
+      const maleGiven = ['KWAME', 'KOFI', 'KWABENA', 'KWAKU', 'YAW', 'KWESI', 'EBENEZER', 'SAMUEL', 'EMMANUEL', 'MICHAEL', 'JOSEPH', 'DANIEL', 'DAVID', 'ISAAC', 'BENJAMIN', 'PETER', 'RICHARD', 'SOLOMON'];
+      const femaleGiven = ['AKOSUA', 'ABENA', 'AKUA', 'YAA', 'AFIA', 'AMA', 'GRACE', 'MERCY', 'MARY', 'REBECCA', 'PATRICIA', 'ESTHER', 'ELIZABETH', 'DORIS', 'COMFORT', 'CHARLOTTE'];
+      const cities = ['ACCRA', 'KUMASI', 'TAMALE', 'SEKONDI-TAKORADI', 'SUNYANI', 'CAPE COAST', 'KOFORIDUA', 'HO', 'TEMA', 'TECHIMAN'];
+
+      const isFemale = Math.random() < 0.45;
+      const surname = surnames[Math.floor(Math.random() * surnames.length)];
+      const given = isFemale
+        ? femaleGiven[Math.floor(Math.random() * femaleGiven.length)]
+        : maleGiven[Math.floor(Math.random() * maleGiven.length)];
+
+      const birthYear = 1975 + Math.floor(Math.random() * 28);
+      const birthMonth = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
+      const birthDay = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
+      const dob = `${birthYear}-${birthMonth}-${birthDay}`;
+
+      const issueYear = 2018 + Math.floor(Math.random() * 5);
+      const issueMonth = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
+      const issueDay = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
+      const issue = `${issueYear}-${issueMonth}-${issueDay}`;
+
+      const expYear = issueYear + 10;
+      const expDay = String(Math.max(1, parseInt(issueDay, 10) - 1)).padStart(2, '0');
+      const expiry = `${expYear}-${issueMonth}-${expDay}`;
+
+      const city = cities[Math.floor(Math.random() * cities.length)];
+      const passNo = 'G' + String(2000000 + Math.floor(Math.random() * 7999999));
+
+      setGhaFieldValues({
+        surname,
+        givenNames: given,
+        passNo,
+        dob,
+        sex: isFemale ? 'F' : 'M',
+        nationality: 'GHANAIAN',
+        pob: city,
+        issue,
+        expiry,
+        placeOfIssue: city,
+        authority: 'PASSPORT OFFICE'
+      });
+      showToast('Randomized!', 'Generated realistic Ghanaian passport data.');
+    }
+
+    function resetGhaPhoto() {
+      const el = $('ghaOutPhotoMain');
+      if (el) el.setAttribute('src', GHA_DEFAULT_PHOTO);
+      const ghost = $('ghaOutGhostPhoto');
+      if (ghost) ghost.setAttribute('src', GHA_GHOST);
+      const input = $('ghaPhotoUpload');
+      if (input) input.value = '';
+      showToast('Photo Reset', 'Restored Ghanaian reference specimen portrait.');
+    }
+
+    function initGhaPassport() {
+      const uploader = $('ghaPhotoUpload');
+      if (uploader) {
+        uploader.addEventListener('change', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (evt) {
+            const src = evt.target.result;
+            const el = $('ghaOutPhotoMain');
+            if (el) el.setAttribute('src', src);
+            const ghost = $('ghaOutGhostPhoto');
+            if (ghost) ghost.setAttribute('src', src);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      updateGhaPreview();
+    }
+
+    function ghaSpecimenText() {
+      const fields = readGhaFields();
+      const mrz = isGhaSpecimen(fields) ? GHA_SPECIMEN_MRZ : buildGhaMrz(fields);
+      return [
+        'REPUBLIC OF GHANA / PASSPORT · PASSEPORT (GHA)',
+        'Type: P  |  Country Code: GHA  |  Passport No: ' + (fields.passNo || ''),
+        'Surname / Nom: ' + (fields.surname || ''),
+        'Given Names / Prénoms: ' + (fields.givenNames || ''),
+        'Nationality / Nationalité: ' + (fields.nationality || ''),
+        'Date of birth / Date de naissance: ' + ghaFormatDate(fields.dob),
+        'Sex / Sexe: ' + (fields.sex || ''),
+        'Place of birth / Lieu de naissance: ' + (fields.pob || ''),
+        'Date of issue / Date de délivrance: ' + ghaFormatDate(fields.issue),
+        'Date of expiry / Date d\'expiration: ' + ghaFormatDate(fields.expiry),
+        'Place of issue / Lieu de émission: ' + (fields.placeOfIssue || ''),
+        'Authority / Autorité: ' + (fields.authority || ''),
+        '',
+        mrz.line1,
+        mrz.line2
+      ].join('\n');
+    }
+
+    function copyGhaSpecimenData() {
+      const text = ghaSpecimenText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          showToast('Copied', 'Ghanaian passport details copied to clipboard.');
+        }).catch(function () {
+          showToast('Copy Failed', 'Clipboard permission was denied.');
+        });
+      } else {
+        showToast('Copy Failed', 'Clipboard is not available in this browser.');
+      }
+    }
+
+    function downloadGhaPassPNG() {
+      const card = $('ghana-passport-card');
+      if (!card) return;
+      if (typeof html2canvas !== 'function') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Ghana passport spread PNG');
+      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+        const link = document.createElement('a');
+        link.download = 'ghana-passport-' + (readGhaFields().passNo || 'G2866330') + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Ready!', 'Ghanaian Passport PNG generated successfully');
+      }).catch(function () {
+        showToast('Download Error', 'Could not export passport image');
+      });
+    }
+
+    function printGhaPassport() {
+      window.print();
+    }
+
+    window.updateGhaPreview = updateGhaPreview;
+    window.randomizeGhaPassport = randomizeGhaPassport;
+    window.resetGhaPassportSpecimen = resetGhaPassportSpecimen;
+    window.resetGhaPhoto = resetGhaPhoto;
+    window.copyGhaSpecimenData = copyGhaSpecimenData;
+    window.downloadGhaPassPNG = downloadGhaPassPNG;
+    window.printGhaPassport = printGhaPassport;
+    window.initGhaPassport = initGhaPassport;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGhaPassport);
+    } else {
+      initGhaPassport();
     }
 
     // ================= PROOF OF ACCOUNT & ADDRESS (GREY BANK LETTER & PDF) CONTROLLER =================
@@ -9143,7 +9527,8 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       updateBgdPreview();
       updateDeuPreview();
       updateCanPreview();
-      switchVerificationCountry('canada');
+      updateGhaPreview();
+      switchVerificationCountry('ghana');
     });
 
     // Explicit Window Bindings for all inline event handlers:
@@ -10308,6 +10693,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Canada</div>
                 <div class="text-[10px] font-medium text-slate-500">Passeport / Passport (CAN)</div>
+              </div>
+            </button>
+
+            <!-- Ghana -->
+            <button type="button" id="country-btn-ghana" onclick="switchVerificationCountry('ghana')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇬🇭</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Ghana</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport / Passeport (GHA)</div>
               </div>
             </button>
           </div>
@@ -18568,6 +18965,332 @@ COD REP DEM CONGO</div>
             </article>
 
             <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic biometric passport reproduction · Canada (Passport · Passeport / CAN) 2-page spread matching reference specimen with bilingual English/French fields, 6 autumn maple leaves, bearer signature, barcode, and ICAO Doc 9303 TD3 machine-readable zone.</p>
+          </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3H-6: REPUBLIC OF GHANA (PASSPORT · PASSEPORT / GHA) VIEW ================= -->
+      <div id="ghana-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  <span>Ghana</span>
+                </span>
+                <h2 class="text-lg font-black text-slate-900 mt-1">Ghanaian e-Passport (GHA)</h2>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="randomizeGhaPassport()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Ghanaian citizen data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <button type="button" onclick="resetGhaPassportSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Ebenezer Opoku reference specimen">
+                  <i class="fa-solid fa-rotate-left"></i> Specimen
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <!-- Surname / Nom -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpSurname">Surname / Nom</label>
+                <input id="ghaInpSurname" type="text" value="OPOKU" oninput="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Given Names / Prénoms -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpGivenNames">Given Names / Prénoms</label>
+                <input id="ghaInpGivenNames" type="text" value="EBENEZER" oninput="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Passport No. -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpPassNo">Passport No / No de passeport</label>
+                <input id="ghaInpPassNo" type="text" value="G2866330" maxlength="9" oninput="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Date of Birth -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpDob">Date of birth / Date de naissance</label>
+                <input id="ghaInpDob" type="date" value="1999-10-11" onchange="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
+              </div>
+
+              <!-- Sex / Sexe -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpSex">Sex / Sexe</label>
+                <select id="ghaInpSex" onchange="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800 bg-white">
+                  <option value="M" selected>M (Male)</option>
+                  <option value="F">F (Female)</option>
+                </select>
+              </div>
+
+              <!-- Nationality -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpNationality">Nationality / Nationalité</label>
+                <input id="ghaInpNationality" type="text" value="GHANAIAN" oninput="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Place of Birth -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpPob">Place of birth / Lieu de naissance</label>
+                <input id="ghaInpPob" type="text" value="ACCRA" oninput="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Place of Issue -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpPlaceOfIssue">Place of issue / Lieu de émission</label>
+                <input id="ghaInpPlaceOfIssue" type="text" value="ACCRA" oninput="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Date of Issue -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpIssue">Date of issue / Date de délivrance</label>
+                <input id="ghaInpIssue" type="date" value="2020-04-23" onchange="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
+              </div>
+
+              <!-- Date of Expiry -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpExpiry">Date of expiry / Date d'expiration</label>
+                <input id="ghaInpExpiry" type="date" value="2030-04-22" onchange="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
+              </div>
+
+              <!-- Authority -->
+              <div class="col-span-1 sm:col-span-2 space-y-1">
+                <label class="font-bold text-slate-600" for="ghaInpAuthority">Authority / Autorité</label>
+                <input id="ghaInpAuthority" type="text" value="PASSPORT OFFICE" oninput="updateGhaPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+              </div>
+            </div>
+
+            <!-- Photo Upload & Controls -->
+            <div class="pt-3 border-t border-slate-100 space-y-2">
+              <label class="font-bold text-xs text-slate-700 block">Bearer Photograph</label>
+              <div class="flex items-center gap-3">
+                <label class="grow px-3 py-2 rounded-xl border border-dashed border-amber-300 hover:border-amber-500 bg-amber-50/40 hover:bg-amber-50 text-amber-900 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span>Upload Passport Photo</span>
+                  <input id="ghaPhotoUpload" type="file" accept="image/*" class="hidden">
+                </label>
+                <button type="button" onclick="resetGhaPhoto()" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Export & Copy Actions -->
+            <div class="pt-3 border-t border-slate-100 flex flex-wrap gap-2">
+              <button type="button" onclick="downloadGhaPassPNG()" class="grow px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download"></i> Download PNG (Spread)
+              </button>
+              <button type="button" onclick="printGhaPassport()" class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors cursor-pointer flex items-center gap-2">
+                <i class="fa-solid fa-print"></i> Print
+              </button>
+              <button type="button" onclick="copyGhaSpecimenData()" class="px-3 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors cursor-pointer" title="Copy text data to clipboard">
+                <i class="fa-solid fa-copy"></i> Copy
+              </button>
+            </div>
+          </section>
+
+          <!-- Passport Preview Column -->
+          <section class="lg:col-span-7 flex flex-col items-center gap-4">
+            <div class="w-full flex items-center justify-between no-print px-1">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Republic of Ghana Biometric e-Passport 2-Page Spread</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <button type="button" onclick="downloadGhaPassPNG()" class="text-amber-700 hover:text-amber-800 font-bold flex items-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-image"></i> High-Res PNG
+                </button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="printGhaPassport()" class="text-slate-600 hover:text-slate-900 font-bold flex items-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-print"></i> Print / PDF
+                </button>
+                <span class="text-slate-300">|</span>
+                <a href="/assets/aistudio/image_f5a855c3.png" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-slate-700 flex items-center gap-1">
+                  <i class="fa-solid fa-image"></i> Reference Photo (PNG)
+                </a>
+              </div>
+            </div>
+
+            <!-- CARD SPREAD -->
+            <article id="ghana-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1b1e23] bg-[#fdfbf6]" style="aspect-ratio: 580 / 800; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+              <!-- Underlay clean reference composite for exact micro-guilloche patterns & watermarks -->
+              <img src="/assets/aistudio/ghana_passport_reference.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-45 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
+
+              <!-- ============ PAGE 3: OBSERVATIONS (TOP HALF) ============ -->
+              <section id="ghaTopPage" class="relative w-full overflow-hidden" style="height: 49.5%; container-type: inline-size; background: linear-gradient(180deg, #fdf8ed 0%, #fefcf7 50%, #fdf8ee 100%);">
+                <!-- SVG Guilloche Security Waves & Black Star Watermark -->
+                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 580 396" preserveAspectRatio="none" aria-hidden="true">
+                  <!-- Lathe waves in warm amber / green -->
+                  <g fill="none" stroke="#d97706" stroke-width="0.35" opacity="0.20">
+                    <circle cx="290" cy="190" r="140" />
+                    <circle cx="290" cy="190" r="110" />
+                    <circle cx="290" cy="190" r="80" />
+                    <path d="M 0 50 Q 290 110 580 50" />
+                    <path d="M 0 90 Q 290 150 580 90" />
+                    <path d="M 0 130 Q 290 190 580 130" />
+                  </g>
+                </svg>
+
+                <!-- Page 3 Header: OBSERVATIONS + Horizontal Rule + Page Number 3 -->
+                <div class="pt-[4%] px-[8%] relative flex flex-col items-center">
+                  <div class="font-serif font-black tracking-[0.2em] text-slate-800 text-[2.5cqw] uppercase">
+                    OBSERVATIONS
+                  </div>
+                  <div class="w-[60%] h-[1px] bg-slate-400/80 mt-1"></div>
+                </div>
+
+                <!-- Page Number 3 (Top Right) -->
+                <div class="absolute right-[6%] top-[3.5%] font-serif font-black text-[#d97706] text-[4.8cqw] select-none pointer-events-none">
+                  3
+                </div>
+
+                <!-- Left Vertical Laser-Perforated Passport Number (Dot Matrix) -->
+                <div class="absolute left-[3.5%] top-[12%] bottom-[12%] flex flex-col justify-center items-center pointer-events-none select-none z-10" style="width: 7%;">
+                  <div id="ghaOutPassNoPage3Perforated" class="font-mono font-bold tracking-[0.45em] text-slate-700/60" style="writing-mode: vertical-lr; transform: rotate(180deg); font-size: 2.7cqw; letter-spacing: 0.55em; text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 0 rgba(0,0,0,0.25);">
+                    G 2 8 6 6 3 3 0
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ BOOKLET SEAM DIVIDER ============ -->
+              <div class="relative w-full h-[5px] bg-gradient-to-b from-[#d5cbb8]/70 via-[#eee7d8] to-[#d8cfbe]/80 border-y border-slate-300/80 shadow-inner flex items-center justify-around pointer-events-none z-20">
+                <div class="w-full h-[1px] border-b border-dashed border-slate-500/30"></div>
+              </div>
+
+              <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF) ============ -->
+              <section id="ghaDataPage" class="relative w-full overflow-hidden" style="height: 49.8%; container-type: inline-size; background: linear-gradient(180deg, #fdfbf7 0%, #fefcf9 50%, #fdfbf6 100%);">
+                <!-- Top Header: Passport/ Passeport + Republic of Ghana + Passport No -->
+                <div class="pt-[2%] px-[4.5%] flex items-start justify-between">
+                  <!-- Left: Passport/ Passeport -->
+                  <div class="shrink-0 text-slate-800">
+                    <span class="font-bold text-[1.8cqw]">Passport/</span>
+                    <span class="font-bold italic text-[1.8cqw] text-slate-700 ml-0.5">Passeport</span>
+                  </div>
+
+                  <!-- Center: Republic of Ghana -->
+                  <div class="text-center font-bold text-slate-900 text-[2.7cqw] tracking-tight">
+                    Republic of Ghana
+                  </div>
+
+                  <!-- Right: Passport No / No de passeport -->
+                  <div class="shrink-0 text-right">
+                    <div class="text-slate-500 font-medium text-[1.15cqw]">Passport No/ No de passeport</div>
+                    <div id="ghaOutPassNoHeader" class="font-mono font-black text-slate-900 text-[2.2cqw] tracking-wider">G2866330</div>
+                  </div>
+                </div>
+
+                <!-- Control Bar: Type / Country Code -->
+                <div class="px-[4.5%] pt-[0.6%] flex items-center gap-12" style="font-size: 1.45cqw;">
+                  <div class="ml-[34%]">
+                    <span class="text-slate-500 font-medium text-[1.15cqw]">Type/Type</span>
+                    <div class="font-black text-slate-900 text-[1.95cqw]">P</div>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 font-medium text-[1.15cqw]">Country Code/ Code de Pays</span>
+                    <div class="font-black text-slate-900 text-[1.95cqw]">GHA</div>
+                  </div>
+                </div>
+
+                <!-- Main Content Area: Photo + Fields + Ghost Photo + Barcode -->
+                <div class="relative px-[4%] pt-[0.8%] flex items-start gap-[2%]">
+                  <!-- LEFT: Photo & Signature Column -->
+                  <div class="shrink-0 flex flex-col items-center" style="width: 27%;">
+                    <div class="w-full aspect-[35/45] rounded-xs overflow-hidden border border-slate-400 shadow-sm bg-slate-100">
+                      <img id="ghaOutPhotoMain" src="/assets/aistudio/ghana_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/ghana_passport_portrait.png'">
+                    </div>
+                    <div class="w-full mt-1 text-center">
+                      <div class="text-slate-500 font-medium text-[1.05cqw] leading-none whitespace-nowrap">Holder's signature/ Signature du titulaire</div>
+                      <div class="h-[24px] flex items-center justify-center mt-0.5">
+                        <img id="ghaOutSignatureImg" src="/assets/aistudio/ghana_passport_signature.png" alt="Signature" class="h-[22px] object-contain opacity-95 mix-blend-multiply" onerror="this.style.display='none'">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- CENTER & RIGHT: Field Grid -->
+                  <div class="grow grid grid-cols-12 gap-x-1.5 gap-y-[1px]" style="font-size: 1.55cqw; line-height: 1.2;">
+                    <!-- Surname / Nom -->
+                    <div class="col-span-8">
+                      <div class="text-slate-500 font-medium text-[1.15cqw]">Surname/ Nom</div>
+                      <div id="ghaOutSurname" class="font-black text-slate-900 text-[2.2cqw] tracking-tight">OPOKU</div>
+                    </div>
+                    <!-- Empty 4 cols for ghost photo space -->
+                    <div class="col-span-4 row-span-4 flex justify-center items-start pt-1">
+                      <div class="w-[52px] h-[58px] rounded-xs overflow-hidden opacity-65 mix-blend-multiply border border-slate-300/50 shadow-2xs">
+                        <img id="ghaOutGhostPhoto" src="/assets/aistudio/ghana_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover">
+                      </div>
+                    </div>
+
+                    <!-- Given Names / Prénoms -->
+                    <div class="col-span-8">
+                      <div class="text-slate-500 font-medium text-[1.15cqw]">Given Names/ Prénoms</div>
+                      <div id="ghaOutGivenNames" class="font-black text-slate-900 text-[2.1cqw] tracking-tight">EBENEZER</div>
+                    </div>
+
+                    <!-- Nationality / Nationalité -->
+                    <div class="col-span-8">
+                      <div class="text-slate-500 font-medium text-[1.15cqw]">Nationality/ Nationalité</div>
+                      <div id="ghaOutNationality" class="font-black text-slate-900 text-[1.95cqw]">GHANAIAN</div>
+                    </div>
+
+                    <!-- Date of birth / Date de naissance -->
+                    <div class="col-span-8">
+                      <div class="text-slate-500 font-medium text-[1.15cqw]">Date of birth/ Date de naissance</div>
+                      <div id="ghaOutDob" class="font-bold text-slate-900 text-[1.9cqw]">11 OCT 1999</div>
+                    </div>
+
+                    <!-- Sex / Sexe & Place of birth / Lieu de naissance -->
+                    <div class="col-span-2">
+                      <div class="text-slate-500 font-medium text-[1.1cqw]">Sex/ Sexe</div>
+                      <div id="ghaOutSex" class="font-black text-slate-900 text-[1.9cqw]">M</div>
+                    </div>
+                    <div class="col-span-10">
+                      <div class="text-slate-500 font-medium text-[1.1cqw]">Place of birth/ Lieu de naissance</div>
+                      <div id="ghaOutPob" class="font-black text-slate-900 text-[1.9cqw]">ACCRA</div>
+                    </div>
+
+                    <!-- Date of issue / Date de délivrance & Place of issue / Lieu de émission -->
+                    <div class="col-span-6">
+                      <div class="text-slate-500 font-medium text-[1.1cqw]">Date of issue/ Date de délivrance</div>
+                      <div id="ghaOutIssue" class="font-bold text-slate-900 text-[1.85cqw]">23 APR 2020</div>
+                    </div>
+                    <div class="col-span-6">
+                      <div class="text-slate-500 font-medium text-[1.1cqw]">Place of issue/ Lieu de émission</div>
+                      <div id="ghaOutPlaceOfIssue" class="font-black text-slate-900 text-[1.85cqw]">ACCRA</div>
+                    </div>
+
+                    <!-- Date of expiry / Date d'expiration & Authority / Autorité -->
+                    <div class="col-span-6">
+                      <div class="text-slate-500 font-medium text-[1.1cqw]">Date of expiry/ Date d'expiration</div>
+                      <div id="ghaOutExpiry" class="font-bold text-slate-900 text-[1.85cqw]">22 APR 2030</div>
+                    </div>
+                    <div class="col-span-6">
+                      <div class="text-slate-500 font-medium text-[1.1cqw]">Authority/ Autorité</div>
+                      <div id="ghaOutAuthority" class="font-black text-slate-900 text-[1.85cqw]">PASSPORT OFFICE</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stacked 2D Barcode (PDF417) Strip -->
+                <div class="mx-[4%] mt-[1%] h-[32px] flex items-center justify-center">
+                  <img src="/assets/aistudio/ghana_passport_barcode.png" alt="2D Barcode" class="w-full h-[28px] object-fill opacity-90" onerror="this.style.display='none'">
+                </div>
+
+                <!-- Machine Readable Zone (MRZ: ICAO Doc 9303 TD3 2 lines × 44 chars) -->
+                <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#fdfbf6]/85" style="height: 19.5%; padding-left: 4%; padding-right: 4%;">
+                  <div id="ghaMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                    P&lt;GHAOPOKU&lt;&lt;EBENEZER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                  </div>
+                  <div id="ghaMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                    G2866330&lt;0GHA9910115M3004227&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;0
+                  </div>
+                </div>
+              </section>
+            </article>
+
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic biometric passport reproduction · Republic of Ghana (Passport · Passeport / GHA) 2-page spread matching reference specimen with OBSERVATIONS header, Black Star watermark, laser-perforated serial number, stacked 2D barcode, and ICAO Doc 9303 TD3 machine-readable zone.</p>
           </section>
         </main>
       </div>
