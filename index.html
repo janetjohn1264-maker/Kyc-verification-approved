@@ -1556,7 +1556,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateZafIdPreview === 'function') updateZafIdPreview();
       } else if (countryKey === 'southafrica') {
-        currentDocType = 'idcard';
+        currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
         const dlTab = $('tab-doc-driverlicense');
@@ -1567,17 +1567,17 @@ var $ = window.$ || (id => document.getElementById(id));
         const dlRadio = $('driverlicense-radio-indicator');
         const refRadio = $('refugeecard-radio-indicator');
         const poaRadio = $('proofofaccount-radio-indicator');
-        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group";
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (typeof updateZafIdPreview === 'function') updateZafIdPreview();
+        if (typeof updateSaPassPreview === 'function') updateSaPassPreview();
       } else if (countryKey === 'drcongo') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -1597,7 +1597,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-indigo-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateDrcPreview === 'function') updateDrcPreview();
@@ -1709,6 +1709,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const seychellesDocView = $('seychelles-doc-view');
       const senegalPassView = $('senegal-passport-view');
       const senegalIdView = $('senegal-idcard-view');
+      const saPassView = $('southafrica-passport-view');
       const drcPassView = $('drcongo-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
@@ -1726,6 +1727,7 @@ var $ = window.$ || (id => document.getElementById(id));
       if (seychellesDocView) seychellesDocView.classList.add('hidden');
       if (senegalPassView) senegalPassView.classList.add('hidden');
       if (senegalIdView) senegalIdView.classList.add('hidden');
+      if (saPassView) saPassView.classList.add('hidden');
       if (drcPassView) drcPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
@@ -1734,7 +1736,7 @@ var $ = window.$ || (id => document.getElementById(id));
       } else if (currentCountry === 'drcongo') {
         if (drcPassView) drcPassView.classList.remove('hidden');
       } else if (currentCountry === 'southafrica') {
-        if (senegalIdView) senegalIdView.classList.remove('hidden');
+        if (saPassView) saPassView.classList.remove('hidden');
       } else if (currentCountry === 'senegal') {
         if (currentDocType === 'idcard' && senegalIdView) {
           senegalIdView.classList.remove('hidden');
@@ -4053,6 +4055,352 @@ var $ = window.$ || (id => document.getElementById(id));
     window.printZafCard = printZafCard;
     window.downloadZafCardPNG = downloadZafCardPNG;
     window.copyZafSpecimenData = copyZafSpecimenData;
+
+    // ================= REPUBLIC OF SOUTH AFRICA PASSPORT (ZAF — 2-PAGE SPREAD) CONTROLLER =================
+    var saPassViewMode = 'live';
+    var saPassIsCustomPhoto = false;
+    var saPassCurrentPhotoSrc = '/assets/aistudio/zaf_passport_portrait_exact.png';
+    var saPassRedactedMode = true; // Matches reference black redaction bars by default; toggleable to reveal live text
+
+    function setSaPassViewMode(mode) {
+      saPassViewMode = (mode === 'specimen') ? 'specimen' : 'live';
+      const liveEl = $('sa-pass-view-live');
+      const specEl = $('sa-pass-view-specimen');
+      const btnLive = $('sa-pass-mode-live');
+      const btnSpec = $('sa-pass-mode-specimen');
+      if (liveEl) liveEl.classList.toggle('hidden', saPassViewMode !== 'live');
+      if (specEl) specEl.classList.toggle('hidden', saPassViewMode !== 'specimen');
+      if (btnLive) {
+        btnLive.className = saPassViewMode === 'live'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+      }
+      if (btnSpec) {
+        btnSpec.className = saPassViewMode === 'specimen'
+          ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer'
+          : 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+      }
+    }
+
+    function setSaPassRedactionMode(isRedacted) {
+      saPassRedactedMode = Boolean(isRedacted);
+      updateSaPassPreview();
+      showToast(
+        saPassRedactedMode ? 'Reference Redaction Bars Enabled' : 'Live Unredacted Values Visible',
+        saPassRedactedMode
+          ? 'Showing exact black redaction bars from reference image'
+          : 'Revealed live Passport No, Identity No & MRZ Line 2'
+      );
+    }
+
+    function setSaPassPhoto(mode, customUrl) {
+      if (mode === 'custom' && customUrl) {
+        saPassIsCustomPhoto = true;
+        saPassCurrentPhotoSrc = customUrl;
+      } else {
+        saPassIsCustomPhoto = false;
+        saPassCurrentPhotoSrc = '/assets/aistudio/zaf_passport_portrait_exact.png';
+      }
+      updateSaPassPreview();
+      showToast('Portrait Updated', saPassIsCustomPhoto ? 'Applied custom bearer portrait to South Africa passport' : 'Restored reference portrait of Atul Kumar Gupta');
+    }
+
+    function resetSaPassPhoto() {
+      saPassIsCustomPhoto = false;
+      saPassCurrentPhotoSrc = '/assets/aistudio/zaf_passport_portrait_exact.png';
+      const inp = $('saPassPhotoInput');
+      if (inp) inp.value = '';
+      updateSaPassPreview();
+      showToast('Portrait Reset', 'Restored exact reference portrait');
+    }
+
+    function saMrzCharVal(ch) {
+      if (!ch || ch === '<') return 0;
+      if (ch >= '0' && ch <= '9') return ch.charCodeAt(0) - 48;
+      if (ch >= 'A' && ch <= 'Z') return ch.charCodeAt(0) - 55;
+      return 0;
+    }
+
+    function saMrzCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        sum += saMrzCharVal(str[i]) * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function saParseDateToYYMMDD(dateStr, fallbackYYMMDD) {
+      if (!dateStr) return fallbackYYMMDD;
+      const clean = dateStr.trim().toUpperCase();
+      const months = { JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06', JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
+      const m = clean.match(/^(\d{1,2})\s+([A-Z]{3})\s+(\d{4})$/);
+      if (m) {
+        const dd = m[1].padStart(2, '0');
+        const mm = months[m[2]] || '01';
+        const yy = m[3].slice(-2);
+        return yy + mm + dd;
+      }
+      return fallbackYYMMDD;
+    }
+
+    function computeSaPassMrz(type, country, surname, givenNames, passNo, dobStr, sex, expiryStr, idNo) {
+      const cleanType = (type || 'PM').toUpperCase().replace(/[^A-Z]/g, '').padEnd(2, '<').slice(0, 2);
+      const cleanCountry = (country || 'ZAF').toUpperCase().replace(/[^A-Z]/g, '').padEnd(3, '<').slice(0, 3);
+      const cleanSur = (surname || 'GUPTA').toUpperCase().replace(/[^A-Z ]/g, '').trim().replace(/\s+/g, '<');
+      const cleanGiv = (givenNames || 'ATUL KUMAR').toUpperCase().replace(/[^A-Z ]/g, '').trim().replace(/\s+/g, '<');
+      const line1Body = `${cleanType}${cleanCountry}${cleanSur}<<${cleanGiv}`;
+      const line1 = line1Body.padEnd(44, '<').slice(0, 44);
+
+      const cleanPass = (passNo || 'M00148293').toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(9, '<').slice(0, 9);
+      const passCD = saMrzCheckDigit(cleanPass);
+      const dobYYMMDD = saParseDateToYYMMDD(dobStr, '680614');
+      const dobCD = saMrzCheckDigit(dobYYMMDD);
+      const cleanSex = (sex || 'M').toUpperCase().replace(/[^MF<]/g, 'M').slice(0, 1) || 'M';
+      const expYYMMDD = saParseDateToYYMMDD(expiryStr, '250730');
+      const expCD = saMrzCheckDigit(expYYMMDD);
+      const cleanOptional = (idNo || '6806145829084').toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(14, '<').slice(0, 14);
+      const optCD = saMrzCheckDigit(cleanOptional);
+      const compositeSource = cleanPass + passCD + dobYYMMDD + dobCD + expYYMMDD + expCD + cleanOptional + optCD;
+      const compCD = saMrzCheckDigit(compositeSource);
+      const line2 = `${cleanPass}${passCD}${cleanCountry}${dobYYMMDD}${dobCD}${cleanSex}${expYYMMDD}${expCD}${cleanOptional}${optCD}${compCD}`.slice(0, 44);
+      return { line1, line2 };
+    }
+
+    function updateSaPassPreview() {
+      const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value.trim() : fb);
+      const setText = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+
+      const passType = getVal('saPassInputType', 'PM').toUpperCase();
+      const countryCode = getVal('saPassInputCountryCode', 'ZAF').toUpperCase();
+      const passNo = getVal('saPassInputPassNo', 'M00148293').toUpperCase();
+      const surname = getVal('saPassInputSurname', 'GUPTA').toUpperCase();
+      const givenNames = getVal('saPassInputGivenNames', 'ATUL KUMAR').toUpperCase();
+      const nationality = getVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN').toUpperCase();
+      const dob = getVal('saPassInputDob', '14 JUN 1968').toUpperCase();
+      const idNo = getVal('saPassInputIdNo', '6806145829084').toUpperCase();
+      const sex = getVal('saPassInputSex', 'M').toUpperCase();
+      const pob = getVal('saPassInputPob', 'IND').toUpperCase();
+      const issueDate = getVal('saPassInputIssueDate', '31 JUL 2015').toUpperCase();
+      const authority = getVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS').toUpperCase();
+      const expiryDate = getVal('saPassInputExpiryDate', '30 JUL 2025').toUpperCase();
+      const sigName = getVal('saPassInputSignature', 'AtulKumar');
+
+      setText('saPassPreviewType', passType);
+      setText('saPassPreviewCountryCode', countryCode);
+      setText('saPassPreviewPassNo', passNo);
+      setText('saPassToolbarNo', saPassRedactedMode ? 'REDACTED (REF)' : passNo);
+      setText('saPassPreviewSurname', surname);
+      setText('saPassPreviewGivenNames', givenNames);
+      setText('saPassPreviewNationality', nationality);
+      setText('saPassPreviewDob', dob);
+      setText('saPassPreviewIdNo', idNo);
+      setText('saPassPreviewSex', sex);
+      setText('saPassPreviewPob', pob);
+      setText('saPassPreviewIssueDate', issueDate);
+      setText('saPassPreviewAuthority', authority);
+      setText('saPassPreviewExpiryDate', expiryDate);
+      setText('saPassPreviewSigText', sigName);
+
+      const mrz = computeSaPassMrz(passType, countryCode, surname, givenNames, passNo, dob, sex, expiryDate, idNo);
+      setText('saPassPreviewMrz1', mrz.line1);
+      setText('saPassPreviewMrz2', mrz.line2);
+
+      // Toggle Redaction Bars
+      const barPass = $('saPassRedactBarPassNo');
+      const barId = $('saPassRedactBarIdNo');
+      const barMrz2 = $('saPassRedactBarMrz2');
+      if (barPass) barPass.classList.toggle('hidden', !saPassRedactedMode);
+      if (barId) barId.classList.toggle('hidden', !saPassRedactedMode);
+      if (barMrz2) barMrz2.classList.toggle('hidden', !saPassRedactedMode);
+
+      const btnRedacted = $('sa-btn-redact-on');
+      const btnUnredacted = $('sa-btn-redact-off');
+      if (btnRedacted) {
+        btnRedacted.className = saPassRedactedMode
+          ? 'px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-900 text-white shadow-2xs cursor-pointer transition'
+          : 'px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition';
+      }
+      if (btnUnredacted) {
+        btnUnredacted.className = !saPassRedactedMode
+          ? 'px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-700 text-white shadow-2xs cursor-pointer transition'
+          : 'px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition';
+      }
+
+      // Portrait & Ghost Portrait updates when custom photo is uploaded
+      const customPhotoWrap = $('saPassCustomPhotoWrap');
+      const customGhostWrap = $('saPassCustomGhostWrap');
+      const mainImg = $('saPassPreviewPhoto');
+      const ghostImg = $('saPassPreviewGhostPhoto');
+      if (mainImg) mainImg.src = saPassIsCustomPhoto ? saPassCurrentPhotoSrc : '/assets/aistudio/zaf_passport_portrait_exact.png';
+      if (ghostImg) ghostImg.src = saPassIsCustomPhoto ? saPassCurrentPhotoSrc : '/assets/aistudio/zaf_passport_ghost_exact.png';
+      if (customPhotoWrap) customPhotoWrap.classList.toggle('hidden', !saPassIsCustomPhoto);
+      if (customGhostWrap) customGhostWrap.classList.toggle('hidden', !saPassIsCustomPhoto);
+
+      // Signature image vs custom cursive text
+      const isCustomSig = sigName && sigName !== 'AtulKumar';
+      const sigImg = $('saPassSigImg');
+      const sigTxt = $('saPassPreviewSigText');
+      if (sigImg) sigImg.classList.toggle('hidden', Boolean(isCustomSig));
+      if (sigTxt) sigTxt.classList.toggle('hidden', !isCustomSig);
+    }
+
+    function loadSaPassPreset(presetKey) {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      if (presetKey === 'reference' || !presetKey) {
+        setVal('saPassInputType', 'PM');
+        setVal('saPassInputCountryCode', 'ZAF');
+        setVal('saPassInputPassNo', 'M00148293');
+        setVal('saPassInputSurname', 'GUPTA');
+        setVal('saPassInputGivenNames', 'ATUL KUMAR');
+        setVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN');
+        setVal('saPassInputDob', '14 JUN 1968');
+        setVal('saPassInputIdNo', '6806145829084');
+        setVal('saPassInputSex', 'M');
+        setVal('saPassInputPob', 'IND');
+        setVal('saPassInputIssueDate', '31 JUL 2015');
+        setVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS');
+        setVal('saPassInputExpiryDate', '30 JUL 2025');
+        setVal('saPassInputSignature', 'AtulKumar');
+        saPassIsCustomPhoto = false;
+        saPassCurrentPhotoSrc = '/assets/aistudio/zaf_passport_portrait_exact.png';
+        saPassRedactedMode = true;
+      } else if (presetKey === 'mokoena') {
+        setVal('saPassInputType', 'PM');
+        setVal('saPassInputCountryCode', 'ZAF');
+        setVal('saPassInputPassNo', 'A04928174');
+        setVal('saPassInputSurname', 'MOKOENA');
+        setVal('saPassInputGivenNames', 'SIPHO MANDLA');
+        setVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN');
+        setVal('saPassInputDob', '22 MAR 1985');
+        setVal('saPassInputIdNo', '8503225419082');
+        setVal('saPassInputSex', 'M');
+        setVal('saPassInputPob', 'ZAF');
+        setVal('saPassInputIssueDate', '14 AUG 2019');
+        setVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS');
+        setVal('saPassInputExpiryDate', '13 AUG 2029');
+        setVal('saPassInputSignature', 'S. Mokoena');
+        saPassRedactedMode = false;
+      } else if (presetKey === 'naidoo') {
+        setVal('saPassInputType', 'PM');
+        setVal('saPassInputCountryCode', 'ZAF');
+        setVal('saPassInputPassNo', 'M08371925');
+        setVal('saPassInputSurname', 'NAIDOO');
+        setVal('saPassInputGivenNames', 'PRIYA DEVI');
+        setVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN');
+        setVal('saPassInputDob', '09 NOV 1992');
+        setVal('saPassInputIdNo', '9211090384086');
+        setVal('saPassInputSex', 'F');
+        setVal('saPassInputPob', 'ZAF');
+        setVal('saPassInputIssueDate', '05 FEB 2021');
+        setVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS');
+        setVal('saPassInputExpiryDate', '04 FEB 2031');
+        setVal('saPassInputSignature', 'P. Naidoo');
+        saPassRedactedMode = false;
+      }
+      updateSaPassPreview();
+      showToast('Preset Loaded', `Loaded South Africa Passport profile: ${(presetKey || 'reference').toUpperCase()}`);
+    }
+
+    function randomizeSaPassport() {
+      const profiles = [
+        { type: 'PM', country: 'ZAF', passNo: 'M00148293', surname: 'GUPTA', given: 'ATUL KUMAR', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '14 JUN 1968', idNo: '6806145829084', sex: 'M', pob: 'IND', issue: '31 JUL 2015', auth: 'DEPT OF HOME AFFAIRS', expiry: '30 JUL 2025', sig: 'AtulKumar' },
+        { type: 'PM', country: 'ZAF', passNo: 'A04928174', surname: 'MOKOENA', given: 'SIPHO MANDLA', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '22 MAR 1985', idNo: '8503225419082', sex: 'M', pob: 'ZAF', issue: '14 AUG 2019', auth: 'DEPT OF HOME AFFAIRS', expiry: '13 AUG 2029', sig: 'S. Mokoena' },
+        { type: 'PM', country: 'ZAF', passNo: 'M08371925', surname: 'NAIDOO', given: 'PRIYA DEVI', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '09 NOV 1992', idNo: '9211090384086', sex: 'F', pob: 'ZAF', issue: '05 FEB 2021', auth: 'DEPT OF HOME AFFAIRS', expiry: '04 FEB 2031', sig: 'P. Naidoo' },
+        { type: 'PM', country: 'ZAF', passNo: 'A07164509', surname: 'DLAMINI', given: 'THABO NKOSINATHI', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '18 SEP 1989', idNo: '8909185192087', sex: 'M', pob: 'ZAF', issue: '20 OCT 2022', auth: 'DEPT OF HOME AFFAIRS', expiry: '19 OCT 2032', sig: 'T. Dlamini' },
+        { type: 'PM', country: 'ZAF', passNo: 'M06294810', surname: 'VAN DER MERWE', given: 'ANELIZE', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '03 APR 1994', idNo: '9404030175083', sex: 'F', pob: 'ZAF', issue: '12 JAN 2023', auth: 'DEPT OF HOME AFFAIRS', expiry: '11 JAN 2033', sig: 'A. vd Merwe' }
+      ];
+      const curSurname = ($('saPassInputSurname') && $('saPassInputSurname').value) ? $('saPassInputSurname').value.trim().toUpperCase() : '';
+      const pool = profiles.filter(item => item.surname !== curSurname);
+      const p = (pool.length ? pool : profiles)[Math.floor(Math.random() * (pool.length ? pool.length : profiles.length))];
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('saPassInputType', p.type);
+      setVal('saPassInputCountryCode', p.country);
+      setVal('saPassInputPassNo', p.passNo);
+      setVal('saPassInputSurname', p.surname);
+      setVal('saPassInputGivenNames', p.given);
+      setVal('saPassInputNationality', p.nat);
+      setVal('saPassInputDob', p.dob);
+      setVal('saPassInputIdNo', p.idNo);
+      setVal('saPassInputSex', p.sex);
+      setVal('saPassInputPob', p.pob);
+      setVal('saPassInputIssueDate', p.issue);
+      setVal('saPassInputAuthority', p.auth);
+      setVal('saPassInputExpiryDate', p.expiry);
+      setVal('saPassInputSignature', p.sig);
+      saPassRedactedMode = (p.surname === 'GUPTA');
+      updateSaPassPreview();
+      showToast('Passport Randomized', `Generated South Africa Passport data for ${p.given} ${p.surname}`);
+    }
+
+    function printSaPassport() {
+      window.print();
+    }
+
+    async function downloadSaPassPNG() {
+      const targetEl = $('sa-passport-card');
+      if (!targetEl) return;
+      try {
+        showToast('Rendering...', 'Generating high-resolution PNG of South Africa Passport...');
+        const canvas = await html2canvas(targetEl, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'south-africa-passport-specimen.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'South Africa Passport PNG generated');
+      } catch (err) {
+        console.error('html2canvas error:', err);
+      }
+    }
+
+    function copySaPassSpecimenData() {
+      const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value : fb);
+      const text = [
+        "REPUBLIC OF SOUTH AFRICA / REPUBLIQUE D'AFRIQUE DU SUD — PASSPORT (SPECIMEN)",
+        "TYPE: " + getVal('saPassInputType', 'PM'),
+        "COUNTRY CODE: " + getVal('saPassInputCountryCode', 'ZAF'),
+        "PASSPORT NO: " + getVal('saPassInputPassNo', 'M00148293'),
+        "SURNAME: " + getVal('saPassInputSurname', 'GUPTA'),
+        "GIVEN NAMES: " + getVal('saPassInputGivenNames', 'ATUL KUMAR'),
+        "NATIONALITY: " + getVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN'),
+        "DATE OF BIRTH: " + getVal('saPassInputDob', '14 JUN 1968'),
+        "IDENTITY NO: " + getVal('saPassInputIdNo', '6806145829084'),
+        "SEX: " + getVal('saPassInputSex', 'M'),
+        "PLACE OF BIRTH: " + getVal('saPassInputPob', 'IND'),
+        "DATE OF ISSUE: " + getVal('saPassInputIssueDate', '31 JUL 2015'),
+        "AUTHORITY: " + getVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS'),
+        "DATE OF EXPIRY: " + getVal('saPassInputExpiryDate', '30 JUL 2025')
+      ].join('\n');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Copied!', 'South Africa Passport specimen data copied to clipboard');
+        });
+      }
+    }
+
+    window.setSaPassViewMode = setSaPassViewMode;
+    window.setSaPassRedactionMode = setSaPassRedactionMode;
+    window.setSaPassPhoto = setSaPassPhoto;
+    window.resetSaPassPhoto = resetSaPassPhoto;
+    window.updateSaPassPreview = updateSaPassPreview;
+    window.loadSaPassPreset = loadSaPassPreset;
+    window.randomizeSaPassport = randomizeSaPassport;
+    window.printSaPassport = printSaPassport;
+    window.downloadSaPassPNG = downloadSaPassPNG;
+    window.copySaPassSpecimenData = copySaPassSpecimenData;
 
     // Seychelles National ID Specimen & Controls
     const officialSycSpecimenSrc = '/assets/aistudio/seychelles_front_card.jpg';
@@ -7166,6 +7514,22 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       }
       if (typeof updateZafIdPreview === 'function') updateZafIdPreview();
 
+      // South Africa Passport Photo upload listener
+      const saPassPhotoInput = $('saPassPhotoInput');
+      if (saPassPhotoInput) {
+        saPassPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              setSaPassPhoto('custom', ev.target.result);
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      if (typeof updateSaPassPreview === 'function') updateSaPassPreview();
+
       // Seychelles ID Photo upload
       const sycPhotoInput = $('sycPhotoInput');
       if (sycPhotoInput) {
@@ -8282,7 +8646,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               </div>
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">South Africa</div>
-                <div class="text-[10px] font-medium text-slate-500">Smart Identity Card (ZAF)</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport / Passeport (ZAF)</div>
               </div>
             </button>
 
@@ -14073,6 +14437,359 @@ MUQDISHO, BANAADIR, SOMALIA</span>
         </main>
       </div>
 
+      <!-- ================= STEP 3H-1: REPUBLIC OF SOUTH AFRICA PASSPORT VIEW (2-PAGE SPREAD: PAGE 48 + BIO-DATA PAGE) ================= -->
+      <div id="southafrica-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- ================= EDITOR CONTROLS ================= -->
+          <section class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <header class="flex items-start gap-3 pb-3 border-b border-slate-100">
+              <span class="text-2xl p-2 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center shrink-0">🇿🇦</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <h1 class="text-base font-bold text-slate-900">South Africa Passport</h1>
+                  <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">ZAF • SAMPLE — NOT VALID</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Exact 1:1 Reference Spread • Page 48 + Bio-Data Page • Live Editor</p>
+              </div>
+            </header>
+
+            <!-- Redaction Bars Mode Switcher (Exact Reference Redacted vs Live Unredacted) -->
+            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-eye-slash text-slate-700"></i> Redaction Bars:
+              </span>
+              <div class="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200">
+                <button type="button" id="sa-btn-redact-on" onclick="setSaPassRedactionMode(true)" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-900 text-white shadow-2xs cursor-pointer transition">
+                  Reference Redacted
+                </button>
+                <button type="button" id="sa-btn-redact-off" onclick="setSaPassRedactionMode(false)" class="px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition">
+                  Unredacted Text
+                </button>
+              </div>
+            </div>
+
+            <!-- Preset Holders & Randomizer -->
+            <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Reference &amp; Presets
+                </span>
+                <button type="button" onclick="randomizeSaPassport()" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs cursor-pointer">
+                  <i class="fa-solid fa-dice"></i> Randomize
+                </button>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 pt-0.5">
+                <button type="button" onclick="loadSaPassPreset('reference')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-800 border border-emerald-300 rounded-lg text-[10px] font-bold transition truncate cursor-pointer">
+                  ★ Gupta A.K. (Ref)
+                </button>
+                <button type="button" onclick="loadSaPassPreset('mokoena')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Mokoena Sipho
+                </button>
+                <button type="button" onclick="loadSaPassPreset('naidoo')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Naidoo Priya
+                </button>
+              </div>
+            </div>
+
+            <form id="saPassportForm" class="space-y-2.5" onsubmit="event.preventDefault();">
+              <!-- Portrait Upload -->
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="block text-[11px] font-bold uppercase text-slate-600">Bearer Portrait Photo</label>
+                  <button type="button" onclick="resetSaPassPhoto()" class="text-[10px] text-emerald-700 hover:underline font-semibold cursor-pointer">Reset Reference Photo</button>
+                </div>
+                <input type="file" id="saPassPhotoInput" accept="image/*" class="w-full text-[11px] text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-emerald-700 file:text-white hover:file:bg-emerald-800 border border-slate-200 rounded-lg p-1 bg-white cursor-pointer">
+              </div>
+
+              <!-- Type, Country Code, Passport No -->
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Type / Type</label>
+                  <input type="text" id="saPassInputType" value="PM" oninput="updateSaPassPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Country code</label>
+                  <input type="text" id="saPassInputCountryCode" value="ZAF" oninput="updateSaPassPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Passport No</label>
+                  <input type="text" id="saPassInputPassNo" value="M00148293" oninput="saPassRedactedMode = false; updateSaPassPreview();" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Surname & Given names -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Surname / Nom</label>
+                  <input type="text" id="saPassInputSurname" value="GUPTA" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Given names / Prénoms</label>
+                  <input type="text" id="saPassInputGivenNames" value="ATUL KUMAR" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Nationality -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Nationality / Nationalité</label>
+                <input type="text" id="saPassInputNationality" value="SOUTH AFRICAN / SUD-AFRICAIN" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+              </div>
+
+              <!-- Date of birth & Identity No -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date of birth</label>
+                  <input type="text" id="saPassInputDob" value="14 JUN 1968" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Identity No / No d&apos;identité</label>
+                  <input type="text" id="saPassInputIdNo" value="6806145829084" oninput="saPassRedactedMode = false; updateSaPassPreview();" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Sex, Place of birth, Authority -->
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Sex / Sexe</label>
+                  <select id="saPassInputSex" onchange="updateSaPassPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-white">
+                    <option value="M" selected>M</option>
+                    <option value="F">F</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Place of birth</label>
+                  <input type="text" id="saPassInputPob" value="IND" oninput="updateSaPassPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Authority / Autorité</label>
+                  <input type="text" id="saPassInputAuthority" value="DEPT OF HOME AFFAIRS" oninput="updateSaPassPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Date of issue & Date of expiry -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date of issue</label>
+                  <input type="text" id="saPassInputIssueDate" value="31 JUL 2015" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date of expiry</label>
+                  <input type="text" id="saPassInputExpiryDate" value="30 JUL 2025" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Holder's signature -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Holder&apos;s signature / Signature du titulaire</label>
+                <input type="text" id="saPassInputSignature" value="AtulKumar" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="pt-2 flex flex-wrap gap-2">
+                <button type="button" onclick="downloadSaPassPNG()" class="flex-1 bg-emerald-800 hover:bg-emerald-900 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm transition text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-download"></i> Save HD PNG
+                </button>
+                <button type="button" onclick="printSaPassport()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm transition text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-print"></i> Print
+                </button>
+                <button type="button" onclick="copySaPassSpecimenData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-3 rounded-xl border border-slate-200 transition text-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Copy Specimen Data">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- ================= LIVE PREVIEW PANEL ================= -->
+          <section class="lg:col-span-8 flex flex-col items-center">
+            <!-- View Mode Toolbar -->
+            <div class="w-full bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-2 no-print">
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="sa-pass-mode-live" onclick="setSaPassViewMode('live')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer">
+                  <i class="fa-solid fa-passport mr-1"></i> Live 1:1 South Africa Passport
+                </button>
+                <button type="button" id="sa-pass-mode-specimen" onclick="setSaPassViewMode('specimen')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                  <i class="fa-solid fa-image mr-1"></i> Original Reference Image
+                </button>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-1 rounded-lg">
+                  SAMPLE — NOT VALID
+                </span>
+                <span class="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold">
+                  No: <span id="saPassToolbarNo">REDACTED (REF)</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- 1. LIVE INTERACTIVE 1:1 SOUTH AFRICA PASSPORT SPREAD (541x761 EXACT PROPORTIONS) -->
+            <div id="sa-pass-view-live" class="w-full flex flex-col items-center">
+              <div class="w-full max-w-[600px] bg-white p-2 sm:p-3 rounded-2xl shadow-2xl border border-slate-300">
+                <article id="sa-passport-card"
+                         class="relative w-full aspect-[541/761] overflow-hidden select-none bg-[#f3f5ef]"
+                         style="container-type: inline-size; font-family: 'OCR B', 'Arial Narrow', 'Consolas', 'Courier New', monospace;">
+
+                  <!-- Clean 1:1 Reference Base Plate (Page 48 Top Page + Spine Fold + Republic of South Africa Bio-Data Page, Bilingual Green Labels, Protea Emblem & Integrated Portraits) -->
+                  <img src="/assets/aistudio/zaf_passport_base_plate.png"
+                       alt="Republic of South Africa Passport 2-Page Spread Base Plate"
+                       class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                  <!-- Custom Main Portrait Overlay (shown when user uploads a custom photo; x=22, y=456, w=135, h=167 in 541x761) -->
+                  <div id="saPassCustomPhotoWrap"
+                       class="hidden absolute z-10 overflow-hidden"
+                       style="left: 4.07%; top: 59.92%; width: 24.95%; height: 21.94%;">
+                    <img id="saPassPreviewPhoto"
+                         src="/assets/aistudio/zaf_passport_portrait_exact.png"
+                         alt="Passport Holder Portrait"
+                         class="w-full h-full object-cover object-top"
+                         style="filter: grayscale(100%) contrast(1.04) brightness(1.02);">
+                    <!-- Wavy security guilloche & latent circular seal overlay across lower portrait -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 135 167" preserveAspectRatio="none">
+                      <path d="M 0 151 Q 22 145, 45 153 T 90 151 T 135 153" fill="none" stroke="#454a44" stroke-width="1.2" opacity="0.65"/>
+                      <path d="M 0 159 Q 22 152, 45 160 T 90 158 T 135 160" fill="none" stroke="#5c625a" stroke-width="1.1" opacity="0.55"/>
+                      <circle cx="122" cy="118" r="28" fill="none" stroke="#d5ddd2" stroke-width="2.5" opacity="0.45"/>
+                    </svg>
+                  </div>
+
+                  <!-- Custom Secondary Ghost Portrait Overlay (shown when user uploads a custom photo; x=264, y=535, w=91, h=114 in 541x761) -->
+                  <div id="saPassCustomGhostWrap"
+                       class="hidden absolute z-10 overflow-hidden"
+                       style="left: 48.80%; top: 70.30%; width: 16.82%; height: 14.98%;">
+                    <img id="saPassPreviewGhostPhoto"
+                         src="/assets/aistudio/zaf_passport_ghost_exact.png"
+                         alt="Passport Ghost Portrait"
+                         class="w-full h-full object-cover object-top opacity-60"
+                         style="filter: grayscale(100%) contrast(0.95) brightness(1.12); mix-blend-mode: multiply;">
+                  </div>
+
+                  <!-- ================= BIO-DATA PAGE DYNAMIC FIELDS (EXACT PIXEL COORDINATES IN 541x761) ================= -->
+
+                  <!-- Type / Type (x=170, y=422 in 541x761) -->
+                  <div id="saPassPreviewType"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.42%; top: 55.45%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">PM</div>
+
+                  <!-- Country code / Code du pays (x=235, y=422 in 541x761) -->
+                  <div id="saPassPreviewCountryCode"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 43.44%; top: 55.45%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">ZAF</div>
+
+                  <!-- Passport No / No du passeport (x=352, y=422 in 541x761) -->
+                  <div id="saPassPreviewPassNo"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 65.06%; top: 55.45%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">M00148293</div>
+
+                  <!-- Exact Reference Black Redaction Bar over Passport No (x=352..439, y=421..434 in 541x761) -->
+                  <div id="saPassRedactBarPassNo"
+                       class="absolute z-30 bg-[#020202]"
+                       style="left: 65.06%; top: 55.32%; width: 16.27%; height: 1.84%;"></div>
+
+                  <!-- Surname / Nom (x=169, y=448 in 541x761) -->
+                  <div id="saPassPreviewSurname"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.24%; top: 58.87%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">GUPTA</div>
+
+                  <!-- Given names / Prénoms (x=169, y=475 in 541x761) -->
+                  <div id="saPassPreviewGivenNames"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.24%; top: 62.42%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">ATUL KUMAR</div>
+
+                  <!-- Nationality / Nationalité (x=170, y=502 in 541x761) -->
+                  <div id="saPassPreviewNationality"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.42%; top: 65.97%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.035em; transform: scaleX(0.90); transform-origin: left top;">SOUTH AFRICAN / SUD-AFRICAIN</div>
+
+                  <!-- Date of birth / Date de naissance (x=171, y=530 in 541x761) -->
+                  <div id="saPassPreviewDob"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.61%; top: 69.65%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">14 JUN 1968</div>
+
+                  <!-- Identity No / No d'identité (x=356, y=530 in 541x761) -->
+                  <div id="saPassPreviewIdNo"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 65.80%; top: 69.65%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.03em; transform: scaleX(0.90); transform-origin: left top;">6806145829084</div>
+
+                  <!-- Exact Reference Black Redaction Bar over Identity No leaving leading '6' edge visible (x=359..444, y=529..541 in 541x761) -->
+                  <div id="saPassRedactBarIdNo"
+                       class="absolute z-30 bg-[#020202]"
+                       style="left: 66.36%; top: 69.51%; width: 15.89%; height: 1.71%;"></div>
+
+                  <!-- Sex / Sexe (x=170, y=558 in 541x761) -->
+                  <div id="saPassPreviewSex"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.42%; top: 73.32%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; transform: scaleX(0.92); transform-origin: left top;">M</div>
+
+                  <!-- Place of birth / Lieu de naissance (x=236, y=558 in 541x761) -->
+                  <div id="saPassPreviewPob"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 43.62%; top: 73.32%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">IND</div>
+
+                  <!-- Date of issue / Date de délivrance (x=172, y=587 in 541x761) -->
+                  <div id="saPassPreviewIssueDate"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.79%; top: 77.14%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">31 JUL 2015</div>
+
+                  <!-- Authority / Autorité (x=357, y=586 in 541x761) -->
+                  <div id="saPassPreviewAuthority"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 65.99%; top: 77.00%; font-size: 2.32cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.025em; transform: scaleX(0.88); transform-origin: left top;">DEPT OF HOME AFFAIRS</div>
+
+                  <!-- Date of expiry / Date d'expiration (x=172, y=615 in 541x761) -->
+                  <div id="saPassPreviewExpiryDate"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
+                       style="left: 31.79%; top: 80.81%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">30 JUL 2025</div>
+
+                  <!-- Holder's signature / Signature du titulaire (Exact Transparent Ink Overlay: x=396, y=612, w=97, h=38 in 541x761) -->
+                  <img id="saPassSigImg"
+                       src="/assets/aistudio/zaf_passport_signature_transparent.png"
+                       alt="Holder Signature AtulKumar"
+                       class="absolute z-20 object-contain object-left pointer-events-none select-none"
+                       style="left: 73.20%; top: 80.42%; width: 17.93%; height: 4.99%;">
+
+                  <!-- Custom Holder Signature Text Fallback when edited away from 'AtulKumar' -->
+                  <div id="saPassPreviewSigText"
+                       class="hidden absolute z-20 italic text-[#252825] whitespace-nowrap leading-none pointer-events-none"
+                       style="left: 73.50%; top: 81.20%; font-size: 2.85cqw; font-family: 'Georgia', 'Times New Roman', serif;">AtulKumar</div>
+
+                  <!-- ================= MACHINE READABLE ZONE (2-LINE ICAO 9303 TD3 MRZ) ================= -->
+                  <!-- MRZ Line 1 (x=23, y=680 in 541x761) -->
+                  <div id="saPassPreviewMrz1"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2b2e2b]"
+                       style="left: 4.25%; top: 89.22%; font-size: 2.48cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.108em;">PMZAFGUPTA&lt;&lt;ATUL&lt;KUMAR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+
+                  <!-- MRZ Line 2 (x=23, y=706 in 541x761) -->
+                  <div id="saPassPreviewMrz2"
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2b2e2b]"
+                       style="left: 4.25%; top: 92.77%; font-size: 2.48cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.108em;">M001482934ZAF6806149M25073026806145829084&lt;52</div>
+
+                  <!-- Exact Reference Black Redaction Bar over MRZ Line 2 leaving left edge of 'M' visible (x=26..505, y=707..719 in 541x761) -->
+                  <div id="saPassRedactBarMrz2"
+                       class="absolute z-30 bg-[#020202]"
+                       style="left: 4.81%; top: 92.90%; width: 88.72%; height: 1.71%;"></div>
+
+                </article>
+              </div>
+            </div>
+
+            <!-- 2. ORIGINAL PROVIDED REFERENCE IMAGE VIEW -->
+            <div id="sa-pass-view-specimen" class="hidden w-full flex flex-col items-center">
+              <div class="w-full max-w-[600px] bg-white p-3 sm:p-4 rounded-2xl shadow-xl border border-slate-200">
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-check-double text-emerald-600"></i> Attached Reference Image (1:1 Source)
+                  </span>
+                  <span class="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">REPUBLIC OF SOUTH AFRICA (ZAF)</span>
+                </div>
+                <img src="/assets/aistudio/Atul-Passport-Redacted_d5459d4d.jpg"
+                     alt="Original Reference Republic of South Africa Passport"
+                     class="w-full h-auto rounded-xl border border-slate-200 shadow-sm">
+              </div>
+            </div>
+          </section>
+
+        </main>
+      </div>
+
       <!-- ================= STEP 3H-2: DEMOCRATIC REPUBLIC OF THE CONGO PASSPORT VIEW ================= -->
       <div id="drcongo-passport-view" class="hidden">
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -16267,6 +16984,14 @@ COD REP DEM CONGO</div>
           docType: 'idcard',
           fnName: 'downloadZafCardPNG'
         },
+        'southafrica-passport-png': {
+          fileId: 'southafrica-passport-png',
+          fileName: 'south-africa-passport-demo.png',
+          docTitle: 'Republic of South Africa — Biometric Passport (HD PNG)',
+          country: 'southafrica',
+          docType: 'passport',
+          fnName: 'downloadSaPassPNG'
+        },
         'drcongo-passport-png': {
           fileId: 'drcongo-passport-png',
           fileName: 'drcongo-passport-demo.png',
@@ -16306,7 +17031,7 @@ COD REP DEM CONGO</div>
         const d = (typeof currentDocType !== 'undefined' && currentDocType) ? currentDocType : 'passport';
         if (d === 'proofofaccount') return 'proof-of-account-png';
         if (c === 'drcongo') return 'drcongo-passport-png';
-        if (c === 'southafrica') return 'zaf-id-png';
+        if (c === 'southafrica') return 'southafrica-passport-png';
         if (c === 'senegal') return d === 'idcard' ? 'zaf-id-png' : 'senegal-passport-png';
         if (c === 'seychelles') return 'seychelles-id-png';
         if (c === 'pakistan') return 'pakistan-id-both-png';
@@ -16666,6 +17391,7 @@ COD REP DEM CONGO</div>
         if (onclickAttr.includes('printPakCard')) return 'pakistan-id-both-png';
         if (onclickAttr.includes('downloadSycCardPNG') || onclickAttr.includes('printSycCard')) return 'seychelles-id-png';
         if (onclickAttr.includes('downloadZafCardPNG') || onclickAttr.includes('printZafCard')) return 'zaf-id-png';
+        if (onclickAttr.includes('downloadSaPassPNG') || onclickAttr.includes('printSaPassport')) return 'southafrica-passport-png';
         if (onclickAttr.includes('downloadSenegalPassPNG') || onclickAttr.includes('printSenegalPassport')) return 'senegal-passport-png';
         if (onclickAttr.includes('downloadDrcPassPNG') || onclickAttr.includes('printDrcPassport')) return 'drcongo-passport-png';
         if (onclickAttr.includes('downloadProofOfAccountPNG') || onclickAttr.includes('printProofOfAccount')) return 'proof-of-account-png';
@@ -17165,11 +17891,13 @@ COD REP DEM CONGO</div>
         downloadSeychellesPNG: () => 'seychelles-id-png',
         printSycCard: () => 'seychelles-id-png',
         printSeychellesDoc: () => 'seychelles-id-png',
-        // Senegal ECOWAS Biometric Passport & National Identity Card (ZAF)
+        // Senegal ECOWAS Biometric Passport & National Identity Card (ZAF) + South Africa Passport
         downloadSenegalPassPNG: () => 'senegal-passport-png',
         printSenegalPassport: () => 'senegal-passport-png',
         downloadZafCardPNG: () => 'zaf-id-png',
         printZafCard: () => 'zaf-id-png',
+        downloadSaPassPNG: () => 'southafrica-passport-png',
+        printSaPassport: () => 'southafrica-passport-png',
         // DR Congo Biometric Passport
         downloadDrcPassPNG: () => 'drcongo-passport-png',
         printDrcPassport: () => 'drcongo-passport-png',
