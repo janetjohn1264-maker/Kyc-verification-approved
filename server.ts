@@ -316,6 +316,41 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileId: 'proof-of-account-pdf',
     fileName: 'proof_of_account__1__3c9d9253.pdf',
   },
+  '/assets/aistudio/image_939e0f4a.png': {
+    fileId: 'canada-reference-png',
+    fileName: 'canada_passport_reference_photo.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/canada_passport_reference.png': {
+    fileId: 'canada-reference-spread-png',
+    fileName: 'canada_passport_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/canada_passport_portrait.png': {
+    fileId: 'canada-portrait-png',
+    fileName: 'canada_passport_portrait.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/canada_passport_signature.png': {
+    fileId: 'canada-signature-png',
+    fileName: 'canada_passport_signature.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/canada_passport_ghost.png': {
+    fileId: 'canada-ghost-portrait-png',
+    fileName: 'canada_passport_ghost.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/canada_maple_leaves.png': {
+    fileId: 'canada-leaves-png',
+    fileName: 'canada_maple_leaves.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/canada_passport_barcode.png': {
+    fileId: 'canada-barcode-png',
+    fileName: 'canada_passport_barcode.png',
+    allowInlineImg: true,
+  },
   '/assets/aistudio/image_f62ff4c3.png': {
     fileId: 'germany-reference-png',
     fileName: 'germany_passport_reference_photo.png',
