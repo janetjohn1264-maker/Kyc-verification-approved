@@ -1216,6 +1216,7 @@ var $ = window.$ || (id => document.getElementById(id));
       };
       showToast(docTitles[docType] || 'Document Selected', `Switched specimen generator to ${docDescs[docType] || 'official document'}`);
     }
+    window.switchVerificationDocType = switchVerificationDoc;
 
     // Switch Country: 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda'
     function switchVerificationCountry(countryKey) {
@@ -1338,7 +1339,8 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       } else if (countryKey === 'senegal') {
-        currentDocType = 'passport';
+        currentDocType = 'idcard';
+        const isIdMode = true;
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
         const dlTab = $('tab-doc-driverlicense');
@@ -1349,16 +1351,48 @@ var $ = window.$ || (id => document.getElementById(id));
         const dlRadio = $('driverlicense-radio-indicator');
         const refRadio = $('refugeecard-radio-indicator');
         const poaRadio = $('proofofaccount-radio-indicator');
-        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group";
-        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passTab) passTab.className = isIdMode
+          ? "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group"
+          : "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = isIdMode
+          ? "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group"
+          : "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
-        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (passRadio) passRadio.className = isIdMode
+          ? "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0"
+          : "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = isIdMode
+          ? "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0"
+          : "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateZafIdPreview === 'function') updateZafIdPreview();
+      } else if (countryKey === 'southafrica') {
+        currentDocType = 'idcard';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50/90 via-emerald-50/30 to-white text-slate-900 shadow-md ring-2 ring-emerald-600/20 transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-emerald-700 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateZafIdPreview === 'function') updateZafIdPreview();
       } else if (countryKey === 'drcongo') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -1394,6 +1428,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-emerald-600"
+        },
+        southafrica: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50 via-white to-amber-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-emerald-700"
         },
         somalia: {
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50 via-white to-sky-50/50 text-sky-950 text-left shadow-sm ring-2 ring-sky-500/20 transition-all cursor-pointer",
@@ -1454,6 +1493,7 @@ var $ = window.$ || (id => document.getElementById(id));
         kenya: 'Kenya',
         somalia: 'Somalia',
         senegal: 'Senegal',
+        southafrica: 'South Africa',
         ethiopia: 'Ethiopia',
         nigeria: 'Nigeria',
         uk: 'United Kingdom',
@@ -1483,6 +1523,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const pakistanDocView = $('pakistan-doc-view');
       const seychellesDocView = $('seychelles-doc-view');
       const senegalPassView = $('senegal-passport-view');
+      const senegalIdView = $('senegal-idcard-view');
       const drcPassView = $('drcongo-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
@@ -1499,6 +1540,7 @@ var $ = window.$ || (id => document.getElementById(id));
       if (pakistanDocView) pakistanDocView.classList.add('hidden');
       if (seychellesDocView) seychellesDocView.classList.add('hidden');
       if (senegalPassView) senegalPassView.classList.add('hidden');
+      if (senegalIdView) senegalIdView.classList.add('hidden');
       if (drcPassView) drcPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
@@ -1506,8 +1548,14 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaDocView) poaDocView.classList.remove('hidden');
       } else if (currentCountry === 'drcongo') {
         if (drcPassView) drcPassView.classList.remove('hidden');
+      } else if (currentCountry === 'southafrica') {
+        if (senegalIdView) senegalIdView.classList.remove('hidden');
       } else if (currentCountry === 'senegal') {
-        if (senegalPassView) senegalPassView.classList.remove('hidden');
+        if (currentDocType === 'idcard' && senegalIdView) {
+          senegalIdView.classList.remove('hidden');
+        } else if (senegalPassView) {
+          senegalPassView.classList.remove('hidden');
+        }
       } else if (currentCountry === 'seychelles') {
         if (seychellesDocView) seychellesDocView.classList.remove('hidden');
       } else if (currentCountry === 'pakistan') {
@@ -3195,6 +3243,207 @@ var $ = window.$ || (id => document.getElementById(id));
     window.printSenegalPassport = printSenegalPassport;
     window.downloadSenegalPassPNG = downloadSenegalPassPNG;
     window.copySenegalSpecimenData = copySenegalSpecimenData;
+
+    // ================= NATIONAL IDENTITY CARD (REPUBLIC OF SOUTH AFRICA / SENEGAL ID VIEW) CONTROLLER =================
+    var zafCurrentViewMode = 'card';
+    var zafIsCustomPhoto = false;
+    var zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
+
+    function setZafViewMode(mode) {
+      zafCurrentViewMode = mode || 'card';
+      const cardEl = $('zaf-view-card');
+      const specEl = $('zaf-view-specimen');
+      const btnCard = $('zaf-tab-card');
+      const btnSpec = $('zaf-tab-specimen');
+      if (cardEl) cardEl.classList.toggle('hidden', zafCurrentViewMode !== 'card');
+      if (specEl) specEl.classList.toggle('hidden', zafCurrentViewMode !== 'specimen');
+      [btnCard, btnSpec].forEach(b => {
+        if (b) {
+          b.classList.remove('bg-emerald-700', 'text-white', 'shadow-xs');
+          b.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+        }
+      });
+      const activeBtn = zafCurrentViewMode === 'specimen' ? btnSpec : btnCard;
+      if (activeBtn) {
+        activeBtn.classList.add('bg-emerald-700', 'text-white', 'shadow-xs');
+        activeBtn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+      }
+    }
+
+    function setZafIdPhoto(mode, customUrl) {
+      if (mode === 'custom' && customUrl) {
+        zafIsCustomPhoto = true;
+        zafCurrentPhotoSrc = customUrl;
+      } else {
+        zafIsCustomPhoto = false;
+        zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
+      }
+      updateZafIdPreview();
+      showToast('Portrait Updated', zafIsCustomPhoto ? 'Applied custom bearer portrait' : 'Restored reference portrait of Lebohang Rebecca Mashego');
+    }
+
+    function resetZafIdPhoto() {
+      zafIsCustomPhoto = false;
+      zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
+      const inp = $('zafPhotoInput');
+      if (inp) inp.value = '';
+      updateZafIdPreview();
+      showToast('Portrait Reset', 'Restored exact reference portrait');
+    }
+
+    function updateZafIdPreview() {
+      const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value.trim() : fb);
+      const setText = (id, val) => { const el = $(id); if (el) el.textContent = val; };
+
+      const surname = getVal('zafInputSurname', 'MASHEGO').toUpperCase();
+      const forenames = getVal('zafInputForenames', 'LEBOHANG REBECCA').toUpperCase();
+      const dob = getVal('zafInputDob', '1993 08 24').toUpperCase();
+      const idNumber = getVal('zafInputIdNumber', '930824 0123 08 7').toUpperCase();
+      const nationality = getVal('zafInputNationality', 'ZAF').toUpperCase();
+      const gender = getVal('zafInputGender', 'F').toUpperCase();
+      const issueDate = getVal('zafInputIssueDate', '2022-11-10');
+      const sigName = getVal('zafInputSignature', 'L. Mashego');
+
+      setText('zafPreviewSurname', surname);
+      setText('zafPreviewForenames', forenames);
+      setText('zafPreviewDob', dob);
+      setText('zafPreviewIdNumber', idNumber);
+      setText('zafPreviewNationality', nationality);
+      setText('zafPreviewGender', gender);
+      setText('zafPreviewIssueDate', issueDate);
+      setText('zafPreviewSignature', sigName);
+
+      document.querySelectorAll('.zaf-avatar-img').forEach(img => {
+        img.src = zafIsCustomPhoto ? zafCurrentPhotoSrc : '/assets/aistudio/zaf_id_portrait_exact.png';
+      });
+
+      const isCustomSig = sigName && sigName !== 'L. Mashego';
+      document.querySelectorAll('.zaf-sig-img').forEach(img => {
+        img.classList.toggle('hidden', Boolean(isCustomSig));
+      });
+      document.querySelectorAll('.zaf-sig-text').forEach(el => {
+        el.classList.toggle('hidden', !isCustomSig);
+      });
+    }
+
+    function loadZafIdPreset(presetKey) {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      if (presetKey === 'reference' || !presetKey) {
+        setVal('zafInputSurname', 'MASHEGO');
+        setVal('zafInputForenames', 'LEBOHANG REBECCA');
+        setVal('zafInputDob', '1993 08 24');
+        setVal('zafInputIdNumber', '930824 0123 08 7');
+        setVal('zafInputNationality', 'ZAF');
+        setVal('zafInputGender', 'F');
+        setVal('zafInputIssueDate', '2022-11-10');
+        setVal('zafInputSignature', 'L. Mashego');
+        zafIsCustomPhoto = false;
+        zafCurrentPhotoSrc = '/assets/aistudio/zaf_id_portrait_exact.png';
+      } else if (presetKey === 'sipho') {
+        setVal('zafInputSurname', 'NDLOVU');
+        setVal('zafInputForenames', 'SIPHO MANDLA');
+        setVal('zafInputDob', '1989 04 15');
+        setVal('zafInputIdNumber', '890415 5182 08 4');
+        setVal('zafInputNationality', 'ZAF');
+        setVal('zafInputGender', 'M');
+        setVal('zafInputIssueDate', '2023-06-18');
+        setVal('zafInputSignature', 'S. Ndlovu');
+      } else if (presetKey === 'thandiwe') {
+        setVal('zafInputSurname', 'KHUMALO');
+        setVal('zafInputForenames', 'THANDIWE GRACE');
+        setVal('zafInputDob', '1997 11 03');
+        setVal('zafInputIdNumber', '971103 0429 08 1');
+        setVal('zafInputNationality', 'ZAF');
+        setVal('zafInputGender', 'F');
+        setVal('zafInputIssueDate', '2024-02-14');
+        setVal('zafInputSignature', 'T. Khumalo');
+      }
+      updateZafIdPreview();
+      showToast('Preset Loaded', `Loaded identity card profile: ${presetKey.toUpperCase()}`);
+    }
+
+    function randomizeZafIdCard() {
+      const profiles = [
+        { surname: 'MASHEGO', forenames: 'LEBOHANG REBECCA', dob: '1993 08 24', id: '930824 0123 08 7', nat: 'ZAF', gender: 'F', issue: '2022-11-10', sig: 'L. Mashego' },
+        { surname: 'NDLOVU', forenames: 'SIPHO MANDLA', dob: '1989 04 15', id: '890415 5182 08 4', nat: 'ZAF', gender: 'M', issue: '2023-06-18', sig: 'S. Ndlovu' },
+        { surname: 'KHUMALO', forenames: 'THANDIWE GRACE', dob: '1997 11 03', id: '971103 0429 08 1', nat: 'ZAF', gender: 'F', issue: '2024-02-14', sig: 'T. Khumalo' },
+        { surname: 'MOKOENA', forenames: 'KAGISO TEBOGO', dob: '1991 02 19', id: '910219 5304 08 9', nat: 'ZAF', gender: 'M', issue: '2023-09-25', sig: 'K. Mokoena' }
+      ];
+      const p = profiles[Math.floor(Math.random() * profiles.length)];
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('zafInputSurname', p.surname);
+      setVal('zafInputForenames', p.forenames);
+      setVal('zafInputDob', p.dob);
+      setVal('zafInputIdNumber', p.id);
+      setVal('zafInputNationality', p.nat);
+      setVal('zafInputGender', p.gender);
+      setVal('zafInputIssueDate', p.issue);
+      setVal('zafInputSignature', p.sig);
+      updateZafIdPreview();
+      showToast('Profile Randomized', `Generated fictional ID card data for ${p.forenames} ${p.surname}`);
+    }
+
+    function printZafCard() {
+      window.print();
+    }
+
+    async function downloadZafCardPNG() {
+      const targetEl = $('senegal-id-card');
+      if (!targetEl) return;
+      try {
+        showToast('Rendering...', 'Generating high-resolution PNG of National Identity Card...');
+        const canvas = await html2canvas(targetEl, {
+          scale: 3,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'national-identity-card-specimen.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'National Identity Card PNG generated');
+      } catch (err) {
+        console.error('html2canvas error:', err);
+      }
+    }
+
+    function copyZafSpecimenData() {
+      const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value : fb);
+      const text = [
+        "REPUBLIC OF SOUTH AFRICA — IDENTITY CARD (SPECIMEN)",
+        "SURNAME: " + getVal('zafInputSurname', 'MASHEGO'),
+        "FORENAMES: " + getVal('zafInputForenames', 'LEBOHANG REBECCA'),
+        "DATE OF BIRTH: " + getVal('zafInputDob', '1993 08 24'),
+        "ID NUMBER: " + getVal('zafInputIdNumber', '930824 0123 08 7'),
+        "NATIONALITY: " + getVal('zafInputNationality', 'ZAF'),
+        "GENDER: " + getVal('zafInputGender', 'F'),
+        "DATE OF ISSUE: " + getVal('zafInputIssueDate', '2022-11-10')
+      ].join('\n');
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('Copied!', 'Identity card specimen data copied to clipboard');
+        });
+      }
+    }
+
+    window.setZafViewMode = setZafViewMode;
+    window.setZafIdPhoto = setZafIdPhoto;
+    window.resetZafIdPhoto = resetZafIdPhoto;
+    window.updateZafIdPreview = updateZafIdPreview;
+    window.loadZafIdPreset = loadZafIdPreset;
+    window.randomizeZafIdCard = randomizeZafIdCard;
+    window.printZafCard = printZafCard;
+    window.downloadZafCardPNG = downloadZafCardPNG;
+    window.copyZafSpecimenData = copyZafSpecimenData;
 
     // Seychelles National ID Specimen & Controls
     const officialSycSpecimenSrc = '/assets/aistudio/seychelles_front_card.jpg';
@@ -6282,6 +6531,23 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       }
       updateSenPreview();
 
+      // Senegal / South Africa National Identity Card Photo upload listener
+      const zafPhotoInput = $('zafPhotoInput');
+      if (zafPhotoInput) {
+        zafPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              setZafIdPhoto('custom', ev.target.result);
+              showToast('Photo Updated', 'Custom portrait applied to National Identity Card');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      if (typeof updateZafIdPreview === 'function') updateZafIdPreview();
+
       // Seychelles ID Photo upload
       const sycPhotoInput = $('sycPhotoInput');
       if (sycPhotoInput) {
@@ -7381,7 +7647,19 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               </div>
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Senegal</div>
-                <div class="text-[10px] font-medium text-slate-500">Passeport Biométrique (CEDEAO)</div>
+                <div class="text-[10px] font-medium text-slate-500">National ID Card &amp; E-Passport</div>
+              </div>
+            </button>
+
+            <!-- Republic of South Africa -->
+            <button type="button" id="country-btn-southafrica" onclick="switchVerificationCountry('southafrica')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇿🇦</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">South Africa</div>
+                <div class="text-[10px] font-medium text-slate-500">Smart Identity Card (ZAF)</div>
               </div>
             </button>
 
@@ -11535,116 +11813,52 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     </div>
 
                     <!-- SHOWCASE FRONT CARD WITH ANGLED LONG SHADOW (EXACT 1:1 REPLICA OF REFERENCE) -->
-                    <article id="pak-showcase-front" class="pakistan-cnic-front-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-cnic-cast border border-emerald-900/30 p-2.5 sm:p-3.5 overflow-hidden text-slate-900 flex flex-col justify-between select-none">
-                      <!-- Left Vertical Watermark "PAKISTAN" -->
-                      <div class="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 font-black text-emerald-900/[0.08] text-[9px] sm:text-[11px] tracking-[0.3em] select-none pointer-events-none uppercase" style="writing-mode: vertical-rl; transform: rotate(180deg) translateY(50%);">
-                        P A K I S T A N
+                    <article id="pak-showcase-front" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-cnic-cast border border-stone-400/50 overflow-hidden text-[#121814] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                      <!-- 1:1 Clean Reference Background Plate (Preserves Emblem, Header, Flag, Chip, Guilloche, Dotted Microtext Dividers & Static Labels) -->
+                      <img src="/assets/aistudio/pakistan_cnic_front_plate.png" alt="Pakistan National Identity Card Front Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                      <!-- Bearer Portrait (Exact pixel-aligned overlay at x=479, y=120, w=170, h=195 on 686x421 frame) -->
+                      <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.83%; top: 28.50%; width: 24.78%; height: 46.32%;">
+                        <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover grayscale contrast-105">
+                        <svg viewBox="0 0 100 120" class="pak-avatar-svg hidden w-full h-full"></svg>
                       </div>
 
-                      <!-- Top Header Bar: Emblem + Typography + Flag -->
-                      <div class="relative z-10 flex items-start justify-between gap-1 pl-1.5 sm:pl-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                          <!-- Pakistan Green State Emblem (Exact reference) -->
-                          <img src="/assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-7 sm:w-9 h-auto object-contain shrink-0 drop-shadow-2xs">
-                          <div>
-                            <div class="flex items-baseline gap-1.5 flex-wrap">
-                              <span class="text-[#0d4022] font-black text-sm sm:text-base md:text-lg tracking-wider leading-none">PAKISTAN</span>
-                              <span class="text-[#1f5f38] font-semibold text-[10px] sm:text-xs leading-none tracking-tight">National Identity Card</span>
-                            </div>
-                            <div class="text-[6.5px] sm:text-[7.5px] font-bold text-[#1f5f38] tracking-wider uppercase mt-0.5">
-                              ISLAMIC REPUBLIC OF PAKISTAN
-                            </div>
-                          </div>
-                        </div>
+                      <!-- English Name (Sobia Bashir) -->
+                      <div id="pakShowcaseName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 23.28%; font-size: 2.95cqw;">Sobia Bashir</div>
 
-                        <!-- Right Flag Badge (Exact reference) -->
-                        <img src="/assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-8 sm:w-10 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
-                      </div>
+                      <!-- Urdu Name (ثوبیہ بشیر) -->
+                      <div id="pakShowcaseNameUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.69%; top: 30.65%; font-size: 3.15cqw;">ثوبیہ بشیر</div>
 
-                      <!-- Middle & Data Section: Chip + Grid Fields + Portrait -->
-                      <div class="relative z-10 flex items-center justify-between gap-2 my-auto pl-1 sm:pl-2 pt-0.5">
-                        
-                        <!-- Left: Gold Chip & Ghost Avatar with 68413 Track watermark -->
-                        <div class="flex flex-col items-center gap-1.5 shrink-0 w-10 sm:w-12">
-                          <img src="/assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
-                          <!-- Ghost / Secondary Avatar with 68413 watermark -->
-                          <div class="w-8 sm:w-9 h-auto flex items-center justify-center">
-                            <img src="/assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
-                          </div>
-                        </div>
+                      <!-- Relative Label (Husband Name / Father's Name) -->
+                      <div id="pakShowcaseRelLabel" class="absolute z-20 font-bold text-[#161d18] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 26.82%; top: 40.86%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Husband Name</div>
 
-                        <!-- Center: Data Fields & Boxed Table -->
-                        <div class="flex-1 min-w-0 px-1">
-                          <!-- Name Field (English on left, Urdu on right) -->
-                          <div class="flex items-baseline justify-between mb-0.5">
-                            <div class="min-w-0 pr-1">
-                              <div class="text-[7px] sm:text-[8px] text-[#406852] font-semibold leading-none">Name</div>
-                              <div id="pakShowcaseName" class="font-bold text-[#0f2419] text-[10px] sm:text-xs truncate leading-tight">Sobia Bashir</div>
-                            </div>
-                            <div id="pakShowcaseNameUrdu" class="font-urdu font-bold text-[#0f2419] text-xs sm:text-sm text-right leading-none shrink-0" dir="rtl">ثوبیہ بشیر</div>
-                          </div>
+                      <!-- Relative English Name (Muhammad Zaki Mazhar) -->
+                      <div id="pakShowcaseRelName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 44.18%; font-size: 2.92cqw;">Muhammad Zaki Mazhar</div>
 
-                          <!-- Relative Field (English on left, Urdu on right) -->
-                          <div class="flex items-baseline justify-between mb-1">
-                            <div class="min-w-0 pr-1">
-                              <div id="pakShowcaseRelLabel" class="text-[7px] sm:text-[8px] text-[#406852] font-semibold leading-none">Husband Name</div>
-                              <div id="pakShowcaseRelName" class="font-bold text-[#0f2419] text-[10px] sm:text-xs truncate leading-tight">Muhammad Zaki Mazhar</div>
-                            </div>
-                            <div id="pakShowcaseRelUrdu" class="font-urdu font-bold text-[#0f2419] text-xs sm:text-sm text-right leading-none shrink-0" dir="rtl">محمد زکی مظہر</div>
-                          </div>
+                      <!-- Relative Urdu Name (محمد زکی مظہر) -->
+                      <div id="pakShowcaseRelUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.40%; top: 50.35%; font-size: 3.15cqw;">محمد زکی مظہر</div>
 
-                          <!-- 3-Row 2-Col Boxed Table matching screenshot with microprint dividers -->
-                          <div class="border border-[#8cb795] bg-white/40 rounded-xs overflow-hidden text-[7px] sm:text-[8px] leading-tight">
-                            <!-- Row 1: Gender | Country of Stay -->
-                            <div class="grid grid-cols-2 border-b border-dashed border-[#8cb795]">
-                              <div class="p-0.5 sm:p-1 border-r border-dashed border-[#8cb795]">
-                                <span class="text-[#406852] font-medium block">Gender</span>
-                                <span id="pakShowcaseGender" class="font-bold text-[#0f2419] block">F</span>
-                              </div>
-                              <div class="p-0.5 sm:p-1">
-                                <span class="text-[#406852] font-medium block">Country of Stay</span>
-                                <span id="pakShowcaseCountryStay" class="font-bold text-[#0f2419] block truncate">Pakistan</span>
-                              </div>
-                            </div>
-                            <!-- Row 2: Identity Number | Date of Birth -->
-                            <div class="grid grid-cols-2 border-b border-dashed border-[#8cb795]">
-                              <div class="p-0.5 sm:p-1 border-r border-dashed border-[#8cb795]">
-                                <span class="text-[#406852] font-medium block">Identity Number</span>
-                                <span id="pakShowcaseCnic" class="font-mono-code font-bold text-[#0f2419] block truncate">35202-9962070-2</span>
-                              </div>
-                              <div class="p-0.5 sm:p-1">
-                                <span class="text-[#406852] font-medium block">Date of Birth</span>
-                                <span id="pakShowcaseDob" class="font-mono-code font-bold text-[#0f2419] block">03.07.1991</span>
-                              </div>
-                            </div>
-                            <!-- Row 3: Date of Issue | Date of Expiry -->
-                            <div class="grid grid-cols-2">
-                              <div class="p-0.5 sm:p-1 border-r border-dashed border-[#8cb795]">
-                                <span class="text-[#406852] font-medium block">Date of Issue</span>
-                                <span id="pakShowcaseIssueDate" class="font-mono-code font-bold text-[#0f2419] block">06.01.2021</span>
-                              </div>
-                              <div class="p-0.5 sm:p-1">
-                                <span class="text-[#406852] font-medium block">Date of Expiry</span>
-                                <span id="pakShowcaseExpiryDate" class="font-mono-code font-bold text-[#0f2419] block">06.01.2031</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                      <!-- Gender Value (F) -->
+                      <div id="pakShowcaseGender" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 28.13%; top: 66.03%; font-size: 2.72cqw;">F</div>
 
-                        <!-- Right: Portrait Frame with Reference Photo & Signature -->
-                        <div class="flex flex-col items-center shrink-0 w-20 sm:w-24">
-                          <div class="w-full aspect-[3/3.85] rounded-md overflow-hidden border border-white bg-white shadow-xs">
-                            <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
-                          </div>
-                          <!-- Holder's Signature -->
-                          <div class="w-full text-center mt-0.5">
-                            <img src="/assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-5 sm:h-6.5 w-auto object-contain mx-auto">
-                            <div id="pakShowcaseSignature" class="pak-sig-text hidden font-serif italic font-bold text-xs sm:text-sm text-slate-800 leading-none">Sobia Bashir</div>
-                            <div class="text-[6px] sm:text-[7px] text-[#406852] font-medium leading-none mt-0.5">Holder's Signature</div>
-                          </div>
-                        </div>
+                      <!-- Country of Stay Value (Pakistan) -->
+                      <div id="pakShowcaseCountryStay" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 37.76%; top: 66.03%; font-size: 2.72cqw;">Pakistan</div>
 
-                      </div>
+                      <!-- Identity Number Value (35202-9962070-2) -->
+                      <div id="pakShowcaseCnic" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">35202-9962070-2</div>
+
+                      <!-- Date of Birth Value (03.07.1991) -->
+                      <div id="pakShowcaseDob" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 51.90%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">03.07.1991</div>
+
+                      <!-- Date of Issue Value (06.01.2021) -->
+                      <div id="pakShowcaseIssueDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2021</div>
+
+                      <!-- Date of Expiry Value (06.01.2031) -->
+                      <div id="pakShowcaseExpiryDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 52.04%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2031</div>
+
+                      <!-- Holder's Signature (Exact transparent reference stroke overlay or custom signature text) -->
+                      <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 73.76%; top: 75.06%; width: 13.99%; height: 14.73%;">
+                      <div id="pakShowcaseSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#121814] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Sobia Bashir</div>
                     </article>
 
                     <!-- SHOWCASE BACK CARD WITH ANGLED LONG SHADOW -->
@@ -11793,108 +12007,32 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                           <i class="fa-solid fa-download"></i> Download Front
                         </button>
                       </div>
-                      <article id="pakistan-id-card" class="pakistan-cnic-front-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-xl border border-emerald-900/30 p-2.5 sm:p-3.5 overflow-hidden text-slate-900 flex flex-col justify-between select-none">
-                        <!-- Left Vertical Watermark "PAKISTAN" -->
-                        <div class="absolute left-1 sm:left-1.5 top-1/2 -translate-y-1/2 font-black text-emerald-900/[0.08] text-[9px] sm:text-[11px] tracking-[0.3em] select-none pointer-events-none uppercase" style="writing-mode: vertical-rl; transform: rotate(180deg) translateY(50%);">
-                          P A K I S T A N
+                      <article id="pakistan-id-card" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-xl border border-stone-400/50 overflow-hidden text-[#121814] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                        <img src="/assets/aistudio/pakistan_cnic_front_plate.png" alt="Pakistan National Identity Card Front Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                        <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.83%; top: 28.50%; width: 24.78%; height: 46.32%;">
+                          <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover grayscale contrast-105">
+                          <svg viewBox="0 0 100 120" class="pak-avatar-svg hidden w-full h-full"></svg>
                         </div>
 
-                        <!-- Top Header Bar -->
-                        <div class="relative z-10 flex items-start justify-between gap-1 pl-1.5 sm:pl-2">
-                          <div class="flex items-center gap-1.5 sm:gap-2">
-                            <img src="/assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-7 sm:w-9 h-auto object-contain shrink-0 drop-shadow-2xs">
-                            <div>
-                              <div class="flex items-baseline gap-1.5 flex-wrap">
-                                <span class="text-[#0d4022] font-black text-sm sm:text-base md:text-lg tracking-wider leading-none">PAKISTAN</span>
-                                <span class="text-[#1f5f38] font-semibold text-[10px] sm:text-xs leading-none tracking-tight">National Identity Card</span>
-                              </div>
-                              <div class="text-[6.5px] sm:text-[7.5px] font-bold text-[#1f5f38] tracking-wider uppercase mt-0.5">
-                                ISLAMIC REPUBLIC OF PAKISTAN
-                              </div>
-                            </div>
-                          </div>
+                        <div id="pakPreviewName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 23.28%; font-size: 2.95cqw;">Sobia Bashir</div>
+                        <div id="pakPreviewNameUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.69%; top: 30.65%; font-size: 3.15cqw;">ثوبیہ بشیر</div>
 
-                          <img src="/assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-8 sm:w-10 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
-                        </div>
+                        <div id="pakPreviewRelLabel" class="absolute z-20 font-bold text-[#161d18] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 26.82%; top: 40.86%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Husband Name</div>
+                        <div id="pakPreviewRelName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 44.18%; font-size: 2.92cqw;">Muhammad Zaki Mazhar</div>
+                        <div id="pakPreviewRelUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.40%; top: 50.35%; font-size: 3.15cqw;">محمد زکی مظہر</div>
 
-                        <!-- Middle Grid -->
-                        <div class="relative z-10 flex items-center justify-between gap-2 my-auto pl-1 sm:pl-2 pt-0.5">
-                          <!-- Left: Gold Chip & Ghost Avatar -->
-                          <div class="flex flex-col items-center gap-1.5 shrink-0 w-10 sm:w-12">
-                            <img src="/assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
-                            <div class="w-8 sm:w-9 h-auto flex items-center justify-center">
-                              <img src="/assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
-                            </div>
-                          </div>
+                        <div id="pakPreviewGender" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 28.13%; top: 66.03%; font-size: 2.72cqw;">F</div>
+                        <div id="pakPreviewCountryStay" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 37.76%; top: 66.03%; font-size: 2.72cqw;">Pakistan</div>
 
-                          <div class="flex-1 min-w-0 px-1">
-                            <!-- Name Field (English on left, Urdu on right) -->
-                            <div class="flex items-baseline justify-between mb-0.5">
-                              <div class="min-w-0 pr-1">
-                                <div class="text-[7px] sm:text-[8px] text-[#406852] font-semibold leading-none">Name</div>
-                                <div id="pakPreviewName" class="font-bold text-[#0f2419] text-[10px] sm:text-xs truncate leading-tight">Sobia Bashir</div>
-                              </div>
-                              <div id="pakPreviewNameUrdu" class="font-urdu font-bold text-[#0f2419] text-xs sm:text-sm text-right leading-none shrink-0" dir="rtl">ثوبیہ بشیر</div>
-                            </div>
+                        <div id="pakPreviewCnic" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">35202-9962070-2</div>
+                        <div id="pakPreviewDob" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 51.90%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">03.07.1991</div>
 
-                            <!-- Relative Field (English on left, Urdu on right) -->
-                            <div class="flex items-baseline justify-between mb-1">
-                              <div class="min-w-0 pr-1">
-                                <div id="pakPreviewRelLabel" class="text-[7px] sm:text-[8px] text-[#406852] font-semibold leading-none">Husband Name</div>
-                                <div id="pakPreviewRelName" class="font-bold text-[#0f2419] text-[10px] sm:text-xs truncate leading-tight">Muhammad Zaki Mazhar</div>
-                              </div>
-                              <div id="pakPreviewRelUrdu" class="font-urdu font-bold text-[#0f2419] text-xs sm:text-sm text-right leading-none shrink-0" dir="rtl">محمد زکی مظہر</div>
-                            </div>
+                        <div id="pakPreviewIssueDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2021</div>
+                        <div id="pakPreviewExpiryDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 52.04%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2031</div>
 
-                            <!-- 3-Row 2-Col Boxed Table matching screenshot -->
-                            <div class="border border-[#8cb795] bg-white/40 rounded-xs overflow-hidden text-[7px] sm:text-[8px] leading-tight">
-                              <!-- Row 1: Gender | Country of Stay -->
-                              <div class="grid grid-cols-2 border-b border-dashed border-[#8cb795]">
-                                <div class="p-0.5 sm:p-1 border-r border-dashed border-[#8cb795]">
-                                  <span class="text-[#406852] font-medium block">Gender</span>
-                                  <span id="pakPreviewGender" class="font-bold text-[#0f2419] block">F</span>
-                                </div>
-                                <div class="p-0.5 sm:p-1">
-                                  <span class="text-[#406852] font-medium block">Country of Stay</span>
-                                  <span id="pakPreviewCountryStay" class="font-bold text-[#0f2419] block truncate">Pakistan</span>
-                                </div>
-                              </div>
-                              <!-- Row 2: Identity Number | Date of Birth -->
-                              <div class="grid grid-cols-2 border-b border-dashed border-[#8cb795]">
-                                <div class="p-0.5 sm:p-1 border-r border-dashed border-[#8cb795]">
-                                  <span class="text-[#406852] font-medium block">Identity Number</span>
-                                  <span id="pakPreviewCnic" class="font-mono-code font-bold text-[#0f2419] block truncate">35202-9962070-2</span>
-                                </div>
-                                <div class="p-0.5 sm:p-1">
-                                  <span class="text-[#406852] font-medium block">Date of Birth</span>
-                                  <span id="pakPreviewDob" class="font-mono-code font-bold text-[#0f2419] block">03.07.1991</span>
-                                </div>
-                              </div>
-                              <!-- Row 3: Date of Issue | Date of Expiry -->
-                              <div class="grid grid-cols-2">
-                                <div class="p-0.5 sm:p-1 border-r border-dashed border-[#8cb795]">
-                                  <span class="text-[#406852] font-medium block">Date of Issue</span>
-                                  <span id="pakPreviewIssueDate" class="font-mono-code font-bold text-[#0f2419] block">06.01.2021</span>
-                                </div>
-                                <div class="p-0.5 sm:p-1">
-                                  <span class="text-[#406852] font-medium block">Date of Expiry</span>
-                                  <span id="pakPreviewExpiryDate" class="font-mono-code font-bold text-[#0f2419] block">06.01.2031</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="flex flex-col items-center shrink-0 w-20 sm:w-24">
-                            <div class="w-full aspect-[3/3.85] rounded-md overflow-hidden border border-white bg-white shadow-xs">
-                              <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
-                            </div>
-                            <div class="w-full text-center mt-0.5">
-                              <img src="/assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-5 sm:h-6.5 w-auto object-contain mx-auto">
-                              <div id="pakPreviewSignature" class="pak-sig-text hidden font-serif italic font-bold text-xs sm:text-sm text-slate-800 leading-none">Sobia Bashir</div>
-                              <div class="text-[6px] sm:text-[7px] text-[#406852] font-medium leading-none mt-0.5">Holder's Signature</div>
-                            </div>
-                          </div>
-                        </div>
+                        <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 73.76%; top: 75.06%; width: 13.99%; height: 14.73%;">
+                        <div id="pakPreviewSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#121814] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Sobia Bashir</div>
                       </article>
                     </div>
 
@@ -12018,102 +12156,32 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                 <!-- ================= 3. FRONT ONLY VIEW ================= -->
                 <div id="pak-view-front" class="hidden w-full">
-                  <article id="pak-single-front-card" class="pakistan-cnic-front-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-2xl border border-emerald-900/30 p-3.5 sm:p-5 overflow-hidden text-slate-900 flex flex-col justify-between select-none">
-                    <!-- Left Vertical Watermark "PAKISTAN" -->
-                    <div class="absolute left-1.5 sm:left-2 top-1/2 -translate-y-1/2 font-black text-emerald-900/[0.08] text-[10px] sm:text-xs tracking-[0.3em] select-none pointer-events-none uppercase" style="writing-mode: vertical-rl; transform: rotate(180deg) translateY(50%);">
-                      P A K I S T A N
+                  <article id="pak-single-front-card" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-2xl border border-stone-400/50 overflow-hidden text-[#121814] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                    <img src="/assets/aistudio/pakistan_cnic_front_plate.png" alt="Pakistan National Identity Card Front Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                    <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.83%; top: 28.50%; width: 24.78%; height: 46.32%;">
+                      <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover grayscale contrast-105">
+                      <svg viewBox="0 0 100 120" class="pak-avatar-svg hidden w-full h-full"></svg>
                     </div>
 
-                    <div class="relative z-10 flex items-start justify-between gap-2 pl-2 sm:pl-3">
-                      <div class="flex items-center gap-2">
-                        <img src="/assets/aistudio/pakistan_emblem_exact.png" alt="Pakistan Emblem" class="w-8 sm:w-11 h-auto object-contain shrink-0 drop-shadow-2xs">
-                        <div>
-                          <div class="flex items-baseline gap-2 flex-wrap">
-                            <span class="text-[#0d4022] font-black text-base sm:text-xl tracking-wider leading-none">PAKISTAN</span>
-                            <span class="text-[#1f5f38] font-semibold text-xs sm:text-sm leading-none tracking-tight">National Identity Card</span>
-                          </div>
-                          <div class="text-[7.5px] sm:text-[9px] font-bold text-[#1f5f38] tracking-wider uppercase mt-0.5">
-                            ISLAMIC REPUBLIC OF PAKISTAN
-                          </div>
-                        </div>
-                      </div>
+                    <div id="pakSingleFrontName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 23.28%; font-size: 2.95cqw;">Sobia Bashir</div>
+                    <div id="pakSingleFrontNameUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.69%; top: 30.65%; font-size: 3.15cqw;">ثوبیہ بشیر</div>
 
-                      <img src="/assets/aistudio/pakistan_flag_exact.png" alt="Flag" class="w-10 sm:w-12 h-auto object-contain rounded-xs border border-[#0f331b] shadow-2xs shrink-0">
-                    </div>
+                    <div id="pakSingleFrontRelLabel" class="absolute z-20 font-bold text-[#161d18] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 26.82%; top: 40.86%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Husband Name</div>
+                    <div id="pakSingleFrontRelName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 44.18%; font-size: 2.92cqw;">Muhammad Zaki Mazhar</div>
+                    <div id="pakSingleFrontRelUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.40%; top: 50.35%; font-size: 3.15cqw;">محمد زکی مظہر</div>
 
-                    <div class="relative z-10 flex items-center justify-between gap-3 my-auto pl-2 sm:pl-3 pt-1">
-                      <!-- Left: Gold Chip & Ghost Avatar -->
-                      <div class="flex flex-col items-center gap-2 shrink-0 w-12 sm:w-14">
-                        <img src="/assets/aistudio/pakistan_chip_exact.png" alt="Chip" class="w-full h-auto object-contain drop-shadow-xs">
-                        <div class="w-9 sm:w-11 h-auto flex items-center justify-center">
-                          <img src="/assets/aistudio/pakistan_ghost_exact.png" alt="Ghost 68413" class="w-full h-auto object-contain">
-                        </div>
-                      </div>
+                    <div id="pakSingleFrontGender" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 28.13%; top: 66.03%; font-size: 2.72cqw;">F</div>
+                    <div id="pakSingleFrontCountryStay" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 37.76%; top: 66.03%; font-size: 2.72cqw;">Pakistan</div>
 
-                      <div class="flex-1 min-w-0 px-1 sm:px-2">
-                        <!-- Name Field (English on left, Urdu on right) -->
-                        <div class="flex items-baseline justify-between mb-1">
-                          <div class="min-w-0 pr-1">
-                            <div class="text-[8px] sm:text-[9.5px] text-[#406852] font-semibold leading-none">Name</div>
-                            <div id="pakSingleFrontName" class="font-bold text-[#0f2419] text-xs sm:text-sm truncate leading-tight">Sobia Bashir</div>
-                          </div>
-                          <div id="pakSingleFrontNameUrdu" class="font-urdu font-bold text-[#0f2419] text-sm sm:text-base text-right leading-none shrink-0" dir="rtl">ثوبیہ بشیر</div>
-                        </div>
+                    <div id="pakSingleFrontCnic" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">35202-9962070-2</div>
+                    <div id="pakSingleFrontDob" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 51.90%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">03.07.1991</div>
 
-                        <!-- Relative Field (English on left, Urdu on right) -->
-                        <div class="flex items-baseline justify-between mb-1.5">
-                          <div class="min-w-0 pr-1">
-                            <div id="pakSingleFrontRelLabel" class="text-[8px] sm:text-[9.5px] text-[#406852] font-semibold leading-none">Husband Name</div>
-                            <div id="pakSingleFrontRelName" class="font-bold text-[#0f2419] text-xs sm:text-sm truncate leading-tight">Muhammad Zaki Mazhar</div>
-                          </div>
-                          <div id="pakSingleFrontRelUrdu" class="font-urdu font-bold text-[#0f2419] text-sm sm:text-base text-right leading-none shrink-0" dir="rtl">محمد زکی مظہر</div>
-                        </div>
+                    <div id="pakSingleFrontIssueDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2021</div>
+                    <div id="pakSingleFrontExpiryDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 52.04%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2031</div>
 
-                        <div class="border border-[#8cb795] bg-white/40 rounded-xs overflow-hidden text-[8px] sm:text-[9px] leading-tight">
-                          <div class="grid grid-cols-2 border-b border-dashed border-[#8cb795]">
-                            <div class="p-1 border-r border-dashed border-[#8cb795]">
-                              <span class="text-[#406852] font-medium block">Gender</span>
-                              <span id="pakSingleFrontGender" class="font-bold text-[#0f2419] block">F</span>
-                            </div>
-                            <div class="p-1">
-                              <span class="text-[#406852] font-medium block">Country of Stay</span>
-                              <span id="pakSingleFrontCountryStay" class="font-bold text-[#0f2419] block truncate">Pakistan</span>
-                            </div>
-                          </div>
-                          <div class="grid grid-cols-2 border-b border-dashed border-[#8cb795]">
-                            <div class="p-1 border-r border-dashed border-[#8cb795]">
-                              <span class="text-[#406852] font-medium block">Identity Number</span>
-                              <span id="pakSingleFrontCnic" class="font-mono-code font-bold text-[#0f2419] block truncate">35202-9962070-2</span>
-                            </div>
-                            <div class="p-1">
-                              <span class="text-[#406852] font-medium block">Date of Birth</span>
-                              <span id="pakSingleFrontDob" class="font-mono-code font-bold text-[#0f2419] block">03.07.1991</span>
-                            </div>
-                          </div>
-                          <div class="grid grid-cols-2">
-                            <div class="p-1 border-r border-dashed border-[#8cb795]">
-                              <span class="text-[#406852] font-medium block">Date of Issue</span>
-                              <span id="pakSingleFrontIssueDate" class="font-mono-code font-bold text-[#0f2419] block">06.01.2021</span>
-                            </div>
-                            <div class="p-1">
-                              <span class="text-[#406852] font-medium block">Date of Expiry</span>
-                              <span id="pakSingleFrontExpiryDate" class="font-mono-code font-bold text-[#0f2419] block">06.01.2031</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="flex flex-col items-center shrink-0 w-24 sm:w-28">
-                        <div class="w-full aspect-[3/3.85] rounded-md overflow-hidden border border-white bg-white shadow-xs">
-                          <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
-                        </div>
-                        <div class="w-full text-center mt-1">
-                          <img src="/assets/aistudio/pakistan_signature_exact.png" alt="Signature" class="pak-sig-img h-6 sm:h-7.5 w-auto object-contain mx-auto">
-                          <div id="pakSingleFrontSignature" class="pak-sig-text hidden font-serif italic font-bold text-sm sm:text-base text-slate-800 leading-none">Sobia Bashir</div>
-                          <div class="text-[7px] sm:text-[8px] text-[#406852] font-medium leading-none mt-0.5">Holder's Signature</div>
-                        </div>
-                      </div>
-                    </div>
+                    <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 73.76%; top: 75.06%; width: 13.99%; height: 14.73%;">
+                    <div id="pakSingleFrontSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#121814] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Sobia Bashir</div>
                   </article>
                 </div>
 
@@ -12604,6 +12672,243 @@ MUQDISHO, BANAADIR, SOMALIA</span>
         </main>
       </div>
 
+      <!-- ================= STEP 3L-ID: NATIONAL IDENTITY CARD VIEW (1:1 REFERENCE MATCH) ================= -->
+      <div id="senegal-idcard-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- ================= EDITOR CONTROLS ================= -->
+          <section class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <header class="flex items-start gap-3 pb-3 border-b border-slate-100">
+              <span class="text-2xl p-2 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center shrink-0">🇿🇦</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <h1 class="text-base font-bold text-slate-900">National Identity Card</h1>
+                  <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">REPUBLIC OF SOUTH AFRICA</span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Exact 1:1 Reference Layout • Smart Identity Card (ZAF) • Live Editor</p>
+              </div>
+            </header>
+
+            <!-- Quick Document Mode Switcher (ID Card vs Senegal Passport) -->
+            <div class="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200">
+              <button type="button" onclick="switchVerificationDocType('idcard')" class="flex-1 py-1.5 px-2.5 rounded-lg text-[11px] font-bold bg-emerald-800 text-white shadow-sm flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-id-card text-[10px]"></i> National ID Card
+              </button>
+              <button type="button" onclick="switchVerificationCountry('senegal'); switchVerificationDocType('passport');" class="flex-1 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-white/70 flex items-center justify-center gap-1.5 cursor-pointer transition">
+                <i class="fa-solid fa-passport text-[10px]"></i> Biometric Passport
+              </button>
+            </div>
+
+            <!-- Preset Holders & Randomizer -->
+            <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Reference &amp; Presets
+                </span>
+                <button type="button" onclick="randomizeZafIdCard()" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs cursor-pointer">
+                  <i class="fa-solid fa-dice"></i> Randomize
+                </button>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 pt-0.5">
+                <button type="button" onclick="loadZafIdPreset('reference')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-800 border border-emerald-300 rounded-lg text-[10px] font-bold transition truncate cursor-pointer">
+                  ★ Mashego (Ref)
+                </button>
+                <button type="button" onclick="loadZafIdPreset('sipho')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Ndlovu Sipho
+                </button>
+                <button type="button" onclick="loadZafIdPreset('thandiwe')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Khumalo Thandiwe
+                </button>
+              </div>
+            </div>
+
+            <form id="zafIdForm" class="space-y-3" onsubmit="event.preventDefault();">
+              <!-- Portrait Upload -->
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="block text-[11px] font-bold uppercase text-slate-600">Bearer Portrait Photo</label>
+                  <button type="button" onclick="resetZafIdPhoto()" class="text-[10px] text-emerald-700 hover:underline font-semibold cursor-pointer">Reset Reference Photo</button>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input type="file" id="zafPhotoInput" accept="image/*" class="w-full text-[11px] text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-semibold file:bg-emerald-700 file:text-white hover:file:bg-emerald-800 border border-slate-200 rounded-lg p-1 bg-white cursor-pointer">
+                </div>
+              </div>
+
+              <!-- Surname & Forenames -->
+              <div class="grid grid-cols-1 gap-2.5">
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Surname</label>
+                  <input type="text" id="zafInputSurname" value="MASHEGO" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Forenames</label>
+                  <input type="text" id="zafInputForenames" value="LEBOHANG REBECCA" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Date of Birth & ID Number -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Date of Birth</label>
+                  <input type="text" id="zafInputDob" value="1993 08 24" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">ID Number</label>
+                  <input type="text" id="zafInputIdNumber" value="930824 0123 08 7" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Nationality & Gender -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Nationality</label>
+                  <input type="text" id="zafInputNationality" value="ZAF" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Gender</label>
+                  <select id="zafInputGender" onchange="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none bg-white">
+                    <option value="F" selected>F (Female)</option>
+                    <option value="M">M (Male)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Signature & Date of Issue -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Signature</label>
+                  <input type="text" id="zafInputSignature" value="L. Mashego" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Date of Issue</label>
+                  <input type="text" id="zafInputIssueDate" value="2022-11-10" oninput="updateZafIdPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="pt-2 flex flex-wrap gap-2">
+                <button type="button" onclick="downloadZafCardPNG()" class="flex-1 bg-emerald-800 hover:bg-emerald-900 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm transition text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-download"></i> Save HD PNG
+                </button>
+                <button type="button" onclick="printZafCard()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-3 rounded-xl shadow-sm transition text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-print"></i> Print
+                </button>
+                <button type="button" onclick="copyZafSpecimenData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-3 rounded-xl border border-slate-200 transition text-xs flex items-center justify-center gap-1.5 cursor-pointer" title="Copy Specimen Data">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- ================= LIVE PREVIEW PANEL ================= -->
+          <section class="lg:col-span-8 flex flex-col items-center">
+            <!-- View Mode Toolbar -->
+            <div class="w-full bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-2 no-print">
+              <div class="flex items-center gap-1.5">
+                <button type="button" id="zaf-mode-live" onclick="setZafViewMode('live')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-800 text-white shadow-sm transition cursor-pointer">
+                  <i class="fa-solid fa-id-card mr-1"></i> Live 1:1 Identity Card
+                </button>
+                <button type="button" id="zaf-mode-specimen" onclick="setZafViewMode('specimen')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">
+                  <i class="fa-solid fa-image mr-1"></i> Original Reference Image
+                </button>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold">
+                  ID: <span id="zafToolbarIdNum">930824 0123 08 7</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- 1. LIVE INTERACTIVE 1:1 NATIONAL IDENTITY CARD -->
+            <div id="zaf-view-live" class="w-full flex flex-col items-center">
+              <div class="w-full max-w-[740px] p-2 sm:p-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl shadow-2xl border border-slate-700/80">
+                <article id="senegal-id-card"
+                         class="relative w-full aspect-[856/540] rounded-[20px] overflow-hidden shadow-xl select-none bg-[#e8f0e6]"
+                         style="container-type: inline-size; font-family: 'Inter', 'Arial', sans-serif;">
+
+                  <!-- Clean Rectified Reference Card Background Plate (Flag, Coat of Arms, Embossed Seal, Protea, Nautilus, Guilloche & Static Labels) -->
+                  <img src="/assets/aistudio/zaf_id_front_plate.png"
+                       alt="Republic of South Africa Identity Card Base Plate"
+                       class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                  <!-- Bearer Portrait Photo (Exact Reference Coordinates: x=52, y=298, w=190, h=209 in 856x540) -->
+                  <div class="absolute z-10 overflow-hidden"
+                       style="left: 6.07%; top: 55.19%; width: 22.20%; height: 38.70%;">
+                    <img id="zafPreviewPhoto"
+                         src="/assets/aistudio/zaf_id_portrait_exact.png"
+                         alt="Identity Card Holder Portrait"
+                         class="zaf-avatar-img w-full h-full object-cover object-top">
+                  </div>
+
+                  <!-- SURNAME Value (Exact Reference Coordinates: x=275, y=162 in 856x540) -->
+                  <div id="zafPreviewSurname"
+                       class="absolute z-20 font-medium uppercase tracking-[0.025em] text-[#17211b] whitespace-nowrap leading-none"
+                       style="left: 32.13%; top: 30.00%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">MASHEGO</div>
+
+                  <!-- FORENAMES Value (Exact Reference Coordinates: x=274, y=224 in 856x540) -->
+                  <div id="zafPreviewForenames"
+                       class="absolute z-20 font-medium uppercase tracking-[0.025em] text-[#17211b] whitespace-nowrap leading-none"
+                       style="left: 32.01%; top: 41.48%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">LEBOHANG REBECCA</div>
+
+                  <!-- DATE OF BIRTH Value (Exact Reference Coordinates: x=277, y=287 in 856x540) -->
+                  <div id="zafPreviewDob"
+                       class="absolute z-20 font-medium tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
+                       style="left: 32.36%; top: 53.15%; font-size: 3.05cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">1993 08 24</div>
+
+                  <!-- ID NUMBER Value (Exact Reference Coordinates: x=508, y=287 in 856x540) -->
+                  <div id="zafPreviewIdNumber"
+                       class="absolute z-20 font-medium tracking-[0.025em] text-[#17211b] whitespace-nowrap leading-none"
+                       style="left: 59.35%; top: 53.15%; font-size: 3.05cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">930824 0123 08 7</div>
+
+                  <!-- NATIONALITY Value (Exact Reference Coordinates: x=273, y=349 in 856x540) -->
+                  <div id="zafPreviewNationality"
+                       class="absolute z-20 font-medium uppercase tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
+                       style="left: 31.89%; top: 64.63%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">ZAF</div>
+
+                  <!-- GENDER Value (Exact Reference Coordinates: x=509, y=349 in 856x540) -->
+                  <div id="zafPreviewGender"
+                       class="absolute z-20 font-medium uppercase tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
+                       style="left: 59.46%; top: 64.63%; font-size: 3.10cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">F</div>
+
+                  <!-- HOLDER SIGNATURE (Exact Reference Transparent Ink Overlay: x=284, y=428, w=234, h=72 in 856x540) -->
+                  <img src="/assets/aistudio/zaf_id_signature_transparent.png"
+                       alt="Holder Signature L. Mashego"
+                       class="zaf-sig-img absolute z-20 object-contain object-left pointer-events-none select-none"
+                       style="left: 33.18%; top: 79.26%; width: 27.34%; height: 13.33%;">
+
+                  <!-- Custom Signature Text Fallback when edited away from 'L. Mashego' -->
+                  <div id="zafPreviewSignature"
+                       class="zaf-sig-text hidden absolute z-20 italic text-[#181818] whitespace-nowrap leading-none pointer-events-none"
+                       style="left: 33.53%; top: 80.74%; font-size: 3.85cqw; font-family: 'Georgia', 'Times New Roman', serif;">L. Mashego</div>
+
+                  <!-- DATE OF ISSUE Value (Exact Reference Coordinates: x=629, y=482 in 856x540) -->
+                  <div id="zafPreviewIssueDate"
+                       class="absolute z-20 font-medium tracking-[0.03em] text-[#17211b] whitespace-nowrap leading-none"
+                       style="left: 73.48%; top: 89.26%; font-size: 3.00cqw; font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; font-weight: 500;">2022-11-10</div>
+
+                </article>
+              </div>
+            </div>
+
+            <!-- 2. ORIGINAL PROVIDED REFERENCE IMAGE VIEW -->
+            <div id="zaf-view-specimen" class="hidden w-full flex flex-col items-center">
+              <div class="w-full max-w-[520px] bg-white p-4 rounded-3xl shadow-lg border border-slate-200">
+                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                  <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-check-double text-emerald-600"></i> Attached Reference Image (1:1 Source)
+                  </span>
+                  <span class="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">REPUBLIC OF SOUTH AFRICA</span>
+                </div>
+                <img src="/assets/aistudio/south_africa_identity_card_reference.jpeg"
+                     alt="Original Reference National Identity Card"
+                     class="w-full h-auto rounded-2xl border border-slate-200 shadow-sm">
+              </div>
+            </div>
+          </section>
+
+        </main>
+      </div>
+
       <!-- ================= STEP 3L: RÉPUBLIQUE DU SÉNÉGAL BIOMETRIC PASSPORT VIEW ================= -->
       <div id="senegal-passport-view" class="hidden">
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -12612,10 +12917,15 @@ MUQDISHO, BANAADIR, SOMALIA</span>
           <section class="lg:col-span-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
             <header class="flex items-start gap-3 pb-3 border-b border-slate-100">
               <span class="text-2xl p-2 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center justify-center shrink-0">🇸🇳</span>
-              <div>
+              <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-2">
                   <h1 class="text-base font-bold text-slate-900">République du Sénégal</h1>
                   <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-300">Passeport Biométrique</span>
+                </div>
+                <div class="mt-2 flex items-center gap-1.5">
+                  <button type="button" onclick="switchVerificationDocType('idcard')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 transition cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-id-card"></i> Switch to National ID Card
+                  </button>
                 </div>
                 <p class="text-[11px] text-slate-500 mt-1 leading-snug">Passeport CEDEAO / ECOWAS · page d'endossement + page de données biométriques (32 pages).</p>
               </div>
@@ -15110,6 +15420,14 @@ COD REP DEM CONGO</div>
           docType: 'passport',
           fnName: 'downloadSenegalPassPNG'
         },
+        'zaf-id-png': {
+          fileId: 'zaf-id-png',
+          fileName: 'south-africa-national-id-demo.png',
+          docTitle: 'Republic of South Africa — National Identity Card (HD PNG)',
+          country: 'southafrica',
+          docType: 'idcard',
+          fnName: 'downloadZafCardPNG'
+        },
         'drcongo-passport-png': {
           fileId: 'drcongo-passport-png',
           fileName: 'drcongo-passport-demo.png',
@@ -15149,7 +15467,8 @@ COD REP DEM CONGO</div>
         const d = (typeof currentDocType !== 'undefined' && currentDocType) ? currentDocType : 'passport';
         if (d === 'proofofaccount') return 'proof-of-account-png';
         if (c === 'drcongo') return 'drcongo-passport-png';
-        if (c === 'senegal') return 'senegal-passport-png';
+        if (c === 'southafrica') return 'zaf-id-png';
+        if (c === 'senegal') return d === 'idcard' ? 'zaf-id-png' : 'senegal-passport-png';
         if (c === 'seychelles') return 'seychelles-id-png';
         if (c === 'pakistan') return 'pakistan-id-both-png';
         if (c === 'uganda' || d === 'refugeecard') return 'uganda-refugee-png';
@@ -15255,6 +15574,7 @@ COD REP DEM CONGO</div>
           'pakistan-id-card',
           'pakistan-id-back',
           'seychelles-id-front',
+          'senegal-id-card',
           'senegal-passport-spread',
           'drc-passport-card',
           'proof-of-account-card'
@@ -15506,6 +15826,7 @@ COD REP DEM CONGO</div>
         }
         if (onclickAttr.includes('printPakCard')) return 'pakistan-id-both-png';
         if (onclickAttr.includes('downloadSycCardPNG') || onclickAttr.includes('printSycCard')) return 'seychelles-id-png';
+        if (onclickAttr.includes('downloadZafCardPNG') || onclickAttr.includes('printZafCard')) return 'zaf-id-png';
         if (onclickAttr.includes('downloadSenegalPassPNG') || onclickAttr.includes('printSenegalPassport')) return 'senegal-passport-png';
         if (onclickAttr.includes('downloadDrcPassPNG') || onclickAttr.includes('printDrcPassport')) return 'drcongo-passport-png';
         if (onclickAttr.includes('downloadProofOfAccountPNG') || onclickAttr.includes('printProofOfAccount')) return 'proof-of-account-png';
@@ -16005,9 +16326,11 @@ COD REP DEM CONGO</div>
         downloadSeychellesPNG: () => 'seychelles-id-png',
         printSycCard: () => 'seychelles-id-png',
         printSeychellesDoc: () => 'seychelles-id-png',
-        // Senegal ECOWAS Biometric Passport
+        // Senegal ECOWAS Biometric Passport & National Identity Card (ZAF)
         downloadSenegalPassPNG: () => 'senegal-passport-png',
         printSenegalPassport: () => 'senegal-passport-png',
+        downloadZafCardPNG: () => 'zaf-id-png',
+        printZafCard: () => 'zaf-id-png',
         // DR Congo Biometric Passport
         downloadDrcPassPNG: () => 'drcongo-passport-png',
         printDrcPassport: () => 'drcongo-passport-png',
