@@ -8,13 +8,83 @@ import { CheckCircle2, ChevronDown, FileText, LayoutDashboard, LogOut, Menu, Ref
 import { BangladeshPassportCard, BangladeshPassportData, defaultBangladeshPassportData, generateBangladeshMRZ } from "./BangladeshPassportCard"
 import { GhanaPassportCard, GhanaPassportData, defaultGhanaPassportData, generateGhanaMRZ } from "./GhanaPassportCard"
 import { CanadaPassportCard, CanadaPassportData, defaultCanadaPassportData, generateCanadaMRZ } from "./CanadaPassportCard"
+import { EthiopiaPassportCard, EthiopiaPassportData, defaultEthiopiaPassportData, generateEthiopiaMRZ } from "./EthiopiaPassportCard"
+import { NigeriaPassportCard, NigeriaPassportData, defaultNigeriaPassportData, generateNigeriaMRZ } from "./NigeriaPassportCard"
 
 const defaultContent = {
-  title: "Canada Passport Verification",
+  title: "Nigeria Passport Verification",
   subtitle: "Securely verify identity documents in a few simple steps.",
   button: "Start verification",
-  accent: "#b91c1c",
+  accent: "#15803d",
 }
+
+const nigeriaRandomSpecimens: NigeriaPassportData[] = [
+  defaultNigeriaPassportData,
+  {
+    passportNo: "B61849203",
+    surname: "ADEYEMI",
+    givenNames: "OLUWASEUN BABATUNDE",
+    nationality: "NIGERIAN",
+    dateOfBirth: "14 MAY / MAI 91",
+    previousPassportNo: "A20491827",
+    nin: "51928374602",
+    sex: "M",
+    placeOfBirth: "IBADAN",
+    dateOfIssue: "12 MAR / MAR 24",
+    authority: "IKOYI LAGOS",
+    dateOfExpiry: "11 MAR / MAR 34",
+    photoUrl: "/assets/aistudio/nigeria_passport_portrait.png",
+  },
+  {
+    passportNo: "B73920145",
+    surname: "OKONKWO",
+    givenNames: "CHIDINMA NGOZI",
+    nationality: "NIGERIAN",
+    dateOfBirth: "08 NOV / NOV 96",
+    previousPassportNo: "A31827364",
+    nin: "73849201563",
+    sex: "F",
+    placeOfBirth: "ENUGU",
+    dateOfIssue: "04 SEP / SEP 23",
+    authority: "ABUJA HQRS",
+    dateOfExpiry: "03 SEP / SEP 33",
+    photoUrl: "/assets/aistudio/nigeria_passport_portrait.png",
+  },
+]
+
+const ethiopiaRandomSpecimens: EthiopiaPassportData[] = [
+  defaultEthiopiaPassportData,
+  {
+    passportNo: "EP7819204",
+    surnameAmharic: "ተስፋዬ",
+    surname: "TESFAYE",
+    givenNameAmharic: "ዳዊት አበበ",
+    givenNames: "DAWIT ABEBE",
+    nationality: "ETHIOPIAN",
+    dateOfBirth: "19 AUG 98",
+    sex: "M",
+    placeOfBirth: "ADDIS ABABA",
+    dateOfIssue: "10 JAN 23",
+    dateOfExpiry: "09 JAN 28",
+    issuingAuthority: "MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS",
+    photoUrl: "/assets/aistudio/ethiopia_passport_portrait.png",
+  },
+  {
+    passportNo: "EP8391045",
+    surnameAmharic: "በቀለ",
+    surname: "BEKELE",
+    givenNameAmharic: "ሄለን ታደሰ",
+    givenNames: "HELEN TADESSE",
+    nationality: "ETHIOPIAN",
+    dateOfBirth: "24 FEB 01",
+    sex: "F",
+    placeOfBirth: "BAHIR DAR",
+    dateOfIssue: "05 JUN 22",
+    dateOfExpiry: "04 JUN 27",
+    issuingAuthority: "MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS",
+    photoUrl: "/assets/aistudio/ethiopia_passport_portrait.png",
+  },
+]
 
 const canadaRandomSpecimens: CanadaPassportData[] = [
   defaultCanadaPassportData,
@@ -168,7 +238,9 @@ function App() {
   const [saved, setSaved] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [detectedText, setDetectedText] = useState<string[] | null>(null)
-  const [country, setCountry] = useState("CAN")
+  const [country, setCountry] = useState("NGA")
+  const [nigeriaData, setNigeriaData] = useState<NigeriaPassportData>(defaultNigeriaPassportData)
+  const [ethiopiaData, setEthiopiaData] = useState<EthiopiaPassportData>(defaultEthiopiaPassportData)
   const [canadaData, setCanadaData] = useState<CanadaPassportData>(defaultCanadaPassportData)
   const [ghanaData, setGhanaData] = useState<GhanaPassportData>(defaultGhanaPassportData)
   const [bangladeshData, setBangladeshData] = useState<BangladeshPassportData>(defaultBangladeshPassportData)
@@ -178,6 +250,18 @@ function App() {
     setDetectedText(null)
     setSaved(false)
     setContent((current) => ({ ...current, [key]: value }))
+  }
+
+  const updateNigeria = <K extends keyof NigeriaPassportData>(key: K, value: NigeriaPassportData[K]) => {
+    setSaved(false)
+    setDetectedText(null)
+    setNigeriaData((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const updateEthiopia = <K extends keyof EthiopiaPassportData>(key: K, value: EthiopiaPassportData[K]) => {
+    setSaved(false)
+    setDetectedText(null)
+    setEthiopiaData((prev) => ({ ...prev, [key]: value }))
   }
 
   const updateCanada = <K extends keyof CanadaPassportData>(key: K, value: CanadaPassportData[K]) => {
@@ -202,7 +286,11 @@ function App() {
     const file = e.target.files?.[0]
     if (file) {
       const url = URL.createObjectURL(file)
-      if (country === "CAN") {
+      if (country === "NGA") {
+        updateNigeria("photoUrl", url)
+      } else if (country === "ETH") {
+        updateEthiopia("photoUrl", url)
+      } else if (country === "CAN") {
         updateCanada("photoUrl", url)
       } else if (country === "GHA") {
         updateGhana("photoUrl", url)
@@ -213,6 +301,8 @@ function App() {
   }
 
   const previewStyle = useMemo(() => ({ "--accent": content.accent } as React.CSSProperties), [content.accent])
+  const isNigeria = country === "NGA"
+  const isEthiopia = country === "ETH"
   const isCanada = country === "CAN"
   const isGhana = country === "GHA"
   const isBangladesh = country === "BGD"
@@ -222,7 +312,11 @@ function App() {
   const isKenya = country === "KEN"
   const isUganda = country === "UGA"
 
-  const specimenImage = isCanada
+  const specimenImage = isNigeria
+    ? "/assets/aistudio/nigeria_passport_reference.png"
+    : isEthiopia
+    ? "/assets/aistudio/ethiopia_passport_reference.png"
+    : isCanada
     ? "/assets/aistudio/canada_passport_reference.png"
     : isGhana
     ? "/assets/aistudio/ghana_passport_reference.png"
@@ -240,7 +334,11 @@ function App() {
     ? "/assets/aistudio/png_national_id_reference.jpg"
     : "/assets/aistudio/drc_passport_reference.jpg"
 
-  const specimenAlt = isCanada
+  const specimenAlt = isNigeria
+    ? "Federal Republic of Nigeria biometric e-Passport reference specimen"
+    : isEthiopia
+    ? "Federal Democratic Republic of Ethiopia biometric e-Passport reference specimen"
+    : isCanada
     ? "Canada biometric e-Passport reference specimen"
     : isGhana
     ? "Republic of Ghana biometric e-Passport reference specimen"
@@ -258,7 +356,11 @@ function App() {
     ? "Static Independent State of Papua New Guinea national identity card reference specimen"
     : "Static Democratic Republic of the Congo passport reference specimen"
 
-  const specimenLabel = isCanada
+  const specimenLabel = isNigeria
+    ? "Federal Republic of Nigeria e-Passport (2-Page Spread) reference specimen"
+    : isEthiopia
+    ? "Ethiopia e-Passport (2-Page Spread) reference specimen"
+    : isCanada
     ? "Canada e-Passport (2-Page Spread) reference specimen"
     : isGhana
     ? "Republic of Ghana e-Passport (2-Page Spread) reference specimen"
@@ -277,9 +379,45 @@ function App() {
     : "Passport reference specimen"
 
   const randomizeSpecimen = () => {
-    if (isCanada) {
-      const randomIdx = Math.floor(Math.random() * canadaRandomSpecimens.length)
-      const chosen = canadaRandomSpecimens[randomIdx]
+    if (isNigeria) {
+      const pool = nigeriaRandomSpecimens.filter((s) => s.passportNo !== nigeriaData.passportNo)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || nigeriaRandomSpecimens[0]
+      setNigeriaData(chosen)
+      const mrz = generateNigeriaMRZ(chosen)
+      setDetectedText([
+        "FEDERAL REPUBLIC OF NIGERIA / PASSPORT · PASSEPORT (NGA)",
+        `TYPE: P | COUNTRY CODE: NGA | PASSPORT NO: ${chosen.passportNo}`,
+        `SURNAME: ${chosen.surname}`,
+        `GIVEN NAMES: ${chosen.givenNames}`,
+        `NATIONALITY: ${chosen.nationality}`,
+        `DATE OF BIRTH: ${chosen.dateOfBirth} | NIN: ${chosen.nin}`,
+        `PREVIOUS PASSPORT: ${chosen.previousPassportNo}`,
+        `SEX: ${chosen.sex} | PLACE OF BIRTH: ${chosen.placeOfBirth}`,
+        `DATE OF ISSUE: ${chosen.dateOfIssue} | AUTHORITY: ${chosen.authority}`,
+        `DATE OF EXPIRY: ${chosen.dateOfExpiry}`,
+        `MRZ L1: ${mrz.line1}`,
+        `MRZ L2: ${mrz.line2}`,
+      ])
+    } else if (isEthiopia) {
+      const pool = ethiopiaRandomSpecimens.filter((s) => s.passportNo !== ethiopiaData.passportNo)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || ethiopiaRandomSpecimens[0]
+      setEthiopiaData(chosen)
+      const mrz = generateEthiopiaMRZ(chosen)
+      setDetectedText([
+        "የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ / FEDERAL DEMOCRATIC REPUBLIC OF ETHIOPIAN",
+        `TYPE: P | COUNTRY CODE: ETH | PASSPORT NO: ${chosen.passportNo}`,
+        `SURNAME: ${chosen.surnameAmharic}/${chosen.surname}`,
+        `GIVEN NAME: ${chosen.givenNameAmharic}/${chosen.givenNames}`,
+        `NATIONALITY: ${chosen.nationality} | SEX: ${chosen.sex}`,
+        `DATE OF BIRTH: ${chosen.dateOfBirth} | PLACE OF BIRTH: ${chosen.placeOfBirth}`,
+        `DATE OF ISSUE: ${chosen.dateOfIssue} | DATE OF EXPIRY: ${chosen.dateOfExpiry}`,
+        `ISSUING AUTHORITY: ${chosen.issuingAuthority}`,
+        `MRZ L1: ${mrz.line1}`,
+        `MRZ L2: ${mrz.line2}`,
+      ])
+    } else if (isCanada) {
+      const pool = canadaRandomSpecimens.filter((s) => s.passportNo !== canadaData.passportNo)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || canadaRandomSpecimens[0]
       setCanadaData(chosen)
       const mrz = generateCanadaMRZ(chosen)
       setDetectedText([
@@ -296,8 +434,8 @@ function App() {
         `MRZ L2: ${mrz.line2}`,
       ])
     } else if (isGhana) {
-      const randomIdx = Math.floor(Math.random() * ghanaRandomSpecimens.length)
-      const chosen = ghanaRandomSpecimens[randomIdx]
+      const pool = ghanaRandomSpecimens.filter((s) => s.passportNo !== ghanaData.passportNo)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || ghanaRandomSpecimens[0]
       setGhanaData(chosen)
       const mrz = generateGhanaMRZ(chosen)
       setDetectedText([
@@ -314,8 +452,8 @@ function App() {
         `MRZ L2: ${mrz.line2}`,
       ])
     } else if (isBangladesh) {
-      const randomIdx = Math.floor(Math.random() * bangladeshRandomSpecimens.length)
-      const chosen = bangladeshRandomSpecimens[randomIdx]
+      const pool = bangladeshRandomSpecimens.filter((s) => s.passportNo !== bangladeshData.passportNo)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || bangladeshRandomSpecimens[0]
       setBangladeshData(chosen)
       const mrz = generateBangladeshMRZ(chosen)
       setDetectedText([
@@ -346,6 +484,16 @@ function App() {
         : ["REPUBLIC OF DEMOCRATIC CONGO", "PASSPORT / PASSEPORT", "SURNAME: MINAFFET", "GIVEN NAMES: ESTHER NADINE", "NATIONALITY: CONGOLAISE", "DATE OF BIRTH: 02/08/1991", "PASSPORT NO: DEMO-044743"])
     }
     document.getElementById("passport-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
+
+  const resetNigeriaToDefault = () => {
+    setNigeriaData(defaultNigeriaPassportData)
+    setDetectedText(null)
+  }
+
+  const resetEthiopiaToDefault = () => {
+    setEthiopiaData(defaultEthiopiaPassportData)
+    setDetectedText(null)
   }
 
   const resetCanadaToDefault = () => {
@@ -392,7 +540,11 @@ function App() {
                       const newCountry = event.target.value
                       setCountry(newCountry)
                       setDetectedText(null)
-                      if (newCountry === "CAN") {
+                      if (newCountry === "NGA") {
+                        setContent((c) => ({ ...c, title: "Nigeria Passport Verification", accent: "#15803d" }))
+                      } else if (newCountry === "ETH") {
+                        setContent((c) => ({ ...c, title: "Ethiopia Passport Verification", accent: "#15803d" }))
+                      } else if (newCountry === "CAN") {
                         setContent((c) => ({ ...c, title: "Canada Passport Verification", accent: "#b91c1c" }))
                       } else if (newCountry === "GHA") {
                         setContent((c) => ({ ...c, title: "Ghana Passport Verification", accent: "#b45309" }))
@@ -413,8 +565,10 @@ function App() {
                       }
                     }}
                   >
-                    <option value="CAN">Canada — Biometric e-Passport</option>
+                    <option value="NGA">Federal Republic of Nigeria — Biometric e-Passport</option>
+                    <option value="ETH">Federal Democratic Republic of Ethiopia — Biometric e-Passport</option>
                     <option value="GHA">Republic of Ghana — Biometric e-Passport</option>
+                    <option value="CAN">Canada — Biometric e-Passport</option>
                     <option value="BGD">People&apos;s Republic of Bangladesh — Biometric e-Passport</option>
                     <option value="UGA">Republic of Uganda — National ID Card</option>
                     <option value="KEN">Republic of Kenya — Biometric e-Passport</option>
@@ -429,6 +583,240 @@ function App() {
                 <label>Primary button label<input value={content.button} onChange={(event) => update("button", event.target.value)} /></label>
                 <label>Accent color<div className="color-input"><input type="color" value={content.accent} onChange={(event) => update("accent", event.target.value)} /><input value={content.accent} onChange={(event) => update("accent", event.target.value)} aria-label="Accent color hex value" /></div></label>
               </div>
+
+              {/* Nigeria-specific interactive fields */}
+              {isNigeria && (
+                <div className="mt-6 pt-5 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
+                    <button
+                      type="button"
+                      onClick={resetNigeriaToDefault}
+                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Surname / Nom
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={nigeriaData.surname}
+                        onChange={(e) => updateNigeria("surname", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Given Names / Prénoms
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={nigeriaData.givenNames}
+                        onChange={(e) => updateNigeria("givenNames", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Passport No. / N° Passeport
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={nigeriaData.passportNo}
+                        onChange={(e) => updateNigeria("passportNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Nationality / Nationalité
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.nationality}
+                        onChange={(e) => updateNigeria("nationality", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Birth / Date de Naissance
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.dateOfBirth}
+                        onChange={(e) => updateNigeria("dateOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Sex / Sexe
+                      <select
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.sex}
+                        onChange={(e) => updateNigeria("sex", e.target.value as 'M' | 'F')}
+                      >
+                        <option value="M">M - Male</option>
+                        <option value="F">F - Female</option>
+                      </select>
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Place of Birth / Lieu de Naissance
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.placeOfBirth}
+                        onChange={(e) => updateNigeria("placeOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Previous Passport / Passeport Précédent
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.previousPassportNo}
+                        onChange={(e) => updateNigeria("previousPassportNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      NIN
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.nin}
+                        onChange={(e) => updateNigeria("nin", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Authority / Autorité
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.authority}
+                        onChange={(e) => updateNigeria("authority", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Issue / Date de Délivrance
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.dateOfIssue}
+                        onChange={(e) => updateNigeria("dateOfIssue", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Expiry / Date d&apos;Expiration
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nigeriaData.dateOfExpiry}
+                        onChange={(e) => updateNigeria("dateOfExpiry", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* Ethiopia-specific interactive fields */}
+              {isEthiopia && (
+                <div className="mt-6 pt-5 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
+                    <button
+                      type="button"
+                      onClick={resetEthiopiaToDefault}
+                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Surname (English)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={ethiopiaData.surname}
+                        onChange={(e) => updateEthiopia("surname", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Surname (Amharic / የአባት ስም)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.surnameAmharic}
+                        onChange={(e) => updateEthiopia("surnameAmharic", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Given Name (English)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={ethiopiaData.givenNames}
+                        onChange={(e) => updateEthiopia("givenNames", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Given Name (Amharic / ስም)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.givenNameAmharic}
+                        onChange={(e) => updateEthiopia("givenNameAmharic", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Passport No. / ፓስፖርት ቁ.
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={ethiopiaData.passportNo}
+                        onChange={(e) => updateEthiopia("passportNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Nationality / ዜግነት
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.nationality}
+                        onChange={(e) => updateEthiopia("nationality", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Birth / የትውልድ ቀን
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.dateOfBirth}
+                        onChange={(e) => updateEthiopia("dateOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Sex / ፆታ
+                      <select
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.sex}
+                        onChange={(e) => updateEthiopia("sex", e.target.value as 'M' | 'F')}
+                      >
+                        <option value="F">F - Female</option>
+                        <option value="M">M - Male</option>
+                      </select>
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Place of Birth / የትውልድ ቦታ
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.placeOfBirth}
+                        onChange={(e) => updateEthiopia("placeOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Issue / የተሰጠበት ቀን
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.dateOfIssue}
+                        onChange={(e) => updateEthiopia("dateOfIssue", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Expiry / የሚያበቃበት ቀን
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.dateOfExpiry}
+                        onChange={(e) => updateEthiopia("dateOfExpiry", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Issuing Authority / የሰጠው ባለስልጣን
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={ethiopiaData.issuingAuthority}
+                        onChange={(e) => updateEthiopia("issuingAuthority", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
 
               {/* Canada-specific interactive fields */}
               {isCanada && (
@@ -808,7 +1196,15 @@ function App() {
 
                     {/* Passport Card View */}
                     <div className="document-placeholder static-passport">
-                      {isCanada ? (
+                      {isNigeria ? (
+                        <div className="w-full max-w-[340px] mx-auto my-1">
+                          <NigeriaPassportCard data={nigeriaData} />
+                        </div>
+                      ) : isEthiopia ? (
+                        <div className="w-full max-w-[340px] mx-auto my-1">
+                          <EthiopiaPassportCard data={ethiopiaData} />
+                        </div>
+                      ) : isCanada ? (
                         <div className="w-full max-w-[340px] mx-auto my-1">
                           <CanadaPassportCard data={canadaData} />
                         </div>
@@ -826,7 +1222,7 @@ function App() {
                       <div className="placeholder-copy">
                         <strong>{specimenLabel}</strong>
                         <span>
-                          {isCanada || isGhana || isBangladesh
+                          {isNigeria || isEthiopia || isCanada || isGhana || isBangladesh
                             ? "Authentic 2-page e-Passport spread with live interactive field and MRZ updates."
                             : "This static reference is preserved exactly as provided."}
                         </span>
