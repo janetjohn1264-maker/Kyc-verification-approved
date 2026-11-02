@@ -1385,8 +1385,9 @@ var $ = window.$ || (id => document.getElementById(id));
       }
 
       renderActiveDocumentView();
-      if (currentCountry === 'ethiopia' && currentDocType === 'passport' && typeof updateEthPreview === 'function') {
-        updateEthPreview();
+      if (currentCountry === 'ethiopia' && currentDocType === 'passport') {
+        if (typeof updateEthPassPreview === 'function') updateEthPassPreview();
+        else if (typeof updateEthPreview === 'function') updateEthPreview();
       }
       if (currentCountry === 'nigeria' && currentDocType === 'passport' && typeof updateNgaPassPreview === 'function') {
         updateNgaPassPreview();
@@ -1485,6 +1486,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateBgdPreview === 'function') updateBgdPreview();
       } else if (countryKey === 'ghana') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -1574,6 +1576,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateEthPassPreview === 'function') updateEthPassPreview();
         if (typeof updateEthPreview === 'function') updateEthPreview();
       } else if (countryKey === 'uganda') {
         currentDocType = 'refugeecard';
@@ -2390,6 +2393,69 @@ var $ = window.$ || (id => document.getElementById(id));
       line2: 'A068217167BGD9705238M33013066902553657<<<<<<66'
     };
 
+    const DOT_MATRIX_FONT = {
+      '0': ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
+      '1': ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
+      '2': ['01110', '10001', '00001', '00110', '01000', '10000', '11111'],
+      '3': ['01110', '10001', '00001', '00110', '00001', '10001', '01110'],
+      '4': ['00010', '00110', '01010', '10010', '11111', '00010', '00010'],
+      '5': ['11111', '10000', '11110', '00001', '00001', '10001', '01110'],
+      '6': ['00110', '01000', '10000', '11110', '10001', '10001', '01110'],
+      '7': ['11111', '00001', '00010', '00100', '01000', '01000', '01000'],
+      '8': ['01110', '10001', '10001', '01110', '10001', '10001', '01110'],
+      '9': ['01110', '10001', '10001', '01111', '00001', '00010', '01100'],
+      'A': ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+      'B': ['11110', '10001', '10001', '11110', '10001', '10001', '11110'],
+      'C': ['01110', '10001', '10000', '10000', '10000', '10001', '01110'],
+      'D': ['11100', '10010', '10001', '10001', '10001', '10010', '11100'],
+      'E': ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+      'F': ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+      'G': ['01110', '10001', '10000', '10111', '10001', '10001', '01110'],
+      'H': ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+      'I': ['01110', '00100', '00100', '00100', '00100', '00100', '01110'],
+      'J': ['00111', '00010', '00010', '00010', '00010', '10010', '01100'],
+      'K': ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+      'L': ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+      'M': ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+      'N': ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+      'O': ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+      'P': ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+      'Q': ['01110', '10001', '10001', '10001', '10101', '10010', '01101'],
+      'R': ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+      'S': ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
+      'T': ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+      'U': ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+      'V': ['10001', '10001', '10001', '10001', '10001', '01010', '00100'],
+      'W': ['10001', '10001', '10001', '10101', '10101', '11011', '10001'],
+      'X': ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
+      'Y': ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+      'Z': ['11111', '00001', '00010', '00100', '01000', '10000', '11111']
+    };
+
+    function renderVerticalDotMatrixPerforation(containerId, rawText, dotFill) {
+      const el = $(containerId);
+      if (!el) return;
+      const chars = String(rawText || '').toUpperCase().replace(/[^A-Z0-9]/g, '').split('').reverse();
+      const fill = dotFill || '#42423e';
+      let html = '';
+      chars.forEach(function (ch) {
+        const grid = DOT_MATRIX_FONT[ch] || DOT_MATRIX_FONT['0'];
+        let circles = '';
+        for (let r = 0; r < grid.length; r++) {
+          const rowStr = grid[r];
+          for (let c = 0; c < rowStr.length; c++) {
+            if (rowStr[c] === '1') {
+              const cx = r * 4.2 + 2.2;
+              const cy = (4 - c) * 4.0 + 2.2;
+              circles += `<circle cx="${cx}" cy="${cy}" r="1.22" fill="${fill}" opacity="0.88" /><circle cx="${cx - 0.35}" cy="${cy - 0.35}" r="0.45" fill="#d7dbd4" opacity="0.6" />`;
+            }
+          }
+        }
+        html += `<svg viewBox="0 0 30 22" style="width:100%;height:9.6%;overflow:visible;display:block;">${circles}</svg>`;
+      });
+      el.innerHTML = html;
+    }
+
     function bgdSetText(id, value) {
       const el = $(id);
       if (el) el.textContent = value == null || value === '' ? '—' : value;
@@ -2422,14 +2488,6 @@ var $ = window.$ || (id => document.getElementById(id));
       const view = $('bangladesh-passport-view');
       if (view && view.classList.contains('hidden') && typeof switchVerificationCountry === 'function') {
         switchVerificationCountry('bangladesh');
-      }
-      const card = $('bangladesh-passport-card');
-      if (card && typeof card.scrollIntoView === 'function') {
-        try {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } catch (err) {
-          card.scrollIntoView();
-        }
       }
     }
 
@@ -2526,7 +2584,8 @@ var $ = window.$ || (id => document.getElementById(id));
       bgdSetText('bgdOutTopName', fullName);
       bgdSetText('bgdOutTopFather', (fields.fatherName || 'MD MOFIZUL ISLAM').toUpperCase());
       bgdSetText('bgdOutTopMother', (fields.motherName || 'AMANA BEGUM').toUpperCase());
-      bgdSetText('bgdOutTopSpouse', fields.spouseName ? fields.spouseName.toUpperCase() : '—');
+      const spouseEl = $('bgdOutTopSpouse');
+      if (spouseEl) spouseEl.textContent = fields.spouseName ? fields.spouseName.toUpperCase() : '';
       bgdSetText('bgdOutTopAddress', fields.permanentAddress || BGD_SPECIMEN.permanentAddress);
       bgdSetText('bgdOutEmergName', (fields.emergencyName || 'JAHIDUL ISLAM').toUpperCase());
       bgdSetText('bgdOutEmergRelation', (fields.emergencyRelation || 'BROTHER').toUpperCase());
@@ -2535,7 +2594,7 @@ var $ = window.$ || (id => document.getElementById(id));
       
       const passNoFormatted = (fields.passNo || 'A06821716').toUpperCase();
       const passNoSpaced = passNoFormatted.split('').join(' ');
-      bgdSetText('bgdOutPerforatedPassNo', passNoSpaced);
+      renderVerticalDotMatrixPerforation('bgdOutPerforatedPassNo', passNoFormatted, '#42423e');
       bgdSetText('bgdOutBarcodeText', passNoSpaced);
 
       // Bottom Page (Bio-data)
@@ -3973,20 +4032,12 @@ var $ = window.$ || (id => document.getElementById(id));
       if (view && view.classList.contains('hidden') && typeof switchVerificationCountry === 'function') {
         switchVerificationCountry('ethiopia');
       }
-      const card = $('ethiopia-passport-card');
-      if (card && typeof card.scrollIntoView === 'function') {
-        try {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } catch (_) {
-          card.scrollIntoView();
-        }
-      }
     }
 
     function buildEthMrz(fields) {
       // Line 1: P<ETH + Surname + << + Given Names + < padding to 44
       const surname = ethMrzClean(fields.surname || '');
-      const given = ethMrzClean(fields.givenNames || '').replace(/\s+/g, '<');
+      const given = String(fields.givenNames || '').toUpperCase().replace(/[^A-Z0-9\s]/g, '').trim().replace(/\s+/g, '<');
       const nameField = `${surname}<<${given}`;
       const line1 = ('P<ETH' + nameField + '<'.repeat(44)).slice(0, 44);
 
@@ -4031,28 +4082,34 @@ var $ = window.$ || (id => document.getElementById(id));
       if (String(fields.sex || '').toUpperCase() !== ETH_SPECIMEN.sex) return false;
       if (String(fields.issue || '') !== ETH_SPECIMEN.issue) return false;
       if (String(fields.expiry || '') !== ETH_SPECIMEN.expiry) return false;
+      if (String(fields.personalNo || '').trim() !== '') return false;
       return true;
     }
 
     function readEthFields() {
+      const val = (id, fallback) => {
+        const el = $(id);
+        if (!el) return fallback;
+        return el.value != null ? String(el.value).trim() : fallback;
+      };
       return {
-        surnameAmharic: ($('ethInpSurnameAmharic') && $('ethInpSurnameAmharic').value) || ETH_SPECIMEN.surnameAmharic,
-        surname: ($('ethInpSurname') && $('ethInpSurname').value.trim()) || ETH_SPECIMEN.surname,
-        givenNameAmharic: ($('ethInpGivenNameAmharic') && $('ethInpGivenNameAmharic').value) || ETH_SPECIMEN.givenNameAmharic,
-        givenNames: ($('ethInpGivenNames') && $('ethInpGivenNames').value.trim()) || ETH_SPECIMEN.givenNames,
-        passNo: ($('ethInpPassNo') && $('ethInpPassNo').value.trim()) || ETH_SPECIMEN.passNo,
-        nationality: ($('ethInpNationality') && $('ethInpNationality').value.trim()) || ETH_SPECIMEN.nationality,
-        sex: ($('ethInpSex') && $('ethInpSex').value) || ETH_SPECIMEN.sex,
-        personalNo: ($('ethInpPersonalNo') && $('ethInpPersonalNo').value.trim()) || '',
-        dob: ($('ethInpDob') && $('ethInpDob').value) || ETH_SPECIMEN.dob,
-        pob: ($('ethInpPob') && $('ethInpPob').value.trim()) || ETH_SPECIMEN.pob,
-        issue: ($('ethInpIssue') && $('ethInpIssue').value) || ETH_SPECIMEN.issue,
-        expiry: ($('ethInpExpiry') && $('ethInpExpiry').value) || ETH_SPECIMEN.expiry,
-        authority: ($('ethInpAuthority') && $('ethInpAuthority').value.trim()) || ETH_SPECIMEN.authority
+        surnameAmharic: val('ethInpSurnameAmharic', ETH_SPECIMEN.surnameAmharic),
+        surname: val('ethInpSurname', ETH_SPECIMEN.surname) || ETH_SPECIMEN.surname,
+        givenNameAmharic: val('ethInpGivenNameAmharic', ETH_SPECIMEN.givenNameAmharic),
+        givenNames: val('ethInpGivenNames', ETH_SPECIMEN.givenNames) || ETH_SPECIMEN.givenNames,
+        passNo: val('ethInpPassNo', ETH_SPECIMEN.passNo) || ETH_SPECIMEN.passNo,
+        nationality: val('ethInpNationality', ETH_SPECIMEN.nationality) || ETH_SPECIMEN.nationality,
+        sex: val('ethInpSex', ETH_SPECIMEN.sex) || ETH_SPECIMEN.sex,
+        personalNo: val('ethInpPersonalNo', ''),
+        dob: val('ethInpDob', ETH_SPECIMEN.dob) || ETH_SPECIMEN.dob,
+        pob: val('ethInpPob', ETH_SPECIMEN.pob) || ETH_SPECIMEN.pob,
+        issue: val('ethInpIssue', ETH_SPECIMEN.issue) || ETH_SPECIMEN.issue,
+        expiry: val('ethInpExpiry', ETH_SPECIMEN.expiry) || ETH_SPECIMEN.expiry,
+        authority: val('ethInpAuthority', ETH_SPECIMEN.authority) || ETH_SPECIMEN.authority
       };
     }
 
-    function updateEthPreview() {
+    function updateEthPassPreview() {
       const f = readEthFields();
 
       // Top control bar
@@ -4100,21 +4157,21 @@ var $ = window.$ || (id => document.getElementById(id));
         const el = $(id);
         if (el) el.value = data[map[id]] == null ? '' : data[map[id]];
       });
-      updateEthPreview();
+      updateEthPassPreview();
     }
 
     function resetEthPassportSpecimen() {
       setEthFieldValues(ETH_SPECIMEN);
-      resetEthPhoto();
+      resetEthPassPhoto();
       showToast('Ethiopian Specimen Restored', 'Reset to Marwo Abdulahi reference specimen');
     }
 
-    function resetEthPhoto() {
+    function resetEthPassPhoto() {
       const main = $('ethOutPhotoMain');
       if (main) main.setAttribute('src', ETH_DEFAULT_PHOTO);
       const ghost = $('ethOutGhostPhoto');
       if (ghost) ghost.setAttribute('src', ETH_GHOST);
-      const inp = $('ethPhotoInput');
+      const inp = $('ethPassPhotoInput');
       if (inp) inp.value = '';
     }
 
@@ -4187,8 +4244,9 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function initEthPassport() {
-      const uploader = $('ethPhotoInput');
-      if (uploader) {
+      const uploader = $('ethPassPhotoInput');
+      if (uploader && !uploader.dataset.ethPassWired) {
+        uploader.dataset.ethPassWired = '1';
         uploader.addEventListener('change', function (e) {
           const file = e.target.files && e.target.files[0];
           if (!file) return;
@@ -4203,7 +4261,7 @@ var $ = window.$ || (id => document.getElementById(id));
           reader.readAsDataURL(file);
         });
       }
-      updateEthPreview();
+      updateEthPassPreview();
     }
 
     function ethSpecimenText() {
@@ -4263,10 +4321,10 @@ var $ = window.$ || (id => document.getElementById(id));
       window.print();
     }
 
-    window.updateEthPreview = updateEthPreview;
+    window.updateEthPassPreview = updateEthPassPreview;
     window.randomizeEthPassport = randomizeEthPassport;
     window.resetEthPassportSpecimen = resetEthPassportSpecimen;
-    window.resetEthPhoto = resetEthPhoto;
+    window.resetEthPassPhoto = resetEthPassPhoto;
     window.copyEthSpecimenData = copyEthSpecimenData;
     window.downloadEthPassPNG = downloadEthPassPNG;
     window.printEthPassport = printEthPassport;
