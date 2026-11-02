@@ -316,6 +316,11 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileId: 'proof-of-account-pdf',
     fileName: 'proof_of_account__1__3c9d9253.pdf',
   },
+  '/assets/aistudio/1793559368456_a809bb91.jpg': {
+    fileId: 'ghana-reference-jpg',
+    fileName: 'ghana_passport_reference_photo.jpg',
+    allowInlineImg: true,
+  },
   '/assets/aistudio/image_f5a855c3.png': {
     fileId: 'ghana-reference-png',
     fileName: 'ghana_passport_reference_photo.png',
@@ -449,9 +454,34 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileName: 'proof_of_account_page_1.png',
     allowInlineImg: true,
   },
-  '/assets/aistudio/proof_of_account_page_2.png': {
-    fileId: 'proof-of-account-png',
-    fileName: 'proof_of_account_page_2.png',
+  '/assets/aistudio/Screenshot_20261102-081952_780c868e.jpg': {
+    fileId: 'ethiopia-reference-screenshot-jpg',
+    fileName: 'Screenshot_20261102-081952.jpg',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ethiopia_passport_reference.png': {
+    fileId: 'ethiopia-passport-reference-png',
+    fileName: 'ethiopia_passport_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ethiopia_passport_portrait.png': {
+    fileId: 'ethiopia-passport-portrait-png',
+    fileName: 'ethiopia_passport_portrait.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ethiopia_passport_ghost.png': {
+    fileId: 'ethiopia-passport-ghost-png',
+    fileName: 'ethiopia_passport_ghost.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ethiopia_passport_barcode.png': {
+    fileId: 'ethiopia-passport-barcode-png',
+    fileName: 'ethiopia_passport_barcode.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/ethiopia_passport_signature.png': {
+    fileId: 'ethiopia-passport-signature-png',
+    fileName: 'ethiopia_passport_signature.png',
     allowInlineImg: true,
   },
 };
