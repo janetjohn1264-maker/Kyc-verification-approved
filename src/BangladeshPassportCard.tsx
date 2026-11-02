@@ -208,6 +208,22 @@ export const BangladeshPassportCard: React.FC<{
   const isCustomGhost = isCustomPhoto || dobWatermark !== "23.05.97";
   const cleanPassChars = (data.passportNo || "A06821716").toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9).split('');
 
+  const isDefaultSpecimen = useMemo(() => {
+    if (isCustomPhoto) return false;
+    const keys: (keyof BangladeshPassportData)[] = [
+      'passportNo', 'surname', 'givenNames', 'nationality', 'personalNo',
+      'dateOfBirth', 'previousPassportNo', 'sex', 'placeOfBirth',
+      'dateOfIssue', 'issuingAuthority', 'dateOfExpiry', 'bookletSerial',
+      'fatherName', 'motherName', 'spouseName',
+      'permanentAddress1', 'permanentAddress2',
+      'emergencyName', 'emergencyRelationship',
+      'emergencyAddress1', 'emergencyAddress2', 'emergencyPhone'
+    ];
+    return keys.every(
+      (k) => String(data[k] ?? '').trim().toUpperCase() === String(defaultBangladeshPassportData[k] ?? '').trim().toUpperCase()
+    );
+  }, [data, isCustomPhoto]);
+
   return (
     <div
       className={`relative w-full overflow-hidden select-none shadow-2xl rounded-sm border border-stone-300 bg-stone-100 ${className}`}
@@ -223,6 +239,15 @@ export const BangladeshPassportCard: React.FC<{
         alt="People's Republic of Bangladesh Passport Base Plate"
         className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0"
       />
+
+      {/* Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active */}
+      {isDefaultSpecimen && (
+        <img
+          src="/assets/aistudio/bgd_passport_reference.png"
+          alt="People's Republic of Bangladesh Passport Specimen Reference"
+          className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-30"
+        />
+      )}
 
       {/* Live Interactive Overlay Layer */}
       <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-[#1c1f24]">

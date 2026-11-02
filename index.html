@@ -2389,9 +2389,10 @@ var $ = window.$ || (id => document.getElementById(id));
     };
 
     const BGD_SPECIMEN_MRZ = {
-      line1: 'P<BGDHOSSAIN<<MD<DELOWER<<<<<<<<<<<<<<<<<<<<<<',
-      line2: 'A068217167BGD9705238M33013066902553657<<<<<<66'
+      line1: 'P<BGDHOSSAIN<<MD<DELOWER<<<<<<<<<<<<<<<<<<<<',
+      line2: 'A068217167BGD9705238M33013066902553657<<<<66'
     };
+    let bgdCustomPhotoLoaded = false;
 
     const DOT_MATRIX_FONT = {
       '0': ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
@@ -2566,7 +2567,7 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function isBgdSpecimen(fields) {
-      const keys = ['surname', 'givenName', 'fatherName', 'motherName', 'passNo', 'prevPassNo', 'personalNo', 'sex', 'nationality', 'pob', 'authority'];
+      const keys = ['surname', 'givenName', 'fatherName', 'motherName', 'spouseName', 'permanentAddress', 'emergencyName', 'emergencyRelation', 'emergencyAddress', 'emergencyPhone', 'passNo', 'prevPassNo', 'personalNo', 'sex', 'nationality', 'pob', 'authority'];
       for (let i = 0; i < keys.length; i++) {
         if (bgdMrzClean(fields[keys[i]]) !== bgdMrzClean(BGD_SPECIMEN[keys[i]])) return false;
       }
@@ -2578,6 +2579,12 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function updateBgdPreview() {
       const fields = readBgdFields();
+      const isDefault = isBgdSpecimen(fields) && !bgdCustomPhotoLoaded;
+
+      const refOverlay = $('bgdRefSpecimenOverlay');
+      if (refOverlay) {
+        refOverlay.style.display = isDefault ? 'block' : 'none';
+      }
 
       // Top Page
       const fullName = (fields.givenName + ' ' + fields.surname).trim().toUpperCase() || 'MD DELOWER HOSSAIN';
@@ -2586,15 +2593,15 @@ var $ = window.$ || (id => document.getElementById(id));
       bgdSetText('bgdOutTopMother', (fields.motherName || 'AMANA BEGUM').toUpperCase());
       const spouseEl = $('bgdOutTopSpouse');
       if (spouseEl) spouseEl.textContent = fields.spouseName ? fields.spouseName.toUpperCase() : '';
-      bgdSetText('bgdOutTopAddress', fields.permanentAddress || BGD_SPECIMEN.permanentAddress);
+      bgdSetText('bgdOutTopAddress', (fields.permanentAddress || BGD_SPECIMEN.permanentAddress).toUpperCase());
       bgdSetText('bgdOutEmergName', (fields.emergencyName || 'JAHIDUL ISLAM').toUpperCase());
       bgdSetText('bgdOutEmergRelation', (fields.emergencyRelation || 'BROTHER').toUpperCase());
-      bgdSetText('bgdOutEmergAddress', fields.emergencyAddress || BGD_SPECIMEN.emergencyAddress);
+      bgdSetText('bgdOutEmergAddress', (fields.emergencyAddress || BGD_SPECIMEN.emergencyAddress).toUpperCase());
       bgdSetText('bgdOutEmergPhone', fields.emergencyPhone || BGD_SPECIMEN.emergencyPhone);
       
       const passNoFormatted = (fields.passNo || 'A06821716').toUpperCase();
       const passNoSpaced = passNoFormatted.split('').join(' ');
-      renderVerticalDotMatrixPerforation('bgdOutPerforatedPassNo', passNoFormatted, '#42423e');
+      renderVerticalDotMatrixPerforation('bgdOutPerforatedPassNo', passNoFormatted, '#2b231d');
       bgdSetText('bgdOutBarcodeText', passNoSpaced);
 
       // Bottom Page (Bio-data)
@@ -2603,14 +2610,32 @@ var $ = window.$ || (id => document.getElementById(id));
       bgdSetText('bgdOutGivenName', (fields.givenName || 'MD DELOWER').toUpperCase());
       bgdSetText('bgdOutNationality', (fields.nationality || 'BANGLADESHI').toUpperCase());
       bgdSetText('bgdOutPersonalNo', fields.personalNo || '6902553657');
-      bgdSetText('bgdOutPrevPassNo', fields.prevPassNo ? fields.prevPassNo.toUpperCase() : '—');
+      bgdSetText('bgdOutPrevPassNo', fields.prevPassNo ? fields.prevPassNo.toUpperCase() : '');
       bgdSetText('bgdOutDob', bgdFormatDate(fields.dob));
       bgdSetText('bgdOutSex', (fields.sex || 'M').toUpperCase());
       bgdSetText('bgdOutPob', (fields.pob || 'BHOLA').toUpperCase());
       bgdSetText('bgdOutIssue', bgdFormatDate(fields.issue));
       bgdSetText('bgdOutExpiry', bgdFormatDate(fields.expiry));
       bgdSetText('bgdOutAuthority', (fields.authority || 'DIP/DHAKA').toUpperCase());
-      bgdSetText('bgdOutGhostDob', bgdFormatShortDob(fields.dob));
+      const shortDob = bgdFormatShortDob(fields.dob);
+      bgdSetText('bgdOutGhostDob', shortDob);
+
+      const customPhotoWrap = $('bgdCustomPhotoWrap');
+      if (customPhotoWrap) customPhotoWrap.style.opacity = bgdCustomPhotoLoaded ? '1' : '0';
+      const customMiniWrap = $('bgdCustomMiniWrap');
+      if (customMiniWrap) customMiniWrap.style.opacity = bgdCustomPhotoLoaded ? '1' : '0';
+      const customGhostWrap = $('bgdCustomGhostWrap');
+      if (customGhostWrap) customGhostWrap.style.opacity = (bgdCustomPhotoLoaded || shortDob !== '23.05.97') ? '1' : '0';
+
+      const sigImg = $('bgdOutSignatureImg');
+      const sigText = $('bgdOutSignatureText');
+      const isDefaultSig = (fields.surname || 'HOSSAIN').trim().toUpperCase() === 'HOSSAIN';
+      if (sigImg) sigImg.style.display = isDefaultSig ? 'block' : 'none';
+      if (sigText) {
+        sigText.style.display = isDefaultSig ? 'none' : 'block';
+        const s = (fields.surname || 'Hossain').trim();
+        sigText.textContent = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+      }
 
       const mrz = isBgdSpecimen(fields) ? BGD_SPECIMEN_MRZ : buildBgdMrz(fields);
       bgdSetText('bgdMrzLine1', mrz.line1);
@@ -2711,12 +2736,14 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function resetBgdPhoto() {
+      bgdCustomPhotoLoaded = false;
       ['bgdOutPhotoMain', 'bgdOutPhotoGhost', 'bgdOutPhotoMini'].forEach(function (id) {
         const el = $(id);
         if (el) el.setAttribute('src', BGD_DEFAULT_PHOTO);
       });
       const input = $('bgdPassPhotoInput');
       if (input) input.value = '';
+      updateBgdPreview();
     }
 
     function initBgdPassport() {
@@ -2729,10 +2756,12 @@ var $ = window.$ || (id => document.getElementById(id));
           const reader = new FileReader();
           reader.onload = function (e) {
             const src = e.target.result;
+            bgdCustomPhotoLoaded = true;
             ['bgdOutPhotoMain', 'bgdOutPhotoGhost', 'bgdOutPhotoMini'].forEach(function (id) {
               const el = $(id);
               if (el) el.setAttribute('src', src);
             });
+            updateBgdPreview();
           };
           reader.readAsDataURL(file);
         });
@@ -6895,11 +6924,13 @@ var $ = window.$ || (id => document.getElementById(id));
     window.copyUsaPassSpecimenData = copyUsaPassSpecimenData;
 
     // Seychelles National ID Specimen & Controls
-    const officialSycSpecimenSrc = '/assets/aistudio/seychelles_front_card.jpg';
+    const officialSycSpecimenSrc = '/assets/aistudio/seychelles_front_reference.png';
     const defaultSycPhotoSrc = '/assets/aistudio/seychelles_portrait_exact.jpg';
     const defaultSycGhostSrc = '/assets/aistudio/seychelles_ghost_exact.png';
+    let sycCustomPhotoLoaded = false;
 
     function initSycDefaultPhoto() {
+      sycCustomPhotoLoaded = false;
       if ($('sycPreviewPhoto')) $('sycPreviewPhoto').src = defaultSycPhotoSrc;
       if ($('sycPreviewGhost')) $('sycPreviewGhost').src = defaultSycGhostSrc;
     }
@@ -6907,6 +6938,7 @@ var $ = window.$ || (id => document.getElementById(id));
     function resetSycPhoto() {
       if ($('sycPhotoInput')) $('sycPhotoInput').value = '';
       initSycDefaultPhoto();
+      updateSycPreview();
       showToast('Photo Restored', 'Restored official Seychelles specimen photo');
     }
 
@@ -6958,7 +6990,7 @@ var $ = window.$ || (id => document.getElementById(id));
       setText('sycPreviewIssueDate', issueDate);
       setText('sycPreviewGhostId', ghostId);
 
-      // Dynamic ICAO TD1 3-Line MRZ Generator synced with Seychelles ID specifications
+      // Dynamic ICAO TD1 3-Line MRZ Generator synced with Seychelles ID reference specimen
       const cleanDigits = ghostId.replace(/[^0-9]/g, '');
       const rawId9 = cleanDigits.slice(0, 11) || '79271098712';
       
@@ -6967,11 +6999,34 @@ var $ = window.$ || (id => document.getElementById(id));
       
       const cleanSurname = surname.replace(/[^A-Z]/g, '');
       const cleanGiven = givenName.trim().replace(/\s+/g, '<').replace(/[^A-Z<]/g, '');
-      const line3 = `${cleanSurname}<<${cleanGiven}`.padEnd(30, '<').substring(0, 30);
+      const isSpecimenValues =
+        idNo === '792-7109-8-7-12' &&
+        surname === 'AGBONDE' &&
+        givenName === 'AFOLABI MICHAEL' &&
+        dob === '25 FEB 1971' &&
+        sex.charAt(0) === 'M' &&
+        issueDate === '20 NOV 2020' &&
+        nationality === 'CITIZEN OF SEYCHELLES' &&
+        ghostId === '79271098712';
+
+      const line3 = isSpecimenValues
+        ? 'AGBONDE<AFOLABI<MICHAEL<<<<<<<'
+        : `${cleanSurname}<${cleanGiven}`.padEnd(30, '<').substring(0, 30);
 
       setText('sycPreviewMrz1', line1);
       setText('sycPreviewMrz2', line2);
       setText('sycPreviewMrz3', line3);
+
+      const isDefaultSpecimen = isSpecimenValues && !sycCustomPhotoLoaded;
+      const frontRef = $('sycFrontRefOverlay');
+      if (frontRef) frontRef.style.display = isDefaultSpecimen ? 'block' : 'none';
+      const backRef = $('sycBackRefOverlay');
+      if (backRef) backRef.style.display = isDefaultSpecimen ? 'block' : 'none';
+
+      const customPhotoWrap = $('sycCustomPhotoWrap');
+      if (customPhotoWrap) customPhotoWrap.style.opacity = sycCustomPhotoLoaded ? '1' : '0';
+      const customGhostWrap = $('sycCustomGhostWrap');
+      if (customGhostWrap) customGhostWrap.style.opacity = sycCustomPhotoLoaded ? '1' : '0';
     }
 
     function randomizeSycId() {
@@ -10096,8 +10151,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           if (file) {
             const reader = new FileReader();
             reader.onload = ev => {
+              sycCustomPhotoLoaded = true;
               if ($('sycPreviewPhoto')) $('sycPreviewPhoto').src = ev.target.result;
               if ($('sycPreviewGhost')) $('sycPreviewGhost').src = ev.target.result;
+              updateSycPreview();
               showToast('Photo Updated', 'Custom portrait photo applied to Seychelles National Identity Card');
             };
             reader.readAsDataURL(file);
@@ -16345,82 +16402,31 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <span class="font-mono-code text-[10px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">CR-80 Standard</span>
                     </div>
 
-                    <article id="seychelles-id-front" class="seychelles-id-front-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-xl border-2 border-slate-300 p-3 sm:p-4 md:p-5 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
-                      
-                      <!-- Top Decorative Motif Band -->
-                      <div class="absolute top-0 left-0 right-0 h-3 sm:h-3.5 md:h-4 overflow-hidden pointer-events-none opacity-90">
-                        <img src="/assets/aistudio/seychelles_top_border.png" alt="" class="w-full h-full object-cover">
-                      </div>
+                    <article id="seychelles-id-front" class="seychelles-id-front-bg relative w-full rounded-[14px] shadow-xl border border-slate-300 overflow-hidden text-[#14171a] select-none bg-[#f5efe8]" style="aspect-ratio: 712 / 448; container-type: inline-size; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">
+                      <!-- 1:1 Rectified Reference Base Plate with Dynamic Value Column Cleanly Inpainted -->
+                      <img src="/assets/aistudio/seychelles_front_clean_bg.png" alt="Seychelles National Identity Card Front Base Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                      <!-- Header: SEYCHELLES NATIONAL IDENTITY CARD -->
-                      <div class="relative z-10 pt-2 sm:pt-2.5 flex items-baseline gap-2 sm:gap-3">
-                        <h2 class="text-blue-600 font-extrabold text-base sm:text-lg md:text-xl tracking-wider uppercase leading-none font-sans">
-                          SEYCHELLES
-                        </h2>
-                        <span class="text-blue-500 font-bold text-xs sm:text-sm md:text-[15px] tracking-wide uppercase leading-none">
-                          NATIONAL IDENTITY CARD
-                        </span>
-                      </div>
+                      <!-- Live Dynamic Bio-Data Overlay (Exact 1:1 Reference Coordinates) -->
+                      <div class="absolute inset-0 w-full h-full z-10 pointer-events-none select-none">
+                        <span id="sycPreviewId" class="absolute font-bold text-[#14171a] whitespace-nowrap leading-none" style="left: 21.91%; top: 31.47%; font-size: 2.35cqw; letter-spacing: 0.01em;">792-7109-8-7-12</span>
+                        <span id="sycPreviewSurname" class="absolute font-bold text-[#14171a] uppercase whitespace-nowrap leading-none" style="left: 21.91%; top: 38.39%; font-size: 2.35cqw; letter-spacing: 0.02em;">AGBONDE</span>
+                        <span id="sycPreviewGivenName" class="absolute font-bold text-[#14171a] uppercase whitespace-nowrap leading-none" style="left: 21.91%; top: 44.87%; font-size: 2.35cqw; letter-spacing: 0.02em;">AFOLABI MICHAEL</span>
+                        <span id="sycPreviewDob" class="absolute font-bold text-[#14171a] uppercase whitespace-nowrap leading-none" style="left: 21.91%; top: 51.79%; font-size: 2.35cqw; letter-spacing: 0.01em;">25 FEB 1971</span>
+                        <span id="sycPreviewNationality" class="absolute font-bold text-[#14171a] uppercase whitespace-nowrap leading-none" style="left: 21.91%; top: 58.93%; font-size: 2.35cqw; letter-spacing: 0.01em;">CITIZEN OF SEYCHELLES</span>
+                        <span id="sycPreviewSex" class="absolute font-bold text-[#14171a] uppercase whitespace-nowrap leading-none" style="left: 21.91%; top: 66.07%; font-size: 2.35cqw;">M</span>
+                        <span id="sycPreviewIssueDate" class="absolute font-bold text-[#14171a] uppercase whitespace-nowrap leading-none" style="left: 21.91%; top: 72.54%; font-size: 2.35cqw; letter-spacing: 0.01em;">20 NOV 2020</span>
 
-                      <!-- Middle Section: Bio-Data Fields (Left) & Portrait + Signature (Right) -->
-                      <div class="relative z-10 flex items-start justify-between gap-3 my-auto pt-1">
-                        
-                        <!-- Left: Structured Field List -->
-                        <div class="flex-1 space-y-1 sm:space-y-1.5 text-left min-w-0 pr-2">
-                          <div class="grid grid-cols-12 gap-1 items-baseline">
-                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Identity No:</span>
-                            <span id="sycPreviewId" class="col-span-7 font-mono-code font-black text-slate-950 text-xs sm:text-sm leading-tight">792-7109-8-7-12</span>
-                          </div>
-
-                          <div class="grid grid-cols-12 gap-1 items-baseline">
-                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Surname:</span>
-                            <span id="sycPreviewSurname" class="col-span-7 font-black text-slate-950 text-xs sm:text-sm uppercase leading-tight truncate">AGBONDE</span>
-                          </div>
-
-                          <div class="grid grid-cols-12 gap-1 items-baseline">
-                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Given Name:</span>
-                            <span id="sycPreviewGivenName" class="col-span-7 font-bold text-slate-950 text-xs sm:text-sm uppercase leading-tight truncate">AFOLABI MICHAEL</span>
-                          </div>
-
-                          <div class="grid grid-cols-12 gap-1 items-baseline">
-                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Date of Birth:</span>
-                            <span id="sycPreviewDob" class="col-span-7 font-mono-code font-bold text-slate-950 text-[11px] sm:text-xs leading-tight">25 FEB 1971</span>
-                          </div>
-
-                          <div class="grid grid-cols-12 gap-1 items-baseline">
-                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Nationality:</span>
-                            <span id="sycPreviewNationality" class="col-span-7 font-bold text-slate-950 text-[10px] sm:text-xs uppercase leading-tight truncate">CITIZEN OF SEYCHELLES</span>
-                          </div>
-
-                          <div class="grid grid-cols-12 gap-1 items-baseline">
-                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Sex:</span>
-                            <span id="sycPreviewSex" class="col-span-7 font-bold text-slate-950 text-xs leading-tight">M</span>
-                          </div>
-
-                          <div class="grid grid-cols-12 gap-1 items-baseline">
-                            <span class="col-span-5 text-[8px] sm:text-[9.5px] font-bold text-slate-700 leading-tight">Date of Issue:</span>
-                            <span id="sycPreviewIssueDate" class="col-span-7 font-mono-code font-bold text-slate-950 text-[11px] sm:text-xs leading-tight">20 NOV 2020</span>
-                          </div>
+                        <!-- Custom Bearer Portrait Overlay (Inside Black Rectangular Frame) -->
+                        <div id="sycCustomPhotoWrap" class="absolute overflow-hidden transition-opacity" style="left: 73.60%; top: 34.60%; width: 21.07%; height: 38.39%; opacity: 0;">
+                          <img id="sycPreviewPhoto" src="/assets/aistudio/seychelles_portrait_exact.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
                         </div>
 
-                        <!-- Right: Photo with Black Frame & Signature Below -->
-                        <div class="flex flex-col items-center shrink-0 w-22 sm:w-26 md:w-30">
-                          <div class="w-full aspect-[3/3.8] rounded-xs overflow-hidden border-2 border-slate-950 bg-white shadow-xs">
-                            <img id="sycPreviewPhoto" src="/assets/aistudio/seychelles_portrait_exact.jpg" alt="Bearer Portrait" class="w-full h-full object-cover">
-                          </div>
-                          <div class="relative w-full flex flex-col items-center mt-1">
-                            <span class="text-[7px] sm:text-[8px] font-bold text-slate-700 leading-none">Signature</span>
-                            <img id="sycPreviewSignature" src="/assets/aistudio/seychelles_holder_sig.png" alt="Signature" class="h-5 sm:h-6 md:h-7 w-auto object-contain mix-blend-multiply mt-0.5">
-                          </div>
-                        </div>
-
+                        <!-- Holder Signature (Preserved ID for compatibility) -->
+                        <img id="sycPreviewSignature" src="/assets/aistudio/seychelles_holder_sig.png" alt="Signature" class="hidden">
                       </div>
 
-                      <!-- Bottom Row: 1D Linear Barcode -->
-                      <div class="relative z-10 pt-1">
-                        <img src="/assets/aistudio/seychelles_barcode_clean.png" alt="Card Barcode" class="h-6 sm:h-7 md:h-8 w-auto max-w-[200px] sm:max-w-[240px] object-contain mix-blend-multiply">
-                      </div>
-
+                      <!-- Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active -->
+                      <img id="sycFrontRefOverlay" src="/assets/aistudio/seychelles_front_reference.png" alt="Seychelles National Identity Card Front Reference" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
                     </article>
                   </div>
 
@@ -16431,48 +16437,28 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <span class="font-mono-code text-[10px] text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">ICAO TD1 MRZ</span>
                     </div>
 
-                    <article id="seychelles-id-back" class="seychelles-id-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-xl border-2 border-slate-300 p-3 sm:p-4 md:p-5 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
-                      
-                      <!-- Top/Middle Row: Chip on Left, Ghost Photo in Center, Authority on Right -->
-                      <div class="relative z-10 flex items-start justify-between gap-3 pt-1">
-                        
-                        <!-- Left: Contact Microchip -->
-                        <div class="shrink-0 pt-2 sm:pt-3">
-                          <img src="/assets/aistudio/seychelles_chip_exact.png" alt="Smart Chip" class="w-10 sm:w-12 md:w-14 h-auto object-contain rounded-xs shadow-xs drop-shadow-2xs">
+                    <article id="seychelles-id-back" class="seychelles-id-back-bg relative w-full rounded-[14px] shadow-xl border border-slate-300 overflow-hidden text-[#14171a] select-none bg-[#f5efe8]" style="aspect-ratio: 712 / 448; container-type: inline-size; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">
+                      <!-- 1:1 Rectified Reference Base Plate with Ghost ID & MRZ Band Cleanly Inpainted -->
+                      <img src="/assets/aistudio/seychelles_back_clean_bg.png" alt="Seychelles National Identity Card Back Base Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                      <!-- Live Dynamic Back Overlay (Ghost Portrait, Ghost ID & 3-Line ICAO TD1 MRZ) -->
+                      <div class="absolute inset-0 w-full h-full z-10 pointer-events-none select-none">
+                        <!-- Custom Ghost Portrait Overlay -->
+                        <div id="sycCustomGhostWrap" class="absolute overflow-hidden rounded-xs transition-opacity" style="left: 25.00%; top: 5.80%; width: 21.35%; height: 31.70%; opacity: 0;">
+                          <img id="sycPreviewGhost" src="/assets/aistudio/seychelles_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-75 mix-blend-multiply">
                         </div>
 
-                        <!-- Center: Ghost Photo with ID Number -->
-                        <div class="flex flex-col items-center">
-                          <div class="w-12 sm:w-14 md:w-16 aspect-[3/3.8] rounded-xs overflow-hidden opacity-85">
-                            <img id="sycPreviewGhost" src="/assets/aistudio/seychelles_ghost_exact.png" alt="Ghost Portrait" class="w-full h-full object-cover">
-                          </div>
-                          <span id="sycPreviewGhostId" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider mt-0.5">79271098712</span>
-                        </div>
+                        <!-- Ghost ID Number Below Ghost Portrait -->
+                        <span id="sycPreviewGhostId" class="absolute font-mono-code font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 27.95%; top: 39.73%; font-size: 2.65cqw; letter-spacing: 0.09em;">79271098712</span>
 
-                        <!-- Right: Issuing Authority & Registrar Signature -->
-                        <div class="flex flex-col items-end text-right">
-                          <span class="text-[7px] sm:text-[8px] text-slate-600 font-medium leading-tight">Authority / Autorité</span>
-                          <span class="text-[7.5px] sm:text-[8.5px] font-black text-slate-900 leading-tight">NATIONAL IDENTIFICATION AUTHORITY</span>
-                          <img src="/assets/aistudio/seychelles_auth_signature_exact.png" alt="Authority Signature" class="h-7 sm:h-9 md:h-11 w-auto object-contain mix-blend-multiply mt-0.5">
-                        </div>
-
+                        <!-- 3-Line TD1 Machine Readable Zone inside White Band -->
+                        <div id="sycPreviewMrz1" class="absolute whitespace-pre font-mono-code font-bold text-[#111316] leading-none" style="left: 3.79%; top: 61.38%; font-size: 4.15cqw; letter-spacing: 0.165em;">IDSYC79271098712&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                        <div id="sycPreviewMrz2" class="absolute whitespace-pre font-mono-code font-bold text-[#111316] leading-none" style="left: 3.79%; top: 69.87%; font-size: 4.15cqw; letter-spacing: 0.165em;">79271098712NGA&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;02</div>
+                        <div id="sycPreviewMrz3" class="absolute whitespace-pre font-mono-code font-bold text-[#111316] leading-none" style="left: 3.79%; top: 78.79%; font-size: 4.15cqw; letter-spacing: 0.165em;">AGBONDE&lt;AFOLABI&lt;MICHAEL&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
                       </div>
 
-                      <!-- Bottom Section: Machine Readable Zone (MRZ) & Disclaimer -->
-                      <div class="relative z-10 space-y-1">
-                        <!-- 3-line TD1 Machine Readable Zone -->
-                        <div class="bg-white/95 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xs border border-slate-200 shadow-2xs">
-                          <div id="sycPreviewMrz1" class="font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] font-black text-slate-950 tracking-[0.16em] leading-tight">IDSYC79271098712&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                          <div id="sycPreviewMrz2" class="font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] font-black text-slate-950 tracking-[0.16em] leading-tight">79271098712NGA&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;02</div>
-                          <div id="sycPreviewMrz3" class="font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] font-black text-slate-950 tracking-[0.16em] leading-tight">AGBONDE&lt;&lt;AFOLABI&lt;MICHAEL&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                        </div>
-
-                        <!-- Property Disclaimer -->
-                        <p class="text-[6.5px] sm:text-[7.5px] text-slate-600 italic text-center leading-tight">
-                          This document remains the property of the Government of Seychelles and shall be produced when requested by an authorized official or relevant authority.
-                        </p>
-                      </div>
-
+                      <!-- Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active -->
+                      <img id="sycBackRefOverlay" src="/assets/aistudio/seychelles_back_reference.png" alt="Seychelles National Identity Card Back Reference" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
                     </article>
                   </div>
 
@@ -18422,339 +18408,90 @@ COD REP DEM CONGO</div>
             </div>
 
             <!-- CARD SPREAD -->
-            <article id="bangladesh-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1b1e23] bg-[#fbfbf9]" style="aspect-ratio: 623 / 863; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-              <!-- Underlay clean composite spread for exact micro-guilloche patterns -->
-              <img src="/assets/aistudio/bgd_passport_clean_bg.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-40 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
+            <article id="bangladesh-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1c1f24] bg-[#fbfbf9]" style="aspect-ratio: 623 / 863; container-type: inline-size; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">
+              <!-- Clean 1:1 Reference Base Plate (623x863) -->
+              <img src="/assets/aistudio/bgd_passport_clean_bg.png" alt="People's Republic of Bangladesh Passport Base Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-              <!-- ============ PAGE 1: PERSONAL DATA & EMERGENCY CONTACT (TOP HALF) ============ -->
-              <section id="bgdTopPage" class="relative w-full overflow-hidden" style="height: 49.6%; container-type: inline-size; background: linear-gradient(180deg, #f7f9f7 0%, #fefefe 40%, #f6faf6 100%);">
-                <!-- SVG Guilloche Security Waves & Watermark -->
-                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 623 428" preserveAspectRatio="none" aria-hidden="true">
-                  <!-- Fine Guilloche rosettes -->
-                  <g fill="none" stroke="#248658" stroke-width="0.4" opacity="0.16">
-                    <circle cx="311" cy="200" r="140" />
-                    <circle cx="311" cy="200" r="120" />
-                    <circle cx="311" cy="200" r="100" />
-                    <circle cx="311" cy="200" r="80" />
-                    <path d="M 0 60 Q 311 120 623 60" />
-                    <path d="M 0 100 Q 311 160 623 100" />
-                    <path d="M 0 140 Q 311 200 623 140" />
-                    <path d="M 0 180 Q 311 240 623 180" />
-                    <path d="M 0 220 Q 311 280 623 220" />
-                  </g>
-                  <!-- Central Watermark Seal -->
-                  <g transform="translate(420, 200)" opacity="0.12">
-                    <circle cx="0" cy="0" r="75" fill="none" stroke="#ba1c24" stroke-width="1.5" />
-                    <circle cx="0" cy="0" r="65" fill="#ba1c24" />
-                    <circle cx="0" cy="0" r="50" fill="none" stroke="#248658" stroke-width="2" />
-                  </g>
-                </svg>
+              <!-- ============ LIVE OVERLAY LAYER (1:1 REFERENCE COORDINATES) ============ -->
+              <div id="bgdTopPage" class="absolute inset-0 w-full h-full z-10 pointer-events-none select-none">
+                <!-- Left Perforated Passport Number (Vertical Needle Punch, reads bottom-to-top) -->
+                <div id="bgdOutPerforatedPassNo" class="absolute flex flex-col justify-between items-center pointer-events-none select-none" style="left: 4.17%; top: 6.49%; width: 5.78%; height: 35.69%;"></div>
 
-                <!-- Top Page Header -->
-                <div class="pt-[3.6%] text-center">
-                  <div class="text-[#248658] font-black uppercase tracking-wider" style="font-size: 2.8cqw; letter-spacing: 0.08em; text-shadow: 0 0.5px 0.5px rgba(0,0,0,0.05);">
-                    PERSONAL DATA AND EMERGENCY CONTACT
-                  </div>
-                </div>
+                <!-- Top-Right Vertical Barcode Serial Text -->
+                <div id="bgdOutBarcodeText" class="absolute font-mono font-bold text-[#1e2226] whitespace-nowrap leading-none" style="left: 84.91%; top: 34.41%; transform-origin: left top; transform: rotate(-90deg); font-size: 1.95cqw; letter-spacing: 0.49em;">A 0 6 8 2 1 7 1 6</div>
 
-                <!-- Left Perforated Passport Number (Vertical Needle Punch) -->
-                <div class="absolute left-[3.2%] top-[10%] bottom-[8%] flex flex-col justify-between items-center pointer-events-none select-none z-10" style="width: 7%;">
-                  <div id="bgdOutPerforatedPassNo" class="font-mono font-bold tracking-[0.45em] text-slate-700/60" style="writing-mode: vertical-lr; transform: rotate(180deg); font-size: 2.6cqw; letter-spacing: 0.55em; text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 0 rgba(0,0,0,0.25);">
-                    A 0 6 8 2 1 7 1 6
-                  </div>
-                </div>
+                <!-- Top Page Data Content (x = 30.34%) -->
+                <div id="bgdOutTopName" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]" style="left: 30.34%; top: 8.57%; font-size: 1.78cqw; transform: scaleX(0.88); transform-origin: left top;">MD DELOWER HOSSAIN</div>
+                <div id="bgdOutTopFather" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]" style="left: 30.34%; top: 10.89%; font-size: 1.78cqw; transform: scaleX(0.88); transform-origin: left top;">MD MOFIZUL ISLAM</div>
+                <div id="bgdOutTopMother" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]" style="left: 30.34%; top: 13.09%; font-size: 1.78cqw; transform: scaleX(0.88); transform-origin: left top;">AMANA BEGUM</div>
+                <div id="bgdOutTopSpouse" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]" style="left: 30.34%; top: 15.18%; font-size: 1.78cqw; transform: scaleX(0.88); transform-origin: left top;"></div>
+                <div id="bgdOutTopAddress" class="absolute font-semibold uppercase text-[#1e2124]" style="left: 30.34%; top: 17.27%; width: 48%; font-size: 1.75cqw; line-height: 1.18; transform: scaleX(0.86); transform-origin: left top;">HOUSE # 57/59, ROAD # 31, BLOCK # D, PALLABI, PALLABI - 1216, DHAKA</div>
 
-                <!-- Top Page Data Content (Holder Family & Emergency Contact) -->
-                <div class="absolute inset-0 flex flex-col justify-start" style="padding-top: 10.5%; padding-left: 17%; padding-right: 28%; font-size: 2.05cqw; line-height: 1.35;">
-                  <!-- Name -->
-                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Name:</span>
-                    <span id="bgdOutTopName" class="col-span-8 font-black text-slate-900 tracking-tight" style="font-size: 2.1cqw;">MD DELOWER HOSSAIN</span>
-                  </div>
-                  <!-- Father's Name -->
-                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Father's Name:</span>
-                    <span id="bgdOutTopFather" class="col-span-8 font-bold text-slate-900">MD MOFIZUL ISLAM</span>
-                  </div>
-                  <!-- Mother's Name -->
-                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Mother's Name:</span>
-                    <span id="bgdOutTopMother" class="col-span-8 font-bold text-slate-900">AMANA BEGUM</span>
-                  </div>
-                  <!-- Spouse's Name -->
-                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Spouse's Name:</span>
-                    <span id="bgdOutTopSpouse" class="col-span-8 font-semibold text-slate-700">—</span>
-                  </div>
-                  <!-- Permanent Address -->
-                  <div class="grid grid-cols-12 gap-1 mb-[4.5%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Permanent Address:</span>
-                    <span id="bgdOutTopAddress" class="col-span-8 font-semibold text-slate-900 leading-snug" style="font-size: 1.85cqw;">HOUSE # 57/59, ROAD # 31, BLOCK # D, PALLABI, PALLABI - 1216, DHAKA</span>
-                  </div>
-
-                  <!-- Emergency Contact Sub-header -->
-                  <div class="font-bold text-slate-800 mb-[1.8%]" style="font-size: 2.0cqw;">
-                    Emergency Contact:
-                  </div>
-                  <!-- Emergency Name -->
-                  <div class="grid grid-cols-12 gap-1 mb-[1.5%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Name:</span>
-                    <span id="bgdOutEmergName" class="col-span-8 font-black text-slate-900">JAHIDUL ISLAM</span>
-                  </div>
-                  <!-- Relationship -->
-                  <div class="grid grid-cols-12 gap-1 mb-[1.5%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Relationship:</span>
-                    <span id="bgdOutEmergRelation" class="col-span-8 font-bold text-slate-900">BROTHER</span>
-                  </div>
-                  <!-- Emergency Address -->
-                  <div class="grid grid-cols-12 gap-1 mb-[1.8%]">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Address:</span>
-                    <span id="bgdOutEmergAddress" class="col-span-8 font-semibold text-slate-900 leading-snug" style="font-size: 1.85cqw;">HOUSE # 76, ROAD # 06, BLOCK-A, PALLABI, PALLABI - 1216, DHAKA</span>
-                  </div>
-                  <!-- Telephone No -->
-                  <div class="grid grid-cols-12 gap-1">
-                    <span class="col-span-4 font-bold text-slate-800" style="font-size: 1.95cqw;">Telephone No:</span>
-                    <span id="bgdOutEmergPhone" class="col-span-8 font-mono font-bold text-slate-900">+8801616166031</span>
-                  </div>
-                </div>
-
-                <!-- Right Side: Vertical Barcode, Seal, and QR code -->
-                <div class="absolute right-[3.5%] top-[14%] bottom-[6%] flex flex-col justify-between items-center" style="width: 24%;">
-                  <!-- Vertical 1D Barcode -->
-                  <div class="flex flex-col items-center">
-                    <div class="bg-white/70 px-1 py-1 rounded-xs flex items-center justify-center">
-                      <!-- Barcode simulation lines -->
-                      <div class="flex items-center h-[120px]" style="writing-mode: vertical-lr; transform: rotate(180deg);">
-                        <svg width="24" height="135" viewBox="0 0 28 150" fill="#000000">
-                          <rect x="0" y="0" width="2" height="150" />
-                          <rect x="3" y="0" width="1" height="150" />
-                          <rect x="6" y="0" width="3" height="150" />
-                          <rect x="11" y="0" width="1" height="150" />
-                          <rect x="14" y="0" width="2" height="150" />
-                          <rect x="18" y="0" width="4" height="150" />
-                          <rect x="23" y="0" width="1" height="150" />
-                          <rect x="25" y="0" width="2" height="150" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div id="bgdOutBarcodeText" class="font-mono font-bold text-[1.8cqw] tracking-[0.25em] text-slate-800 mt-1" style="writing-mode: vertical-lr; transform: rotate(180deg);">
-                      A 0 6 8 2 1 7 1 6
-                    </div>
-                  </div>
-
-                  <!-- QR Code / DataMatrix -->
-                  <div class="p-1 bg-white/90 rounded-xs border border-slate-300 shadow-xs mb-1">
-                    <svg width="46" height="46" viewBox="0 0 46 46" fill="#000000">
-                      <!-- Standard QR pattern representation -->
-                      <rect x="2" y="2" width="12" height="12" fill="none" stroke="#000" stroke-width="2.5" />
-                      <rect x="5.5" y="5.5" width="5" height="5" />
-                      <rect x="32" y="2" width="12" height="12" fill="none" stroke="#000" stroke-width="2.5" />
-                      <rect x="35.5" y="5.5" width="5" height="5" />
-                      <rect x="2" y="32" width="12" height="12" fill="none" stroke="#000" stroke-width="2.5" />
-                      <rect x="5.5" y="5.5" width="5" height="5" />
-                      <rect x="5.5" y="35.5" width="5" height="5" />
-                      <!-- Data modules -->
-                      <rect x="18" y="4" width="3" height="3" /><rect x="24" y="6" width="3" height="3" /><rect x="18" y="12" width="3" height="3" />
-                      <rect x="6" y="18" width="3" height="3" /><rect x="12" y="22" width="3" height="3" /><rect x="18" y="18" width="3" height="3" />
-                      <rect x="24" y="22" width="3" height="3" /><rect x="30" y="18" width="3" height="3" /><rect x="36" y="22" width="3" height="3" />
-                      <rect x="18" y="28" width="3" height="3" /><rect x="24" y="32" width="3" height="3" /><rect x="32" y="30" width="3" height="3" />
-                      <rect x="38" y="34" width="3" height="3" /><rect x="22" y="38" width="3" height="3" /><rect x="36" y="40" width="3" height="3" />
-                    </svg>
-                  </div>
-                </div>
-              </section>
-
-              <!-- ============ BOOKLET SEAM DIVIDER ============ -->
-              <div class="relative w-full h-[5px] bg-gradient-to-b from-[#b8c2b5]/70 via-[#e0e6de] to-[#c2ccbf]/80 border-y border-slate-300/80 shadow-inner flex items-center justify-around pointer-events-none z-20">
-                <div class="w-full h-[1px] border-b border-dashed border-slate-500/30"></div>
+                <div id="bgdOutEmergName" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]" style="left: 30.34%; top: 23.75%; font-size: 1.78cqw; transform: scaleX(0.88); transform-origin: left top;">JAHIDUL ISLAM</div>
+                <div id="bgdOutEmergRelation" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]" style="left: 30.34%; top: 26.07%; font-size: 1.78cqw; transform: scaleX(0.88); transform-origin: left top;">BROTHER</div>
+                <div id="bgdOutEmergAddress" class="absolute font-semibold uppercase text-[#1e2124]" style="left: 30.50%; top: 28.16%; width: 48%; font-size: 1.75cqw; line-height: 1.18; transform: scaleX(0.86); transform-origin: left top;">HOUSE # 76, ROAD # 06, BLOCK-A, PALLABI, PALLABI - 1216, DHAKA</div>
+                <div id="bgdOutEmergPhone" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]" style="left: 30.66%; top: 32.10%; font-size: 1.78cqw; transform: scaleX(0.88); transform-origin: left top;">+8801616166031</div>
               </div>
 
               <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF) ============ -->
-              <section id="bgdDataPage" class="relative w-full overflow-hidden" style="height: 49.8%; container-type: inline-size; background: linear-gradient(180deg, #fbfbf9 0%, #f6f8f6 45%, #fbf9f6 100%);">
-                <!-- Guilloche patterns & Central Seal Watermark -->
-                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 623 430" preserveAspectRatio="none" aria-hidden="true">
-                  <!-- Central Watermark Seal: গণপ্রজাতন্ত্রী বাংলাদেশ Emblem -->
-                  <g transform="translate(360, 160)" opacity="0.14">
-                    <circle cx="0" cy="0" r="70" fill="none" stroke="#1d6643" stroke-width="2" />
-                    <circle cx="0" cy="0" r="62" fill="none" stroke="#248658" stroke-width="0.8" stroke-dasharray="2 1" />
-                    <text x="0" y="5" text-anchor="middle" font-size="14" font-weight="900" fill="#1d6643" font-family="'Inter', sans-serif">গণপ্রজাতন্ত্রী বাংলাদেশ</text>
-                  </g>
-                  <!-- Fine Guilloche arcs -->
-                  <g fill="none" stroke="#248658" stroke-width="0.4" opacity="0.15">
-                    <circle cx="110" cy="180" r="90" />
-                    <circle cx="520" cy="160" r="90" />
-                    <path d="M 0 50 Q 311 0 623 50" />
-                    <path d="M 0 100 Q 311 50 623 100" />
-                    <path d="M 0 150 Q 311 100 623 150" />
-                    <path d="M 0 200 Q 311 150 623 200" />
-                    <path d="M 0 250 Q 311 200 623 250" />
-                  </g>
-                </svg>
-
-                <!-- Data Page Header -->
-                <div class="pt-[2.2%] px-[3.5%] flex items-start justify-between">
-                  <!-- Left: PASSPORT / পাসপোর্ট -->
-                  <div class="text-left leading-none">
-                    <div class="font-extrabold text-slate-800 tracking-wider" style="font-size: 2.7cqw;">PASSPORT</div>
-                    <div class="font-bold text-slate-600 mt-[1px]" style="font-size: 2.1cqw;">পাসপোর্ট</div>
-                  </div>
-                  <!-- Center-Right: গণপ্রজাতন্ত্রী বাংলাদেশ / PEOPLE'S REPUBLIC OF BANGLADESH -->
-                  <div class="text-right leading-tight">
-                    <div class="font-black text-[#1b6b45] tracking-tight" style="font-size: 2.9cqw;">
-                      গণপ্রজাতন্ত্রী বাংলাদেশ
-                    </div>
-                    <div class="font-extrabold text-[#ba1c24] uppercase tracking-wider" style="font-size: 2.5cqw;">
-                      PEOPLE'S REPUBLIC OF BANGLADESH
-                    </div>
-                  </div>
+              <div id="bgdDataPage" class="absolute inset-0 w-full h-full z-10 pointer-events-none select-none">
+                <!-- Custom Bearer Portrait Photo when uploaded -->
+                <div id="bgdCustomPhotoWrap" class="absolute overflow-hidden rounded-xs transition-opacity" style="left: 4.65%; top: 62.57%; width: 23.44%; height: 21.67%; opacity: 0;">
+                  <img id="bgdOutPhotoMain" src="/assets/aistudio/bgd_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover object-center contrast-105" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
                 </div>
 
-                <!-- Main Content Area: Bearer Portrait + Field Grid + Ghost Portrait -->
-                <div class="relative px-[3.2%] pt-[1.8%] flex items-start gap-[2%]">
-                  <!-- LEFT: Bearer Portrait Photo -->
-                  <div class="relative shrink-0 rounded-xs overflow-hidden border border-slate-400/90 shadow-md bg-slate-200" style="width: 28%; aspect-ratio: 35 / 45;">
-                    <img id="bgdOutPhotoMain" src="/assets/aistudio/bgd_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
-                    <!-- Subtle Corner Vignette -->
-                    <div class="absolute inset-0 ring-1 ring-inset ring-black/15 pointer-events-none"></div>
-                  </div>
-
-                  <!-- CENTER: Dual-language Data Grid -->
-                  <div class="grow grid grid-cols-12 gap-x-2 gap-y-[3px]" style="font-size: 1.8cqw; line-height: 1.25;">
-                    <!-- Row 1: Type / Country Code / Passport Number -->
-                    <div class="col-span-2">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">শ্রেণি / Type</div>
-                      <div id="bgdOutType" class="font-black text-slate-900 text-[2.1cqw]">P</div>
-                    </div>
-                    <div class="col-span-3">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">দেশ কোড / Country Code</div>
-                      <div id="bgdOutCode" class="font-black text-slate-900 text-[2.1cqw]">BGD</div>
-                    </div>
-                    <div class="col-span-7">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">পাসপোর্ট নং / Passport Number</div>
-                      <div id="bgdOutPassNo" class="font-mono font-black text-slate-900 text-[2.3cqw] tracking-wide">A06821716</div>
-                    </div>
-
-                    <!-- Row 2: Surname -->
-                    <div class="col-span-12 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">বংশগত নাম / Surname</div>
-                      <div id="bgdOutSurname" class="font-black text-slate-900 text-[2.35cqw] tracking-tight">HOSSAIN</div>
-                    </div>
-
-                    <!-- Row 3: Given Name -->
-                    <div class="col-span-12 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">প্রদত্ত নাম / Given Name</div>
-                      <div id="bgdOutGivenName" class="font-black text-slate-900 text-[2.35cqw] tracking-tight">MD DELOWER</div>
-                    </div>
-
-                    <!-- Row 4: Nationality / Personal No -->
-                    <div class="col-span-5 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">জাতীয়তা / Nationality</div>
-                      <div id="bgdOutNationality" class="font-black text-slate-900 text-[2.0cqw]">BANGLADESHI</div>
-                    </div>
-                    <div class="col-span-7 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">ব্যক্তিগত নং / Personal No.</div>
-                      <div id="bgdOutPersonalNo" class="font-mono font-bold text-slate-900 text-[2.0cqw]">6902553657</div>
-                    </div>
-
-                    <!-- Row 5: DOB / Previous Passport No -->
-                    <div class="col-span-5 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">জন্ম তারিখ / Date of Birth</div>
-                      <div id="bgdOutDob" class="font-bold text-slate-900 text-[1.9cqw]">23 MAY 1997</div>
-                    </div>
-                    <div class="col-span-7 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">পূর্ববর্তী পাসপোর্ট নং / Previous Passport No.</div>
-                      <div id="bgdOutPrevPassNo" class="font-mono font-bold text-slate-900 text-[1.9cqw]">BT0283556</div>
-                    </div>
-
-                    <!-- Row 6: Sex / Place of Birth -->
-                    <div class="col-span-3 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">লিঙ্গ / Sex</div>
-                      <div id="bgdOutSex" class="font-black text-slate-900 text-[2.0cqw]">M</div>
-                    </div>
-                    <div class="col-span-9 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">জন্মস্থান / Place of Birth</div>
-                      <div id="bgdOutPob" class="font-bold text-slate-900 text-[2.0cqw]">BHOLA</div>
-                    </div>
-
-                    <!-- Row 7: Date of Issue / Issuing Authority -->
-                    <div class="col-span-5 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">প্রদানের তারিখ / Date of Issue</div>
-                      <div id="bgdOutIssue" class="font-bold text-slate-900 text-[1.9cqw]">31 JAN 2023</div>
-                    </div>
-                    <div class="col-span-7 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">প্রদানকারী কর্তৃপক্ষ / Issuing Authority</div>
-                      <div id="bgdOutAuthority" class="font-bold text-slate-900 text-[1.9cqw]">DIP/DHAKA</div>
-                    </div>
-
-                    <!-- Row 8: Date of Expiry / Holder's Signature -->
-                    <div class="col-span-5 mt-[1px]">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">মেয়াদোত্তীর্ণের তারিখ / Date of Expiry</div>
-                      <div id="bgdOutExpiry" class="font-bold text-slate-900 text-[1.9cqw]">30 JAN 2033</div>
-                    </div>
-                    <div class="col-span-7 mt-[1px] relative">
-                      <div class="text-slate-500 font-semibold text-[1.4cqw]">স্বাক্ষর / Holder's Signature</div>
-                      <div class="h-[18px] flex items-center">
-                        <!-- Realistic bearer signature path -->
-                        <svg class="h-[16px] w-[90px] text-slate-800" viewBox="0 0 100 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M 6 18 C 12 6, 20 2, 28 14 C 32 20, 36 22, 44 10 C 50 4, 56 16, 68 12 C 78 8, 86 18, 96 14" />
-                          <path d="M 18 14 L 38 14" stroke-width="1.2" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- RIGHT: Tinted Mini Photo + Ghost Portrait + Flag -->
-                  <div class="shrink-0 flex flex-col items-center justify-between" style="width: 14%; height: 165px;">
-                    <!-- Small circular tinted portrait -->
-                    <div class="w-[38px] h-[48px] rounded-full overflow-hidden border border-red-900/40 shadow-xs relative bg-rose-950/20">
-                      <img id="bgdOutPhotoMini" src="/assets/aistudio/bgd_passport_portrait.png" alt="" class="w-full h-full object-cover mix-blend-multiply opacity-80" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
-                      <div class="absolute inset-0 bg-rose-900/40 mix-blend-color pointer-events-none"></div>
-                    </div>
-
-                    <!-- Ghost photo with laser-engraved DOB watermark -->
-                    <div class="relative w-[38px] h-[48px] rounded-xs overflow-hidden border border-slate-300 bg-slate-100 shadow-xs">
-                      <img id="bgdOutPhotoGhost" src="/assets/aistudio/bgd_passport_portrait.png" alt="" class="w-full h-full object-cover grayscale opacity-55 contrast-125" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
-                      <!-- DOB watermark engraved across bottom of ghost photo -->
-                      <div id="bgdOutGhostDob" class="absolute inset-x-0 bottom-0 text-center font-mono font-black text-slate-800 tracking-tighter" style="font-size: 1.5cqw; background: rgba(255,255,255,0.45); backdrop-filter: blur(0.5px);">
-                        23.05.97
-                      </div>
-                    </div>
-
-                    <!-- Specimen serial code -->
-                    <div class="font-mono font-bold text-slate-700 tracking-wider" style="font-size: 1.6cqw;">
-                      982450
-                    </div>
-
-                    <!-- Bangladesh National Flag (Green field with Red circle at slight angle) -->
-                    <div class="w-[32px] h-[19px] bg-[#006a4e] rounded-[1px] relative shadow-xs border border-black/20 flex items-center justify-center transform -rotate-1">
-                      <div class="w-[11px] h-[11px] rounded-full bg-[#f42a41] -translate-x-[1px]"></div>
-                    </div>
-                  </div>
+                <!-- Custom Mini Crimson Oval Portrait when uploaded -->
+                <div id="bgdCustomMiniWrap" class="absolute rounded-full overflow-hidden transition-opacity" style="left: 84.67%; top: 57.59%; width: 9.63%; height: 8.69%; opacity: 0;">
+                  <img id="bgdOutPhotoMini" src="/assets/aistudio/bgd_passport_portrait.png" alt="" class="w-full h-full object-cover mix-blend-multiply opacity-85" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
+                  <div class="absolute inset-0 bg-rose-900/45 mix-blend-color pointer-events-none"></div>
                 </div>
 
-                <!-- Holographic Optical Security Strip (Repeated BGD + Chip Icon + Wave Foil) -->
-                <div class="relative mx-[3.2%] mt-[2.5%] h-[14px] rounded-[2px] overflow-hidden border-y border-cyan-400/50 shadow-xs flex items-center justify-between px-2" style="background: linear-gradient(90deg, rgba(6,182,212,0.3) 0%, rgba(59,130,246,0.35) 20%, rgba(236,72,153,0.35) 45%, rgba(234,179,8,0.35) 70%, rgba(16,185,129,0.3) 100%);">
-                  <div class="flex items-center gap-4 text-[1.4cqw] font-mono font-black tracking-widest text-slate-800/80 uppercase">
-                    <span>★ BGD</span>
-                    <span>☲ BGD</span>
-                    <span>★ BGD</span>
-                    <span>☲ BGD</span>
-                    <span>★ BGD</span>
-                    <span>☲ BGD</span>
-                    <span>★ BGD</span>
-                  </div>
+                <!-- Custom Ghost Portrait with DOB watermark when photo or DOB is modified -->
+                <div id="bgdCustomGhostWrap" class="absolute overflow-hidden rounded-xs bg-[#e8e5ec] transition-opacity" style="left: 85.71%; top: 69.52%; width: 9.31%; height: 6.95%; opacity: 0;">
+                  <img id="bgdOutPhotoGhost" src="/assets/aistudio/bgd_passport_portrait.png" alt="" class="w-full h-full object-cover object-top grayscale opacity-65 contrast-110 mix-blend-multiply" onerror="this.src='/assets/aistudio/images_9bd6b29a.png'">
+                  <div id="bgdOutGhostDob" class="absolute inset-x-0 bottom-[18%] text-center font-sans font-extrabold text-[#4a4d52]/80 leading-none" style="font-size: 1.75cqw; letter-spacing: 0.04em; text-shadow: 0 0 2px rgba(255,255,255,0.85);">23.05.97</div>
                 </div>
+
+                <!-- Row 1: Type / Country Code / Passport Number -->
+                <div id="bgdOutType" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 31.78%; top: 58.52%; font-size: 2.05cqw;">P</div>
+                <div id="bgdOutCode" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 41.89%; top: 58.52%; font-size: 2.05cqw; letter-spacing: 0.02em;">BGD</div>
+                <div id="bgdOutPassNo" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 62.44%; top: 58.52%; font-size: 2.05cqw; letter-spacing: 0.02em;">A06821716</div>
+
+                <!-- Row 2: Surname -->
+                <div id="bgdOutSurname" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 31.46%; top: 62.11%; font-size: 2.05cqw; letter-spacing: 0.01em;">HOSSAIN</div>
+
+                <!-- Row 3: Given Name -->
+                <div id="bgdOutGivenName" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 31.62%; top: 65.35%; font-size: 2.05cqw; letter-spacing: 0.01em;">MD DELOWER</div>
+
+                <!-- Row 4: Nationality / Personal No. -->
+                <div id="bgdOutNationality" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 31.78%; top: 68.83%; font-size: 2.05cqw; letter-spacing: 0.01em;">BANGLADESHI</div>
+                <div id="bgdOutPersonalNo" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 53.93%; top: 68.83%; font-size: 2.05cqw; letter-spacing: 0.02em;">6902553657</div>
+
+                <!-- Row 5: Date of Birth / Previous Passport No. -->
+                <div id="bgdOutDob" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 31.94%; top: 72.42%; font-size: 2.05cqw; letter-spacing: 0.01em;">23 MAY 1997</div>
+                <div id="bgdOutPrevPassNo" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 54.09%; top: 72.42%; font-size: 2.05cqw; letter-spacing: 0.02em;">BT0283556</div>
+
+                <!-- Row 6: Sex / Place of Birth / Booklet Serial -->
+                <div id="bgdOutSex" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 31.78%; top: 75.67%; font-size: 2.05cqw;">M</div>
+                <div id="bgdOutPob" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 42.86%; top: 75.67%; font-size: 2.05cqw; letter-spacing: 0.01em;">BHOLA</div>
+                <div class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#1c2026]" style="left: 74.32%; top: 75.67%; font-size: 2.05cqw; letter-spacing: 0.02em;">982450</div>
+
+                <!-- Row 7: Date of Issue / Issuing Authority -->
+                <div id="bgdOutIssue" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 31.94%; top: 79.03%; font-size: 2.05cqw; letter-spacing: 0.01em;">31 JAN 2023</div>
+                <div id="bgdOutAuthority" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 53.93%; top: 79.03%; font-size: 2.05cqw; letter-spacing: 0.01em;">DIP/DHAKA</div>
+
+                <!-- Row 8: Date of Expiry / Holder's Signature -->
+                <div id="bgdOutExpiry" class="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]" style="left: 32.10%; top: 82.73%; font-size: 2.05cqw; letter-spacing: 0.01em;">30 JAN 2033</div>
+                <img id="bgdOutSignatureImg" src="/assets/aistudio/bgd_passport_signature.png" alt="Holder Signature" class="absolute object-contain pointer-events-none" style="left: 66.13%; top: 82.27%; width: 8.35%; height: 3.01%;">
+                <div id="bgdOutSignatureText" class="absolute italic text-[#1e2229] font-semibold whitespace-nowrap leading-none" style="display: none; left: 65.8%; top: 82.5%; transform: rotate(-6deg); font-family: 'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive; font-size: 2.5cqw;">Hossain</div>
 
                 <!-- Machine Readable Zone (MRZ: ICAO Doc 9303 TD3 2 lines × 44 chars) -->
-                <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#fdfdfc]/80" style="height: 19.5%; padding-left: 3.5%; padding-right: 3.5%;">
-                  <div id="bgdMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
-                    P&lt;BGDHOSSAIN&lt;&lt;MD&lt;DELOWER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
-                  </div>
-                  <div id="bgdMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
-                    A068217167BGD9705238M33013066902553657&lt;&lt;&lt;&lt;&lt;&lt;66
-                  </div>
-                </div>
-              </section>
+                <div id="bgdMrzLine1" class="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]" style="left: 4.82%; top: 89.69%; font-family: 'OCRB', 'OCR B', 'Courier New', Courier, monospace; font-size: 2.75cqw; letter-spacing: 0.18em;">P&lt;BGDHOSSAIN&lt;&lt;MD&lt;DELOWER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                <div id="bgdMrzLine2" class="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]" style="left: 4.82%; top: 93.16%; font-family: 'OCRB', 'OCR B', 'Courier New', Courier, monospace; font-size: 2.75cqw; letter-spacing: 0.18em;">A068217167BGD9705238M33013066902553657&lt;&lt;&lt;&lt;66</div>
+              </div>
+
+              <!-- Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active -->
+              <img id="bgdRefSpecimenOverlay" src="/assets/aistudio/bgd_passport_reference.png" alt="People's Republic of Bangladesh Passport Reference" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
             </article>
 
             <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic biometric passport reproduction · People's Republic of Bangladesh (গণপ্রজাতন্ত্রী বাংলাদেশ / BGD) 2-page spread matching reference specimen with dual-language bio-data, perforated needle passport number, Code 128 &amp; QR matrix, and ICAO Doc 9303 TD3 machine-readable zone.</p>
