@@ -53,6 +53,47 @@ export const defaultBangladeshPassportData: BangladeshPassportData = {
   emergencyAddress2: "- 1216, DHAKA",
   emergencyPhone: "+8801616166031",
   photoUrl: "/assets/aistudio/bgd_passport_portrait.png",
+  signatureUrl: "/assets/aistudio/bgd_passport_signature.png",
+};
+
+// 5x7 dot-matrix glyphs for authentic laser-perforated passport numbers
+const DOT_MATRIX_FONT: Record<string, string[]> = {
+  '0': ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+  '1': ["00100", "01100", "00100", "00100", "00100", "00100", "01110"],
+  '2': ["01110", "10001", "00001", "00010", "00100", "01000", "11111"],
+  '3': ["01110", "10001", "00001", "00110", "00001", "10001", "01110"],
+  '4': ["00010", "00110", "01010", "10010", "11111", "00010", "00010"],
+  '5': ["11111", "10000", "11110", "00001", "00001", "10001", "01110"],
+  '6': ["00110", "01000", "10000", "11110", "10001", "10001", "01110"],
+  '7': ["11111", "00001", "00010", "00100", "01000", "01000", "01000"],
+  '8': ["01110", "10001", "10001", "01110", "10001", "10001", "01110"],
+  '9': ["01110", "10001", "10001", "01111", "00001", "00010", "01100"],
+  'A': ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
+  'B': ["11110", "10001", "10001", "11110", "10001", "10001", "11110"],
+  'C': ["01110", "10001", "10000", "10000", "10000", "10001", "01110"],
+  'D': ["11100", "10010", "10001", "10001", "10001", "10010", "11100"],
+  'E': ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
+  'F': ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
+  'G': ["01110", "10001", "10000", "10111", "10001", "10001", "01110"],
+  'H': ["10001", "10001", "10001", "11111", "10001", "10001", "10001"],
+  'I': ["01110", "00100", "00100", "00100", "00100", "00100", "01110"],
+  'J': ["00111", "00010", "00010", "00010", "00010", "10010", "01100"],
+  'K': ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+  'L': ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+  'M': ["10001", "11011", "10101", "10101", "10001", "10001", "10001"],
+  'N': ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
+  'O': ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+  'P': ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
+  'Q': ["01110", "10001", "10001", "10001", "10101", "10010", "01101"],
+  'R': ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
+  'S': ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
+  'T': ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+  'U': ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+  'V': ["10001", "10001", "10001", "10001", "10001", "01010", "00100"],
+  'W': ["10001", "10001", "10001", "10101", "10101", "11011", "10001"],
+  'X': ["10001", "10001", "01010", "00100", "01010", "10001", "10001"],
+  'Y': ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
+  'Z': ["11111", "00001", "00010", "00100", "01000", "10000", "11111"],
 };
 
 // Calculate ICAO 9303 7-3-1 check digit
@@ -145,26 +186,12 @@ export const BangladeshPassportCard: React.FC<{
 }> = ({ data = defaultBangladeshPassportData, className = "" }) => {
   const mrz = useMemo(() => generateBangladeshMRZ(data), [data]);
 
-  // Check if current data strictly matches default reference specimen
-  const isDefaultSpecimen = useMemo(() => {
-    return (
-      data.passportNo === defaultBangladeshPassportData.passportNo &&
-      data.surname === defaultBangladeshPassportData.surname &&
-      data.givenNames === defaultBangladeshPassportData.givenNames &&
-      data.personalNo === defaultBangladeshPassportData.personalNo &&
-      data.dateOfBirth === defaultBangladeshPassportData.dateOfBirth &&
-      data.dateOfIssue === defaultBangladeshPassportData.dateOfIssue &&
-      data.dateOfExpiry === defaultBangladeshPassportData.dateOfExpiry &&
-      data.placeOfBirth === defaultBangladeshPassportData.placeOfBirth &&
-      data.emergencyName === defaultBangladeshPassportData.emergencyName &&
-      data.emergencyPhone === defaultBangladeshPassportData.emergencyPhone &&
-      (!data.photoUrl || data.photoUrl === defaultBangladeshPassportData.photoUrl)
-    );
-  }, [data]);
+  const isCustomPhoto = Boolean(data.photoUrl && data.photoUrl !== defaultBangladeshPassportData.photoUrl);
+  const isDefaultSignature = data.surname.toUpperCase() === defaultBangladeshPassportData.surname;
 
   // Formatted date string for ghost portrait watermark (e.g. 23.05.97)
   const dobWatermark = useMemo(() => {
-    const parts = data.dateOfBirth.trim().split(/\s+/);
+    const parts = (data.dateOfBirth || "").trim().split(/\s+/);
     if (parts.length === 3) {
       const day = parts[0].padStart(2, '0');
       const monthMap: Record<string, string> = {
@@ -178,162 +205,179 @@ export const BangladeshPassportCard: React.FC<{
     return "23.05.97";
   }, [data.dateOfBirth]);
 
+  const isCustomGhost = isCustomPhoto || dobWatermark !== "23.05.97";
+  const cleanPassChars = (data.passportNo || "A06821716").toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9).split('');
+
   return (
     <div
       className={`relative w-full overflow-hidden select-none shadow-2xl rounded-sm border border-stone-300 bg-stone-100 ${className}`}
       style={{
         aspectRatio: "623 / 863",
-        fontFamily: "'Courier New', Courier, monospace, system-ui",
+        containerType: "inline-size",
+        fontFamily: "'Arial', 'Helvetica Neue', Helvetica, sans-serif",
       }}
     >
-      {/* Background Layer: authentic high-res clean scanned guilloche */}
+      {/* Clean 1:1 Reference Base Plate (623x863) */}
       <img
         src="/assets/aistudio/bgd_passport_clean_bg.png"
-        alt="Bangladesh Passport Background"
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        alt="People's Republic of Bangladesh Passport Base Plate"
+        className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0"
       />
 
-      {/* If strictly default reference specimen, display the exact unaltered reference layer with 100% pixel fidelity */}
-      {isDefaultSpecimen && (
-        <img
-          src="/assets/aistudio/bgd_passport_reference.png"
-          alt="Authentic Bangladesh Passport Reference Specimen"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
-        />
-      )}
+      {/* Live Interactive Overlay Layer */}
+      <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-[#1c1f24]">
+        {/* ========================================================= */}
+        {/* TOP PAGE: PERSONAL DATA AND EMERGENCY CONTACT             */}
+        {/* ========================================================= */}
 
-      {/* Dynamic Overlays: Active when fields are edited or randomized */}
-      {!isDefaultSpecimen && (
-        <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-neutral-900">
-          {/* ========================================================= */}
-          {/* TOP PAGE: PERSONAL DATA AND EMERGENCY CONTACT             */}
-          {/* Reference bounding area: y: 0% .. 50%                     */}
-          {/* ========================================================= */}
+        {/* Top-Left Vertical Laser-Perforated Passport Number (reads bottom-to-top, rotated -90deg) */}
+        <svg
+          viewBox="0 0 36 310"
+          className="absolute pointer-events-none"
+          style={{
+            left: "4.17%",
+            top: "6.49%",
+            width: "5.78%",
+            height: "35.69%",
+          }}
+        >
+          {cleanPassChars.map((ch, idx) => {
+            const glyph = DOT_MATRIX_FONT[ch] || DOT_MATRIX_FONT['0'];
+            // Character 0 ('A') at bottom, last character ('6') at top
+            const charBaseY = 274 - idx * 33;
+            return (
+              <g key={idx}>
+                {glyph.map((rowStr, rIdx) =>
+                  rowStr.split('').map((bit, cIdx) => {
+                    if (bit !== '1') return null;
+                    // Rotated -90deg: glyph row rIdx goes left-to-right (x), glyph col cIdx goes bottom-to-top (y)
+                    const cx = 4 + rIdx * 4.2;
+                    const cy = charBaseY + (4 - cIdx) * 4.2;
+                    return (
+                      <g key={`${rIdx}-${cIdx}`}>
+                        <circle cx={cx + 0.4} cy={cy + 0.4} r={1.45} fill="rgba(255,250,240,0.75)" />
+                        <circle cx={cx} cy={cy} r={1.25} fill="#2b231d" fillOpacity={0.85} />
+                      </g>
+                    );
+                  })
+                )}
+              </g>
+            );
+          })}
+        </svg>
 
-          {/* Left Vertical Laser Perforation */}
+        {/* Top-Right Vertical Barcode Serial Text (reads bottom-to-top along right edge of 1D barcode) */}
+        <div
+          className="absolute font-mono font-bold text-[#1e2226] whitespace-nowrap leading-none"
+          style={{
+            left: "84.91%",
+            top: "34.41%",
+            transformOrigin: "left top",
+            transform: "rotate(-90deg)",
+            fontSize: "1.95cqw",
+            letterSpacing: "0.49em",
+          }}
+        >
+          {cleanPassChars.join(' ')}
+        </div>
+
+        {/* Top Page Text Fields (x = 30.34%) */}
+        {/* Name */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "8.57%", fontSize: "1.78cqw", transform: "scaleX(0.88)", transformOrigin: "left top" }}
+        >
+          {data.givenNames} {data.surname}
+        </div>
+
+        {/* Father's Name */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "10.89%", fontSize: "1.78cqw", transform: "scaleX(0.88)", transformOrigin: "left top" }}
+        >
+          {data.fatherName}
+        </div>
+
+        {/* Mother's Name */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "13.09%", fontSize: "1.78cqw", transform: "scaleX(0.88)", transformOrigin: "left top" }}
+        >
+          {data.motherName}
+        </div>
+
+        {/* Spouse's Name */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "15.18%", fontSize: "1.78cqw", transform: "scaleX(0.88)", transformOrigin: "left top" }}
+        >
+          {data.spouseName || ""}
+        </div>
+
+        {/* Permanent Address Line 1 */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "17.27%", fontSize: "1.75cqw", transform: "scaleX(0.86)", transformOrigin: "left top" }}
+        >
+          {data.permanentAddress1}
+        </div>
+
+        {/* Permanent Address Line 2 */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "19.12%", fontSize: "1.75cqw", transform: "scaleX(0.86)", transformOrigin: "left top" }}
+        >
+          {data.permanentAddress2}
+        </div>
+
+        {/* Emergency Contact Name */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "23.75%", fontSize: "1.78cqw", transform: "scaleX(0.88)", transformOrigin: "left top" }}
+        >
+          {data.emergencyName}
+        </div>
+
+        {/* Emergency Contact Relationship */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.34%", top: "26.07%", fontSize: "1.78cqw", transform: "scaleX(0.88)", transformOrigin: "left top" }}
+        >
+          {data.emergencyRelationship}
+        </div>
+
+        {/* Emergency Contact Address Line 1 */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.50%", top: "28.16%", fontSize: "1.75cqw", transform: "scaleX(0.86)", transformOrigin: "left top" }}
+        >
+          {data.emergencyAddress1}
+        </div>
+
+        {/* Emergency Contact Address Line 2 */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.50%", top: "30.01%", fontSize: "1.75cqw", transform: "scaleX(0.86)", transformOrigin: "left top" }}
+        >
+          {data.emergencyAddress2}
+        </div>
+
+        {/* Emergency Contact Telephone No */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1e2124]"
+          style={{ left: "30.66%", top: "32.10%", fontSize: "1.78cqw", transform: "scaleX(0.88)", transformOrigin: "left top" }}
+        >
+          {data.emergencyPhone}
+        </div>
+
+        {/* ========================================================= */}
+        {/* BOTTOM PAGE: BIO-DATA & MRZ                               */}
+        {/* ========================================================= */}
+
+        {/* Custom Bearer Portrait Photo when uploaded */}
+        {isCustomPhoto && (
           <div
-            className="absolute tracking-[0.22em] text-[10px] font-mono font-bold text-neutral-800 opacity-80"
-            style={{
-              left: "4.8%",
-              top: "13.2%",
-              transformOrigin: "left top",
-              transform: "rotate(90deg)",
-              letterSpacing: "0.42em",
-            }}
-          >
-            {data.passportNo}
-          </div>
-
-          {/* Right Vertical Barcode Text */}
-          <div
-            className="absolute tracking-[0.35em] text-[9.5px] font-mono font-bold text-neutral-800 opacity-90"
-            style={{
-              left: "81.8%",
-              top: "15.0%",
-              transformOrigin: "left top",
-              transform: "rotate(90deg)",
-            }}
-          >
-            {data.passportNo.split('').join(' ')}
-          </div>
-
-          {/* Top Page Text Fields */}
-          {/* Name */}
-          <div
-            className="absolute text-[10px] font-bold font-mono tracking-wide text-neutral-900"
-            style={{ left: "30.4%", top: "8.7%" }}
-          >
-            {data.givenNames} {data.surname}
-          </div>
-
-          {/* Father's Name */}
-          <div
-            className="absolute text-[10px] font-bold font-mono tracking-wide text-neutral-900"
-            style={{ left: "30.4%", top: "11.0%" }}
-          >
-            {data.fatherName}
-          </div>
-
-          {/* Mother's Name */}
-          <div
-            className="absolute text-[10px] font-bold font-mono tracking-wide text-neutral-900"
-            style={{ left: "30.4%", top: "13.2%" }}
-          >
-            {data.motherName}
-          </div>
-
-          {/* Spouse's Name */}
-          <div
-            className="absolute text-[10px] font-bold font-mono tracking-wide text-neutral-900"
-            style={{ left: "30.4%", top: "15.4%" }}
-          >
-            {data.spouseName || ""}
-          </div>
-
-          {/* Permanent Address Line 1 */}
-          <div
-            className="absolute text-[9.5px] font-bold font-mono tracking-tight text-neutral-900 max-w-[46%]"
-            style={{ left: "30.4%", top: "17.4%" }}
-          >
-            {data.permanentAddress1}
-          </div>
-
-          {/* Permanent Address Line 2 */}
-          <div
-            className="absolute text-[9.5px] font-bold font-mono tracking-tight text-neutral-900"
-            style={{ left: "30.4%", top: "19.3%" }}
-          >
-            {data.permanentAddress2}
-          </div>
-
-          {/* Emergency Contact Name */}
-          <div
-            className="absolute text-[10px] font-bold font-mono tracking-wide text-neutral-900"
-            style={{ left: "30.4%", top: "23.9%" }}
-          >
-            {data.emergencyName}
-          </div>
-
-          {/* Emergency Contact Relationship */}
-          <div
-            className="absolute text-[10px] font-bold font-mono tracking-wide text-neutral-900"
-            style={{ left: "30.4%", top: "26.1%" }}
-          >
-            {data.emergencyRelationship}
-          </div>
-
-          {/* Emergency Contact Address Line 1 */}
-          <div
-            className="absolute text-[9.5px] font-bold font-mono tracking-tight text-neutral-900 max-w-[46%]"
-            style={{ left: "30.4%", top: "28.3%" }}
-          >
-            {data.emergencyAddress1}
-          </div>
-
-          {/* Emergency Contact Address Line 2 */}
-          <div
-            className="absolute text-[9.5px] font-bold font-mono tracking-tight text-neutral-900"
-            style={{ left: "30.4%", top: "30.2%" }}
-          >
-            {data.emergencyAddress2}
-          </div>
-
-          {/* Emergency Contact Telephone No */}
-          <div
-            className="absolute text-[10px] font-bold font-mono tracking-wide text-neutral-900"
-            style={{ left: "30.8%", top: "32.3%" }}
-          >
-            {data.emergencyPhone}
-          </div>
-
-          {/* ========================================================= */}
-          {/* BOTTOM PAGE: BIO-DATA & MRZ                               */}
-          {/* Reference bounding area: y: 50% .. 100%                   */}
-          {/* ========================================================= */}
-
-          {/* Bearer Portrait Photo (x: 29/623 = 4.65%, y: 540/863 = 62.57%, w: 146/623 = 23.44%, h: 187/863 = 21.67%) */}
-          <div
-            className="absolute overflow-hidden rounded-xs shadow-inner bg-slate-200"
+            className="absolute overflow-hidden rounded-xs"
             style={{
               left: "4.65%",
               top: "62.57%",
@@ -342,169 +386,203 @@ export const BangladeshPassportCard: React.FC<{
             }}
           >
             <img
-              src={data.photoUrl || "/assets/aistudio/bgd_passport_portrait.png"}
+              src={data.photoUrl}
               alt="Bearer portrait"
-              className="w-full h-full object-cover object-center filter contrast-105"
+              className="w-full h-full object-cover object-center contrast-105"
             />
           </div>
+        )}
 
-          {/* Ghost Portrait with DOB watermark overlay */}
+        {/* Ghost Portrait with DOB watermark overlay when photo or DOB is modified */}
+        {isCustomGhost && (
           <div
-            className="absolute overflow-hidden rounded-xs opacity-65 grayscale contrast-125 mix-blend-multiply"
+            className="absolute overflow-hidden rounded-xs bg-[#e8e5ec]"
             style={{
-              left: "86.6%",
-              top: "70.0%",
-              width: "9.0%",
-              height: "10.8%",
+              left: "85.71%",
+              top: "69.52%",
+              width: "9.31%",
+              height: "6.95%",
             }}
           >
             <img
               src={data.photoUrl || "/assets/aistudio/bgd_passport_portrait.png"}
               alt="Ghost bearer portrait"
-              className="w-full h-full object-cover object-top"
+              className="w-full h-full object-cover object-top grayscale opacity-65 contrast-110 mix-blend-multiply"
             />
-            {/* Watermark date across lower chest */}
             <div
-              className="absolute bottom-1 inset-x-0 text-center font-mono font-black text-[8px] tracking-wider text-black opacity-80"
-              style={{ textShadow: "0 0 2px rgba(255,255,255,0.8)" }}
+              className="absolute inset-x-0 bottom-[18%] text-center font-sans font-extrabold text-[#4a4d52]/80 leading-none"
+              style={{
+                fontSize: "1.75cqw",
+                letterSpacing: "0.04em",
+                textShadow: "0 0 2px rgba(255,255,255,0.85)",
+              }}
             >
               {dobWatermark}
             </div>
           </div>
+        )}
 
-          {/* Row 1: Type / Country Code / Passport Number */}
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "31.8%", top: "58.7%" }}
-          >
-            P
-          </div>
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "42.3%", top: "58.7%" }}
-          >
-            {data.nationality === "BANGLADESHI" ? "BGD" : "BGD"}
-          </div>
-          <div
-            className="absolute text-[11px] font-mono font-extrabold tracking-wider text-neutral-950"
-            style={{ left: "62.4%", top: "58.7%" }}
-          >
-            {data.passportNo}
-          </div>
-
-          {/* Row 2: Surname */}
-          <div
-            className="absolute text-[11px] font-mono font-extrabold tracking-wider text-neutral-950"
-            style={{ left: "31.8%", top: "62.2%" }}
-          >
-            {data.surname}
-          </div>
-
-          {/* Row 3: Given Name */}
-          <div
-            className="absolute text-[11px] font-mono font-extrabold tracking-wider text-neutral-950"
-            style={{ left: "31.8%", top: "65.5%" }}
-          >
-            {data.givenNames}
-          </div>
-
-          {/* Row 4: Nationality / Personal No. */}
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "31.8%", top: "68.9%" }}
-          >
-            {data.nationality}
-          </div>
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "53.8%", top: "68.9%" }}
-          >
-            {data.personalNo}
-          </div>
-
-          {/* Row 5: Date of Birth / Previous Passport No. */}
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "31.8%", top: "72.4%" }}
-          >
-            {data.dateOfBirth}
-          </div>
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "53.8%", top: "72.4%" }}
-          >
-            {data.previousPassportNo}
-          </div>
-
-          {/* Row 6: Sex / Place of Birth / Booklet Serial No */}
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "32.0%", top: "75.8%" }}
-          >
-            {data.sex}
-          </div>
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "42.8%", top: "75.8%" }}
-          >
-            {data.placeOfBirth}
-          </div>
-          <div
-            className="absolute text-[10px] font-mono font-bold tracking-wider text-neutral-800"
-            style={{ left: "74.8%", top: "75.8%" }}
-          >
-            {data.bookletSerial}
-          </div>
-
-          {/* Row 7: Date of Issue / Issuing Authority */}
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "31.8%", top: "79.2%" }}
-          >
-            {data.dateOfIssue}
-          </div>
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "53.8%", top: "79.2%" }}
-          >
-            {data.issuingAuthority}
-          </div>
-
-          {/* Row 8: Date of Expiry / Holder's Signature */}
-          <div
-            className="absolute text-[10.5px] font-mono font-bold tracking-wider text-neutral-950"
-            style={{ left: "31.8%", top: "82.6%" }}
-          >
-            {data.dateOfExpiry}
-          </div>
-          <div
-            className="absolute font-serif italic text-neutral-800 font-semibold"
-            style={{
-              left: "66.5%",
-              top: "82.6%",
-              transform: "rotate(-5deg)",
-              fontFamily: "'Brush Script MT', 'Segoe Script', cursive, sans-serif",
-              fontSize: "14px",
-            }}
-          >
-            {data.surname.slice(0, 1) + data.givenNames.slice(0, 1).toLowerCase() + data.surname.slice(1).toLowerCase()}
-          </div>
-
-          {/* ========================================================= */}
-          {/* ICAO Doc 9303 TD3 2-Line MRZ (44 monospace characters each) */}
-          {/* ========================================================= */}
-          <div
-            className="absolute left-[4.2%] right-[4.2%] text-neutral-950 font-mono tracking-[0.27em] text-[11px] leading-[1.6] font-bold select-all whitespace-pre"
-            style={{
-              top: "89.8%",
-              fontFamily: "'OCRB', 'Courier New', Courier, monospace",
-            }}
-          >
-            <div>{mrz.line1}</div>
-            <div className="mt-[6px]">{mrz.line2}</div>
-          </div>
+        {/* Row 1: Type / Country Code / Passport Number */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "31.78%", top: "58.52%", fontSize: "2.05cqw" }}
+        >
+          P
         </div>
-      )}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "41.89%", top: "58.52%", fontSize: "2.05cqw", letterSpacing: "0.02em" }}
+        >
+          BGD
+        </div>
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "62.44%", top: "58.52%", fontSize: "2.05cqw", letterSpacing: "0.02em" }}
+        >
+          {data.passportNo}
+        </div>
+
+        {/* Row 2: Surname */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "31.46%", top: "62.11%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.surname}
+        </div>
+
+        {/* Row 3: Given Name */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "31.62%", top: "65.35%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.givenNames}
+        </div>
+
+        {/* Row 4: Nationality / Personal No. */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "31.78%", top: "68.83%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.nationality}
+        </div>
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "53.93%", top: "68.83%", fontSize: "2.05cqw", letterSpacing: "0.02em" }}
+        >
+          {data.personalNo}
+        </div>
+
+        {/* Row 5: Date of Birth / Previous Passport No. */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "31.94%", top: "72.42%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.dateOfBirth}
+        </div>
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "54.09%", top: "72.42%", fontSize: "2.05cqw", letterSpacing: "0.02em" }}
+        >
+          {data.previousPassportNo}
+        </div>
+
+        {/* Row 6: Sex / Place of Birth / Booklet Serial No */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "31.78%", top: "75.67%", fontSize: "2.05cqw" }}
+        >
+          {data.sex}
+        </div>
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "42.86%", top: "75.67%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.placeOfBirth}
+        </div>
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#1c2026]"
+          style={{ left: "74.32%", top: "75.67%", fontSize: "2.05cqw", letterSpacing: "0.02em" }}
+        >
+          {data.bookletSerial}
+        </div>
+
+        {/* Row 7: Date of Issue / Issuing Authority */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "31.94%", top: "79.03%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.dateOfIssue}
+        </div>
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "53.93%", top: "79.03%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.issuingAuthority}
+        </div>
+
+        {/* Row 8: Date of Expiry / Holder's Signature */}
+        <div
+          className="absolute font-bold uppercase whitespace-nowrap leading-none text-[#16191d]"
+          style={{ left: "32.10%", top: "82.73%", fontSize: "2.05cqw", letterSpacing: "0.01em" }}
+        >
+          {data.dateOfExpiry}
+        </div>
+
+        {isDefaultSignature ? (
+          <img
+            src="/assets/aistudio/bgd_passport_signature.png"
+            alt="Holder Signature"
+            className="absolute object-contain pointer-events-none"
+            style={{
+              left: "66.13%",
+              top: "82.27%",
+              width: "8.35%",
+              height: "3.01%",
+            }}
+          />
+        ) : (
+          <div
+            className="absolute italic text-[#1e2229] font-semibold whitespace-nowrap leading-none"
+            style={{
+              left: "65.8%",
+              top: "82.5%",
+              transform: "rotate(-6deg)",
+              fontFamily: "'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive",
+              fontSize: "2.5cqw",
+            }}
+          >
+            {data.surname.slice(0, 1) + data.surname.slice(1).toLowerCase()}
+          </div>
+        )}
+
+        {/* ========================================================= */}
+        {/* ICAO Doc 9303 TD3 2-Line MRZ (44 monospace characters each) */}
+        {/* ========================================================= */}
+        <div
+          className="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]"
+          style={{
+            left: "4.82%",
+            top: "89.69%",
+            fontFamily: "'OCRB', 'OCR B', 'Courier New', Courier, monospace",
+            fontSize: "2.75cqw",
+            letterSpacing: "0.18em",
+          }}
+        >
+          {mrz.line1}
+        </div>
+        <div
+          className="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]"
+          style={{
+            left: "4.82%",
+            top: "93.16%",
+            fontFamily: "'OCRB', 'OCR B', 'Courier New', Courier, monospace",
+            fontSize: "2.75cqw",
+            letterSpacing: "0.18em",
+          }}
+        >
+          {mrz.line2}
+        </div>
+      </div>
     </div>
   );
 };

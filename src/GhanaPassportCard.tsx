@@ -113,23 +113,6 @@ export const GhanaPassportCard: React.FC<{
 }> = ({ data = defaultGhanaPassportData, className = "" }) => {
   const mrz = useMemo(() => generateGhanaMRZ(data), [data]);
 
-  const isDefaultSpecimen = useMemo(() => {
-    return (
-      data.passportNo === defaultGhanaPassportData.passportNo &&
-      data.surname === defaultGhanaPassportData.surname &&
-      data.givenNames === defaultGhanaPassportData.givenNames &&
-      data.nationality === defaultGhanaPassportData.nationality &&
-      data.dateOfBirth === defaultGhanaPassportData.dateOfBirth &&
-      data.sex === defaultGhanaPassportData.sex &&
-      data.placeOfBirth === defaultGhanaPassportData.placeOfBirth &&
-      data.dateOfIssue === defaultGhanaPassportData.dateOfIssue &&
-      data.placeOfIssue === defaultGhanaPassportData.placeOfIssue &&
-      data.dateOfExpiry === defaultGhanaPassportData.dateOfExpiry &&
-      data.authority === defaultGhanaPassportData.authority &&
-      (!data.photoUrl || data.photoUrl === defaultGhanaPassportData.photoUrl)
-    );
-  }, [data]);
-
   const isCustomPhoto = Boolean(data.photoUrl && data.photoUrl !== defaultGhanaPassportData.photoUrl);
 
   return (
@@ -148,18 +131,8 @@ export const GhanaPassportCard: React.FC<{
         className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0"
       />
 
-      {/* Exact Unaltered Reference Layer when Default Specimen is Active */}
-      {isDefaultSpecimen && (
-        <img
-          src="/assets/aistudio/ghana_passport_reference.png"
-          alt="Authentic Republic of Ghana Passport Reference Specimen"
-          className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10"
-        />
-      )}
-
-      {/* Dynamic Overlays: Active when fields or portrait are edited or randomized */}
-      {!isDefaultSpecimen && (
-        <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-[#1e2124]">
+      {/* Live Interactive Overlay Layer */}
+      <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-[#1e2124]">
           {/* Top Page Left Vertical Laser-Perforated Passport Number (x: 4.83%, y: 8.13%, w: 7.24%, h: 35.63%) */}
           <div
             className="absolute flex items-center justify-center font-mono font-extrabold text-[#3c342b]/80"
@@ -334,7 +307,6 @@ export const GhanaPassportCard: React.FC<{
             {mrz.line2}
           </div>
         </div>
-      )}
     </div>
   );
 };

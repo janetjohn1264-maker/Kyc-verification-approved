@@ -34,6 +34,46 @@ export const defaultNigeriaPassportData: NigeriaPassportData = {
   signatureUrl: "/assets/aistudio/nigeria_passport_signature.png",
 };
 
+// 5x7 dot-matrix glyphs for authentic laser-perforated passport numbers
+const DOT_MATRIX_FONT: Record<string, string[]> = {
+  '0': ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+  '1': ["00100", "01100", "00100", "00100", "00100", "00100", "01110"],
+  '2': ["01110", "10001", "00001", "00010", "00100", "01000", "11111"],
+  '3': ["01110", "10001", "00001", "00110", "00001", "10001", "01110"],
+  '4': ["00010", "00110", "01010", "10010", "11111", "00010", "00010"],
+  '5': ["11111", "10000", "11110", "00001", "00001", "10001", "01110"],
+  '6': ["00110", "01000", "10000", "11110", "10001", "10001", "01110"],
+  '7': ["11111", "00001", "00010", "00100", "01000", "01000", "01000"],
+  '8': ["01110", "10001", "10001", "01110", "10001", "10001", "01110"],
+  '9': ["01110", "10001", "10001", "01111", "00001", "00010", "01100"],
+  'A': ["01110", "10001", "10001", "11111", "10001", "10001", "10001"],
+  'B': ["11110", "10001", "10001", "11110", "10001", "10001", "11110"],
+  'C': ["01110", "10001", "10000", "10000", "10000", "10001", "01110"],
+  'D': ["11100", "10010", "10001", "10001", "10001", "10010", "11100"],
+  'E': ["11111", "10000", "10000", "11110", "10000", "10000", "11111"],
+  'F': ["11111", "10000", "10000", "11110", "10000", "10000", "10000"],
+  'G': ["01110", "10001", "10000", "10111", "10001", "10001", "01110"],
+  'H': ["10001", "10001", "10001", "11111", "10001", "10001", "10001"],
+  'I': ["01110", "00100", "00100", "00100", "00100", "00100", "01110"],
+  'J': ["00111", "00010", "00010", "00010", "00010", "10010", "01100"],
+  'K': ["10001", "10010", "10100", "11000", "10100", "10010", "10001"],
+  'L': ["10000", "10000", "10000", "10000", "10000", "10000", "11111"],
+  'M': ["10001", "11011", "10101", "10101", "10001", "10001", "10001"],
+  'N': ["10001", "11001", "10101", "10011", "10001", "10001", "10001"],
+  'O': ["01110", "10001", "10001", "10001", "10001", "10001", "01110"],
+  'P': ["11110", "10001", "10001", "11110", "10000", "10000", "10000"],
+  'Q': ["01110", "10001", "10001", "10001", "10101", "10010", "01101"],
+  'R': ["11110", "10001", "10001", "11110", "10100", "10010", "10001"],
+  'S': ["01111", "10000", "10000", "01110", "00001", "00001", "11110"],
+  'T': ["11111", "00100", "00100", "00100", "00100", "00100", "00100"],
+  'U': ["10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+  'V': ["10001", "10001", "10001", "10001", "10001", "01010", "00100"],
+  'W': ["10001", "10001", "10001", "10101", "10101", "11011", "10001"],
+  'X': ["10001", "10001", "01010", "00100", "01010", "10001", "10001"],
+  'Y': ["10001", "10001", "01010", "00100", "00100", "00100", "00100"],
+  'Z': ["11111", "00001", "00010", "00100", "01000", "10000", "11111"],
+};
+
 function calcIcaoCheckDigit(input: string): string {
   const weights = [7, 3, 1];
   let sum = 0;
@@ -119,25 +159,21 @@ export const NigeriaPassportCard: React.FC<{
 }> = ({ data = defaultNigeriaPassportData, className = "" }) => {
   const mrz = useMemo(() => generateNigeriaMRZ(data), [data]);
 
-  const isDefaultSpecimen = useMemo(() => {
-    return (
-      data.passportNo === defaultNigeriaPassportData.passportNo &&
-      data.surname === defaultNigeriaPassportData.surname &&
-      data.givenNames === defaultNigeriaPassportData.givenNames &&
-      data.nationality === defaultNigeriaPassportData.nationality &&
-      data.dateOfBirth === defaultNigeriaPassportData.dateOfBirth &&
-      data.previousPassportNo === defaultNigeriaPassportData.previousPassportNo &&
-      data.nin === defaultNigeriaPassportData.nin &&
-      data.sex === defaultNigeriaPassportData.sex &&
-      data.placeOfBirth === defaultNigeriaPassportData.placeOfBirth &&
-      data.dateOfIssue === defaultNigeriaPassportData.dateOfIssue &&
-      data.authority === defaultNigeriaPassportData.authority &&
-      data.dateOfExpiry === defaultNigeriaPassportData.dateOfExpiry &&
-      (!data.photoUrl || data.photoUrl === defaultNigeriaPassportData.photoUrl)
-    );
-  }, [data]);
-
   const isCustomPhoto = Boolean(data.photoUrl && data.photoUrl !== defaultNigeriaPassportData.photoUrl);
+  const isCustomSignature = data.surname.toUpperCase() !== defaultNigeriaPassportData.surname;
+
+  // Format numeric DOB for the silver oval hologram (e.g. "30.12.1994")
+  const ovalDobNumeric = useMemo(() => {
+    const yymmdd = formatNigeriaYYMMDD(data.dateOfBirth, "941230");
+    const yy = parseInt(yymmdd.slice(0, 2), 10);
+    const yyyy = yy > 30 ? `19${yymmdd.slice(0, 2)}` : `20${yymmdd.slice(0, 2)}`;
+    const mm = yymmdd.slice(2, 4);
+    const dd = yymmdd.slice(4, 6);
+    return `${dd}.${mm}.${yyyy}`;
+  }, [data.dateOfBirth]);
+
+  const isCustomOvalDob = ovalDobNumeric !== "30.12.1994";
+  const cleanPassChars = (data.passportNo || "B50621098").toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9).split('');
 
   return (
     <div
@@ -155,199 +191,239 @@ export const NigeriaPassportCard: React.FC<{
         className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0"
       />
 
-      {/* Exact Unaltered Reference Layer when Default Specimen is Active */}
-      {isDefaultSpecimen && (
-        <img
-          src="/assets/aistudio/nigeria_passport_reference.png"
-          alt="Authentic Federal Republic of Nigeria Passport Reference Specimen"
-          className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10"
-        />
-      )}
+      {/* Live Interactive Overlay Layer */}
+      <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-[#161a1d]">
+        {/* Top Page Right Vertical Laser-Perforated Passport Number (5x7 dot-matrix reading bottom-to-top) */}
+        <svg
+          viewBox="0 0 36 290"
+          className="absolute pointer-events-none"
+          style={{
+            left: "89.44%",
+            top: "11.00%",
+            width: "5.28%",
+            height: "33.60%",
+          }}
+        >
+          {cleanPassChars.map((ch, idx) => {
+            const glyph = DOT_MATRIX_FONT[ch] || DOT_MATRIX_FONT['0'];
+            // Character 0 ('B') at bottom, character 8 ('8') at top
+            const charBaseY = 256 - idx * 31.5;
+            return (
+              <g key={idx}>
+                {glyph.map((rowStr, rIdx) =>
+                  rowStr.split('').map((bit, cIdx) => {
+                    if (bit !== '1') return null;
+                    const cx = 4 + rIdx * 4.2;
+                    const cy = charBaseY + (4 - cIdx) * 4.2;
+                    return (
+                      <g key={`${rIdx}-${cIdx}`}>
+                        <circle cx={cx + 0.4} cy={cy + 0.4} r={1.45} fill="rgba(255,255,255,0.8)" />
+                        <circle cx={cx} cy={cy} r={1.3} fill="#2d2620" fillOpacity={0.88} />
+                      </g>
+                    );
+                  })
+                )}
+              </g>
+            );
+          })}
+        </svg>
 
-      {/* Dynamic Overlays: Active when fields or portrait are edited or randomized */}
-      {!isDefaultSpecimen && (
-        <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-[#161a1d]">
-          {/* Top Page Right Vertical Laser-Perforated Passport Number (x: 89.28%, y: 10.89%, w: 5.60%, h: 33.73%) */}
-          <div
-            className="absolute flex items-center justify-center font-mono font-extrabold text-[#2b302c]/80"
-            style={{
-              left: "89.28%",
-              top: "10.89%",
-              width: "5.60%",
-              height: "33.73%",
-              writingMode: "vertical-rl",
-              transform: "rotate(180deg)",
-              fontSize: "4.1cqw",
-              letterSpacing: "0.26em",
-              textShadow: "0.5px 0.5px 0 rgba(255,255,255,0.85)",
-            }}
-          >
-            {data.passportNo}
-          </div>
+        {/* Custom Portrait & Ghost Portrait when user uploads a custom photo */}
+        {isCustomPhoto && (
+          <>
+            <div
+              className="absolute overflow-hidden"
+              style={{
+                left: "5.60%",
+                top: "62.72%",
+                width: "22.40%",
+                height: "19.53%",
+              }}
+            >
+              <img
+                src={data.photoUrl}
+                alt="Bearer portrait"
+                className="w-full h-full object-cover object-top grayscale contrast-95"
+              />
+            </div>
+            <div
+              className="absolute overflow-hidden opacity-60 mix-blend-multiply rounded-full"
+              style={{
+                left: "87.20%",
+                top: "59.76%",
+                width: "10.40%",
+                height: "11.24%",
+              }}
+            >
+              <img
+                src={data.photoUrl}
+                alt="Ghost bearer portrait"
+                className="w-full h-full object-cover object-top grayscale contrast-105"
+              />
+            </div>
+          </>
+        )}
 
-          {/* Custom Portrait & Ghost Portrait when user uploads a custom photo */}
-          {isCustomPhoto && (
-            <>
-              <div
-                className="absolute overflow-hidden"
-                style={{
-                  left: "5.60%",
-                  top: "62.72%",
-                  width: "22.40%",
-                  height: "19.53%",
-                }}
-              >
-                <img
-                  src={data.photoUrl}
-                  alt="Bearer portrait"
-                  className="w-full h-full object-cover object-top grayscale contrast-95"
-                />
-              </div>
-              <div
-                className="absolute overflow-hidden opacity-60 mix-blend-multiply rounded-full"
-                style={{
-                  left: "87.20%",
-                  top: "59.76%",
-                  width: "10.40%",
-                  height: "11.24%",
-                }}
-              >
-                <img
-                  src={data.photoUrl}
-                  alt="Ghost bearer portrait"
-                  className="w-full h-full object-cover object-top grayscale contrast-105"
-                />
-              </div>
-            </>
-          )}
-
-          {/* Row 1 Values: Type (32.16%, 59.17%), Country Code (42.24%, 59.17%), Passport No (61.12%, 59.05%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.16%", top: "59.17%", fontSize: "2.15cqw" }}
-          >
-            P
-          </div>
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "42.24%", top: "59.17%", fontSize: "2.15cqw" }}
-          >
-            NGA
-          </div>
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "61.12%", top: "59.05%", fontSize: "2.15cqw", letterSpacing: "0.02em" }}
-          >
-            {data.passportNo}
-          </div>
-
-          {/* Row 2 Value: Surname (32.32%, 62.72%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.32%", top: "62.72%", fontSize: "2.15cqw" }}
-          >
-            {data.surname}
-          </div>
-
-          {/* Row 3 Value: Given Names (32.16%, 65.92%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.16%", top: "65.92%", fontSize: "2.15cqw" }}
-          >
-            {data.givenNames}
-          </div>
-
-          {/* Row 4 Values: Nationality (32.32%, 69.35%) & Previous Passport (61.28%, 69.11%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.32%", top: "69.35%", fontSize: "2.15cqw" }}
-          >
-            {data.nationality}
-          </div>
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "61.28%", top: "69.11%", fontSize: "2.15cqw", letterSpacing: "0.02em" }}
-          >
-            {data.previousPassportNo}
-          </div>
-
-          {/* Row 5 Values: Date of Birth (32.32%, 72.54%) & NIN (61.12%, 72.43%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.32%", top: "72.54%", fontSize: "2.15cqw" }}
-          >
-            {data.dateOfBirth}
-          </div>
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "61.12%", top: "72.43%", fontSize: "2.15cqw", letterSpacing: "0.02em" }}
-          >
-            {data.nin}
-          </div>
-
-          {/* Row 6 Values: Sex (32.48%, 75.98%) & Place of Birth (40.48%, 75.98%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.48%", top: "75.98%", fontSize: "2.15cqw" }}
-          >
-            {data.sex}
-          </div>
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "40.48%", top: "75.98%", fontSize: "2.15cqw" }}
-          >
-            {data.placeOfBirth}
-          </div>
-
-          {/* Row 7 Values: Date of Issue (32.16%, 79.41%) & Authority (61.44%, 79.17%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.16%", top: "79.41%", fontSize: "2.15cqw" }}
-          >
-            {data.dateOfIssue}
-          </div>
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "61.44%", top: "79.17%", fontSize: "2.15cqw" }}
-          >
-            {data.authority}
-          </div>
-
-          {/* Row 8 Value: Date of Expiry (32.32%, 82.84%) */}
-          <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
-            style={{ left: "32.32%", top: "82.84%", fontSize: "2.15cqw" }}
-          >
-            {data.dateOfExpiry}
-          </div>
-
-          {/* ICAO Doc 9303 TD3 2-Line MRZ (x: 6.24%, y1: 91.36%, y2: 94.91%) */}
-          <div
-            className="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]"
-            style={{
-              left: "6.24%",
-              top: "91.36%",
-              fontFamily: "'OCRB', 'OCR B', 'Courier New', Courier, monospace",
-              fontSize: "2.82cqw",
-              letterSpacing: "0.125em",
-            }}
-          >
-            {mrz.line1}
-          </div>
-          <div
-            className="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]"
-            style={{
-              left: "6.24%",
-              top: "94.91%",
-              fontFamily: "'OCRB', 'OCR B', 'Courier New', Courier, monospace",
-              fontSize: "2.82cqw",
-              letterSpacing: "0.125em",
-            }}
-          >
-            {mrz.line2}
-          </div>
+        {/* Row 1 Values: Type (32.00%, 59.17%), Country Code (42.08%, 59.17%), Passport No (61.12%, 59.05%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.00%", top: "59.17%", fontSize: "2.15cqw" }}
+        >
+          P
         </div>
-      )}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "42.08%", top: "59.17%", fontSize: "2.15cqw" }}
+        >
+          NGA
+        </div>
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "61.12%", top: "59.05%", fontSize: "2.15cqw", letterSpacing: "0.02em" }}
+        >
+          {data.passportNo}
+        </div>
+
+        {/* Row 2 Value: Surname (32.16%, 62.72%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.16%", top: "62.72%", fontSize: "2.15cqw" }}
+        >
+          {data.surname}
+        </div>
+
+        {/* Row 3 Value: Given Names (32.16%, 65.92%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.16%", top: "65.92%", fontSize: "2.15cqw" }}
+        >
+          {data.givenNames}
+        </div>
+
+        {/* Row 4 Values: Nationality (32.16%, 69.23%) & Previous Passport (61.28%, 69.11%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.16%", top: "69.23%", fontSize: "2.15cqw" }}
+        >
+          {data.nationality}
+        </div>
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "61.28%", top: "69.11%", fontSize: "2.15cqw", letterSpacing: "0.02em" }}
+        >
+          {data.previousPassportNo}
+        </div>
+
+        {/* Row 5 Values: Date of Birth (32.32%, 72.54%) & NIN (61.12%, 72.43%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.32%", top: "72.54%", fontSize: "2.15cqw" }}
+        >
+          {data.dateOfBirth}
+        </div>
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "61.12%", top: "72.43%", fontSize: "2.15cqw", letterSpacing: "0.02em" }}
+        >
+          {data.nin}
+        </div>
+
+        {/* Row 6 Values: Sex (32.32%, 75.98%) & Place of Birth (40.16%, 75.98%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.32%", top: "75.98%", fontSize: "2.15cqw" }}
+        >
+          {data.sex}
+        </div>
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "40.16%", top: "75.98%", fontSize: "2.15cqw" }}
+        >
+          {data.placeOfBirth}
+        </div>
+
+        {/* Row 7 Values: Date of Issue (32.16%, 79.29%) & Authority (61.44%, 79.17%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.16%", top: "79.29%", fontSize: "2.15cqw" }}
+        >
+          {data.dateOfIssue}
+        </div>
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "61.44%", top: "79.17%", fontSize: "2.15cqw" }}
+        >
+          {data.authority}
+        </div>
+
+        {/* Row 8 Value: Date of Expiry (32.16%, 82.72%) */}
+        <div
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]"
+          style={{ left: "32.16%", top: "82.72%", fontSize: "2.15cqw" }}
+        >
+          {data.dateOfExpiry}
+        </div>
+
+        {/* Dynamic Oval Hologram DOB when DOB is modified from specimen */}
+        {isCustomOvalDob && (
+          <div
+            className="absolute flex items-center justify-center rounded-full bg-[#dadce0]/90 font-sans font-bold text-[#4a4e54] leading-none"
+            style={{
+              left: "79.2%",
+              top: "76.7%",
+              width: "12.8%",
+              height: "2.2%",
+              fontSize: "1.65cqw",
+              letterSpacing: "0.02em",
+            }}
+          >
+            {ovalDobNumeric}
+          </div>
+        )}
+
+        {/* Dynamic Holder's Signature when surname changes */}
+        {isCustomSignature && (
+          <div
+            className="absolute flex items-center justify-center bg-[#eefaf0]/95 italic font-bold text-[#191d21]"
+            style={{
+              left: "69.5%",
+              top: "82.4%",
+              width: "12.5%",
+              height: "5.2%",
+              fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+              fontSize: "2.5cqw",
+            }}
+          >
+            {data.surname.slice(0, 1) + data.surname.slice(1).toLowerCase()}
+          </div>
+        )}
+
+        {/* ICAO Doc 9303 TD3 2-Line MRZ (x: 6.08%, y1: 91.36%, y2: 94.91%) */}
+        <div
+          className="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]"
+          style={{
+            left: "6.08%",
+            top: "91.36%",
+            fontFamily: "'OCRB', 'OCR B', 'Courier New', Courier, monospace",
+            fontSize: "2.82cqw",
+            letterSpacing: "0.125em",
+          }}
+        >
+          {mrz.line1}
+        </div>
+        <div
+          className="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]"
+          style={{
+            left: "6.08%",
+            top: "94.91%",
+            fontFamily: "'OCRB', 'OCR B', 'Courier New', Courier, monospace",
+            fontSize: "2.82cqw",
+            letterSpacing: "0.125em",
+          }}
+        >
+          {mrz.line2}
+        </div>
+      </div>
     </div>
   );
 };

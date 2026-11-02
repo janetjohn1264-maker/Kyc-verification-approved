@@ -12,7 +12,7 @@ import { EthiopiaPassportCard, EthiopiaPassportData, defaultEthiopiaPassportData
 import { NigeriaPassportCard, NigeriaPassportData, defaultNigeriaPassportData, generateNigeriaMRZ } from "./NigeriaPassportCard"
 
 const defaultContent = {
-  title: "Nigeria Passport Verification",
+  title: "Ethiopia Passport Verification",
   subtitle: "Securely verify identity documents in a few simple steps.",
   button: "Start verification",
   accent: "#15803d",
@@ -61,6 +61,7 @@ const ethiopiaRandomSpecimens: EthiopiaPassportData[] = [
     givenNameAmharic: "ዳዊት አበበ",
     givenNames: "DAWIT ABEBE",
     nationality: "ETHIOPIAN",
+    personalNo: "",
     dateOfBirth: "19 AUG 98",
     sex: "M",
     placeOfBirth: "ADDIS ABABA",
@@ -76,11 +77,28 @@ const ethiopiaRandomSpecimens: EthiopiaPassportData[] = [
     givenNameAmharic: "ሄለን ታደሰ",
     givenNames: "HELEN TADESSE",
     nationality: "ETHIOPIAN",
+    personalNo: "",
     dateOfBirth: "24 FEB 01",
     sex: "F",
     placeOfBirth: "BAHIR DAR",
     dateOfIssue: "05 JUN 22",
     dateOfExpiry: "04 JUN 27",
+    issuingAuthority: "MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS",
+    photoUrl: "/assets/aistudio/ethiopia_passport_portrait.png",
+  },
+  {
+    passportNo: "EP9104827",
+    surnameAmharic: "አለሙ",
+    surname: "ALEMU",
+    givenNameAmharic: "ዮሐንስ ግርማ",
+    givenNames: "YOHANNES GIRMA",
+    nationality: "ETHIOPIAN",
+    personalNo: "",
+    dateOfBirth: "12 OCT 95",
+    sex: "M",
+    placeOfBirth: "DIRE DAWA",
+    dateOfIssue: "18 NOV 23",
+    dateOfExpiry: "17 NOV 28",
     issuingAuthority: "MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS",
     photoUrl: "/assets/aistudio/ethiopia_passport_portrait.png",
   },
@@ -233,17 +251,291 @@ const bangladeshRandomSpecimens: BangladeshPassportData[] = [
   }
 ]
 
+interface OtherDocumentData {
+  documentNo: string
+  personalNo: string
+  surname: string
+  givenNames: string
+  nationality: string
+  dateOfBirth: string
+  sex: string
+  placeOfBirth: string
+  dateOfIssue: string
+  dateOfExpiry: string
+  authority: string
+  photoUrl?: string
+}
+
+const otherCountryRandomSpecimens: Record<string, OtherDocumentData[]> = {
+  UGA: [
+    {
+      documentNo: "CA050221301",
+      personalNo: "CM650231018R1D",
+      surname: "KATO",
+      givenNames: "CHRISTOPHER MUGANGA",
+      nationality: "UGA",
+      dateOfBirth: "20.05.1965",
+      sex: "M",
+      placeOfBirth: "KAMPALA",
+      dateOfIssue: "18.09.2025",
+      dateOfExpiry: "17.09.2035",
+      authority: "NIRA UGANDA",
+    },
+    {
+      documentNo: "CA081940215",
+      personalNo: "CF920418029K2E",
+      surname: "NAMUKASA",
+      givenNames: "GRACE NAKATO",
+      nationality: "UGA",
+      dateOfBirth: "14.08.1992",
+      sex: "F",
+      placeOfBirth: "ENTEBBE",
+      dateOfIssue: "10.03.2024",
+      dateOfExpiry: "09.03.2034",
+      authority: "NIRA UGANDA",
+    },
+    {
+      documentNo: "CA093817462",
+      personalNo: "CM881105044M9A",
+      surname: "OKELLO",
+      givenNames: "DENIS OTIM",
+      nationality: "UGA",
+      dateOfBirth: "05.11.1988",
+      sex: "M",
+      placeOfBirth: "GULU",
+      dateOfIssue: "22.06.2023",
+      dateOfExpiry: "21.06.2033",
+      authority: "NIRA UGANDA",
+    },
+  ],
+  KEN: [
+    {
+      documentNo: "BK569259",
+      personalNo: "3466792",
+      surname: "RUKU",
+      givenNames: "GEORGE MWANGI",
+      nationality: "KENYAN",
+      dateOfBirth: "12 JUN 1993",
+      sex: "M",
+      placeOfBirth: "THIKA, KEN",
+      dateOfIssue: "01 MAR 2024",
+      dateOfExpiry: "28 FEB 2034",
+      authority: "GOVERNMENT OF KENYA",
+    },
+    {
+      documentNo: "AK819204",
+      personalNo: "4829103",
+      surname: "WANJIKU",
+      givenNames: "FAITH NJERI",
+      nationality: "KENYAN",
+      dateOfBirth: "24 SEP 1996",
+      sex: "F",
+      placeOfBirth: "NAIROBI, KEN",
+      dateOfIssue: "15 JUL 2023",
+      dateOfExpiry: "14 JUL 2033",
+      authority: "GOVERNMENT OF KENYA",
+    },
+    {
+      documentNo: "BK904182",
+      personalNo: "2910485",
+      surname: "ODHIAMBO",
+      givenNames: "BRIAN OTIENO",
+      nationality: "KENYAN",
+      dateOfBirth: "08 FEB 1990",
+      sex: "M",
+      placeOfBirth: "KISUMU, KEN",
+      dateOfIssue: "19 NOV 2022",
+      dateOfExpiry: "18 NOV 2032",
+      authority: "GOVERNMENT OF KENYA",
+    },
+  ],
+  SEN: [
+    {
+      documentNo: "1 02 19910828 00011 3",
+      personalNo: "SN19910828001",
+      surname: "BODIAN",
+      givenNames: "OUSSEYNOU",
+      nationality: "SENEGALAISE",
+      dateOfBirth: "28/08/1991",
+      sex: "M",
+      placeOfBirth: "GUIDEL BAMBADINKA",
+      dateOfIssue: "16/05/2019",
+      dateOfExpiry: "15/05/2029",
+      authority: "COMM. DE PIKINE",
+    },
+    {
+      documentNo: "2 01 19950412 00482 7",
+      personalNo: "SN19950412048",
+      surname: "NDIAYE",
+      givenNames: "FATOU BINTOU",
+      nationality: "SENEGALAISE",
+      dateOfBirth: "12/04/1995",
+      sex: "F",
+      placeOfBirth: "DAKAR PLATEAU",
+      dateOfIssue: "08/10/2022",
+      dateOfExpiry: "07/10/2032",
+      authority: "PREF. DE DAKAR",
+    },
+    {
+      documentNo: "1 04 19891103 00918 5",
+      personalNo: "SN19891103091",
+      surname: "DIOP",
+      givenNames: "MAMADOU LAMINE",
+      nationality: "SENEGALAISE",
+      dateOfBirth: "03/11/1989",
+      sex: "M",
+      placeOfBirth: "SAINT-LOUIS",
+      dateOfIssue: "21/01/2021",
+      dateOfExpiry: "20/01/2031",
+      authority: "COMM. DE SAINT-LOUIS",
+    },
+  ],
+  DRC: [
+    {
+      documentNo: "DEMO-044743",
+      personalNo: "CD910802004",
+      surname: "MINAFFET",
+      givenNames: "ESTHER NADINE",
+      nationality: "CONGOLAISE",
+      dateOfBirth: "02/08/1991",
+      sex: "F",
+      placeOfBirth: "KINSHASA",
+      dateOfIssue: "14/06/2022",
+      dateOfExpiry: "13/06/2027",
+      authority: "MIN. DES AFFAIRES ETRANGERES",
+    },
+    {
+      documentNo: "OP0819420",
+      personalNo: "CD870319018",
+      surname: "KABONGO",
+      givenNames: "PATRICK MUTOMBO",
+      nationality: "CONGOLAISE",
+      dateOfBirth: "19/03/1987",
+      sex: "M",
+      placeOfBirth: "LUBUMBASHI",
+      dateOfIssue: "05/09/2023",
+      dateOfExpiry: "04/09/2028",
+      authority: "MIN. DES AFFAIRES ETRANGERES",
+    },
+    {
+      documentNo: "OP0954108",
+      personalNo: "CD941210052",
+      surname: "MBALA",
+      givenNames: "CHANTAL KASONGO",
+      nationality: "CONGOLAISE",
+      dateOfBirth: "10/12/1994",
+      sex: "F",
+      placeOfBirth: "GOMA",
+      dateOfIssue: "11/02/2024",
+      dateOfExpiry: "10/02/2029",
+      authority: "MIN. DES AFFAIRES ETRANGERES",
+    },
+  ],
+  RSA: [
+    {
+      documentNo: "930802 0123 08 7",
+      personalNo: "8403190123087",
+      surname: "MASHEGO",
+      givenNames: "REBECCA",
+      nationality: "ZAF",
+      dateOfBirth: "19/03/1984",
+      sex: "F",
+      placeOfBirth: "ZAF",
+      dateOfIssue: "12/05/2021",
+      dateOfExpiry: "11/05/2031",
+      authority: "DEPT OF HOME AFFAIRS",
+    },
+    {
+      documentNo: "891124 5182 08 4",
+      personalNo: "8911245182084",
+      surname: "NKOSI",
+      givenNames: "SIPHO MANDLA",
+      nationality: "ZAF",
+      dateOfBirth: "24/11/1989",
+      sex: "M",
+      placeOfBirth: "ZAF",
+      dateOfIssue: "04/08/2022",
+      dateOfExpiry: "03/08/2032",
+      authority: "DEPT OF HOME AFFAIRS",
+    },
+    {
+      documentNo: "960415 0491 08 2",
+      personalNo: "9604150491082",
+      surname: "DLAMINI",
+      givenNames: "THANDIWE ZANELE",
+      nationality: "ZAF",
+      dateOfBirth: "15/04/1996",
+      sex: "F",
+      placeOfBirth: "ZAF",
+      dateOfIssue: "19/01/2024",
+      dateOfExpiry: "18/01/2034",
+      authority: "DEPT OF HOME AFFAIRS",
+    },
+  ],
+  PNG: [
+    {
+      documentNo: "1330003246",
+      personalNo: "PNG20001010",
+      surname: "MAREW",
+      givenNames: "THEODORE",
+      nationality: "PAPUA NEW GUINEAN",
+      dateOfBirth: "10-10-2000",
+      sex: "M",
+      placeOfBirth: "PORT MORESBY",
+      dateOfIssue: "17-02-2021",
+      dateOfExpiry: "17-02-2031",
+      authority: "PNG CIVIL & IDENTITY REGISTRY",
+    },
+    {
+      documentNo: "1330084912",
+      personalNo: "PNG19940622",
+      surname: "KUMAN",
+      givenNames: "MARIA THERESA",
+      nationality: "PAPUA NEW GUINEAN",
+      dateOfBirth: "22-06-1994",
+      sex: "F",
+      placeOfBirth: "LAE",
+      dateOfIssue: "09-07-2022",
+      dateOfExpiry: "09-07-2032",
+      authority: "PNG CIVIL & IDENTITY REGISTRY",
+    },
+    {
+      documentNo: "1330159204",
+      personalNo: "PNG19880314",
+      surname: "SOMARE",
+      givenNames: "PETER MICHAEL",
+      nationality: "PAPUA NEW GUINEAN",
+      dateOfBirth: "14-03-1988",
+      sex: "M",
+      placeOfBirth: "WEWAK",
+      dateOfIssue: "25-11-2023",
+      dateOfExpiry: "25-11-2033",
+      authority: "PNG CIVIL & IDENTITY REGISTRY",
+    },
+  ],
+}
+
+const defaultOtherCountryData: Record<string, OtherDocumentData> = {
+  UGA: otherCountryRandomSpecimens.UGA[0],
+  KEN: otherCountryRandomSpecimens.KEN[0],
+  SEN: otherCountryRandomSpecimens.SEN[0],
+  DRC: otherCountryRandomSpecimens.DRC[0],
+  RSA: otherCountryRandomSpecimens.RSA[0],
+  PNG: otherCountryRandomSpecimens.PNG[0],
+}
+
 function App() {
   const [content, setContent] = useState(defaultContent)
   const [saved, setSaved] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [detectedText, setDetectedText] = useState<string[] | null>(null)
-  const [country, setCountry] = useState("NGA")
+  const [country, setCountry] = useState("ETH")
   const [nigeriaData, setNigeriaData] = useState<NigeriaPassportData>(defaultNigeriaPassportData)
   const [ethiopiaData, setEthiopiaData] = useState<EthiopiaPassportData>(defaultEthiopiaPassportData)
   const [canadaData, setCanadaData] = useState<CanadaPassportData>(defaultCanadaPassportData)
   const [ghanaData, setGhanaData] = useState<GhanaPassportData>(defaultGhanaPassportData)
   const [bangladeshData, setBangladeshData] = useState<BangladeshPassportData>(defaultBangladeshPassportData)
+  const [otherData, setOtherData] = useState<Record<string, OtherDocumentData>>(defaultOtherCountryData)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const update = (key: keyof typeof defaultContent, value: string) => {
@@ -282,6 +574,18 @@ function App() {
     setBangladeshData((prev) => ({ ...prev, [key]: value }))
   }
 
+  const updateOtherCountry = <K extends keyof OtherDocumentData>(key: K, value: OtherDocumentData[K]) => {
+    setSaved(false)
+    setDetectedText(null)
+    setOtherData((prev) => ({
+      ...prev,
+      [country]: {
+        ...(prev[country] || defaultOtherCountryData[country] || defaultOtherCountryData.UGA),
+        [key]: value,
+      },
+    }))
+  }
+
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -294,8 +598,10 @@ function App() {
         updateCanada("photoUrl", url)
       } else if (country === "GHA") {
         updateGhana("photoUrl", url)
-      } else {
+      } else if (country === "BGD") {
         updateBangladesh("photoUrl", url)
+      } else {
+        updateOtherCountry("photoUrl", url)
       }
     }
   }
@@ -470,20 +776,23 @@ function App() {
         `MRZ L1: ${mrz.line1}`,
         `MRZ L2: ${mrz.line2}`,
       ])
-    } else if (isUganda) {
-      setDetectedText(["REPUBLIC OF UGANDA", "NATIONAL ID CARD", "SURNAME: KATO", "GIVEN NAME: CHRISTOPHER MUGANGA", "NATIONALITY: UGA", "SEX: M", "DATE OF BIRTH: 20.05.1965", "NIN: CM650231018R1D", "DATE OF ISSUE: 18.09.2025", "DATE OF EXPIRY: 17.09.2035", "CARD NO: CA050221301"])
-    } else if (isKenya) {
-      setDetectedText(["REPUBLIC OF KENYA / JAMHURI YA KENYA / REPUBLIQUE DE KENYA", "PASSPORT / PASI / PASSEPORT", "TYPE: P", "COUNTRY CODE: KEN", "PASSPORT NO: BK569259", "SURNAME: RUKU", "GIVEN NAMES: GEORGE MWANGI", "NATIONALITY: KENYAN", "DATE OF BIRTH: 12 JUN 1993", "PERSONAL NO: 3466792", "SEX: M", "PLACE OF BIRTH: THIKA, KEN", "DATE OF ISSUE: 01 MAR 2024", "DATE OF EXPIRY: 28 FEB 2034", "ISSUING AUTHORITY: GOVERNMENT OF KENYA", "PLACE OF RESIDENCE: RUIRU, RUIRU", "HEIGHT: 5'6\" (1.68 m)", "COLOUR OF EYES: BLACK"])
-    } else if (isSenegal) {
-      setDetectedText(["REPUBLIQUE DU SENEGAL", "CARTE D'IDENTITE CEDEAO", "N° DE LA CARTE D'IDENTITE: 1 02 19910828 00011 3", "PRENOMS: OUSSEYNOU", "NOM: BODIAN", "DATE DE NAISSANCE: 28/08/1991", "SEXE: M", "TAILLE: 190 cm", "LIEU DE NAISSANCE: GUIDEL BAMBADINKA", "DATE DE DELIVRANCE: 16/05/2019", "DATE D'EXPIRATION: 15/05/2029", "CENTRE D'ENREGISTREMENT: COMM. DE PIKINE", "ADRESSE DU DOMOMICILE: GUINAW RAILS"])
-    } else if (isPapuaNewGuinea) {
-      setDetectedText(["INDEPENDENT STATE OF PAPUA NEW GUINEA", "NATIONAL IDENTITY CARD", "SURNAME: MAREW", "GIVEN NAMES: THEODORE", "DATE OF BIRTH: 10-10-2000", "GENDER: Male", "NID No: 1330003246", "DATE OF ISSUE: 17-02-2021", "DATE OF EXPIRY: 17-02-2031"])
     } else {
-      setDetectedText(isSouthAfrica
-        ? ["REPUBLIC OF SOUTH AFRICA", "IDENTITY CARD", "SURNAME: MASHEGO", "FORENAMES: REBECCA", "DATE OF BIRTH: 19/03/1984", "ID NUMBER: 930802 0123 08 7", "NATIONALITY: ZAF"]
-        : ["REPUBLIC OF DEMOCRATIC CONGO", "PASSPORT / PASSEPORT", "SURNAME: MINAFFET", "GIVEN NAMES: ESTHER NADINE", "NATIONALITY: CONGOLAISE", "DATE OF BIRTH: 02/08/1991", "PASSPORT NO: DEMO-044743"])
+      const list = otherCountryRandomSpecimens[country] || otherCountryRandomSpecimens.DRC
+      const current = otherData[country] || list[0]
+      const pool = list.filter((s) => s.documentNo !== current.documentNo)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || list[0]
+      setOtherData((prev) => ({ ...prev, [country]: chosen }))
+      setDetectedText([
+        `${specimenLabel.toUpperCase()} (${country})`,
+        `DOCUMENT / PASSPORT NO: ${chosen.documentNo} | PERSONAL / NIN NO: ${chosen.personalNo}`,
+        `SURNAME: ${chosen.surname}`,
+        `GIVEN NAMES: ${chosen.givenNames}`,
+        `NATIONALITY: ${chosen.nationality} | SEX: ${chosen.sex}`,
+        `DATE OF BIRTH: ${chosen.dateOfBirth} | PLACE OF BIRTH: ${chosen.placeOfBirth}`,
+        `DATE OF ISSUE: ${chosen.dateOfIssue} | DATE OF EXPIRY: ${chosen.dateOfExpiry}`,
+        `ISSUING AUTHORITY: ${chosen.authority}`,
+      ])
     }
-    document.getElementById("passport-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
   const resetNigeriaToDefault = () => {
@@ -511,6 +820,23 @@ function App() {
     setDetectedText(null)
   }
 
+  const resetOtherToDefault = () => {
+    setOtherData((prev) => ({
+      ...prev,
+      [country]: defaultOtherCountryData[country] || defaultOtherCountryData.DRC,
+    }))
+    setDetectedText(null)
+  }
+
+  const resetCurrentCountry = () => {
+    if (isNigeria) resetNigeriaToDefault()
+    else if (isEthiopia) resetEthiopiaToDefault()
+    else if (isCanada) resetCanadaToDefault()
+    else if (isGhana) resetGhanaToDefault()
+    else if (isBangladesh) resetBangladeshToDefault()
+    else resetOtherToDefault()
+  }
+
   return (
     <div className="app-shell">
       <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
@@ -531,10 +857,42 @@ function App() {
 
           <div className="editor-layout" id="passport-editor">
             <section className="editor-panel" aria-label="Editor controls">
-              <div className="panel-header"><div><h2>Document & Content</h2><p>Customize the screen content and passport fields.</p></div><span className="live-pill"><span /> Live</span></div>
+              <div className="panel-header">
+                <div><h2>Document & Content</h2><p>Customize the screen content and passport fields.</p></div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 font-semibold shadow-xs cursor-pointer"
+                  >
+                    <RefreshCw size={13} /> Randomize
+                  </button>
+                  <span className="live-pill"><span /> Live</span>
+                </div>
+              </div>
               <div className="form-stack">
-                <label>Country / document
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-semibold text-slate-700">Country / document</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold cursor-pointer"
+                      >
+                        <RefreshCw size={11} /> Randomize {country}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetCurrentCountry}
+                        className="text-[11px] flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 font-semibold cursor-pointer"
+                      >
+                        <RotateCcw size={11} /> Reset
+                      </button>
+                    </div>
+                  </div>
                   <select
+                    className="w-full"
                     value={country}
                     onChange={(event) => {
                       const newCountry = event.target.value
@@ -577,7 +935,7 @@ function App() {
                     <option value="RSA">Republic of South Africa — Identity card</option>
                     <option value="PNG">Independent State of Papua New Guinea — National ID Card</option>
                   </select>
-                </label>
+                </div>
                 <label>Screen title<input value={content.title} onChange={(event) => update("title", event.target.value)} /></label>
                 <label>Description<textarea rows={2} value={content.subtitle} onChange={(event) => update("subtitle", event.target.value)} /></label>
                 <label>Primary button label<input value={content.button} onChange={(event) => update("button", event.target.value)} /></label>
@@ -589,13 +947,22 @@ function App() {
                 <div className="mt-6 pt-5 border-t border-slate-200">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <button
-                      type="button"
-                      onClick={resetNigeriaToDefault}
-                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
-                    >
-                      <RotateCcw size={12} /> Reset to Specimen
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
+                      >
+                        <RefreshCw size={12} /> Randomize
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetNigeriaToDefault}
+                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
+                      >
+                        <RotateCcw size={12} /> Reset to Specimen
+                      </button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
@@ -706,13 +1073,22 @@ function App() {
                 <div className="mt-6 pt-5 border-t border-slate-200">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <button
-                      type="button"
-                      onClick={resetEthiopiaToDefault}
-                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
-                    >
-                      <RotateCcw size={12} /> Reset to Specimen
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
+                      >
+                        <RefreshCw size={12} /> Randomize
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetEthiopiaToDefault}
+                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
+                      >
+                        <RotateCcw size={12} /> Reset to Specimen
+                      </button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
@@ -807,6 +1183,15 @@ function App() {
                       />
                     </label>
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Personal No. / መለያ ቁ.
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        placeholder="Optional"
+                        value={ethiopiaData.personalNo || ""}
+                        onChange={(e) => updateEthiopia("personalNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
                       Issuing Authority / የሰጠው ባለስልጣን
                       <input
                         className="p-2 border rounded border-slate-300 text-xs font-mono"
@@ -823,13 +1208,22 @@ function App() {
                 <div className="mt-6 pt-5 border-t border-slate-200">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <button
-                      type="button"
-                      onClick={resetCanadaToDefault}
-                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-red-700 font-semibold"
-                    >
-                      <RotateCcw size={12} /> Reset to Specimen
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 font-semibold"
+                      >
+                        <RefreshCw size={12} /> Randomize
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetCanadaToDefault}
+                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-red-700 font-semibold"
+                      >
+                        <RotateCcw size={12} /> Reset to Specimen
+                      </button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
@@ -941,13 +1335,22 @@ function App() {
                 <div className="mt-6 pt-5 border-t border-slate-200">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <button
-                      type="button"
-                      onClick={resetGhanaToDefault}
-                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-amber-700 font-semibold"
-                    >
-                      <RotateCcw size={12} /> Reset to Specimen
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 font-semibold"
+                      >
+                        <RefreshCw size={12} /> Randomize
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetGhanaToDefault}
+                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-amber-700 font-semibold"
+                      >
+                        <RotateCcw size={12} /> Reset to Specimen
+                      </button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
@@ -1050,13 +1453,22 @@ function App() {
                 <div className="mt-6 pt-5 border-t border-slate-200">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <button
-                      type="button"
-                      onClick={resetBangladeshToDefault}
-                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
-                    >
-                      <RotateCcw size={12} /> Reset to Specimen
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
+                      >
+                        <RefreshCw size={12} /> Randomize
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetBangladeshToDefault}
+                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
+                      >
+                        <RotateCcw size={12} /> Reset to Specimen
+                      </button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
@@ -1143,6 +1555,70 @@ function App() {
                         onChange={(e) => updateBangladesh("issuingAuthority", e.target.value.toUpperCase())}
                       />
                     </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Previous Passport No.
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={bangladeshData.previousPassportNo}
+                        onChange={(e) => updateBangladesh("previousPassportNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Booklet Serial No.
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={bangladeshData.bookletSerial}
+                        onChange={(e) => updateBangladesh("bookletSerial", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Father&apos;s Name
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={bangladeshData.fatherName}
+                        onChange={(e) => updateBangladesh("fatherName", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Mother&apos;s Name
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={bangladeshData.motherName}
+                        onChange={(e) => updateBangladesh("motherName", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Spouse&apos;s Name
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        placeholder="Optional"
+                        value={bangladeshData.spouseName}
+                        onChange={(e) => updateBangladesh("spouseName", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Emergency Relationship
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={bangladeshData.emergencyRelationship}
+                        onChange={(e) => updateBangladesh("emergencyRelationship", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Permanent Address (Lines 1 & 2)
+                      <div className="flex flex-col gap-1.5">
+                        <input
+                          className="p-2 border rounded border-slate-300 text-xs font-mono"
+                          value={bangladeshData.permanentAddress1}
+                          onChange={(e) => updateBangladesh("permanentAddress1", e.target.value.toUpperCase())}
+                        />
+                        <input
+                          className="p-2 border rounded border-slate-300 text-xs font-mono"
+                          value={bangladeshData.permanentAddress2}
+                          onChange={(e) => updateBangladesh("permanentAddress2", e.target.value.toUpperCase())}
+                        />
+                      </div>
+                    </label>
                     <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
                       Emergency Contact Name & Phone
                       <div className="flex gap-2">
@@ -1160,7 +1636,145 @@ function App() {
                         />
                       </div>
                     </label>
+                    <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Emergency Address (Lines 1 & 2)
+                      <div className="flex flex-col gap-1.5">
+                        <input
+                          className="p-2 border rounded border-slate-300 text-xs font-mono"
+                          value={bangladeshData.emergencyAddress1}
+                          onChange={(e) => updateBangladesh("emergencyAddress1", e.target.value.toUpperCase())}
+                        />
+                        <input
+                          className="p-2 border rounded border-slate-300 text-xs font-mono"
+                          value={bangladeshData.emergencyAddress2}
+                          onChange={(e) => updateBangladesh("emergencyAddress2", e.target.value.toUpperCase())}
+                        />
+                      </div>
+                    </label>
                   </div>
+                </div>
+              )}
+
+              {/* Interactive Document Data Fields + Randomize for all other countries (UGA, KEN, SEN, DRC, RSA, PNG) */}
+              {!isNigeria && !isEthiopia && !isCanada && !isGhana && !isBangladesh && (
+                <div className="mt-6 pt-5 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Document Data Fields</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
+                      >
+                        <RefreshCw size={12} /> Randomize
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetOtherToDefault}
+                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
+                      >
+                        <RotateCcw size={12} /> Reset to Specimen
+                      </button>
+                    </div>
+                  </div>
+                  {(() => {
+                    const currentDoc = otherData[country] || defaultOtherCountryData[country] || defaultOtherCountryData.UGA
+                    return (
+                      <div className="grid grid-cols-2 gap-3 text-xs">
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Surname
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                            value={currentDoc.surname}
+                            onChange={(e) => updateOtherCountry("surname", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Given Names
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                            value={currentDoc.givenNames}
+                            onChange={(e) => updateOtherCountry("givenNames", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Document / Passport No.
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                            value={currentDoc.documentNo}
+                            onChange={(e) => updateOtherCountry("documentNo", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Personal / NIN No.
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.personalNo}
+                            onChange={(e) => updateOtherCountry("personalNo", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Nationality
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.nationality}
+                            onChange={(e) => updateOtherCountry("nationality", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Sex
+                          <select
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.sex}
+                            onChange={(e) => updateOtherCountry("sex", e.target.value)}
+                          >
+                            <option value="M">M - Male</option>
+                            <option value="F">F - Female</option>
+                          </select>
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Date of Birth
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.dateOfBirth}
+                            onChange={(e) => updateOtherCountry("dateOfBirth", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Place of Birth
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.placeOfBirth}
+                            onChange={(e) => updateOtherCountry("placeOfBirth", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Date of Issue
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.dateOfIssue}
+                            onChange={(e) => updateOtherCountry("dateOfIssue", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Date of Expiry
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.dateOfExpiry}
+                            onChange={(e) => updateOtherCountry("dateOfExpiry", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                        <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
+                          Issuing Authority
+                          <input
+                            className="p-2 border rounded border-slate-300 text-xs font-mono"
+                            value={currentDoc.authority}
+                            onChange={(e) => updateOtherCountry("authority", e.target.value.toUpperCase())}
+                          />
+                        </label>
+                      </div>
+                    )
+                  })()}
                 </div>
               )}
 
@@ -1183,7 +1797,7 @@ function App() {
             </section>
 
             <section className="preview-column">
-              <div className="preview-heading"><div><h2>Live preview</h2><p>This is what applicants will see.</p></div><div className="device-toggle"><button className="selected">Desktop</button><button>Mobile</button></div></div>
+              <div className="preview-heading"><div><h2>Live preview</h2><p>This is what applicants will see.</p></div><div className="device-toggle"><button type="button" onClick={randomizeSpecimen} className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 mr-1 cursor-pointer"><RefreshCw size={13} /> Randomize</button><button className="selected">Desktop</button><button>Mobile</button></div></div>
               <div className="preview-frame">
                 <div className="preview-browser"><span /><span /><span /><small>verify.kyc.app/passport</small></div>
                 <div className="preview-page" style={previewStyle}>
@@ -1217,15 +1831,52 @@ function App() {
                           <BangladeshPassportCard data={bangladeshData} />
                         </div>
                       ) : (
-                        <img className="passport-reference-image" src={specimenImage} alt={specimenAlt} />
+                        <div className="relative w-full mx-auto">
+                          <img className="passport-reference-image" src={specimenImage} alt={specimenAlt} />
+                          {(() => {
+                            const currentDoc = otherData[country] || defaultOtherCountryData[country] || defaultOtherCountryData.UGA
+                            return (
+                              <div className="mt-2 p-2.5 rounded bg-slate-900/95 text-white text-left font-mono text-[10px] leading-snug shadow-lg border border-slate-700">
+                                <div className="flex items-center justify-between text-emerald-400 font-bold mb-1 border-b border-slate-700 pb-1">
+                                  <span>LIVE SPECIMEN DATA ({country})</span>
+                                  <span>NO: {currentDoc.documentNo}</span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                                  <div><span className="text-slate-400">SURNAME:</span> {currentDoc.surname}</div>
+                                  <div><span className="text-slate-400">GIVEN:</span> {currentDoc.givenNames}</div>
+                                  <div><span className="text-slate-400">DOB:</span> {currentDoc.dateOfBirth}</div>
+                                  <div><span className="text-slate-400">SEX / NAT:</span> {currentDoc.sex} / {currentDoc.nationality}</div>
+                                  <div><span className="text-slate-400">NIN/ID:</span> {currentDoc.personalNo}</div>
+                                  <div><span className="text-slate-400">EXPIRY:</span> {currentDoc.dateOfExpiry}</div>
+                                </div>
+                              </div>
+                            )
+                          })()}
+                        </div>
                       )}
                       <div className="placeholder-copy">
                         <strong>{specimenLabel}</strong>
                         <span>
                           {isNigeria || isEthiopia || isCanada || isGhana || isBangladesh
                             ? "Authentic 2-page e-Passport spread with live interactive field and MRZ updates."
-                            : "This static reference is preserved exactly as provided."}
+                            : "Interactive specimen reference with live field and randomize support."}
                         </span>
+                        <div className="flex items-center justify-center gap-2 mt-2 pt-2 border-t border-slate-200/80 w-full">
+                          <button
+                            type="button"
+                            onClick={randomizeSpecimen}
+                            className="text-[11px] flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 font-semibold shadow-xs cursor-pointer"
+                          >
+                            <RefreshCw size={12} /> Randomize {country}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={resetCurrentCountry}
+                            className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold cursor-pointer"
+                          >
+                            <RotateCcw size={12} /> Reset
+                          </button>
+                        </div>
                       </div>
                     </div>
 
