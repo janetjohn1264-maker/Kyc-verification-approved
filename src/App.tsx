@@ -7,13 +7,48 @@ import { useMemo, useState, useRef } from "react"
 import { CheckCircle2, ChevronDown, FileText, LayoutDashboard, LogOut, Menu, RefreshCw, RotateCcw, Save, Settings, ShieldCheck, Upload, UserRound, X } from "lucide-react"
 import { BangladeshPassportCard, BangladeshPassportData, defaultBangladeshPassportData, generateBangladeshMRZ } from "./BangladeshPassportCard"
 import { GhanaPassportCard, GhanaPassportData, defaultGhanaPassportData, generateGhanaMRZ } from "./GhanaPassportCard"
+import { CanadaPassportCard, CanadaPassportData, defaultCanadaPassportData, generateCanadaMRZ } from "./CanadaPassportCard"
 
 const defaultContent = {
-  title: "Ghana Passport Verification",
+  title: "Canada Passport Verification",
   subtitle: "Securely verify identity documents in a few simple steps.",
   button: "Start verification",
-  accent: "#b45309", // Ghana warm gold/amber accent
+  accent: "#b91c1c",
 }
+
+const canadaRandomSpecimens: CanadaPassportData[] = [
+  defaultCanadaPassportData,
+  {
+    passportNo: "ZF482910",
+    surname: "TREMBLAY",
+    givenNames: "SOPHIE MARIE",
+    nationality: "CANADIENNE",
+    dateOfBirth: "14 AUG / AOÛT 1992",
+    sex: "F/F",
+    placeOfBirth: "MONTREAL",
+    dateOfIssue: "10 MAR / MAR 2021",
+    dateOfExpiry: "09 MAR / MAR 2031",
+    authority: "MONTREAL",
+    barcodeCode: "ECR81920",
+    signatureText: "Sophie Tremblay",
+    photoUrl: "/assets/aistudio/canada_passport_portrait.png",
+  },
+  {
+    passportNo: "ZG910482",
+    surname: "MACDONALD",
+    givenNames: "LIAM ALEXANDER",
+    nationality: "CANADIENNE",
+    dateOfBirth: "22 NOV / NOV 1985",
+    sex: "M/M",
+    placeOfBirth: "TORONTO",
+    dateOfIssue: "18 JUL / JUIL 2022",
+    dateOfExpiry: "17 JUL / JUIL 2032",
+    authority: "TORONTO",
+    barcodeCode: "ECR50391",
+    signatureText: "Liam MacDonald",
+    photoUrl: "/assets/aistudio/canada_passport_portrait.png",
+  },
+]
 
 const ghanaRandomSpecimens: GhanaPassportData[] = [
   defaultGhanaPassportData,
@@ -133,7 +168,8 @@ function App() {
   const [saved, setSaved] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [detectedText, setDetectedText] = useState<string[] | null>(null)
-  const [country, setCountry] = useState("GHA")
+  const [country, setCountry] = useState("CAN")
+  const [canadaData, setCanadaData] = useState<CanadaPassportData>(defaultCanadaPassportData)
   const [ghanaData, setGhanaData] = useState<GhanaPassportData>(defaultGhanaPassportData)
   const [bangladeshData, setBangladeshData] = useState<BangladeshPassportData>(defaultBangladeshPassportData)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -142,6 +178,12 @@ function App() {
     setDetectedText(null)
     setSaved(false)
     setContent((current) => ({ ...current, [key]: value }))
+  }
+
+  const updateCanada = <K extends keyof CanadaPassportData>(key: K, value: CanadaPassportData[K]) => {
+    setSaved(false)
+    setDetectedText(null)
+    setCanadaData((prev) => ({ ...prev, [key]: value }))
   }
 
   const updateGhana = <K extends keyof GhanaPassportData>(key: K, value: GhanaPassportData[K]) => {
@@ -160,7 +202,9 @@ function App() {
     const file = e.target.files?.[0]
     if (file) {
       const url = URL.createObjectURL(file)
-      if (country === "GHA") {
+      if (country === "CAN") {
+        updateCanada("photoUrl", url)
+      } else if (country === "GHA") {
         updateGhana("photoUrl", url)
       } else {
         updateBangladesh("photoUrl", url)
@@ -169,6 +213,7 @@ function App() {
   }
 
   const previewStyle = useMemo(() => ({ "--accent": content.accent } as React.CSSProperties), [content.accent])
+  const isCanada = country === "CAN"
   const isGhana = country === "GHA"
   const isBangladesh = country === "BGD"
   const isSouthAfrica = country === "RSA"
@@ -177,7 +222,9 @@ function App() {
   const isKenya = country === "KEN"
   const isUganda = country === "UGA"
 
-  const specimenImage = isGhana
+  const specimenImage = isCanada
+    ? "/assets/aistudio/canada_passport_reference.png"
+    : isGhana
     ? "/assets/aistudio/ghana_passport_reference.png"
     : isBangladesh
     ? "/assets/aistudio/bgd_passport_reference.png"
@@ -193,7 +240,9 @@ function App() {
     ? "/assets/aistudio/png_national_id_reference.jpg"
     : "/assets/aistudio/drc_passport_reference.jpg"
 
-  const specimenAlt = isGhana
+  const specimenAlt = isCanada
+    ? "Canada biometric e-Passport reference specimen"
+    : isGhana
     ? "Republic of Ghana biometric e-Passport reference specimen"
     : isBangladesh
     ? "People's Republic of Bangladesh e-Passport reference specimen"
@@ -209,7 +258,9 @@ function App() {
     ? "Static Independent State of Papua New Guinea national identity card reference specimen"
     : "Static Democratic Republic of the Congo passport reference specimen"
 
-  const specimenLabel = isGhana
+  const specimenLabel = isCanada
+    ? "Canada e-Passport (2-Page Spread) reference specimen"
+    : isGhana
     ? "Republic of Ghana e-Passport (2-Page Spread) reference specimen"
     : isBangladesh
     ? "Bangladesh e-Passport (2-Page Spread) reference specimen"
@@ -226,7 +277,25 @@ function App() {
     : "Passport reference specimen"
 
   const randomizeSpecimen = () => {
-    if (isGhana) {
+    if (isCanada) {
+      const randomIdx = Math.floor(Math.random() * canadaRandomSpecimens.length)
+      const chosen = canadaRandomSpecimens[randomIdx]
+      setCanadaData(chosen)
+      const mrz = generateCanadaMRZ(chosen)
+      setDetectedText([
+        "CANADA / PASSPORT · PASSEPORT (CAN)",
+        `TYPE: P | ISSUING COUNTRY: CAN | PASSPORT NO: ${chosen.passportNo}`,
+        `SURNAME: ${chosen.surname}`,
+        `GIVEN NAMES: ${chosen.givenNames}`,
+        `NATIONALITY: ${chosen.nationality}`,
+        `DATE OF BIRTH: ${chosen.dateOfBirth}`,
+        `SEX: ${chosen.sex} | PLACE OF BIRTH: ${chosen.placeOfBirth}`,
+        `DATE OF ISSUE: ${chosen.dateOfIssue}`,
+        `DATE OF EXPIRY: ${chosen.dateOfExpiry} | AUTHORITY: ${chosen.authority}`,
+        `MRZ L1: ${mrz.line1}`,
+        `MRZ L2: ${mrz.line2}`,
+      ])
+    } else if (isGhana) {
       const randomIdx = Math.floor(Math.random() * ghanaRandomSpecimens.length)
       const chosen = ghanaRandomSpecimens[randomIdx]
       setGhanaData(chosen)
@@ -279,6 +348,11 @@ function App() {
     document.getElementById("passport-editor")?.scrollIntoView({ behavior: "smooth", block: "start" })
   }
 
+  const resetCanadaToDefault = () => {
+    setCanadaData(defaultCanadaPassportData)
+    setDetectedText(null)
+  }
+
   const resetGhanaToDefault = () => {
     setGhanaData(defaultGhanaPassportData)
     setDetectedText(null)
@@ -318,7 +392,9 @@ function App() {
                       const newCountry = event.target.value
                       setCountry(newCountry)
                       setDetectedText(null)
-                      if (newCountry === "GHA") {
+                      if (newCountry === "CAN") {
+                        setContent((c) => ({ ...c, title: "Canada Passport Verification", accent: "#b91c1c" }))
+                      } else if (newCountry === "GHA") {
                         setContent((c) => ({ ...c, title: "Ghana Passport Verification", accent: "#b45309" }))
                       } else if (newCountry === "BGD") {
                         setContent((c) => ({ ...c, title: "Bangladesh Passport Verification", accent: "#166534" }))
@@ -337,6 +413,7 @@ function App() {
                       }
                     }}
                   >
+                    <option value="CAN">Canada — Biometric e-Passport</option>
                     <option value="GHA">Republic of Ghana — Biometric e-Passport</option>
                     <option value="BGD">People&apos;s Republic of Bangladesh — Biometric e-Passport</option>
                     <option value="UGA">Republic of Uganda — National ID Card</option>
@@ -352,6 +429,124 @@ function App() {
                 <label>Primary button label<input value={content.button} onChange={(event) => update("button", event.target.value)} /></label>
                 <label>Accent color<div className="color-input"><input type="color" value={content.accent} onChange={(event) => update("accent", event.target.value)} /><input value={content.accent} onChange={(event) => update("accent", event.target.value)} aria-label="Accent color hex value" /></div></label>
               </div>
+
+              {/* Canada-specific interactive fields */}
+              {isCanada && (
+                <div className="mt-6 pt-5 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
+                    <button
+                      type="button"
+                      onClick={resetCanadaToDefault}
+                      className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-red-700 font-semibold"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Surname / Nom
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={canadaData.surname}
+                        onChange={(e) => updateCanada("surname", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Given names / Prénoms
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={canadaData.givenNames}
+                        onChange={(e) => updateCanada("givenNames", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Passport No. / N° de passeport
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={canadaData.passportNo}
+                        onChange={(e) => updateCanada("passportNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Nationality / Nationalité
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.nationality}
+                        onChange={(e) => updateCanada("nationality", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Birth
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.dateOfBirth}
+                        onChange={(e) => updateCanada("dateOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Sex / Sexe
+                      <select
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.sex}
+                        onChange={(e) => updateCanada("sex", e.target.value)}
+                      >
+                        <option value="F/F">F/F (Female)</option>
+                        <option value="M/M">M/M (Male)</option>
+                        <option value="X/X">X/X (Unspecified)</option>
+                      </select>
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Place of Birth
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.placeOfBirth}
+                        onChange={(e) => updateCanada("placeOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Issuing Authority
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.authority}
+                        onChange={(e) => updateCanada("authority", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Issue
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.dateOfIssue}
+                        onChange={(e) => updateCanada("dateOfIssue", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Expiry
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.dateOfExpiry}
+                        onChange={(e) => updateCanada("dateOfExpiry", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Barcode / OVD Code
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.barcodeCode}
+                        onChange={(e) => updateCanada("barcodeCode", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Signature Name
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={canadaData.signatureText}
+                        onChange={(e) => updateCanada("signatureText", e.target.value)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
 
               {/* Ghana-specific interactive fields */}
               {isGhana && (
@@ -613,7 +808,11 @@ function App() {
 
                     {/* Passport Card View */}
                     <div className="document-placeholder static-passport">
-                      {isGhana ? (
+                      {isCanada ? (
+                        <div className="w-full max-w-[340px] mx-auto my-1">
+                          <CanadaPassportCard data={canadaData} />
+                        </div>
+                      ) : isGhana ? (
                         <div className="w-full max-w-[340px] mx-auto my-1">
                           <GhanaPassportCard data={ghanaData} />
                         </div>
@@ -627,7 +826,7 @@ function App() {
                       <div className="placeholder-copy">
                         <strong>{specimenLabel}</strong>
                         <span>
-                          {isGhana || isBangladesh
+                          {isCanada || isGhana || isBangladesh
                             ? "Authentic 2-page e-Passport spread with live interactive field and MRZ updates."
                             : "This static reference is preserved exactly as provided."}
                         </span>

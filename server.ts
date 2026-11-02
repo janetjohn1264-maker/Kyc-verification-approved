@@ -366,6 +366,11 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileName: 'canada_passport_reference.png',
     allowInlineImg: true,
   },
+  '/assets/aistudio/canada_passport_clean_bg.png': {
+    fileId: 'canada-clean-bg-png',
+    fileName: 'canada_passport_clean_bg.png',
+    allowInlineImg: true,
+  },
   '/assets/aistudio/canada_passport_portrait.png': {
     fileId: 'canada-portrait-png',
     fileName: 'canada_passport_portrait.png',
