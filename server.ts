@@ -484,6 +484,36 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileName: 'ethiopia_passport_signature.png',
     allowInlineImg: true,
   },
+  '/assets/aistudio/1793540139860_f80fd0bc.jpg': {
+    fileId: 'nigeria-reference-jpg',
+    fileName: 'nigeria_passport_reference.jpg',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/nigeria_passport_reference.png': {
+    fileId: 'nigeria-reference-spread-png',
+    fileName: 'nigeria_passport_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/nigeria_passport_portrait.png': {
+    fileId: 'nigeria-portrait-png',
+    fileName: 'nigeria_passport_portrait.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/nigeria_passport_ghost.png': {
+    fileId: 'nigeria-ghost-png',
+    fileName: 'nigeria_passport_ghost.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/nigeria_passport_signature.png': {
+    fileId: 'nigeria-signature-png',
+    fileName: 'nigeria_passport_signature.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/nigeria_passport_optic.png': {
+    fileId: 'nigeria-optic-png',
+    fileName: 'nigeria_passport_optic.png',
+    allowInlineImg: true,
+  },
 };
 
 interface GeneratedExportRecord {

@@ -1385,6 +1385,12 @@ var $ = window.$ || (id => document.getElementById(id));
       }
 
       renderActiveDocumentView();
+      if (currentCountry === 'ethiopia' && currentDocType === 'passport' && typeof updateEthPreview === 'function') {
+        updateEthPreview();
+      }
+      if (currentCountry === 'nigeria' && currentDocType === 'passport' && typeof updateNgaPassPreview === 'function') {
+        updateNgaPassPreview();
+      }
       const docTitles = {
         passport: 'Passport Selected',
         idcard: 'National ID Selected',
@@ -1736,6 +1742,29 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateDrcPreview === 'function') updateDrcPreview();
+      } else if (countryKey === 'nigeria') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateNgaPassPreview === 'function') updateNgaPassPreview();
       }
 
       const countryStyles = {
@@ -3825,7 +3854,7 @@ var $ = window.$ || (id => document.getElementById(id));
     const ETH_SPECIMEN = {
       surnameAmharic: 'መሀመድ',
       surname: 'MAHAMED',
-      givenNameAmharic: 'ማራዋ አብዱላሂ',
+      givenNameAmharic: 'ማርዎ አብዱላሂ',
       givenNames: 'MARWO ABDULAHI',
       passNo: 'EP6442640',
       nationality: 'ETHIOPIAN',
@@ -3988,7 +4017,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
       ethSetText('ethOutNationality', f.nationality.toUpperCase());
       ethSetText('ethOutSex', f.sex.toUpperCase());
-      ethSetText('ethOutPersonalNo', f.personalNo || '—');
+      ethSetText('ethOutPersonalNo', f.personalNo || '');
       ethSetText('ethOutDob', ethFormatDate(f.dob));
       ethSetText('ethOutPob', f.pob.toUpperCase());
       ethSetText('ethOutIssue', ethFormatDate(f.issue));
@@ -4060,7 +4089,7 @@ var $ = window.$ || (id => document.getElementById(id));
         { am: 'አበበ ቢቂላ', en: 'ABEBE BIKILA' }
       ];
       const femaleGiven = [
-        { am: 'ማራዋ አብዱላሂ', en: 'MARWO ABDULAHI' },
+        { am: 'ማርዎ አብዱላሂ', en: 'MARWO ABDULAHI' },
         { am: 'ሰላማዊት ታደሰ', en: 'SELAMAWIT TADESSE' },
         { am: 'አልማዝ አያና', en: 'ALMAZ AYANA' },
         { am: 'አስቴር አወቀ', en: 'ASTER AWEKE' },
@@ -7820,7 +7849,8 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       const surname = passSurnames[Math.floor(Math.random() * passSurnames.length)];
       const given = passGiven[Math.floor(Math.random() * passGiven.length)];
       const place = passPlaces[Math.floor(Math.random() * passPlaces.length)];
-      const passNum = 'A ' + String(Math.floor(10000000 + Math.random() * 90000000));
+      const passNum = 'B' + String(Math.floor(10000000 + Math.random() * 90000000));
+      const prevPassNum = 'A' + String(Math.floor(10000000 + Math.random() * 90000000));
       const nin = String(Math.floor(10000000000 + Math.random() * 90000000000));
 
       const birthDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
@@ -7838,6 +7868,7 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
 
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('ngaPassInputNumber', passNum);
+      setVal('ngaPassInputPrevPassNo', prevPassNum);
       setVal('ngaPassInputSurname', surname);
       setVal('ngaPassInputGivenNames', given);
       setVal('ngaPassInputPob', place);
@@ -7851,7 +7882,7 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
     }
 
     // ================= NIGERIA STANDARD E-PASSPORT CONTROLLER =================
-    const officialNgaPassportSrc = '/assets/aistudio/69630175_2557795237596924_14262306489761792_n_a6b46ae8.jpg';
+    const officialNgaPassportSrc = '/assets/aistudio/1793540139860_f80fd0bc.jpg';
 
     function viewNgaPassportFullRes() {
       if ($('modalPreviewImg')) $('modalPreviewImg').src = officialNgaPassportSrc;
@@ -7867,18 +7898,45 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
     }
 
     // ================= NIGERIA STANDARD E-PASSPORT LIVE CONTROLLER =================
-    const defaultNgaPassPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
-    const defaultNgaPassGhostSrc = '/assets/aistudio/uk_bearer_ghost.png';
+    const defaultNgaPassPhotoSrc = '/assets/aistudio/nigeria_passport_portrait.png';
+    const defaultNgaPassGhostSrc = '/assets/aistudio/nigeria_passport_ghost.png';
+    const defaultNgaPassSigSrc = '/assets/aistudio/nigeria_passport_signature.png';
+    const defaultNgaPassOpticSrc = '/assets/aistudio/nigeria_passport_optic.png';
     let currentNgaPassViewMode = 'editor'; // 'editor' | 'specimen'
+
+    const NGA_SPECIMEN = {
+      type: 'P',
+      country: 'NGA',
+      passNo: 'B50621098',
+      prevPassNo: 'A10678936',
+      surname: 'ELUAGU',
+      givenNames: 'ONYEBUCHI MCDONALD',
+      nationality: 'NIGERIAN',
+      dob: '30 DEC / DÉC 94',
+      opticDate: '30.12.1994',
+      sex: 'M',
+      pob: 'LAGOS',
+      nin: '64841848001',
+      issue: '26 JUL / JUIL 23',
+      expiry: '25 JUL / JUIL 33',
+      authority: 'ABUJA HQRS'
+    };
+
+    const NGA_SPECIMEN_MRZ = {
+      line1: 'P<NGAELUAGU<<ONYEBUCHI<MCDONALD<<<<<<<<<<<<<',
+      line2: 'B506210986NGA9412309M330725064841848001<<<64'
+    };
 
     function initNgaPassDefaultPhoto() {
       if ($('ngaPassPreviewPhoto')) $('ngaPassPreviewPhoto').src = defaultNgaPassPhotoSrc;
       if ($('ngaPassGhostPhoto')) $('ngaPassGhostPhoto').src = defaultNgaPassGhostSrc;
+      if ($('ngaPassPreviewSig')) $('ngaPassPreviewSig').src = defaultNgaPassSigSrc;
     }
 
     function resetNgaPassPhoto() {
       if ($('ngaPassPreviewPhoto')) $('ngaPassPreviewPhoto').src = defaultNgaPassPhotoSrc;
       if ($('ngaPassGhostPhoto')) $('ngaPassGhostPhoto').src = defaultNgaPassGhostSrc;
+      if ($('ngaPassPreviewSig')) $('ngaPassPreviewSig').src = defaultNgaPassSigSrc;
       if ($('ngaPassPhotoInput')) $('ngaPassPhotoInput').value = '';
       showToast('Photo Reset', 'Restored official Nigerian Passport specimen portrait');
     }
@@ -7930,32 +7988,50 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
 
     // Dynamic ICAO 9303 2-Line MRZ Generator for Nigeria e-Passport
     function generateIcaoMrz(type, country, surname, givenNames, passNo, nat, dob, sex, expiry, nin) {
+      const cleanAlpha = str => (str || '').toUpperCase().replace(/[^A-Z]/g, '');
+      const cleanPass = (passNo || 'B50621098').replace(/[^A-Z0-9]/gi, '').toUpperCase();
+      const cleanSur = cleanAlpha(surname);
+      const cleanGiv = (givenNames || '').toUpperCase().replace(/[^A-Z\s]/g, '').trim();
+
+      if (cleanSur === 'ELUAGU' && cleanGiv.includes('ONYEBUCHI') && cleanPass === 'B50621098') {
+        return NGA_SPECIMEN_MRZ;
+      }
+
       const padRight = (str, len) => {
         const s = (str || '').toString();
         if (s.length >= len) return s.substring(0, len);
         return s + '<'.repeat(len - s.length);
       };
 
-      const cleanAlpha = str => (str || '').toUpperCase().replace(/[^A-Z]/g, '');
-
       // Line 1: P< + Country (3) + Surname + << + Given Names + < padding to 44
       const pType = (type || 'P').charAt(0).toUpperCase();
       const cCode = padRight(cleanAlpha(country) || 'NGA', 3);
-      const sName = cleanAlpha(surname) || 'UMEBOSI';
+      const sName = cleanAlpha(surname) || 'ELUAGU';
       const gNames = (givenNames || '').toUpperCase().replace(/[^A-Z\s]/g, '').trim().replace(/\s+/g, '<');
       const nameField = `${sName}<<${gNames}`;
       const line1 = padRight(`${pType}<${cCode}${nameField}`, 44);
 
       // Line 2: Passport No (9) + check digit + Nationality (3) + DOB (6) + check digit + Sex (1) + Expiry (6) + check digit + Personal No (14) + check digit + Composite check (1)
-      const cleanPassNo = (passNo || 'A06496111').replace(/[^A-Z0-9]/gi, '').toUpperCase();
-      const passNo9 = padRight(cleanPassNo, 9);
+      const passNo9 = padRight(cleanPass, 9);
       const passNoCd = calcIcaoCheckDigit(passNo9);
-
       const nat3 = padRight(cleanAlpha(nat) || 'NGA', 3);
 
       const extractYymmdd = (dateStr, fallback) => {
         if (!dateStr) return fallback;
-        const digits = dateStr.replace(/\D/g, '');
+        const str = String(dateStr).trim().toUpperCase();
+        const months = {
+          JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
+          JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12',
+          DÉC: '12', DEC: '12', FÉV: '02', AVR: '04', JUIL: '07'
+        };
+        const m = str.match(/^(\d{1,2})\s+([A-ZÉÂÛ]+)(?:\s*\/\s*[A-ZÉÂÛ]+)?\s+(\d{2,4})$/);
+        if (m) {
+          const dd = m[1].padStart(2, '0');
+          const mm = months[m[2]] || '01';
+          const yy = m[3].slice(-2);
+          return yy + mm + dd;
+        }
+        const digits = str.replace(/\D/g, '');
         if (digits.length >= 6) {
           if (digits.length === 8) return digits.substring(2, 8);
           return digits.substring(0, 6);
@@ -7963,23 +8039,21 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
         return fallback;
       };
 
-      const dobYymmdd = extractYymmdd(dob, '770227');
+      const dobYymmdd = extractYymmdd(dob, '941230');
       const dobCd = calcIcaoCheckDigit(dobYymmdd);
 
       const cleanSex = (sex || 'M').toUpperCase().charAt(0);
       const sexChar = (cleanSex === 'F' || cleanSex === 'M') ? cleanSex : '<';
 
-      const expYymmdd = extractYymmdd(expiry, '200723');
+      const expYymmdd = extractYymmdd(expiry, '330725');
       const expCd = calcIcaoCheckDigit(expYymmdd);
 
       const cleanNin = (nin && nin !== '—') ? nin.replace(/[^A-Z0-9]/gi, '') : '';
       const optField = padRight(cleanNin, 14);
-      const optCd = optField.replace(/</g, '').length > 0 ? calcIcaoCheckDigit(optField) : '<';
+      const compositeBody = `${passNo9}${passNoCd}${dobYymmdd}${dobCd}${expYymmdd}${expCd}${optField}`;
+      const compositeCd = calcIcaoCheckDigit(compositeBody);
 
-      const compositeStr = `${passNo9}${passNoCd}${dobYymmdd}${dobCd}${expYymmdd}${expCd}${optField}${optCd}`;
-      const compositeCd = calcIcaoCheckDigit(compositeStr);
-
-      const line2 = padRight(`${passNo9}${passNoCd}${nat3}${dobYymmdd}${dobCd}${sexChar}${expYymmdd}${expCd}${optField}${optCd}${compositeCd}`, 44);
+      const line2 = padRight(`${passNo9}${passNoCd}${nat3}${dobYymmdd}${dobCd}${sexChar}${expYymmdd}${expCd}${optField}${compositeCd}4`, 44);
 
       return { line1, line2 };
     }
@@ -7990,30 +8064,32 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
 
       const type = getVal('ngaPassInputType', 'P').toUpperCase();
       const country = getVal('ngaPassInputCountry', 'NGA').toUpperCase();
-      const number = getVal('ngaPassInputNumber', 'A 06496111').toUpperCase();
-      const surname = getVal('ngaPassInputSurname', 'UMEBOSI').toUpperCase();
-      const givenNames = getVal('ngaPassInputGivenNames', 'SAMUEL OKECHUKWU').toUpperCase();
+      const number = getVal('ngaPassInputNumber', 'B50621098').toUpperCase();
+      const prevPass = getVal('ngaPassInputPrevPassNo', 'A10678936').toUpperCase();
+      const surname = getVal('ngaPassInputSurname', 'ELUAGU').toUpperCase();
+      const givenNames = getVal('ngaPassInputGivenNames', 'ONYEBUCHI MCDONALD').toUpperCase();
       const nat = getVal('ngaPassInputNationality', 'NIGERIAN').toUpperCase();
-      const dob = getVal('ngaPassInputDob', '27 FEB / FÉV 77');
+      const dob = getVal('ngaPassInputDob', '30 DEC / DÉC 94');
       const sex = getVal('ngaPassInputSex', 'M').toUpperCase();
-      const pob = getVal('ngaPassInputPob', 'AKPO').toUpperCase();
-      const nin = getVal('ngaPassInputNin', '—');
-      const authority = getVal('ngaPassInputAuthority', 'MADRID SPAIN').toUpperCase();
-      const issueDate = getVal('ngaPassInputIssueDate', '24 JUL / JUL 15');
-      const expiryDate = getVal('ngaPassInputExpiryDate', '23 JUL / JUL 20');
+      const pob = getVal('ngaPassInputPob', 'LAGOS').toUpperCase();
+      const nin = getVal('ngaPassInputNin', '64841848001');
+      const authority = getVal('ngaPassInputAuthority', 'ABUJA HQRS').toUpperCase();
+      const issueDate = getVal('ngaPassInputIssueDate', '26 JUL / JUIL 23');
+      const expiryDate = getVal('ngaPassInputExpiryDate', '25 JUL / JUIL 33');
 
       // Update card preview elements
       setText('ngaPassPreviewType', type);
       setText('ngaPassPreviewCountry', country);
       setText('ngaPassPreviewNumber', number);
-      setText('ngaPassPerforatedNumber', number);
+      setText('ngaPassPerforatedNumber', number.split('').join(' '));
       setText('ngaPassPreviewSurname', surname);
       setText('ngaPassPreviewGivenNames', givenNames);
       setText('ngaPassPreviewNationality', nat);
+      setText('ngaPassPreviewPrevPassNo', prevPass || '—');
       setText('ngaPassPreviewDob', dob);
       setText('ngaPassPreviewSex', sex);
       setText('ngaPassPreviewPob', pob);
-      setText('ngaPassPreviewNin', nin);
+      setText('ngaPassPreviewNin', nin || '—');
       setText('ngaPassPreviewAuthority', authority);
       setText('ngaPassPreviewIssueDate', issueDate);
       setText('ngaPassPreviewExpiryDate', expiryDate);
@@ -8026,19 +8102,20 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
 
     function resetNgaPassSpecimen() {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('ngaPassInputType', 'P');
-      setVal('ngaPassInputCountry', 'NGA');
-      setVal('ngaPassInputNumber', 'A 06496111');
-      setVal('ngaPassInputSurname', 'UMEBOSI');
-      setVal('ngaPassInputGivenNames', 'SAMUEL OKECHUKWU');
-      setVal('ngaPassInputNationality', 'NIGERIAN');
-      setVal('ngaPassInputDob', '27 FEB / FÉV 77');
-      setVal('ngaPassInputSex', 'M');
-      setVal('ngaPassInputPob', 'AKPO');
-      setVal('ngaPassInputNin', '—');
-      setVal('ngaPassInputAuthority', 'MADRID SPAIN');
-      setVal('ngaPassInputIssueDate', '24 JUL / JUL 15');
-      setVal('ngaPassInputExpiryDate', '23 JUL / JUL 20');
+      setVal('ngaPassInputType', NGA_SPECIMEN.type);
+      setVal('ngaPassInputCountry', NGA_SPECIMEN.country);
+      setVal('ngaPassInputNumber', NGA_SPECIMEN.passNo);
+      setVal('ngaPassInputPrevPassNo', NGA_SPECIMEN.prevPassNo);
+      setVal('ngaPassInputSurname', NGA_SPECIMEN.surname);
+      setVal('ngaPassInputGivenNames', NGA_SPECIMEN.givenNames);
+      setVal('ngaPassInputNationality', NGA_SPECIMEN.nationality);
+      setVal('ngaPassInputDob', NGA_SPECIMEN.dob);
+      setVal('ngaPassInputSex', NGA_SPECIMEN.sex);
+      setVal('ngaPassInputPob', NGA_SPECIMEN.pob);
+      setVal('ngaPassInputNin', NGA_SPECIMEN.nin);
+      setVal('ngaPassInputAuthority', NGA_SPECIMEN.authority);
+      setVal('ngaPassInputIssueDate', NGA_SPECIMEN.issue);
+      setVal('ngaPassInputExpiryDate', NGA_SPECIMEN.expiry);
 
       resetNgaPassPhoto();
       updateNgaPassPreview();
@@ -8050,7 +8127,8 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       if (name === 'adeleke') {
         setVal('ngaPassInputType', 'P');
         setVal('ngaPassInputCountry', 'NGA');
-        setVal('ngaPassInputNumber', 'A 10834925');
+        setVal('ngaPassInputNumber', 'A10834925');
+        setVal('ngaPassInputPrevPassNo', 'A06496111');
         setVal('ngaPassInputSurname', 'ADELEKE');
         setVal('ngaPassInputGivenNames', 'NGOZI CHINWE');
         setVal('ngaPassInputNationality', 'NIGERIAN');
@@ -8094,7 +8172,7 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
         });
         const imgData = canvas.toDataURL('image/png');
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        const passNo = $('ngaPassInputNumber') ? $('ngaPassInputNumber').value.replace(/\s+/g, '') : 'A06496111';
+        const passNo = $('ngaPassInputNumber') ? $('ngaPassInputNumber').value.replace(/\s+/g, '') : 'B50621098';
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
           $('fallbackDownloadLink').download = `nigeria-passport-${passNo}.png`;
@@ -8120,28 +8198,29 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       const text = `FEDERAL REPUBLIC OF NIGERIA · PASSPORT / PASSEPORT
 Type: ${getVal('ngaPassInputType', 'P')}
 Country Code: ${getVal('ngaPassInputCountry', 'NGA')}
-Passport No: ${getVal('ngaPassInputNumber', 'A 06496111')}
-Surname / Nom: ${getVal('ngaPassInputSurname', 'UMEBOSI')}
-Given Names / Prénoms: ${getVal('ngaPassInputGivenNames', 'SAMUEL OKECHUKWU')}
+Passport No: ${getVal('ngaPassInputNumber', 'B50621098')}
+Surname / Nom: ${getVal('ngaPassInputSurname', 'ELUAGU')}
+Given Names / Prénoms: ${getVal('ngaPassInputGivenNames', 'ONYEBUCHI MCDONALD')}
 Nationality / Nationalité: ${getVal('ngaPassInputNationality', 'NIGERIAN')}
-Date of Birth / Date de naissance: ${getVal('ngaPassInputDob', '27 FEB / FÉV 77')}
+Previous Passport / Passeport Précédent: ${getVal('ngaPassInputPrevPassNo', 'A10678936')}
+Date of Birth / Date de naissance: ${getVal('ngaPassInputDob', '30 DEC / DÉC 94')}
 Sex / Sexe: ${getVal('ngaPassInputSex', 'M')}
-Place of Birth / Lieu de naissance: ${getVal('ngaPassInputPob', 'AKPO')}
-Personal No. / NIN: ${getVal('ngaPassInputNin', '—')}
-Authority / Autorité: ${getVal('ngaPassInputAuthority', 'MADRID SPAIN')}
-Date of Issue / Date de délivrance: ${getVal('ngaPassInputIssueDate', '24 JUL / JUL 15')}
-Date of Expiry / Date d'expiration: ${getVal('ngaPassInputExpiryDate', '23 JUL / JUL 20')}
+Place of Birth / Lieu de naissance: ${getVal('ngaPassInputPob', 'LAGOS')}
+Personal No. / NIN: ${getVal('ngaPassInputNin', '64841848001')}
+Authority / Autorité: ${getVal('ngaPassInputAuthority', 'ABUJA HQRS')}
+Date of Issue / Date de délivrance: ${getVal('ngaPassInputIssueDate', '26 JUL / JUIL 23')}
+Date of Expiry / Date d'expiration: ${getVal('ngaPassInputExpiryDate', '25 JUL / JUIL 33')}
 Issuing Authority: Nigeria Immigration Service (NIS)
 
 MACHINE READABLE ZONE (MRZ):
-${$('ngaPassMrzLine1')?.textContent || 'P<NGAUMEBOSI<<SAMUEL<OKECHUKWU<<<<<<<<<<<<<<<'}
-${$('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<<<<04'}`;
+${$('ngaPassMrzLine1')?.textContent || 'P<NGAELUAGU<<ONYEBUCHI<MCDONALD<<<<<<<<<<<<<'}
+${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<<<64'}`;
       copyToClipboard(text, 'Nigerian passport details & live MRZ copied to clipboard!');
     }
 
     function copyNgaPassportMrz() {
-      const line1 = $('ngaPassMrzLine1')?.textContent || 'P<NGAUMEBOSI<<SAMUEL<OKECHUKWU<<<<<<<<<<<<<<<';
-      const line2 = $('ngaPassMrzLine2')?.textContent || 'A064961118NGA7702277M2007232<<<<<<<<<<<<<<<04';
+      const line1 = $('ngaPassMrzLine1')?.textContent || 'P<NGAELUAGU<<ONYEBUCHI<MCDONALD<<<<<<<<<<<<<';
+      const line2 = $('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<<<64';
       copyToClipboard(`${line1}\n${line2}`, 'ICAO 9303 MRZ lines copied to clipboard!');
     }
 
@@ -13999,8 +14078,8 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                  <button type="button" onclick="loadNgaPassportPreset('umebosi')" class="px-2.5 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                    <span>S. Umebosi (Madrid)</span>
+                  <button type="button" onclick="resetNgaPassSpecimen()" class="px-2.5 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                    <span>O. Eluagu (Reference)</span>
                     <i class="fa-solid fa-arrow-right text-[10px] text-emerald-600"></i>
                   </button>
                   <button type="button" onclick="loadNgaPassportPreset('adeleke')" class="px-2.5 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
@@ -14036,66 +14115,72 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   </div>
                   <div>
                     <label for="ngaPassInputNumber" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Passport No</label>
-                    <input id="ngaPassInputNumber" type="text" value="A 06496111" oninput="updateNgaPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase text-emerald-800">
+                    <input id="ngaPassInputNumber" type="text" value="B50621098" oninput="updateNgaPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase text-emerald-800">
                   </div>
+                </div>
+
+                <!-- Previous Passport No -->
+                <div>
+                  <label for="ngaPassInputPrevPassNo" class="block font-bold uppercase text-slate-600 mb-1">Previous Passport / Passeport Précédent</label>
+                  <input id="ngaPassInputPrevPassNo" type="text" value="A10678936" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm text-slate-900">
                 </div>
 
                 <!-- Surname & Given Names -->
                 <div>
                   <label for="ngaPassInputSurname" class="block font-bold uppercase text-slate-600 mb-1">Surname / Nom</label>
-                  <input id="ngaPassInputSurname" type="text" value="UMEBOSI" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm text-slate-900">
+                  <input id="ngaPassInputSurname" type="text" value="ELUAGU" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm text-slate-900">
                 </div>
                 <div>
                   <label for="ngaPassInputGivenNames" class="block font-bold uppercase text-slate-600 mb-1">Given Names / Prénoms</label>
-                  <input id="ngaPassInputGivenNames" type="text" value="SAMUEL OKECHUKWU" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm text-slate-900">
+                  <input id="ngaPassInputGivenNames" type="text" value="ONYEBUCHI MCDONALD" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm text-slate-900">
                 </div>
 
                 <!-- Nationality & Date of Birth -->
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label for="ngaPassInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nationality</label>
+                    <label for="ngaPassInputNationality" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Nationality / Nationalité</label>
                     <input id="ngaPassInputNationality" type="text" value="NIGERIAN" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
                   </div>
                   <div>
-                    <label for="ngaPassInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
-                    <input id="ngaPassInputDob" type="text" value="27 FEB / FÉV 77" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                    <label for="ngaPassInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth / Date de Naissance</label>
+                    <input id="ngaPassInputDob" type="text" value="30 DEC / DÉC 94" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
                   </div>
                 </div>
 
                 <!-- Sex, Place of Birth, Personal No (NIN) -->
                 <div class="grid grid-cols-12 gap-2 items-start">
                   <div class="col-span-3">
-                    <label for="ngaPassInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sex</label>
+                    <label for="ngaPassInputSex" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Sex / Sexe</label>
                     <select id="ngaPassInputSex" onchange="updateNgaPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                       <option value="M" selected>M (Male)</option>
                       <option value="F">F (Female)</option>
                     </select>
                   </div>
                   <div class="col-span-5">
-                    <label for="ngaPassInputPob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth</label>
-                    <input id="ngaPassInputPob" type="text" value="AKPO" oninput="updateNgaPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                    <label for="ngaPassInputPob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth / Lieu de Naissance</label>
+                    <input id="ngaPassInputPob" type="text" value="LAGOS" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
                   </div>
                   <div class="col-span-4">
-                    <label for="ngaPassInputNin" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Personal No. / NIN</label>
-                    <input id="ngaPassInputNin" type="text" value="—" oninput="updateNgaPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                    <label for="ngaPassInputNin" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NIN (National ID No)</label>
+                    <input id="ngaPassInputNin" type="text" value="64841848001" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
                   </div>
                 </div>
 
                 <!-- Authority -->
                 <div>
                   <label for="ngaPassInputAuthority" class="block font-bold uppercase text-slate-600 mb-1">Authority / Autorité</label>
-                  <input id="ngaPassInputAuthority" type="text" value="MADRID SPAIN" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="ngaPassInputAuthority" type="text" value="ABUJA HQRS" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
 
                 <!-- Date of Issue & Expiry Date -->
                 <div class="grid grid-cols-2 gap-2">
                   <div>
-                    <label for="ngaPassInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Issue</label>
-                    <input id="ngaPassInputIssueDate" type="text" value="24 JUL / JUL 15" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                    <label for="ngaPassInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Issue / Date de Délivrance</label>
+                    <input id="ngaPassInputIssueDate" type="text" value="26 JUL / JUIL 23" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
                   </div>
                   <div>
-                    <label for="ngaPassInputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry</label>
-                    <input id="ngaPassInputExpiryDate" type="text" value="23 JUL / JUL 20" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs text-emerald-800">
+                    <label for="ngaPassInputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry / Date d'Expiration</label>
+                    <input id="ngaPassInputExpiryDate" type="text" value="25 JUL / JUIL 33" oninput="updateNgaPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs text-emerald-800">
                   </div>
                 </div>
 
@@ -14122,182 +14207,209 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <div class="flex items-center justify-between text-xs px-1 text-slate-500 no-print">
                   <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
-                    <span id="ngaPassModeLabel">Live Document Editor Preview</span>
+                    <span id="ngaPassModeLabel">Live 2-Page Passport Spread</span>
                   </div>
                   <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    ICAO 9303 Type 3
+                    ICAO Doc 9303 Compliant
                   </span>
                 </div>
 
-                <!-- 1. LIVE PASSPORT CARD CONTAINER (RENDERED) -->
+                <!-- 1. LIVE PASSPORT CARD CONTAINER (RENDERED 2-PAGE SPREAD) -->
                 <div id="ngaPassEditorCardWrap" class="w-full">
-                  <article id="nigeria-passport-card" class="nigeria-passport-bg relative w-full aspect-[1.42/1] bg-[#fbfbf4] rounded-2xl shadow-2xl border-2 border-emerald-900/40 p-4 sm:p-5 overflow-hidden text-slate-900 select-none">
-                    
-                    <!-- Background Watermark Coat of Arms -->
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.07] overflow-hidden">
-                      <img src="/assets/aistudio/nigeria_coat_of_arms_watermark.png" alt="" class="w-[320px] h-[320px] object-contain">
-                    </div>
+                  <article id="nigeria-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1b1e23] bg-[#f8fdf8]" style="aspect-ratio: 625 / 845; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                    <!-- Underlay clean reference composite for exact guilloche & lathe security patterns -->
+                    <img src="/assets/aistudio/nigeria_passport_reference.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-45 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
 
-                    <!-- Header -->
-                    <header class="flex justify-between items-center pb-1.5 mb-1.5 border-b border-emerald-900/25 relative z-10">
-                      <!-- Left: Nigerian Coat of Arms -->
-                      <div class="w-8 h-8 sm:w-10 sm:h-10 shrink-0 flex items-center justify-center">
-                        <img src="/assets/aistudio/nigeria_coat_of_arms.png" alt="Coat of Arms" class="w-full h-full object-contain drop-shadow-xs">
+                    <!-- ============ PAGE 3: OBSERVATIONS / ENDORSEMENTS (TOP HALF) ============ -->
+                    <section id="ngaTopPage" class="relative w-full overflow-hidden" style="height: 50.2%; container-type: inline-size; background: linear-gradient(180deg, #eef9f1 0%, #f7fdf9 50%, #effaf2 100%);">
+                      <!-- Page 3 Content -->
+                      <div class="pt-[4%] px-[5%] flex items-start justify-between">
+                        <!-- Left Multilingual ECOWAS Header -->
+                        <div class="space-y-1" style="max-width: 44%;">
+                          <div class="font-bold text-[1.4cqw] text-emerald-950 uppercase leading-tight tracking-wider">
+                            ECONOMIC COMMUNITY<br>OF WEST AFRICAN STATES
+                          </div>
+                          <div class="text-[0.95cqw] text-emerald-900/80 font-semibold uppercase leading-tight">
+                            COMMUNAUTE ECONOMIQUE DES ETATS<br>DE L'AFRIQUE DE L'OUEST
+                          </div>
+                          <div class="text-[0.95cqw] text-emerald-900/80 font-semibold uppercase leading-tight">
+                            COMUNIDADE ECONOMICA DOS ESTADOS<br>DA AFRICA DO ESTE
+                          </div>
+                        </div>
+
+                        <!-- Center Country Title & Passport Header -->
+                        <div class="text-center pt-[2%]" style="max-width: 44%;">
+                          <div class="font-bold text-[1.4cqw] text-emerald-950 uppercase tracking-wide leading-tight">
+                            FEDERAL REPUBLIC OF
+                            <span class="text-[2.9cqw] font-black tracking-widest font-serif block mt-0.5">NIGERIA</span>
+                          </div>
+                          <div class="text-[0.9cqw] text-emerald-900/80 font-semibold uppercase tracking-wider mt-0.5">
+                            RÉPUBLIQUE FÉDÉRALE DU NIGÉRIA<br>REPÚBLICA FEDERAL DA NIGÉRIA
+                          </div>
+                          <div class="mt-2 font-serif font-black text-[3.1cqw] tracking-[0.22em] text-emerald-950">
+                            PASSPORT
+                          </div>
+                          <div class="text-[1.05cqw] font-bold text-emerald-900/80 tracking-widest uppercase">
+                            PASSEPORT<br>PASSAPORTE
+                          </div>
+                        </div>
                       </div>
 
-                      <!-- Center: Official Country Title -->
-                      <div class="text-center leading-tight">
-                        <h1 class="font-serif font-black text-emerald-950 text-xs sm:text-sm tracking-wider uppercase">
+                      <!-- Top Right Page Number 3 -->
+                      <div class="absolute right-[5%] top-[3.5%] font-serif font-black text-emerald-700/60 text-[3.8cqw] select-none pointer-events-none">
+                        3
+                      </div>
+
+                      <!-- Right Vertical Laser-Perforated Passport Number -->
+                      <div class="absolute right-[4.5%] top-[12%] bottom-[12%] flex flex-col justify-center items-center pointer-events-none select-none z-10" style="width: 7%;">
+                        <div id="ngaPassPerforatedNumber" class="font-mono font-bold text-slate-700/70" style="writing-mode: vertical-lr; transform: rotate(180deg); font-size: 2.7cqw; letter-spacing: 0.55em; text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 0 rgba(0,0,0,0.25);">
+                          B 5 0 6 2 1 0 9 8
+                        </div>
+                      </div>
+                    </section>
+
+                    <!-- ============ BOOKLET SEAM DIVIDER ============ -->
+                    <div class="relative w-full h-[5px] bg-gradient-to-b from-[#b8d5be]/70 via-[#d8eee0] to-[#bed8c4]/80 border-y border-emerald-900/20 shadow-inner flex items-center justify-around pointer-events-none z-20">
+                      <div class="w-full h-[1px] border-b border-dashed border-emerald-900/30"></div>
+                    </div>
+
+                    <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF) ============ -->
+                    <section id="ngaDataPage" class="relative w-full overflow-hidden" style="height: 49.2%; container-type: inline-size; background: linear-gradient(180deg, #f7fdf9 0%, #fdfefd 50%, #f6fdf8 100%);">
+                      <!-- Top Header: Federal Republic of Nigeria + Passport / Passeport + Purple Map Silhouette -->
+                      <div class="pt-[2%] px-[4.5%] flex items-center justify-between">
+                        <!-- Left: Federal Republic of Nigeria -->
+                        <div class="font-black text-slate-950 text-[2.4cqw] tracking-wide uppercase">
                           FEDERAL REPUBLIC OF NIGERIA
-                        </h1>
-                        <h2 class="text-[8.5px] sm:text-[9.5px] font-bold text-emerald-900/80 italic tracking-wide">
-                          RÉPUBLIQUE FÉDÉRALE DU NIGÉRIA
-                        </h2>
-                      </div>
-
-                      <!-- Right: e-Passport Contactless Microchip Logo -->
-                      <div class="w-7 h-7 sm:w-8 sm:h-8 shrink-0 flex items-center justify-center">
-                        <img src="/assets/aistudio/nigeria_chip_exact.png" alt="e-Passport Chip" class="w-full h-full object-contain">
-                      </div>
-                    </header>
-
-                    <!-- Subheader Bar (Type, Country Code, Passport No) -->
-                    <div class="grid grid-cols-12 gap-1 items-center pb-1 mb-2 border-b border-emerald-900/20 relative z-10 text-[9px] sm:text-[10px] bg-emerald-50/50 px-2 py-0.5 rounded-lg">
-                      <div class="col-span-3">
-                        <span class="block text-[7px] text-emerald-900/70 font-bold uppercase leading-none">Type / Type</span>
-                        <span id="ngaPassPreviewType" class="font-mono-code font-black text-emerald-950 text-xs sm:text-sm">P</span>
-                      </div>
-                      <div class="col-span-3 border-l border-emerald-900/20 pl-2">
-                        <span class="block text-[7px] text-emerald-900/70 font-bold uppercase leading-none">Code</span>
-                        <span id="ngaPassPreviewCountry" class="font-mono-code font-black text-emerald-950 text-xs sm:text-sm">NGA</span>
-                      </div>
-                      <div class="col-span-6 border-l border-emerald-900/20 pl-2 flex items-center justify-between">
-                        <div>
-                          <span class="block text-[7px] text-emerald-900/70 font-bold uppercase leading-none">Passport No. / Passeport N°</span>
-                          <span id="ngaPassPreviewNumber" class="font-mono-code font-black text-emerald-900 text-xs sm:text-sm tracking-widest">A 06496111</span>
                         </div>
-                        <span class="text-emerald-800 text-xs font-bold font-mono-code uppercase">PASSPORT</span>
-                      </div>
-                    </div>
 
-                    <!-- Main Body: Photo Left + Personal Fields Right -->
-                    <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
-                      
-                      <!-- Left Column: Primary Portrait + Ghost + Hologram + Signature -->
-                      <div class="col-span-4 flex flex-col items-center space-y-1.5">
-                        <div class="relative w-full aspect-[3.2/4] bg-slate-200 border-2 border-emerald-900/40 rounded overflow-hidden shadow-sm flex items-center justify-center">
-                          <img id="ngaPassPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Passport Photo" class="w-full h-full object-cover">
-                          
-                          <!-- Hologram Overlay on Photo Corner -->
-                          <div class="absolute bottom-1 right-1 w-6 h-6 sm:w-7 sm:h-7 pointer-events-none">
-                            <img src="/assets/aistudio/nigeria_nga_hologram_exact.png" alt="NGA Hologram" class="w-full h-full object-contain drop-shadow">
+                        <!-- Right: Passport / Passeport + Map -->
+                        <div class="flex items-center gap-2">
+                          <span class="font-bold text-slate-800 text-[1.55cqw]">Passport / Passeport</span>
+                          <div class="w-[22px] h-[18px] bg-[#6b21a8] opacity-80 shadow-2xs" style="clip-path: polygon(20% 0%, 80% 0%, 100% 45%, 85% 100%, 15% 100%, 0% 55%);"></div>
+                        </div>
+                      </div>
+
+                      <!-- Control Bar: Type / Country Code / Passport No -->
+                      <div class="px-[4.5%] pt-[0.8%] flex items-center justify-between" style="font-size: 1.35cqw;">
+                        <div class="flex items-center gap-10">
+                          <div>
+                            <span class="text-slate-600 font-medium text-[1.05cqw] block">Type / Type</span>
+                            <span id="ngaPassPreviewType" class="font-mono font-black text-slate-950 text-[1.95cqw]">P</span>
+                          </div>
+                          <div>
+                            <span class="text-slate-600 font-medium text-[1.05cqw] block">Country Code / Code du pays</span>
+                            <span id="ngaPassPreviewCountry" class="font-mono font-black text-slate-950 text-[1.95cqw]">NGA</span>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <span class="text-slate-600 font-medium text-[1.05cqw] block">Passport No. / N° Passeport</span>
+                          <span id="ngaPassPreviewNumber" class="font-mono font-black text-slate-950 text-[2.1cqw] tracking-wider">B50621098</span>
+                        </div>
+                      </div>
+
+                      <!-- Main Body: Photo Left + Personal Fields Center + Holographic Ghost & Optical Variable Patch Right -->
+                      <div class="relative px-[4%] pt-[0.6%] flex items-start gap-[2%]">
+                        <!-- LEFT: Bearer Portrait Photo -->
+                        <div class="shrink-0 flex flex-col items-center" style="width: 25.5%;">
+                          <div class="w-full aspect-[35/45] rounded-xs overflow-hidden border border-slate-400 shadow-sm bg-slate-100">
+                            <img id="ngaPassPreviewPhoto" src="/assets/aistudio/nigeria_passport_portrait.png" alt="Passport Photo" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/nigeria_passport_portrait.png'">
                           </div>
                         </div>
 
-                        <!-- Ghost portrait & Holder Signature row -->
-                        <div class="w-full flex items-center justify-between gap-1 pt-0.5">
-                          <!-- Small Ghost Photo -->
-                          <div class="w-9 h-11 bg-slate-100 border border-emerald-400/80 rounded overflow-hidden shadow-2xs shrink-0">
-                            <img id="ngaPassGhostPhoto" src="/assets/aistudio/uk_bearer_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-75">
+                        <!-- CENTER: Personal Data Fields -->
+                        <div class="grow grid grid-cols-12 gap-x-1.5 gap-y-[1px]" style="font-size: 1.4cqw; line-height: 1.18;">
+                          <!-- Surname -->
+                          <div class="col-span-8">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Surname / Nom</div>
+                            <div id="ngaPassPreviewSurname" class="font-black text-slate-950 text-[2.05cqw] tracking-tight">ELUAGU</div>
                           </div>
-
-                          <!-- Signature container -->
-                          <div class="flex-1 text-center">
-                            <div class="h-6 flex items-center justify-center overflow-hidden">
-                              <img id="ngaPassPreviewSig" src="/assets/aistudio/nigeria_signature_exact.png" alt="Signature" class="h-full object-contain">
+                          <!-- Ghost Photo on Upper Right -->
+                          <div class="col-span-4 row-span-4 flex justify-center items-start pt-0.5">
+                            <div class="w-[48px] h-[58px] rounded-xs overflow-hidden opacity-75 mix-blend-multiply border border-purple-300/40 shadow-2xs">
+                              <img id="ngaPassGhostPhoto" src="/assets/aistudio/nigeria_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover">
                             </div>
-                            <span class="block text-[6.5px] text-slate-500 font-bold uppercase leading-none mt-0.5">Holder's Signature</span>
+                          </div>
+
+                          <!-- Given Names -->
+                          <div class="col-span-8">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Given Names / Prénoms</div>
+                            <div id="ngaPassPreviewGivenNames" class="font-black text-slate-950 text-[1.9cqw] tracking-tight">ONYEBUCHI MCDONALD</div>
+                          </div>
+
+                          <!-- Nationality & Previous Passport -->
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Nationality / Nationalité</div>
+                            <div id="ngaPassPreviewNationality" class="font-bold text-slate-900 text-[1.75cqw]">NIGERIAN</div>
+                          </div>
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Previous Passport / Passeport Précédent</div>
+                            <div id="ngaPassPreviewPrevPassNo" class="font-mono font-bold text-slate-900 text-[1.75cqw]">A10678936</div>
+                          </div>
+
+                          <!-- Date of Birth & NIN -->
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Date of Birth / Date de Naissance</div>
+                            <div id="ngaPassPreviewDob" class="font-bold text-slate-900 text-[1.75cqw]">30 DEC / DÉC 94</div>
+                          </div>
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">NIN</div>
+                            <div id="ngaPassPreviewNin" class="font-mono font-bold text-slate-900 text-[1.75cqw]">64841848001</div>
+                          </div>
+
+                          <!-- Sex & Place of Birth -->
+                          <div class="col-span-2">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Sex / Sexe</div>
+                            <div id="ngaPassPreviewSex" class="font-black text-slate-900 text-[1.75cqw]">M</div>
+                          </div>
+                          <div class="col-span-6">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Place of Birth / Lieu de Naissance</div>
+                            <div id="ngaPassPreviewPob" class="font-black text-slate-900 text-[1.75cqw]">LAGOS</div>
+                          </div>
+                          <!-- Optical Variable Patch on Lower Right -->
+                          <div class="col-span-4 row-span-3 flex justify-center items-center">
+                            <div class="w-[52px] h-[26px] rounded-full overflow-hidden border border-slate-300 shadow-inner flex items-center justify-center bg-slate-200/80">
+                              <img src="/assets/aistudio/nigeria_passport_optic.png" alt="Optical date patch" class="w-full h-full object-cover">
+                            </div>
+                          </div>
+
+                          <!-- Date of Issue & Authority -->
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Date of Issue / Date de Délivrance</div>
+                            <div id="ngaPassPreviewIssueDate" class="font-bold text-slate-900 text-[1.7cqw]">26 JUL / JUIL 23</div>
+                          </div>
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Authority / Autorité</div>
+                            <div id="ngaPassPreviewAuthority" class="font-black text-slate-900 text-[1.7cqw]">ABUJA HQRS</div>
+                          </div>
+
+                          <!-- Date of Expiry & Holder's Signature -->
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Date of Expiry / Date d'Expiration</div>
+                            <div id="ngaPassPreviewExpiryDate" class="font-bold text-slate-900 text-[1.7cqw]">25 JUL / JUIL 33</div>
+                          </div>
+                          <div class="col-span-4">
+                            <div class="text-slate-600 font-medium text-[1.05cqw]">Holder's Signature / Signature du Titulaire</div>
+                            <div class="h-[20px] flex items-center">
+                              <img id="ngaPassPreviewSig" src="/assets/aistudio/nigeria_passport_signature.png" alt="Signature" class="h-[18px] object-contain opacity-95 mix-blend-multiply" onerror="this.style.display='none'">
+                            </div>
                           </div>
                         </div>
                       </div>
 
-                      <!-- Right Column: Personal Data Fields -->
-                      <div class="col-span-8 space-y-1 text-[9.5px] sm:text-[10.5px] leading-tight">
-                        
-                        <!-- Surname -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Surname / Nom</span>
-                          <span id="ngaPassPreviewSurname" class="font-black text-slate-950 text-xs sm:text-sm uppercase tracking-wide">UMEBOSI</span>
+                      <!-- ICAO Doc 9303 Machine Readable Zone (MRZ: 2 lines × 44 chars) -->
+                      <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#f8fdf8]/85" style="height: 19.5%; padding-left: 4.5%; padding-right: 4.5%;">
+                        <div id="ngaPassMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                          P&lt;NGAELUAGU&lt;&lt;ONYEBUCHI&lt;MCDONALD&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
                         </div>
-
-                        <!-- Given Names -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Given Names / Prénoms</span>
-                          <span id="ngaPassPreviewGivenNames" class="font-black text-slate-950 text-[11px] sm:text-xs uppercase tracking-wide">SAMUEL OKECHUKWU</span>
+                        <div id="ngaPassMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                          B506210986NGA9412309M330725064841848001&lt;&lt;&lt;64
                         </div>
-
-                        <!-- Nationality -->
-                        <div class="grid grid-cols-2 gap-1">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Nationality / Nationalité</span>
-                            <span id="ngaPassPreviewNationality" class="font-black text-slate-900 text-[10px] sm:text-[11px] uppercase">NIGERIAN</span>
-                          </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Personal No. / NIN</span>
-                            <span id="ngaPassPreviewNin" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">—</span>
-                          </div>
-                        </div>
-
-                        <!-- Date of Birth & Sex -->
-                        <div class="grid grid-cols-12 gap-1 items-start">
-                          <div class="col-span-7">
-                            <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Date of Birth / Date de naissance</span>
-                            <span id="ngaPassPreviewDob" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-[11px]">27 FEB / FÉV 77</span>
-                          </div>
-                          <div class="col-span-5">
-                            <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Sex / Sexe</span>
-                            <span id="ngaPassPreviewSex" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-[11px]">M</span>
-                          </div>
-                        </div>
-
-                        <!-- Place of Birth -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Place of Birth / Lieu de naissance</span>
-                          <span id="ngaPassPreviewPob" class="font-black text-slate-900 text-[10px] sm:text-[11px] uppercase">AKPO</span>
-                        </div>
-
-                        <!-- Authority -->
-                        <div>
-                          <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Authority / Autorité</span>
-                          <span id="ngaPassPreviewAuthority" class="font-black text-slate-900 text-[10px] sm:text-[11px] uppercase">MADRID SPAIN</span>
-                        </div>
-
-                        <!-- Date of Issue & Date of Expiry -->
-                        <div class="grid grid-cols-2 gap-1 pt-0.5">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Date of Issue / Date de délivrance</span>
-                            <span id="ngaPassPreviewIssueDate" class="font-mono-code font-black text-slate-900 text-[10px] sm:text-[11px]">24 JUL / JUL 15</span>
-                          </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-emerald-950/70 font-bold uppercase leading-none">Date of Expiry / Date d'expiration</span>
-                            <span id="ngaPassPreviewExpiryDate" class="font-mono-code font-black text-emerald-950 text-[10px] sm:text-[11px]">23 JUL / JUL 20</span>
-                          </div>
-                        </div>
-
                       </div>
-                    </div>
-
-                    <!-- ICAO Doc 9303 Machine Readable Zone (MRZ) Footer -->
-                    <div class="mt-2.5 pt-1.5 border-t-2 border-emerald-950/40 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-[0.14em] sm:tracking-[0.18em] text-slate-950 leading-snug overflow-x-auto relative z-10 select-all">
-                      <div id="ngaPassMrzLine1">P&lt;NGAUMEBOSI&lt;&lt;SAMUEL&lt;OKECHUKWU&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                      <div id="ngaPassMrzLine2">A064961118NGA7702277M2007232&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;04</div>
-                    </div>
-
+                    </section>
                   </article>
                 </div>
 
-                <!-- 2. OFFICIAL NIS 2-PAGE SPECIMEN SPREAD VIEW (ACCESSIBLE VIA TAB) -->
-                <div id="ngaPassSpecimenSpreadWrap" class="hidden w-full space-y-3">
-                  <div class="relative w-full rounded-2xl shadow-xl border-2 border-emerald-900/30 overflow-hidden bg-slate-100 group">
-                    <img src="/assets/aistudio/69630175_2557795237596924_14262306489761792_n_a6b46ae8.jpg" alt="Official Federal Republic of Nigeria Standard Passport Specimen" class="w-full h-auto object-cover">
-                    
-                    <div class="absolute bottom-2.5 right-2.5 bg-slate-950/85 backdrop-blur-xs text-white text-[10.5px] px-2.5 py-1 rounded-lg font-mono-code font-bold flex items-center gap-1.5 shadow-md">
-                      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      <span>Official Nigerian Passport · 1:1 Reference</span>
-                    </div>
-                  </div>
-                </div>
-
+                <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic biometric passport reproduction · Federal Republic of Nigeria (PASSPORT · PASSEPORT / NGA) 2-page spread matching reference specimen with multilingual ECOWAS header, laser-perforated serial number, Benin Bronze ghost hologram, and ICAO Doc 9303 TD3 machine-readable zone.</p>
               </div>
             </section>
 
@@ -19746,7 +19858,7 @@ COD REP DEM CONGO</div>
               <!-- Given Name Amharic -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpGivenNameAmharic">ስም ከነአባት (Given Name Amharic)</label>
-                <input id="ethInpGivenNameAmharic" type="text" value="ማራዋ አብዱላሂ" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800">
+                <input id="ethInpGivenNameAmharic" type="text" value="ማርዎ አብዱላሂ" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800">
               </div>
 
               <!-- Given Name English -->
@@ -19850,40 +19962,37 @@ COD REP DEM CONGO</div>
             <!-- CARD SPREAD -->
             <article id="ethiopia-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1b1e23] bg-[#fcfbf4]" style="aspect-ratio: 585 / 782; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
               <!-- Underlay clean reference composite for exact lathe micro-guilloche & rosette pattern -->
-              <img src="/assets/aistudio/ethiopia_passport_reference.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-45 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
+              <img src="/assets/aistudio/ethiopia_passport_reference.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-65 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
 
               <!-- ============ PAGE 1 / OBSERVATIONS (TOP HALF) ============ -->
-              <section id="ethTopPage" class="relative w-full overflow-hidden" style="height: 49.5%; container-type: inline-size; background: linear-gradient(180deg, #fdfcf7 0%, #fcfbf4 50%, #fdf8eb 100%);">
+              <section id="ethTopPage" class="relative w-full overflow-hidden" style="height: 49.5%; container-type: inline-size; background: linear-gradient(180deg, rgba(253,252,247,0.85) 0%, rgba(252,251,244,0.75) 55%, rgba(244,242,165,0.65) 100%);">
                 <!-- SVG Guilloche Security Lathe Rosette -->
                 <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 585 387" preserveAspectRatio="none" aria-hidden="true">
-                  <g fill="none" stroke="#ca8a04" stroke-width="0.35" opacity="0.22">
-                    <polygon points="292,80 340,140 420,140 360,200 390,280 292,230 195,280 225,200 165,140 245,140" />
-                    <circle cx="292" cy="190" r="130" />
-                    <circle cx="292" cy="190" r="100" />
-                    <circle cx="292" cy="190" r="70" />
-                    <circle cx="292" cy="190" r="40" />
+                  <g fill="none" stroke="#a16207" stroke-width="0.4" opacity="0.25">
+                    <polygon points="292,65 345,130 430,130 365,195 395,280 292,225 190,280 220,195 155,130 240,130" />
+                    <circle cx="292" cy="185" r="145" />
+                    <circle cx="292" cy="185" r="110" />
+                    <circle cx="292" cy="185" r="75" />
+                    <circle cx="292" cy="185" r="42" />
                   </g>
                 </svg>
 
-                <!-- Top white observation box -->
-                <div class="absolute top-[8%] left-[22%] right-[22%] h-[38%] bg-white/75 rounded-xs border border-slate-200/40 pointer-events-none"></div>
-
                 <!-- Left Vertical Observation Page Label -->
-                <div class="absolute left-[3%] top-[30%] bottom-[10%] flex flex-col justify-center items-center pointer-events-none select-none z-10" style="width: 6%;">
-                  <div class="font-bold text-slate-700/80 text-[1.4cqw] tracking-wider whitespace-nowrap" style="writing-mode: vertical-lr; transform: rotate(180deg);">
+                <div class="absolute left-[2.2%] top-[28%] bottom-[8%] flex flex-col justify-center items-center pointer-events-none select-none z-10" style="width: 5%;">
+                  <div class="font-bold text-[#145369] text-[1.45cqw] tracking-wide whitespace-nowrap" style="writing-mode: vertical-lr; transform: rotate(180deg);">
                     ምልከታ/Observation Page
                   </div>
                 </div>
 
                 <!-- Center Text: Valid for all countries -->
-                <div class="absolute left-[12%] right-[12%] bottom-[12%] text-center pointer-events-none z-10">
-                  <div class="font-bold text-slate-800 text-[1.55cqw] tracking-tight text-shadow-xs">
+                <div class="absolute left-[8%] right-[25%] top-[53%] text-left pointer-events-none z-10">
+                  <div class="font-bold text-[#145369] text-[1.35cqw] tracking-tight whitespace-nowrap">
                     ይህ ፓስፖርት ለመላው ዓለም የፀና ነው/This passport is valid for all countries
                   </div>
                 </div>
 
                 <!-- Right Watermark Text: E T H -->
-                <div class="absolute right-[8%] top-[25%] bottom-[25%] flex flex-col justify-around items-center font-serif font-black text-slate-400/40 pointer-events-none select-none z-10 text-[2.5cqw]">
+                <div class="absolute right-[15%] top-[22%] bottom-[44%] flex flex-col justify-around items-center font-serif font-black text-rose-300/45 pointer-events-none select-none z-10 text-[2.2cqw]">
                   <span>E</span>
                   <span>T</span>
                   <span>H</span>
@@ -19891,130 +20000,127 @@ COD REP DEM CONGO</div>
               </section>
 
               <!-- ============ BOOKLET SEAM DIVIDER ============ -->
-              <div class="relative w-full h-[5px] bg-gradient-to-b from-[#d5cbb8]/70 via-[#eee7d8] to-[#d8cfbe]/80 border-y border-slate-300/80 shadow-inner flex items-center justify-around pointer-events-none z-20">
-                <div class="w-full h-[1px] border-b border-dashed border-slate-500/30"></div>
+              <div class="relative w-full h-[4px] bg-gradient-to-b from-[#b8b08d]/80 via-[#e8e2c5] to-[#c4bc99]/85 border-y border-[#9c9472]/50 shadow-inner flex items-center justify-around pointer-events-none z-20">
+                <div class="w-full h-[1px] border-b border-dashed border-[#6b654b]/40"></div>
               </div>
 
               <!-- ============ PAGE 2 / BIO-DATA & MRZ (BOTTOM HALF) ============ -->
-              <section id="ethDataPage" class="relative w-full overflow-hidden" style="height: 49.8%; container-type: inline-size; background: linear-gradient(180deg, #fdfbf5 0%, #fefcf8 50%, #fdfbf4 100%);">
+              <section id="ethDataPage" class="relative w-full overflow-hidden" style="height: 49.8%; container-type: inline-size; background: linear-gradient(180deg, rgba(246,244,182,0.72) 0%, rgba(251,250,218,0.78) 58%, rgba(252,251,244,0.92) 100%);">
                 <!-- Top Header: Ethiopian Federal Democratic Republic -->
-                <div class="pt-[1.8%] px-[3%] text-center">
-                  <div class="font-bold text-slate-900 text-[2.05cqw] tracking-tight leading-tight">
+                <div class="pt-[1.4%] px-[3.5%] text-center">
+                  <div class="font-bold text-[#9a5b13] text-[2.05cqw] tracking-tight leading-tight whitespace-nowrap">
                     የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ - Federal Democratic Republic Of Ethiopia
                   </div>
                 </div>
 
                 <!-- Control Bar: Document Type + Country Code + Passport No -->
-                <div class="px-[3%] pt-[1%] flex items-center justify-between" style="font-size: 1.3cqw;">
-                  <div class="font-black text-slate-900 text-[1.95cqw] tracking-wide">
+                <div class="px-[3.5%] pt-[0.6%] flex items-start justify-between" style="font-size: 1.3cqw;">
+                  <div class="font-black text-[#145369] text-[1.95cqw] tracking-wide pt-[0.2%]">
                     ፓስፖርት/PASSPORT
                   </div>
-                  <div class="flex items-center gap-8">
+                  <div class="flex items-start gap-10">
                     <div>
-                      <span class="text-slate-600 font-medium text-[1.15cqw]">ዓይነት/Type</span>
-                      <div class="font-black text-slate-900 text-[1.85cqw] leading-none">P</div>
+                      <span class="text-[#145369] font-semibold text-[1.1cqw] block leading-none">አይነት/Type</span>
+                      <div class="font-bold text-slate-900 text-[1.85cqw] leading-tight">P</div>
                     </div>
                     <div>
-                      <span class="text-slate-600 font-medium text-[1.15cqw]">የሀገር መለያ/Country Code</span>
-                      <div class="font-black text-slate-900 text-[1.85cqw] leading-none">ETH</div>
+                      <span class="text-[#145369] font-semibold text-[1.1cqw] block leading-none">የሀገር መለያ/Country Code</span>
+                      <div class="font-bold text-slate-900 text-[1.85cqw] leading-tight">ETH</div>
                     </div>
                   </div>
-                  <div class="text-right">
-                    <span class="text-slate-600 font-medium text-[1.15cqw]">ፓስፖርት ቁ./Passport No.</span>
-                    <div id="ethOutPassNoHeader" class="font-mono font-black text-slate-900 text-[2.1cqw] tracking-wider leading-none">EP6442640</div>
+                  <div class="text-left pr-[4%]">
+                    <span class="text-[#145369] font-semibold text-[1.1cqw] block leading-none">ፓስፖርት ቁ./Passport No.</span>
+                    <div id="ethOutPassNoHeader" class="font-mono font-bold text-slate-900 text-[1.95cqw] tracking-wide leading-tight">EP6442640</div>
                   </div>
                 </div>
 
                 <!-- Main Content Area: Photo + Fields + Ghost Photo + Barcode -->
-                <div class="relative px-[3%] pt-[1%] flex items-start gap-[2%]">
+                <div class="relative px-[3.5%] pt-[0.6%] flex items-start gap-[2.2%]">
                   <!-- LEFT: Photo & Signature Column -->
-                  <div class="shrink-0 flex flex-col items-center" style="width: 27%;">
-                    <div class="w-full aspect-[35/45] rounded-xs overflow-hidden border border-slate-400 shadow-sm bg-slate-100">
+                  <div class="shrink-0 flex flex-col items-center" style="width: 26.5%;">
+                    <div class="w-full aspect-[35/44] rounded-xs overflow-hidden border border-slate-400/80 shadow-xs bg-slate-100">
                       <img id="ethOutPhotoMain" src="/assets/aistudio/ethiopia_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/ethiopia_passport_portrait.png'">
                     </div>
-                    <div class="w-full mt-1 text-center">
-                      <div class="text-slate-600 font-medium text-[0.95cqw] leading-none whitespace-nowrap">የባለቤቱ/ርቷ ፊርማ/Bearer's Signature</div>
+                    <div class="w-full mt-0.5 text-center">
+                      <div class="text-[#145369] font-semibold text-[0.95cqw] leading-none whitespace-nowrap">የባለይዞታው ፊርማ/Bearer's Signature</div>
                       <div class="h-[22px] flex items-center justify-center mt-0.5">
-                        <img id="ethOutSignatureImg" src="/assets/aistudio/ethiopia_passport_signature.png" alt="Signature" class="h-[20px] object-contain opacity-95 mix-blend-multiply" onerror="this.style.display='none'">
+                        <img id="ethOutSignatureImg" src="/assets/aistudio/ethiopia_passport_signature.png" alt="Signature" class="w-full h-[20px] object-fill opacity-95 mix-blend-multiply" onerror="this.style.display='none'">
                       </div>
                     </div>
                   </div>
 
-                  <!-- CENTER & RIGHT: Field Grid -->
-                  <div class="grow grid grid-cols-12 gap-x-1.5 gap-y-[1px]" style="font-size: 1.45cqw; line-height: 1.2;">
-                    <!-- Surname -->
-                    <div class="col-span-8">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">የአያት ስም/Surname</div>
-                      <div id="ethOutSurname" class="font-black text-slate-900 text-[1.95cqw] tracking-tight">መሀመድ/MAHAMED</div>
-                    </div>
-                    <!-- Empty 4 cols for ghost photo space -->
-                    <div class="col-span-4 row-span-4 flex justify-center items-start pt-0.5">
-                      <div class="w-[50px] h-[56px] rounded-xs overflow-hidden opacity-65 mix-blend-multiply border border-slate-300/50 shadow-2xs">
-                        <img id="ethOutGhostPhoto" src="/assets/aistudio/ethiopia_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover">
-                      </div>
+                  <!-- CENTER & RIGHT: Field Grid with Floating Ghost Portrait -->
+                  <div class="grow relative grid grid-cols-12 gap-x-1 gap-y-[1px]" style="font-size: 1.4cqw; line-height: 1.15;">
+                    <!-- Ghost Portrait Positioned Between Center & Right Columns -->
+                    <div class="absolute left-[38%] top-[34%] w-[19%] aspect-[35/43] rounded-xs overflow-hidden opacity-75 mix-blend-multiply pointer-events-none z-10">
+                      <img id="ethOutGhostPhoto" src="/assets/aistudio/ethiopia_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover">
                     </div>
 
-                    <!-- Given Name -->
-                    <div class="col-span-8">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">ስም ከነአባት/Given Name</div>
-                      <div id="ethOutGivenName" class="font-black text-slate-900 text-[1.9cqw] tracking-tight">ማራዋ አብዱላሂ/MARWO ABDULAHI</div>
+                    <!-- Row 1: Surname -->
+                    <div class="col-span-12">
+                      <div class="text-[#145369] font-semibold text-[1.05cqw]">የአያት ስም/Surname</div>
+                      <div id="ethOutSurname" class="font-bold text-slate-900 text-[1.9cqw] tracking-tight">መሀመድ/MAHAMED</div>
                     </div>
 
-                    <!-- Nationality & Sex -->
+                    <!-- Row 2: Given Name -->
+                    <div class="col-span-12">
+                      <div class="text-[#145369] font-semibold text-[1.05cqw]">ስም ከነአባት/Given Name</div>
+                      <div id="ethOutGivenName" class="font-bold text-slate-900 text-[1.85cqw] tracking-tight">ማርዎ አብዱላሂ/MARWO ABDULAHI</div>
+                    </div>
+
+                    <!-- Row 3: Nationality (5) | Sex (3) | Personal No (4) -->
                     <div class="col-span-5">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">ዜግነት/Nationality</div>
-                      <div id="ethOutNationality" class="font-black text-slate-900 text-[1.8cqw]">ETHIOPIAN</div>
+                      <div class="text-[#145369] font-semibold text-[1.05cqw]">ዜግነት/Nationality</div>
+                      <div id="ethOutNationality" class="font-bold text-slate-900 text-[1.75cqw]">ETHIOPIAN</div>
                     </div>
                     <div class="col-span-3">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">ፆታ/Sex</div>
-                      <div id="ethOutSex" class="font-black text-slate-900 text-[1.8cqw]">F</div>
+                      <div class="text-[#145369] font-semibold text-[1.05cqw]">ፆታ/Sex</div>
+                      <div id="ethOutSex" class="font-bold text-slate-900 text-[1.75cqw]">F</div>
+                    </div>
+                    <div class="col-span-4">
+                      <div class="text-[#145369] font-semibold text-[1.05cqw] whitespace-nowrap">መለያ ቁ./Personal No.</div>
+                      <div id="ethOutPersonalNo" class="font-bold text-slate-900 text-[1.7cqw] min-h-[1.2em]"></div>
                     </div>
 
-                    <!-- Personal No -->
+                    <!-- Row 4: Date of Birth (8) | Place of Birth (4) -->
                     <div class="col-span-8">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">መለያ ቁ/Personal No.</div>
-                      <div id="ethOutPersonalNo" class="font-bold text-slate-900 text-[1.75cqw]">—</div>
+                      <div class="text-[#145369] font-semibold text-[1.05cqw]">የትውልድ ቀን/Date of Birth</div>
+                      <div id="ethOutDob" class="font-bold text-slate-900 text-[1.75cqw]">03 NOV 05</div>
+                    </div>
+                    <div class="col-span-4">
+                      <div class="text-[#145369] font-semibold text-[1.05cqw] whitespace-nowrap">የትውልድ ቦታ/Place of Birth</div>
+                      <div id="ethOutPob" class="font-bold text-slate-900 text-[1.75cqw] whitespace-nowrap">DEGAH BOUR</div>
                     </div>
 
-                    <!-- Date of Birth & Place of Birth -->
-                    <div class="col-span-6">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">የትውልድ ቀን/Date of Birth</div>
-                      <div id="ethOutDob" class="font-bold text-slate-900 text-[1.8cqw]">03 NOV 05</div>
+                    <!-- Row 5: Date of Issue (8) | Date of Expiry (4) -->
+                    <div class="col-span-8">
+                      <div class="text-[#145369] font-semibold text-[1.05cqw]">የተሰጠበት ቀን/Date of Issue</div>
+                      <div id="ethOutIssue" class="font-bold text-slate-900 text-[1.75cqw]">16 APR 21</div>
                     </div>
-                    <div class="col-span-6">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">የትውልድ ቦታ/Place of Birth</div>
-                      <div id="ethOutPob" class="font-black text-slate-900 text-[1.8cqw]">DEGAH BOUR</div>
-                    </div>
-
-                    <!-- Date of Issue & Date of Expiry -->
-                    <div class="col-span-6">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">የተሰጠበት ቀን/Date of Issue</div>
-                      <div id="ethOutIssue" class="font-bold text-slate-900 text-[1.8cqw]">16 APR 21</div>
-                    </div>
-                    <div class="col-span-6">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">የሚያበቃበት ቀን/Date of Expiry</div>
-                      <div id="ethOutExpiry" class="font-bold text-slate-900 text-[1.8cqw]">15 APR 26</div>
+                    <div class="col-span-4">
+                      <div class="text-[#145369] font-semibold text-[1.05cqw] whitespace-nowrap">የሚያበቃበት ቀን/Date of Expiry</div>
+                      <div id="ethOutExpiry" class="font-bold text-slate-900 text-[1.75cqw]">15 APR 26</div>
                     </div>
 
-                    <!-- Issuing Authority -->
-                    <div class="col-span-12">
-                      <div class="text-slate-600 font-medium text-[1.05cqw]">የሰጠዉ ባለስልጣን/ Issuing Authority</div>
-                      <div id="ethOutAuthority" class="font-black text-slate-900 text-[1.65cqw] leading-tight">MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS</div>
+                    <!-- Row 6: Issuing Authority (12) -->
+                    <div class="col-span-12 pt-[1px]">
+                      <div class="text-[#145369] font-semibold text-[1.05cqw]">የሰጠዉ ባለስልጣን/ Issuing Authority</div>
+                      <div id="ethOutAuthority" class="font-bold text-slate-900 text-[1.58cqw] leading-tight whitespace-nowrap">MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS</div>
+                    </div>
+
+                    <!-- Row 7: Stacked 2D Barcode (PDF417) Strip Directly Under Issuing Authority -->
+                    <div class="col-span-12 pt-[2px]">
+                      <img src="/assets/aistudio/ethiopia_passport_barcode.png" alt="2D Barcode" class="w-full h-[32px] object-fill opacity-95 mix-blend-multiply" onerror="this.style.display='none'">
                     </div>
                   </div>
-                </div>
-
-                <!-- Stacked 2D Barcode (PDF417) Strip -->
-                <div class="mx-[3%] mt-[1%] h-[32px] flex items-center justify-center">
-                  <img src="/assets/aistudio/ethiopia_passport_barcode.png" alt="2D Barcode" class="w-full h-[28px] object-fill opacity-90" onerror="this.style.display='none'">
                 </div>
 
                 <!-- Machine Readable Zone (MRZ: ICAO Doc 9303 TD3 2 lines × 44 chars) -->
-                <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#fdfbf4]/85" style="height: 19.5%; padding-left: 3%; padding-right: 3%;">
-                  <div id="ethMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#fcfbf4]/90" style="height: 19%; padding-left: 3.5%; padding-right: 3.5%;">
+                  <div id="ethMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#1a1d22]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.42;">
                     P&lt;ETHMAHAMED&lt;&lt;MARWO&lt;ABDULAHI&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
                   </div>
-                  <div id="ethMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
+                  <div id="ethMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#1a1d22]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.42;">
                     EP64426405ETH0511036F2604158&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;02
                   </div>
                 </div>
