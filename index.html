@@ -3644,6 +3644,8 @@ var $ = window.$ || (id => document.getElementById(id));
       return true;
     }
 
+    let ghaCustomPhotoActive = false;
+
     function updateGhaPreview() {
       const fields = readGhaFields();
       const passClean = (fields.passNo || 'G2866330').toUpperCase();
@@ -3666,9 +3668,16 @@ var $ = window.$ || (id => document.getElementById(id));
       ghaSetText('ghaOutAuthority', (fields.authority || 'PASSPORT OFFICE').toUpperCase());
 
       // MRZ
-      const mrz = isGhaSpecimen(fields) ? GHA_SPECIMEN_MRZ : buildGhaMrz(fields);
+      const specimenMatch = isGhaSpecimen(fields);
+      const mrz = specimenMatch ? GHA_SPECIMEN_MRZ : buildGhaMrz(fields);
       ghaSetText('ghaMrzLine1', mrz.line1);
       ghaSetText('ghaMrzLine2', mrz.line2);
+
+      // Show exact reference overlay when specimen fields and photo are unmodified
+      const refOverlay = $('ghaRefSpecimenOverlay');
+      if (refOverlay) {
+        refOverlay.style.display = (specimenMatch && !ghaCustomPhotoActive) ? 'block' : 'none';
+      }
     }
 
     function setGhaFieldValues(data) {
@@ -3743,12 +3752,18 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function resetGhaPhoto() {
+      ghaCustomPhotoActive = false;
       const el = $('ghaOutPhotoMain');
       if (el) el.setAttribute('src', GHA_DEFAULT_PHOTO);
       const ghost = $('ghaOutGhostPhoto');
       if (ghost) ghost.setAttribute('src', GHA_GHOST);
+      const photoWrap = $('ghaCustomPhotoWrap');
+      if (photoWrap) photoWrap.style.opacity = '0';
+      const ghostWrap = $('ghaCustomGhostWrap');
+      if (ghostWrap) ghostWrap.style.opacity = '0';
       const input = $('ghaPhotoUpload');
       if (input) input.value = '';
+      updateGhaPreview();
       showToast('Photo Reset', 'Restored Ghanaian reference specimen portrait.');
     }
 
@@ -3761,10 +3776,16 @@ var $ = window.$ || (id => document.getElementById(id));
           const reader = new FileReader();
           reader.onload = function (evt) {
             const src = evt.target.result;
+            ghaCustomPhotoActive = true;
             const el = $('ghaOutPhotoMain');
             if (el) el.setAttribute('src', src);
             const ghost = $('ghaOutGhostPhoto');
             if (ghost) ghost.setAttribute('src', src);
+            const photoWrap = $('ghaCustomPhotoWrap');
+            if (photoWrap) photoWrap.style.opacity = '1';
+            const ghostWrap = $('ghaCustomGhostWrap');
+            if (ghostWrap) ghostWrap.style.opacity = '0.58';
+            updateGhaPreview();
           };
           reader.readAsDataURL(file);
         });
@@ -19639,179 +19660,73 @@ COD REP DEM CONGO</div>
             </div>
 
             <!-- CARD SPREAD -->
-            <article id="ghana-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1b1e23] bg-[#fdfbf6]" style="aspect-ratio: 580 / 800; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-              <!-- Underlay clean reference composite for exact micro-guilloche patterns & watermarks -->
-              <img src="/assets/aistudio/ghana_passport_reference.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-45 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
+            <article id="ghana-passport-card" class="relative w-full max-w-[580px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1e1d1b] bg-[#f8f0dc]" style="aspect-ratio: 580 / 800; container-type: inline-size; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">
+              <!-- Base Plate: 1:1 Reference Scan with Only Dynamic Value Text Cleanly Inpainted -->
+              <img src="/assets/aistudio/ghana_passport_clean_bg.png" alt="Republic of Ghana Passport Spread Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-              <!-- ============ PAGE 3: OBSERVATIONS (TOP HALF) ============ -->
-              <section id="ghaTopPage" class="relative w-full overflow-hidden" style="height: 49.5%; container-type: inline-size; background: linear-gradient(180deg, #fdf8ed 0%, #fefcf7 50%, #fdf8ee 100%);">
-                <!-- SVG Guilloche Security Waves & Black Star Watermark -->
-                <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 580 396" preserveAspectRatio="none" aria-hidden="true">
-                  <!-- Lathe waves in warm amber / green -->
-                  <g fill="none" stroke="#d97706" stroke-width="0.35" opacity="0.20">
-                    <circle cx="290" cy="190" r="140" />
-                    <circle cx="290" cy="190" r="110" />
-                    <circle cx="290" cy="190" r="80" />
-                    <path d="M 0 50 Q 290 110 580 50" />
-                    <path d="M 0 90 Q 290 150 580 90" />
-                    <path d="M 0 130 Q 290 190 580 130" />
-                  </g>
-                </svg>
-
-                <!-- Page 3 Header: OBSERVATIONS + Horizontal Rule + Page Number 3 -->
-                <div class="pt-[4%] px-[8%] relative flex flex-col items-center">
-                  <div class="font-serif font-black tracking-[0.2em] text-slate-800 text-[2.5cqw] uppercase">
-                    OBSERVATIONS
-                  </div>
-                  <div class="w-[60%] h-[1px] bg-slate-400/80 mt-1"></div>
-                </div>
-
-                <!-- Page Number 3 (Top Right) -->
-                <div class="absolute right-[6%] top-[3.5%] font-serif font-black text-[#d97706] text-[4.8cqw] select-none pointer-events-none">
-                  3
-                </div>
-
-                <!-- Left Vertical Laser-Perforated Passport Number (Dot Matrix) -->
-                <div class="absolute left-[3.5%] top-[12%] bottom-[12%] flex flex-col justify-center items-center pointer-events-none select-none z-10" style="width: 7%;">
-                  <div id="ghaOutPassNoPage3Perforated" class="font-mono font-bold tracking-[0.45em] text-slate-700/60" style="writing-mode: vertical-lr; transform: rotate(180deg); font-size: 2.7cqw; letter-spacing: 0.55em; text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 0 rgba(0,0,0,0.25);">
+              <!-- ============ PAGE 3: OBSERVATIONS (TOP HALF: y=0..400) ============ -->
+              <section id="ghaTopPage" class="relative w-full overflow-hidden z-10" style="height: 50%; container-type: inline-size; background: transparent;">
+                <!-- Left Vertical Laser-Perforated Passport Number (Dot Matrix, reading bottom-to-top) -->
+                <div class="absolute flex items-center justify-center pointer-events-none select-none" style="left: 4.83%; top: 16.25%; width: 7.24%; height: 71.25%;">
+                  <div id="ghaOutPassNoPage3Perforated" style="writing-mode: vertical-lr; transform: rotate(180deg); font-family: 'Courier New', Courier, monospace; font-weight: 800; font-size: 4.8cqw; letter-spacing: 0.25em; color: rgba(48, 35, 22, 0.78); filter: contrast(1.15); text-shadow: 0 0 0.6px rgba(32, 22, 12, 0.55); white-space: nowrap;">
                     G 2 8 6 6 3 3 0
                   </div>
                 </div>
               </section>
 
-              <!-- ============ BOOKLET SEAM DIVIDER ============ -->
-              <div class="relative w-full h-[5px] bg-gradient-to-b from-[#d5cbb8]/70 via-[#eee7d8] to-[#d8cfbe]/80 border-y border-slate-300/80 shadow-inner flex items-center justify-around pointer-events-none z-20">
-                <div class="w-full h-[1px] border-b border-dashed border-slate-500/30"></div>
-              </div>
-
-              <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF) ============ -->
-              <section id="ghaDataPage" class="relative w-full overflow-hidden" style="height: 49.8%; container-type: inline-size; background: linear-gradient(180deg, #fdfbf7 0%, #fefcf9 50%, #fdfbf6 100%);">
-                <!-- Top Header: Passport/ Passeport + Republic of Ghana + Passport No -->
-                <div class="pt-[2%] px-[4.5%] flex items-start justify-between">
-                  <!-- Left: Passport/ Passeport -->
-                  <div class="shrink-0 text-slate-800">
-                    <span class="font-bold text-[1.8cqw]">Passport/</span>
-                    <span class="font-bold italic text-[1.8cqw] text-slate-700 ml-0.5">Passeport</span>
-                  </div>
-
-                  <!-- Center: Republic of Ghana -->
-                  <div class="text-center font-bold text-slate-900 text-[2.7cqw] tracking-tight">
-                    Republic of Ghana
-                  </div>
-
-                  <!-- Right: Passport No / No de passeport -->
-                  <div class="shrink-0 text-right">
-                    <div class="text-slate-500 font-medium text-[1.15cqw]">Passport No/ No de passeport</div>
-                    <div id="ghaOutPassNoHeader" class="font-mono font-black text-slate-900 text-[2.2cqw] tracking-wider">G2866330</div>
-                  </div>
+              <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF: y=400..800) ============ -->
+              <section id="ghaDataPage" class="relative w-full overflow-hidden z-10" style="height: 50%; container-type: inline-size; background: transparent;">
+                <!-- Custom Portrait Overlay (visible when user uploads a custom portrait) -->
+                <div id="ghaCustomPhotoWrap" class="absolute overflow-hidden rounded-[2px] pointer-events-none transition-opacity" style="left: 7.24%; top: 26.00%; width: 25.52%; height: 37.50%; opacity: 0;">
+                  <img id="ghaOutPhotoMain" src="/assets/aistudio/ghana_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" style="filter: contrast(1.03) sepia(0.06);" onerror="this.src='/assets/aistudio/ghana_passport_portrait.png'">
                 </div>
 
-                <!-- Control Bar: Type / Country Code -->
-                <div class="px-[4.5%] pt-[0.6%] flex items-center gap-12" style="font-size: 1.45cqw;">
-                  <div class="ml-[34%]">
-                    <span class="text-slate-500 font-medium text-[1.15cqw]">Type/Type</span>
-                    <div class="font-black text-slate-900 text-[1.95cqw]">P</div>
-                  </div>
-                  <div>
-                    <span class="text-slate-500 font-medium text-[1.15cqw]">Country Code/ Code de Pays</span>
-                    <div class="font-black text-slate-900 text-[1.95cqw]">GHA</div>
-                  </div>
+                <!-- Custom Ghost Portrait Overlay (visible when user uploads a custom portrait) -->
+                <div id="ghaCustomGhostWrap" class="absolute overflow-hidden rounded-[2px] pointer-events-none mix-blend-multiply transition-opacity" style="left: 68.97%; top: 27.00%; width: 13.45%; height: 19.50%; opacity: 0;">
+                  <img id="ghaOutGhostPhoto" src="/assets/aistudio/ghana_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover" style="filter: grayscale(0.28) contrast(0.95) brightness(1.06);">
                 </div>
 
-                <!-- Main Content Area: Photo + Fields + Ghost Photo + Barcode -->
-                <div class="relative px-[4%] pt-[0.8%] flex items-start gap-[2%]">
-                  <!-- LEFT: Photo & Signature Column -->
-                  <div class="shrink-0 flex flex-col items-center" style="width: 27%;">
-                    <div class="w-full aspect-[35/45] rounded-xs overflow-hidden border border-slate-400 shadow-sm bg-slate-100">
-                      <img id="ghaOutPhotoMain" src="/assets/aistudio/ghana_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/ghana_passport_portrait.png'">
-                    </div>
-                    <div class="w-full mt-1 text-center">
-                      <div class="text-slate-500 font-medium text-[1.05cqw] leading-none whitespace-nowrap">Holder's signature/ Signature du titulaire</div>
-                      <div class="h-[24px] flex items-center justify-center mt-0.5">
-                        <img id="ghaOutSignatureImg" src="/assets/aistudio/ghana_passport_signature.png" alt="Signature" class="h-[22px] object-contain opacity-95 mix-blend-multiply" onerror="this.style.display='none'">
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- CENTER & RIGHT: Field Grid -->
-                  <div class="grow grid grid-cols-12 gap-x-1.5 gap-y-[1px]" style="font-size: 1.55cqw; line-height: 1.2;">
-                    <!-- Surname / Nom -->
-                    <div class="col-span-8">
-                      <div class="text-slate-500 font-medium text-[1.15cqw]">Surname/ Nom</div>
-                      <div id="ghaOutSurname" class="font-black text-slate-900 text-[2.2cqw] tracking-tight">OPOKU</div>
-                    </div>
-                    <!-- Empty 4 cols for ghost photo space -->
-                    <div class="col-span-4 row-span-4 flex justify-center items-start pt-1">
-                      <div class="w-[52px] h-[58px] rounded-xs overflow-hidden opacity-65 mix-blend-multiply border border-slate-300/50 shadow-2xs">
-                        <img id="ghaOutGhostPhoto" src="/assets/aistudio/ghana_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover">
-                      </div>
-                    </div>
-
-                    <!-- Given Names / Prénoms -->
-                    <div class="col-span-8">
-                      <div class="text-slate-500 font-medium text-[1.15cqw]">Given Names/ Prénoms</div>
-                      <div id="ghaOutGivenNames" class="font-black text-slate-900 text-[2.1cqw] tracking-tight">EBENEZER</div>
-                    </div>
-
-                    <!-- Nationality / Nationalité -->
-                    <div class="col-span-8">
-                      <div class="text-slate-500 font-medium text-[1.15cqw]">Nationality/ Nationalité</div>
-                      <div id="ghaOutNationality" class="font-black text-slate-900 text-[1.95cqw]">GHANAIAN</div>
-                    </div>
-
-                    <!-- Date of birth / Date de naissance -->
-                    <div class="col-span-8">
-                      <div class="text-slate-500 font-medium text-[1.15cqw]">Date of birth/ Date de naissance</div>
-                      <div id="ghaOutDob" class="font-bold text-slate-900 text-[1.9cqw]">11 OCT 1999</div>
-                    </div>
-
-                    <!-- Sex / Sexe & Place of birth / Lieu de naissance -->
-                    <div class="col-span-2">
-                      <div class="text-slate-500 font-medium text-[1.1cqw]">Sex/ Sexe</div>
-                      <div id="ghaOutSex" class="font-black text-slate-900 text-[1.9cqw]">M</div>
-                    </div>
-                    <div class="col-span-10">
-                      <div class="text-slate-500 font-medium text-[1.1cqw]">Place of birth/ Lieu de naissance</div>
-                      <div id="ghaOutPob" class="font-black text-slate-900 text-[1.9cqw]">ACCRA</div>
-                    </div>
-
-                    <!-- Date of issue / Date de délivrance & Place of issue / Lieu de émission -->
-                    <div class="col-span-6">
-                      <div class="text-slate-500 font-medium text-[1.1cqw]">Date of issue/ Date de délivrance</div>
-                      <div id="ghaOutIssue" class="font-bold text-slate-900 text-[1.85cqw]">23 APR 2020</div>
-                    </div>
-                    <div class="col-span-6">
-                      <div class="text-slate-500 font-medium text-[1.1cqw]">Place of issue/ Lieu de émission</div>
-                      <div id="ghaOutPlaceOfIssue" class="font-black text-slate-900 text-[1.85cqw]">ACCRA</div>
-                    </div>
-
-                    <!-- Date of expiry / Date d'expiration & Authority / Autorité -->
-                    <div class="col-span-6">
-                      <div class="text-slate-500 font-medium text-[1.1cqw]">Date of expiry/ Date d'expiration</div>
-                      <div id="ghaOutExpiry" class="font-bold text-slate-900 text-[1.85cqw]">22 APR 2030</div>
-                    </div>
-                    <div class="col-span-6">
-                      <div class="text-slate-500 font-medium text-[1.1cqw]">Authority/ Autorité</div>
-                      <div id="ghaOutAuthority" class="font-black text-slate-900 text-[1.85cqw]">PASSPORT OFFICE</div>
-                    </div>
-                  </div>
+                <!-- Preserved Signature Element ID -->
+                <div class="absolute pointer-events-none opacity-0" style="left: 10.34%; top: 66.25%; width: 19.66%; height: 12.50%;">
+                  <img id="ghaOutSignatureImg" src="/assets/aistudio/ghana_passport_signature.png" alt="Signature" class="w-full h-full object-contain">
                 </div>
 
-                <!-- Stacked 2D Barcode (PDF417) Strip -->
-                <div class="mx-[4%] mt-[1%] h-[32px] flex items-center justify-center">
-                  <img src="/assets/aistudio/ghana_passport_barcode.png" alt="2D Barcode" class="w-full h-[28px] object-fill opacity-90" onerror="this.style.display='none'">
-                </div>
+                <!-- Row 1: Type (P), Country Code (GHA), Passport No (G2866330) -->
+                <div class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 35.86%; top: 16.50%; font-size: 2.38cqw; letter-spacing: 0.01em;">P</div>
+                <div class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 49.14%; top: 16.50%; font-size: 2.38cqw; letter-spacing: 0.02em;">GHA</div>
+                <div id="ghaOutPassNoHeader" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 76.72%; top: 16.50%; font-size: 2.38cqw; letter-spacing: 0.02em;">G2866330</div>
+
+                <!-- Row 2: Surname / Nom -->
+                <div id="ghaOutSurname" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 35.69%; top: 22.75%; font-size: 2.38cqw; letter-spacing: 0.02em;">OPOKU</div>
+
+                <!-- Row 3: Given Names / Prénoms -->
+                <div id="ghaOutGivenNames" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 35.86%; top: 28.75%; font-size: 2.38cqw; letter-spacing: 0.02em;">EBENEZER</div>
+
+                <!-- Row 4: Nationality / Nationalité -->
+                <div id="ghaOutNationality" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 35.86%; top: 35.00%; font-size: 2.38cqw; letter-spacing: 0.02em;">GHANAIAN</div>
+
+                <!-- Row 5: Date of birth / Date de naissance -->
+                <div id="ghaOutDob" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 36.03%; top: 41.00%; font-size: 2.38cqw; letter-spacing: 0.02em;">11 OCT 1999</div>
+
+                <!-- Row 6: Sex / Sexe & Place of birth / Lieu de naissance -->
+                <div id="ghaOutSex" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 35.86%; top: 47.50%; font-size: 2.38cqw;">M</div>
+                <div id="ghaOutPob" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 46.72%; top: 47.50%; font-size: 2.38cqw; letter-spacing: 0.02em;">ACCRA</div>
+
+                <!-- Row 7: Date of issue / Date de délivrance & Place of issue / Lieu de émission -->
+                <div id="ghaOutIssue" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 35.86%; top: 53.50%; font-size: 2.38cqw; letter-spacing: 0.02em;">23 APR 2020</div>
+                <div id="ghaOutPlaceOfIssue" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 71.03%; top: 53.50%; font-size: 2.38cqw; letter-spacing: 0.02em;">ACCRA</div>
+
+                <!-- Row 8: Date of expiry / Date d'expiration & Authority / Autorité -->
+                <div id="ghaOutExpiry" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 35.86%; top: 59.50%; font-size: 2.38cqw; letter-spacing: 0.02em;">22 APR 2030</div>
+                <div id="ghaOutAuthority" class="absolute font-bold text-[#1f1e1c] whitespace-nowrap leading-none" style="left: 71.21%; top: 59.50%; font-size: 2.38cqw; letter-spacing: 0.01em;">PASSPORT OFFICE</div>
 
                 <!-- Machine Readable Zone (MRZ: ICAO Doc 9303 TD3 2 lines × 44 chars) -->
-                <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#fdfbf6]/85" style="height: 19.5%; padding-left: 4%; padding-right: 4%;">
-                  <div id="ghaMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
-                    P&lt;GHAOPOKU&lt;&lt;EBENEZER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
-                  </div>
-                  <div id="ghaMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
-                    G2866330&lt;0GHA9910115M3004227&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;0
-                  </div>
-                </div>
+                <div id="ghaMrzLine1" class="absolute whitespace-nowrap leading-none" style="left: 9.14%; top: 82.25%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 700; font-size: 2.68cqw; letter-spacing: 0.142cqw; color: #1c1d1f;">P&lt;GHAOPOKU&lt;&lt;EBENEZER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                <div id="ghaMrzLine2" class="absolute whitespace-nowrap leading-none" style="left: 9.14%; top: 89.25%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 700; font-size: 2.68cqw; letter-spacing: 0.142cqw; color: #1c1d1f;">G2866330&lt;0GHA9910115M3004227&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;0</div>
               </section>
+
+              <!-- Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active -->
+              <img id="ghaRefSpecimenOverlay" src="/assets/aistudio/ghana_passport_reference.png" alt="Republic of Ghana Passport Specimen Reference" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
             </article>
 
             <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic biometric passport reproduction · Republic of Ghana (Passport · Passeport / GHA) 2-page spread matching reference specimen with OBSERVATIONS header, Black Star watermark, laser-perforated serial number, stacked 2D barcode, and ICAO Doc 9303 TD3 machine-readable zone.</p>

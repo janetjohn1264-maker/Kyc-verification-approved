@@ -331,6 +331,11 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileName: 'ghana_passport_reference.png',
     allowInlineImg: true,
   },
+  '/assets/aistudio/ghana_passport_clean_bg.png': {
+    fileId: 'ghana-clean-bg-png',
+    fileName: 'ghana_passport_clean_bg.png',
+    allowInlineImg: true,
+  },
   '/assets/aistudio/ghana_passport_portrait.png': {
     fileId: 'ghana-portrait-png',
     fileName: 'ghana_passport_portrait.png',
