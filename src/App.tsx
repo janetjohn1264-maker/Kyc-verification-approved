@@ -10,12 +10,13 @@ import { GhanaPassportCard, GhanaPassportData, defaultGhanaPassportData, generat
 import { CanadaPassportCard, CanadaPassportData, defaultCanadaPassportData, generateCanadaMRZ } from "./CanadaPassportCard"
 import { EthiopiaPassportCard, EthiopiaPassportData, defaultEthiopiaPassportData, generateEthiopiaMRZ } from "./EthiopiaPassportCard"
 import { NigeriaPassportCard, NigeriaPassportData, defaultNigeriaPassportData, generateNigeriaMRZ } from "./NigeriaPassportCard"
+import { RwandaIdCard, RwandaIdData, defaultRwandaIdData, rwandaRandomSpecimens } from "./RwandaIdCard"
 
 const defaultContent = {
-  title: "Ethiopia Passport Verification",
+  title: "Rwanda National ID Verification",
   subtitle: "Securely verify identity documents in a few simple steps.",
   button: "Start verification",
-  accent: "#15803d",
+  accent: "#009eb0",
 }
 
 const nigeriaRandomSpecimens: NigeriaPassportData[] = [
@@ -529,7 +530,8 @@ function App() {
   const [saved, setSaved] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [detectedText, setDetectedText] = useState<string[] | null>(null)
-  const [country, setCountry] = useState("ETH")
+  const [country, setCountry] = useState("RWA")
+  const [rwandaData, setRwandaData] = useState<RwandaIdData>(defaultRwandaIdData)
   const [nigeriaData, setNigeriaData] = useState<NigeriaPassportData>(defaultNigeriaPassportData)
   const [ethiopiaData, setEthiopiaData] = useState<EthiopiaPassportData>(defaultEthiopiaPassportData)
   const [canadaData, setCanadaData] = useState<CanadaPassportData>(defaultCanadaPassportData)
@@ -542,6 +544,12 @@ function App() {
     setDetectedText(null)
     setSaved(false)
     setContent((current) => ({ ...current, [key]: value }))
+  }
+
+  const updateRwanda = <K extends keyof RwandaIdData>(key: K, value: RwandaIdData[K]) => {
+    setSaved(false)
+    setDetectedText(null)
+    setRwandaData((prev) => ({ ...prev, [key]: value }))
   }
 
   const updateNigeria = <K extends keyof NigeriaPassportData>(key: K, value: NigeriaPassportData[K]) => {
@@ -590,7 +598,9 @@ function App() {
     const file = e.target.files?.[0]
     if (file) {
       const url = URL.createObjectURL(file)
-      if (country === "NGA") {
+      if (country === "RWA") {
+        updateRwanda("photoUrl", url)
+      } else if (country === "NGA") {
         updateNigeria("photoUrl", url)
       } else if (country === "ETH") {
         updateEthiopia("photoUrl", url)
@@ -607,6 +617,7 @@ function App() {
   }
 
   const previewStyle = useMemo(() => ({ "--accent": content.accent } as React.CSSProperties), [content.accent])
+  const isRwanda = country === "RWA"
   const isNigeria = country === "NGA"
   const isEthiopia = country === "ETH"
   const isCanada = country === "CAN"
@@ -618,7 +629,9 @@ function App() {
   const isKenya = country === "KEN"
   const isUganda = country === "UGA"
 
-  const specimenImage = isNigeria
+  const specimenImage = isRwanda
+    ? "/assets/aistudio/rwanda_id_front_reference.png"
+    : isNigeria
     ? "/assets/aistudio/nigeria_passport_reference.png"
     : isEthiopia
     ? "/assets/aistudio/ethiopia_passport_reference.png"
@@ -640,7 +653,9 @@ function App() {
     ? "/assets/aistudio/png_national_id_reference.jpg"
     : "/assets/aistudio/drc_passport_reference.jpg"
 
-  const specimenAlt = isNigeria
+  const specimenAlt = isRwanda
+    ? "Republic of Rwanda National Identity Card (Indangamuntu) reference specimen"
+    : isNigeria
     ? "Federal Republic of Nigeria biometric e-Passport reference specimen"
     : isEthiopia
     ? "Federal Democratic Republic of Ethiopia biometric e-Passport reference specimen"
@@ -662,7 +677,9 @@ function App() {
     ? "Static Independent State of Papua New Guinea national identity card reference specimen"
     : "Static Democratic Republic of the Congo passport reference specimen"
 
-  const specimenLabel = isNigeria
+  const specimenLabel = isRwanda
+    ? "Rwanda National ID Card (Indangamuntu) reference specimen"
+    : isNigeria
     ? "Federal Republic of Nigeria e-Passport (2-Page Spread) reference specimen"
     : isEthiopia
     ? "Ethiopia e-Passport (2-Page Spread) reference specimen"
@@ -685,7 +702,22 @@ function App() {
     : "Passport reference specimen"
 
   const randomizeSpecimen = () => {
-    if (isNigeria) {
+    if (isRwanda) {
+      const pool = rwandaRandomSpecimens.filter((s) => s.idNumber !== rwandaData.idNumber)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || rwandaRandomSpecimens[0]
+      setRwandaData(chosen)
+      setDetectedText([
+        "REPUBULIKA Y'U RWANDA / REPUBLIC OF RWANDA",
+        "INDANGAMUNTU / NATIONAL IDENTITY CARD",
+        `INDANGAMUNTU / NATIONAL ID NO: ${chosen.idNumber}`,
+        `AMAZINA / NAMES: ${chosen.surname} ${chosen.givenNames}`,
+        `ITARIKI YAVUTSEHO / DATE OF BIRTH: ${chosen.dateOfBirth}`,
+        `IGITSINA / SEX: ${chosen.sex}`,
+        `AHO YATANGIWE / PLACE OF ISSUE: ${chosen.placeOfIssue}`,
+        `UMUKONO WA NYIRAYO / SIGNATURE: ${chosen.signatureText || chosen.surname}`,
+        `ISSUE NO: ${chosen.issueNumber || "0164"}`,
+      ])
+    } else if (isNigeria) {
       const pool = nigeriaRandomSpecimens.filter((s) => s.passportNo !== nigeriaData.passportNo)
       const chosen = pool[Math.floor(Math.random() * pool.length)] || nigeriaRandomSpecimens[0]
       setNigeriaData(chosen)
@@ -795,6 +827,11 @@ function App() {
     }
   }
 
+  const resetRwandaToDefault = () => {
+    setRwandaData(defaultRwandaIdData)
+    setDetectedText(null)
+  }
+
   const resetNigeriaToDefault = () => {
     setNigeriaData(defaultNigeriaPassportData)
     setDetectedText(null)
@@ -829,7 +866,8 @@ function App() {
   }
 
   const resetCurrentCountry = () => {
-    if (isNigeria) resetNigeriaToDefault()
+    if (isRwanda) resetRwandaToDefault()
+    else if (isNigeria) resetNigeriaToDefault()
     else if (isEthiopia) resetEthiopiaToDefault()
     else if (isCanada) resetCanadaToDefault()
     else if (isGhana) resetGhanaToDefault()
@@ -898,7 +936,9 @@ function App() {
                       const newCountry = event.target.value
                       setCountry(newCountry)
                       setDetectedText(null)
-                      if (newCountry === "NGA") {
+                      if (newCountry === "RWA") {
+                        setContent((c) => ({ ...c, title: "Rwanda National ID Verification", accent: "#009eb0" }))
+                      } else if (newCountry === "NGA") {
                         setContent((c) => ({ ...c, title: "Nigeria Passport Verification", accent: "#15803d" }))
                       } else if (newCountry === "ETH") {
                         setContent((c) => ({ ...c, title: "Ethiopia Passport Verification", accent: "#15803d" }))
@@ -923,6 +963,7 @@ function App() {
                       }
                     }}
                   >
+                    <option value="RWA">Republic of Rwanda — National Identity Card (Indangamuntu)</option>
                     <option value="NGA">Federal Republic of Nigeria — Biometric e-Passport</option>
                     <option value="ETH">Federal Democratic Republic of Ethiopia — Biometric e-Passport</option>
                     <option value="GHA">Republic of Ghana — Biometric e-Passport</option>
@@ -941,6 +982,143 @@ function App() {
                 <label>Primary button label<input value={content.button} onChange={(event) => update("button", event.target.value)} /></label>
                 <label>Accent color<div className="color-input"><input type="color" value={content.accent} onChange={(event) => update("accent", event.target.value)} /><input value={content.accent} onChange={(event) => update("accent", event.target.value)} aria-label="Accent color hex value" /></div></label>
               </div>
+
+              {/* Rwanda-specific interactive fields */}
+              {isRwanda && (
+                <div className="mt-6 pt-5 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Rwanda National ID (Indangamuntu) Fields</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={randomizeSpecimen}
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold cursor-pointer"
+                      >
+                        <RefreshCw size={12} /> Randomize
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetRwandaToDefault}
+                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold cursor-pointer"
+                      >
+                        <RotateCcw size={12} /> Reset to Specimen
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Surname (Ubushize)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={rwandaData.surname}
+                        onChange={(e) => updateRwanda("surname", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Given Names (Amazina)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={rwandaData.givenNames}
+                        onChange={(e) => updateRwanda("givenNames", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
+                      National ID No. (Indangamuntu)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={rwandaData.idNumber}
+                        placeholder="1 1998 8 0014393 0 17"
+                        onChange={(e) => updateRwanda("idNumber", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Date of Birth (Itariki yavutseho)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={rwandaData.dateOfBirth}
+                        placeholder="DD/MM/YYYY"
+                        onChange={(e) => updateRwanda("dateOfBirth", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Sex (Igitsina)
+                      <select
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={rwandaData.sex}
+                        onChange={(e) => updateRwanda("sex", e.target.value as "Gabo / M" | "Gore / F")}
+                      >
+                        <option value="Gabo / M">Gabo / M (Male)</option>
+                        <option value="Gore / F">Gore / F (Female)</option>
+                      </select>
+                    </label>
+                    <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Place of Issue (Aho Yatangiwe)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={rwandaData.placeOfIssue}
+                        placeholder="District / Sector (e.g. Gakenke / Gashenyi)"
+                        onChange={(e) => updateRwanda("placeOfIssue", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Signature Script
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={rwandaData.signatureText || ""}
+                        placeholder="Signature script"
+                        onChange={(e) => updateRwanda("signatureText", e.target.value)}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      Issue Number (Back Serial)
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={rwandaData.issueNumber || "0164"}
+                        placeholder="0164"
+                        onChange={(e) => updateRwanda("issueNumber", e.target.value)}
+                      />
+                    </label>
+                    <div className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
+                      <span>Card View Side</span>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateRwanda("cardSide", "front")}
+                          className={`p-2 rounded border text-xs font-semibold cursor-pointer ${
+                            (rwandaData.cardSide || "front") === "front"
+                              ? "bg-emerald-50 border-emerald-500 text-emerald-800"
+                              : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          Front Side
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateRwanda("cardSide", "back")}
+                          className={`p-2 rounded border text-xs font-semibold cursor-pointer ${
+                            rwandaData.cardSide === "back"
+                              ? "bg-emerald-50 border-emerald-500 text-emerald-800"
+                              : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          Back Side
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => updateRwanda("cardSide", "both")}
+                          className={`p-2 rounded border text-xs font-semibold cursor-pointer ${
+                            rwandaData.cardSide === "both"
+                              ? "bg-emerald-50 border-emerald-500 text-emerald-800"
+                              : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          Both Sides
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Nigeria-specific interactive fields */}
               {isNigeria && (
@@ -1810,7 +1988,14 @@ function App() {
 
                     {/* Passport Card View */}
                     <div className="document-placeholder static-passport">
-                      {isNigeria ? (
+                      {isRwanda ? (
+                        <div className="w-full max-w-[360px] mx-auto my-1">
+                          <RwandaIdCard
+                            data={rwandaData}
+                            onSideChange={(side) => updateRwanda("cardSide", side)}
+                          />
+                        </div>
+                      ) : isNigeria ? (
                         <div className="w-full max-w-[340px] mx-auto my-1">
                           <NigeriaPassportCard data={nigeriaData} />
                         </div>

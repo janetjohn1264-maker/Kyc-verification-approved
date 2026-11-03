@@ -120,7 +120,7 @@
       #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
-      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back, #drc-passport-card, #bangladesh-passport-card, #germany-passport-card, #canada-passport-card, #ghana-passport-card, #ethiopia-passport-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+      #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back, #drc-passport-card, #bangladesh-passport-card, #germany-passport-card, #canada-passport-card, #ghana-passport-card, #ethiopia-passport-card, #rwanda-id-front, #rwanda-id-back { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
     }
 
     /* Seychelles National Identity Card Security Backgrounds */
@@ -1768,6 +1768,29 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateNgaPassPreview === 'function') updateNgaPassPreview();
+      } else if (countryKey === 'rwanda') {
+        currentDocType = 'idcard';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-cyan-600 bg-gradient-to-br from-cyan-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-cyan-500/20 transition-all cursor-pointer relative group";
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-cyan-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateRwaIdPreview === 'function') updateRwaIdPreview();
       }
 
       const countryStyles = {
@@ -1850,6 +1873,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-amber-500 bg-gradient-to-br from-amber-50 via-white to-emerald-50/50 text-amber-950 text-left shadow-sm ring-2 ring-amber-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-amber-500"
+        },
+        rwanda: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-cyan-600 bg-gradient-to-br from-cyan-50 via-white to-emerald-50/50 text-cyan-950 text-left shadow-sm ring-2 ring-cyan-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-cyan-50/40 hover:border-cyan-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-cyan-600"
         }
       };
 
@@ -1882,7 +1910,8 @@ var $ = window.$ || (id => document.getElementById(id));
         bangladesh: 'Bangladesh',
         germany: 'Germany',
         canada: 'Canada',
-        ghana: 'Ghana'
+        ghana: 'Ghana',
+        rwanda: 'Rwanda'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -1913,6 +1942,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const deuPassView = $('germany-passport-view');
       const canPassView = $('canada-passport-view');
       const ghaPassView = $('ghana-passport-view');
+      const rwandaDocView = $('rwanda-doc-view');
       const ethPassView = $('ethiopia-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
@@ -1938,10 +1968,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (deuPassView) deuPassView.classList.add('hidden');
       if (canPassView) canPassView.classList.add('hidden');
       if (ghaPassView) ghaPassView.classList.add('hidden');
+      if (rwandaDocView) rwandaDocView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'rwanda') {
+        if (rwandaDocView) rwandaDocView.classList.remove('hidden');
       } else if (currentCountry === 'ghana') {
         if (ghaPassView) ghaPassView.classList.remove('hidden');
       } else if (currentCountry === 'canada') {
@@ -3981,6 +4014,297 @@ var $ = window.$ || (id => document.getElementById(id));
       document.addEventListener('DOMContentLoaded', initGhaPassport);
     } else {
       initGhaPassport();
+    }
+
+    // ================= REPUBLIC OF RWANDA / INDANGAMUNTU (NATIONAL ID CARD / RWA) CONTROLLER =================
+    const RWA_DEFAULT_PHOTO = '/assets/aistudio/rwanda_id_portrait.png';
+    const RWA_GHOST = '/assets/aistudio/rwanda_id_ghost.png';
+    const RWA_BARCODE = '/assets/aistudio/rwanda_id_barcode.png';
+
+    const RWA_SPECIMEN = {
+      names: 'HITAYEZU Jean Claude',
+      idNo: '1 1998 8 0014393 0 17',
+      dob: '1998-01-01',
+      sex: 'Gabo / M',
+      placeOfIssue: 'Gakenke / Gashenyi',
+      signature: 'Jean Claude',
+      issueNo: '0164'
+    };
+
+    let rwaCustomPhotoActive = false;
+    let rwaCurrentSide = 'front';
+
+    function rwaSetText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = (value == null ? '' : String(value));
+    }
+
+    function rwaFormatDate(isoStr) {
+      if (!isoStr) return '';
+      const parts = String(isoStr).split('-');
+      if (parts.length !== 3) return String(isoStr);
+      const yr = parts[0];
+      const mo = parts[1];
+      const day = parts[2];
+      return `${day}/${mo}/${yr}`;
+    }
+
+    function readRwaFields() {
+      return {
+        names: $('rwaInpNames') ? $('rwaInpNames').value.trim() : RWA_SPECIMEN.names,
+        idNo: $('rwaInpIdNo') ? $('rwaInpIdNo').value.trim() : RWA_SPECIMEN.idNo,
+        dob: $('rwaInpDob') ? $('rwaInpDob').value : RWA_SPECIMEN.dob,
+        sex: $('rwaInpSex') ? $('rwaInpSex').value.trim() : RWA_SPECIMEN.sex,
+        placeOfIssue: $('rwaInpPlaceOfIssue') ? $('rwaInpPlaceOfIssue').value.trim() : RWA_SPECIMEN.placeOfIssue,
+        signature: $('rwaInpSignature') ? $('rwaInpSignature').value.trim() : RWA_SPECIMEN.signature,
+        issueNo: $('rwaInpIssueNo') ? $('rwaInpIssueNo').value.trim() : RWA_SPECIMEN.issueNo
+      };
+    }
+
+    function isRwaSpecimen(fields) {
+      if (fields.names !== RWA_SPECIMEN.names) return false;
+      if (fields.idNo !== RWA_SPECIMEN.idNo) return false;
+      if (fields.dob !== RWA_SPECIMEN.dob) return false;
+      if (fields.sex !== RWA_SPECIMEN.sex) return false;
+      if (fields.placeOfIssue !== RWA_SPECIMEN.placeOfIssue) return false;
+      if (fields.signature !== RWA_SPECIMEN.signature) return false;
+      if (fields.issueNo !== RWA_SPECIMEN.issueNo) return false;
+      return true;
+    }
+
+    function updateRwaIdPreview() {
+      const f = readRwaFields();
+
+      // Front card dynamic fields
+      rwaSetText('rwaOutNames', f.names);
+      rwaSetText('rwaOutDob', rwaFormatDate(f.dob));
+      rwaSetText('rwaOutSex', f.sex);
+      rwaSetText('rwaOutPlaceOfIssue', f.placeOfIssue);
+      rwaSetText('rwaOutSignature', f.signature);
+      rwaSetText('rwaOutIdNo', f.idNo);
+
+      // Back card dynamic fields
+      rwaSetText('rwaOutIssueNo', f.issueNo);
+
+      // Specimen overlay toggling: show the 100% 1:1 scan overlay when unmodified specimen data is active
+      const refOverlay = $('rwaRefSpecimenOverlay');
+      if (refOverlay) {
+        refOverlay.style.display = (isRwaSpecimen(f) && !rwaCustomPhotoActive) ? 'block' : 'none';
+      }
+    }
+
+    function setRwaFieldValues(data) {
+      if ($('rwaInpNames')) $('rwaInpNames').value = data.names || '';
+      if ($('rwaInpIdNo')) $('rwaInpIdNo').value = data.idNo || '';
+      if ($('rwaInpDob')) $('rwaInpDob').value = data.dob || '';
+      if ($('rwaInpSex')) $('rwaInpSex').value = data.sex || 'Gabo / M';
+      if ($('rwaInpPlaceOfIssue')) $('rwaInpPlaceOfIssue').value = data.placeOfIssue || '';
+      if ($('rwaInpSignature')) $('rwaInpSignature').value = data.signature || '';
+      if ($('rwaInpIssueNo')) $('rwaInpIssueNo').value = data.issueNo || '0164';
+      updateRwaIdPreview();
+    }
+
+    function switchRwaSide(side) {
+      rwaCurrentSide = side;
+      const frontCard = $('rwanda-id-front');
+      const backCard = $('rwanda-id-back');
+      const btnFront = $('rwaBtnSideFront');
+      const btnBack = $('rwaBtnSideBack');
+      const btnBoth = $('rwaBtnSideBoth');
+
+      const activeClass = "py-1.5 text-xs font-bold rounded-lg bg-white text-slate-900 shadow-2xs cursor-pointer";
+      const inactiveClass = "py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer";
+
+      if (btnFront) btnFront.className = (side === 'front') ? activeClass : inactiveClass;
+      if (btnBack) btnBack.className = (side === 'back') ? activeClass : inactiveClass;
+      if (btnBoth) btnBoth.className = (side === 'both') ? activeClass : inactiveClass;
+
+      if (side === 'front') {
+        if (frontCard) frontCard.classList.remove('hidden');
+        if (backCard) backCard.classList.add('hidden');
+      } else if (side === 'back') {
+        if (frontCard) frontCard.classList.add('hidden');
+        if (backCard) backCard.classList.remove('hidden');
+      } else {
+        if (frontCard) frontCard.classList.remove('hidden');
+        if (backCard) backCard.classList.remove('hidden');
+      }
+    }
+
+    function resetRwaIdSpecimen() {
+      setRwaFieldValues(RWA_SPECIMEN);
+      resetRwaPhoto();
+      showToast('Specimen Restored', 'Reset to Hitayezu Jean Claude reference specimen');
+    }
+
+    function resetRwaPhoto() {
+      rwaCustomPhotoActive = false;
+      const main = $('rwaOutPhotoMain');
+      if (main) main.setAttribute('src', RWA_DEFAULT_PHOTO);
+      const ghost = $('rwaOutGhostPhoto');
+      if (ghost) ghost.setAttribute('src', RWA_GHOST);
+      const backPhoto = $('rwaOutPhotoBack');
+      if (backPhoto) backPhoto.setAttribute('src', RWA_GHOST);
+      const inp = $('rwaPhotoUpload');
+      if (inp) inp.value = '';
+      updateRwaIdPreview();
+    }
+
+    function randomizeRwaId() {
+      const maleSurnames = ['MUGISHA', 'HABIMANA', 'MUTSINZI', 'NSENGIMANA', 'BIZIMANA', 'RUKUNDO', 'NIYONZIMA', 'HITAYEZU', 'TWAGIRAMUNGU', 'MANZI'];
+      const maleGiven = ['Jean Claude', 'Emmanuel', 'Patrick', 'Eric', 'Innocent', 'Olivier', 'Alexis', 'Christian', 'Faustin', 'Alphonse'];
+
+      const femaleSurnames = ['UWASE', 'UWIMANA', 'IRADUKUNDA', 'INGABIRE', 'MUKAMANA', 'UMUTONI', 'UWAMAHORO', 'MUTESI', 'NYIRAHABIMANA', 'KANEZA'];
+      const femaleGiven = ['Marie Grace', 'Aline', 'Clarisse', 'Diane', 'Nadine', 'Chantal', 'Sandrine', 'Esperance', 'Beatha', 'Angelique'];
+
+      const places = [
+        'Gasabo / Kinyinya',
+        'Nyarugenge / Nyamirambo',
+        'Kicukiro / Gahanga',
+        'Musanze / Muhoza',
+        'Rubavu / Gisenyi',
+        'Huye / Ngoma',
+        'Gakenke / Gashenyi',
+        'Rwamagana / Kigabiro',
+        'Bugesera / Nyamata',
+        'Karongi / Bwishyura'
+      ];
+
+      const pick = list => list[Math.floor(Math.random() * list.length)];
+      const pad = (n, len) => String(n).padStart(len, '0');
+      const digits = len => { let out = ''; for (let i = 0; i < len; i++) out += String(Math.floor(Math.random() * 10)); return out; };
+
+      const isFemale = Math.random() < 0.5;
+      const surname = isFemale ? pick(femaleSurnames) : pick(maleSurnames);
+      const given = isFemale ? pick(femaleGiven) : pick(maleGiven);
+      const fullName = `${surname} ${given}`;
+      const sex = isFemale ? 'Gore / F' : 'Gabo / M';
+      const sexCode = isFemale ? '7' : '8';
+
+      const birthYear = 1978 + Math.floor(Math.random() * 26); // 1978 to 2003
+      const birthMonth = 1 + Math.floor(Math.random() * 12);
+      const birthDay = 1 + Math.floor(Math.random() * 28);
+      const dobIso = `${birthYear}-${pad(birthMonth, 2)}-${pad(birthDay, 2)}`;
+
+      // Rwandan National ID: 1 YYYY [8|7] [7 digits] [1 digit] [2 digits]
+      const seq = digits(7);
+      const check1 = digits(1);
+      const check2 = digits(2);
+      const idFormatted = `1 ${birthYear} ${sexCode} ${seq} ${check1} ${check2}`;
+
+      const place = pick(places);
+      const issueNo = digits(4);
+
+      setRwaFieldValues({
+        names: fullName,
+        idNo: idFormatted,
+        dob: dobIso,
+        sex: sex,
+        placeOfIssue: place,
+        signature: given,
+        issueNo: issueNo
+      });
+
+      // Switch to front view if on back
+      if (rwaCurrentSide === 'back') {
+        switchRwaSide('front');
+      }
+
+      showToast('Profile Randomized', `Generated Rwandan National ID for ${fullName}`);
+    }
+
+    function initRwaIdCard() {
+      const uploader = $('rwaPhotoUpload');
+      if (uploader && !uploader.dataset.rwaWired) {
+        uploader.dataset.rwaWired = '1';
+        uploader.addEventListener('change', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (evt) {
+            rwaCustomPhotoActive = true;
+            const src = evt.target.result;
+            const main = $('rwaOutPhotoMain');
+            if (main) main.setAttribute('src', src);
+            const ghost = $('rwaOutGhostPhoto');
+            if (ghost) ghost.setAttribute('src', src);
+            const backPhoto = $('rwaOutPhotoBack');
+            if (backPhoto) backPhoto.setAttribute('src', src);
+            updateRwaIdPreview();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      updateRwaIdPreview();
+    }
+
+    function rwaSpecimenText() {
+      const f = readRwaFields();
+      return [
+        'REPUBLIKA Y\'U RWANDA / REPUBLIC OF RWANDA',
+        'INDANGAMUNTU / NATIONAL IDENTITY CARD',
+        'Amazina / Names: ' + f.names,
+        'Itariki yavutseho / Date of Birth: ' + rwaFormatDate(f.dob),
+        'Igitsina / Sex: ' + f.sex,
+        'Aho Yatangiwe / Place of Issue: ' + f.placeOfIssue,
+        'Umukono wa Nyirayo / Signature: ' + f.signature,
+        'Indangamuntu / National ID No.: ' + f.idNo,
+        'Issue Number: ' + f.issueNo
+      ].join('\n');
+    }
+
+    function copyRwaSpecimenData() {
+      const text = rwaSpecimenText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          showToast('Copied', 'Rwanda National ID details copied to clipboard.');
+        }).catch(function () {
+          showToast('Copy Failed', 'Clipboard permission was denied.');
+        });
+      } else {
+        showToast('Copy Failed', 'Clipboard is not available in this browser.');
+      }
+    }
+
+    function downloadRwaCardPNG() {
+      const target = (rwaCurrentSide === 'back') ? $('rwanda-id-back') : $('rwanda-id-front');
+      if (!target) return;
+      if (typeof html2canvas !== 'function') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Rwanda National ID PNG');
+      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+        const link = document.createElement('a');
+        const f = readRwaFields();
+        const cleanId = (f.idNo || 'RWA').replace(/\s+/g, '-');
+        link.download = `rwanda-id-${cleanId}-${rwaCurrentSide}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Ready!', 'Rwanda National ID PNG downloaded successfully');
+      }).catch(function () {
+        showToast('Download Error', 'Could not export ID image');
+      });
+    }
+
+    function printRwaCard() {
+      window.print();
+    }
+
+    window.updateRwaIdPreview = updateRwaIdPreview;
+    window.randomizeRwaId = randomizeRwaId;
+    window.resetRwaIdSpecimen = resetRwaIdSpecimen;
+    window.resetRwaPhoto = resetRwaPhoto;
+    window.switchRwaSide = switchRwaSide;
+    window.copyRwaSpecimenData = copyRwaSpecimenData;
+    window.downloadRwaCardPNG = downloadRwaCardPNG;
+    window.printRwaCard = printRwaCard;
+    window.initRwaIdCard = initRwaIdCard;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initRwaIdCard);
+    } else {
+      initRwaIdCard();
     }
 
     // ================= FEDERAL DEMOCRATIC REPUBLIC OF ETHIOPIA / PASSPORT · ፓስፖርት (ETH) E-PASSPORT CONTROLLER =================
@@ -11361,6 +11685,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Ghana</div>
                 <div class="text-[10px] font-medium text-slate-500">Passport / Passeport (GHA)</div>
+              </div>
+            </button>
+
+            <!-- Rwanda -->
+            <button type="button" id="country-btn-rwanda" onclick="switchVerificationCountry('rwanda')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-cyan-50/40 hover:border-cyan-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇷🇼</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Rwanda</div>
+                <div class="text-[10px] font-medium text-slate-500">ID Card (Indangamuntu)</div>
               </div>
             </button>
           </div>
@@ -19415,6 +19751,217 @@ COD REP DEM CONGO</div>
             </article>
 
             <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic biometric passport reproduction · Republic of Ghana (Passport · Passeport / GHA) 2-page spread matching reference specimen with OBSERVATIONS header, Black Star watermark, laser-perforated serial number, stacked 2D barcode, and ICAO Doc 9303 TD3 machine-readable zone.</p>
+          </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3H-7: REPUBLIC OF RWANDA (INDANGAMUNTU · NATIONAL IDENTITY CARD / RWA) VIEW ================= -->
+      <div id="rwanda-doc-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-50 text-cyan-800 border border-cyan-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                  <span>Rwanda</span>
+                </span>
+                <h2 class="text-lg font-black text-slate-900 mt-1">National ID Card (Indangamuntu)</h2>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="randomizeRwaId()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Rwandan citizen data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <button type="button" onclick="resetRwaIdSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Hitayezu Jean Claude reference specimen">
+                  <i class="fa-solid fa-rotate-left"></i> Specimen
+                </button>
+              </div>
+            </div>
+
+            <!-- Card View Side Toggle -->
+            <div class="space-y-1">
+              <label class="font-bold text-slate-600 text-xs block">Card View Mode</label>
+              <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl">
+                <button type="button" id="rwaBtnSideFront" onclick="switchRwaSide('front')" class="py-1.5 text-xs font-bold rounded-lg bg-white text-slate-900 shadow-2xs cursor-pointer">Front</button>
+                <button type="button" id="rwaBtnSideBack" onclick="switchRwaSide('back')" class="py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer">Back</button>
+                <button type="button" id="rwaBtnSideBoth" onclick="switchRwaSide('both')" class="py-1.5 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 cursor-pointer">Both Sides</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <!-- Names (Amazina / Names) -->
+              <div class="col-span-1 sm:col-span-2 space-y-1">
+                <label class="font-bold text-slate-600" for="rwaInpNames">Amazina / Names</label>
+                <input id="rwaInpNames" type="text" value="HITAYEZU Jean Claude" oninput="updateRwaIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-bold text-slate-800">
+              </div>
+
+              <!-- National ID No. -->
+              <div class="col-span-1 sm:col-span-2 space-y-1">
+                <label class="font-bold text-slate-600" for="rwaInpIdNo">Indangamuntu / National ID No.</label>
+                <input id="rwaInpIdNo" type="text" value="1 1998 8 0014393 0 17" maxlength="24" oninput="updateRwaIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono font-bold text-slate-800">
+              </div>
+
+              <!-- Date of Birth -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="rwaInpDob">Itariki yavutseho / Date of Birth</label>
+                <input id="rwaInpDob" type="date" value="1998-01-01" onchange="updateRwaIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-slate-800 font-medium">
+              </div>
+
+              <!-- Sex -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="rwaInpSex">Igitsina / Sex</label>
+                <select id="rwaInpSex" onchange="updateRwaIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-bold text-slate-800 bg-white">
+                  <option value="Gabo / M" selected>Gabo / M (Male)</option>
+                  <option value="Gore / F">Gore / F (Female)</option>
+                </select>
+              </div>
+
+              <!-- Place of Issue -->
+              <div class="col-span-1 sm:col-span-2 space-y-1">
+                <label class="font-bold text-slate-600" for="rwaInpPlaceOfIssue">Aho Yatangiwe / Place of Issue</label>
+                <input id="rwaInpPlaceOfIssue" type="text" value="Gakenke / Gashenyi" oninput="updateRwaIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-bold text-slate-800">
+              </div>
+
+              <!-- Signature Text -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="rwaInpSignature">Umukono / Signature Script</label>
+                <input id="rwaInpSignature" type="text" value="Jean Claude" oninput="updateRwaIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-semibold text-slate-800">
+              </div>
+
+              <!-- Back Card Issue Number -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="rwaInpIssueNo">Issue Number (Back Plate)</label>
+                <input id="rwaInpIssueNo" type="text" value="0164" maxlength="6" oninput="updateRwaIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 font-mono font-bold text-slate-800">
+              </div>
+            </div>
+
+            <!-- Photo Upload & Controls -->
+            <div class="pt-3 border-t border-slate-100 space-y-2">
+              <label class="font-bold text-xs text-slate-700 block">Bearer Photograph</label>
+              <div class="flex items-center gap-3">
+                <label class="grow px-3 py-2 rounded-xl border border-dashed border-cyan-300 hover:border-cyan-500 bg-cyan-50/40 hover:bg-cyan-50 text-cyan-900 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span>Upload ID Photo</span>
+                  <input id="rwaPhotoUpload" type="file" accept="image/*" class="hidden">
+                </label>
+                <button type="button" onclick="resetRwaPhoto()" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Export & Copy Actions -->
+            <div class="pt-3 border-t border-slate-100 flex flex-wrap gap-2">
+              <button type="button" onclick="downloadRwaCardPNG()" class="grow px-4 py-2.5 rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white font-bold text-xs shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download"></i> Download PNG
+              </button>
+              <button type="button" onclick="printRwaCard()" class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors cursor-pointer flex items-center gap-2">
+                <i class="fa-solid fa-print"></i> Print
+              </button>
+              <button type="button" onclick="copyRwaSpecimenData()" class="px-3 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors cursor-pointer" title="Copy text data to clipboard">
+                <i class="fa-solid fa-copy"></i> Copy
+              </button>
+            </div>
+          </section>
+
+          <!-- Card Preview Column -->
+          <section class="lg:col-span-7 flex flex-col items-center gap-5">
+            <div class="w-full flex items-center justify-between no-print px-1">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></span>
+                <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Republika y'u Rwanda · Indangamuntu (National ID Card)</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <button type="button" onclick="downloadRwaCardPNG()" class="text-cyan-700 hover:text-cyan-800 font-bold flex items-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-image"></i> High-Res PNG
+                </button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="printRwaCard()" class="text-slate-600 hover:text-slate-900 font-bold flex items-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-print"></i> Print / PDF
+                </button>
+                <span class="text-slate-300">|</span>
+                <a href="/assets/aistudio/1793640603186_32ee264a.jpg" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-slate-700 flex items-center gap-1">
+                  <i class="fa-solid fa-image"></i> Reference Front
+                </a>
+              </div>
+            </div>
+
+            <!-- CONTAINER FOR CARDS -->
+            <div id="rwaCardContainer" class="w-full flex flex-col items-center gap-6">
+
+              <!-- ============ RWANDA ID FRONT CARD ============ -->
+              <article id="rwanda-id-front" class="relative w-full max-w-[560px] mx-auto rounded-2xl shadow-xl border border-slate-200 overflow-hidden select-none bg-[#e8f5fb]" style="aspect-ratio: 688 / 434; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                <!-- Base Plate: High-resolution clean scan with value text seamlessly inpainted -->
+                <img src="/assets/aistudio/rwanda_id_clean_front_bg.png" alt="Rwanda National ID Front Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                <!-- Main Bearer Photo (Oval Vignette) -->
+                <div class="absolute overflow-hidden z-10 pointer-events-none flex items-center justify-center" style="left: 8.8%; top: 17.5%; width: 25.8%; height: 60.5%;">
+                  <img id="rwaOutPhotoMain" src="/assets/aistudio/rwanda_id_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover" style="border-radius: 50% 50% 48% 48% / 54% 54% 46% 46%; filter: contrast(1.02) saturate(1.04);">
+                </div>
+
+                <!-- Ghost Portrait at bottom right -->
+                <div class="absolute overflow-hidden z-10 pointer-events-none mix-blend-multiply flex items-center justify-center opacity-85" style="left: 82.5%; top: 76.5%; width: 9.8%; height: 19%;">
+                  <img id="rwaOutGhostPhoto" src="/assets/aistudio/rwanda_id_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover" style="filter: grayscale(0.2) contrast(0.95);">
+                </div>
+
+                <!-- Dynamic Text Overlay Fields -->
+                <!-- Names -->
+                <div id="rwaOutNames" class="absolute font-black text-slate-900 whitespace-nowrap leading-none z-10 tracking-tight" style="left: 42.5%; top: 48.0%; font-size: 3.4cqw;">
+                  HITAYEZU Jean Claude
+                </div>
+
+                <!-- Date of Birth -->
+                <div id="rwaOutDob" class="absolute font-black text-slate-900 whitespace-nowrap leading-none z-10 tracking-tight" style="left: 42.5%; top: 60.5%; font-size: 3.2cqw;">
+                  01/01/1998
+                </div>
+
+                <!-- Sex -->
+                <div id="rwaOutSex" class="absolute font-black text-slate-900 whitespace-nowrap leading-none z-10 tracking-tight" style="left: 42.5%; top: 73.0%; font-size: 3.1cqw;">
+                  Gabo / M
+                </div>
+
+                <!-- Place of Issue -->
+                <div id="rwaOutPlaceOfIssue" class="absolute font-black text-slate-900 whitespace-nowrap leading-none z-10 tracking-tight" style="left: 59.5%; top: 73.0%; font-size: 3.1cqw;">
+                  Gakenke / Gashenyi
+                </div>
+
+                <!-- Signature Script -->
+                <div id="rwaOutSignature" class="absolute font-bold text-slate-800 whitespace-nowrap leading-none z-10 italic" style="left: 42.5%; top: 83.2%; font-family: 'Brush Script MT', 'Dancing Script', 'Caveat', cursive, sans-serif; font-size: 3.8cqw; transform: rotate(-2deg); opacity: 0.9;">
+                  Jean Claude
+                </div>
+
+                <!-- National ID Number -->
+                <div id="rwaOutIdNo" class="absolute font-black text-slate-900 whitespace-nowrap leading-none z-10 tracking-wider" style="left: 47.0%; top: 94.0%; font-family: 'Courier New', Courier, monospace; font-size: 3.9cqw; font-weight: 900; letter-spacing: 0.04em;">
+                  1 1998 8 0014393 0 17
+                </div>
+
+                <!-- Exact 1:1 Reference Specimen Overlay (Shown when default specimen data is unmodified) -->
+                <img id="rwaRefSpecimenOverlay" src="/assets/aistudio/rwanda_id_front_reference.png" alt="Rwanda ID Specimen Exact Reference" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
+              </article>
+
+              <!-- ============ RWANDA ID BACK CARD ============ -->
+              <article id="rwanda-id-back" class="relative w-full max-w-[560px] mx-auto rounded-2xl shadow-xl border border-slate-200 overflow-hidden select-none bg-[#e8f5fb] hidden" style="aspect-ratio: 688 / 434; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+                <!-- Reference Back Scan Base -->
+                <img src="/assets/aistudio/rwanda_id_back_reference.png" alt="Rwanda National ID Back Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                <!-- Issue Number on Left Vertical Edge -->
+                <div class="absolute z-10 pointer-events-none select-none" style="left: 2.2%; top: 81.0%; transform: rotate(-90deg); transform-origin: left top;">
+                  <span id="rwaOutIssueNo" class="font-mono font-bold text-slate-800 tracking-wider" style="font-size: 2.6cqw;">0164</span>
+                </div>
+
+                <!-- Small Bearer Photo on Back Right -->
+                <div class="absolute z-10 pointer-events-none overflow-hidden rounded-[2px]" style="left: 83.2%; top: 40.5%; width: 10.5%; height: 22.0%;">
+                  <img id="rwaOutPhotoBack" src="/assets/aistudio/rwanda_id_ghost.png" alt="Bearer Photo Back" class="w-full h-full object-cover" style="filter: contrast(1.05);">
+                </div>
+
+                <!-- Barcode overlay at bottom -->
+                <div class="absolute z-10 pointer-events-none select-none flex items-center justify-center" style="left: 6.0%; top: 62.5%; width: 86.0%; height: 32.5%;">
+                  <img id="rwaOutBarcode" src="/assets/aistudio/rwanda_id_barcode.png" alt="2D ID Barcode" class="w-full h-full object-fill mix-blend-multiply">
+                </div>
+              </article>
+            </div>
+
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic national identity card reproduction · Republika y'u Rwanda (INDANGAMUNTU / National Identity Card) with official Coat of Arms, national flag, radiant sunburst security guilloche, bearer oval portrait, ghost watermark, and high-density 2D barcode.</p>
           </section>
         </main>
       </div>

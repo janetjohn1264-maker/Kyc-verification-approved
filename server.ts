@@ -524,6 +524,56 @@ const PROTECTED_STATIC_ASSETS: Record<string, { fileId: string; fileName: string
     fileName: 'nigeria_passport_optic.png',
     allowInlineImg: true,
   },
+  '/assets/aistudio/rwanda_id_front_reference.png': {
+    fileId: 'rwanda-id-front-png',
+    fileName: 'rwanda_id_front_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/rwanda_id_clean_front_bg.png': {
+    fileId: 'rwanda-id-clean-front-png',
+    fileName: 'rwanda_id_clean_front_bg.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/rwanda_id_back_reference.png': {
+    fileId: 'rwanda-id-back-png',
+    fileName: 'rwanda_id_back_reference.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/rwanda_id_portrait.png': {
+    fileId: 'rwanda-id-portrait-png',
+    fileName: 'rwanda_id_portrait.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/rwanda_id_ghost.png': {
+    fileId: 'rwanda-id-ghost-png',
+    fileName: 'rwanda_id_ghost.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/rwanda_coat_of_arms.png': {
+    fileId: 'rwanda-coat-arms-png',
+    fileName: 'rwanda_coat_of_arms.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/rwanda_flag.png': {
+    fileId: 'rwanda-flag-png',
+    fileName: 'rwanda_flag.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/rwanda_id_barcode.png': {
+    fileId: 'rwanda-id-barcode-png',
+    fileName: 'rwanda_id_barcode.png',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/1793640603186_32ee264a.jpg': {
+    fileId: 'rwanda-front-ref-jpg',
+    fileName: 'rwanda_national_id_front.jpg',
+    allowInlineImg: true,
+  },
+  '/assets/aistudio/1793640616308_fc9880cf.jpg': {
+    fileId: 'rwanda-back-ref-jpg',
+    fileName: 'rwanda_national_id_back.jpg',
+    allowInlineImg: true,
+  },
 };
 
 interface GeneratedExportRecord {
