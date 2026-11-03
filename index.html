@@ -22370,21 +22370,28 @@ COD REP DEM CONGO</div>
         }
       }
 
+      // Server-verified lock state is kept strictly in closure memory (never trusting localStorage/sessionStorage for unlock status)
+      const serverVerifiedFileLocks = Object.create(null);
+      try {
+        localStorage.removeItem(LOCK_MAP_STORAGE_KEY);
+        sessionStorage.removeItem(LOCK_MAP_STORAGE_KEY);
+      } catch (e) {}
+
       function getSavedFileLocks() {
-        try {
-          const raw = localStorage.getItem(LOCK_MAP_STORAGE_KEY);
-          return raw ? JSON.parse(raw) : {};
-        } catch (e) {
-          return {};
-        }
+        return serverVerifiedFileLocks;
       }
 
       function saveFileLockRecord(fileId, record) {
-        try {
-          const map = getSavedFileLocks();
-          map[fileId] = record;
-          localStorage.setItem(LOCK_MAP_STORAGE_KEY, JSON.stringify(map));
-        } catch (e) {}
+        if (!fileId || !record) return;
+        serverVerifiedFileLocks[fileId] = {
+          lockId: record.lockId || null,
+          fileId: fileId,
+          trackingUrl: record.trackingUrl || OFFICIAL_OGADS_LINK,
+          status: record.status || 'locked',
+          unlocked: Boolean(record.unlocked && record.downloadAuthToken),
+          downloadAuthToken: record.unlocked && record.downloadAuthToken ? String(record.downloadAuthToken) : null,
+          expiresAt: record.expiresAt || null
+        };
       }
 
       const visitorSessionId = getOrCreateVisitorSessionId();
@@ -22407,7 +22414,7 @@ COD REP DEM CONGO</div>
       let authorizedExecutionBypass = false;
       let currentAuthorizedContext = null;
 
-      // Complete catalog of every downloadable / exportable verification file in the project
+      // Complete catalog of every downloadable / exportable verification file across all 16 countries
       const FILE_CATALOG = {
         'kenya-passport-png': {
           fileId: 'kenya-passport-png',
@@ -22496,6 +22503,14 @@ COD REP DEM CONGO</div>
           country: 'ethiopia',
           docType: 'idcard',
           fnName: 'downloadEthPNG'
+        },
+        'ethiopia-passport-png': {
+          fileId: 'ethiopia-passport-png',
+          fileName: 'ethiopia-epassport-demo.png',
+          docTitle: 'Federal Democratic Republic of Ethiopia — Biometric e-Passport (HD PNG)',
+          country: 'ethiopia',
+          docType: 'passport',
+          fnName: 'downloadEthPassPNG'
         },
         'nigeria-id-png': {
           fileId: 'nigeria-id-png',
@@ -22620,6 +22635,94 @@ COD REP DEM CONGO</div>
           docType: 'passport',
           staticAssetPath: '/assets/aistudio/drc_passport_reference.jpg'
         },
+        'bangladesh-passport-png': {
+          fileId: 'bangladesh-passport-png',
+          fileName: 'bangladesh-passport-demo.png',
+          docTitle: 'People\'s Republic of Bangladesh — Biometric e-Passport (HD PNG)',
+          country: 'bangladesh',
+          docType: 'passport',
+          fnName: 'downloadBgdPassPNG'
+        },
+        'bangladesh-reference-jpg': {
+          fileId: 'bangladesh-reference-jpg',
+          fileName: 'Bangladesh-Passport-Reference-Specimen.jpg',
+          docTitle: 'Bangladesh Biometric Passport Reference Specimen (JPG)',
+          country: 'bangladesh',
+          docType: 'passport',
+          staticAssetPath: '/assets/aistudio/1793535919782_9b492622.jpg'
+        },
+        'germany-passport-png': {
+          fileId: 'germany-passport-png',
+          fileName: 'germany-reisepass-demo.png',
+          docTitle: 'Federal Republic of Germany — Biometric Reisepass (HD PNG)',
+          country: 'germany',
+          docType: 'passport',
+          fnName: 'downloadDeuPassPNG'
+        },
+        'germany-reference-png': {
+          fileId: 'germany-reference-png',
+          fileName: 'Germany-Reisepass-Reference-Specimen.png',
+          docTitle: 'German Biometric Reisepass Reference Specimen (PNG)',
+          country: 'germany',
+          docType: 'passport',
+          staticAssetPath: '/assets/aistudio/image_f62ff4c3.png'
+        },
+        'canada-passport-png': {
+          fileId: 'canada-passport-png',
+          fileName: 'canada-passport-demo.png',
+          docTitle: 'Canada — Biometric e-Passport Spread (HD PNG)',
+          country: 'canada',
+          docType: 'passport',
+          fnName: 'downloadCanPassPNG'
+        },
+        'canada-reference-png': {
+          fileId: 'canada-reference-png',
+          fileName: 'Canada-Passport-Reference-Specimen.png',
+          docTitle: 'Canadian Biometric Passport Reference Specimen (PNG)',
+          country: 'canada',
+          docType: 'passport',
+          staticAssetPath: '/assets/aistudio/image_939e0f4a.png'
+        },
+        'ghana-passport-png': {
+          fileId: 'ghana-passport-png',
+          fileName: 'ghana-passport-demo.png',
+          docTitle: 'Republic of Ghana — Biometric e-Passport (HD PNG)',
+          country: 'ghana',
+          docType: 'passport',
+          fnName: 'downloadGhaPassPNG'
+        },
+        'ghana-reference-jpg': {
+          fileId: 'ghana-reference-jpg',
+          fileName: 'Ghana-Passport-Reference-Specimen.jpg',
+          docTitle: 'Ghanaian Biometric Passport Reference Specimen (JPG)',
+          country: 'ghana',
+          docType: 'passport',
+          staticAssetPath: '/assets/aistudio/1793559368456_a809bb91.jpg'
+        },
+        'rwanda-id-png': {
+          fileId: 'rwanda-id-png',
+          fileName: 'rwanda-national-id-demo.png',
+          docTitle: 'Republic of Rwanda — Indangamuntu National ID Card (HD PNG)',
+          country: 'rwanda',
+          docType: 'idcard',
+          fnName: 'downloadRwaCardPNG'
+        },
+        'rwanda-reference-front-jpg': {
+          fileId: 'rwanda-reference-front-jpg',
+          fileName: 'Rwanda-National-ID-Front-Specimen.jpg',
+          docTitle: 'Rwanda National ID Card Front Reference Specimen (JPG)',
+          country: 'rwanda',
+          docType: 'idcard',
+          staticAssetPath: '/assets/aistudio/1793640603186_32ee264a.jpg'
+        },
+        'rwanda-reference-back-jpg': {
+          fileId: 'rwanda-reference-back-jpg',
+          fileName: 'Rwanda-National-ID-Back-Specimen.jpg',
+          docTitle: 'Rwanda National ID Card Back Reference Specimen (JPG)',
+          country: 'rwanda',
+          docType: 'idcard',
+          staticAssetPath: '/assets/aistudio/1793640616308_fc9880cf.jpg'
+        },
         'proof-of-account-pdf': {
           fileId: 'proof-of-account-pdf',
           fileName: 'Proof-of-Address-and-Account-Confirmation.pdf',
@@ -22642,6 +22745,11 @@ COD REP DEM CONGO</div>
         const c = (typeof currentCountry !== 'undefined' && currentCountry) ? currentCountry : 'kenya';
         const d = (typeof currentDocType !== 'undefined' && currentDocType) ? currentDocType : 'passport';
         if (d === 'proofofaccount') return 'proof-of-account-png';
+        if (c === 'rwanda') return 'rwanda-id-png';
+        if (c === 'ghana') return 'ghana-passport-png';
+        if (c === 'canada') return 'canada-passport-png';
+        if (c === 'germany') return 'germany-passport-png';
+        if (c === 'bangladesh') return 'bangladesh-passport-png';
         if (c === 'drcongo') return 'drcongo-passport-png';
         if (c === 'usa') return 'usa-passport-png';
         if (c === 'southafrica') return 'southafrica-passport-png';
@@ -22652,7 +22760,7 @@ COD REP DEM CONGO</div>
         if (c === 'uk') return 'uk-passport-png';
         if (d === 'driverlicense') return 'somalia-dl-png';
         if (c === 'nigeria') return d === 'passport' ? 'nigeria-passport-png' : 'nigeria-id-png';
-        if (c === 'ethiopia') return 'ethiopia-id-png';
+        if (c === 'ethiopia') return d === 'idcard' ? 'ethiopia-id-png' : 'ethiopia-passport-png';
         if (c === 'somalia') return d === 'idcard' ? 'somalia-smart-id-png' : 'somalia-passport-png';
         if (d === 'idcard') return 'kenya-id-both-png';
         return 'kenya-passport-png';
@@ -22744,6 +22852,7 @@ COD REP DEM CONGO</div>
           'somalia-passport-id-card',
           'somalia-driverlicense-card',
           'ethiopia-fayda-card',
+          'ethiopia-passport-card',
           'nigeria-id-card',
           'nigeria-passport-card',
           'uk-passport-card',
@@ -22756,6 +22865,12 @@ COD REP DEM CONGO</div>
           'sa-passport-card',
           'usa-passport-card',
           'drc-passport-card',
+          'bangladesh-passport-card',
+          'germany-passport-card',
+          'canada-passport-card',
+          'ghana-passport-card',
+          'rwanda-id-front',
+          'rwanda-id-back',
           'proof-of-account-card'
         ];
         previewIds.forEach((id) => {
@@ -22973,7 +23088,8 @@ COD REP DEM CONGO</div>
       // Resolve any DOM button or link to its exact catalog key
       function mapButtonToCatalogKey(el) {
         if (!el) return null;
-        if (el.id === 'downloadBtn' || el.id === 'fallbackDownloadLink') return 'kenya-passport-png';
+        if (el.id === 'downloadBtn') return resolveActiveFileKey();
+        if (el.id === 'fallbackDownloadLink') return resolveActiveFileKey();
         if (el.id === 'printBtn') return 'kenya-passport-print';
         if (el.id === 'shareImageBtn') return resolveActiveFileKey();
 
@@ -22994,22 +23110,28 @@ COD REP DEM CONGO</div>
         if (onclickAttr.includes('downloadSomPassIdCardPNG') || onclickAttr.includes('printSomPassIdCard')) return 'somalia-pass-id-png';
         if (onclickAttr.includes('downloadSomLicPNG') || onclickAttr.includes('printSomaliDriverLicense')) return 'somalia-dl-png';
         if (onclickAttr.includes('downloadEthPNG') || onclickAttr.includes('printEthCard')) return 'ethiopia-id-png';
-        if (onclickAttr.includes('downloadNgaCardPNG') || onclickAttr.includes('printNgaCard')) return 'nigeria-id-png';
-        if (onclickAttr.includes('downloadNgaPassportPNG') || onclickAttr.includes('printNgaPassport')) return 'nigeria-passport-png';
+        if (onclickAttr.includes('downloadEthPassPNG') || onclickAttr.includes('printEthPassport') || onclickAttr.includes('copyEthSpecimenData')) return 'ethiopia-passport-png';
+        if (onclickAttr.includes('downloadNgaCardPNG') || onclickAttr.includes('printNgaCard') || onclickAttr.includes('viewNgaFullRes')) return 'nigeria-id-png';
+        if (onclickAttr.includes('downloadNgaPassportPNG') || onclickAttr.includes('printNgaPassport') || onclickAttr.includes('viewNgaPassportFullRes')) return 'nigeria-passport-png';
         if (onclickAttr.includes('downloadUkPassPNG') || onclickAttr.includes('printUkPass')) return 'uk-passport-png';
-        if (onclickAttr.includes('downloadUgandaPNG') || onclickAttr.includes('printUgandaCard')) return 'uganda-refugee-png';
+        if (onclickAttr.includes('downloadUgandaPNG') || onclickAttr.includes('printUgandaCard') || onclickAttr.includes('viewUgandaFullRes')) return 'uganda-refugee-png';
         if (onclickAttr.includes('downloadPakCardPNG')) {
           if (onclickAttr.includes('pakistan-id-card')) return 'pakistan-id-front-png';
           if (onclickAttr.includes('pakistan-id-back')) return 'pakistan-id-back-png';
           return 'pakistan-id-both-png';
         }
-        if (onclickAttr.includes('printPakCard')) return 'pakistan-id-both-png';
-        if (onclickAttr.includes('downloadSycCardPNG') || onclickAttr.includes('printSycCard')) return 'seychelles-id-png';
-        if (onclickAttr.includes('downloadZafCardPNG') || onclickAttr.includes('printZafCard')) return 'zaf-id-png';
-        if (onclickAttr.includes('downloadSaPassPNG') || onclickAttr.includes('printSaPassport')) return 'southafrica-passport-png';
-        if (onclickAttr.includes('downloadUsaPassPNG') || onclickAttr.includes('printUsaPassport')) return 'usa-passport-png';
-        if (onclickAttr.includes('downloadSenegalPassPNG') || onclickAttr.includes('printSenegalPassport')) return 'senegal-passport-png';
-        if (onclickAttr.includes('downloadDrcPassPNG') || onclickAttr.includes('printDrcPassport')) return 'drcongo-passport-png';
+        if (onclickAttr.includes('printPakCard') || onclickAttr.includes('viewPakFullRes')) return 'pakistan-id-both-png';
+        if (onclickAttr.includes('downloadSycCardPNG') || onclickAttr.includes('printSycCard') || onclickAttr.includes('viewSycFullRes')) return 'seychelles-id-png';
+        if (onclickAttr.includes('downloadZafCardPNG') || onclickAttr.includes('printZafCard') || onclickAttr.includes('viewZafIdFullRes')) return 'zaf-id-png';
+        if (onclickAttr.includes('downloadSaPassPNG') || onclickAttr.includes('printSaPassport') || onclickAttr.includes('viewSaPassFullRes')) return 'southafrica-passport-png';
+        if (onclickAttr.includes('downloadUsaPassPNG') || onclickAttr.includes('printUsaPassport') || onclickAttr.includes('viewUsaPassFullRes')) return 'usa-passport-png';
+        if (onclickAttr.includes('downloadSenegalPassPNG') || onclickAttr.includes('printSenegalPassport') || onclickAttr.includes('viewSenFullRes')) return 'senegal-passport-png';
+        if (onclickAttr.includes('downloadDrcPassPNG') || onclickAttr.includes('printDrcPassport') || onclickAttr.includes('copyDrcSpecimenData')) return 'drcongo-passport-png';
+        if (onclickAttr.includes('downloadBgdPassPNG') || onclickAttr.includes('printBgdPassport') || onclickAttr.includes('copyBgdSpecimenData')) return 'bangladesh-passport-png';
+        if (onclickAttr.includes('downloadDeuPassPNG') || onclickAttr.includes('printDeuPassport') || onclickAttr.includes('copyDeuSpecimenData')) return 'germany-passport-png';
+        if (onclickAttr.includes('downloadCanPassPNG') || onclickAttr.includes('printCanPassport') || onclickAttr.includes('copyCanSpecimenData')) return 'canada-passport-png';
+        if (onclickAttr.includes('downloadGhaPassPNG') || onclickAttr.includes('printGhaPassport') || onclickAttr.includes('copyGhaSpecimenData')) return 'ghana-passport-png';
+        if (onclickAttr.includes('downloadRwaCardPNG') || onclickAttr.includes('printRwaCard') || onclickAttr.includes('copyRwaSpecimenData')) return 'rwanda-id-png';
         if (onclickAttr.includes('downloadProofOfAccountPNG') || onclickAttr.includes('printProofOfAccount')) return 'proof-of-account-png';
         if (onclickAttr.includes('openOgadsContentLockerByKey')) {
           const m = onclickAttr.match(/openOgadsContentLockerByKey\(['"]([^'"]+)['"]\)/);
@@ -23022,7 +23144,14 @@ COD REP DEM CONGO</div>
         }
         if (hrefAttr.includes('pakistan_cnic_specimen.jpg')) return 'pakistan-specimen-jpg';
         if (hrefAttr.includes('drc_passport_reference.jpg') || hrefAttr.includes('1792952087537_9a2ef351.jpg')) return 'drcongo-reference-jpg';
+        if (hrefAttr.includes('1793535919782_9b492622.jpg') || hrefAttr.includes('bgd_passport_reference.png')) return 'bangladesh-reference-jpg';
+        if (hrefAttr.includes('image_f62ff4c3.png') || hrefAttr.includes('germany_passport_reference.png')) return 'germany-reference-png';
+        if (hrefAttr.includes('image_939e0f4a.png')) return 'canada-reference-png';
+        if (hrefAttr.includes('1793559368456_a809bb91.jpg')) return 'ghana-reference-jpg';
+        if (hrefAttr.includes('1793640603186_32ee264a.jpg')) return 'rwanda-reference-front-jpg';
+        if (hrefAttr.includes('1793640616308_fc9880cf.jpg')) return 'rwanda-reference-back-jpg';
         if (hrefAttr.includes('proof_of_account')) return 'proof-of-account-pdf';
+        if (hrefAttr.includes('/assets/aistudio/')) return resolveActiveFileKey();
         return null;
       }
 
@@ -23033,10 +23162,10 @@ COD REP DEM CONGO</div>
           '#shareImageBtn',
           'button[onclick*="download"]',
           'button[onclick*="print"]',
+          'button[onclick*="FullRes"]',
+          'button[onclick*="SpecimenData"]',
           'a[download]',
-          'a[href*="proof_of_account"]',
-          'a[href*="drc_passport_reference"]',
-          'a[href*="pakistan_cnic_specimen"]'
+          'a[href*="/assets/aistudio/"]'
         ];
         const elements = document.querySelectorAll(selectors.join(','));
         elements.forEach((el) => {
@@ -23129,7 +23258,7 @@ COD REP DEM CONGO</div>
               })
             });
             const data = await resp.json();
-            if (data && data.ok) {
+            if (resp.ok && data && data.ok) {
               activeLockState = data;
               if (data.verificationConfigured !== undefined) {
                 publicOgadsConfig.verificationConfigured = Boolean(data.verificationConfigured);
@@ -23146,16 +23275,23 @@ COD REP DEM CONGO</div>
                 downloadAuthToken: data.downloadAuthToken || null,
                 expiresAt: data.expiresAt || null
               });
+            } else {
+              throw new Error((data && data.error) || 'Failed to initialize OGAds lock session.');
             }
           }
         } catch (err) {
           activeLockState = {
-            lockId: existingRec ? existingRec.lockId : ('lock_local_' + Date.now().toString(36)),
+            lockId: existingRec ? existingRec.lockId : ('lock_err_' + Date.now().toString(36)),
             trackingUrl: OFFICIAL_OGADS_LINK,
             status: 'locked',
             unlocked: false,
             verificationConfigured: false
           };
+          const errorText = document.getElementById('ogadsLockerErrorText');
+          if (errorBox && errorText) {
+            errorBox.classList.remove('hidden');
+            errorText.textContent = 'Could not reach the OGAds verification server. Protected content remains locked — click Retry below to re-establish your lock session.';
+          }
         }
 
         renderOgadsLockerModalState();
@@ -23283,9 +23419,12 @@ COD REP DEM CONGO</div>
         }
       };
 
-      window.retryOgadsOfferRedirect = function() {
+      window.retryOgadsOfferRedirect = async function() {
         const errorBox = document.getElementById('ogadsLockerErrorBox');
         if (errorBox) errorBox.classList.add('hidden');
+        if (activeLockerItem && (!activeLockState || String(activeLockState.lockId || '').startsWith('lock_err_'))) {
+          await window.openOgadsContentLocker(activeLockerItem);
+        }
         const btn = document.getElementById('ogadsLockerRedirectBtn');
         if (btn) btn.click();
       };
@@ -23471,11 +23610,14 @@ COD REP DEM CONGO</div>
         downloadSomaliaDlPNG: () => 'somalia-dl-png',
         printSomaliDriverLicense: () => 'somalia-dl-png',
         printSomaliaDl: () => 'somalia-dl-png',
-        // Ethiopia Fayda National ID
+        // Ethiopia Fayda National ID & Biometric e-Passport
         downloadEthPNG: () => 'ethiopia-id-png',
         downloadEthiopiaPNG: () => 'ethiopia-id-png',
         printEthCard: () => 'ethiopia-id-png',
         printEthiopiaDoc: () => 'ethiopia-id-png',
+        downloadEthPassPNG: () => 'ethiopia-passport-png',
+        printEthPassport: () => 'ethiopia-passport-png',
+        copyEthSpecimenData: () => 'ethiopia-passport-png',
         // Nigeria NIMC National ID & e-Passport
         downloadNgaCardPNG: () => 'nigeria-id-png',
         downloadNigeriaPNG: () => 'nigeria-id-png',
@@ -23519,17 +23661,43 @@ COD REP DEM CONGO</div>
         // DR Congo Biometric Passport
         downloadDrcPassPNG: () => 'drcongo-passport-png',
         printDrcPassport: () => 'drcongo-passport-png',
+        copyDrcSpecimenData: () => 'drcongo-passport-png',
+        // Bangladesh Biometric e-Passport
+        downloadBgdPassPNG: () => 'bangladesh-passport-png',
+        printBgdPassport: () => 'bangladesh-passport-png',
+        copyBgdSpecimenData: () => 'bangladesh-passport-png',
+        // Germany Biometric Reisepass
+        downloadDeuPassPNG: () => 'germany-passport-png',
+        printDeuPassport: () => 'germany-passport-png',
+        copyDeuSpecimenData: () => 'germany-passport-png',
+        // Canada Biometric Passport
+        downloadCanPassPNG: () => 'canada-passport-png',
+        printCanPassport: () => 'canada-passport-png',
+        copyCanSpecimenData: () => 'canada-passport-png',
+        // Ghana Biometric Passport
+        downloadGhaPassPNG: () => 'ghana-passport-png',
+        printGhaPassport: () => 'ghana-passport-png',
+        copyGhaSpecimenData: () => 'ghana-passport-png',
+        // Rwanda National ID Card (Indangamuntu)
+        downloadRwaCardPNG: () => 'rwanda-id-png',
+        printRwaCard: () => 'rwanda-id-png',
+        copyRwaSpecimenData: () => 'rwanda-id-png',
         // Proof of Account & Address
         downloadProofOfAccountPNG: () => 'proof-of-account-png',
         printProofOfAccount: () => 'proof-of-account-png',
         downloadPoaPNG: () => 'proof-of-account-png',
         downloadPoaOfficialPDF: () => 'proof-of-account-pdf',
         printPoaDoc: () => 'proof-of-account-pdf',
-        // Full-Resolution Specimen Modal Export Triggers
+        // Full-Resolution Specimen Modal Export Triggers (All Countries)
+        viewUgandaFullRes: () => 'uganda-refugee-png',
         viewSycFullRes: () => 'seychelles-id-png',
         viewNgaFullRes: () => 'nigeria-id-png',
         viewNgaPassportFullRes: () => 'nigeria-passport-png',
         viewPakFullRes: () => 'pakistan-id-both-png',
+        viewSenFullRes: () => 'senegal-passport-png',
+        viewZafIdFullRes: () => 'zaf-id-png',
+        viewSaPassFullRes: () => 'southafrica-passport-png',
+        viewUsaPassFullRes: () => 'usa-passport-png',
         // Mobile Modal Share Image
         sharePassportImage: () => resolveActiveFileKey()
       };
@@ -23551,7 +23719,7 @@ COD REP DEM CONGO</div>
           };
         });
 
-        // Attach capture-phase listener on window so it executes BEFORE any element-level click listener (including #downloadBtn & #printBtn)
+        // Attach capture-phase listener on window so it executes BEFORE any element-level click listener (including #downloadBtn, #printBtn, and any specimen links)
         window.addEventListener('click', function(e) {
           if (authorizedExecutionBypass && currentAuthorizedContext) return;
           const target = e.target;
@@ -23561,7 +23729,7 @@ COD REP DEM CONGO</div>
           if (target.closest('#ogadsContentLockerModal') || target.closest('#ogadsAdminModal')) return;
 
           const actionable = target.closest(
-            '#downloadBtn, #printBtn, #shareImageBtn, #fallbackDownloadLink, [data-ogads-file-key], button[onclick*="download"], button[onclick*="print"], a[download], a[href*="proof_of_account"], a[href*="drc_passport_reference"], a[href*="pakistan_cnic_specimen"]'
+            '#downloadBtn, #printBtn, #shareImageBtn, #fallbackDownloadLink, [data-ogads-file-key], button[onclick*="download"], button[onclick*="print"], button[onclick*="FullRes"], button[onclick*="SpecimenData"], a[download], a[href*="/assets/aistudio/"]'
           );
           if (!actionable) return;
 
@@ -23872,6 +24040,20 @@ COD REP DEM CONGO</div>
           const data = await resp.json();
           if (data && data.ok) {
             publicOgadsConfig = Object.assign(publicOgadsConfig, data);
+            // Synchronize in-memory lock records strictly with server-reported activeLocks
+            Object.keys(serverVerifiedFileLocks).forEach((k) => {
+              delete serverVerifiedFileLocks[k];
+            });
+            if (Array.isArray(data.activeLocks)) {
+              data.activeLocks.forEach((l) => {
+                if (l && l.fileId) {
+                  saveFileLockRecord(l.fileId, l);
+                }
+              });
+            }
+            if (typeof window.syncActiveOgadsUnlockBar === 'function') {
+              window.syncActiveOgadsUnlockBar();
+            }
           }
         } catch (e) {}
       }

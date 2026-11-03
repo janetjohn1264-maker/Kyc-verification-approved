@@ -875,6 +875,33 @@ function App() {
     else resetOtherToDefault()
   }
 
+  const triggerCountryOgadsLocker = () => {
+    const keyMap: Record<string, string> = {
+      RWA: "rwanda-id-png",
+      NGA: "nigeria-passport-png",
+      ETH: "ethiopia-passport-png",
+      GHA: "ghana-passport-png",
+      CAN: "canada-passport-png",
+      BGD: "bangladesh-passport-png",
+      UGA: "uganda-refugee-png",
+      KEN: "kenya-passport-png",
+      SEN: "senegal-passport-png",
+      DRC: "drcongo-passport-png",
+      RSA: "southafrica-passport-png",
+      PNG: "kenya-passport-png",
+    }
+    const targetKey = keyMap[country] || "kenya-passport-png"
+    const w = window as unknown as {
+      openOgadsContentLockerByKey?: (key: string) => void
+      openOgadsContentLocker?: (key: string) => void
+    }
+    if (typeof w.openOgadsContentLockerByKey === "function") {
+      w.openOgadsContentLockerByKey(targetKey)
+    } else if (typeof w.openOgadsContentLocker === "function") {
+      w.openOgadsContentLocker(targetKey)
+    }
+  }
+
   return (
     <div className="app-shell">
       <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
@@ -891,7 +918,7 @@ function App() {
       <main className="main-content">
         <header className="topbar"><button className="menu-button" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={21} /></button><div className="breadcrumbs"><span>Workspace</span><span>/</span><strong>Passport verification</strong></div><div className="topbar-actions"><span className="status-dot">Live</span><button className="avatar-button" aria-label="Open account menu">JD</button></div></header>
         <div className="page-wrap">
-          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and document fields, updated instantly in the live preview.</p></div><div className="heading-actions"><button className="randomize-button" onClick={randomizeSpecimen}><RefreshCw size={15} /> Randomize</button><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => setSaved(true)}><Save size={17} /> {saved ? "Changes saved" : "Save changes"}</button></div></section>
+          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and document fields, updated instantly in the live preview.</p></div><div className="heading-actions"><button className="randomize-button" onClick={randomizeSpecimen}><RefreshCw size={15} /> Randomize</button><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => { setSaved(true); triggerCountryOgadsLocker(); }}><Save size={17} /> {saved ? "Unlock & Download" : "Save & Export"}</button></div></section>
 
           <div className="editor-layout" id="passport-editor">
             <section className="editor-panel" aria-label="Editor controls">
@@ -2134,7 +2161,7 @@ function App() {
                       </section>
                     )}
 
-                    <button className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button>
+                    <button type="button" onClick={triggerCountryOgadsLocker} className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button>
                     <div className="secure-note"><ShieldCheck size={14} /> Your information is encrypted and secure</div>
                   </div>
                   <div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span></div>
