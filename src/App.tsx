@@ -13,10 +13,10 @@ import { NigeriaPassportCard, NigeriaPassportData, defaultNigeriaPassportData, g
 import { RwandaIdCard, RwandaIdData, defaultRwandaIdData, rwandaRandomSpecimens } from "./RwandaIdCard"
 
 const defaultContent = {
-  title: "Rwanda National ID Verification",
+  title: "South Africa Passport Verification",
   subtitle: "Securely verify identity documents in a few simple steps.",
   button: "Start verification",
-  accent: "#009eb0",
+  accent: "#15803d",
 }
 
 const nigeriaRandomSpecimens: NigeriaPassportData[] = [
@@ -434,42 +434,42 @@ const otherCountryRandomSpecimens: Record<string, OtherDocumentData[]> = {
   ],
   RSA: [
     {
-      documentNo: "930802 0123 08 7",
-      personalNo: "8403190123087",
-      surname: "MASHEGO",
-      givenNames: "REBECCA",
-      nationality: "ZAF",
-      dateOfBirth: "19/03/1984",
-      sex: "F",
-      placeOfBirth: "ZAF",
-      dateOfIssue: "12/05/2021",
-      dateOfExpiry: "11/05/2031",
-      authority: "DEPT OF HOME AFFAIRS",
-    },
-    {
-      documentNo: "891124 5182 08 4",
-      personalNo: "8911245182084",
-      surname: "NKOSI",
-      givenNames: "SIPHO MANDLA",
-      nationality: "ZAF",
-      dateOfBirth: "24/11/1989",
+      documentNo: "M00328723",
+      personalNo: "6309075016088",
+      surname: "GAGIANO",
+      givenNames: "DIRK JOHAN",
+      nationality: "SOUTH AFRICAN / SUD-AFRICAIN",
+      dateOfBirth: "07 SEP 1963",
       sex: "M",
       placeOfBirth: "ZAF",
-      dateOfIssue: "04/08/2022",
-      dateOfExpiry: "03/08/2032",
+      dateOfIssue: "03 FEB 2020",
+      dateOfExpiry: "02 FEB 2030",
       authority: "DEPT OF HOME AFFAIRS",
     },
     {
-      documentNo: "960415 0491 08 2",
-      personalNo: "9604150491082",
-      surname: "DLAMINI",
-      givenNames: "THANDIWE ZANELE",
-      nationality: "ZAF",
-      dateOfBirth: "15/04/1996",
+      documentNo: "A04928174",
+      personalNo: "8503225419082",
+      surname: "MOKOENA",
+      givenNames: "SIPHO MANDLA",
+      nationality: "SOUTH AFRICAN / SUD-AFRICAIN",
+      dateOfBirth: "22 MAR 1985",
+      sex: "M",
+      placeOfBirth: "ZAF",
+      dateOfIssue: "14 AUG 2019",
+      dateOfExpiry: "13 AUG 2029",
+      authority: "DEPT OF HOME AFFAIRS",
+    },
+    {
+      documentNo: "M08371925",
+      personalNo: "9211090384086",
+      surname: "NAIDOO",
+      givenNames: "PRIYA DEVI",
+      nationality: "SOUTH AFRICAN / SUD-AFRICAIN",
+      dateOfBirth: "09 NOV 1992",
       sex: "F",
       placeOfBirth: "ZAF",
-      dateOfIssue: "19/01/2024",
-      dateOfExpiry: "18/01/2034",
+      dateOfIssue: "05 FEB 2021",
+      dateOfExpiry: "04 FEB 2031",
       authority: "DEPT OF HOME AFFAIRS",
     },
   ],
@@ -530,7 +530,7 @@ function App() {
   const [saved, setSaved] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [detectedText, setDetectedText] = useState<string[] | null>(null)
-  const [country, setCountry] = useState("RWA")
+  const [country, setCountry] = useState("RSA")
   const [rwandaData, setRwandaData] = useState<RwandaIdData>(defaultRwandaIdData)
   const [nigeriaData, setNigeriaData] = useState<NigeriaPassportData>(defaultNigeriaPassportData)
   const [ethiopiaData, setEthiopiaData] = useState<EthiopiaPassportData>(defaultEthiopiaPassportData)
@@ -648,7 +648,7 @@ function App() {
     : isSenegal
     ? "/assets/aistudio/senegal_cedeao_rectified_ref.png"
     : isSouthAfrica
-    ? "/assets/aistudio/south_africa_identity_card_reference.jpeg"
+    ? "/assets/aistudio/image_02a4a299.png"
     : isPapuaNewGuinea
     ? "/assets/aistudio/png_national_id_reference.jpg"
     : "/assets/aistudio/drc_passport_reference.jpg"
@@ -672,7 +672,7 @@ function App() {
     : isSenegal
     ? "Static Republic of Senegal ECOWAS identity card reference specimen"
     : isSouthAfrica
-    ? "Static Republic of South Africa identity card reference specimen"
+    ? "Republic of South Africa biometric e-Passport (2-Page Spread) reference specimen"
     : isPapuaNewGuinea
     ? "Static Independent State of Papua New Guinea national identity card reference specimen"
     : "Static Democratic Republic of the Congo passport reference specimen"
@@ -696,7 +696,7 @@ function App() {
     : isSenegal
     ? "Senegal CEDEAO identity card reference specimen"
     : isSouthAfrica
-    ? "South Africa identity card reference specimen"
+    ? "Republic of South Africa e-Passport (2-Page Spread) reference specimen"
     : isPapuaNewGuinea
     ? "Papua New Guinea national ID reference specimen"
     : "Passport reference specimen"
@@ -955,7 +955,7 @@ function App() {
                       } else if (newCountry === "SEN") {
                         setContent((c) => ({ ...c, title: "Senegal ID Card Verification", accent: "#15803d" }))
                       } else if (newCountry === "RSA") {
-                        setContent((c) => ({ ...c, title: "South Africa ID Verification", accent: "#0284c7" }))
+                        setContent((c) => ({ ...c, title: "South Africa Passport Verification", accent: "#15803d" }))
                       } else if (newCountry === "PNG") {
                         setContent((c) => ({ ...c, title: "Papua New Guinea ID Verification", accent: "#b91c1c" }))
                       } else {
@@ -973,7 +973,7 @@ function App() {
                     <option value="KEN">Republic of Kenya — Biometric e-Passport</option>
                     <option value="SEN">Republic of Senegal — National Identity Card (CEDEAO)</option>
                     <option value="DRC">Democratic Republic of the Congo — Passport</option>
-                    <option value="RSA">Republic of South Africa — Identity card</option>
+                    <option value="RSA">Republic of South Africa — Biometric e-Passport</option>
                     <option value="PNG">Independent State of Papua New Guinea — National ID Card</option>
                   </select>
                 </div>

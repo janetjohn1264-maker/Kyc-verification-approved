@@ -174,6 +174,20 @@ export const NigeriaPassportCard: React.FC<{
 
   const isCustomOvalDob = ovalDobNumeric !== "30.12.1994";
   const cleanPassChars = (data.passportNo || "B50621098").toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9).split('');
+  const isExactSpecimen =
+    !isCustomPhoto &&
+    data.passportNo.trim().toUpperCase() === defaultNigeriaPassportData.passportNo &&
+    data.surname.trim().toUpperCase() === defaultNigeriaPassportData.surname &&
+    data.givenNames.trim().toUpperCase() === defaultNigeriaPassportData.givenNames &&
+    data.nationality.trim().toUpperCase() === defaultNigeriaPassportData.nationality &&
+    data.dateOfBirth.trim().toUpperCase() === defaultNigeriaPassportData.dateOfBirth.toUpperCase() &&
+    data.previousPassportNo.trim().toUpperCase() === defaultNigeriaPassportData.previousPassportNo &&
+    data.nin.trim() === defaultNigeriaPassportData.nin &&
+    data.sex === defaultNigeriaPassportData.sex &&
+    data.placeOfBirth.trim().toUpperCase() === defaultNigeriaPassportData.placeOfBirth &&
+    data.dateOfIssue.trim().toUpperCase() === defaultNigeriaPassportData.dateOfIssue.toUpperCase() &&
+    data.authority.trim().toUpperCase() === defaultNigeriaPassportData.authority &&
+    data.dateOfExpiry.trim().toUpperCase() === defaultNigeriaPassportData.dateOfExpiry.toUpperCase();
 
   return (
     <div
@@ -190,6 +204,15 @@ export const NigeriaPassportCard: React.FC<{
         alt="Federal Republic of Nigeria Passport Base Plate"
         className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0"
       />
+
+      {/* Exact 1:1 Reference Specimen Overlay when default specimen values are active */}
+      {isExactSpecimen && (
+        <img
+          src="/assets/aistudio/nigeria_passport_reference.png"
+          alt="Federal Republic of Nigeria Official Passport Specimen"
+          className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-30"
+        />
+      )}
 
       {/* Live Interactive Overlay Layer */}
       <div className="absolute inset-0 w-full h-full z-20 pointer-events-none text-[#161a1d]">

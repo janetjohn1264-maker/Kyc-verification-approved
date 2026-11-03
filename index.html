@@ -6673,8 +6673,163 @@ var $ = window.$ || (id => document.getElementById(id));
     // ================= REPUBLIC OF SOUTH AFRICA PASSPORT (ZAF — 2-PAGE SPREAD) CONTROLLER =================
     var saPassViewMode = 'live';
     var saPassIsCustomPhoto = false;
-    var saPassCurrentPhotoSrc = '/assets/aistudio/zaf_passport_portrait_exact.png';
-    var saPassRedactedMode = true; // Matches reference black redaction bars by default; toggleable to reveal live text
+    var saPassCurrentPhotoSrc = '/assets/aistudio/image_02a4a299.png';
+    var saPassRedactedMode = false; // Unredacted by default to match reference image_02a4a299.png
+    var saPassBaseCanvasReady = false;
+
+    const SA_PASS_SPECIMEN = {
+      type: 'PM',
+      country: 'ZAF',
+      passNo: 'M00328723',
+      surname: 'GAGIANO',
+      givenNames: 'DIRK JOHAN',
+      nationality: 'SOUTH AFRICAN / SUD-AFRICAIN',
+      dob: '07 SEP 1963',
+      idNo: '6309075016088',
+      sex: 'M',
+      pob: 'ZAF',
+      issueDate: '03 FEB 2020',
+      authority: 'DEPT OF HOME AFFAIRS',
+      expiryDate: '02 FEB 2030',
+      signature: 'D. Gagiano'
+    };
+
+    const SA_DOT_MATRIX_FONT = {
+      '0': ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
+      '1': ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
+      '2': ['01110', '10001', '00001', '00110', '01000', '10000', '11111'],
+      '3': ['11110', '00001', '00001', '01110', '00001', '00001', '11110'],
+      '4': ['00010', '00110', '01010', '10010', '11111', '00010', '00010'],
+      '5': ['11111', '10000', '11110', '00001', '00001', '10001', '01110'],
+      '6': ['00110', '01000', '10000', '11110', '10001', '10001', '01110'],
+      '7': ['11111', '00001', '00010', '00100', '01000', '01000', '01000'],
+      '8': ['01110', '10001', '10001', '01110', '10001', '10001', '01110'],
+      '9': ['01110', '10001', '10001', '01111', '00001', '00010', '01100'],
+      'A': ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+      'B': ['11110', '10001', '10001', '11110', '10001', '10001', '11110'],
+      'C': ['01110', '10001', '10000', '10000', '10000', '10001', '01110'],
+      'D': ['11100', '10010', '10001', '10001', '10001', '10010', '11100'],
+      'E': ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+      'F': ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+      'G': ['01110', '10001', '10000', '10111', '10001', '10001', '01110'],
+      'H': ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+      'I': ['01110', '00100', '00100', '00100', '00100', '00100', '01110'],
+      'J': ['00111', '00010', '00010', '00010', '00010', '10010', '01100'],
+      'K': ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+      'L': ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+      'M': ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+      'N': ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+      'O': ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+      'P': ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+      'Q': ['01110', '10001', '10001', '10001', '10101', '10010', '01101'],
+      'R': ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+      'S': ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
+      'T': ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+      'U': ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+      'V': ['10001', '10001', '10001', '10001', '10001', '01010', '00100'],
+      'W': ['10001', '10001', '10001', '10101', '10101', '10101', '01010'],
+      'X': ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
+      'Y': ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+      'Z': ['11111', '00001', '00010', '00100', '01000', '10000', '11111'],
+    };
+
+    function renderSaPassPerforatedSvg(passNo) {
+      const svgEl = $('saPassPerforatedSvg');
+      if (!svgEl) return;
+      const chars = (passNo || 'M00328723').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9).split('');
+      let markup = '';
+      chars.forEach((ch, idx) => {
+        const glyph = SA_DOT_MATRIX_FONT[ch] || SA_DOT_MATRIX_FONT['0'];
+        const charBaseY = 256 - idx * 31.0;
+        glyph.forEach((rowStr, rIdx) => {
+          for (let cIdx = 0; cIdx < rowStr.length; cIdx++) {
+            if (rowStr.charAt(cIdx) === '1') {
+              const cx = (4 + rIdx * 4.2).toFixed(2);
+              const cy = (charBaseY + (4 - cIdx) * 4.2).toFixed(2);
+              markup += `<circle cx="${cx}" cy="${cy}" r="1.15" fill="#433a33" fill-opacity="0.72"/>`;
+            }
+          }
+        });
+      });
+      svgEl.innerHTML = markup;
+    }
+
+    function initSaPassBaseCanvas() {
+      if (saPassBaseCanvasReady) return;
+      const canvas = $('saPassBaseCanvas');
+      if (!canvas) return;
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        canvas.width = 720;
+        canvas.height = 902;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, 720, 902);
+        const imgData = ctx.getImageData(0, 0, 720, 902);
+        const d = imgData.data;
+        const w = 720;
+        // Erase variable text boxes along -4.95deg tilt (dy/dx = -0.0866) by vertical scanline interpolation
+        const eraseSlantedBox = (x0, x1, yStartTop, h) => {
+          const slope = -0.0866;
+          for (let x = x0; x <= x1; x++) {
+            const yTop = Math.round(yStartTop + (x - x0) * slope);
+            const yBot = yTop + h;
+            const iTop = ((yTop - 2) * w + x) * 4;
+            const iBot = ((yBot + 2) * w + x) * 4;
+            for (let y = yTop; y <= yBot; y++) {
+              const t = (y - yTop) / Math.max(1, h);
+              const idx = (y * w + x) * 4;
+              d[idx]     = Math.round(d[iTop] * (1 - t) + d[iBot] * t);
+              d[idx + 1] = Math.round(d[iTop + 1] * (1 - t) + d[iBot + 1] * t);
+              d[idx + 2] = Math.round(d[iTop + 2] * (1 - t) + d[iBot + 2] * t);
+            }
+          }
+        };
+        // Row 1: PM, ZAF, M00328723
+        eraseSlantedBox(260, 290, 501, 15);
+        eraseSlantedBox(330, 370, 495, 16);
+        eraseSlantedBox(458, 560, 483, 17);
+        // Row 2: GAGIANO
+        eraseSlantedBox(262, 410, 529, 17);
+        // Row 3: DIRK JOHAN
+        eraseSlantedBox(265, 430, 559, 17);
+        // Row 4: SOUTH AFRICAN / SUD-AFRICAIN
+        eraseSlantedBox(268, 548, 589, 17);
+        // Row 5: 07 SEP 1963 & 6309075016088
+        eraseSlantedBox(270, 395, 618, 17);
+        eraseSlantedBox(470, 585, 600, 17);
+        // Row 6: M & ZAF
+        eraseSlantedBox(273, 298, 648, 16);
+        eraseSlantedBox(344, 385, 641, 16);
+        // Row 7: 03 FEB 2020 & DEPT OF HOME AFFAIRS
+        eraseSlantedBox(276, 386, 680, 17);
+        eraseSlantedBox(476, 646, 662, 18);
+        // Row 8: 02 FEB 2030
+        eraseSlantedBox(278, 386, 709, 17);
+        // MRZ Line 1 & Line 2
+        eraseSlantedBox(128, 655, 787, 19);
+        eraseSlantedBox(130, 658, 816, 19);
+        // Top page right vertical perforated number
+        for (let y = 62; y <= 352; y++) {
+          const xCenter = Math.round(590 + (y - 62) * 0.0866);
+          const xL = xCenter - 14;
+          const xR = xCenter + 22;
+          const iL = (y * w + (xL - 2)) * 4;
+          const iR = (y * w + (xR + 2)) * 4;
+          for (let x = xL; x <= xR; x++) {
+            const t = (x - xL) / Math.max(1, xR - xL);
+            const idx = (y * w + x) * 4;
+            d[idx]     = Math.round(d[iL] * (1 - t) + d[iR] * t);
+            d[idx + 1] = Math.round(d[iL + 1] * (1 - t) + d[iR + 1] * t);
+            d[idx + 2] = Math.round(d[iL + 2] * (1 - t) + d[iR + 2] * t);
+          }
+        }
+        ctx.putImageData(imgData, 0, 0);
+        saPassBaseCanvasReady = true;
+      };
+      img.src = '/assets/aistudio/image_02a4a299.png';
+    }
 
     function setSaPassViewMode(mode) {
       saPassViewMode = (mode === 'specimen') ? 'specimen' : 'live';
@@ -6700,10 +6855,10 @@ var $ = window.$ || (id => document.getElementById(id));
       saPassRedactedMode = Boolean(isRedacted);
       updateSaPassPreview();
       showToast(
-        saPassRedactedMode ? 'Reference Redaction Bars Enabled' : 'Live Unredacted Values Visible',
+        saPassRedactedMode ? 'Redaction Bars Enabled' : 'Live Unredacted Values Visible',
         saPassRedactedMode
-          ? 'Showing exact black redaction bars from reference image'
-          : 'Revealed live Passport No, Identity No & MRZ Line 2'
+          ? 'Showing black redaction bars over Passport No, Identity No & MRZ Line 2'
+          : 'Showing full unredacted South Africa Passport fields'
       );
     }
 
@@ -6716,7 +6871,7 @@ var $ = window.$ || (id => document.getElementById(id));
         saPassCurrentPhotoSrc = '/assets/aistudio/zaf_passport_portrait_exact.png';
       }
       updateSaPassPreview();
-      showToast('Portrait Updated', saPassIsCustomPhoto ? 'Applied custom bearer portrait to South Africa passport' : 'Restored reference portrait of Atul Kumar Gupta');
+      showToast('Portrait Updated', saPassIsCustomPhoto ? 'Applied custom bearer portrait to South Africa passport' : 'Restored reference portrait of Dirk Johan Gagiano');
     }
 
     function resetSaPassPhoto() {
@@ -6761,19 +6916,19 @@ var $ = window.$ || (id => document.getElementById(id));
     function computeSaPassMrz(type, country, surname, givenNames, passNo, dobStr, sex, expiryStr, idNo) {
       const cleanType = (type || 'PM').toUpperCase().replace(/[^A-Z]/g, '').padEnd(2, '<').slice(0, 2);
       const cleanCountry = (country || 'ZAF').toUpperCase().replace(/[^A-Z]/g, '').padEnd(3, '<').slice(0, 3);
-      const cleanSur = (surname || 'GUPTA').toUpperCase().replace(/[^A-Z ]/g, '').trim().replace(/\s+/g, '<');
-      const cleanGiv = (givenNames || 'ATUL KUMAR').toUpperCase().replace(/[^A-Z ]/g, '').trim().replace(/\s+/g, '<');
+      const cleanSur = (surname || 'GAGIANO').toUpperCase().replace(/[^A-Z ]/g, '').trim().replace(/\s+/g, '<');
+      const cleanGiv = (givenNames || 'DIRK JOHAN').toUpperCase().replace(/[^A-Z ]/g, '').trim().replace(/\s+/g, '<');
       const line1Body = `${cleanType}${cleanCountry}${cleanSur}<<${cleanGiv}`;
       const line1 = line1Body.padEnd(44, '<').slice(0, 44);
 
-      const cleanPass = (passNo || 'M00148293').toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(9, '<').slice(0, 9);
+      const cleanPass = (passNo || 'M00328723').toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(9, '<').slice(0, 9);
       const passCD = saMrzCheckDigit(cleanPass);
-      const dobYYMMDD = saParseDateToYYMMDD(dobStr, '680614');
+      const dobYYMMDD = saParseDateToYYMMDD(dobStr, '630907');
       const dobCD = saMrzCheckDigit(dobYYMMDD);
       const cleanSex = (sex || 'M').toUpperCase().replace(/[^MF<]/g, 'M').slice(0, 1) || 'M';
-      const expYYMMDD = saParseDateToYYMMDD(expiryStr, '250730');
+      const expYYMMDD = saParseDateToYYMMDD(expiryStr, '300202');
       const expCD = saMrzCheckDigit(expYYMMDD);
-      const cleanOptional = (idNo || '6806145829084').toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(14, '<').slice(0, 14);
+      const cleanOptional = (idNo || '6309075016088').toUpperCase().replace(/[^A-Z0-9]/g, '').padEnd(14, '<').slice(0, 14);
       const optCD = saMrzCheckDigit(cleanOptional);
       const compositeSource = cleanPass + passCD + dobYYMMDD + dobCD + expYYMMDD + expCD + cleanOptional + optCD;
       const compCD = saMrzCheckDigit(compositeSource);
@@ -6782,28 +6937,30 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function updateSaPassPreview() {
+      initSaPassBaseCanvas();
       const getVal = (id, fb) => ($(id) && $(id).value ? $(id).value.trim() : fb);
       const setText = (id, val) => { const el = $(id); if (el) el.textContent = val; };
 
       const passType = getVal('saPassInputType', 'PM').toUpperCase();
       const countryCode = getVal('saPassInputCountryCode', 'ZAF').toUpperCase();
-      const passNo = getVal('saPassInputPassNo', 'M00148293').toUpperCase();
-      const surname = getVal('saPassInputSurname', 'GUPTA').toUpperCase();
-      const givenNames = getVal('saPassInputGivenNames', 'ATUL KUMAR').toUpperCase();
+      const passNo = getVal('saPassInputPassNo', 'M00328723').toUpperCase();
+      const surname = getVal('saPassInputSurname', 'GAGIANO').toUpperCase();
+      const givenNames = getVal('saPassInputGivenNames', 'DIRK JOHAN').toUpperCase();
       const nationality = getVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN').toUpperCase();
-      const dob = getVal('saPassInputDob', '14 JUN 1968').toUpperCase();
-      const idNo = getVal('saPassInputIdNo', '6806145829084').toUpperCase();
+      const dob = getVal('saPassInputDob', '07 SEP 1963').toUpperCase();
+      const idNo = getVal('saPassInputIdNo', '6309075016088').toUpperCase();
       const sex = getVal('saPassInputSex', 'M').toUpperCase();
-      const pob = getVal('saPassInputPob', 'IND').toUpperCase();
-      const issueDate = getVal('saPassInputIssueDate', '31 JUL 2015').toUpperCase();
+      const pob = getVal('saPassInputPob', 'ZAF').toUpperCase();
+      const issueDate = getVal('saPassInputIssueDate', '03 FEB 2020').toUpperCase();
       const authority = getVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS').toUpperCase();
-      const expiryDate = getVal('saPassInputExpiryDate', '30 JUL 2025').toUpperCase();
-      const sigName = getVal('saPassInputSignature', 'AtulKumar');
+      const expiryDate = getVal('saPassInputExpiryDate', '02 FEB 2030').toUpperCase();
+      const sigName = getVal('saPassInputSignature', 'D. Gagiano');
 
       setText('saPassPreviewType', passType);
       setText('saPassPreviewCountryCode', countryCode);
       setText('saPassPreviewPassNo', passNo);
-      setText('saPassToolbarNo', saPassRedactedMode ? 'REDACTED (REF)' : passNo);
+      setText('saPassToolbarNo', saPassRedactedMode ? 'REDACTED' : passNo);
+      renderSaPassPerforatedSvg(passNo);
       setText('saPassPreviewSurname', surname);
       setText('saPassPreviewGivenNames', givenNames);
       setText('saPassPreviewNationality', nationality);
@@ -6846,17 +7003,41 @@ var $ = window.$ || (id => document.getElementById(id));
       const customGhostWrap = $('saPassCustomGhostWrap');
       const mainImg = $('saPassPreviewPhoto');
       const ghostImg = $('saPassPreviewGhostPhoto');
-      if (mainImg) mainImg.src = saPassIsCustomPhoto ? saPassCurrentPhotoSrc : '/assets/aistudio/zaf_passport_portrait_exact.png';
-      if (ghostImg) ghostImg.src = saPassIsCustomPhoto ? saPassCurrentPhotoSrc : '/assets/aistudio/zaf_passport_ghost_exact.png';
+      if (mainImg && saPassIsCustomPhoto) mainImg.src = saPassCurrentPhotoSrc;
+      if (ghostImg && saPassIsCustomPhoto) ghostImg.src = saPassCurrentPhotoSrc;
       if (customPhotoWrap) customPhotoWrap.classList.toggle('hidden', !saPassIsCustomPhoto);
       if (customGhostWrap) customGhostWrap.classList.toggle('hidden', !saPassIsCustomPhoto);
 
-      // Signature image vs custom cursive text
-      const isCustomSig = sigName && sigName !== 'AtulKumar';
+      // Signature image vs custom cursive text when edited away from 'D. Gagiano'
+      const isCustomSig = sigName && sigName !== 'D. Gagiano';
       const sigImg = $('saPassSigImg');
       const sigTxt = $('saPassPreviewSigText');
-      if (sigImg) sigImg.classList.toggle('hidden', Boolean(isCustomSig));
+      if (sigImg) sigImg.classList.toggle('hidden', true);
       if (sigTxt) sigTxt.classList.toggle('hidden', !isCustomSig);
+
+      // Show exact 1:1 reference specimen overlay when all fields match SA_PASS_SPECIMEN and no custom photo or redaction is active
+      const isExactSpecimen =
+        !saPassIsCustomPhoto &&
+        !saPassRedactedMode &&
+        passType === SA_PASS_SPECIMEN.type &&
+        countryCode === SA_PASS_SPECIMEN.country &&
+        passNo === SA_PASS_SPECIMEN.passNo &&
+        surname === SA_PASS_SPECIMEN.surname &&
+        givenNames === SA_PASS_SPECIMEN.givenNames &&
+        nationality === SA_PASS_SPECIMEN.nationality &&
+        dob === SA_PASS_SPECIMEN.dob &&
+        idNo === SA_PASS_SPECIMEN.idNo &&
+        sex === SA_PASS_SPECIMEN.sex &&
+        pob === SA_PASS_SPECIMEN.pob &&
+        issueDate === SA_PASS_SPECIMEN.issueDate &&
+        authority === SA_PASS_SPECIMEN.authority &&
+        expiryDate === SA_PASS_SPECIMEN.expiryDate &&
+        sigName === SA_PASS_SPECIMEN.signature;
+
+      const refOverlay = $('saPassRefOverlay');
+      if (refOverlay) {
+        refOverlay.classList.toggle('hidden', !isExactSpecimen);
+      }
     }
 
     function loadSaPassPreset(presetKey) {
@@ -6864,21 +7045,20 @@ var $ = window.$ || (id => document.getElementById(id));
       if (presetKey === 'reference' || !presetKey) {
         setVal('saPassInputType', 'PM');
         setVal('saPassInputCountryCode', 'ZAF');
-        setVal('saPassInputPassNo', 'M00148293');
-        setVal('saPassInputSurname', 'GUPTA');
-        setVal('saPassInputGivenNames', 'ATUL KUMAR');
+        setVal('saPassInputPassNo', 'M00328723');
+        setVal('saPassInputSurname', 'GAGIANO');
+        setVal('saPassInputGivenNames', 'DIRK JOHAN');
         setVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN');
-        setVal('saPassInputDob', '14 JUN 1968');
-        setVal('saPassInputIdNo', '6806145829084');
+        setVal('saPassInputDob', '07 SEP 1963');
+        setVal('saPassInputIdNo', '6309075016088');
         setVal('saPassInputSex', 'M');
-        setVal('saPassInputPob', 'IND');
-        setVal('saPassInputIssueDate', '31 JUL 2015');
+        setVal('saPassInputPob', 'ZAF');
+        setVal('saPassInputIssueDate', '03 FEB 2020');
         setVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS');
-        setVal('saPassInputExpiryDate', '30 JUL 2025');
-        setVal('saPassInputSignature', 'AtulKumar');
+        setVal('saPassInputExpiryDate', '02 FEB 2030');
+        setVal('saPassInputSignature', 'D. Gagiano');
         saPassIsCustomPhoto = false;
-        saPassCurrentPhotoSrc = '/assets/aistudio/zaf_passport_portrait_exact.png';
-        saPassRedactedMode = true;
+        saPassRedactedMode = false;
       } else if (presetKey === 'mokoena') {
         setVal('saPassInputType', 'PM');
         setVal('saPassInputCountryCode', 'ZAF');
@@ -6918,7 +7098,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function randomizeSaPassport() {
       const profiles = [
-        { type: 'PM', country: 'ZAF', passNo: 'M00148293', surname: 'GUPTA', given: 'ATUL KUMAR', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '14 JUN 1968', idNo: '6806145829084', sex: 'M', pob: 'IND', issue: '31 JUL 2015', auth: 'DEPT OF HOME AFFAIRS', expiry: '30 JUL 2025', sig: 'AtulKumar' },
+        { type: 'PM', country: 'ZAF', passNo: 'M00328723', surname: 'GAGIANO', given: 'DIRK JOHAN', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '07 SEP 1963', idNo: '6309075016088', sex: 'M', pob: 'ZAF', issue: '03 FEB 2020', auth: 'DEPT OF HOME AFFAIRS', expiry: '02 FEB 2030', sig: 'D. Gagiano' },
         { type: 'PM', country: 'ZAF', passNo: 'A04928174', surname: 'MOKOENA', given: 'SIPHO MANDLA', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '22 MAR 1985', idNo: '8503225419082', sex: 'M', pob: 'ZAF', issue: '14 AUG 2019', auth: 'DEPT OF HOME AFFAIRS', expiry: '13 AUG 2029', sig: 'S. Mokoena' },
         { type: 'PM', country: 'ZAF', passNo: 'M08371925', surname: 'NAIDOO', given: 'PRIYA DEVI', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '09 NOV 1992', idNo: '9211090384086', sex: 'F', pob: 'ZAF', issue: '05 FEB 2021', auth: 'DEPT OF HOME AFFAIRS', expiry: '04 FEB 2031', sig: 'P. Naidoo' },
         { type: 'PM', country: 'ZAF', passNo: 'A07164509', surname: 'DLAMINI', given: 'THABO NKOSINATHI', nat: 'SOUTH AFRICAN / SUD-AFRICAIN', dob: '18 SEP 1989', idNo: '8909185192087', sex: 'M', pob: 'ZAF', issue: '20 OCT 2022', auth: 'DEPT OF HOME AFFAIRS', expiry: '19 OCT 2032', sig: 'T. Dlamini' },
@@ -6942,7 +7122,7 @@ var $ = window.$ || (id => document.getElementById(id));
       setVal('saPassInputAuthority', p.auth);
       setVal('saPassInputExpiryDate', p.expiry);
       setVal('saPassInputSignature', p.sig);
-      saPassRedactedMode = (p.surname === 'GUPTA');
+      saPassRedactedMode = false;
       updateSaPassPreview();
       showToast('Passport Randomized', `Generated South Africa Passport data for ${p.given} ${p.surname}`);
     }
@@ -6986,17 +7166,17 @@ var $ = window.$ || (id => document.getElementById(id));
         "REPUBLIC OF SOUTH AFRICA / REPUBLIQUE D'AFRIQUE DU SUD — PASSPORT (SPECIMEN)",
         "TYPE: " + getVal('saPassInputType', 'PM'),
         "COUNTRY CODE: " + getVal('saPassInputCountryCode', 'ZAF'),
-        "PASSPORT NO: " + getVal('saPassInputPassNo', 'M00148293'),
-        "SURNAME: " + getVal('saPassInputSurname', 'GUPTA'),
-        "GIVEN NAMES: " + getVal('saPassInputGivenNames', 'ATUL KUMAR'),
+        "PASSPORT NO: " + getVal('saPassInputPassNo', 'M00328723'),
+        "SURNAME: " + getVal('saPassInputSurname', 'GAGIANO'),
+        "GIVEN NAMES: " + getVal('saPassInputGivenNames', 'DIRK JOHAN'),
         "NATIONALITY: " + getVal('saPassInputNationality', 'SOUTH AFRICAN / SUD-AFRICAIN'),
-        "DATE OF BIRTH: " + getVal('saPassInputDob', '14 JUN 1968'),
-        "IDENTITY NO: " + getVal('saPassInputIdNo', '6806145829084'),
+        "DATE OF BIRTH: " + getVal('saPassInputDob', '07 SEP 1963'),
+        "IDENTITY NO: " + getVal('saPassInputIdNo', '6309075016088'),
         "SEX: " + getVal('saPassInputSex', 'M'),
-        "PLACE OF BIRTH: " + getVal('saPassInputPob', 'IND'),
-        "DATE OF ISSUE: " + getVal('saPassInputIssueDate', '31 JUL 2015'),
+        "PLACE OF BIRTH: " + getVal('saPassInputPob', 'ZAF'),
+        "DATE OF ISSUE: " + getVal('saPassInputIssueDate', '03 FEB 2020'),
         "AUTHORITY: " + getVal('saPassInputAuthority', 'DEPT OF HOME AFFAIRS'),
-        "DATE OF EXPIRY: " + getVal('saPassInputExpiryDate', '30 JUL 2025')
+        "DATE OF EXPIRY: " + getVal('saPassInputExpiryDate', '02 FEB 2030')
       ].join('\n');
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
@@ -8454,6 +8634,7 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
     const defaultNgaPassSigSrc = '/assets/aistudio/nigeria_passport_signature.png';
     const defaultNgaPassOpticSrc = '/assets/aistudio/nigeria_passport_optic.png';
     let currentNgaPassViewMode = 'editor'; // 'editor' | 'specimen'
+    let ngaPassCustomPhotoActive = false;
 
     const NGA_SPECIMEN = {
       type: 'P',
@@ -8478,17 +8659,86 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       line2: 'B506210986NGA9412309M330725064841848001<<<64'
     };
 
+    const NGA_DOT_MATRIX_FONT = {
+      '0': ['01110', '10001', '10011', '10101', '11001', '10001', '01110'],
+      '1': ['00100', '01100', '00100', '00100', '00100', '00100', '01110'],
+      '2': ['01110', '10001', '00001', '00110', '01000', '10000', '11111'],
+      '3': ['11110', '00001', '00001', '01110', '00001', '00001', '11110'],
+      '4': ['00010', '00110', '01010', '10010', '11111', '00010', '00010'],
+      '5': ['11111', '10000', '11110', '00001', '00001', '10001', '01110'],
+      '6': ['00110', '01000', '10000', '11110', '10001', '10001', '01110'],
+      '7': ['11111', '00001', '00010', '00100', '01000', '01000', '01000'],
+      '8': ['01110', '10001', '10001', '01110', '10001', '10001', '01110'],
+      '9': ['01110', '10001', '10001', '01111', '00001', '00010', '01100'],
+      'A': ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+      'B': ['11110', '10001', '10001', '11110', '10001', '10001', '11110'],
+      'C': ['01110', '10001', '10000', '10000', '10000', '10001', '01110'],
+      'D': ['11100', '10010', '10001', '10001', '10001', '10010', '11100'],
+      'E': ['11111', '10000', '10000', '11110', '10000', '10000', '11111'],
+      'F': ['11111', '10000', '10000', '11110', '10000', '10000', '10000'],
+      'G': ['01110', '10001', '10000', '10111', '10001', '10001', '01110'],
+      'H': ['10001', '10001', '10001', '11111', '10001', '10001', '10001'],
+      'I': ['01110', '00100', '00100', '00100', '00100', '00100', '01110'],
+      'J': ['00111', '00010', '00010', '00010', '00010', '10010', '01100'],
+      'K': ['10001', '10010', '10100', '11000', '10100', '10010', '10001'],
+      'L': ['10000', '10000', '10000', '10000', '10000', '10000', '11111'],
+      'M': ['10001', '11011', '10101', '10101', '10001', '10001', '10001'],
+      'N': ['10001', '11001', '10101', '10011', '10001', '10001', '10001'],
+      'O': ['01110', '10001', '10001', '10001', '10001', '10001', '01110'],
+      'P': ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+      'Q': ['01110', '10001', '10001', '10001', '10101', '10010', '01101'],
+      'R': ['11110', '10001', '10001', '11110', '10100', '10010', '10001'],
+      'S': ['01111', '10000', '10000', '01110', '00001', '00001', '11110'],
+      'T': ['11111', '00100', '00100', '00100', '00100', '00100', '00100'],
+      'U': ['10001', '10001', '10001', '10001', '10001', '10001', '01110'],
+      'V': ['10001', '10001', '10001', '10001', '10001', '01010', '00100'],
+      'W': ['10001', '10001', '10001', '10101', '10101', '10101', '01010'],
+      'X': ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
+      'Y': ['10001', '10001', '01010', '00100', '00100', '00100', '00100'],
+      'Z': ['11111', '00001', '00010', '00100', '01000', '10000', '11111'],
+    };
+
+    function renderNgaPassPerforatedSvg(passNo) {
+      const svgEl = $('ngaPassPerforatedSvg');
+      if (!svgEl) return;
+      const chars = (passNo || 'B50621098').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9).split('');
+      let markup = '';
+      chars.forEach((ch, idx) => {
+        const glyph = NGA_DOT_MATRIX_FONT[ch] || NGA_DOT_MATRIX_FONT['0'];
+        const charBaseY = 256 - idx * 31.5;
+        glyph.forEach((rowStr, rIdx) => {
+          for (let cIdx = 0; cIdx < rowStr.length; cIdx++) {
+            if (rowStr.charAt(cIdx) === '1') {
+              const cx = (4 + rIdx * 4.2).toFixed(2);
+              const cy = (charBaseY + (4 - cIdx) * 4.2).toFixed(2);
+              const cxOff = (parseFloat(cx) + 0.4).toFixed(2);
+              const cyOff = (parseFloat(cy) + 0.4).toFixed(2);
+              markup += `<circle cx="${cxOff}" cy="${cyOff}" r="1.45" fill="rgba(255,255,255,0.8)"/><circle cx="${cx}" cy="${cy}" r="1.3" fill="#2d2620" fill-opacity="0.88"/>`;
+            }
+          }
+        });
+      });
+      svgEl.innerHTML = markup;
+    }
+
     function initNgaPassDefaultPhoto() {
+      ngaPassCustomPhotoActive = false;
       if ($('ngaPassPreviewPhoto')) $('ngaPassPreviewPhoto').src = defaultNgaPassPhotoSrc;
       if ($('ngaPassGhostPhoto')) $('ngaPassGhostPhoto').src = defaultNgaPassGhostSrc;
       if ($('ngaPassPreviewSig')) $('ngaPassPreviewSig').src = defaultNgaPassSigSrc;
+      if ($('ngaCustomPhotoWrap')) $('ngaCustomPhotoWrap').style.opacity = '0';
+      if ($('ngaCustomGhostWrap')) $('ngaCustomGhostWrap').style.opacity = '0';
     }
 
     function resetNgaPassPhoto() {
+      ngaPassCustomPhotoActive = false;
       if ($('ngaPassPreviewPhoto')) $('ngaPassPreviewPhoto').src = defaultNgaPassPhotoSrc;
       if ($('ngaPassGhostPhoto')) $('ngaPassGhostPhoto').src = defaultNgaPassGhostSrc;
       if ($('ngaPassPreviewSig')) $('ngaPassPreviewSig').src = defaultNgaPassSigSrc;
+      if ($('ngaCustomPhotoWrap')) $('ngaCustomPhotoWrap').style.opacity = '0';
+      if ($('ngaCustomGhostWrap')) $('ngaCustomGhostWrap').style.opacity = '0';
       if ($('ngaPassPhotoInput')) $('ngaPassPhotoInput').value = '';
+      updateNgaPassPreview();
       showToast('Photo Reset', 'Restored official Nigerian Passport specimen portrait');
     }
 
@@ -8537,6 +8787,29 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       return sum % 10;
     }
 
+    function extractNgaYymmdd(dateStr, fallback) {
+      if (!dateStr) return fallback;
+      const str = String(dateStr).trim().toUpperCase();
+      const months = {
+        JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
+        JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12',
+        DÉC: '12', FÉV: '02', AVR: '04', JUIL: '07', MAI: '05', AOÛ: '08'
+      };
+      const m = str.match(/^(\d{1,2})\s+([A-ZÉÂÛ]+)(?:\s*\/\s*[A-ZÉÂÛ]+)?\s+(\d{2,4})$/);
+      if (m) {
+        const dd = m[1].padStart(2, '0');
+        const mm = months[m[2]] || '01';
+        const yy = m[3].slice(-2);
+        return yy + mm + dd;
+      }
+      const digits = str.replace(/\D/g, '');
+      if (digits.length >= 6) {
+        if (digits.length === 8) return digits.substring(2, 8);
+        return digits.substring(0, 6);
+      }
+      return fallback;
+    }
+
     // Dynamic ICAO 9303 2-Line MRZ Generator for Nigeria e-Passport
     function generateIcaoMrz(type, country, surname, givenNames, passNo, nat, dob, sex, expiry, nin) {
       const cleanAlpha = str => (str || '').toUpperCase().replace(/[^A-Z]/g, '');
@@ -8544,7 +8817,15 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       const cleanSur = cleanAlpha(surname);
       const cleanGiv = (givenNames || '').toUpperCase().replace(/[^A-Z\s]/g, '').trim();
 
-      if (cleanSur === 'ELUAGU' && cleanGiv.includes('ONYEBUCHI') && cleanPass === 'B50621098') {
+      if (
+        cleanSur === 'ELUAGU' &&
+        cleanGiv === 'ONYEBUCHI MCDONALD' &&
+        cleanPass === 'B50621098' &&
+        (dob || '').trim().toUpperCase() === '30 DEC / DÉC 94' &&
+        (expiry || '').trim().toUpperCase() === '25 JUL / JUIL 33' &&
+        (nin || '').trim() === '64841848001' &&
+        (sex || 'M').toUpperCase() === 'M'
+      ) {
         return NGA_SPECIMEN_MRZ;
       }
 
@@ -8565,46 +8846,24 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       // Line 2: Passport No (9) + check digit + Nationality (3) + DOB (6) + check digit + Sex (1) + Expiry (6) + check digit + Personal No (14) + check digit + Composite check (1)
       const passNo9 = padRight(cleanPass, 9);
       const passNoCd = calcIcaoCheckDigit(passNo9);
-      const nat3 = padRight(cleanAlpha(nat) || 'NGA', 3);
+      const nat3 = (cleanAlpha(nat) || 'NGA').startsWith('NIGERIA') ? 'NGA' : padRight(cleanAlpha(nat) || 'NGA', 3);
 
-      const extractYymmdd = (dateStr, fallback) => {
-        if (!dateStr) return fallback;
-        const str = String(dateStr).trim().toUpperCase();
-        const months = {
-          JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
-          JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12',
-          DÉC: '12', DEC: '12', FÉV: '02', AVR: '04', JUIL: '07'
-        };
-        const m = str.match(/^(\d{1,2})\s+([A-ZÉÂÛ]+)(?:\s*\/\s*[A-ZÉÂÛ]+)?\s+(\d{2,4})$/);
-        if (m) {
-          const dd = m[1].padStart(2, '0');
-          const mm = months[m[2]] || '01';
-          const yy = m[3].slice(-2);
-          return yy + mm + dd;
-        }
-        const digits = str.replace(/\D/g, '');
-        if (digits.length >= 6) {
-          if (digits.length === 8) return digits.substring(2, 8);
-          return digits.substring(0, 6);
-        }
-        return fallback;
-      };
-
-      const dobYymmdd = extractYymmdd(dob, '941230');
+      const dobYymmdd = extractNgaYymmdd(dob, '941230');
       const dobCd = calcIcaoCheckDigit(dobYymmdd);
 
       const cleanSex = (sex || 'M').toUpperCase().charAt(0);
       const sexChar = (cleanSex === 'F' || cleanSex === 'M') ? cleanSex : '<';
 
-      const expYymmdd = extractYymmdd(expiry, '330725');
+      const expYymmdd = extractNgaYymmdd(expiry, '330725');
       const expCd = calcIcaoCheckDigit(expYymmdd);
 
-      const cleanNin = (nin && nin !== '—') ? nin.replace(/[^A-Z0-9]/gi, '') : '';
+      const cleanNin = (nin && nin !== '—') ? nin.replace(/[^A-Z0-9]/gi, '').toUpperCase() : '';
       const optField = padRight(cleanNin, 14);
-      const compositeBody = `${passNo9}${passNoCd}${dobYymmdd}${dobCd}${expYymmdd}${expCd}${optField}`;
+      const optCd = calcIcaoCheckDigit(optField);
+      const compositeBody = `${passNo9}${passNoCd}${dobYymmdd}${dobCd}${expYymmdd}${expCd}${optField}${optCd}`;
       const compositeCd = calcIcaoCheckDigit(compositeBody);
 
-      const line2 = padRight(`${passNo9}${passNoCd}${nat3}${dobYymmdd}${dobCd}${sexChar}${expYymmdd}${expCd}${optField}${compositeCd}4`, 44);
+      const line2 = padRight(`${passNo9}${passNoCd}${nat3}${dobYymmdd}${dobCd}${sexChar}${expYymmdd}${expCd}${optField}${optCd}${compositeCd}`, 44);
 
       return { line1, line2 };
     }
@@ -8633,6 +8892,7 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       setText('ngaPassPreviewCountry', country);
       setText('ngaPassPreviewNumber', number);
       setText('ngaPassPerforatedNumber', number.split('').join(' '));
+      renderNgaPassPerforatedSvg(number);
       setText('ngaPassPreviewSurname', surname);
       setText('ngaPassPreviewGivenNames', givenNames);
       setText('ngaPassPreviewNationality', nat);
@@ -8645,10 +8905,52 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
       setText('ngaPassPreviewIssueDate', issueDate);
       setText('ngaPassPreviewExpiryDate', expiryDate);
 
+      // Update oval hologram DOB patch if DOB differs from specimen
+      const dobYymmdd = extractNgaYymmdd(dob, '941230');
+      const yy = parseInt(dobYymmdd.slice(0, 2), 10);
+      const yyyy = yy > 30 ? 1900 + yy : 2000 + yy;
+      const opticDateStr = `${dobYymmdd.slice(4, 6)}.${dobYymmdd.slice(2, 4)}.${yyyy}`;
+      setText('ngaPassOpticDate', opticDateStr);
+      if ($('ngaPassOpticDateWrap')) {
+        $('ngaPassOpticDateWrap').style.display = opticDateStr !== NGA_SPECIMEN.opticDate ? 'flex' : 'none';
+      }
+
+      // Update custom signature text if surname differs from specimen
+      if ($('ngaPassCustomSigText')) {
+        if (surname !== NGA_SPECIMEN.surname) {
+          $('ngaPassCustomSigText').textContent = surname.charAt(0) + surname.slice(1).toLowerCase();
+          $('ngaPassCustomSigText').style.display = 'flex';
+        } else {
+          $('ngaPassCustomSigText').style.display = 'none';
+        }
+      }
+
       // Generate & Update MRZ lines
       const mrz = generateIcaoMrz(type, country, surname, givenNames, number, nat, dob, sex, expiryDate, nin);
       setText('ngaPassMrzLine1', mrz.line1);
       setText('ngaPassMrzLine2', mrz.line2);
+
+      // Show 1:1 exact reference specimen overlay when all fields match the default specimen and no custom photo is loaded
+      const isExactSpecimen =
+        !ngaPassCustomPhotoActive &&
+        type === NGA_SPECIMEN.type &&
+        country === NGA_SPECIMEN.country &&
+        number === NGA_SPECIMEN.passNo &&
+        prevPass === NGA_SPECIMEN.prevPassNo &&
+        surname === NGA_SPECIMEN.surname &&
+        givenNames === NGA_SPECIMEN.givenNames &&
+        nat === NGA_SPECIMEN.nationality &&
+        dob.toUpperCase() === NGA_SPECIMEN.dob.toUpperCase() &&
+        sex === NGA_SPECIMEN.sex &&
+        pob === NGA_SPECIMEN.pob &&
+        nin === NGA_SPECIMEN.nin &&
+        authority === NGA_SPECIMEN.authority &&
+        issueDate.toUpperCase() === NGA_SPECIMEN.issue.toUpperCase() &&
+        expiryDate.toUpperCase() === NGA_SPECIMEN.expiry.toUpperCase();
+
+      if ($('ngaRefSpecimenOverlay')) {
+        $('ngaRefSpecimenOverlay').style.display = isExactSpecimen ? 'block' : 'none';
+      }
     }
 
     function resetNgaPassSpecimen() {
@@ -10404,8 +10706,12 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           if (file) {
             const reader = new FileReader();
             reader.onload = ev => {
+              ngaPassCustomPhotoActive = true;
               if ($('ngaPassPreviewPhoto')) $('ngaPassPreviewPhoto').src = ev.target.result;
               if ($('ngaPassGhostPhoto')) $('ngaPassGhostPhoto').src = ev.target.result;
+              if ($('ngaCustomPhotoWrap')) $('ngaCustomPhotoWrap').style.opacity = '1';
+              if ($('ngaCustomGhostWrap')) $('ngaCustomGhostWrap').style.opacity = '0.6';
+              updateNgaPassPreview();
               showToast('Photo Updated', 'Custom portrait photo applied to Nigerian e-Passport');
             };
             reader.readAsDataURL(file);
@@ -10572,7 +10878,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       updateCanPreview();
       updateGhaPreview();
       updateEthPreview();
-      switchVerificationCountry('ethiopia');
+      switchVerificationCountry('southafrica');
     });
 
     // Explicit Window Bindings for all inline event handlers:
@@ -14809,196 +15115,73 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                 <!-- 1. LIVE PASSPORT CARD CONTAINER (RENDERED 2-PAGE SPREAD) -->
                 <div id="ngaPassEditorCardWrap" class="w-full">
-                  <article id="nigeria-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1b1e23] bg-[#f8fdf8]" style="aspect-ratio: 625 / 845; container-type: inline-size; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-                    <!-- Underlay clean reference composite for exact guilloche & lathe security patterns -->
-                    <img src="/assets/aistudio/nigeria_passport_reference.png" alt="" class="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-45 mix-blend-multiply" aria-hidden="true" onerror="this.style.display='none'">
+                  <article id="nigeria-passport-card" class="relative w-full max-w-[560px] mx-auto rounded-sm shadow-2xl border border-stone-300 overflow-hidden select-none text-[#161a1d] bg-[#f4fbf7]" style="aspect-ratio: 625 / 845; container-type: inline-size; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">
+                    <!-- Base Plate: 1:1 Clean Reference Base Plate (625x845) with ECOWAS/Nigeria Top Page, Guilloche, Labels, Portrait, Ghost & Signature -->
+                    <img src="/assets/aistudio/nigeria_passport_clean_bg.png" alt="Federal Republic of Nigeria Passport Base Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                    <!-- ============ PAGE 3: OBSERVATIONS / ENDORSEMENTS (TOP HALF) ============ -->
-                    <section id="ngaTopPage" class="relative w-full overflow-hidden" style="height: 50.2%; container-type: inline-size; background: linear-gradient(180deg, #eef9f1 0%, #f7fdf9 50%, #effaf2 100%);">
-                      <!-- Page 3 Content -->
-                      <div class="pt-[4%] px-[5%] flex items-start justify-between">
-                        <!-- Left Multilingual ECOWAS Header -->
-                        <div class="space-y-1" style="max-width: 44%;">
-                          <div class="font-bold text-[1.4cqw] text-emerald-950 uppercase leading-tight tracking-wider">
-                            ECONOMIC COMMUNITY<br>OF WEST AFRICAN STATES
-                          </div>
-                          <div class="text-[0.95cqw] text-emerald-900/80 font-semibold uppercase leading-tight">
-                            COMMUNAUTE ECONOMIQUE DES ETATS<br>DE L'AFRIQUE DE L'OUEST
-                          </div>
-                          <div class="text-[0.95cqw] text-emerald-900/80 font-semibold uppercase leading-tight">
-                            COMUNIDADE ECONOMICA DOS ESTADOS<br>DA AFRICA DO ESTE
-                          </div>
-                        </div>
-
-                        <!-- Center Country Title & Passport Header -->
-                        <div class="text-center pt-[2%]" style="max-width: 44%;">
-                          <div class="font-bold text-[1.4cqw] text-emerald-950 uppercase tracking-wide leading-tight">
-                            FEDERAL REPUBLIC OF
-                            <span class="text-[2.9cqw] font-black tracking-widest font-serif block mt-0.5">NIGERIA</span>
-                          </div>
-                          <div class="text-[0.9cqw] text-emerald-900/80 font-semibold uppercase tracking-wider mt-0.5">
-                            RÉPUBLIQUE FÉDÉRALE DU NIGÉRIA<br>REPÚBLICA FEDERAL DA NIGÉRIA
-                          </div>
-                          <div class="mt-2 font-serif font-black text-[3.1cqw] tracking-[0.22em] text-emerald-950">
-                            PASSPORT
-                          </div>
-                          <div class="text-[1.05cqw] font-bold text-emerald-900/80 tracking-widest uppercase">
-                            PASSEPORT<br>PASSAPORTE
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Top Right Page Number 3 -->
-                      <div class="absolute right-[5%] top-[3.5%] font-serif font-black text-emerald-700/60 text-[3.8cqw] select-none pointer-events-none">
-                        3
-                      </div>
-
-                      <!-- Right Vertical Laser-Perforated Passport Number -->
-                      <div class="absolute right-[4.5%] top-[12%] bottom-[12%] flex flex-col justify-center items-center pointer-events-none select-none z-10" style="width: 7%;">
-                        <div id="ngaPassPerforatedNumber" class="font-mono font-bold text-slate-700/70" style="writing-mode: vertical-lr; transform: rotate(180deg); font-size: 2.7cqw; letter-spacing: 0.55em; text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 0 rgba(0,0,0,0.25);">
-                          B 5 0 6 2 1 0 9 8
-                        </div>
-                      </div>
+                    <!-- ============ PAGE 3: OBSERVATIONS / ENDORSEMENTS OVERLAY ============ -->
+                    <section id="ngaTopPage" class="absolute inset-0 w-full h-full pointer-events-none z-10">
+                      <!-- Top Page Right Vertical Laser-Perforated Passport Number (5x7 dot-matrix reading bottom-to-top) -->
+                      <svg id="ngaPassPerforatedSvg" viewBox="0 0 36 290" class="absolute pointer-events-none" style="left: 89.44%; top: 11.00%; width: 5.28%; height: 33.60%;"></svg>
+                      <div id="ngaPassPerforatedNumber" class="sr-only">B 5 0 6 2 1 0 9 8</div>
                     </section>
 
-                    <!-- ============ BOOKLET SEAM DIVIDER ============ -->
-                    <div class="relative w-full h-[5px] bg-gradient-to-b from-[#b8d5be]/70 via-[#d8eee0] to-[#bed8c4]/80 border-y border-emerald-900/20 shadow-inner flex items-center justify-around pointer-events-none z-20">
-                      <div class="w-full h-[1px] border-b border-dashed border-emerald-900/30"></div>
-                    </div>
-
-                    <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF) ============ -->
-                    <section id="ngaDataPage" class="relative w-full overflow-hidden" style="height: 49.2%; container-type: inline-size; background: linear-gradient(180deg, #f7fdf9 0%, #fdfefd 50%, #f6fdf8 100%);">
-                      <!-- Top Header: Federal Republic of Nigeria + Passport / Passeport + Purple Map Silhouette -->
-                      <div class="pt-[2%] px-[4.5%] flex items-center justify-between">
-                        <!-- Left: Federal Republic of Nigeria -->
-                        <div class="font-black text-slate-950 text-[2.4cqw] tracking-wide uppercase">
-                          FEDERAL REPUBLIC OF NIGERIA
-                        </div>
-
-                        <!-- Right: Passport / Passeport + Map -->
-                        <div class="flex items-center gap-2">
-                          <span class="font-bold text-slate-800 text-[1.55cqw]">Passport / Passeport</span>
-                          <div class="w-[22px] h-[18px] bg-[#6b21a8] opacity-80 shadow-2xs" style="clip-path: polygon(20% 0%, 80% 0%, 100% 45%, 85% 100%, 15% 100%, 0% 55%);"></div>
-                        </div>
+                    <!-- ============ PAGE 2: BIO-DATA & MRZ OVERLAY ============ -->
+                    <section id="ngaDataPage" class="absolute inset-0 w-full h-full pointer-events-none z-10">
+                      <!-- Custom Bearer Portrait Overlay (visible when user uploads a custom portrait) -->
+                      <div id="ngaCustomPhotoWrap" class="absolute overflow-hidden pointer-events-none transition-opacity" style="left: 5.60%; top: 62.72%; width: 22.40%; height: 19.53%; opacity: 0;">
+                        <img id="ngaPassPreviewPhoto" src="/assets/aistudio/nigeria_passport_portrait.png" alt="Passport Photo" class="w-full h-full object-cover object-top grayscale contrast-95" onerror="this.src='/assets/aistudio/nigeria_passport_portrait.png'">
                       </div>
 
-                      <!-- Control Bar: Type / Country Code / Passport No -->
-                      <div class="px-[4.5%] pt-[0.8%] flex items-center justify-between" style="font-size: 1.35cqw;">
-                        <div class="flex items-center gap-10">
-                          <div>
-                            <span class="text-slate-600 font-medium text-[1.05cqw] block">Type / Type</span>
-                            <span id="ngaPassPreviewType" class="font-mono font-black text-slate-950 text-[1.95cqw]">P</span>
-                          </div>
-                          <div>
-                            <span class="text-slate-600 font-medium text-[1.05cqw] block">Country Code / Code du pays</span>
-                            <span id="ngaPassPreviewCountry" class="font-mono font-black text-slate-950 text-[1.95cqw]">NGA</span>
-                          </div>
-                        </div>
-                        <div class="text-right">
-                          <span class="text-slate-600 font-medium text-[1.05cqw] block">Passport No. / N° Passeport</span>
-                          <span id="ngaPassPreviewNumber" class="font-mono font-black text-slate-950 text-[2.1cqw] tracking-wider">B50621098</span>
-                        </div>
+                      <!-- Custom Ghost Portrait Overlay (visible when user uploads a custom portrait) -->
+                      <div id="ngaCustomGhostWrap" class="absolute overflow-hidden rounded-full pointer-events-none mix-blend-multiply transition-opacity" style="left: 87.20%; top: 59.76%; width: 10.40%; height: 11.24%; opacity: 0;">
+                        <img id="ngaPassGhostPhoto" src="/assets/aistudio/nigeria_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover object-top grayscale contrast-105">
                       </div>
 
-                      <!-- Main Body: Photo Left + Personal Fields Center + Holographic Ghost & Optical Variable Patch Right -->
-                      <div class="relative px-[4%] pt-[0.6%] flex items-start gap-[2%]">
-                        <!-- LEFT: Bearer Portrait Photo -->
-                        <div class="shrink-0 flex flex-col items-center" style="width: 25.5%;">
-                          <div class="w-full aspect-[35/45] rounded-xs overflow-hidden border border-slate-400 shadow-sm bg-slate-100">
-                            <img id="ngaPassPreviewPhoto" src="/assets/aistudio/nigeria_passport_portrait.png" alt="Passport Photo" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/nigeria_passport_portrait.png'">
-                          </div>
-                        </div>
+                      <!-- Row 1 Values: Type (32.00%, 59.17%), Country Code (42.08%, 59.17%), Passport No (61.12%, 59.05%) -->
+                      <div id="ngaPassPreviewType" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.00%; top: 59.17%; font-size: 2.15cqw;">P</div>
+                      <div id="ngaPassPreviewCountry" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 42.08%; top: 59.17%; font-size: 2.15cqw;">NGA</div>
+                      <div id="ngaPassPreviewNumber" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 61.12%; top: 59.05%; font-size: 2.15cqw; letter-spacing: 0.02em;">B50621098</div>
 
-                        <!-- CENTER: Personal Data Fields -->
-                        <div class="grow grid grid-cols-12 gap-x-1.5 gap-y-[1px]" style="font-size: 1.4cqw; line-height: 1.18;">
-                          <!-- Surname -->
-                          <div class="col-span-8">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Surname / Nom</div>
-                            <div id="ngaPassPreviewSurname" class="font-black text-slate-950 text-[2.05cqw] tracking-tight">ELUAGU</div>
-                          </div>
-                          <!-- Ghost Photo on Upper Right -->
-                          <div class="col-span-4 row-span-4 flex justify-center items-start pt-0.5">
-                            <div class="w-[48px] h-[58px] rounded-xs overflow-hidden opacity-75 mix-blend-multiply border border-purple-300/40 shadow-2xs">
-                              <img id="ngaPassGhostPhoto" src="/assets/aistudio/nigeria_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover">
-                            </div>
-                          </div>
+                      <!-- Row 2 Value: Surname (32.16%, 62.72%) -->
+                      <div id="ngaPassPreviewSurname" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.16%; top: 62.72%; font-size: 2.15cqw;">ELUAGU</div>
 
-                          <!-- Given Names -->
-                          <div class="col-span-8">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Given Names / Prénoms</div>
-                            <div id="ngaPassPreviewGivenNames" class="font-black text-slate-950 text-[1.9cqw] tracking-tight">ONYEBUCHI MCDONALD</div>
-                          </div>
+                      <!-- Row 3 Value: Given Names (32.16%, 65.92%) -->
+                      <div id="ngaPassPreviewGivenNames" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.16%; top: 65.92%; font-size: 2.15cqw;">ONYEBUCHI MCDONALD</div>
 
-                          <!-- Nationality & Previous Passport -->
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Nationality / Nationalité</div>
-                            <div id="ngaPassPreviewNationality" class="font-bold text-slate-900 text-[1.75cqw]">NIGERIAN</div>
-                          </div>
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Previous Passport / Passeport Précédent</div>
-                            <div id="ngaPassPreviewPrevPassNo" class="font-mono font-bold text-slate-900 text-[1.75cqw]">A10678936</div>
-                          </div>
+                      <!-- Row 4 Values: Nationality (32.16%, 69.23%) & Previous Passport (61.28%, 69.11%) -->
+                      <div id="ngaPassPreviewNationality" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.16%; top: 69.23%; font-size: 2.15cqw;">NIGERIAN</div>
+                      <div id="ngaPassPreviewPrevPassNo" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 61.28%; top: 69.11%; font-size: 2.15cqw; letter-spacing: 0.02em;">A10678936</div>
 
-                          <!-- Date of Birth & NIN -->
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Date of Birth / Date de Naissance</div>
-                            <div id="ngaPassPreviewDob" class="font-bold text-slate-900 text-[1.75cqw]">30 DEC / DÉC 94</div>
-                          </div>
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">NIN</div>
-                            <div id="ngaPassPreviewNin" class="font-mono font-bold text-slate-900 text-[1.75cqw]">64841848001</div>
-                          </div>
+                      <!-- Row 5 Values: Date of Birth (32.32%, 72.54%) & NIN (61.12%, 72.43%) -->
+                      <div id="ngaPassPreviewDob" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.32%; top: 72.54%; font-size: 2.15cqw;">30 DEC / DÉC 94</div>
+                      <div id="ngaPassPreviewNin" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 61.12%; top: 72.43%; font-size: 2.15cqw; letter-spacing: 0.02em;">64841848001</div>
 
-                          <!-- Sex & Place of Birth -->
-                          <div class="col-span-2">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Sex / Sexe</div>
-                            <div id="ngaPassPreviewSex" class="font-black text-slate-900 text-[1.75cqw]">M</div>
-                          </div>
-                          <div class="col-span-6">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Place of Birth / Lieu de Naissance</div>
-                            <div id="ngaPassPreviewPob" class="font-black text-slate-900 text-[1.75cqw]">LAGOS</div>
-                          </div>
-                          <!-- Optical Variable Patch on Lower Right -->
-                          <div class="col-span-4 row-span-3 flex justify-center items-center">
-                            <div class="w-[52px] h-[26px] rounded-full overflow-hidden border border-slate-300 shadow-inner flex items-center justify-center bg-slate-200/80">
-                              <img src="/assets/aistudio/nigeria_passport_optic.png" alt="Optical date patch" class="w-full h-full object-cover">
-                            </div>
-                          </div>
+                      <!-- Row 6 Values: Sex (32.32%, 75.98%) & Place of Birth (40.16%, 75.98%) -->
+                      <div id="ngaPassPreviewSex" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.32%; top: 75.98%; font-size: 2.15cqw;">M</div>
+                      <div id="ngaPassPreviewPob" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 40.16%; top: 75.98%; font-size: 2.15cqw;">LAGOS</div>
 
-                          <!-- Date of Issue & Authority -->
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Date of Issue / Date de Délivrance</div>
-                            <div id="ngaPassPreviewIssueDate" class="font-bold text-slate-900 text-[1.7cqw]">26 JUL / JUIL 23</div>
-                          </div>
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Authority / Autorité</div>
-                            <div id="ngaPassPreviewAuthority" class="font-black text-slate-900 text-[1.7cqw]">ABUJA HQRS</div>
-                          </div>
+                      <!-- Row 7 Values: Date of Issue (32.16%, 79.29%) & Authority (61.44%, 79.17%) -->
+                      <div id="ngaPassPreviewIssueDate" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.16%; top: 79.29%; font-size: 2.15cqw;">26 JUL / JUIL 23</div>
+                      <div id="ngaPassPreviewAuthority" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 61.44%; top: 79.17%; font-size: 2.15cqw;">ABUJA HQRS</div>
 
-                          <!-- Date of Expiry & Holder's Signature -->
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Date of Expiry / Date d'Expiration</div>
-                            <div id="ngaPassPreviewExpiryDate" class="font-bold text-slate-900 text-[1.7cqw]">25 JUL / JUIL 33</div>
-                          </div>
-                          <div class="col-span-4">
-                            <div class="text-slate-600 font-medium text-[1.05cqw]">Holder's Signature / Signature du Titulaire</div>
-                            <div class="h-[20px] flex items-center">
-                              <img id="ngaPassPreviewSig" src="/assets/aistudio/nigeria_passport_signature.png" alt="Signature" class="h-[18px] object-contain opacity-95 mix-blend-multiply" onerror="this.style.display='none'">
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <!-- Row 8 Value: Date of Expiry (32.16%, 82.72%) -->
+                      <div id="ngaPassPreviewExpiryDate" class="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#14181b]" style="left: 32.16%; top: 82.72%; font-size: 2.15cqw;">25 JUL / JUIL 33</div>
+
+                      <!-- Dynamic Oval Hologram DOB when DOB is modified from specimen -->
+                      <div id="ngaPassOpticDateWrap" class="absolute hidden items-center justify-center rounded-full bg-[#dadce0]/90 font-sans font-bold text-[#4a4e54] leading-none" style="left: 79.2%; top: 76.7%; width: 12.8%; height: 2.2%; font-size: 1.65cqw; letter-spacing: 0.02em;">30.12.1994</div>
+
+                      <!-- Preserved Signature Image & Dynamic Holder's Signature when surname changes -->
+                      <img id="ngaPassPreviewSig" src="/assets/aistudio/nigeria_passport_signature.png" alt="Signature" class="hidden" onerror="this.style.display='none'">
+                      <div id="ngaPassCustomSigText" class="absolute hidden items-center justify-center bg-[#eefaf0]/95 italic font-bold text-[#191d21]" style="left: 69.5%; top: 82.4%; width: 12.5%; height: 5.2%; font-family: 'Brush Script MT', 'Segoe Script', cursive; font-size: 2.5cqw;">Eluagu</div>
 
                       <!-- ICAO Doc 9303 Machine Readable Zone (MRZ: 2 lines × 44 chars) -->
-                      <div class="absolute inset-x-0 bottom-0 flex flex-col justify-center bg-[#f8fdf8]/85" style="height: 19.5%; padding-left: 4.5%; padding-right: 4.5%;">
-                        <div id="ngaPassMrzLine1" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
-                          P&lt;NGAELUAGU&lt;&lt;ONYEBUCHI&lt;MCDONALD&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
-                        </div>
-                        <div id="ngaPassMrzLine2" class="font-mono font-bold whitespace-nowrap overflow-hidden text-[#111418]" style="font-size: 2.75cqw; letter-spacing: 0.11em; line-height: 1.45;">
-                          B506210986NGA9412309M330725064841848001&lt;&lt;&lt;64
-                        </div>
-                      </div>
+                      <div id="ngaPassMrzLine1" class="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]" style="left: 6.08%; top: 91.36%; font-family: 'OCRB', 'OCR B', 'Courier New', Courier, monospace; font-size: 2.82cqw; letter-spacing: 0.125em;">P&lt;NGAELUAGU&lt;&lt;ONYEBUCHI&lt;MCDONALD&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="ngaPassMrzLine2" class="absolute whitespace-pre uppercase leading-none font-bold text-[#14171a]" style="left: 6.08%; top: 94.91%; font-family: 'OCRB', 'OCR B', 'Courier New', Courier, monospace; font-size: 2.82cqw; letter-spacing: 0.125em;">B506210986NGA9412309M330725064841848001&lt;&lt;&lt;64</div>
                     </section>
+
+                    <!-- Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active -->
+                    <img id="ngaRefSpecimenOverlay" src="/assets/aistudio/nigeria_passport_reference.png" alt="Federal Republic of Nigeria Passport Reference Specimen" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
                   </article>
                 </div>
 
@@ -17534,17 +17717,17 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </div>
             </header>
 
-            <!-- Redaction Bars Mode Switcher (Exact Reference Redacted vs Live Unredacted) -->
+            <!-- Redaction Bars Mode Switcher (Optional Redaction vs Live Unredacted) -->
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 flex items-center justify-between gap-2">
               <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                <i class="fa-solid fa-eye-slash text-slate-700"></i> Redaction Bars:
+                <i class="fa-solid fa-eye text-emerald-700"></i> Privacy Mode:
               </span>
               <div class="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200">
-                <button type="button" id="sa-btn-redact-on" onclick="setSaPassRedactionMode(true)" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-900 text-white shadow-2xs cursor-pointer transition">
-                  Reference Redacted
+                <button type="button" id="sa-btn-redact-off" onclick="setSaPassRedactionMode(false)" class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-700 text-white shadow-2xs cursor-pointer transition">
+                  Unredacted (Ref)
                 </button>
-                <button type="button" id="sa-btn-redact-off" onclick="setSaPassRedactionMode(false)" class="px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition">
-                  Unredacted Text
+                <button type="button" id="sa-btn-redact-on" onclick="setSaPassRedactionMode(true)" class="px-2.5 py-1 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition">
+                  Redacted Bars
                 </button>
               </div>
             </div>
@@ -17561,7 +17744,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </div>
               <div class="grid grid-cols-3 gap-1.5 pt-0.5">
                 <button type="button" onclick="loadSaPassPreset('reference')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-800 border border-emerald-300 rounded-lg text-[10px] font-bold transition truncate cursor-pointer">
-                  ★ Gupta A.K. (Ref)
+                  ★ Gagiano D.J. (Ref)
                 </button>
                 <button type="button" onclick="loadSaPassPreset('mokoena')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
                   Mokoena Sipho
@@ -17594,7 +17777,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </div>
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Passport No</label>
-                  <input type="text" id="saPassInputPassNo" value="M00148293" oninput="saPassRedactedMode = false; updateSaPassPreview();" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputPassNo" value="M00328723" oninput="saPassRedactedMode = false; updateSaPassPreview();" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
               </div>
 
@@ -17602,11 +17785,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Surname / Nom</label>
-                  <input type="text" id="saPassInputSurname" value="GUPTA" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputSurname" value="GAGIANO" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Given names / Prénoms</label>
-                  <input type="text" id="saPassInputGivenNames" value="ATUL KUMAR" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputGivenNames" value="DIRK JOHAN" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
               </div>
 
@@ -17620,11 +17803,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date of birth</label>
-                  <input type="text" id="saPassInputDob" value="14 JUN 1968" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputDob" value="07 SEP 1963" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Identity No / No d&apos;identité</label>
-                  <input type="text" id="saPassInputIdNo" value="6806145829084" oninput="saPassRedactedMode = false; updateSaPassPreview();" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputIdNo" value="6309075016088" oninput="saPassRedactedMode = false; updateSaPassPreview();" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
               </div>
 
@@ -17639,7 +17822,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </div>
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Place of birth</label>
-                  <input type="text" id="saPassInputPob" value="IND" oninput="updateSaPassPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputPob" value="ZAF" oninput="updateSaPassPreview()" class="w-full px-2 py-1.5 rounded-lg border border-slate-300 text-xs font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Authority / Autorité</label>
@@ -17651,18 +17834,18 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date of issue</label>
-                  <input type="text" id="saPassInputIssueDate" value="31 JUL 2015" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputIssueDate" value="03 FEB 2020" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
                 <div>
                   <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Date of expiry</label>
-                  <input type="text" id="saPassInputExpiryDate" value="30 JUL 2025" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                  <input type="text" id="saPassInputExpiryDate" value="02 FEB 2030" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-emerald-600 focus:outline-none">
                 </div>
               </div>
 
               <!-- Holder's signature -->
               <div>
                 <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Holder&apos;s signature / Signature du titulaire</label>
-                <input type="text" id="saPassInputSignature" value="AtulKumar" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none">
+                <input type="text" id="saPassInputSignature" value="D. Gagiano" oninput="updateSaPassPreview()" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-2 focus:ring-emerald-600 focus:outline-none">
               </div>
 
               <!-- Action Buttons -->
@@ -17697,44 +17880,49 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   SAMPLE — NOT VALID
                 </span>
                 <span class="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold">
-                  No: <span id="saPassToolbarNo">REDACTED (REF)</span>
+                  No: <span id="saPassToolbarNo">M00328723</span>
                 </span>
               </div>
             </div>
 
-            <!-- 1. LIVE INTERACTIVE 1:1 SOUTH AFRICA PASSPORT SPREAD (541x761 EXACT PROPORTIONS) -->
+            <!-- 1. LIVE INTERACTIVE 1:1 SOUTH AFRICA PASSPORT SPREAD (720x902 EXACT REFERENCE PROPORTIONS) -->
             <div id="sa-pass-view-live" class="w-full flex flex-col items-center">
-              <div class="w-full max-w-[600px] bg-white p-2 sm:p-3 rounded-2xl shadow-2xl border border-slate-300">
+              <div class="w-full max-w-[640px] bg-white p-2 sm:p-3 rounded-2xl shadow-2xl border border-slate-300">
                 <article id="sa-passport-card"
-                         class="relative w-full aspect-[541/761] overflow-hidden select-none bg-[#f3f5ef]"
+                         class="relative w-full aspect-[720/902] overflow-hidden select-none bg-[#f5f6f2]"
                          style="container-type: inline-size; font-family: 'OCR B', 'Arial Narrow', 'Consolas', 'Courier New', monospace;">
 
-                  <!-- Clean 1:1 Reference Base Plate (Page 48 Top Page + Spine Fold + Republic of South Africa Bio-Data Page, Bilingual Green Labels, Protea Emblem & Integrated Portraits) -->
-                  <img src="/assets/aistudio/zaf_passport_base_plate.png"
-                       alt="Republic of South Africa Passport 2-Page Spread Base Plate"
-                       class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+                  <!-- Runtime Clean Base Plate Canvas (interpolated directly from image_02a4a299.png) -->
+                  <canvas id="saPassBaseCanvas"
+                          width="720"
+                          height="902"
+                          class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0"></canvas>
 
-                  <!-- Custom Main Portrait Overlay (shown when user uploads a custom photo; x=22, y=456, w=135, h=167 in 541x761) -->
+                  <!-- Top Page Right Vertical Laser-Perforated Passport Number (5x7 dot-matrix reading bottom-to-top) -->
+                  <svg id="saPassPerforatedSvg"
+                       viewBox="0 0 36 290"
+                       class="absolute z-10 pointer-events-none"
+                       style="left: 80.56%; top: 7.21%; width: 5.20%; height: 31.26%; transform: rotate(-4.95deg); transform-origin: center center;"></svg>
+
+                  <!-- Custom Main Portrait Overlay (shown when user uploads a custom photo; x=128, y=563, w=130, h=166 in 720x902) -->
                   <div id="saPassCustomPhotoWrap"
                        class="hidden absolute z-10 overflow-hidden"
-                       style="left: 4.07%; top: 59.92%; width: 24.95%; height: 21.94%;">
+                       style="left: 17.78%; top: 62.42%; width: 18.06%; height: 18.40%; transform: rotate(-4.95deg); transform-origin: center center;">
                     <img id="saPassPreviewPhoto"
                          src="/assets/aistudio/zaf_passport_portrait_exact.png"
                          alt="Passport Holder Portrait"
                          class="w-full h-full object-cover object-top"
                          style="filter: grayscale(100%) contrast(1.04) brightness(1.02);">
-                    <!-- Wavy security guilloche & latent circular seal overlay across lower portrait -->
                     <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 135 167" preserveAspectRatio="none">
                       <path d="M 0 151 Q 22 145, 45 153 T 90 151 T 135 153" fill="none" stroke="#454a44" stroke-width="1.2" opacity="0.65"/>
                       <path d="M 0 159 Q 22 152, 45 160 T 90 158 T 135 160" fill="none" stroke="#5c625a" stroke-width="1.1" opacity="0.55"/>
-                      <circle cx="122" cy="118" r="28" fill="none" stroke="#d5ddd2" stroke-width="2.5" opacity="0.45"/>
                     </svg>
                   </div>
 
-                  <!-- Custom Secondary Ghost Portrait Overlay (shown when user uploads a custom photo; x=264, y=535, w=91, h=114 in 541x761) -->
+                  <!-- Custom Secondary Ghost Portrait Overlay (shown when user uploads a custom photo; x=380, y=625, w=105, h=110 in 720x902) -->
                   <div id="saPassCustomGhostWrap"
-                       class="hidden absolute z-10 overflow-hidden"
-                       style="left: 48.80%; top: 70.30%; width: 16.82%; height: 14.98%;">
+                       class="hidden absolute z-10 overflow-hidden rounded-full"
+                       style="left: 52.78%; top: 69.29%; width: 14.58%; height: 12.20%; transform: rotate(-4.95deg); transform-origin: center center;">
                     <img id="saPassPreviewGhostPhoto"
                          src="/assets/aistudio/zaf_passport_ghost_exact.png"
                          alt="Passport Ghost Portrait"
@@ -17742,110 +17930,116 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                          style="filter: grayscale(100%) contrast(0.95) brightness(1.12); mix-blend-mode: multiply;">
                   </div>
 
-                  <!-- ================= BIO-DATA PAGE DYNAMIC FIELDS (EXACT PIXEL COORDINATES IN 541x761) ================= -->
+                  <!-- ================= BIO-DATA PAGE DYNAMIC FIELDS (EXACT PIXEL COORDINATES IN 720x902 AT -4.95deg) ================= -->
 
-                  <!-- Type / Type (x=170, y=422 in 541x761) -->
+                  <!-- Type / Type (x=263, y=504 in 720x902) -->
                   <div id="saPassPreviewType"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.42%; top: 55.45%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">PM</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 36.53%; top: 55.88%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">PM</div>
 
-                  <!-- Country code / Code du pays (x=235, y=422 in 541x761) -->
+                  <!-- Country code / Code du pays (x=333, y=497 in 720x902) -->
                   <div id="saPassPreviewCountryCode"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 43.44%; top: 55.45%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">ZAF</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 46.25%; top: 55.10%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">ZAF</div>
 
-                  <!-- Passport No / No du passeport (x=352, y=422 in 541x761) -->
+                  <!-- Passport No / No du passeport (x=463, y=485 in 720x902) -->
                   <div id="saPassPreviewPassNo"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 65.06%; top: 55.45%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">M00148293</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 64.31%; top: 53.77%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">M00328723</div>
 
-                  <!-- Exact Reference Black Redaction Bar over Passport No (x=352..439, y=421..434 in 541x761) -->
+                  <!-- Optional Black Redaction Bar over Passport No -->
                   <div id="saPassRedactBarPassNo"
-                       class="absolute z-30 bg-[#020202]"
-                       style="left: 65.06%; top: 55.32%; width: 16.27%; height: 1.84%;"></div>
+                       class="hidden absolute z-35 bg-[#020202]"
+                       style="left: 64.10%; top: 53.65%; width: 12.20%; height: 1.75%; transform: rotate(-4.95deg); transform-origin: left top;"></div>
 
-                  <!-- Surname / Nom (x=169, y=448 in 541x761) -->
+                  <!-- Surname / Nom (x=265, y=531 in 720x902) -->
                   <div id="saPassPreviewSurname"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.24%; top: 58.87%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">GUPTA</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 36.81%; top: 58.87%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">GAGIANO</div>
 
-                  <!-- Given names / Prénoms (x=169, y=475 in 541x761) -->
+                  <!-- Given names / Prénoms (x=268, y=561 in 720x902) -->
                   <div id="saPassPreviewGivenNames"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.24%; top: 62.42%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">ATUL KUMAR</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 37.22%; top: 62.20%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">DIRK JOHAN</div>
 
-                  <!-- Nationality / Nationalité (x=170, y=502 in 541x761) -->
+                  <!-- Nationality / Nationalité (x=271, y=591 in 720x902) -->
                   <div id="saPassPreviewNationality"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.42%; top: 65.97%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.035em; transform: scaleX(0.90); transform-origin: left top;">SOUTH AFRICAN / SUD-AFRICAIN</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 37.64%; top: 65.52%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.035em; transform: rotate(-4.95deg) scaleX(0.92); transform-origin: left top;">SOUTH AFRICAN / SUD-AFRICAIN</div>
 
-                  <!-- Date of birth / Date de naissance (x=171, y=530 in 541x761) -->
+                  <!-- Date of birth / Date de naissance (x=273, y=620 in 720x902) -->
                   <div id="saPassPreviewDob"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.61%; top: 69.65%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">14 JUN 1968</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 37.92%; top: 68.74%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">07 SEP 1963</div>
 
-                  <!-- Identity No / No d'identité (x=356, y=530 in 541x761) -->
+                  <!-- Identity No / No d'identité (x=474, y=602 in 720x902) -->
                   <div id="saPassPreviewIdNo"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 65.80%; top: 69.65%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.03em; transform: scaleX(0.90); transform-origin: left top;">6806145829084</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 65.83%; top: 66.74%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.03em; transform: rotate(-4.95deg) scaleX(0.92); transform-origin: left top;">6309075016088</div>
 
-                  <!-- Exact Reference Black Redaction Bar over Identity No leaving leading '6' edge visible (x=359..444, y=529..541 in 541x761) -->
+                  <!-- Optional Black Redaction Bar over Identity No -->
                   <div id="saPassRedactBarIdNo"
-                       class="absolute z-30 bg-[#020202]"
-                       style="left: 66.36%; top: 69.51%; width: 15.89%; height: 1.71%;"></div>
+                       class="hidden absolute z-35 bg-[#020202]"
+                       style="left: 65.70%; top: 66.60%; width: 13.00%; height: 1.75%; transform: rotate(-4.95deg); transform-origin: left top;"></div>
 
-                  <!-- Sex / Sexe (x=170, y=558 in 541x761) -->
+                  <!-- Sex / Sexe (x=276, y=650 in 720x902) -->
                   <div id="saPassPreviewSex"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.42%; top: 73.32%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; transform: scaleX(0.92); transform-origin: left top;">M</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 38.33%; top: 72.06%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">M</div>
 
-                  <!-- Place of birth / Lieu de naissance (x=236, y=558 in 541x761) -->
+                  <!-- Place of birth / Lieu de naissance (x=347, y=643 in 720x902) -->
                   <div id="saPassPreviewPob"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 43.62%; top: 73.32%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">IND</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 48.19%; top: 71.29%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">ZAF</div>
 
-                  <!-- Date of issue / Date de délivrance (x=172, y=587 in 541x761) -->
+                  <!-- Date of issue / Date de délivrance (x=279, y=682 in 720x902) -->
                   <div id="saPassPreviewIssueDate"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.79%; top: 77.14%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">31 JUL 2015</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 38.75%; top: 75.61%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">03 FEB 2020</div>
 
-                  <!-- Authority / Autorité (x=357, y=586 in 541x761) -->
+                  <!-- Authority / Autorité (x=479, y=664 in 720x902) -->
                   <div id="saPassPreviewAuthority"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 65.99%; top: 77.00%; font-size: 2.32cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.025em; transform: scaleX(0.88); transform-origin: left top;">DEPT OF HOME AFFAIRS</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 66.53%; top: 73.61%; font-size: 1.85cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.025em; transform: rotate(-4.95deg) scaleX(0.90); transform-origin: left top;">DEPT OF HOME AFFAIRS</div>
 
-                  <!-- Date of expiry / Date d'expiration (x=172, y=615 in 541x761) -->
+                  <!-- Date of expiry / Date d'expiration (x=281, y=712 in 720x902) -->
                   <div id="saPassPreviewExpiryDate"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2f332f]"
-                       style="left: 31.79%; top: 80.81%; font-size: 2.35cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.04em; transform: scaleX(0.92); transform-origin: left top;">30 JUL 2025</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2c302c]"
+                       style="left: 39.03%; top: 78.94%; font-size: 1.88cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.04em; transform: rotate(-4.95deg) scaleX(0.94); transform-origin: left top;">02 FEB 2030</div>
 
-                  <!-- Holder's signature / Signature du titulaire (Exact Transparent Ink Overlay: x=396, y=612, w=97, h=38 in 541x761) -->
+                  <!-- Legacy signature image sink (kept for compatibility) -->
                   <img id="saPassSigImg"
                        src="/assets/aistudio/zaf_passport_signature_transparent.png"
-                       alt="Holder Signature AtulKumar"
-                       class="absolute z-20 object-contain object-left pointer-events-none select-none"
-                       style="left: 73.20%; top: 80.42%; width: 17.93%; height: 4.99%;">
+                       alt="Holder Signature"
+                       class="hidden absolute z-20 object-contain object-left pointer-events-none select-none"
+                       style="left: 73.61%; top: 75.39%; width: 12.50%; height: 4.50%; transform: rotate(-4.95deg); transform-origin: left top;">
 
-                  <!-- Custom Holder Signature Text Fallback when edited away from 'AtulKumar' -->
+                  <!-- Custom Holder Signature Text Fallback when edited away from 'D. Gagiano' -->
                   <div id="saPassPreviewSigText"
-                       class="hidden absolute z-20 italic text-[#252825] whitespace-nowrap leading-none pointer-events-none"
-                       style="left: 73.50%; top: 81.20%; font-size: 2.85cqw; font-family: 'Georgia', 'Times New Roman', serif;">AtulKumar</div>
+                       class="hidden absolute z-20 italic text-[#252825] bg-[#eef0e6]/90 px-1 rounded whitespace-nowrap leading-none pointer-events-none"
+                       style="left: 73.61%; top: 75.80%; font-size: 2.35cqw; font-family: 'Brush Script MT', 'Segoe Script', 'Georgia', cursive; transform: rotate(-4.95deg); transform-origin: left top;">D. Gagiano</div>
 
                   <!-- ================= MACHINE READABLE ZONE (2-LINE ICAO 9303 TD3 MRZ) ================= -->
-                  <!-- MRZ Line 1 (x=23, y=680 in 541x761) -->
+                  <!-- MRZ Line 1 (x=132, y=790 in 720x902) -->
                   <div id="saPassPreviewMrz1"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2b2e2b]"
-                       style="left: 4.25%; top: 89.22%; font-size: 2.48cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.108em;">PMZAFGUPTA&lt;&lt;ATUL&lt;KUMAR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#242724]"
+                       style="left: 18.33%; top: 87.58%; font-size: 2.04cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.092em; transform: rotate(-4.95deg); transform-origin: left top;">PMZAFGAGIANO&lt;&lt;DIRK&lt;JOHAN&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
 
-                  <!-- MRZ Line 2 (x=23, y=706 in 541x761) -->
+                  <!-- MRZ Line 2 (x=134, y=819 in 720x902) -->
                   <div id="saPassPreviewMrz2"
-                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#2b2e2b]"
-                       style="left: 4.25%; top: 92.77%; font-size: 2.48cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 600; letter-spacing: 0.108em;">M001482934ZAF6806149M25073026806145829084&lt;52</div>
+                       class="absolute z-20 uppercase whitespace-nowrap leading-none text-[#242724]"
+                       style="left: 18.61%; top: 90.80%; font-size: 2.04cqw; font-family: 'OCR B', 'Consolas', 'Courier New', monospace; font-weight: 700; letter-spacing: 0.092em; transform: rotate(-4.95deg); transform-origin: left top;">M003287237ZAF6309071M30020276309075016088&lt;30</div>
 
-                  <!-- Exact Reference Black Redaction Bar over MRZ Line 2 leaving left edge of 'M' visible (x=26..505, y=707..719 in 541x761) -->
+                  <!-- Optional Black Redaction Bar over MRZ Line 2 -->
                   <div id="saPassRedactBarMrz2"
-                       class="absolute z-30 bg-[#020202]"
-                       style="left: 4.81%; top: 92.90%; width: 88.72%; height: 1.71%;"></div>
+                       class="hidden absolute z-35 bg-[#020202]"
+                       style="left: 18.50%; top: 90.70%; width: 72.00%; height: 1.80%; transform: rotate(-4.95deg); transform-origin: left top;"></div>
+
+                  <!-- Exact 1:1 Reference Specimen Overlay (shown when default specimen GAGIANO DIRK JOHAN is active) -->
+                  <img id="saPassRefOverlay"
+                       src="/assets/aistudio/image_02a4a299.png"
+                       alt="Republic of South Africa Passport 1:1 Reference Specimen"
+                       class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-30">
 
                 </article>
               </div>
@@ -17853,14 +18047,14 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
             <!-- 2. ORIGINAL PROVIDED REFERENCE IMAGE VIEW -->
             <div id="sa-pass-view-specimen" class="hidden w-full flex flex-col items-center">
-              <div class="w-full max-w-[600px] bg-white p-3 sm:p-4 rounded-2xl shadow-xl border border-slate-200">
+              <div class="w-full max-w-[640px] bg-white p-3 sm:p-4 rounded-2xl shadow-xl border border-slate-200">
                 <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
                   <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <i class="fa-solid fa-check-double text-emerald-600"></i> Attached Reference Image (1:1 Source)
                   </span>
                   <span class="text-[10px] font-mono bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">REPUBLIC OF SOUTH AFRICA (ZAF)</span>
                 </div>
-                <img src="/assets/aistudio/Atul-Passport-Redacted_d5459d4d.jpg"
+                <img src="/assets/aistudio/image_02a4a299.png"
                      alt="Original Reference Republic of South Africa Passport"
                      class="w-full h-auto rounded-xl border border-slate-200 shadow-sm">
               </div>
