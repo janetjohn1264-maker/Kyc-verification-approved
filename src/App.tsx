@@ -4,7 +4,7 @@
  */
 
 import { useMemo, useState, useRef } from "react"
-import { CheckCircle2, ChevronDown, FileText, LayoutDashboard, LogOut, Menu, RefreshCw, RotateCcw, Save, Settings, ShieldCheck, Upload, UserRound, X } from "lucide-react"
+import { CheckCircle2, ChevronDown, Dices, FileText, LayoutDashboard, LogOut, Menu, RefreshCw, RotateCcw, Save, Settings, ShieldCheck, Upload, UserRound, X } from "lucide-react"
 import { BangladeshPassportCard, BangladeshPassportData, defaultBangladeshPassportData, generateBangladeshMRZ } from "./BangladeshPassportCard"
 import { GhanaPassportCard, GhanaPassportData, defaultGhanaPassportData, generateGhanaMRZ } from "./GhanaPassportCard"
 import { CanadaPassportCard, CanadaPassportData, defaultCanadaPassportData, generateCanadaMRZ } from "./CanadaPassportCard"
@@ -901,31 +901,44 @@ function App() {
                   <button
                     type="button"
                     onClick={randomizeSpecimen}
-                    className="text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-emerald-600 text-white hover:bg-emerald-700 font-semibold shadow-xs cursor-pointer"
+                    className="text-xs flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black shadow-md shadow-indigo-700/20 cursor-pointer transition-all"
                   >
-                    <RefreshCw size={13} /> Randomize
+                    <Dices size={14} className="text-amber-300" />
+                    <span>Randomize Card</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider">INSTANT FILL</span>
                   </button>
                   <span className="live-pill"><span /> Live</span>
                 </div>
               </div>
               <div className="form-stack">
                 <div>
+                  <div className="mb-3">
+                    <button
+                      type="button"
+                      onClick={randomizeSpecimen}
+                      className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                        <Dices size={20} />
+                      </div>
+                      <div className="text-left">
+                        <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                          <span>Randomize Card</span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                        </div>
+                        <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional sample fields for {country} document preview</div>
+                      </div>
+                    </button>
+                  </div>
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-semibold text-slate-700">Country / document</span>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold cursor-pointer"
-                      >
-                        <RefreshCw size={11} /> Randomize {country}
-                      </button>
-                      <button
-                        type="button"
                         onClick={resetCurrentCountry}
-                        className="text-[11px] flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600 hover:bg-slate-200 font-semibold cursor-pointer"
+                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
                       >
-                        <RotateCcw size={11} /> Reset
+                        <RotateCcw size={11} /> Reset Sample
                       </button>
                     </div>
                   </div>
@@ -985,26 +998,33 @@ function App() {
 
               {/* Rwanda-specific interactive fields */}
               {isRwanda && (
-                <div className="mt-6 pt-5 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Rwanda National ID (Indangamuntu) Fields</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold cursor-pointer"
-                      >
-                        <RefreshCw size={12} /> Randomize
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetRwandaToDefault}
-                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold cursor-pointer"
-                      >
-                        <RotateCcw size={12} /> Reset to Specimen
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={resetRwandaToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Rwandan Indangamuntu sample data</div>
+                    </div>
+                  </button>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
                       Surname (Ubushize)
@@ -1122,26 +1142,33 @@ function App() {
 
               {/* Nigeria-specific interactive fields */}
               {isNigeria && (
-                <div className="mt-6 pt-5 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
-                      >
-                        <RefreshCw size={12} /> Randomize
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetNigeriaToDefault}
-                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
-                      >
-                        <RotateCcw size={12} /> Reset to Specimen
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={resetNigeriaToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Nigerian passport sample data &amp; MRZ</div>
+                    </div>
+                  </button>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
                       Surname / Nom
@@ -1248,26 +1275,33 @@ function App() {
 
               {/* Ethiopia-specific interactive fields */}
               {isEthiopia && (
-                <div className="mt-6 pt-5 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
-                      >
-                        <RefreshCw size={12} /> Randomize
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetEthiopiaToDefault}
-                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
-                      >
-                        <RotateCcw size={12} /> Reset to Specimen
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={resetEthiopiaToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Ethiopian passport sample data &amp; MRZ</div>
+                    </div>
+                  </button>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
                       Surname (English)
@@ -1383,26 +1417,33 @@ function App() {
 
               {/* Canada-specific interactive fields */}
               {isCanada && (
-                <div className="mt-6 pt-5 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-red-50 border border-red-200 text-red-700 hover:bg-red-100 font-semibold"
-                      >
-                        <RefreshCw size={12} /> Randomize
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetCanadaToDefault}
-                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-red-700 font-semibold"
-                      >
-                        <RotateCcw size={12} /> Reset to Specimen
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={resetCanadaToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Canadian passport sample data &amp; MRZ</div>
+                    </div>
+                  </button>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
                       Surname / Nom
@@ -1510,26 +1551,33 @@ function App() {
 
               {/* Ghana-specific interactive fields */}
               {isGhana && (
-                <div className="mt-6 pt-5 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100 font-semibold"
-                      >
-                        <RefreshCw size={12} /> Randomize
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetGhanaToDefault}
-                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-amber-700 font-semibold"
-                      >
-                        <RotateCcw size={12} /> Reset to Specimen
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={resetGhanaToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Ghanaian passport sample data &amp; MRZ</div>
+                    </div>
+                  </button>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
                       Surname / Nom
@@ -1628,26 +1676,33 @@ function App() {
 
               {/* Bangladesh-specific interactive fields */}
               {isBangladesh && (
-                <div className="mt-6 pt-5 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Passport Data Fields</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
-                      >
-                        <RefreshCw size={12} /> Randomize
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetBangladeshToDefault}
-                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
-                      >
-                        <RotateCcw size={12} /> Reset to Specimen
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={resetBangladeshToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Bangladeshi passport sample data &amp; MRZ</div>
+                    </div>
+                  </button>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
                       Passport No
@@ -1835,26 +1890,33 @@ function App() {
 
               {/* Interactive Document Data Fields + Randomize for all other countries (UGA, KEN, SEN, DRC, RSA, PNG) */}
               {!isNigeria && !isEthiopia && !isCanada && !isGhana && !isBangladesh && (
-                <div className="mt-6 pt-5 border-t border-slate-200">
-                  <div className="flex items-center justify-between mb-3">
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Document Data Fields</span>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={randomizeSpecimen}
-                        className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 font-semibold"
-                      >
-                        <RefreshCw size={12} /> Randomize
-                      </button>
-                      <button
-                        type="button"
-                        onClick={resetOtherToDefault}
-                        className="text-[11px] flex items-center gap-1 text-slate-500 hover:text-emerald-700 font-semibold"
-                      >
-                        <RotateCcw size={12} /> Reset to Specimen
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={resetOtherToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
                   </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional {country} sample document data &amp; MRZ</div>
+                    </div>
+                  </button>
                   {(() => {
                     const currentDoc = otherData[country] || defaultOtherCountryData[country] || defaultOtherCountryData.UGA
                     return (

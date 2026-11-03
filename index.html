@@ -12107,8 +12107,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               </label>
               <span class="text-[11px] font-medium text-slate-400 hidden sm:inline">Jurisdiction &amp; registry formatting</span>
             </div>
-            <button type="button" id="universal-randomize-country-btn" onclick="randomizeActiveDocument()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-sm hover:shadow cursor-pointer" title="Randomize whichever country document is currently active">
-              <i class="fa-solid fa-shuffle text-amber-300"></i> Universal Randomize
+            <button type="button" id="universal-randomize-country-btn" onclick="randomizeActiveDocument()" class="px-4 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white rounded-2xl text-xs font-black tracking-wide transition-all flex items-center gap-2 shadow-lg shadow-indigo-700/25 border border-indigo-300/40 transform hover:-translate-y-0.5 cursor-pointer" title="Randomize whichever country document is currently active">
+              <i class="fa-solid fa-dice text-amber-300 text-sm"></i>
+              <span>Randomize Card</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
             </button>
           </div>
 
@@ -12342,9 +12344,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           </div>
 
           <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button type="button" id="ogads-wb-randomize-btn" onclick="randomizeActiveDocument()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-emerald-700/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer" title="Universal Randomize active country document">
-              <i class="fa-solid fa-shuffle text-amber-300 text-sm"></i>
-              <span>RANDOMIZE DATA</span>
+            <button type="button" id="ogads-wb-randomize-btn" onclick="randomizeActiveDocument()" class="w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-indigo-700/25 border border-indigo-300/40 flex items-center justify-center gap-2.5 transition-all transform hover:-translate-y-0.5 cursor-pointer" title="Universal Randomize active country document">
+              <i class="fa-solid fa-dice text-amber-300 text-base"></i>
+              <span>Randomize Card</span>
+              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
             </button>
             <button type="button" id="ogads-wb-unlock-btn" onclick="triggerActiveDocumentUnlock()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-300 hover:via-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer">
               <i class="fa-solid fa-unlock-keyhole text-sm"></i>
@@ -12371,14 +12374,30 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">KENYA</span>
             </div>
 
-            <!-- Preset Holders & Randomize Button -->
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeKenyaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Kenya e-Passport sample details &amp; TD3 MRZ</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Preset Holders & Reset -->
             <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 space-y-2.5">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
-                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Reference &amp; Presets
+                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Reference &amp; Sample Presets
                 </span>
-                <button type="button" onclick="randomizeKenyaPassport()" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white rounded-lg text-[11px] font-extrabold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
-                  <i class="fa-solid fa-dice text-amber-300"></i> Randomize Passport
+                <button type="button" onclick="loadKenyaPassportPreset('reference')" class="px-2.5 py-1 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-lg text-[10px] font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
               <div class="grid grid-cols-3 gap-1.5">
@@ -12451,9 +12470,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 </div>
               </div>
 
-              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+              <div class="pt-3 border-t grid grid-cols-3 gap-2">
+                <button type="button" onclick="loadKenyaPassportPreset('reference')" class="py-2.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all"><i class="fa-solid fa-rotate-left"></i>Reset</button>
                 <button type="button" id="downloadBtn" class="py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-image"></i>Save PNG</button>
-                <button type="button" id="printBtn" class="py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Passport</button>
+                <button type="button" id="printBtn" class="py-2.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print</button>
               </div>
             </form>
           </section>
@@ -12682,16 +12702,16 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
             <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeKenyaIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:via-teal-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-700/25 hover:shadow-emerald-700/40 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeKenyaIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Kenya Maisha Namba ID details &amp; serials</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Kenya Maisha Namba ID sample details &amp; serials</div>
                 </div>
               </button>
             </div>
@@ -13013,16 +13033,16 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
             <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeSomaliaIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:via-blue-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-sky-700/25 hover:shadow-sky-700/40 border-2 border-sky-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeSomaliaIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-sky-100 opacity-90 mt-0.5">Generate authentic Somali Smart ID numbers &amp; bio-data</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Somali Smart ID sample numbers &amp; bio-data</div>
                 </div>
               </button>
             </div>
@@ -13648,16 +13668,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
             <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeSomaliaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:via-blue-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-sky-700/25 hover:shadow-sky-700/40 border-2 border-sky-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeSomaliaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-sky-100 opacity-90 mt-0.5">Generate authentic Somali passport credentials &amp; ID card</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Somali passport sample credentials &amp; ID card</div>
                 </div>
               </button>
             </div>
@@ -14176,16 +14196,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
             <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeSomaliaDriverLicense()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:via-blue-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-sky-700/25 hover:shadow-sky-700/40 border-2 border-sky-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeSomaliaDriverLicense()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-sky-100 opacity-90 mt-0.5">Generate authentic Somalia driver permit &amp; vehicle category</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Somalia driver permit &amp; vehicle category</div>
                 </div>
               </button>
             </div>
@@ -14428,16 +14448,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
             <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeEthiopiaIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-amber-600 to-teal-600 hover:from-emerald-500 hover:via-amber-500 hover:to-teal-500 text-white font-black text-sm tracking-wide shadow-xl shadow-amber-600/25 hover:shadow-amber-600/40 border-2 border-amber-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeEthiopiaIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Fayda bio-data (Amharic/English) &amp; FCN</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Fayda bio-data (Amharic/English) &amp; FCN</div>
                 </div>
               </button>
             </div>
@@ -14786,16 +14806,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
               <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
               <div class="pt-0.5">
-                <button type="button" onclick="randomizeNgaCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:via-teal-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-700/25 hover:shadow-emerald-700/40 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <button type="button" onclick="randomizeNgaCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                   <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                     <i class="fa-solid fa-dice"></i>
                   </div>
                   <div class="text-left">
                     <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                      <span>Randomize Card Details</span>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                      <span>Randomize Card</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                     </div>
-                    <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Nigerian bio-data, 16-digit card &amp; doc numbers</div>
+                    <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Nigerian bio-data, 16-digit card &amp; doc numbers</div>
                   </div>
                 </button>
               </div>
@@ -15111,16 +15131,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
               <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE PASSPORT BUTTON -->
               <div class="pt-0.5">
-                <button type="button" onclick="randomizeNgaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:via-teal-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-700/25 hover:shadow-emerald-700/40 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <button type="button" onclick="randomizeNgaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                   <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                     <i class="fa-solid fa-dice"></i>
                   </div>
                   <div class="text-left">
                     <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                      <span>Randomize Passport Details</span>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                      <span>Randomize Card</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                     </div>
-                    <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Nigerian passport data &amp; real-time MRZ</div>
+                    <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Nigerian passport sample data &amp; real-time MRZ</div>
                   </div>
                 </button>
               </div>
@@ -15399,16 +15419,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
               <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
               <div class="pt-0.5">
-                <button type="button" onclick="randomizeUkPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-rose-600 hover:from-blue-600 hover:via-indigo-600 hover:to-rose-500 text-white font-black text-sm tracking-wide shadow-xl shadow-blue-800/25 hover:shadow-blue-800/40 border-2 border-blue-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <button type="button" onclick="randomizeUkPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                   <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                     <i class="fa-solid fa-dice"></i>
                   </div>
                   <div class="text-left">
                     <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                      <span>Randomize Card Details</span>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                      <span>Randomize Card</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                     </div>
-                    <div class="text-[11px] font-normal text-blue-100 opacity-90 mt-0.5">Generate authentic British Citizen bio-data, 9-digit passport &amp; MRZ</div>
+                    <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional British Citizen bio-data, 9-digit passport &amp; MRZ</div>
                   </div>
                 </button>
               </div>
@@ -15805,20 +15825,17 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
               <!-- Prominent Randomize Card Button -->
               <div class="pt-0.5">
-                <button type="button" onclick="randomizeUgandaRefugeeCard()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 hover:from-emerald-600 hover:via-teal-600 hover:to-emerald-700 text-white font-black text-xs tracking-wide shadow-md flex items-center justify-between gap-3 transition-all cursor-pointer group">
-                  <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center text-amber-300 text-base group-hover:rotate-180 transition-transform duration-500 shrink-0">
-                      <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </div>
-                    <div class="text-left">
-                      <div class="leading-tight font-extrabold flex items-center gap-2">
-                        <span>Randomize Uganda NID Specimen</span>
-                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 uppercase">Instant Fill</span>
-                      </div>
-                      <div class="text-[10px] font-normal text-emerald-100">Auto-fills Ugandan Name, NIN (CM/CF), Card No., Village &amp; TD1 MRZ</div>
-                    </div>
+                <button type="button" onclick="randomizeUgandaRefugeeCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                  <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                    <i class="fa-solid fa-dice"></i>
                   </div>
-                  <i class="fa-solid fa-chevron-right text-emerald-200 text-xs"></i>
+                  <div class="text-left">
+                    <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                      <span>Randomize Card</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                    </div>
+                    <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Auto-fills fictional Ugandan Name, NIN (CM/CF), Card No., Village &amp; TD1 MRZ</div>
+                  </div>
                 </button>
               </div>
 
@@ -16237,16 +16254,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
               <!-- BIG RANDOMIZE CARD BUTTON -->
               <div class="pt-0.5">
-                <button type="button" onclick="randomizePakCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-green-800 hover:from-emerald-600 hover:via-teal-600 hover:to-green-700 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-800/25 hover:shadow-emerald-800/40 border-2 border-emerald-400/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <button type="button" onclick="randomizePakCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                   <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                     <i class="fa-solid fa-dice"></i>
                   </div>
                   <div class="text-left">
                     <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                       <span>Randomize Card</span>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                     </div>
-                    <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate fictional Pakistani bio-data, addresses, and CNIC</div>
+                    <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Pakistani bio-data, addresses, and CNIC</div>
                   </div>
                 </button>
               </div>
@@ -17017,16 +17034,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
               <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
               <div class="pt-0.5">
-                <button type="button" onclick="randomizeSycCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:via-blue-500 hover:to-indigo-500 text-white font-black text-sm tracking-wide shadow-xl shadow-sky-600/25 hover:shadow-sky-600/40 border-2 border-sky-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <button type="button" onclick="randomizeSycCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                   <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                     <i class="fa-solid fa-dice"></i>
                   </div>
                   <div class="text-left">
                     <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                      <span>Randomize Card Details</span>
-                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                      <span>Randomize Card</span>
+                      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                     </div>
-                    <div class="text-[11px] font-normal text-sky-100 opacity-90 mt-0.5">Generate Seychellois bio-data, identity numbers &amp; synced MRZ</div>
+                    <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Seychellois bio-data, identity numbers &amp; synced MRZ</div>
                   </div>
                 </button>
               </div>
@@ -17260,14 +17277,30 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </button>
             </div>
 
-            <!-- Preset Holders & Randomizer -->
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeZafIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Senegal CEDEAO ID sample data &amp; card number</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Preset Holders & Reset -->
             <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
                   <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Reference &amp; Presets
                 </span>
-                <button type="button" onclick="randomizeZafIdCard()" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs cursor-pointer">
-                  <i class="fa-solid fa-dice"></i> Randomize
+                <button type="button" onclick="loadZafIdPreset('reference')" class="px-2.5 py-1 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-lg text-[10px] font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
               <div class="grid grid-cols-3 gap-1.5 pt-0.5">
@@ -17548,6 +17581,22 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <p class="text-[11px] text-slate-500 mt-1 leading-snug">Passeport CEDEAO / ECOWAS · page d'endossement + page de données biométriques (32 pages).</p>
               </div>
             </header>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeSenegalPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Senegal biometric passport sample data &amp; MRZ</div>
+                </div>
+              </button>
+            </div>
 
             <form id="senPassDocForm" class="space-y-3" onsubmit="return false;">
               <div>
@@ -17884,14 +17933,30 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </div>
             </div>
 
-            <!-- Preset Holders & Randomizer -->
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeSaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional South Africa passport sample data &amp; TD3 MRZ</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Preset Holders & Reset -->
             <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
                   <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Reference &amp; Presets
                 </span>
-                <button type="button" onclick="randomizeSaPassport()" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs cursor-pointer">
-                  <i class="fa-solid fa-dice"></i> Randomize
+                <button type="button" onclick="loadSaPassPreset('reference')" class="px-2.5 py-1 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-lg text-[10px] font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
               <div class="grid grid-cols-3 gap-1.5 pt-0.5">
@@ -18233,14 +18298,30 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               </div>
             </header>
 
-            <!-- Preset Holders & Randomizer -->
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeUsaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional U.S. passport sample bio-data &amp; TD3 MRZ</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Preset Holders & Reset -->
             <div class="bg-blue-50/70 p-3 rounded-xl border border-blue-200/80 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-blue-950 flex items-center gap-1.5">
                   <i class="fa-solid fa-wand-magic-sparkles text-blue-700"></i> Reference &amp; Presets
                 </span>
-                <button type="button" onclick="randomizeUsaPassport()" class="px-2.5 py-1 bg-blue-800 hover:bg-blue-900 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1 shadow-xs cursor-pointer">
-                  <i class="fa-solid fa-dice"></i> Randomize
+                <button type="button" onclick="loadUsaPassPreset('reference')" class="px-2.5 py-1 bg-white hover:bg-blue-100 text-blue-900 border border-blue-300 rounded-lg text-[10px] font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
               <div class="grid grid-cols-3 gap-1.5 pt-0.5">
@@ -18566,16 +18647,16 @@ MUQDISHO, BANAADIR, SOMALIA</span>
             </div>
 
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeDrcPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-500 hover:from-indigo-500 hover:via-blue-500 hover:to-sky-400 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeDrcPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Congolese passport data, numbers &amp; MRZ</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Congolese passport sample data, numbers &amp; MRZ</div>
                 </div>
               </button>
             </div>
@@ -19022,16 +19103,16 @@ COD REP DEM CONGO</div>
             </div>
 
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeBgdPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-600 hover:from-emerald-600 hover:via-teal-600 hover:to-emerald-500 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-700/25 hover:shadow-emerald-700/40 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeBgdPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate authentic Bangladeshi passport data, barcode &amp; TD3 MRZ</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Bangladeshi passport sample data, barcode &amp; TD3 MRZ</div>
                 </div>
               </button>
             </div>
@@ -19287,16 +19368,16 @@ COD REP DEM CONGO</div>
             </div>
 
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeDeuPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-slate-900 via-red-800 to-amber-600 hover:from-slate-800 hover:via-red-700 hover:to-amber-500 text-white font-black text-sm tracking-wide shadow-xl shadow-amber-900/20 hover:shadow-amber-900/35 border-2 border-amber-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeDeuPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
                     <span>Randomize Card</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-amber-100 opacity-90 mt-0.5">Generate authentic German passport data, CAN number &amp; TD3 MRZ</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional German passport sample data, CAN number &amp; TD3 MRZ</div>
                 </div>
               </button>
             </div>
@@ -19728,13 +19809,26 @@ COD REP DEM CONGO</div>
                 <h2 class="text-lg font-black text-slate-900 mt-1">Canadian e-Passport (CAN)</h2>
               </div>
               <div class="flex items-center gap-1.5">
-                <button type="button" onclick="randomizeCanPassport()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Canadian citizen data">
-                  <i class="fa-solid fa-shuffle"></i> Randomize
-                </button>
                 <button type="button" onclick="resetCanPassportSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Doug Thomas reference specimen">
-                  <i class="fa-solid fa-rotate-left"></i> Specimen
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
+            </div>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeCanPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Canadian passport sample bio-data, OVD &amp; TD3 MRZ</div>
+                </div>
+              </button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -19987,13 +20081,26 @@ COD REP DEM CONGO</div>
                 <h2 class="text-lg font-black text-slate-900 mt-1">Ghanaian e-Passport (GHA)</h2>
               </div>
               <div class="flex items-center gap-1.5">
-                <button type="button" onclick="randomizeGhaPassport()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Ghanaian citizen data">
-                  <i class="fa-solid fa-shuffle"></i> Randomize
-                </button>
                 <button type="button" onclick="resetGhaPassportSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Ebenezer Opoku reference specimen">
-                  <i class="fa-solid fa-rotate-left"></i> Specimen
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
+            </div>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeGhaPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Ghanaian e-Passport sample bio-data &amp; TD3 MRZ</div>
+                </div>
+              </button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -20207,13 +20314,26 @@ COD REP DEM CONGO</div>
                 <h2 class="text-lg font-black text-slate-900 mt-1">National ID Card (Indangamuntu)</h2>
               </div>
               <div class="flex items-center gap-1.5">
-                <button type="button" onclick="randomizeRwaId()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Rwandan citizen data">
-                  <i class="fa-solid fa-shuffle"></i> Randomize
-                </button>
                 <button type="button" onclick="resetRwaIdSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Hitayezu Jean Claude reference specimen">
-                  <i class="fa-solid fa-rotate-left"></i> Specimen
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
+            </div>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeRwaId()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Rwandan Indangamuntu ID sample data &amp; barcode</div>
+                </div>
+              </button>
             </div>
 
             <!-- Card View Side Toggle -->
@@ -20418,13 +20538,26 @@ COD REP DEM CONGO</div>
                 <h2 class="text-lg font-black text-slate-900 mt-1">Ethiopian e-Passport (ETH)</h2>
               </div>
               <div class="flex items-center gap-1.5">
-                <button type="button" onclick="randomizeEthPassport()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Ethiopian citizen data">
-                  <i class="fa-solid fa-shuffle"></i> Randomize
-                </button>
                 <button type="button" onclick="resetEthPassportSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Marwo Abdulahi reference specimen">
-                  <i class="fa-solid fa-rotate-left"></i> Specimen
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
                 </button>
               </div>
+            </div>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeEthPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Ethiopian e-Passport sample bio-data &amp; TD3 MRZ</div>
+                </div>
+              </button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -20766,16 +20899,16 @@ COD REP DEM CONGO</div>
 
             <!-- Big Randomize Button -->
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeProofOfAccount()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-800 to-zinc-900 hover:from-slate-900 hover:via-slate-700 hover:to-zinc-800 text-white font-black text-sm tracking-wide shadow-xl shadow-slate-900/25 hover:shadow-slate-900/40 border-2 border-slate-600/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
-                <div class="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+              <button type="button" onclick="randomizeProofOfAccount()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                    <span>Randomize Account Details</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">Instant Fill</span>
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-slate-300 opacity-90 mt-0.5">Generate authentic UK IBAN, Sort Code, Swift &amp; client holder data</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional UK IBAN, Sort Code, Swift &amp; client holder sample data</div>
                 </div>
               </button>
             </div>
