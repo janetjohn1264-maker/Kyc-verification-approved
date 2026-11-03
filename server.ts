@@ -71,6 +71,18 @@ export interface ConversionRecord {
   rawDate: string;
 }
 
+export interface SecurityEventRecord {
+  eventId: string;
+  sessionId: string;
+  eventType: string;
+  country: string;
+  docType: string;
+  attemptCount: number;
+  suspiciousFlag: boolean;
+  timestamp: number;
+  visitorIp: string;
+}
+
 export interface OgadsStore {
   config: OgadsConfig;
   stats: {
@@ -78,9 +90,12 @@ export interface OgadsStore {
     totalUnlockedDownloads: number;
     totalLockRequests: number;
     totalOfferClicks: number;
+    totalSecurityEvents?: number;
+    totalSuspiciousAlerts?: number;
   };
   locks: Record<string, LockRecord>;
   conversions: ConversionRecord[];
+  securityEvents?: SecurityEventRecord[];
 }
 
 function hashPassword(password: string, salt: string): string {
@@ -119,9 +134,12 @@ function createDefaultStore(): OgadsStore {
       totalUnlockedDownloads: 0,
       totalLockRequests: 0,
       totalOfferClicks: 0,
+      totalSecurityEvents: 0,
+      totalSuspiciousAlerts: 0,
     },
     locks: {},
     conversions: [],
+    securityEvents: [],
   };
 }
 
@@ -164,6 +182,7 @@ function loadStore(): void {
         },
         locks: parsed.locks || {},
         conversions: Array.isArray(parsed.conversions) ? parsed.conversions : [],
+        securityEvents: Array.isArray(parsed.securityEvents) ? parsed.securityEvents : [],
       };
       // Sync environment overrides if set
       if (process.env.OGADS_POSTBACK_SECRET && !store.config.postbackSecret) {
@@ -1350,6 +1369,66 @@ async function startServer() {
     });
   });
 
+  // 8B. Record Non-PII Client Security & Screenshot Deterrence Events
+  const ALLOWED_SECURITY_EVENT_TYPES = new Set([
+    'contextmenu_blocked',
+    'copy_blocked',
+    'cut_blocked',
+    'select_blocked',
+    'drag_blocked',
+    'screenshot_shortcut_detected',
+    'print_shortcut_blocked',
+    'save_shortcut_blocked',
+    'devtools_shortcut_detected',
+    'watermark_tamper_detected',
+    'rapid_suspicious_activity',
+    'tab_focus_loss_shield',
+  ]);
+
+  app.post('/api/ogads/security-event', (req: Request, res: Response) => {
+    const sessionId = getOrCreateVisitorSession(req, res);
+    const rawType = typeof req.body?.eventType === 'string' ? req.body.eventType.trim() : '';
+    const eventType = ALLOWED_SECURITY_EVENT_TYPES.has(rawType) ? rawType : 'security_policy_triggered';
+    const rawCountry = typeof req.body?.country === 'string' ? req.body.country.trim().replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24) : 'global';
+    const rawDocType = typeof req.body?.docType === 'string' ? req.body.docType.trim().replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 24) : 'document';
+    const attemptCount = Math.max(1, Math.min(9999, Number(req.body?.attemptCount) || 1));
+    const suspiciousFlag = Boolean(req.body?.suspiciousFlag || attemptCount >= 3 || eventType === 'rapid_suspicious_activity' || eventType === 'watermark_tamper_detected');
+
+    const eventRecord: SecurityEventRecord = {
+      eventId: 'sec_' + crypto.randomBytes(8).toString('hex'),
+      sessionId,
+      eventType,
+      country: rawCountry || 'global',
+      docType: rawDocType || 'document',
+      attemptCount,
+      suspiciousFlag,
+      timestamp: Date.now(),
+      visitorIp: getClientIp(req),
+    };
+
+    if (!Array.isArray(store.securityEvents)) {
+      store.securityEvents = [];
+    }
+    store.securityEvents.unshift(eventRecord);
+    if (store.securityEvents.length > 300) {
+      store.securityEvents = store.securityEvents.slice(0, 300);
+    }
+
+    store.stats.totalSecurityEvents = (store.stats.totalSecurityEvents || 0) + 1;
+    if (suspiciousFlag) {
+      store.stats.totalSuspiciousAlerts = (store.stats.totalSuspiciousAlerts || 0) + 1;
+    }
+    saveStore();
+
+    res.json({
+      ok: true,
+      recorded: true,
+      eventId: eventRecord.eventId,
+      suspiciousFlag,
+      attemptCount,
+    });
+  });
+
   app.post('/api/ogads/admin/login', (req: Request, res: Response) => {
     const password = typeof req.body?.password === 'string' ? req.body.password : '';
     if (!password || password.length < 4) {
@@ -1471,6 +1550,7 @@ async function startServer() {
         offerId: l.offerId,
         payout: l.payout,
       })),
+      recentSecurityEvents: (store.securityEvents || []).slice(0, 30),
     });
   });
 

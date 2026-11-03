@@ -38,5 +38,43 @@ nav { display: grid; gap: 4px; } nav a { display: flex; align-items: center; gap
   .detected-text-heading span { color: #2563eb; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
   .detected-text-list { display: grid; gap: 5px; margin-top: 9px; color: #5e6b80; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10px; line-height: 1.45; }
   .detected-text-list span { padding-bottom: 4px; border-bottom: 1px solid #e7eef8; }
-.passport-reference-image { display: block; width: min(100%, 245px); height: auto; aspect-ratio: 443 / 594; object-fit: contain; border-radius: 2px; }
+.passport-reference-image { display: block; width: min(100%, 245px); height: auto; aspect-ratio: 443 / 594; object-fit: contain; border-radius: 2px; -webkit-user-drag: none; }
 .static-passport .placeholder-copy { text-align: center; }
+.preview-frame, .static-passport, .detected-text {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.kyc-react-blurred .static-passport,
+.kyc-react-blurred .detected-text {
+  filter: blur(24px) brightness(0.32) !important;
+  opacity: 0.16 !important;
+  pointer-events: none !important;
+  transition: none !important;
+}
+.kyc-react-watermark-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.kyc-react-wm-item {
+  position: absolute;
+  pointer-events: none !important;
+  user-select: none !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: rgba(15, 23, 42, 0.16);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+  padding: 2px 5px;
+  border: 1px dashed rgba(15, 23, 42, 0.12);
+  border-radius: 4px;
+}
+

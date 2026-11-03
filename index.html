@@ -597,6 +597,112 @@
     .sen-pp-crease {
       box-shadow: inset 0 -10px 14px -8px rgba(0,0,0,.18), inset 0 10px 14px -8px rgba(0,0,0,.18);
     }
+
+    /* ================= KYC SCREENSHOT & SENSITIVE-CONTENT PROTECTION ================= */
+    #verification-workbench [id$="-view"],
+    #verification-workbench article,
+    #poaPdfContainer,
+    #poaLetterContainer,
+    #imageModal {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+    }
+
+    #verification-workbench input,
+    #verification-workbench textarea,
+    #verification-workbench select,
+    #ogadsAdminPostbackUrlBox {
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      -ms-user-select: text !important;
+      user-select: text !important;
+      -webkit-touch-callout: default !important;
+    }
+
+    #verification-workbench article img,
+    #verification-workbench [id$="-view"] img,
+    #modalPreviewImg {
+      -webkit-user-drag: none !important;
+      user-drag: none !important;
+      -webkit-touch-callout: none !important;
+    }
+
+    .kyc-protected-surface {
+      position: relative !important;
+    }
+
+    .kyc-dynamic-watermark-overlay {
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 46 !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      overflow: hidden !important;
+      border-radius: inherit;
+      mix-blend-mode: multiply;
+    }
+
+    .kyc-wm-stamp {
+      position: absolute !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace !important;
+      font-size: clamp(7.5px, 1.05cqw, 10.5px) !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.07em !important;
+      line-height: 1.25 !important;
+      color: rgba(15, 23, 42, 0.16) !important;
+      text-shadow: 0 0 1px rgba(255, 255, 255, 0.38) !important;
+      white-space: nowrap !important;
+      text-transform: uppercase !important;
+      padding: 2px 6px !important;
+      border: 1px dashed rgba(15, 23, 42, 0.11) !important;
+      border-radius: 4px !important;
+      background: rgba(255, 255, 255, 0.06) !important;
+      transition: transform 0.35s ease, top 0.35s ease, left 0.35s ease;
+    }
+
+    body.kyc-tab-blurred #verification-workbench article,
+    body.kyc-tab-blurred #poaPdfContainer,
+    body.kyc-tab-blurred #poaLetterContainer,
+    body.kyc-tab-blurred #modalPreviewImg,
+    body.kyc-suspicious-locked #verification-workbench article,
+    body.kyc-suspicious-locked #poaPdfContainer,
+    body.kyc-suspicious-locked #poaLetterContainer,
+    body.kyc-suspicious-locked #modalPreviewImg,
+    body.kyc-shortcut-shield #verification-workbench article,
+    body.kyc-shortcut-shield #poaPdfContainer,
+    body.kyc-shortcut-shield #poaLetterContainer,
+    body.kyc-shortcut-shield #modalPreviewImg {
+      filter: blur(26px) brightness(0.28) contrast(0.75) !important;
+      opacity: 0.14 !important;
+      pointer-events: none !important;
+      transition: none !important;
+    }
+
+    #kyc-focus-blur-banner {
+      display: none;
+    }
+
+    body.kyc-tab-blurred #kyc-focus-blur-banner,
+    body.kyc-shortcut-shield #kyc-focus-blur-banner {
+      display: flex !important;
+    }
+
+    @media print {
+      #verification-workbench article,
+      #poaPdfContainer,
+      #poaLetterContainer,
+      #modalPreviewImg {
+        filter: blur(32px) !important;
+        opacity: 0.08 !important;
+      }
+    }
   </style>
 
   <script>
@@ -11302,10 +11408,6 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           <i class="fa-solid fa-lock text-xs text-amber-600"></i>
           <span>Admin</span>
         </button>
-        <button onclick="openContactModal()" class="lg:hidden px-3 py-2 text-emerald-700 hover:text-emerald-800 bg-emerald-50 rounded-xl border border-emerald-200 text-xs font-bold flex items-center gap-1 cursor-pointer">
-          <i class="fa-solid fa-headset text-sm"></i>
-          <span>Support</span>
-        </button>
 
         <!-- Mobile Menu Hamburger Button -->
         <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu" class="lg:hidden p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl border border-slate-200 cursor-pointer transition-colors flex items-center justify-center">
@@ -12358,6 +12460,43 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <span>DOWNLOAD NOW</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- KYC Sensitive-Content & Screenshot Deterrence Status Bar -->
+      <div id="kyc-security-protection-bar" class="max-w-7xl mx-auto mb-5 no-print">
+        <div class="rounded-xl bg-slate-900/95 border border-slate-700/80 px-3.5 py-2.5 text-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-[11px]">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 font-bold uppercase tracking-wider text-[10px]">
+              <i class="fa-solid fa-user-shield text-[10px]"></i>
+              <span>Active Content Shield</span>
+            </span>
+            <span class="text-slate-300 font-medium">
+              Right-click/copy lock, focus-loss auto-blur, and live session watermarking are active across all country KYC documents.
+            </span>
+            <span class="text-slate-400 text-[10px] italic">
+              (Note: Browser-based controls deter and watermark unauthorized capture, though OS/hardware capture cannot be 100% guaranteed by any browser.)
+            </span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 shrink-0 font-mono text-[10px]">
+            <span id="kyc-sec-bar-session" class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-amber-300">SID: initializing...</span>
+            <span id="kyc-sec-bar-clock" class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-sky-300">--:--:-- UTC</span>
+            <span id="kyc-sec-bar-events" class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-emerald-300">Events: 0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instant Focus-Loss / Screenshot Shortcut Privacy Shield Notice -->
+      <div id="kyc-focus-blur-banner" class="fixed inset-0 z-[105] pointer-events-none items-center justify-center p-4">
+        <div class="max-w-md w-full rounded-2xl bg-slate-950/95 border border-amber-500/50 p-5 text-center shadow-2xl backdrop-blur-md">
+          <div class="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center mx-auto mb-3 text-lg">
+            <i class="fa-solid fa-eye-slash"></i>
+          </div>
+          <h4 class="text-white font-black text-sm uppercase tracking-wider">Sensitive KYC Content Hidden</h4>
+          <p id="kyc-focus-blur-reason" class="text-slate-300 text-xs mt-1.5 leading-relaxed">
+            Verification document previews are automatically blurred when the browser tab loses focus, is minimized, or a capture shortcut is detected. Return focus to this window to restore the view.
+          </p>
+          <div id="kyc-focus-blur-meta" class="mt-3 pt-2.5 border-t border-slate-800 font-mono text-[10px] text-amber-300/90"></div>
         </div>
       </div>
 
@@ -24078,6 +24217,655 @@ COD REP DEM CONGO</div>
         document.addEventListener('DOMContentLoaded', initOgadsSystem);
       } else {
         initOgadsSystem();
+      }
+    })();
+
+    // ================= ADVANCED KYC SCREENSHOT & SENSITIVE-CONTENT PROTECTION CONTROLLER =================
+    (function() {
+      var SESSION_STORAGE_KEY = 'ogads_visitor_session_v1';
+      var SUSPICIOUS_WINDOW_MS = 60000;
+      var SUSPICIOUS_THRESHOLD = 3;
+      var recentSecurityTimestamps = [];
+      var totalRecordedEvents = 0;
+      var isSuspiciousLocked = false;
+      var shortcutShieldTimer = null;
+      var toastTimer = null;
+      var watermarkCycleCount = 0;
+      var isRestoringWatermark = false;
+
+      var PROTECTED_CARD_IDS = [
+        'passport-card',
+        'kenya-id-front',
+        'kenya-id-back',
+        'somali-smart-id-card',
+        'somalia-card',
+        'somalia-passport-spread',
+        'somalia-passport-id-card',
+        'somalia-driverlicense-card',
+        'ethiopia-fayda-card',
+        'ethiopia-passport-card',
+        'nigeria-id-card',
+        'nigeria-passport-card',
+        'uk-passport-card',
+        'uganda-refugee-card',
+        'uganda-id-back-card',
+        'pak-showcase-front',
+        'pak-showcase-back',
+        'pakistan-id-card',
+        'pakistan-id-back',
+        'pak-single-front-card',
+        'pak-single-back-card',
+        'seychelles-id-front',
+        'seychelles-id-back',
+        'senegal-id-card',
+        'senegal-passport-spread',
+        'senegal-datapage-card',
+        'senegal-page1-card',
+        'sa-passport-card',
+        'usa-passport-card',
+        'drc-passport-card',
+        'bangladesh-passport-card',
+        'germany-passport-card',
+        'canada-passport-card',
+        'ghana-passport-card',
+        'rwanda-id-front',
+        'rwanda-id-back',
+        'proof-of-account-card',
+        'poaPdfContainer',
+        'poaLetterContainer'
+      ];
+
+      function getVisitorSessionId() {
+        try {
+          var sid = localStorage.getItem(SESSION_STORAGE_KEY);
+          if (!sid) {
+            sid = 'vs_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+            localStorage.setItem(SESSION_STORAGE_KEY, sid);
+          }
+          return sid;
+        } catch (e) {
+          return 'vs_ephemeral_session';
+        }
+      }
+
+      function getShortSessionTag() {
+        var full = getVisitorSessionId();
+        return full.length > 18 ? full.slice(0, 18) : full;
+      }
+
+      function getFormattedTimestamp() {
+        var now = new Date();
+        return now.toISOString().replace('T', ' ').slice(0, 19) + ' UTC';
+      }
+
+      function getActiveCountryViewId() {
+        var views = document.querySelectorAll('#verification-workbench [id$="-view"]');
+        for (var i = 0; i < views.length; i++) {
+          var v = views[i];
+          if (!v.classList.contains('hidden') && v.offsetParent !== null) {
+            return v.id;
+          }
+        }
+        return 'kenya-passport-view';
+      }
+
+      function getActiveDocKeySafe() {
+        try {
+          if (typeof window.getActiveWorkbenchDownloadKey === 'function') {
+            return String(window.getActiveWorkbenchDownloadKey() || '');
+          }
+        } catch (e) {}
+        return getActiveCountryViewId();
+      }
+
+      function isEditableInputTarget(target) {
+        if (!target || !target.tagName) return false;
+        var tag = target.tagName.toUpperCase();
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+        if (target.isContentEditable) return true;
+        if (target.closest && target.closest('#ogadsAdminPostbackUrlBox')) return true;
+        return false;
+      }
+
+      function isInsideProtectedKycSurface(target) {
+        if (!target || !target.closest) return false;
+        if (isEditableInputTarget(target)) return false;
+        return Boolean(
+          target.closest('#verification-workbench article') ||
+          target.closest('#verification-workbench [id$="-view"]') ||
+          target.closest('#poaPdfContainer') ||
+          target.closest('#poaLetterContainer') ||
+          target.closest('#imageModal')
+        );
+      }
+
+      function ensureProtectionUiElements() {
+        if (!document.getElementById('kyc-protection-toast')) {
+          var toast = document.createElement('div');
+          toast.id = 'kyc-protection-toast';
+          toast.className = 'fixed bottom-5 right-5 z-[115] hidden max-w-sm rounded-xl bg-slate-950/95 border border-amber-500/50 px-4 py-3 text-white shadow-2xl backdrop-blur-md pointer-events-none';
+          toast.innerHTML =
+            '<div class="flex items-start gap-2.5">' +
+              '<i class="fa-solid fa-shield-halved text-amber-400 mt-0.5"></i>' +
+              '<div class="text-xs leading-snug">' +
+                '<div id="kyc-protection-toast-title" class="font-extrabold text-amber-300 uppercase tracking-wider text-[11px]">Protected KYC Specimen</div>' +
+                '<div id="kyc-protection-toast-msg" class="text-slate-300 mt-0.5">Action restricted on sensitive KYC verification content.</div>' +
+              '</div>' +
+            '</div>';
+          document.body.appendChild(toast);
+        }
+
+        if (!document.getElementById('kyc-suspicious-activity-modal')) {
+          var modal = document.createElement('div');
+          modal.id = 'kyc-suspicious-activity-modal';
+          modal.className = 'fixed inset-0 z-[120] hidden items-center justify-center bg-slate-950/88 backdrop-blur-md p-4';
+          modal.innerHTML =
+            '<div class="max-w-md w-full rounded-2xl bg-slate-900 border border-rose-500/50 p-6 text-white shadow-2xl">' +
+              '<div class="flex items-center gap-3 mb-3">' +
+                '<div class="w-11 h-11 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-300 flex items-center justify-center text-lg shrink-0">' +
+                  '<i class="fa-solid fa-triangle-exclamation"></i>' +
+                '</div>' +
+                '<div>' +
+                  '<span class="text-[10px] font-extrabold uppercase tracking-widest text-rose-400 block">Security Event Recorded</span>' +
+                  '<h3 class="text-base font-black tracking-tight">Repeated Protected-Content Access Detected</h3>' +
+                '</div>' +
+              '</div>' +
+              '<p class="text-xs text-slate-300 leading-relaxed">' +
+                'Multiple attempts to copy, inspect, capture, or tamper with protected KYC verification specimens were detected in a short interval. Sensitive previews have been temporarily shielded and this non-PII security event has been logged against your session.' +
+              '</p>' +
+              '<div class="mt-3 p-3 rounded-xl bg-slate-950/90 border border-slate-800 font-mono text-[10px] text-slate-300 space-y-1">' +
+                '<div id="kyc-suspicious-modal-sid">SESSION: --</div>' +
+                '<div id="kyc-suspicious-modal-count">SECURITY EVENTS IN WINDOW: --</div>' +
+                '<div class="text-slate-400">DISCLOSURE: Browser-level controls deter and watermark unauthorized capture but do not replace OS/hardware-level security.</div>' +
+              '</div>' +
+              '<button type="button" id="kyc-suspicious-restore-btn" class="mt-4 w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider transition cursor-pointer">' +
+                'Acknowledge & Restore Protected View' +
+              '</button>' +
+            '</div>';
+          document.body.appendChild(modal);
+
+          var restoreBtn = document.getElementById('kyc-suspicious-restore-btn');
+          if (restoreBtn) {
+            restoreBtn.addEventListener('click', function() {
+              isSuspiciousLocked = false;
+              recentSecurityTimestamps = [];
+              document.body.classList.remove('kyc-suspicious-locked');
+              document.body.classList.remove('kyc-shortcut-shield');
+              modal.classList.add('hidden');
+              modal.classList.remove('flex');
+            });
+          }
+        }
+      }
+
+      function showProtectionToast(title, message) {
+        ensureProtectionUiElements();
+        var toast = document.getElementById('kyc-protection-toast');
+        var tEl = document.getElementById('kyc-protection-toast-title');
+        var mEl = document.getElementById('kyc-protection-toast-msg');
+        if (!toast || !tEl || !mEl) return;
+        tEl.textContent = title || 'Protected KYC Specimen';
+        mEl.textContent = message || 'This action is restricted on sensitive KYC verification pages.';
+        toast.classList.remove('hidden');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() {
+          toast.classList.add('hidden');
+        }, 3200);
+      }
+
+      function updateStatusBar() {
+        var sidEl = document.getElementById('kyc-sec-bar-session');
+        var clkEl = document.getElementById('kyc-sec-bar-clock');
+        var evtEl = document.getElementById('kyc-sec-bar-events');
+        var metaEl = document.getElementById('kyc-focus-blur-meta');
+        var shortSid = getShortSessionTag();
+        var ts = getFormattedTimestamp();
+        if (sidEl) sidEl.textContent = 'SID: ' + shortSid;
+        if (clkEl) clkEl.textContent = ts;
+        if (evtEl) {
+          evtEl.textContent = 'Events: ' + totalRecordedEvents;
+          if (totalRecordedEvents >= SUSPICIOUS_THRESHOLD) {
+            evtEl.className = 'px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/50 text-rose-300 font-bold';
+          }
+        }
+        if (metaEl) {
+          metaEl.textContent = 'WATERMARK SESSION: ' + shortSid + ' • ' + ts;
+        }
+      }
+
+      function recordSecurityEvent(eventType, details, countTowardSuspicious) {
+        totalRecordedEvents += 1;
+        var now = Date.now();
+        if (countTowardSuspicious !== false) {
+          recentSecurityTimestamps = recentSecurityTimestamps.filter(function(t) {
+            return now - t < SUSPICIOUS_WINDOW_MS;
+          });
+          recentSecurityTimestamps.push(now);
+        }
+
+        var attemptCount = recentSecurityTimestamps.length;
+        var isSuspicious = attemptCount >= SUSPICIOUS_THRESHOLD || eventType === 'watermark_tamper_detected';
+
+        updateStatusBar();
+
+        // Send strictly non-PII security telemetry to server
+        try {
+          fetch('/api/ogads/security-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: getVisitorSessionId(),
+              eventType: eventType,
+              documentKey: getActiveDocKeySafe(),
+              countryView: getActiveCountryViewId(),
+              attemptCount: attemptCount,
+              suspicious: isSuspicious,
+              details: String(details || '').slice(0, 120)
+            })
+          }).catch(function() {});
+        } catch (e) {}
+
+        if (isSuspicious && !isSuspiciousLocked) {
+          isSuspiciousLocked = true;
+          document.body.classList.add('kyc-suspicious-locked');
+          ensureProtectionUiElements();
+          var modal = document.getElementById('kyc-suspicious-activity-modal');
+          var sidNode = document.getElementById('kyc-suspicious-modal-sid');
+          var cntNode = document.getElementById('kyc-suspicious-modal-count');
+          if (sidNode) sidNode.textContent = 'SESSION ID: ' + getShortSessionTag() + ' (' + getFormattedTimestamp() + ')';
+          if (cntNode) cntNode.textContent = 'RECENT BLOCKED ATTEMPTS (60s): ' + attemptCount;
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+        }
+      }
+
+      function triggerTemporaryShortcutShield(reasonText) {
+        var reasonEl = document.getElementById('kyc-focus-blur-reason');
+        if (reasonEl && reasonText) {
+          reasonEl.textContent = reasonText;
+        }
+        document.body.classList.add('kyc-shortcut-shield');
+        updateStatusBar();
+        if (shortcutShieldTimer) clearTimeout(shortcutShieldTimer);
+        shortcutShieldTimer = setTimeout(function() {
+          if (!document.hidden && document.hasFocus()) {
+            document.body.classList.remove('kyc-shortcut-shield');
+          }
+        }, 2600);
+      }
+
+      // Build dynamic canvas watermark pattern + multi-point DOM stamps
+      function buildWatermarkPatternDataUrl(sessionTag, timestampStr, cycle) {
+        try {
+          var canvas = document.createElement('canvas');
+          canvas.width = 340;
+          canvas.height = 170;
+          var ctx = canvas.getContext('2d');
+          if (!ctx) return '';
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.save();
+          ctx.translate(170, 85);
+          var angleDeg = -21 + ((cycle % 5) - 2) * 0.9;
+          ctx.rotate((angleDeg * Math.PI) / 180);
+          ctx.font = '700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.105)';
+          ctx.textAlign = 'center';
+          ctx.fillText('KYC PROTECTED • ' + sessionTag, 0, -6);
+          ctx.font = '600 9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+          ctx.fillStyle = 'rgba(30, 41, 59, 0.095)';
+          ctx.fillText(timestampStr + ' • DO NOT CAPTURE', 0, 10);
+          ctx.restore();
+          return canvas.toDataURL('image/png');
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function getAllProtectedSurfaceNodes() {
+        var nodes = [];
+        var seen = new Set();
+
+        for (var i = 0; i < PROTECTED_CARD_IDS.length; i++) {
+          var el = document.getElementById(PROTECTED_CARD_IDS[i]);
+          if (el && !seen.has(el)) {
+            seen.add(el);
+            nodes.push(el);
+          }
+        }
+
+        var articles = document.querySelectorAll('#verification-workbench [id$="-view"] article');
+        for (var j = 0; j < articles.length; j++) {
+          var art = articles[j];
+          if (art && !seen.has(art)) {
+            seen.add(art);
+            nodes.push(art);
+          }
+        }
+        return nodes;
+      }
+
+      function renderAndRefreshWatermarks() {
+        isRestoringWatermark = true;
+        try {
+          watermarkCycleCount += 1;
+          var sessionTag = getShortSessionTag();
+          var ts = getFormattedTimestamp();
+          var bgDataUrl = buildWatermarkPatternDataUrl(sessionTag, ts, watermarkCycleCount);
+          var surfaces = getAllProtectedSurfaceNodes();
+
+          var positions = [
+            { top: 14, left: 8, rot: -16 },
+            { top: 46, left: 26, rot: -14 },
+            { top: 76, left: 12, rot: -17 },
+            { top: 24, left: 52, rot: -15 }
+          ];
+
+          for (var i = 0; i < surfaces.length; i++) {
+            var surface = surfaces[i];
+            if (!surface.classList.contains('kyc-protected-surface')) {
+              surface.classList.add('kyc-protected-surface');
+            }
+            var computedPos = window.getComputedStyle(surface).position;
+            if (computedPos === 'static') {
+              surface.style.position = 'relative';
+            }
+
+            var overlay = surface.querySelector(':scope > .kyc-dynamic-watermark-overlay');
+            if (!overlay) {
+              overlay = document.createElement('div');
+              overlay.className = 'kyc-dynamic-watermark-overlay';
+              overlay.setAttribute('data-kyc-wm', 'true');
+              overlay.setAttribute('aria-hidden', 'true');
+              for (var p = 0; p < positions.length; p++) {
+                var stamp = document.createElement('div');
+                stamp.className = 'kyc-wm-stamp';
+                stamp.setAttribute('data-kyc-wm-stamp', String(p));
+                overlay.appendChild(stamp);
+              }
+              surface.appendChild(overlay);
+            }
+
+            // Ensure overlay style integrity
+            overlay.style.cssText =
+              'position:absolute !important;inset:0 !important;z-index:46 !important;pointer-events:none !important;' +
+              'user-select:none !important;-webkit-user-select:none !important;overflow:hidden !important;border-radius:inherit;' +
+              (bgDataUrl ? 'background-image:url("' + bgDataUrl + '");background-repeat:repeat;' : '');
+
+            var stamps = overlay.querySelectorAll('.kyc-wm-stamp');
+            if (stamps.length < positions.length) {
+              overlay.innerHTML = '';
+              for (var k = 0; k < positions.length; k++) {
+                var newStamp = document.createElement('div');
+                newStamp.className = 'kyc-wm-stamp';
+                newStamp.setAttribute('data-kyc-wm-stamp', String(k));
+                overlay.appendChild(newStamp);
+              }
+              stamps = overlay.querySelectorAll('.kyc-wm-stamp');
+            }
+
+            for (var s = 0; s < stamps.length; s++) {
+              var base = positions[s % positions.length];
+              var jitterTop = ((watermarkCycleCount + s * 3) % 5) - 2;
+              var jitterLeft = ((watermarkCycleCount * 2 + s * 5) % 7) - 3;
+              var jitterRot = base.rot + (((watermarkCycleCount + s) % 3) - 1) * 1.1;
+              var st = stamps[s];
+              st.style.top = (base.top + jitterTop) + '%';
+              st.style.left = (base.left + jitterLeft) + '%';
+              st.style.transform = 'rotate(' + jitterRot.toFixed(1) + 'deg)';
+              st.textContent = sessionTag + ' • ' + ts;
+            }
+          }
+
+          updateStatusBar();
+        } finally {
+          isRestoringWatermark = false;
+        }
+      }
+
+      function setupWatermarkTamperObserver() {
+        var workbench = document.getElementById('verification-workbench');
+        if (!workbench || typeof MutationObserver === 'undefined') return;
+
+        var observer = new MutationObserver(function(mutations) {
+          if (isRestoringWatermark) return;
+          var tampered = false;
+
+          for (var i = 0; i < mutations.length; i++) {
+            var m = mutations[i];
+            if (m.type === 'childList' && m.removedNodes && m.removedNodes.length > 0) {
+              for (var r = 0; r < m.removedNodes.length; r++) {
+                var node = m.removedNodes[r];
+                if (node && node.nodeType === 1) {
+                  if (
+                    node.classList.contains('kyc-dynamic-watermark-overlay') ||
+                    node.classList.contains('kyc-wm-stamp') ||
+                    (node.querySelector && node.querySelector('.kyc-dynamic-watermark-overlay'))
+                  ) {
+                    tampered = true;
+                    break;
+                  }
+                }
+              }
+            } else if (m.type === 'attributes' && m.target && m.target.nodeType === 1) {
+              var t = m.target;
+              if (t.classList.contains('kyc-dynamic-watermark-overlay') || t.classList.contains('kyc-wm-stamp')) {
+                var cs = window.getComputedStyle(t);
+                if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') < 0.05) {
+                  tampered = true;
+                  break;
+                }
+              }
+            }
+          }
+
+          if (tampered) {
+            renderAndRefreshWatermarks();
+            recordSecurityEvent('watermark_tamper_detected', 'Watermark overlay modification or removal blocked', true);
+            showProtectionToast('Watermark Integrity Enforced', 'Dynamic session watermark restored automatically.');
+          }
+        });
+
+        observer.observe(workbench, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['style', 'class', 'hidden']
+        });
+      }
+
+      function installInteractionProtections() {
+        // 1. Disable right-click / context menu on sensitive KYC verification views
+        document.addEventListener('contextmenu', function(e) {
+          if (isInsideProtectedKycSurface(e.target)) {
+            e.preventDefault();
+            e.stopPropagation();
+            recordSecurityEvent('contextmenu_blocked', 'Right-click context menu blocked on KYC view', true);
+            showProtectionToast('Context Menu Disabled', 'Right-click is disabled on sensitive KYC verification specimens.');
+            return false;
+          }
+        }, true);
+
+        // 2. Disable copy & cut on sensitive KYC verification content
+        document.addEventListener('copy', function(e) {
+          if (isEditableInputTarget(e.target)) return;
+          if (isInsideProtectedKycSurface(e.target) || (window.getSelection && String(window.getSelection()).trim().length > 0)) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.clipboardData) {
+              try {
+                e.clipboardData.setData('text/plain', 'Protected KYC Verification Content — Copying Disabled.');
+              } catch (err) {}
+            }
+            recordSecurityEvent('copy_blocked', 'Copy attempt blocked on KYC specimen', true);
+            showProtectionToast('Copying Disabled', 'Copying sensitive KYC verification data is restricted.');
+            return false;
+          }
+        }, true);
+
+        document.addEventListener('cut', function(e) {
+          if (isEditableInputTarget(e.target)) return;
+          if (isInsideProtectedKycSurface(e.target)) {
+            e.preventDefault();
+            e.stopPropagation();
+            recordSecurityEvent('cut_blocked', 'Cut attempt blocked on KYC specimen', true);
+            showProtectionToast('Cut Disabled', 'Cutting sensitive KYC verification data is restricted.');
+            return false;
+          }
+        }, true);
+
+        document.addEventListener('dragstart', function(e) {
+          if (isInsideProtectedKycSurface(e.target)) {
+            e.preventDefault();
+            e.stopPropagation();
+            recordSecurityEvent('drag_blocked', 'Image/element drag blocked on KYC specimen', true);
+            showProtectionToast('Drag Disabled', 'Dragging KYC specimen images is restricted.');
+            return false;
+          }
+        }, true);
+
+        // 3. Detect screenshot-related, print, save, and inspection keyboard shortcuts
+        function handleShortcutKey(e) {
+          var key = String(e.key || '');
+          var lower = key.toLowerCase();
+          var code = e.keyCode || e.which || 0;
+
+          // PrintScreen key
+          if (key === 'PrintScreen' || code === 44) {
+            e.preventDefault();
+            triggerTemporaryShortcutShield('Screenshot key (PrintScreen) detected. Sensitive KYC previews have been blurred and watermarked.');
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+              navigator.clipboard.writeText('Protected KYC Verification Specimen — Screenshot Capture Restricted [' + getShortSessionTag() + ']').catch(function() {});
+            }
+            recordSecurityEvent('screenshot_shortcut_detected', 'PrintScreen key detected', true);
+            showProtectionToast('Screenshot Attempt Detected', 'PrintScreen shortcut detected and logged against session ' + getShortSessionTag() + '.');
+            return false;
+          }
+
+          // macOS Cmd+Shift+3 / 4 / 5 / 6 or Windows Win+Shift+S
+          if ((e.metaKey && e.shiftKey && (lower === '3' || lower === '4' || lower === '5' || lower === '6' || lower === 's')) ||
+              (e.ctrlKey && e.shiftKey && lower === 's')) {
+            e.preventDefault();
+            triggerTemporaryShortcutShield('Screen capture shortcut detected. Sensitive KYC previews have been blurred and logged.');
+            recordSecurityEvent('screenshot_shortcut_detected', 'OS capture shortcut Meta/Ctrl+Shift+' + lower.toUpperCase(), true);
+            showProtectionToast('Capture Shortcut Detected', 'Screen capture shortcut detected and recorded.');
+            return false;
+          }
+
+          // Print shortcut Ctrl/Cmd + P
+          if ((e.ctrlKey || e.metaKey) && lower === 'p') {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerTemporaryShortcutShield('Print shortcut (Ctrl/Cmd+P) is disabled on protected KYC specimens.');
+            recordSecurityEvent('print_shortcut_blocked', 'Ctrl/Cmd+P blocked', true);
+            showProtectionToast('Printing Restricted', 'Direct browser printing of KYC verification pages is disabled.');
+            return false;
+          }
+
+          // Save page shortcut Ctrl/Cmd + S
+          if ((e.ctrlKey || e.metaKey) && !e.shiftKey && lower === 's') {
+            e.preventDefault();
+            e.stopPropagation();
+            recordSecurityEvent('save_shortcut_blocked', 'Ctrl/Cmd+S blocked', true);
+            showProtectionToast('Save Page Restricted', 'Saving raw KYC verification pages is disabled.');
+            return false;
+          }
+
+          // DevTools / View Source shortcuts: F12, Ctrl/Cmd+Shift+I/J/C/K, Ctrl/Cmd+U
+          if (
+            key === 'F12' || code === 123 ||
+            ((e.ctrlKey || e.metaKey) && e.shiftKey && (lower === 'i' || lower === 'j' || lower === 'c' || lower === 'k')) ||
+            ((e.ctrlKey || e.metaKey) && lower === 'u')
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            triggerTemporaryShortcutShield('Inspection shortcut detected. Sensitive KYC content is shielded.');
+            recordSecurityEvent('devtools_shortcut_detected', 'Inspection shortcut detected: ' + (key || code), true);
+            showProtectionToast('Inspection Restricted', 'Developer inspection shortcuts are restricted on protected KYC pages.');
+            return false;
+          }
+        }
+
+        window.addEventListener('keydown', handleShortcutKey, true);
+        window.addEventListener('keyup', function(e) {
+          var key = String(e.key || '');
+          var code = e.keyCode || e.which || 0;
+          if (key === 'PrintScreen' || code === 44) {
+            handleShortcutKey(e);
+          }
+        }, true);
+
+        // Mobile multi-finger (3-finger screenshot gesture on Android/iOS) detection
+        document.addEventListener('touchstart', function(e) {
+          if (e.touches && e.touches.length >= 3 && isInsideProtectedKycSurface(e.target)) {
+            triggerTemporaryShortcutShield('Multi-finger touch capture gesture detected. Sensitive KYC content has been blurred.');
+            recordSecurityEvent('screenshot_shortcut_detected', 'Mobile 3-finger touch gesture detected', true);
+            showProtectionToast('Touch Capture Detected', 'Multi-finger screenshot gesture detected and logged.');
+          }
+        }, { passive: true, capture: true });
+
+        // 4 & 5. Auto-blur when tab becomes inactive, loses focus, or is minimized; restore on return
+        function activateFocusBlur(reason) {
+          var reasonEl = document.getElementById('kyc-focus-blur-reason');
+          if (reasonEl && reason) {
+            reasonEl.textContent = reason;
+          }
+          document.body.classList.add('kyc-tab-blurred');
+          updateStatusBar();
+        }
+
+        function restoreFocusBlur() {
+          if (!document.hidden && document.hasFocus()) {
+            document.body.classList.remove('kyc-tab-blurred');
+            updateStatusBar();
+          }
+        }
+
+        document.addEventListener('visibilitychange', function() {
+          if (document.hidden || document.visibilityState !== 'visible') {
+            activateFocusBlur('Browser tab is inactive or minimized. Sensitive KYC content is blurred until you return.');
+            recordSecurityEvent('tab_focus_loss_shield', 'Tab hidden / minimized auto-blur activated', false);
+          } else {
+            restoreFocusBlur();
+          }
+        });
+
+        window.addEventListener('blur', function() {
+          activateFocusBlur('Window lost focus. Sensitive KYC content is temporarily blurred to prevent background capture.');
+        });
+
+        window.addEventListener('focus', function() {
+          document.body.classList.remove('kyc-tab-blurred');
+          updateStatusBar();
+        });
+
+        window.addEventListener('pagehide', function() {
+          activateFocusBlur('Page minimized or backgrounded. Sensitive KYC content is blurred.');
+        });
+
+        window.addEventListener('pageshow', function() {
+          document.body.classList.remove('kyc-tab-blurred');
+          updateStatusBar();
+        });
+      }
+
+      function initKycContentProtection() {
+        ensureProtectionUiElements();
+        renderAndRefreshWatermarks();
+        setupWatermarkTamperObserver();
+        installInteractionProtections();
+
+        // Continuously update watermark timestamp & subtle micro-jitter every 1 second
+        setInterval(function() {
+          renderAndRefreshWatermarks();
+        }, 1000);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initKycContentProtection);
+      } else {
+        initKycContentProtection();
       }
     })();
   </script>

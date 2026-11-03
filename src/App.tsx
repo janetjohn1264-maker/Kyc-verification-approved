@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useMemo, useState, useRef } from "react"
+import { useMemo, useState, useRef, useEffect, useCallback } from "react"
 import { CheckCircle2, ChevronDown, Dices, FileText, LayoutDashboard, LogOut, Menu, RefreshCw, RotateCcw, Save, Settings, ShieldCheck, Upload, UserRound, X } from "lucide-react"
 import { BangladeshPassportCard, BangladeshPassportData, defaultBangladeshPassportData, generateBangladeshMRZ } from "./BangladeshPassportCard"
 import { GhanaPassportCard, GhanaPassportData, defaultGhanaPassportData, generateGhanaMRZ } from "./GhanaPassportCard"
@@ -539,6 +539,104 @@ function App() {
   const [bangladeshData, setBangladeshData] = useState<BangladeshPassportData>(defaultBangladeshPassportData)
   const [otherData, setOtherData] = useState<Record<string, OtherDocumentData>>(defaultOtherCountryData)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [isPreviewBlurred, setIsPreviewBlurred] = useState(false)
+  const [securityNotice, setSecurityNotice] = useState<string | null>(null)
+  const [watermarkTick, setWatermarkTick] = useState(0)
+  const [visitorSessionId] = useState(() => {
+    try {
+      const existing = localStorage.getItem("ogads_visitor_session_v1")
+      if (existing) return existing
+      const created = `vs_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
+      localStorage.setItem("ogads_visitor_session_v1", created)
+      return created
+    } catch {
+      return "vs_ephemeral_session"
+    }
+  })
+  const recentAttemptsRef = useRef<number[]>([])
+
+  const reportSecurityEvent = useCallback(
+    (eventType: string, details: string) => {
+      const now = Date.now()
+      recentAttemptsRef.current = recentAttemptsRef.current.filter((t) => now - t < 60000)
+      recentAttemptsRef.current.push(now)
+      const attemptCount = recentAttemptsRef.current.length
+      const suspicious = attemptCount >= 3
+      setSecurityNotice(
+        suspicious
+          ? `Repeated protected-content access detected (${attemptCount} events). Security event recorded.`
+          : details
+      )
+      fetch("/api/ogads/security-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: visitorSessionId,
+          eventType,
+          documentKey: country,
+          countryView: `${country.toLowerCase()}-react-preview`,
+          attemptCount,
+          suspicious,
+          details,
+        }),
+      }).catch(() => {})
+    },
+    [country, visitorSessionId]
+  )
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setWatermarkTick((t) => t + 1)
+    }, 1000)
+    return () => window.clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden || document.visibilityState !== "visible") {
+        setIsPreviewBlurred(true)
+      } else if (document.hasFocus()) {
+        setIsPreviewBlurred(false)
+      }
+    }
+    const handleBlur = () => setIsPreviewBlurred(true)
+    const handleFocus = () => setIsPreviewBlurred(false)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key || ""
+      const lower = key.toLowerCase()
+      if (
+        key === "PrintScreen" ||
+        (e.metaKey && e.shiftKey && ["3", "4", "5", "6", "s"].includes(lower)) ||
+        (e.ctrlKey && e.shiftKey && lower === "s")
+      ) {
+        e.preventDefault()
+        setIsPreviewBlurred(true)
+        reportSecurityEvent("screenshot_shortcut_detected", "Screenshot keyboard shortcut detected")
+      } else if ((e.ctrlKey || e.metaKey) && lower === "p") {
+        e.preventDefault()
+        setIsPreviewBlurred(true)
+        reportSecurityEvent("print_shortcut_blocked", "Print shortcut blocked on KYC specimen")
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibility)
+    window.addEventListener("blur", handleBlur)
+    window.addEventListener("focus", handleFocus)
+    window.addEventListener("keydown", handleKeyDown, true)
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility)
+      window.removeEventListener("blur", handleBlur)
+      window.removeEventListener("focus", handleFocus)
+      window.removeEventListener("keydown", handleKeyDown, true)
+    }
+  }, [reportSecurityEvent])
+
+  const watermarkTimestamp = useMemo(() => {
+    void watermarkTick
+    return new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC"
+  }, [watermarkTick])
+
+  const shortSessionId = visitorSessionId.slice(0, 18)
 
   const update = (key: keyof typeof defaultContent, value: string) => {
     setDetectedText(null)
@@ -2065,7 +2163,25 @@ function App() {
 
             <section className="preview-column">
               <div className="preview-heading"><div><h2>Live preview</h2><p>This is what applicants will see.</p></div><div className="device-toggle"><button type="button" onClick={randomizeSpecimen} className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 mr-1 cursor-pointer"><RefreshCw size={13} /> Randomize</button><button className="selected">Desktop</button><button>Mobile</button></div></div>
-              <div className="preview-frame">
+              <div
+                className={`preview-frame ${isPreviewBlurred ? "kyc-react-blurred" : ""}`}
+                onContextMenu={(e) => {
+                  e.preventDefault()
+                  reportSecurityEvent("contextmenu_blocked", "Right-click context menu disabled on KYC preview")
+                }}
+                onCopy={(e) => {
+                  e.preventDefault()
+                  reportSecurityEvent("copy_blocked", "Copying sensitive KYC verification data is disabled")
+                }}
+                onCut={(e) => {
+                  e.preventDefault()
+                  reportSecurityEvent("cut_blocked", "Cutting sensitive KYC verification data is disabled")
+                }}
+                onDragStart={(e) => {
+                  e.preventDefault()
+                  reportSecurityEvent("drag_blocked", "Dragging KYC specimen assets is disabled")
+                }}
+              >
                 <div className="preview-browser"><span /><span /><span /><small>verify.kyc.app/passport</small></div>
                 <div className="preview-page" style={previewStyle}>
                   <div className="preview-nav"><div className="preview-logo"><div className="logo-shield"><ShieldCheck size={14} /></div><strong>KYC Verify</strong></div><span>Need help?</span></div>
@@ -2075,8 +2191,29 @@ function App() {
                     <h3>{content.title}</h3>
                     <p>{content.subtitle}</p>
 
+                    {securityNotice && (
+                      <div className="mt-2 mb-1 px-2.5 py-1.5 rounded bg-amber-950/90 border border-amber-500/40 text-amber-200 text-[10px] font-mono">
+                        {securityNotice}
+                      </div>
+                    )}
+
                     {/* Passport Card View */}
-                    <div className="document-placeholder static-passport">
+                    <div className="document-placeholder static-passport relative overflow-hidden">
+                      <div className="kyc-react-watermark-layer" aria-hidden="true">
+                        {[0, 1, 2].map((idx) => (
+                          <div
+                            key={idx}
+                            className="kyc-react-wm-item"
+                            style={{
+                              top: `${16 + idx * 30 + ((watermarkTick + idx) % 3)}%`,
+                              left: `${8 + idx * 14 + ((watermarkTick * 2 + idx) % 5)}%`,
+                              transform: `rotate(${-15 + ((watermarkTick + idx) % 3)}deg)`,
+                            }}
+                          >
+                            {shortSessionId} • {watermarkTimestamp}
+                          </div>
+                        ))}
+                      </div>
                       {isRwanda ? (
                         <div className="w-full max-w-[360px] mx-auto my-1">
                           <RwandaIdCard

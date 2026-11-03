@@ -16,7 +16,9 @@
     "totalConversions": 0,
     "totalUnlockedDownloads": 0,
     "totalLockRequests": 24,
-    "totalOfferClicks": 0
+    "totalOfferClicks": 0,
+    "totalSecurityEvents": 1,
+    "totalSuspiciousAlerts": 0
   },
   "locks": {
     "lck_80a31ad437da99198731": {
@@ -620,5 +622,18 @@
       "visitorIp": "127.0.0.1"
     }
   },
-  "conversions": []
+  "conversions": [],
+  "securityEvents": [
+    {
+      "eventId": "sec_61df2f0ceec7f99a",
+      "sessionId": "vs_test_verify",
+      "eventType": "contextmenu_blocked",
+      "country": "global",
+      "docType": "document",
+      "attemptCount": 1,
+      "suspiciousFlag": false,
+      "timestamp": 1793738555586,
+      "visitorIp": "127.0.0.1"
+    }
+  ]
 }
