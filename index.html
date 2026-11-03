@@ -1791,6 +1791,29 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateRwaIdPreview === 'function') updateRwaIdPreview();
+      } else if (countryKey === 'somalia') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-amber-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateSomPassPreview === 'function') updateSomPassPreview();
       }
 
       const countryStyles = {
@@ -9613,26 +9636,179 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     // ================= SOMALIA BIOMETRIC PASSPORT CONTROLLER =================
-    const defaultSomPassPhoto = '/assets/aistudio/uk_bearer_portrait.png';
+    const defaultSomPassPhoto = '/assets/aistudio/image_309a7992.png';
+    let somPassCustomPhotoLoaded = false;
+    let somPassBaseCanvasInitialized = false;
+
+    function initSomPassBaseCanvas() {
+      if (somPassBaseCanvasInitialized) return;
+      const canvas = $('somPassBaseCanvas');
+      if (!canvas) return;
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const w = img.naturalWidth || 720;
+        const h = img.naturalHeight || 941;
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, w, h);
+
+        // Interpolate vertical strips over horizontal variable text fields
+        const clearHField = (x, y, bw, bh) => {
+          for (let col = x; col < x + bw; col++) {
+            const topY = Math.max(0, y - 2);
+            const botY = Math.min(h - 1, y + bh + 2);
+            const topPx = ctx.getImageData(col, topY, 1, 1).data;
+            const botPx = ctx.getImageData(col, botY, 1, 1).data;
+            for (let row = y; row < y + bh; row++) {
+              const t = (row - y) / Math.max(1, bh - 1);
+              const r = Math.round(topPx[0] * (1 - t) + botPx[0] * t);
+              const g = Math.round(topPx[1] * (1 - t) + botPx[1] * t);
+              const b = Math.round(topPx[2] * (1 - t) + botPx[2] * t);
+              ctx.fillStyle = `rgb(${r},${g},${b})`;
+              ctx.fillRect(col, row, 1, 1);
+            }
+          }
+        };
+
+        // Interpolate horizontal strips over the top-left vertical perforated passport number
+        const clearVField = (x, y, bw, bh) => {
+          for (let row = y; row < y + bh; row++) {
+            const leftX = Math.max(0, x - 3);
+            const rightX = Math.min(w - 1, x + bw + 3);
+            const leftPx = ctx.getImageData(leftX, row, 1, 1).data;
+            const rightPx = ctx.getImageData(rightX, row, 1, 1).data;
+            for (let col = x; col < x + bw; col++) {
+              const t = (col - x) / Math.max(1, bw - 1);
+              const r = Math.round(leftPx[0] * (1 - t) + rightPx[0] * t);
+              const g = Math.round(leftPx[1] * (1 - t) + rightPx[1] * t);
+              const b = Math.round(leftPx[2] * (1 - t) + rightPx[2] * t);
+              ctx.fillStyle = `rgb(${r},${g},${b})`;
+              ctx.fillRect(col, row, 1, 1);
+            }
+          }
+        };
+
+        // Top-left vertical laser-perforated passport number (P01581134)
+        clearVField(50, 72, 34, 276);
+
+        // Biographical data fields on Page 2
+        clearHField(240, 513, 20, 13);   // Type: P
+        clearHField(339, 513, 42, 13);   // Country Code: SOM
+        clearHField(517, 513, 85, 13);   // Passport No: P01581134
+        clearHField(234, 546, 242, 14);  // Name: ABDIRIZAK IBRAHIM MOHAMED
+        clearHField(234, 580, 170, 14);  // Mother's Name: NIMO MOHAMED NUH
+        clearHField(485, 565, 95, 13);   // NID value after "NID:"
+        clearHField(234, 615, 65, 14);   // Nationality: SOMALI
+        clearHField(457, 615, 80, 14);   // Occupation: STUDENT
+        clearHField(234, 649, 96, 15);   // Date of Birth: 04 May 2005
+        clearHField(457, 649, 102, 14);  // Place of Issue: MOGADISHU
+        clearHField(234, 683, 48, 14);   // Gender: MALE
+        clearHField(457, 683, 102, 14);  // Place of Birth: MOGADISHU
+        clearHField(233, 717, 95, 15);   // Date of Issue: 26 Sep 2024
+        clearHField(456, 717, 178, 14);  // Issuing Authority: SOMALI GOVERNMENT
+        clearHField(233, 751, 95, 15);   // Date of Expiry: 25 Sep 2029
+
+        // MRZ Lines 1 & 2
+        clearHField(36, 808, 620, 19);
+        clearHField(36, 841, 620, 20);
+
+        somPassBaseCanvasInitialized = true;
+      };
+      img.src = '/assets/aistudio/image_309a7992.png';
+    }
+
+    const SOM_PASS_DOT_FONT = {
+      '0': ['01110','10001','10001','10001','10001','10001','01110'],
+      '1': ['00100','01100','00100','00100','00100','00100','01110'],
+      '2': ['01110','10001','00001','00010','00100','01000','11111'],
+      '3': ['01110','10001','00001','00110','00001','10001','01110'],
+      '4': ['00010','00110','01010','10010','11111','00010','00010'],
+      '5': ['11111','10000','11110','00001','00001','10001','01110'],
+      '6': ['01110','10000','11110','10001','10001','10001','01110'],
+      '7': ['11111','00001','00010','00100','01000','01000','01000'],
+      '8': ['01110','10001','10001','01110','10001','10001','01110'],
+      '9': ['01110','10001','10001','01111','00001','00001','01110'],
+      'P': ['11110','10001','10001','11110','10000','10000','10000'],
+      'A': ['01110','10001','10001','11111','10001','10001','10001'],
+      'B': ['11110','10001','10001','11110','10001','10001','11110'],
+      'S': ['01111','10000','10000','01110','00001','00001','11110'],
+    };
+
+    function renderSomPassPerforation(passNo) {
+      const svg = $('somPassPerforatedSvg');
+      if (!svg) return;
+      const clean = (passNo || 'P01581134').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9);
+      let circles = '';
+      // Vertical orientation reading bottom-to-top (rotated -90 deg) matching the top-left margin of Page 3
+      const totalChars = clean.length;
+      for (let idx = 0; idx < totalChars; idx++) {
+        // Bottom character is idx=0 ('P'), top character is last digit ('4')
+        const ch = clean[idx];
+        const glyph = SOM_PASS_DOT_FONT[ch] || SOM_PASS_DOT_FONT['0'];
+        const charBaseY = 260 - idx * 29;
+        for (let r = 0; r < 7; r++) {
+          for (let c = 0; c < 5; c++) {
+            if (glyph[r][c] === '1') {
+              // Rotate -90 degrees: glyph row r goes left-to-right (x), glyph col c goes bottom-to-top (y)
+              const cx = 4 + r * 3.8;
+              const cy = charBaseY - c * 3.8;
+              circles += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="1.25" fill="#3a332c" fill-opacity="0.78" />`;
+            }
+          }
+        }
+      }
+      svg.innerHTML = circles;
+    }
+
+    function somPassMrzCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        let val = 0;
+        if (ch >= '0' && ch <= '9') val = ch.charCodeAt(0) - 48;
+        else if (ch >= 'A' && ch <= 'Z') val = ch.charCodeAt(0) - 55;
+        sum += val * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function parseSomPassDateToYYMMDD(dateStr, fallback) {
+      if (!dateStr) return fallback;
+      const months = { JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06', JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
+      const m = dateStr.trim().match(/^(\d{1,2})\s+([A-Za-z]{3})[a-z]*\s+(\d{2,4})/i);
+      if (m) {
+        const dd = m[1].padStart(2, '0');
+        const mm = months[m[2].toUpperCase()] || '01';
+        const yy = m[3].length === 4 ? m[3].slice(2) : m[3].padStart(2, '0');
+        return `${yy}${mm}${dd}`;
+      }
+      return fallback;
+    }
 
     function updateSomPassPreview() {
-      const type = $('somPassInputType')?.value || 'P';
-      const country = $('somPassInputCountry')?.value || 'SOM';
-      const passNo = $('somPassInputNumber')?.value || 'P00724085';
-      const name = $('somPassInputName')?.value || 'MAXAMED CABDIQADIR MAXAMED';
-      const mother = $('somPassInputMother')?.value || 'FARTUN ADEN RONOW';
-      const nid = $('somPassInputNid')?.value || '29505057463496';
-      const nat = $('somPassInputNationality')?.value || 'SOMALI';
-      const occ = $('somPassInputOccupation')?.value || 'STUDENT';
-      const dob = $('somPassInputDob')?.value || '05 May 1995';
-      const issuePlace = $('somPassInputIssuePlace')?.value || 'BAIDOA';
-      const sex = $('somPassInputSex')?.value || 'MALE';
-      const birthPlace = $('somPassInputBirthPlace')?.value || 'HUDUR';
-      const issueDate = $('somPassInputIssueDate')?.value || '21 Apr 2018';
-      const expDate = $('somPassInputExpiryDate')?.value || '20 Apr 2023';
-      const authority = $('somPassInputAuthority')?.value || 'SOMALI GOVERNMENT';
+      initSomPassBaseCanvas();
 
-      // Update Single page
+      const type = ($('somPassInputType')?.value || 'P').toUpperCase();
+      const country = ($('somPassInputCountry')?.value || 'SOM').toUpperCase();
+      const passNo = ($('somPassInputNumber')?.value || 'P01581134').toUpperCase();
+      const name = ($('somPassInputName')?.value || 'ABDIRIZAK IBRAHIM MOHAMED').toUpperCase();
+      const mother = ($('somPassInputMother')?.value || 'NIMO MOHAMED NUH').toUpperCase();
+      const nid = ($('somPassInputNid')?.value || '30505041623073').trim();
+      const nat = ($('somPassInputNationality')?.value || 'SOMALI').toUpperCase();
+      const occ = ($('somPassInputOccupation')?.value || 'STUDENT').toUpperCase();
+      const dob = $('somPassInputDob')?.value || '04 May 2005';
+      const issuePlace = ($('somPassInputIssuePlace')?.value || 'MOGADISHU').toUpperCase();
+      const sex = ($('somPassInputSex')?.value || 'MALE').toUpperCase();
+      const birthPlace = ($('somPassInputBirthPlace')?.value || 'MOGADISHU').toUpperCase();
+      const issueDate = $('somPassInputIssueDate')?.value || '26 Sep 2024';
+      const expDate = $('somPassInputExpiryDate')?.value || '25 Sep 2029';
+      const authority = ($('somPassInputAuthority')?.value || 'SOMALI GOVERNMENT').toUpperCase();
+
+      // Update Single page (if present)
       if ($('somPassPreviewType')) $('somPassPreviewType').textContent = type;
       if ($('somPassPreviewCountry')) $('somPassPreviewCountry').textContent = country;
       if ($('somPassPreviewNumber')) $('somPassPreviewNumber').textContent = passNo;
@@ -9654,6 +9830,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       if ($('somPassSpreadCountry')) $('somPassSpreadCountry').textContent = country;
       if ($('somPassSpreadNumber')) $('somPassSpreadNumber').textContent = passNo;
       if ($('somPassPerforatedNumber')) $('somPassPerforatedNumber').textContent = passNo;
+      renderSomPassPerforation(passNo);
       if ($('somPassSpreadName')) $('somPassSpreadName').textContent = name;
       if ($('somPassSpreadMother')) $('somPassSpreadMother').textContent = mother;
       if ($('somPassSpreadNid')) $('somPassSpreadNid').textContent = nid;
@@ -9677,12 +9854,31 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       if ($('somPassIdCardExpiry')) $('somPassIdCardExpiry').textContent = expDate;
       if ($('somPassIdCardGender')) $('somPassIdCardGender').textContent = sex;
 
-      // MRZ generation
-      const cleanName = name.toUpperCase().replace(/[^A-Z]/g, '<');
-      const cleanPass = passNo.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      // ICAO 9303 MRZ generation matching Somali Passport convention (Surname = last name token, Given names = preceding tokens)
+      const nameParts = name.trim().split(/\s+/).filter(Boolean);
+      let mrzNameSegment = '';
+      if (nameParts.length >= 2) {
+        const surname = nameParts[nameParts.length - 1].replace(/[^A-Z]/g, '');
+        const given = nameParts.slice(0, -1).map(p => p.replace(/[^A-Z]/g, '')).join('<');
+        mrzNameSegment = `${surname}<<${given}`;
+      } else {
+        mrzNameSegment = name.replace(/[^A-Z]/g, '<');
+      }
+      const countryCode = country.padEnd(3, '<').slice(0, 3);
+      const typeCode = (type.slice(0, 1) || 'P') + '<';
+      const mrz1 = `${typeCode}${countryCode}${mrzNameSegment}`.padEnd(44, '<').substring(0, 44);
+
+      const cleanPass = passNo.replace(/[^A-Z0-9]/g, '').padEnd(9, '<').slice(0, 9);
+      const passCheck = somPassMrzCheckDigit(cleanPass);
+      const dobYYMMDD = parseSomPassDateToYYMMDD(dob, '050504');
+      const dobCheck = somPassMrzCheckDigit(dobYYMMDD);
       const cleanSex = sex.startsWith('F') ? 'F' : 'M';
-      let mrz1 = `P<${country}${cleanName}`.padEnd(44, '<').substring(0, 44);
-      let mrz2 = `${cleanPass}3${country}9505058${cleanSex}2304207${nid}72`.padEnd(44, '<').substring(0, 44);
+      const expYYMMDD = parseSomPassDateToYYMMDD(expDate, '290925');
+      const expCheck = somPassMrzCheckDigit(expYYMMDD);
+      const cleanNid = nid.replace(/[^0-9A-Z]/g, '').padEnd(14, '<').slice(0, 14);
+      const nidCheck = somPassMrzCheckDigit(cleanNid);
+      const compositeCheck = somPassMrzCheckDigit(`${cleanPass}${passCheck}${dobYYMMDD}${dobCheck}${expYYMMDD}${expCheck}${cleanNid}${nidCheck}`);
+      const mrz2 = `${cleanPass}${passCheck}${countryCode}${dobYYMMDD}${dobCheck}${cleanSex}${expYYMMDD}${expCheck}${cleanNid}${nidCheck}${compositeCheck}`.padEnd(44, '<').substring(0, 44);
 
       if ($('somPassMrzLine1')) $('somPassMrzLine1').textContent = mrz1;
       if ($('somPassMrzLine2')) $('somPassMrzLine2').textContent = mrz2;
@@ -9694,6 +9890,31 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       const wmText = $('somPassWatermarkText')?.value || 'SPECIMEN';
       if ($('somPassSampleWatermark')) $('somPassSampleWatermark').style.display = showWm ? 'flex' : 'none';
       if ($('somPassWatermarkLabel')) $('somPassWatermarkLabel').textContent = wmText.toUpperCase();
+
+      // Check if all fields match the exact reference specimen
+      const isDefaultSpecimen =
+        !somPassCustomPhotoLoaded &&
+        !showWm &&
+        type === 'P' &&
+        country === 'SOM' &&
+        passNo === 'P01581134' &&
+        name === 'ABDIRIZAK IBRAHIM MOHAMED' &&
+        mother === 'NIMO MOHAMED NUH' &&
+        nid === '30505041623073' &&
+        nat === 'SOMALI' &&
+        occ === 'STUDENT' &&
+        dob.trim().toUpperCase() === '04 MAY 2005' &&
+        issuePlace === 'MOGADISHU' &&
+        sex === 'MALE' &&
+        birthPlace === 'MOGADISHU' &&
+        issueDate.trim().toUpperCase() === '26 SEP 2024' &&
+        expDate.trim().toUpperCase() === '25 SEP 2029' &&
+        authority === 'SOMALI GOVERNMENT';
+
+      const refOverlay = $('somPassRefOverlay');
+      if (refOverlay) {
+        refOverlay.style.display = isDefaultSpecimen ? 'block' : 'none';
+      }
     }
 
     function setSomPassDisplayMode(mode) {
@@ -9702,27 +9923,37 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function resetSomPassPhoto() {
-      if ($('somPassPreviewPhotoSpread')) $('somPassPreviewPhotoSpread').src = defaultSomPassPhoto;
-      if ($('somPassIdCardPhoto')) $('somPassIdCardPhoto').src = defaultSomPassPhoto;
+      somPassCustomPhotoLoaded = false;
+      const mainPhoto = $('somPassPreviewPhotoSpread');
+      const ghostWrap = $('somPassGhostPhotoWrap');
+      if (mainPhoto) {
+        mainPhoto.src = defaultSomPassPhoto;
+        mainPhoto.classList.add('hidden');
+      }
+      if (ghostWrap) {
+        ghostWrap.classList.add('hidden');
+      }
+      if ($('somPassIdCardPhoto')) $('somPassIdCardPhoto').src = defaultSomPassIdPhoto;
       if ($('somPassPhotoInput')) $('somPassPhotoInput').value = '';
+      updateSomPassPreview();
       showToast('Photo Reset', 'Restored official Somali passport portrait photo');
     }
 
     function resetSomPassDetailsToSample() {
       if ($('somPassInputType')) $('somPassInputType').value = 'P';
       if ($('somPassInputCountry')) $('somPassInputCountry').value = 'SOM';
-      if ($('somPassInputNumber')) $('somPassInputNumber').value = 'P00849261';
-      if ($('somPassInputName')) $('somPassInputName').value = 'CABDIRAXMAAN CUMAR WARSAME';
-      if ($('somPassInputMother')) $('somPassInputMother').value = 'DEEQA OMAR ROBLE';
-      if ($('somPassInputNid')) $('somPassInputNid').value = '29708149583210';
+      if ($('somPassInputNumber')) $('somPassInputNumber').value = 'P01581134';
+      if ($('somPassInputName')) $('somPassInputName').value = 'ABDIRIZAK IBRAHIM MOHAMED';
+      if ($('somPassInputMother')) $('somPassInputMother').value = 'NIMO MOHAMED NUH';
+      if ($('somPassInputNid')) $('somPassInputNid').value = '30505041623073';
       if ($('somPassInputNationality')) $('somPassInputNationality').value = 'SOMALI';
-      if ($('somPassInputOccupation')) $('somPassInputOccupation').value = 'BUSINESSMAN';
-      if ($('somPassInputDob')) $('somPassInputDob').value = '14 Aug 1997';
+      if ($('somPassInputOccupation')) $('somPassInputOccupation').value = 'STUDENT';
+      if ($('somPassInputDob')) $('somPassInputDob').value = '04 May 2005';
       if ($('somPassInputIssuePlace')) $('somPassInputIssuePlace').value = 'MOGADISHU';
       if ($('somPassInputSex')) $('somPassInputSex').value = 'MALE';
       if ($('somPassInputBirthPlace')) $('somPassInputBirthPlace').value = 'MOGADISHU';
-      if ($('somPassInputIssueDate')) $('somPassInputIssueDate').value = '18 Jun 2021';
-      if ($('somPassInputExpiryDate')) $('somPassInputExpiryDate').value = '17 Jun 2026';
+      if ($('somPassInputIssueDate')) $('somPassInputIssueDate').value = '26 Sep 2024';
+      if ($('somPassInputExpiryDate')) $('somPassInputExpiryDate').value = '25 Sep 2029';
       if ($('somPassInputAuthority')) $('somPassInputAuthority').value = 'SOMALI GOVERNMENT';
       if ($('somPassWatermarkText')) $('somPassWatermarkText').value = 'SPECIMEN';
       if ($('somPassShowWatermark')) $('somPassShowWatermark').checked = false;
@@ -9732,28 +9963,28 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function randomizeSomaliaPassport() {
-      const maleNames = ['CABDIRAXMAAN CUMAR WARSAME', 'AXMED XASAN CALI', 'ISMAACIIL YUUSUF FAARAX', 'KHAALID SHIRE GUULEED', 'JAAMAC CUSMAAN DIRIE', 'CILMI AADAN ROOBLE'];
-      const femaleNames = ['FARTUN ADEN RONOW', 'MARYAN MAXAMUD GELLE', 'SAFIA DAHIR CILMI', 'XALIIMO CALI NUUR', 'DEEQA OMAR ROBLE'];
-      const mothers = ['DEEQA OMAR ROBLE', 'MARYAN ABDI WARSAME', 'SAFIA HASSAN GEDI', 'FARTUN ADEN RONOW', 'FADUMA ALI JIBRIL'];
+      const maleNames = ['ABDIRIZAK IBRAHIM MOHAMED', 'CABDIRAXMAAN CUMAR WARSAME', 'AXMED XASAN CALI', 'ISMAACIIL YUUSUF FAARAX', 'KHAALID SHIRE GUULEED', 'JAAMAC CUSMAAN DIRIE'];
+      const femaleNames = ['NIMO MOHAMED NUH', 'FARTUN ADEN RONOW', 'MARYAN MAXAMUD GELLE', 'SAFIA DAHIR CILMI', 'XALIIMO CALI NUUR', 'DEEQA OMAR ROBLE'];
+      const mothers = ['NIMO MOHAMED NUH', 'DEEQA OMAR ROBLE', 'MARYAN ABDI WARSAME', 'SAFIA HASSAN GEDI', 'FARTUN ADEN RONOW', 'FADUMA ALI JIBRIL'];
       const cities = ['MOGADISHU', 'BAIDOA', 'HUDUR', 'HARGEYSA', 'KISMAYO', 'BOSASO', 'GAROWE'];
-      const occupations = ['BUSINESSMAN', 'STUDENT', 'CIVIL SERVANT', 'ENGINEER', 'TEACHER', 'TRADER', 'CONSULTANT'];
+      const occupations = ['STUDENT', 'BUSINESSMAN', 'CIVIL SERVANT', 'ENGINEER', 'TEACHER', 'TRADER', 'CONSULTANT'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
       const isMale = Math.random() > 0.4;
       const name = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
       const mother = mothers[Math.floor(Math.random() * mothers.length)];
-      const passNo = 'P' + String(Math.floor(10000000 + Math.random() * 90000000));
-      const nid = '297' + String(Math.floor(10000000000 + Math.random() * 90000000000));
+      const passNo = 'P0' + String(Math.floor(1000000 + Math.random() * 9000000));
+      const nid = '305' + String(Math.floor(10000000000 + Math.random() * 90000000000));
       const occ = occupations[Math.floor(Math.random() * occupations.length)];
 
       const bDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
       const bMonth = months[Math.floor(Math.random() * months.length)];
-      const bYear = String(Math.floor(1982 + Math.random() * 20));
+      const bYear = String(Math.floor(1985 + Math.random() * 21));
       const dob = `${bDay} ${bMonth} ${bYear}`;
 
       const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
       const iMonth = months[Math.floor(Math.random() * months.length)];
-      const iYear = String(Math.floor(2018 + Math.random() * 6));
+      const iYear = String(Math.floor(2020 + Math.random() * 5));
       const issueDate = `${iDay} ${iMonth} ${iYear}`;
       const expDate = `${iDay} ${iMonth} ${parseInt(iYear, 10) + 5}`;
 
@@ -9845,13 +10076,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function updateSomPassIdCardPreview() {
-      const name = $('somPassIdInputName')?.value || 'Shufti Ahmed Mahammud';
-      const father = $('somPassIdInputFather')?.value || 'Hameed Ahmed';
-      const sex = $('somPassIdInputSex')?.value || 'Female';
-      const dob = $('somPassIdInputDob')?.value || '22-02-1980';
-      const idNo = $('somPassIdInputIdNo')?.value || '23654789221';
-      const issue = $('somPassIdInputIssue')?.value || '15-11-2022';
-      const expiry = $('somPassIdInputExpiry')?.value || '12-06-2027';
+      const name = $('somPassIdInputName')?.value || 'ABDIRIZAK IBRAHIM MOHAMED';
+      const father = $('somPassIdInputFather')?.value || 'IBRAHIM MOHAMED';
+      const sex = $('somPassIdInputSex')?.value || 'Male';
+      const dob = $('somPassIdInputDob')?.value || '04-05-2005';
+      const idNo = $('somPassIdInputIdNo')?.value || '30505041623073';
+      const issue = $('somPassIdInputIssue')?.value || '26-09-2024';
+      const expiry = $('somPassIdInputExpiry')?.value || '25-09-2029';
 
       if ($('somPassIdCardPreviewName')) $('somPassIdCardPreviewName').textContent = name;
       if ($('somPassIdCardPreviewFather')) $('somPassIdCardPreviewFather').textContent = father;
@@ -9899,13 +10130,13 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
     }
 
     function resetSomPassIdCardToSample() {
-      if ($('somPassIdInputName')) $('somPassIdInputName').value = 'CABDIRAXMAAN CUMAR WARSAME';
-      if ($('somPassIdInputFather')) $('somPassIdInputFather').value = 'CUMAR WARSAME';
+      if ($('somPassIdInputName')) $('somPassIdInputName').value = 'ABDIRIZAK IBRAHIM MOHAMED';
+      if ($('somPassIdInputFather')) $('somPassIdInputFather').value = 'IBRAHIM MOHAMED';
       if ($('somPassIdInputSex')) $('somPassIdInputSex').value = 'Male';
-      if ($('somPassIdInputDob')) $('somPassIdInputDob').value = '14-08-1997';
-      if ($('somPassIdInputIdNo')) $('somPassIdInputIdNo').value = '29708149583210';
-      if ($('somPassIdInputIssue')) $('somPassIdInputIssue').value = '18-06-2021';
-      if ($('somPassIdInputExpiry')) $('somPassIdInputExpiry').value = '17-06-2026';
+      if ($('somPassIdInputDob')) $('somPassIdInputDob').value = '04-05-2005';
+      if ($('somPassIdInputIdNo')) $('somPassIdInputIdNo').value = '30505041623073';
+      if ($('somPassIdInputIssue')) $('somPassIdInputIssue').value = '26-09-2024';
+      if ($('somPassIdInputExpiry')) $('somPassIdInputExpiry').value = '25-09-2029';
       resetSomPassIdPhoto();
       updateSomPassIdCardPreview();
       showToast('Sample Restored', 'Restored Somali Passport Identity Card reference details');
@@ -10587,9 +10818,19 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           if (file) {
             const reader = new FileReader();
             reader.onload = ev => {
+              somPassCustomPhotoLoaded = true;
               if ($('somPassPreviewPhoto')) $('somPassPreviewPhoto').src = ev.target.result;
-              if ($('somPassPreviewPhotoSpread')) $('somPassPreviewPhotoSpread').src = ev.target.result;
+              const mainPhoto = $('somPassPreviewPhotoSpread');
+              if (mainPhoto) {
+                mainPhoto.src = ev.target.result;
+                mainPhoto.classList.remove('hidden');
+              }
+              const ghostPhoto = $('somPassGhostPhotoSpread');
+              const ghostWrap = $('somPassGhostPhotoWrap');
+              if (ghostPhoto) ghostPhoto.src = ev.target.result;
+              if (ghostWrap) ghostWrap.classList.remove('hidden');
               if ($('somPassIdCardPhoto')) $('somPassIdCardPhoto').src = ev.target.result;
+              updateSomPassPreview();
               showToast('Photo Updated', 'Custom portrait photo applied to Somali Passport & ID Card');
             };
             reader.readAsDataURL(file);
@@ -10864,6 +11105,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       updateSomSmartIdPreview();
       setSomIdFormat('smartid');
       updateSomPassPreview();
+      updateSomPassIdCardPreview();
       updateEthPreview();
       updateSomLicPreview();
       updateNgaPreview();
@@ -10878,7 +11120,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       updateCanPreview();
       updateGhaPreview();
       updateEthPreview();
-      switchVerificationCountry('southafrica');
+      switchVerificationCountry('somalia');
     });
 
     // Explicit Window Bindings for all inline event handlers:
@@ -13445,25 +13687,25 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Passport No</label>
-                  <input id="somPassInputNumber" type="text" value="P00849261" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                  <input id="somPassInputNumber" type="text" value="P01581134" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
                 </div>
               </div>
 
               <!-- Full Name (Magaca / الاسم) -->
               <div>
                 <label class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Name</label>
-                <input id="somPassInputName" type="text" value="CABDIRAXMAAN CUMAR WARSAME" oninput="updateSomPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+                <input id="somPassInputName" type="text" value="ABDIRIZAK IBRAHIM MOHAMED" oninput="updateSomPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
               </div>
 
               <!-- Mother's Name & NID -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Magaca Hooyada (Mother)</label>
-                  <input id="somPassInputMother" type="text" value="DEEQA OMAR ROBLE" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somPassInputMother" type="text" value="NIMO MOHAMED NUH" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NID (National ID)</label>
-                  <input id="somPassInputNid" type="text" value="29708149583210" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputNid" type="text" value="30505041623073" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
               </div>
 
@@ -13475,7 +13717,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Shaqada / Occupation</label>
-                  <input id="somPassInputOccupation" type="text" value="BUSINESSMAN" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
+                  <input id="somPassInputOccupation" type="text" value="STUDENT" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs">
                 </div>
               </div>
 
@@ -13483,7 +13725,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth (Dhalashada)</label>
-                  <input id="somPassInputDob" type="text" value="14 Aug 1997" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputDob" type="text" value="04 May 2005" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Issue (Meesha Bixiyey)</label>
@@ -13510,11 +13752,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Issue (la Bixiyey)</label>
-                  <input id="somPassInputIssueDate" type="text" value="18 Jun 2021" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputIssueDate" type="text" value="26 Sep 2024" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Expiry (Dhacayo)</label>
-                  <input id="somPassInputExpiryDate" type="text" value="17 Jun 2026" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  <input id="somPassInputExpiryDate" type="text" value="25 Sep 2029" oninput="updateSomPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
                 </div>
               </div>
 
@@ -13582,13 +13824,13 @@ MUQDISHO, BANAADIR, SOMALIA</span>
               <!-- Full Name (Magaca / الاسم) -->
               <div>
                 <label for="somPassIdInputName" class="block font-bold uppercase text-slate-600 mb-1">Magaca / الاسم / Name</label>
-                <input id="somPassIdInputName" type="text" value="CABDIRAXMAAN CUMAR WARSAME" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+                <input id="somPassIdInputName" type="text" value="ABDIRIZAK IBRAHIM MOHAMED" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
               </div>
 
               <!-- Father's Name (Magaca Aabbaha / اسم الأب) -->
               <div>
                 <label for="somPassIdInputFather" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Magaca Aabbaha / اسم الأب / Father's Name</label>
-                <input id="somPassIdInputFather" type="text" value="CUMAR WARSAME" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                <input id="somPassIdInputFather" type="text" value="IBRAHIM MOHAMED" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs bg-white">
               </div>
 
               <!-- Sex & Date of Birth -->
@@ -13602,25 +13844,25 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </div>
                 <div>
                   <label for="somPassIdInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda Dhalashada / Date of Birth</label>
-                  <input id="somPassIdInputDob" type="text" value="14-08-1997" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="somPassIdInputDob" type="text" value="04-05-2005" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
               </div>
 
               <!-- Identity Number (Lambarka aqoonsiga / رقم الهوية) -->
               <div>
                 <label for="somPassIdInputIdNo" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Lambarka aqoonsiga / Identity Number</label>
-                <input id="somPassIdInputIdNo" type="text" value="29708149583210" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white text-slate-900">
+                <input id="somPassIdInputIdNo" type="text" value="30505041623073" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white text-slate-900">
               </div>
 
               <!-- Date of Issue & Date of Expiry -->
               <div class="grid grid-cols-2 gap-2">
                 <div>
                   <label for="somPassIdInputIssue" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda la bixiyay / Issue Date</label>
-                  <input id="somPassIdInputIssue" type="text" value="18-06-2021" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="somPassIdInputIssue" type="text" value="26-09-2024" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
                 <div>
                   <label for="somPassIdInputExpiry" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Taariikhda uu dhacayo / Expiry Date</label>
-                  <input id="somPassIdInputExpiry" type="text" value="17-06-2026" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="somPassIdInputExpiry" type="text" value="25-09-2029" oninput="updateSomPassIdCardPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
               </div>
 
@@ -13656,157 +13898,67 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </div>
 
                 <div id="somalia-passport-spread" class="w-full">
-                  <article class="bg-white rounded-lg shadow-2xl border-2 border-slate-400 overflow-hidden text-slate-900 select-none">
-                    
-                    <!-- UPPER PAGE: PAGE 3 OBSERVATIONS & SIGNATURE -->
-                    <div class="relative w-full aspect-[1.45/1] overflow-hidden border-b-2 border-dashed border-slate-400">
-                      <!-- Background image of Page 3 Observations -->
-                      <img src="/assets/aistudio/somali_passport_obs_page.jpg" alt="Page 3 Observations" class="w-full h-full object-cover">
+                  <article class="relative w-full aspect-[720/941] bg-white rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none" style="container-type: inline-size;">
+                    <!-- Base Canvas with Reference Specimen Background & Interpolated Guilloche over Variable Fields -->
+                    <canvas id="somPassBaseCanvas" width="720" height="941" class="absolute inset-0 w-full h-full object-fill pointer-events-none z-0"></canvas>
 
-                      <!-- Dynamic Perforated Passport Number Overlay on Top-Left of Page 3 -->
-                      <div class="absolute left-6 top-8 pointer-events-none transform -rotate-90 origin-top-left font-mono-code text-xs sm:text-sm font-black tracking-[0.35em] text-slate-900/40 select-none">
-                        <span id="somPassPerforatedNumber">P00849261</span>
-                      </div>
+                    <!-- Dynamic Top-Left Vertical Laser-Perforated Passport Number on Page 3 -->
+                    <svg id="somPassPerforatedSvg" viewBox="0 0 32 275" class="absolute pointer-events-none z-10" style="left: 7.22%; top: 7.90%; width: 4.50%; height: 29.00%;"></svg>
+                    <span id="somPassPerforatedNumber" class="sr-only">P01581134</span>
 
-                      <!-- Page Number 3 indicator badge -->
-                      <div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-white/70 backdrop-blur-2xs text-[10px] font-bold text-slate-700">
-                        Page 3 · Fiiro Gaar Ah (Observations)
-                      </div>
+                    <!-- Custom Main Portrait Photo Overlay (shown when user uploads a custom photo) -->
+                    <img id="somPassPreviewPhotoSpread" src="/assets/aistudio/image_309a7992.png" alt="Holder Portrait" class="hidden absolute object-cover pointer-events-none z-10" style="left: 5.00%; top: 58.10%; width: 25.00%; height: 23.80%;">
+
+                    <!-- Custom Ghost Portrait Overlay (shown when user uploads a custom photo) -->
+                    <div id="somPassGhostPhotoWrap" class="hidden absolute overflow-hidden pointer-events-none z-10" style="left: 58.00%; top: 55.50%; width: 22.00%; height: 22.80%; opacity: 0.48; mix-blend-mode: multiply; border-radius: 38%;">
+                      <img id="somPassGhostPhotoSpread" src="/assets/aistudio/image_309a7992.png" alt="" class="w-full h-full object-cover">
                     </div>
 
-                    <!-- BOOKLET SPINE / STITCHING SEAM -->
-                    <div class="h-2.5 bg-gradient-to-b from-slate-300 via-slate-100 to-slate-300 flex items-center justify-center border-y border-slate-400">
-                      <div class="w-full border-t border-dashed border-slate-400/80"></div>
+                    <!-- Dynamic Biographical Data Overlays on Page 2 -->
+                    <div class="absolute inset-0 pointer-events-none z-20 font-sans text-[#1f1d1b] leading-none">
+                      <!-- Row 1: Type, Country Code, Passport No -->
+                      <span id="somPassSpreadType" class="absolute font-semibold uppercase tracking-normal" style="left: 33.75%; top: 54.45%; font-size: 1.78cqw;">P</span>
+                      <span id="somPassSpreadCountry" class="absolute font-semibold uppercase tracking-normal" style="left: 47.50%; top: 54.45%; font-size: 1.78cqw;">SOM</span>
+                      <span id="somPassSpreadNumber" class="absolute font-semibold uppercase tracking-tight" style="left: 72.08%; top: 54.45%; font-size: 1.78cqw;">P01581134</span>
+
+                      <!-- Row 2: Name -->
+                      <span id="somPassSpreadName" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 32.92%; top: 58.10%; font-size: 1.76cqw;">ABDIRIZAK IBRAHIM MOHAMED</span>
+
+                      <!-- Row 3: Mother's Name & NID -->
+                      <span id="somPassSpreadMother" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 33.00%; top: 61.70%; font-size: 1.72cqw;">NIMO MOHAMED NUH</span>
+                      <span id="somPassSpreadNid" class="absolute font-bold tracking-tight whitespace-nowrap" style="left: 67.64%; top: 60.15%; font-size: 1.48cqw;">30505041623073</span>
+
+                      <!-- Row 4: Nationality & Occupation -->
+                      <span id="somPassSpreadNationality" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 32.92%; top: 65.40%; font-size: 1.76cqw;">SOMALI</span>
+                      <span id="somPassSpreadOccupation" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 63.89%; top: 65.40%; font-size: 1.76cqw;">STUDENT</span>
+
+                      <!-- Row 5: Date of Birth & Place of Issue -->
+                      <span id="somPassSpreadDob" class="absolute font-semibold tracking-tight whitespace-nowrap" style="left: 32.92%; top: 69.05%; font-size: 1.76cqw;">04 May 2005</span>
+                      <span id="somPassSpreadIssuePlace" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 63.89%; top: 69.05%; font-size: 1.76cqw;">MOGADISHU</span>
+
+                      <!-- Row 6: Gender & Place of Birth -->
+                      <span id="somPassSpreadSex" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 32.92%; top: 72.65%; font-size: 1.76cqw;">MALE</span>
+                      <span id="somPassSpreadBirthPlace" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 63.89%; top: 72.65%; font-size: 1.76cqw;">MOGADISHU</span>
+
+                      <!-- Row 7: Date of Issue & Issuing Authority -->
+                      <span id="somPassSpreadIssueDate" class="absolute font-semibold tracking-tight whitespace-nowrap" style="left: 32.78%; top: 76.28%; font-size: 1.76cqw;">26 Sep 2024</span>
+                      <span id="somPassSpreadAuthority" class="absolute font-semibold uppercase tracking-tight whitespace-nowrap" style="left: 63.75%; top: 76.28%; font-size: 1.76cqw;">SOMALI GOVERNMENT</span>
+
+                      <!-- Row 8: Date of Expiry -->
+                      <span id="somPassSpreadExpiryDate" class="absolute font-semibold tracking-tight whitespace-nowrap" style="left: 32.78%; top: 79.90%; font-size: 1.76cqw;">25 Sep 2029</span>
+
+                      <!-- MRZ Lines 1 & 2 -->
+                      <div id="somPassSpreadMrzLine1" class="absolute font-mono-code font-bold text-[#141414] whitespace-nowrap" style="left: 5.65%; top: 86.05%; font-size: 2.32cqw; letter-spacing: 0.42cqw;">P&lt;SOMMOHAMED&lt;&lt;ABDIRIZAK&lt;IBRAHIM&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <div id="somPassSpreadMrzLine2" class="absolute font-mono-code font-bold text-[#141414] whitespace-nowrap" style="left: 5.65%; top: 89.60%; font-size: 2.32cqw; letter-spacing: 0.42cqw;">P015811346SOM0505044M29092553050504162307394</div>
                     </div>
 
-                    <!-- LOWER PAGE: PAGE 2 BIOGRAPHICAL DATA PAGE (Rendered with current form data) -->
-                    <div class="somali-passport-bg relative w-full aspect-[1.42/1] p-4 sm:p-5 overflow-hidden text-slate-900">
-                      <!-- Header -->
-                      <header class="flex justify-between items-center pb-1.5 mb-2 border-b border-slate-300/80 relative z-10">
-                        <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
-                          JAMHUURIYADDA SOOMAALIYA
-                        </div>
-                        <div class="font-arabic font-bold text-sky-950 text-xs sm:text-sm">
-                          جمهورية الصومال
-                        </div>
-                        <div class="font-serif font-black text-sky-950 text-[10px] sm:text-[12px] tracking-wider uppercase">
-                          SOMALI REPUBLIC
-                        </div>
-                      </header>
-
-                      <!-- Subheader Bar -->
-                      <div class="grid grid-cols-12 gap-1 items-center pb-2 mb-2 border-b border-slate-300 relative z-10 text-[9px] sm:text-[10px]">
-                        <div class="col-span-4 flex items-center gap-2">
-                          <div class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 flex items-center justify-center">
-                            <img src="/assets/aistudio/somali_passport_coat_of_arms.png" alt="" class="w-full h-full object-contain">
-                          </div>
-                          <div class="leading-none">
-                            <div class="font-black text-slate-950 text-[10px] sm:text-[11px] tracking-wider">BAASABOOR</div>
-                            <div class="font-arabic font-bold text-slate-800 text-[9px]">جواز سفر</div>
-                            <div class="font-black text-slate-950 text-[9px] sm:text-[10px] tracking-wider">PASSPORT</div>
-                          </div>
-                        </div>
-                        <div class="col-span-2 border-l border-slate-300 pl-1.5">
-                          <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Nooca / Type</span>
-                          <span id="somPassSpreadType" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">P</span>
-                        </div>
-                        <div class="col-span-2 border-l border-slate-300 pl-1.5">
-                          <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Astaanta / Code</span>
-                          <span id="somPassSpreadCountry" class="font-mono-code font-bold text-slate-900 text-xs sm:text-sm">SOM</span>
-                        </div>
-                        <div class="col-span-4 border-l border-slate-300 pl-1.5 flex items-center justify-between">
-                          <div>
-                            <span class="block text-[7px] text-slate-500 font-bold uppercase leading-none">Passport No</span>
-                            <span id="somPassSpreadNumber" class="font-mono-code font-extrabold text-slate-950 text-xs sm:text-sm tracking-wider">P00849261</span>
-                          </div>
-                          <span class="text-amber-800 text-lg sm:text-xl font-bold pr-1">★</span>
-                        </div>
-                      </div>
-
-                      <!-- Main Data Fields Grid -->
-                      <div class="grid grid-cols-12 gap-2 sm:gap-3 items-start relative z-10">
-                        <div class="col-span-4 flex flex-col items-center">
-                          <div class="w-full aspect-[3.2/4] bg-slate-200 border border-slate-400 rounded overflow-hidden shadow-sm flex items-center justify-center relative">
-                            <img id="somPassPreviewPhotoSpread" src="/assets/aistudio/uk_bearer_portrait.png" alt="" class="w-full h-full object-cover">
-                          </div>
-                        </div>
-                        <div class="col-span-8 space-y-1 text-[9px] sm:text-[10px] leading-tight">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca / الاسم / Name</span>
-                            <span id="somPassSpreadName" class="font-extrabold text-slate-950 text-xs sm:text-sm uppercase tracking-wide">CABDIRAXMAAN CUMAR WARSAME</span>
-                          </div>
-                          <div class="grid grid-cols-12 gap-1 items-start">
-                            <div class="col-span-7">
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Magaca Hooyada / Mother's Name</span>
-                              <span id="somPassSpreadMother" class="font-bold text-slate-900 text-[10px] sm:text-[11px] uppercase">DEEQA OMAR ROBLE</span>
-                            </div>
-                            <div class="col-span-5">
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">NID:</span>
-                              <span id="somPassSpreadNid" class="font-mono-code font-bold text-slate-950 text-[10px] sm:text-[11px]">29708149583210</span>
-                            </div>
-                          </div>
-                          <div class="grid grid-cols-2 gap-1">
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Jinsiyada / Nationality</span>
-                              <span id="somPassSpreadNationality" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">SOMALI</span>
-                            </div>
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Shaqada / Occupation</span>
-                              <span id="somPassSpreadOccupation" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">BUSINESSMAN</span>
-                            </div>
-                          </div>
-                          <div class="grid grid-cols-2 gap-1">
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda Dhalashada / Date of Birth</span>
-                              <span id="somPassSpreadDob" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">14 Aug 1997</span>
-                            </div>
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Bixiyey / Place of Issue</span>
-                              <span id="somPassSpreadIssuePlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">MOGADISHU</span>
-                            </div>
-                          </div>
-                          <div class="grid grid-cols-2 gap-1">
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Lab Dheddig / Gender</span>
-                              <span id="somPassSpreadSex" class="font-mono-code font-bold text-slate-900 text-[10px] sm:text-[11px]">MALE</span>
-                            </div>
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Meesha Dhaleshada / Place of Birth</span>
-                              <span id="somPassSpreadBirthPlace" class="font-extrabold text-slate-900 text-[10px] sm:text-[11px] uppercase">MOGADISHU</span>
-                            </div>
-                          </div>
-                          <div class="grid grid-cols-2 gap-1">
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda la Bixiyey / Date of Issue</span>
-                              <span id="somPassSpreadIssueDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">18 Jun 2021</span>
-                            </div>
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Xafiiska / Authority</span>
-                              <span id="somPassSpreadAuthority" class="font-extrabold text-slate-900 text-[9.5px] sm:text-[10px] uppercase">SOMALI GOVERNMENT</span>
-                            </div>
-                          </div>
-                          <div class="grid grid-cols-2 gap-1 pt-0.5">
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Taariikhda uu Dhacayo / Expiry</span>
-                              <span id="somPassSpreadExpiryDate" class="font-mono-code font-extrabold text-slate-950 text-[10px] sm:text-[11px]">17 Jun 2026</span>
-                            </div>
-                            <div>
-                              <span class="block text-[7px] sm:text-[7.5px] text-slate-500 font-bold uppercase leading-none">Saxiixa / Signature</span>
-                              <div class="border-b border-slate-400 mt-2 h-3 flex items-end">
-                                <span class="text-[8px] italic text-slate-400 font-mono-code select-none">C. Cumar Warsame</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- MRZ on Spread -->
-                      <div class="mt-2.5 pt-1.5 border-t-2 border-slate-400 font-mono-code text-[10px] sm:text-[11.5px] font-bold tracking-widest text-slate-950 leading-snug overflow-x-auto relative z-10">
-                        <div id="somPassSpreadMrzLine1">P&lt;SOMWARSAME&lt;&lt;CABDIRAXMAAN&lt;CUMAR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                        <div id="somPassSpreadMrzLine2">P008492614SOM9708148M2606173297081495832104</div>
-                      </div>
-
+                    <!-- Optional Diagonal Specimen Watermark -->
+                    <div id="somPassSampleWatermark" style="display: none;" class="absolute inset-0 items-center justify-center pointer-events-none z-40">
+                      <span id="somPassWatermarkLabel" class="font-mono-code font-black text-4xl sm:text-5xl tracking-[0.25em] text-red-600/25 border-4 border-red-600/25 px-6 py-2 rounded-xl -rotate-12 uppercase select-none">SPECIMEN</span>
                     </div>
+
+                    <!-- 1:1 Reference Specimen Overlay (Active when unmodified default specimen data is displayed) -->
+                    <img id="somPassRefOverlay" src="/assets/aistudio/image_309a7992.png" alt="Somali Republic Passport Specimen" class="absolute inset-0 w-full h-full object-fill pointer-events-none z-30">
                   </article>
                 </div>
               </div>
