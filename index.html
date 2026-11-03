@@ -2033,6 +2033,70 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
 
+    function randomizeActiveDocument() {
+      if (currentDocType === 'proofofaccount') {
+        if (typeof randomizeProofOfAccount === 'function') randomizeProofOfAccount();
+      } else if (currentCountry === 'rwanda') {
+        if (typeof randomizeRwaId === 'function') randomizeRwaId();
+      } else if (currentCountry === 'ghana') {
+        if (typeof randomizeGhaPassport === 'function') randomizeGhaPassport();
+      } else if (currentCountry === 'canada') {
+        if (typeof randomizeCanPassport === 'function') randomizeCanPassport();
+      } else if (currentCountry === 'germany') {
+        if (typeof randomizeDeuPassport === 'function') randomizeDeuPassport();
+      } else if (currentCountry === 'bangladesh') {
+        if (typeof randomizeBgdPassport === 'function') randomizeBgdPassport();
+      } else if (currentCountry === 'drcongo') {
+        if (typeof randomizeDrcPassport === 'function') randomizeDrcPassport();
+      } else if (currentCountry === 'usa') {
+        if (typeof randomizeUsaPassport === 'function') randomizeUsaPassport();
+      } else if (currentCountry === 'southafrica') {
+        if (typeof randomizeSaPassport === 'function') randomizeSaPassport();
+      } else if (currentCountry === 'senegal') {
+        if (currentDocType === 'idcard' && typeof randomizeZafIdCard === 'function') {
+          randomizeZafIdCard();
+        } else if (typeof randomizeSenegalPassport === 'function') {
+          randomizeSenegalPassport();
+        }
+      } else if (currentCountry === 'seychelles') {
+        if (typeof randomizeSycCard === 'function') randomizeSycCard();
+      } else if (currentCountry === 'pakistan') {
+        if (typeof randomizePakCard === 'function') randomizePakCard();
+      } else if (currentCountry === 'uganda') {
+        if (typeof randomizeUgandaRefugeeCard === 'function') randomizeUgandaRefugeeCard();
+      } else if (currentCountry === 'uk') {
+        if (typeof randomizeUkPassport === 'function') randomizeUkPassport();
+      } else if (currentCountry === 'nigeria') {
+        if (currentDocType === 'passport' && typeof randomizeNgaPassport === 'function') {
+          randomizeNgaPassport();
+        } else if (typeof randomizeNgaCard === 'function') {
+          randomizeNgaCard();
+        }
+      } else if (currentCountry === 'ethiopia') {
+        if (currentDocType === 'passport' && typeof randomizeEthPassport === 'function') {
+          randomizeEthPassport();
+        } else if (typeof randomizeEthiopiaIdCard === 'function') {
+          randomizeEthiopiaIdCard();
+        }
+      } else if (currentCountry === 'somalia') {
+        if (currentDocType === 'passport' && typeof randomizeSomaliaPassport === 'function') {
+          randomizeSomaliaPassport();
+        } else if (currentDocType === 'driverlicense' && typeof randomizeSomaliaDriverLicense === 'function') {
+          randomizeSomaliaDriverLicense();
+        } else if (typeof randomizeSomaliaIdCard === 'function') {
+          randomizeSomaliaIdCard();
+        }
+      } else if (currentCountry === 'kenya') {
+        if (currentDocType === 'idcard' && typeof randomizeKenyaIdCard === 'function') {
+          randomizeKenyaIdCard();
+        } else if (typeof randomizeKenyaPassport === 'function') {
+          randomizeKenyaPassport();
+        }
+      }
+    }
+    window.randomizeActiveDocument = randomizeActiveDocument;
+    window.randomizeUniversal = randomizeActiveDocument;
+
     // ================= DEMOCRATIC REPUBLIC OF THE CONGO PASSPORT CONTROLLER =================
     const DRC_DEFAULT_PHOTO = '/assets/aistudio/drc_passport_portrait.jpg';
     const DRC_SIGNATURE = '/assets/aistudio/drc_passport_signature.png';
@@ -11487,12 +11551,17 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
 
         <!-- Country Selector Color Cards -->
         <div>
-          <div class="flex items-center justify-between mb-3">
-            <label class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-              <i class="fa-solid fa-earth-africa text-emerald-700"></i>
-              Select Issuing Country:
-            </label>
-            <span class="text-[11px] font-medium text-slate-400">Jurisdiction &amp; registry formatting</span>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-earth-africa text-emerald-700"></i>
+                Select Issuing Country:
+              </label>
+              <span class="text-[11px] font-medium text-slate-400 hidden sm:inline">Jurisdiction &amp; registry formatting</span>
+            </div>
+            <button type="button" id="universal-randomize-country-btn" onclick="randomizeActiveDocument()" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 shadow-sm hover:shadow cursor-pointer" title="Randomize whichever country document is currently active">
+              <i class="fa-solid fa-shuffle text-amber-300"></i> Universal Randomize
+            </button>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-3">
@@ -11725,6 +11794,10 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           </div>
 
           <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button type="button" id="ogads-wb-randomize-btn" onclick="randomizeActiveDocument()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-emerald-700/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer" title="Universal Randomize active country document">
+              <i class="fa-solid fa-shuffle text-amber-300 text-sm"></i>
+              <span>RANDOMIZE DATA</span>
+            </button>
             <button type="button" id="ogads-wb-unlock-btn" onclick="triggerActiveDocumentUnlock()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-300 hover:via-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs sm:text-sm tracking-wide shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer">
               <i class="fa-solid fa-unlock-keyhole text-sm"></i>
               <span>UNLOCK DOWNLOAD</span>
@@ -12032,7 +12105,12 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-id-card text-emerald-700"></i> Kenya National ID Builder</h1>
                 <p class="text-xs text-slate-500 mt-0.5">Republic of Kenya Maisha Namba 3rd Generation Smart ID Card.</p>
               </div>
-              <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">MAISHA ID</span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="randomizeKenyaIdCard()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Kenya ID data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">MAISHA ID</span>
+              </div>
             </div>
 
             <!-- View Mode Switcher: Both Sides vs Front vs Back -->
@@ -12361,7 +12439,12 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 </h1>
                 <p class="text-xs text-slate-500 mt-0.5">Waraqadda Aqoonsiga · Federal Republic of Somalia (Jamhuuriyadda Soomaaliya).</p>
               </div>
-              <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">SOMALIA · NATIONAL ID</span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="randomizeSomaliaIdCard()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali ID data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">SOMALIA · NATIONAL ID</span>
+              </div>
             </div>
 
             <!-- Format Selector: National Identity Card vs NIRA Certificate -->
@@ -12985,7 +13068,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <h1 class="text-lg font-bold flex items-center gap-2"><i class="fa-solid fa-passport text-sky-700"></i> Somalia Passport Builder</h1>
                 <p class="text-xs text-slate-500 mt-0.5">Somali Republic Biometric Passport (Baasaboor / جواز سفر).</p>
               </div>
-              <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · PASSPORT</span>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="randomizeSomaliaPassport()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali passport data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · PASSPORT</span>
+              </div>
             </div>
 
             <!-- Active Document Editor Switcher -->
@@ -14201,6 +14289,10 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
             <!-- Action Buttons in Header -->
             <div class="flex flex-wrap items-center gap-2.5 no-print">
+              <button type="button" onclick="randomizeNgaCard()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all" title="Generate random Nigerian ID card details">
+                <i class="fa-solid fa-shuffle"></i>
+                <span>Randomize</span>
+              </button>
               <button type="button" onclick="downloadNgaCardPNG()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-2 cursor-pointer transition-all">
                 <i class="fa-solid fa-download"></i>
                 <span>Download (PNG)</span>
