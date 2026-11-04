@@ -52,13 +52,47 @@ nav { display: grid; gap: 4px; } nav a { display: flex; align-items: center; gap
   pointer-events: none !important;
   transition: none !important;
 }
-.kyc-react-watermark-layer,
-.kyc-react-wm-item,
 .static-passport .ogads-demo-specimen-tag,
 .static-passport .sample-watermark,
 .preview-frame article .sample-watermark,
 .preview-frame article .ogads-demo-specimen-tag {
   display: none !important;
+}
+
+.kyc-react-watermark-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6% 7%;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.kyc-react-wm-item {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(15, 23, 42, 0.10);
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.22);
+  transform: rotate(-12deg);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+@media print {
+  .static-passport,
+  .preview-frame,
+  .detected-text {
+    filter: blur(36px) brightness(0.2) !important;
+    opacity: 0.04 !important;
+    visibility: hidden !important;
+  }
 }
 
 /* Document preview visual clarity & sharpness */

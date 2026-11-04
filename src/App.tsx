@@ -561,13 +561,7 @@ function App() {
       recentAttemptsRef.current.push(now)
       const attemptCount = recentAttemptsRef.current.length
       const suspicious = attemptCount >= 3
-      if (suspicious) {
-        setSecurityNotice(
-          `Repeated protected-content access detected (${attemptCount} events). Security event recorded.`
-        )
-      } else if (eventType !== "copy_blocked" && eventType !== "cut_blocked" && details) {
-        setSecurityNotice(details)
-      }
+      setSecurityNotice(null)
       fetch("/api/ogads/security-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -589,12 +583,30 @@ function App() {
     const handleVisibility = () => {
       if (document.hidden || document.visibilityState !== "visible") {
         setIsPreviewBlurred(true)
-      } else if (document.hasFocus()) {
+      } else {
         setIsPreviewBlurred(false)
       }
     }
     const handleBlur = () => setIsPreviewBlurred(true)
-    const handleFocus = () => setIsPreviewBlurred(false)
+    const handleFocus = () => {
+      if (!document.hidden) setIsPreviewBlurred(false)
+    }
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (!e.relatedTarget) setIsPreviewBlurred(true)
+    }
+    const handleMouseEnter = () => {
+      if (!document.hidden) setIsPreviewBlurred(false)
+    }
+    const handleActiveRestore = () => {
+      if (!document.hidden) setIsPreviewBlurred(false)
+    }
+    const handleBeforePrint = () => setIsPreviewBlurred(true)
+    const handleAfterPrint = () => {
+      if (!document.hidden && document.hasFocus()) setIsPreviewBlurred(false)
+    }
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault()
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       const key = e.key || ""
       const lower = key.toLowerCase()
@@ -608,19 +620,50 @@ function App() {
         reportSecurityEvent("screenshot_shortcut_detected", "Screenshot keyboard shortcut detected")
       } else if ((e.ctrlKey || e.metaKey) && lower === "p") {
         e.preventDefault()
+        e.stopPropagation()
         setIsPreviewBlurred(true)
         reportSecurityEvent("print_shortcut_blocked", "Print shortcut blocked on KYC specimen")
+      } else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && lower === "s") {
+        e.preventDefault()
+        e.stopPropagation()
+        reportSecurityEvent("save_shortcut_blocked", "Save shortcut blocked on KYC specimen")
+      } else if (
+        key === "F12" ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && ["i", "j", "c", "k"].includes(lower)) ||
+        ((e.ctrlKey || e.metaKey) && lower === "u")
+      ) {
+        e.preventDefault()
+        e.stopPropagation()
+        reportSecurityEvent("devtools_shortcut_detected", "Inspection shortcut blocked")
       }
     }
 
     document.addEventListener("visibilitychange", handleVisibility)
+    document.addEventListener("contextmenu", handleContextMenu, true)
     window.addEventListener("blur", handleBlur)
     window.addEventListener("focus", handleFocus)
+    window.addEventListener("pagehide", handleBlur)
+    window.addEventListener("pageshow", handleFocus)
+    window.addEventListener("beforeprint", handleBeforePrint)
+    window.addEventListener("afterprint", handleAfterPrint)
+    window.addEventListener("pointermove", handleActiveRestore, { passive: true })
+    window.addEventListener("pointerdown", handleActiveRestore, { passive: true })
+    document.documentElement.addEventListener("mouseleave", handleMouseLeave)
+    document.documentElement.addEventListener("mouseenter", handleMouseEnter)
     window.addEventListener("keydown", handleKeyDown, true)
     return () => {
       document.removeEventListener("visibilitychange", handleVisibility)
+      document.removeEventListener("contextmenu", handleContextMenu, true)
       window.removeEventListener("blur", handleBlur)
       window.removeEventListener("focus", handleFocus)
+      window.removeEventListener("pagehide", handleBlur)
+      window.removeEventListener("pageshow", handleFocus)
+      window.removeEventListener("beforeprint", handleBeforePrint)
+      window.removeEventListener("afterprint", handleAfterPrint)
+      window.removeEventListener("pointermove", handleActiveRestore)
+      window.removeEventListener("pointerdown", handleActiveRestore)
+      document.documentElement.removeEventListener("mouseleave", handleMouseLeave)
+      document.documentElement.removeEventListener("mouseenter", handleMouseEnter)
       window.removeEventListener("keydown", handleKeyDown, true)
     }
   }, [reportSecurityEvent])
@@ -2192,6 +2235,30 @@ function App() {
 
                     {/* Passport Card View */}
                     <div className="document-placeholder static-passport relative overflow-hidden">
+                      {/* Discreet dynamic user-specific watermark inside protected preview */}
+                      <div className="kyc-react-watermark-layer" aria-hidden="true">
+                        <div className="flex justify-end w-full">
+                          <span className="kyc-react-wm-item">UID:{visitorSessionId.slice(0, 18)} • {country}</span>
+                        </div>
+                        <div className="flex justify-center w-full">
+                          <span className="kyc-react-wm-item">UID:{visitorSessionId.slice(0, 18)} • {country}</span>
+                        </div>
+                        <div className="flex justify-start w-full">
+                          <span className="kyc-react-wm-item">UID:{visitorSessionId.slice(0, 18)} • {country}</span>
+                        </div>
+                      </div>
+
+                      {isPreviewBlurred && (
+                        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 text-center rounded-lg">
+                          <div className="text-amber-300 font-extrabold text-xs uppercase tracking-wider">
+                            Protected KYC Preview Hidden
+                          </div>
+                          <p className="text-slate-300 text-[10px] mt-1 leading-snug max-w-[260px]">
+                            Preview is shielded while tab is inactive or out of focus. Return to this window to restore.
+                          </p>
+                        </div>
+                      )}
+
                       {isRwanda ? (
                         <div className="w-full max-w-[360px] mx-auto my-1">
                           <RwandaIdCard
@@ -2221,7 +2288,7 @@ function App() {
                         </div>
                       ) : (
                         <div className="relative w-full mx-auto">
-                          <img className="passport-reference-image" src={specimenImage} alt={specimenAlt} />
+                          <img className="passport-reference-image" src={specimenImage} alt={specimenAlt} draggable={false} />
                           {(() => {
                             const currentDoc = otherData[country] || defaultOtherCountryData[country] || defaultOtherCountryData.UGA
                             return (

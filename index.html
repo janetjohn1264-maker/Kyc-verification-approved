@@ -602,6 +602,9 @@
     /* ================= KYC SCREENSHOT & SENSITIVE-CONTENT PROTECTION ================= */
     #verification-workbench [id$="-view"],
     #verification-workbench article,
+    .kyc-protected-surface,
+    #somalia-passport-spread,
+    #senegal-passport-spread,
     #poaPdfContainer,
     #poaLetterContainer,
     #imageModal {
@@ -635,10 +638,7 @@
       position: relative !important;
     }
 
-    .kyc-dynamic-watermark-overlay,
-    .kyc-wm-stamp,
-    .kyc-react-watermark-layer,
-    .kyc-react-wm-item,
+    /* Hide SAMPLE / DEMO watermarks inside document previews so backgrounds stay clean and sharp */
     #verification-workbench article .sample-watermark,
     #verification-workbench article [id*="SampleWatermark"],
     #verification-workbench article [id*="sampleWatermark"],
@@ -651,6 +651,35 @@
       pointer-events: none !important;
       height: 0 !important;
       width: 0 !important;
+    }
+
+    /* Discreet dynamic user-specific session watermark on protected previews */
+    .kyc-dynamic-watermark-overlay {
+      position: absolute !important;
+      inset: 0 !important;
+      pointer-events: none !important;
+      z-index: 35 !important;
+      overflow: hidden !important;
+      background: transparent !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      padding: 6% 7% !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+    }
+
+    .kyc-wm-stamp {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+      font-size: clamp(7px, 1.05cqw, 10px) !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.08em !important;
+      color: rgba(15, 23, 42, 0.10) !important;
+      text-shadow: 0 0 1px rgba(255, 255, 255, 0.22) !important;
+      white-space: nowrap !important;
+      pointer-events: none !important;
+      transform: rotate(-12deg) !important;
+      line-height: 1.1 !important;
     }
 
     /* ================= DOCUMENT PREVIEW VISUAL CLARITY & SHARPNESS ================= */
@@ -687,24 +716,28 @@
     }
 
     body.kyc-tab-blurred #verification-workbench article,
+    body.kyc-tab-blurred #somalia-passport-spread,
+    body.kyc-tab-blurred #senegal-passport-spread,
     body.kyc-tab-blurred #poaPdfContainer,
     body.kyc-tab-blurred #poaLetterContainer,
     body.kyc-tab-blurred #modalPreviewImg,
-    body.kyc-suspicious-locked #verification-workbench article,
-    body.kyc-suspicious-locked #poaPdfContainer,
-    body.kyc-suspicious-locked #poaLetterContainer,
-    body.kyc-suspicious-locked #modalPreviewImg,
+    body.kyc-tab-blurred .static-passport,
     body.kyc-shortcut-shield #verification-workbench article,
+    body.kyc-shortcut-shield #somalia-passport-spread,
+    body.kyc-shortcut-shield #senegal-passport-spread,
     body.kyc-shortcut-shield #poaPdfContainer,
     body.kyc-shortcut-shield #poaLetterContainer,
-    body.kyc-shortcut-shield #modalPreviewImg {
-      filter: blur(26px) brightness(0.28) contrast(0.75) !important;
-      opacity: 0.14 !important;
+    body.kyc-shortcut-shield #modalPreviewImg,
+    body.kyc-shortcut-shield .static-passport {
+      filter: blur(28px) brightness(0.26) contrast(0.75) !important;
+      opacity: 0.12 !important;
       pointer-events: none !important;
       transition: none !important;
     }
 
-    #kyc-security-protection-bar {
+    #kyc-security-protection-bar,
+    #kyc-protection-toast,
+    #kyc-suspicious-activity-modal {
       display: none !important;
     }
 
@@ -719,11 +752,20 @@
 
     @media print {
       #verification-workbench article,
+      #verification-workbench [id$="-view"],
+      #somalia-passport-spread,
+      #senegal-passport-spread,
       #poaPdfContainer,
       #poaLetterContainer,
-      #modalPreviewImg {
-        filter: blur(32px) !important;
-        opacity: 0.08 !important;
+      #modalPreviewImg,
+      .static-passport,
+      .preview-frame {
+        filter: blur(36px) brightness(0.2) !important;
+        opacity: 0.04 !important;
+        visibility: hidden !important;
+      }
+      #kyc-focus-blur-banner {
+        display: flex !important;
       }
     }
 
@@ -24636,84 +24678,23 @@ COD REP DEM CONGO</div>
         return Boolean(
           target.closest('#verification-workbench article') ||
           target.closest('#verification-workbench [id$="-view"]') ||
+          target.closest('.kyc-protected-surface') ||
+          target.closest('#somalia-passport-spread') ||
+          target.closest('#senegal-passport-spread') ||
           target.closest('#poaPdfContainer') ||
           target.closest('#poaLetterContainer') ||
-          target.closest('#imageModal')
+          target.closest('#imageModal') ||
+          target.closest('.static-passport') ||
+          target.closest('.preview-frame')
         );
       }
 
       function ensureProtectionUiElements() {
-        if (!document.getElementById('kyc-protection-toast')) {
-          var toast = document.createElement('div');
-          toast.id = 'kyc-protection-toast';
-          toast.className = 'fixed bottom-5 right-5 z-[115] hidden max-w-sm rounded-xl bg-slate-950/95 border border-amber-500/50 px-4 py-3 text-white shadow-2xl backdrop-blur-md pointer-events-none';
-          toast.innerHTML =
-            '<div class="flex items-start gap-2.5">' +
-              '<i class="fa-solid fa-shield-halved text-amber-400 mt-0.5"></i>' +
-              '<div class="text-xs leading-snug">' +
-                '<div id="kyc-protection-toast-title" class="font-extrabold text-amber-300 uppercase tracking-wider text-[11px]">Protected KYC Specimen</div>' +
-                '<div id="kyc-protection-toast-msg" class="text-slate-300 mt-0.5">Action restricted on sensitive KYC verification content.</div>' +
-              '</div>' +
-            '</div>';
-          document.body.appendChild(toast);
-        }
-
-        if (!document.getElementById('kyc-suspicious-activity-modal')) {
-          var modal = document.createElement('div');
-          modal.id = 'kyc-suspicious-activity-modal';
-          modal.className = 'fixed inset-0 z-[120] hidden items-center justify-center bg-slate-950/88 backdrop-blur-md p-4';
-          modal.innerHTML =
-            '<div class="max-w-md w-full rounded-2xl bg-slate-900 border border-rose-500/50 p-6 text-white shadow-2xl">' +
-              '<div class="flex items-center gap-3 mb-3">' +
-                '<div class="w-11 h-11 rounded-xl bg-rose-500/20 border border-rose-400/40 text-rose-300 flex items-center justify-center text-lg shrink-0">' +
-                  '<i class="fa-solid fa-triangle-exclamation"></i>' +
-                '</div>' +
-                '<div>' +
-                  '<span class="text-[10px] font-extrabold uppercase tracking-widest text-rose-400 block">Security Event Recorded</span>' +
-                  '<h3 class="text-base font-black tracking-tight">Repeated Protected-Content Access Detected</h3>' +
-                '</div>' +
-              '</div>' +
-              '<p class="text-xs text-slate-300 leading-relaxed">' +
-                'Multiple attempts to copy, inspect, capture, or tamper with protected KYC verification specimens were detected in a short interval. Sensitive previews have been temporarily shielded and this non-PII security event has been logged against your session.' +
-              '</p>' +
-              '<div class="mt-3 p-3 rounded-xl bg-slate-950/90 border border-slate-800 font-mono text-[10px] text-slate-300 space-y-1">' +
-                '<div id="kyc-suspicious-modal-sid">SESSION: --</div>' +
-                '<div id="kyc-suspicious-modal-count">SECURITY EVENTS IN WINDOW: --</div>' +
-                '<div class="text-slate-400">DISCLOSURE: Browser-level controls deter and watermark unauthorized capture but do not replace OS/hardware-level security.</div>' +
-              '</div>' +
-              '<button type="button" id="kyc-suspicious-restore-btn" class="mt-4 w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider transition cursor-pointer">' +
-                'Acknowledge & Restore Protected View' +
-              '</button>' +
-            '</div>';
-          document.body.appendChild(modal);
-
-          var restoreBtn = document.getElementById('kyc-suspicious-restore-btn');
-          if (restoreBtn) {
-            restoreBtn.addEventListener('click', function() {
-              isSuspiciousLocked = false;
-              recentSecurityTimestamps = [];
-              document.body.classList.remove('kyc-suspicious-locked');
-              document.body.classList.remove('kyc-shortcut-shield');
-              modal.classList.add('hidden');
-              modal.classList.remove('flex');
-            });
-          }
-        }
+        // Silent protection mode: no unnecessary warning popups or lockout modals
       }
 
-      function showProtectionToast(title, message) {
-        ensureProtectionUiElements();
-        var toast = document.getElementById('kyc-protection-toast');
-        var tEl = document.getElementById('kyc-protection-toast-title');
-        var mEl = document.getElementById('kyc-protection-toast-msg');
-        if (!toast || !tEl || !mEl) return;
-        tEl.textContent = title || 'Protected KYC Specimen';
-        mEl.textContent = message || 'This action is restricted on sensitive KYC verification pages.';
-        toast.classList.remove('hidden');
-        if (toastTimer) clearTimeout(toastTimer);
-        toastTimer = setTimeout(function() {
-          toast.classList.add('hidden');
-        }, 3200);
+      function showProtectionToast() {
+        // Silent protection mode per requirement 10: do not display unnecessary warning messages or popups
       }
 
       function updateStatusBar() {
@@ -24727,9 +24708,6 @@ COD REP DEM CONGO</div>
         if (clkEl) clkEl.textContent = ts;
         if (evtEl) {
           evtEl.textContent = 'Events: ' + totalRecordedEvents;
-          if (totalRecordedEvents >= SUSPICIOUS_THRESHOLD) {
-            evtEl.className = 'px-2 py-0.5 rounded bg-rose-950/90 border border-rose-500/50 text-rose-300 font-bold';
-          }
         }
         if (metaEl) {
           metaEl.textContent = 'SESSION: ' + shortSid + ' • ' + ts;
@@ -24751,7 +24729,7 @@ COD REP DEM CONGO</div>
 
         updateStatusBar();
 
-        // Send strictly non-PII security telemetry to server
+        // Send strictly non-PII security telemetry to server silently
         try {
           fetch('/api/ogads/security-event', {
             method: 'POST',
@@ -24767,21 +24745,6 @@ COD REP DEM CONGO</div>
             })
           }).catch(function() {});
         } catch (e) {}
-
-        if (isSuspicious && !isSuspiciousLocked) {
-          isSuspiciousLocked = true;
-          document.body.classList.add('kyc-suspicious-locked');
-          ensureProtectionUiElements();
-          var modal = document.getElementById('kyc-suspicious-activity-modal');
-          var sidNode = document.getElementById('kyc-suspicious-modal-sid');
-          var cntNode = document.getElementById('kyc-suspicious-modal-count');
-          if (sidNode) sidNode.textContent = 'SESSION ID: ' + getShortSessionTag() + ' (' + getFormattedTimestamp() + ')';
-          if (cntNode) cntNode.textContent = 'RECENT BLOCKED ATTEMPTS (60s): ' + attemptCount;
-          if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-          }
-        }
       }
 
       function triggerTemporaryShortcutShield(reasonText) {
@@ -24796,24 +24759,7 @@ COD REP DEM CONGO</div>
           if (!document.hidden && document.hasFocus()) {
             document.body.classList.remove('kyc-shortcut-shield');
           }
-        }, 2600);
-      }
-
-      function removeDistractingWatermarks() {
-        try {
-          var overlays = document.querySelectorAll('.kyc-dynamic-watermark-overlay, .kyc-wm-stamp, .kyc-react-watermark-layer, .kyc-react-wm-item');
-          for (var i = 0; i < overlays.length; i++) {
-            var el = overlays[i];
-            if (el && el.parentNode) {
-              el.parentNode.removeChild(el);
-            }
-          }
-        } catch (e) {}
-      }
-
-      // Keep document backgrounds clean, sharp, and visually clear without decorative overlays
-      function buildWatermarkPatternDataUrl() {
-        return '';
+        }, 2200);
       }
 
       function getAllProtectedSurfaceNodes() {
@@ -24839,39 +24785,152 @@ COD REP DEM CONGO</div>
         return nodes;
       }
 
+      function enforceNonDraggableImages(root) {
+        try {
+          var scope = root || document;
+          var imgs = scope.querySelectorAll(
+            '#verification-workbench article img, #verification-workbench [id$="-view"] img, #modalPreviewImg, .static-passport img, .passport-reference-image'
+          );
+          for (var i = 0; i < imgs.length; i++) {
+            var img = imgs[i];
+            if (img.getAttribute('draggable') !== 'false') {
+              img.setAttribute('draggable', 'false');
+            }
+          }
+        } catch (e) {}
+      }
+
       function renderAndRefreshWatermarks() {
-        // Keeps document previews visually clear, clean, and sharp without distracting decorative watermarks
-        removeDistractingWatermarks();
+        if (isRestoringWatermark) return;
+        isRestoringWatermark = true;
+        try {
+          watermarkCycleCount += 1;
+          var shortSid = getShortSessionTag();
+          var tsShort = getFormattedTimestamp().slice(0, 16) + ' UTC';
+          var stampText = 'UID:' + shortSid + ' • ' + tsShort;
+          var nodes = getAllProtectedSurfaceNodes();
+
+          for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (!node) continue;
+            if (!node.classList.contains('kyc-protected-surface')) {
+              node.classList.add('kyc-protected-surface');
+            }
+
+            // Skip parent wrapper if it already contains child <article> elements that get their own watermark
+            if (node.tagName !== 'ARTICLE' && node.querySelector && node.querySelector('article')) {
+              continue;
+            }
+
+            var overlay = node.querySelector(':scope > .kyc-dynamic-watermark-overlay');
+            if (!overlay) {
+              overlay = document.createElement('div');
+              overlay.className = 'kyc-dynamic-watermark-overlay';
+              overlay.setAttribute('aria-hidden', 'true');
+              overlay.setAttribute('data-kyc-wm', '1');
+
+              var rowTop = document.createElement('div');
+              rowTop.style.cssText = 'display:flex;justify-content:flex-end;width:100%;pointer-events:none;';
+              var stampTop = document.createElement('span');
+              stampTop.className = 'kyc-wm-stamp';
+              rowTop.appendChild(stampTop);
+
+              var rowMid = document.createElement('div');
+              rowMid.style.cssText = 'display:flex;justify-content:center;width:100%;pointer-events:none;';
+              var stampMid = document.createElement('span');
+              stampMid.className = 'kyc-wm-stamp';
+              rowMid.appendChild(stampMid);
+
+              var rowBot = document.createElement('div');
+              rowBot.style.cssText = 'display:flex;justify-content:flex-start;width:100%;pointer-events:none;';
+              var stampBot = document.createElement('span');
+              stampBot.className = 'kyc-wm-stamp';
+              rowBot.appendChild(stampBot);
+
+              overlay.appendChild(rowTop);
+              overlay.appendChild(rowMid);
+              overlay.appendChild(rowBot);
+              node.appendChild(overlay);
+            }
+
+            var stamps = overlay.querySelectorAll('.kyc-wm-stamp');
+            for (var s = 0; s < stamps.length; s++) {
+              if (stamps[s].textContent !== stampText) {
+                stamps[s].textContent = stampText;
+              }
+            }
+          }
+
+          enforceNonDraggableImages(document);
+        } catch (e) {
+        } finally {
+          isRestoringWatermark = false;
+        }
       }
 
       function setupWatermarkTamperObserver() {
-        // Document clarity observer: ensures specimen backgrounds stay clean and unobstructed
         var workbench = document.getElementById('verification-workbench');
         if (!workbench || typeof MutationObserver === 'undefined') return;
 
-        var observer = new MutationObserver(function() {
-          removeDistractingWatermarks();
+        var tamperTimer = null;
+        var observer = new MutationObserver(function(mutations) {
+          if (isRestoringWatermark) return;
+          var needsRestore = false;
+          for (var i = 0; i < mutations.length; i++) {
+            var m = mutations[i];
+            if (m.type === 'childList' && m.removedNodes && m.removedNodes.length > 0) {
+              for (var r = 0; r < m.removedNodes.length; r++) {
+                var rn = m.removedNodes[r];
+                if (rn && rn.nodeType === 1 && (rn.classList.contains('kyc-dynamic-watermark-overlay') || rn.classList.contains('kyc-wm-stamp'))) {
+                  needsRestore = true;
+                  break;
+                }
+              }
+            } else if (m.type === 'attributes' && m.target && m.target.classList &&
+                       (m.target.classList.contains('kyc-dynamic-watermark-overlay') || m.target.classList.contains('kyc-wm-stamp'))) {
+              needsRestore = true;
+            }
+            if (needsRestore) break;
+          }
+          if (needsRestore) {
+            if (tamperTimer) clearTimeout(tamperTimer);
+            tamperTimer = setTimeout(function() {
+              renderAndRefreshWatermarks();
+            }, 40);
+          }
         });
 
         observer.observe(workbench, {
           childList: true,
-          subtree: true
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['style', 'class', 'hidden']
         });
+
+        setInterval(function() {
+          renderAndRefreshWatermarks();
+          updateStatusBar();
+        }, 30000);
       }
 
       function installInteractionProtections() {
-        // 1. Disable right-click / context menu on sensitive KYC verification views
+        // 1. Disable right-click / context menu across the website silently
         document.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          recordSecurityEvent('contextmenu_blocked', 'Right-click context menu blocked', false);
+          return false;
+        }, true);
+
+        // 2. Disable text selection, copy, and cut on protected content while keeping form inputs working
+        document.addEventListener('selectstart', function(e) {
+          if (isEditableInputTarget(e.target)) return;
           if (isInsideProtectedKycSurface(e.target)) {
             e.preventDefault();
-            e.stopPropagation();
-            recordSecurityEvent('contextmenu_blocked', 'Right-click context menu blocked on KYC view', true);
-            showProtectionToast('Context Menu Disabled', 'Right-click is disabled on sensitive KYC verification specimens.');
             return false;
           }
         }, true);
 
-        // 2. Disable copy & cut on sensitive KYC verification content
         document.addEventListener('copy', function(e) {
           if (isEditableInputTarget(e.target)) return;
           if (isInsideProtectedKycSurface(e.target) || (window.getSelection && String(window.getSelection()).trim().length > 0)) {
@@ -24882,7 +24941,7 @@ COD REP DEM CONGO</div>
                 e.clipboardData.setData('text/plain', '');
               } catch (err) {}
             }
-            recordSecurityEvent('copy_blocked', 'Copy attempt blocked on KYC specimen', true);
+            recordSecurityEvent('copy_blocked', 'Copy attempt blocked on KYC specimen', false);
             return false;
           }
         }, true);
@@ -24897,22 +24956,24 @@ COD REP DEM CONGO</div>
                 e.clipboardData.setData('text/plain', '');
               } catch (err) {}
             }
-            recordSecurityEvent('cut_blocked', 'Cut attempt blocked on KYC specimen', true);
+            recordSecurityEvent('cut_blocked', 'Cut attempt blocked on KYC specimen', false);
             return false;
           }
         }, true);
 
+        // 6. Prevent casual image dragging and direct image saving
         document.addEventListener('dragstart', function(e) {
-          if (isInsideProtectedKycSurface(e.target)) {
+          if (isEditableInputTarget(e.target)) return;
+          var isImg = e.target && e.target.tagName && e.target.tagName.toUpperCase() === 'IMG';
+          if (isImg || isInsideProtectedKycSurface(e.target)) {
             e.preventDefault();
             e.stopPropagation();
-            recordSecurityEvent('drag_blocked', 'Image/element drag blocked on KYC specimen', true);
-            showProtectionToast('Drag Disabled', 'Dragging KYC specimen images is restricted.');
+            recordSecurityEvent('drag_blocked', 'Image/element drag blocked on KYC specimen', false);
             return false;
           }
         }, true);
 
-        // 3. Detect screenshot-related, print, save, and inspection keyboard shortcuts
+        // 3. Discourage printing, saving, and capture keyboard shortcuts silently
         function handleShortcutKey(e) {
           var key = String(e.key || '');
           var lower = key.toLowerCase();
@@ -24921,12 +24982,11 @@ COD REP DEM CONGO</div>
           // PrintScreen key
           if (key === 'PrintScreen' || code === 44) {
             e.preventDefault();
-            triggerTemporaryShortcutShield('Screenshot key (PrintScreen) detected. Sensitive KYC previews have been blurred and watermarked.');
+            triggerTemporaryShortcutShield('Capture key detected. Protected KYC previews are temporarily shielded.');
             if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-              navigator.clipboard.writeText('Protected KYC Verification Specimen — Screenshot Capture Restricted [' + getShortSessionTag() + ']').catch(function() {});
+              navigator.clipboard.writeText('').catch(function() {});
             }
-            recordSecurityEvent('screenshot_shortcut_detected', 'PrintScreen key detected', true);
-            showProtectionToast('Screenshot Attempt Detected', 'PrintScreen shortcut detected and logged against session ' + getShortSessionTag() + '.');
+            recordSecurityEvent('screenshot_shortcut_detected', 'PrintScreen key detected', false);
             return false;
           }
 
@@ -24934,9 +24994,8 @@ COD REP DEM CONGO</div>
           if ((e.metaKey && e.shiftKey && (lower === '3' || lower === '4' || lower === '5' || lower === '6' || lower === 's')) ||
               (e.ctrlKey && e.shiftKey && lower === 's')) {
             e.preventDefault();
-            triggerTemporaryShortcutShield('Screen capture shortcut detected. Sensitive KYC previews have been blurred and logged.');
-            recordSecurityEvent('screenshot_shortcut_detected', 'OS capture shortcut Meta/Ctrl+Shift+' + lower.toUpperCase(), true);
-            showProtectionToast('Capture Shortcut Detected', 'Screen capture shortcut detected and recorded.');
+            triggerTemporaryShortcutShield('Screen capture shortcut detected. Protected KYC previews are temporarily shielded.');
+            recordSecurityEvent('screenshot_shortcut_detected', 'OS capture shortcut Meta/Ctrl+Shift+' + lower.toUpperCase(), false);
             return false;
           }
 
@@ -24944,9 +25003,8 @@ COD REP DEM CONGO</div>
           if ((e.ctrlKey || e.metaKey) && lower === 'p') {
             e.preventDefault();
             e.stopPropagation();
-            triggerTemporaryShortcutShield('Print shortcut (Ctrl/Cmd+P) is disabled on protected KYC specimens.');
-            recordSecurityEvent('print_shortcut_blocked', 'Ctrl/Cmd+P blocked', true);
-            showProtectionToast('Printing Restricted', 'Direct browser printing of KYC verification pages is disabled.');
+            triggerTemporaryShortcutShield('Printing is disabled on protected KYC verification pages.');
+            recordSecurityEvent('print_shortcut_blocked', 'Ctrl/Cmd+P blocked', false);
             return false;
           }
 
@@ -24954,12 +25012,11 @@ COD REP DEM CONGO</div>
           if ((e.ctrlKey || e.metaKey) && !e.shiftKey && lower === 's') {
             e.preventDefault();
             e.stopPropagation();
-            recordSecurityEvent('save_shortcut_blocked', 'Ctrl/Cmd+S blocked', true);
-            showProtectionToast('Save Page Restricted', 'Saving raw KYC verification pages is disabled.');
+            recordSecurityEvent('save_shortcut_blocked', 'Ctrl/Cmd+S blocked', false);
             return false;
           }
 
-          // DevTools / View Source shortcuts: F12, Ctrl/Cmd+Shift+I/J/C/K, Ctrl/Cmd+U
+          // View Source / Inspection shortcuts: F12, Ctrl/Cmd+Shift+I/J/C/K, Ctrl/Cmd+U
           if (
             key === 'F12' || code === 123 ||
             ((e.ctrlKey || e.metaKey) && e.shiftKey && (lower === 'i' || lower === 'j' || lower === 'c' || lower === 'k')) ||
@@ -24967,9 +25024,7 @@ COD REP DEM CONGO</div>
           ) {
             e.preventDefault();
             e.stopPropagation();
-            triggerTemporaryShortcutShield('Inspection shortcut detected. Sensitive KYC content is shielded.');
-            recordSecurityEvent('devtools_shortcut_detected', 'Inspection shortcut detected: ' + (key || code), true);
-            showProtectionToast('Inspection Restricted', 'Developer inspection shortcuts are restricted on protected KYC pages.');
+            recordSecurityEvent('devtools_shortcut_detected', 'Inspection shortcut detected: ' + (key || code), false);
             return false;
           }
         }
@@ -24983,16 +25038,26 @@ COD REP DEM CONGO</div>
           }
         }, true);
 
+        // Print lifecycle protection
+        window.addEventListener('beforeprint', function() {
+          document.body.classList.add('kyc-tab-blurred', 'kyc-shortcut-shield');
+        });
+
+        window.addEventListener('afterprint', function() {
+          if (!document.hidden && document.hasFocus()) {
+            document.body.classList.remove('kyc-tab-blurred', 'kyc-shortcut-shield');
+          }
+        });
+
         // Mobile multi-finger (3-finger screenshot gesture on Android/iOS) detection
         document.addEventListener('touchstart', function(e) {
           if (e.touches && e.touches.length >= 3 && isInsideProtectedKycSurface(e.target)) {
-            triggerTemporaryShortcutShield('Multi-finger touch capture gesture detected. Sensitive KYC content has been blurred.');
-            recordSecurityEvent('screenshot_shortcut_detected', 'Mobile 3-finger touch gesture detected', true);
-            showProtectionToast('Touch Capture Detected', 'Multi-finger screenshot gesture detected and logged.');
+            triggerTemporaryShortcutShield('Multi-finger capture gesture detected. Protected KYC previews are temporarily shielded.');
+            recordSecurityEvent('screenshot_shortcut_detected', 'Mobile 3-finger touch gesture detected', false);
           }
         }, { passive: true, capture: true });
 
-        // 4 & 5. Auto-blur when tab becomes inactive, loses focus, or is minimized; restore on return
+        // 4 & 5. Immediately display privacy overlay when switching tabs, minimizing, or leaving the page; restore on return
         function activateFocusBlur(reason) {
           var reasonEl = document.getElementById('kyc-focus-blur-reason');
           if (reasonEl && reason) {
@@ -25003,15 +25068,16 @@ COD REP DEM CONGO</div>
         }
 
         function restoreFocusBlur() {
-          if (!document.hidden && document.hasFocus()) {
+          if (!document.hidden) {
             document.body.classList.remove('kyc-tab-blurred');
+            document.body.classList.remove('kyc-shortcut-shield');
             updateStatusBar();
           }
         }
 
         document.addEventListener('visibilitychange', function() {
           if (document.hidden || document.visibilityState !== 'visible') {
-            activateFocusBlur('Browser tab is inactive or minimized. Sensitive KYC content is blurred until you return.');
+            activateFocusBlur('Browser tab is inactive or minimized. Sensitive KYC content is hidden until you return.');
             recordSecurityEvent('tab_focus_loss_shield', 'Tab hidden / minimized auto-blur activated', false);
           } else {
             restoreFocusBlur();
@@ -25019,21 +25085,43 @@ COD REP DEM CONGO</div>
         });
 
         window.addEventListener('blur', function() {
-          activateFocusBlur('Window lost focus. Sensitive KYC content is temporarily blurred to prevent background capture.');
+          activateFocusBlur('Window lost focus. Sensitive KYC content is hidden until you return to this page.');
         });
 
         window.addEventListener('focus', function() {
-          document.body.classList.remove('kyc-tab-blurred');
-          updateStatusBar();
+          restoreFocusBlur();
         });
 
         window.addEventListener('pagehide', function() {
-          activateFocusBlur('Page minimized or backgrounded. Sensitive KYC content is blurred.');
+          activateFocusBlur('Page minimized or backgrounded. Sensitive KYC content is hidden.');
         });
 
         window.addEventListener('pageshow', function() {
-          document.body.classList.remove('kyc-tab-blurred');
-          updateStatusBar();
+          restoreFocusBlur();
+        });
+
+        if (document.documentElement) {
+          document.documentElement.addEventListener('mouseleave', function(e) {
+            if (!e.relatedTarget && !e.toElement) {
+              activateFocusBlur('Pointer left the browser window. Move back into the page to restore the protected KYC preview.');
+            }
+          });
+
+          document.documentElement.addEventListener('mouseenter', function() {
+            if (!document.hidden) {
+              restoreFocusBlur();
+            }
+          });
+        }
+
+        // Instant restoration when the user interacts with or returns to the active page
+        ['pointermove', 'pointerdown', 'mousedown', 'touchstart', 'keydown'].forEach(function(evtName) {
+          window.addEventListener(evtName, function(e) {
+            if (evtName === 'touchstart' && e.touches && e.touches.length >= 3) return;
+            if (!document.hidden && document.body.classList.contains('kyc-tab-blurred')) {
+              restoreFocusBlur();
+            }
+          }, { passive: true, capture: true });
         });
       }
 
@@ -25042,6 +25130,7 @@ COD REP DEM CONGO</div>
           if (typeof window.autoFitDocumentFields === 'function') {
             window.autoFitDocumentFields();
           }
+          renderAndRefreshWatermarks();
         };
 
         const fnNames = [
@@ -25114,10 +25203,11 @@ COD REP DEM CONGO</div>
 
       function initKycContentProtection() {
         ensureProtectionUiElements();
-        removeDistractingWatermarks();
+        renderAndRefreshWatermarks();
         setupWatermarkTamperObserver();
         installInteractionProtections();
         initUniversalAutoFitHooks();
+        updateStatusBar();
       }
 
       if (document.readyState === 'loading') {
