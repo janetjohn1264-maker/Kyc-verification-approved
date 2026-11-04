@@ -52,10 +52,8 @@ nav { display: grid; gap: 4px; } nav a { display: flex; align-items: center; gap
   pointer-events: none !important;
   transition: none !important;
 }
-.static-passport .ogads-demo-specimen-tag,
 .static-passport .sample-watermark,
-.preview-frame article .sample-watermark,
-.preview-frame article .ogads-demo-specimen-tag {
+.preview-frame article .sample-watermark {
   display: none !important;
 }
 

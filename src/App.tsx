@@ -545,10 +545,10 @@ function App() {
   const [securityNotice, setSecurityNotice] = useState<string | null>(null)
   const [visitorSessionId] = useState(() => {
     try {
-      const existing = localStorage.getItem("ogads_visitor_session_v1")
+      const existing = localStorage.getItem("kyc_visitor_session_v1")
       if (existing) return existing
       const created = `vs_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`
-      localStorage.setItem("ogads_visitor_session_v1", created)
+      localStorage.setItem("kyc_visitor_session_v1", created)
       return created
     } catch {
       return "vs_ephemeral_session"
@@ -557,28 +557,13 @@ function App() {
   const recentAttemptsRef = useRef<number[]>([])
 
   const reportSecurityEvent = useCallback(
-    (eventType: string, details: string) => {
+    (_eventType: string, _details: string) => {
       const now = Date.now()
       recentAttemptsRef.current = recentAttemptsRef.current.filter((t) => now - t < 60000)
       recentAttemptsRef.current.push(now)
-      const attemptCount = recentAttemptsRef.current.length
-      const suspicious = attemptCount >= 3
       setSecurityNotice(null)
-      fetch("/api/ogads/security-event", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          sessionId: visitorSessionId,
-          eventType,
-          documentKey: country,
-          countryView: `${country.toLowerCase()}-react-preview`,
-          attemptCount,
-          suspicious,
-          details,
-        }),
-      }).catch(() => {})
     },
-    [country, visitorSessionId]
+    []
   )
 
   useEffect(() => {
@@ -1044,34 +1029,6 @@ function App() {
     else resetOtherToDefault()
   }
 
-  const triggerCountryOgadsLocker = () => {
-    const keyMap: Record<string, string> = {
-      RWA: "rwanda-id-png",
-      NGA: "nigeria-passport-png",
-      ETH: "ethiopia-passport-png",
-      GHA: "ghana-passport-png",
-      NPL: "nepal-passport-png",
-      CAN: "canada-passport-png",
-      BGD: "bangladesh-passport-png",
-      UGA: "uganda-refugee-png",
-      KEN: "kenya-passport-png",
-      SEN: "senegal-passport-png",
-      DRC: "drcongo-passport-png",
-      RSA: "southafrica-passport-png",
-      PNG: "kenya-passport-png",
-    }
-    const targetKey = keyMap[country] || "kenya-passport-png"
-    const w = window as unknown as {
-      openOgadsContentLockerByKey?: (key: string) => void
-      openOgadsContentLocker?: (key: string) => void
-    }
-    if (typeof w.openOgadsContentLockerByKey === "function") {
-      w.openOgadsContentLockerByKey(targetKey)
-    } else if (typeof w.openOgadsContentLocker === "function") {
-      w.openOgadsContentLocker(targetKey)
-    }
-  }
-
   return (
     <div className="app-shell">
       <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
@@ -1088,7 +1045,7 @@ function App() {
       <main className="main-content">
         <header className="topbar"><button className="menu-button" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={21} /></button><div className="breadcrumbs"><span>Workspace</span><span>/</span><strong>Passport verification</strong></div><div className="topbar-actions"><span className="status-dot">Live</span><button className="avatar-button" aria-label="Open account menu">JD</button></div></header>
         <div className="page-wrap">
-          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and document fields, updated instantly in the live preview.</p></div><div className="heading-actions"><button className="randomize-button" onClick={randomizeSpecimen}><RefreshCw size={15} /> Randomize</button><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => { setSaved(true); triggerCountryOgadsLocker(); }}><Save size={17} /> {saved ? "Unlock & Download" : "Save & Export"}</button></div></section>
+          <section className="page-heading"><div><p className="eyebrow">VERIFICATION FLOW</p><h1>Passport verification</h1><p className="heading-copy">Edit your verification screen and document fields, updated instantly in the live preview.</p></div><div className="heading-actions"><button className="randomize-button" onClick={randomizeSpecimen}><RefreshCw size={15} /> Randomize</button><button className={`save-button ${saved ? "saved" : ""}`} onClick={() => setSaved(true)}><Save size={17} /> {saved ? "Saved" : "Save & Export"}</button></div></section>
 
           <div className="editor-layout" id="passport-editor">
             <section className="editor-panel" aria-label="Editor controls">
@@ -2517,7 +2474,7 @@ function App() {
                       </section>
                     )}
 
-                    <button type="button" onClick={triggerCountryOgadsLocker} className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button>
+                    <button type="button" onClick={() => setSaved(true)} className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button>
                     <div className="secure-note"><ShieldCheck size={14} /> Your information is encrypted and secure</div>
                   </div>
                   <div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span></div>

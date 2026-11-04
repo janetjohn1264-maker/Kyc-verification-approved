@@ -6,7 +6,7 @@ RUN npm install --no-audit --no-fund
 COPY . .
 RUN npm run build
 
-# ---- runtime stage: full-stack Express + OGAds postback server ----
+# ---- runtime stage: full-stack Express server ----
 FROM node:20-alpine
 WORKDIR /app
 COPY --from=build /app/package*.json ./
