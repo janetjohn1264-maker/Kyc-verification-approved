@@ -86,6 +86,15 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
 
   const isCustomPhoto = Boolean(data.photoUrl && data.photoUrl !== defaultRwandaIdData.photoUrl)
 
+  const fitCqw = (text: string, baseCqw: number, maxChars: number, minCqw = baseCqw * 0.58) => {
+    const len = (text || "").trim().length
+    if (len <= maxChars) return `${baseCqw}cqw`
+    return `${Math.max(minCqw, +(baseCqw * (maxChars / len)).toFixed(2))}cqw`
+  }
+
+  const fullNameText = `${data.surname} ${data.givenNames}`.trim()
+  const sigDisplay = data.signatureText || `${data.surname} ${data.givenNames.slice(0, 1)}.`
+
   const renderFrontCard = () => (
     <div
       id="rwanda-id-front"
@@ -135,18 +144,18 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
         <>
           {/* Bearer Full Name: Amazina / Names */}
           <div
-            className="absolute flex items-center pointer-events-none select-none"
+            className="absolute flex items-center pointer-events-none select-none overflow-hidden"
             style={{
               left: "40.2%",
               top: "43.2%",
-              width: "55.0%",
+              width: "52.0%",
               height: "6.2%",
             }}
           >
             <span
-              className="font-bold text-[#080808] whitespace-nowrap tracking-[0.015em]"
+              className="font-bold text-[#080808] whitespace-nowrap tracking-[0.015em] overflow-hidden text-ellipsis max-w-full"
               style={{
-                fontSize: "2.75cqw",
+                fontSize: fitCqw(fullNameText, 2.75, 24),
                 lineHeight: 1,
               }}
             >
@@ -156,7 +165,7 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
 
           {/* Date of Birth: Itariki yavutseho / Date of Birth */}
           <div
-            className="absolute flex items-center pointer-events-none select-none"
+            className="absolute flex items-center pointer-events-none select-none overflow-hidden"
             style={{
               left: "40.2%",
               top: "56.5%",
@@ -165,9 +174,9 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
             }}
           >
             <span
-              className="font-bold text-[#080808] whitespace-nowrap tracking-[0.02em]"
+              className="font-bold text-[#080808] whitespace-nowrap tracking-[0.02em] overflow-hidden max-w-full"
               style={{
-                fontSize: "2.75cqw",
+                fontSize: fitCqw(data.dateOfBirth, 2.75, 16),
                 lineHeight: 1,
               }}
             >
@@ -177,18 +186,18 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
 
           {/* Sex: Igitsina / Sex */}
           <div
-            className="absolute flex items-center pointer-events-none select-none"
+            className="absolute flex items-center pointer-events-none select-none overflow-hidden"
             style={{
               left: "40.2%",
               top: "69.5%",
-              width: "16.0%",
+              width: "15.5%",
               height: "6.0%",
             }}
           >
             <span
-              className="font-bold text-[#080808] whitespace-nowrap"
+              className="font-bold text-[#080808] whitespace-nowrap overflow-hidden max-w-full"
               style={{
-                fontSize: "2.65cqw",
+                fontSize: fitCqw(data.sex, 2.65, 10),
                 lineHeight: 1,
               }}
             >
@@ -198,18 +207,18 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
 
           {/* Place of Issue: Aho Yatangiwe / Place of Issue */}
           <div
-            className="absolute flex items-center pointer-events-none select-none"
+            className="absolute flex items-center pointer-events-none select-none overflow-hidden"
             style={{
               left: "57.6%",
               top: "69.5%",
-              width: "38.0%",
+              width: "24.5%",
               height: "6.0%",
             }}
           >
             <span
-              className="font-bold text-[#080808] whitespace-nowrap"
+              className="font-bold text-[#080808] whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
               style={{
-                fontSize: "2.65cqw",
+                fontSize: fitCqw(data.placeOfIssue, 2.65, 18),
                 lineHeight: 1,
               }}
             >
@@ -219,24 +228,24 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
 
           {/* Signature script */}
           <div
-            className="absolute flex items-center pointer-events-none select-none"
+            className="absolute flex items-center pointer-events-none select-none overflow-hidden"
             style={{
               left: "40.2%",
               top: "79.0%",
-              width: "35.0%",
+              width: "38.0%",
               height: "6.5%",
             }}
           >
             <span
-              className="text-[#101010] whitespace-nowrap opacity-90"
+              className="text-[#101010] whitespace-nowrap opacity-90 overflow-hidden text-ellipsis max-w-full"
               style={{
                 fontFamily: "'Brush Script MT', 'Snell Roundhand', 'Segoe Script', cursive",
-                fontSize: "3.6cqw",
+                fontSize: fitCqw(sigDisplay, 3.6, 18),
                 fontWeight: 600,
                 transform: "rotate(-2deg)",
               }}
             >
-              {data.signatureText || `${data.surname} ${data.givenNames.slice(0, 1)}.`}
+              {sigDisplay}
             </span>
           </div>
 
@@ -262,18 +271,18 @@ export const RwandaIdCard: React.FC<RwandaIdCardProps> = ({ data, onSideChange }
 
           {/* Bottom National ID Number: Indangamuntu / National ID No. */}
           <div
-            className="absolute flex items-center pointer-events-none select-none"
+            className="absolute flex items-center pointer-events-none select-none overflow-hidden"
             style={{
               left: "44.8%",
               top: "91.2%",
-              width: "53.0%",
+              width: "37.5%",
               height: "6.5%",
             }}
           >
             <span
-              className="font-bold text-[#050505] whitespace-nowrap tracking-[0.08em]"
+              className="font-bold text-[#050505] whitespace-nowrap tracking-[0.08em] overflow-hidden max-w-full"
               style={{
-                fontSize: "3.25cqw",
+                fontSize: fitCqw(data.idNumber, 3.25, 22),
                 letterSpacing: "0.06em",
               }}
             >

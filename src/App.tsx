@@ -393,7 +393,7 @@ const otherCountryRandomSpecimens: Record<string, OtherDocumentData[]> = {
   ],
   DRC: [
     {
-      documentNo: "DEMO-044743",
+      documentNo: "OP044743",
       personalNo: "CD910802004",
       surname: "MINAFFET",
       givenNames: "ESTHER NADINE",
@@ -541,7 +541,6 @@ function App() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [isPreviewBlurred, setIsPreviewBlurred] = useState(false)
   const [securityNotice, setSecurityNotice] = useState<string | null>(null)
-  const [watermarkTick, setWatermarkTick] = useState(0)
   const [visitorSessionId] = useState(() => {
     try {
       const existing = localStorage.getItem("ogads_visitor_session_v1")
@@ -587,13 +586,6 @@ function App() {
   )
 
   useEffect(() => {
-    const timer = window.setInterval(() => {
-      setWatermarkTick((t) => t + 1)
-    }, 1000)
-    return () => window.clearInterval(timer)
-  }, [])
-
-  useEffect(() => {
     const handleVisibility = () => {
       if (document.hidden || document.visibilityState !== "visible") {
         setIsPreviewBlurred(true)
@@ -632,13 +624,6 @@ function App() {
       window.removeEventListener("keydown", handleKeyDown, true)
     }
   }, [reportSecurityEvent])
-
-  const watermarkTimestamp = useMemo(() => {
-    void watermarkTick
-    return new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC"
-  }, [watermarkTick])
-
-  const shortSessionId = visitorSessionId.slice(0, 18)
 
   const update = (key: keyof typeof defaultContent, value: string) => {
     setDetectedText(null)
@@ -2199,23 +2184,14 @@ function App() {
                       </div>
                     )}
 
+                    {/* Live preview editor page warning outside the document */}
+                    <div className="mt-2 mb-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-50 border border-amber-200 text-amber-900 text-[10px] font-bold tracking-wider uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                      SAMPLE / DEMO SPECIMEN — NOT AN OFFICIAL DOCUMENT
+                    </div>
+
                     {/* Passport Card View */}
                     <div className="document-placeholder static-passport relative overflow-hidden">
-                      <div className="kyc-react-watermark-layer" aria-hidden="true">
-                        {[0, 1, 2].map((idx) => (
-                          <div
-                            key={idx}
-                            className="kyc-react-wm-item"
-                            style={{
-                              top: `${16 + idx * 30 + ((watermarkTick + idx) % 3)}%`,
-                              left: `${8 + idx * 14 + ((watermarkTick * 2 + idx) % 5)}%`,
-                              transform: `rotate(${-15 + ((watermarkTick + idx) % 3)}deg)`,
-                            }}
-                          >
-                            {shortSessionId} • {watermarkTimestamp}
-                          </div>
-                        ))}
-                      </div>
                       {isRwanda ? (
                         <div className="w-full max-w-[360px] mx-auto my-1">
                           <RwandaIdCard
@@ -2303,7 +2279,7 @@ function App() {
                     <button type="button" onClick={triggerCountryOgadsLocker} className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button>
                     <div className="secure-note"><ShieldCheck size={14} /> Your information is encrypted and secure</div>
                   </div>
-                  <div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span><a href="mailto:getkycapproved@gmail.com" className="text-slate-400 hover:text-slate-600 no-underline">getkycapproved@gmail.com</a></div>
+                  <div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span></div>
                 </div>
               </div>
             </section>

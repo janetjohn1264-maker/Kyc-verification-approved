@@ -635,37 +635,55 @@
       position: relative !important;
     }
 
-    .kyc-dynamic-watermark-overlay {
-      position: absolute !important;
-      inset: 0 !important;
-      z-index: 46 !important;
+    .kyc-dynamic-watermark-overlay,
+    .kyc-wm-stamp,
+    .kyc-react-watermark-layer,
+    .kyc-react-wm-item,
+    #verification-workbench article .sample-watermark,
+    #verification-workbench article [id*="SampleWatermark"],
+    #verification-workbench article [id*="sampleWatermark"],
+    #verification-workbench article .ogads-demo-specimen-tag,
+    .static-passport .ogads-demo-specimen-tag,
+    .static-passport .sample-watermark {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
       pointer-events: none !important;
-      user-select: none !important;
-      -webkit-user-select: none !important;
-      overflow: hidden !important;
-      border-radius: inherit;
-      mix-blend-mode: multiply;
+      height: 0 !important;
+      width: 0 !important;
     }
 
-    .kyc-wm-stamp {
-      position: absolute !important;
-      pointer-events: none !important;
-      user-select: none !important;
-      -webkit-user-select: none !important;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace !important;
-      font-size: clamp(7.5px, 1.05cqw, 10.5px) !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.07em !important;
-      line-height: 1.25 !important;
-      color: rgba(15, 23, 42, 0.16) !important;
-      text-shadow: 0 0 1px rgba(255, 255, 255, 0.38) !important;
-      white-space: nowrap !important;
-      text-transform: uppercase !important;
-      padding: 2px 6px !important;
-      border: 1px dashed rgba(15, 23, 42, 0.11) !important;
-      border-radius: 4px !important;
-      background: rgba(255, 255, 255, 0.06) !important;
-      transition: transform 0.35s ease, top 0.35s ease, left 0.35s ease;
+    /* ================= DOCUMENT PREVIEW VISUAL CLARITY & SHARPNESS ================= */
+    #verification-workbench article,
+    .preview-frame article,
+    .static-passport {
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+      text-rendering: optimizeLegibility !important;
+      backface-visibility: hidden !important;
+      transform: translateZ(0);
+    }
+
+    #verification-workbench article img,
+    #verification-workbench [id$="-view"] img,
+    #modalPreviewImg,
+    .static-passport img,
+    .passport-reference-image img {
+      -webkit-user-drag: none !important;
+      user-drag: none !important;
+      -webkit-touch-callout: none !important;
+      image-rendering: -webkit-optimize-contrast !important;
+      image-rendering: crisp-edges !important;
+    }
+
+    #verification-workbench article [class*="-mrz"],
+    #verification-workbench article [class*="-val"],
+    #verification-workbench article [class*="-lbl"],
+    #verification-workbench article .font-mono,
+    #verification-workbench article .font-mono-code {
+      -webkit-font-smoothing: antialiased !important;
+      text-rendering: optimizeLegibility !important;
+      font-feature-settings: "tnum" 1, "zero" 1;
     }
 
     body.kyc-tab-blurred #verification-workbench article,
@@ -708,11 +726,349 @@
         opacity: 0.08 !important;
       }
     }
+
+    /* ================= UNIVERSAL DOCUMENT FIELD BOUNDARIES & OVERFLOW PROTECTION ================= */
+    /* Prevent long names, dates, ID numbers, and authorities from overlapping adjacent columns or photos */
+    #verification-workbench article .grid,
+    #verification-workbench article .grid > div,
+    #verification-workbench article .flex > div {
+      min-width: 0;
+    }
+
+    #previewDescBearer { max-width: 80.5%; overflow: hidden; text-overflow: ellipsis; }
+    #previewResidence { max-width: 80.5%; overflow: hidden; text-overflow: ellipsis; }
+    #previewHeightFt { max-width: 7.4%; overflow: hidden; }
+    #previewHeightM { max-width: 38.0%; overflow: hidden; }
+    #previewEyes { max-width: 80.5%; overflow: hidden; text-overflow: ellipsis; }
+    #previewPeculiarities { max-width: 80.5%; overflow: hidden; text-overflow: ellipsis; }
+    #previewProfession { max-width: 80.5%; overflow: hidden; text-overflow: ellipsis; }
+    #previewPassportType { max-width: 8.2%; overflow: hidden; }
+    #previewIssuingState { max-width: 22.5%; overflow: hidden; }
+    #previewPassportNo { max-width: 29.0%; overflow: hidden; }
+    #previewSurname { max-width: 50.0%; overflow: hidden; text-overflow: ellipsis; }
+    #previewGivenNames { max-width: 50.0%; overflow: hidden; text-overflow: ellipsis; }
+    #previewNationality { max-width: 31.5%; overflow: hidden; text-overflow: ellipsis; }
+    #previewDob { max-width: 31.5%; overflow: hidden; }
+    #previewPersonalNo { max-width: 29.0%; overflow: hidden; }
+    #previewSex { max-width: 8.2%; overflow: hidden; }
+    #previewPob { max-width: 40.0%; overflow: hidden; text-overflow: ellipsis; }
+    #previewIssueDate { max-width: 31.5%; overflow: hidden; }
+    #previewAuthority { max-width: 29.0%; overflow: hidden; text-overflow: ellipsis; }
+    #previewExpiryDate { max-width: 31.5%; overflow: hidden; }
+    #previewHolderSigText { max-width: 27.5%; overflow: hidden; text-overflow: ellipsis; }
+    #mrzLine1, #mrzLine2 { max-width: 90.5%; overflow: hidden; }
+
+    /* Kenya National ID (Maisha Namba) */
+    #kidPreviewSurname { max-width: 54.0%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewGiven { max-width: 53.5%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewSex { max-width: 14.5%; overflow: hidden; }
+    #kidPreviewNationality { max-width: 16.2%; overflow: hidden; }
+    #kidPreviewDob { max-width: 21.5%; overflow: hidden; }
+    #kidPreviewPob { max-width: 54.0%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewIdNo { max-width: 54.0%; overflow: hidden; }
+    #kidPreviewExpiry { max-width: 54.0%; overflow: hidden; }
+    #kidPreviewPlace { max-width: 34.0%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewCounty { max-width: 35.5%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewSubCounty { max-width: 35.5%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewDivision { max-width: 35.5%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewLocation { max-width: 35.5%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewSubLocation { max-width: 65.0%; overflow: hidden; text-overflow: ellipsis; }
+    #kidPreviewDateIssue { max-width: 28.5%; overflow: hidden; }
+    #kidPreviewMrz1, #kidPreviewMrz2, #kidPreviewMrz3 { max-width: 90.5%; overflow: hidden; }
+
+    /* Somalia Passport & ID Cards */
+    #somPassSpreadType { max-width: 12.5%; overflow: hidden; }
+    #somPassSpreadCountry { max-width: 23.0%; overflow: hidden; }
+    #somPassSpreadNumber { max-width: 22.5%; overflow: hidden; }
+    #somPassSpreadName { max-width: 33.0%; overflow: hidden; text-overflow: ellipsis; }
+    #somPassSpreadMother { max-width: 33.0%; overflow: hidden; text-overflow: ellipsis; }
+    #somPassSpreadNid { max-width: 27.0%; overflow: hidden; }
+    #somPassSpreadNationality { max-width: 29.5%; overflow: hidden; }
+    #somPassSpreadOccupation { max-width: 30.5%; overflow: hidden; text-overflow: ellipsis; }
+    #somPassSpreadDob { max-width: 29.5%; overflow: hidden; }
+    #somPassSpreadIssuePlace { max-width: 30.5%; overflow: hidden; text-overflow: ellipsis; }
+    #somPassSpreadSex { max-width: 29.5%; overflow: hidden; }
+    #somPassSpreadBirthPlace { max-width: 30.5%; overflow: hidden; text-overflow: ellipsis; }
+    #somPassSpreadIssueDate { max-width: 29.5%; overflow: hidden; }
+    #somPassSpreadAuthority { max-width: 30.5%; overflow: hidden; text-overflow: ellipsis; }
+    #somPassSpreadExpiryDate { max-width: 29.5%; overflow: hidden; }
+    #somPassSpreadMrzLine1, #somPassSpreadMrzLine2 { max-width: 91.5%; overflow: hidden; }
+    #somSmartIdPreviewName, #somPassIdCardPreviewName, #somPassIdCardPreviewFather, #somLicPreviewName { overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    #somSmartIdPreviewDob, #somSmartIdPreviewIssue { flex-shrink: 0; white-space: nowrap; }
+    #somSmartIdPreviewPob, #somSmartIdPreviewIssuePlace { min-width: 0; flex: 1; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #somSmartIdPreviewExpiry, #somSmartIdPreviewGender, #somSmartIdPreviewNo { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; }
+    #somPreviewNameAfaran, #somPreviewFullName, #somPreviewParent, #somPreviewSex, #somPreviewDob, #somPreviewPob, #somPreviewCountry { display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #somLicPreviewNo, #somLicPreviewIssueDate, #somLicPreviewExpiryDate, #somLicPreviewNationality, #somLicPreviewDob, #somLicPreviewPob { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Ethiopia Fayda ID & Passport */
+    #ethPreviewNameAm, #ethPreviewNameEn, #ethPreviewDobEth, #ethPreviewDobGreg, #ethPreviewNatAm, #ethPreviewNatEn, #ethPreviewSexAm, #ethPreviewSexEn, #ethPreviewExpiry, #ethPreviewFCN { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; }
+    #ethOutSurname, #ethOutGivenName, #ethOutSex, #ethOutPersonalNo, #ethOutPob, #ethOutExpiry, #ethOutAuthority, #ethOutPassNoHeader { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; }
+    #ethOutNationality { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 88%; display: block; }
+    #ethOutDob, #ethOutIssue { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%; display: block; }
+
+    /* Nigeria NIMC ID & e-Passport */
+    #ngaPreviewSurname, #ngaPreviewFirstName, #ngaPreviewMiddleName, #ngaPreviewDob, #ngaPreviewIssueDate, #ngaPreviewNationality, #ngaPreviewSex, #ngaPreviewHeight, #ngaPreviewCardNo, #ngaPreviewExpiryDate, #ngaPreviewDocNo { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; display: block; }
+    #ngaPassPreviewType { max-width: 8.8%; overflow: hidden; }
+    #ngaPassPreviewCountry { max-width: 17.5%; overflow: hidden; }
+    #ngaPassPreviewNumber { max-width: 24.5%; overflow: hidden; }
+    #ngaPassPreviewSurname { max-width: 53.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ngaPassPreviewGivenNames { max-width: 53.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ngaPassPreviewNationality { max-width: 27.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ngaPassPreviewPrevPassNo { max-width: 24.0%; overflow: hidden; }
+    #ngaPassPreviewDob { max-width: 27.5%; overflow: hidden; }
+    #ngaPassPreviewNin { max-width: 24.5%; overflow: hidden; }
+    #ngaPassPreviewSex { max-width: 6.5%; overflow: hidden; }
+    #ngaPassPreviewPob { max-width: 37.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ngaPassPreviewIssueDate { max-width: 27.5%; overflow: hidden; }
+    #ngaPassPreviewAuthority { max-width: 17.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ngaPassPreviewExpiryDate { max-width: 35.0%; overflow: hidden; }
+    #ngaPassCustomSigText { max-width: 25.0%; overflow: hidden; }
+    #ngaPassMrzLine1, #ngaPassMrzLine2 { max-width: 91.0%; overflow: hidden; }
+
+    /* UK Passport */
+    #ukPassPreviewSurname, #ukPassPreviewGivenNames, #ukPassPreviewNationality, #ukPassPreviewDob, #ukPassPreviewPob, #ukPassPreviewSex, #ukPassPreviewAuthority, #ukPassPreviewIssueDate, #ukPassPreviewExpiryDate { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    /* Uganda National ID / Refugee Card */
+    #ugaPreviewSurname { max-width: 61.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ugaPreviewGivenName { max-width: 61.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ugaPreviewNationality { max-width: 16.2%; overflow: hidden; }
+    #ugaPreviewSex { max-width: 10.5%; overflow: hidden; }
+    #ugaPreviewDob { max-width: 32.0%; overflow: hidden; }
+    #ugaPreviewId { max-width: 27.0%; overflow: hidden; }
+    #ugaPreviewCardNo { max-width: 34.0%; overflow: hidden; }
+    #ugaPreviewExpiry { max-width: 45.0%; overflow: hidden; }
+    #ugaPreviewSigText { max-width: 44.0%; overflow: hidden; }
+    #ugaPreviewVillage, #ugaPreviewParish, #ugaPreviewSCounty, #ugaPreviewCounty, #ugaPreviewDistrict { max-width: 74.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ugaPreviewMrz1, #ugaPreviewMrz2, #ugaPreviewMrz3 { max-width: 89.5%; overflow: hidden; }
+
+    /* Pakistan CNIC (Showcase, Live, Single) */
+    #pakShowcaseName, #pakPreviewName, #pakSingleFrontName { max-width: 40.5%; overflow: hidden; text-overflow: ellipsis; }
+    #pakShowcaseRelLabel, #pakPreviewRelLabel, #pakSingleFrontRelLabel { max-width: 40.5%; overflow: hidden; }
+    #pakShowcaseRelName, #pakPreviewRelName, #pakSingleFrontRelName { max-width: 40.0%; overflow: hidden; text-overflow: ellipsis; }
+    #pakShowcaseGender, #pakPreviewGender, #pakSingleFrontGender { max-width: 8.2%; overflow: hidden; }
+    #pakShowcaseCountryStay, #pakPreviewCountryStay, #pakSingleFrontCountryStay { max-width: 30.0%; overflow: hidden; text-overflow: ellipsis; }
+    #pakShowcaseCnic, #pakPreviewCnic, #pakSingleFrontCnic { max-width: 22.5%; overflow: hidden; }
+    #pakShowcaseDob, #pakPreviewDob, #pakSingleFrontDob { max-width: 17.2%; overflow: hidden; }
+    #pakShowcaseIssueDate, #pakPreviewIssueDate, #pakSingleFrontIssueDate { max-width: 22.5%; overflow: hidden; }
+    #pakShowcaseExpiryDate, #pakPreviewExpiryDate, #pakSingleFrontExpiryDate { max-width: 22.5%; overflow: hidden; }
+    #pakShowcaseSignature, #pakPreviewSignature, #pakSingleFrontSignature { max-width: 24.0%; overflow: hidden; }
+
+    /* Seychelles National ID */
+    #sycPreviewId { max-width: 50.0%; overflow: hidden; }
+    #sycPreviewSurname { max-width: 50.0%; overflow: hidden; text-overflow: ellipsis; }
+    #sycPreviewGivenName { max-width: 50.0%; overflow: hidden; text-overflow: ellipsis; }
+    #sycPreviewDob { max-width: 50.0%; overflow: hidden; }
+    #sycPreviewNationality { max-width: 50.0%; overflow: hidden; text-overflow: ellipsis; }
+    #sycPreviewSex { max-width: 50.0%; overflow: hidden; }
+    #sycPreviewIssueDate { max-width: 50.0%; overflow: hidden; }
+    #sycPreviewGhostId { max-width: 66.0%; overflow: hidden; }
+    #sycPreviewMrz1, #sycPreviewMrz2, #sycPreviewMrz3 { max-width: 93.0%; overflow: hidden; }
+
+    /* Senegal CEDEAO ID Card & Passport */
+    #zafPreviewIdNumber { max-width: 62.5%; overflow: hidden; }
+    #zafPreviewForenames { max-width: 62.5%; overflow: hidden; text-overflow: ellipsis; }
+    #zafPreviewSurname { max-width: 62.5%; overflow: hidden; text-overflow: ellipsis; }
+    #zafPreviewDob { max-width: 25.5%; overflow: hidden; }
+    #zafPreviewGender { max-width: 10.0%; overflow: hidden; }
+    #zafPreviewHeight { max-width: 10.8%; overflow: hidden; }
+    #zafPreviewPob { max-width: 48.5%; overflow: hidden; text-overflow: ellipsis; }
+    #zafPreviewIssueDate { max-width: 25.2%; overflow: hidden; }
+    #zafPreviewExpiryDate { max-width: 22.5%; overflow: hidden; }
+    #zafPreviewRegCenter { max-width: 62.5%; overflow: hidden; text-overflow: ellipsis; }
+    #zafPreviewAddress { max-width: 62.5%; overflow: hidden; text-overflow: ellipsis; }
+    #zafPreviewSignature { max-width: 20.0%; overflow: hidden; }
+    .sen-pp-sign { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    /* South Africa Passport */
+    #saPassPreviewType { max-width: 8.5%; overflow: hidden; }
+    #saPassPreviewCountryCode { max-width: 16.5%; overflow: hidden; }
+    #saPassPreviewPassNo { max-width: 30.0%; overflow: hidden; }
+    #saPassPreviewSurname { max-width: 55.0%; overflow: hidden; text-overflow: ellipsis; }
+    #saPassPreviewGivenNames { max-width: 55.0%; overflow: hidden; text-overflow: ellipsis; }
+    #saPassPreviewNationality { max-width: 27.0%; overflow: hidden; text-overflow: ellipsis; }
+    #saPassPreviewDob { max-width: 26.5%; overflow: hidden; }
+    #saPassPreviewIdNo { max-width: 28.5%; overflow: hidden; }
+    #saPassPreviewSex { max-width: 8.5%; overflow: hidden; }
+    #saPassPreviewPob { max-width: 17.0%; overflow: hidden; text-overflow: ellipsis; }
+    #saPassPreviewIssueDate { max-width: 26.5%; overflow: hidden; }
+    #saPassPreviewAuthority { max-width: 28.0%; overflow: hidden; text-overflow: ellipsis; }
+    #saPassPreviewExpiryDate { max-width: 26.5%; overflow: hidden; }
+    #saPassPreviewSigText { max-width: 21.0%; overflow: hidden; }
+    #saPassPreviewMrz1, #saPassPreviewMrz2 { max-width: 78.5%; overflow: hidden; }
+
+    /* USA Passport */
+    #usaPassPreviewSigText { max-width: 50.0%; overflow: hidden; }
+    #usaPassPreviewType { max-width: 11.0%; overflow: hidden; }
+    #usaPassPreviewCountryCode { max-width: 16.5%; overflow: hidden; }
+    #usaPassPreviewPassNo { max-width: 28.0%; overflow: hidden; }
+    #usaPassPreviewSurname { max-width: 64.0%; overflow: hidden; text-overflow: ellipsis; }
+    #usaPassPreviewGivenNames { max-width: 64.0%; overflow: hidden; text-overflow: ellipsis; }
+    #usaPassPreviewNationality { max-width: 60.0%; overflow: hidden; text-overflow: ellipsis; }
+    #usaPassPreviewDob { max-width: 45.0%; overflow: hidden; }
+    #usaPassPreviewSex { max-width: 45.0%; overflow: hidden; }
+    #usaPassPreviewPob { max-width: 45.0%; overflow: hidden; text-overflow: ellipsis; }
+    #usaPassPreviewIssueDate { max-width: 43.5%; overflow: hidden; }
+    #usaPassPreviewExpiryDate { max-width: 43.5%; overflow: hidden; }
+    #usaPassPreviewAuthority { max-width: 44.5%; overflow: hidden; text-overflow: ellipsis; }
+    #usaPassPreviewMrz1, #usaPassPreviewMrz2 { max-width: 92.5%; overflow: hidden; }
+
+    /* DR Congo Passport */
+    #drcOutSurname, #drcOutPostname, #drcOutGivenNames, #drcOutDob, #drcOutNationality, #drcOutIssue, #drcOutExpiry { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30.5cqw; }
+    #drcOutPassNo, #drcOutPersonalNo, #drcOutAuthority { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 26cqw; }
+    #drcOutPob { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 20cqw; }
+    #drcOutAddress, #drcOutProfession { display: block; overflow: hidden; text-overflow: ellipsis; max-width: 70cqw; }
+
+    /* Bangladesh Passport */
+    #bgdOutTopName, #bgdOutTopFather, #bgdOutTopMother, #bgdOutTopSpouse, #bgdOutEmergName, #bgdOutEmergRelation, #bgdOutEmergPhone { max-width: 64.0%; overflow: hidden; text-overflow: ellipsis; }
+    #bgdOutTopAddress, #bgdOutEmergAddress { max-width: 64.0%; overflow: hidden; }
+    #bgdOutType { max-width: 8.8%; overflow: hidden; }
+    #bgdOutCode { max-width: 19.0%; overflow: hidden; }
+    #bgdOutPassNo { max-width: 20.5%; overflow: hidden; }
+    #bgdOutSurname { max-width: 51.0%; overflow: hidden; text-overflow: ellipsis; }
+    #bgdOutGivenName { max-width: 51.0%; overflow: hidden; text-overflow: ellipsis; }
+    #bgdOutNationality { max-width: 20.8%; overflow: hidden; }
+    #bgdOutPersonalNo { max-width: 30.0%; overflow: hidden; }
+    #bgdOutDob { max-width: 20.8%; overflow: hidden; }
+    #bgdOutPrevPassNo { max-width: 29.8%; overflow: hidden; }
+    #bgdOutSex { max-width: 9.8%; overflow: hidden; }
+    #bgdOutPob { max-width: 41.0%; overflow: hidden; text-overflow: ellipsis; }
+    #bgdOutIssue { max-width: 20.5%; overflow: hidden; }
+    #bgdOutAuthority { max-width: 40.5%; overflow: hidden; text-overflow: ellipsis; }
+    #bgdOutExpiry { max-width: 32.0%; overflow: hidden; }
+    #bgdOutSignatureText { max-width: 28.5%; overflow: hidden; }
+    #bgdMrzLine1, #bgdMrzLine2 { max-width: 92.0%; overflow: hidden; }
+
+    /* Germany Passport */
+    #deuOutSurname, #deuOutGivenNames, #deuOutDob, #deuOutSex, #deuOutNationality, #deuOutPob, #deuOutIssue, #deuOutExpiry, #deuOutAuthority, #deuOutTopResidence { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+    /* Canada Passport */
+    #canOutPassNoHeader { max-width: 19.0%; overflow: hidden; }
+    #canOutSurname { max-width: 60.0%; overflow: hidden; text-overflow: ellipsis; }
+    #canOutGivenNames { max-width: 60.0%; overflow: hidden; text-overflow: ellipsis; }
+    #canOutNationality { max-width: 58.5%; overflow: hidden; text-overflow: ellipsis; }
+    #canOutDob { max-width: 58.0%; overflow: hidden; }
+    #canOutSex { max-width: 8.5%; overflow: hidden; }
+    #canOutPob { max-width: 48.5%; overflow: hidden; text-overflow: ellipsis; }
+    #canOutIssue { max-width: 58.0%; overflow: hidden; }
+    #canOutExpiry { max-width: 58.5%; overflow: hidden; }
+    #canOutAuthority { max-width: 58.5%; overflow: hidden; text-overflow: ellipsis; }
+    #canMrzLine1, #canMrzLine2 { max-width: 94.0%; overflow: hidden; }
+
+    /* Ghana Passport */
+    #ghaOutPassNoHeader { max-width: 18.0%; overflow: hidden; }
+    #ghaOutSurname { max-width: 58.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ghaOutGivenNames { max-width: 31.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ghaOutNationality { max-width: 31.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ghaOutDob { max-width: 31.0%; overflow: hidden; }
+    #ghaOutSex { max-width: 9.5%; overflow: hidden; }
+    #ghaOutPob { max-width: 20.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ghaOutIssue { max-width: 33.5%; overflow: hidden; }
+    #ghaOutPlaceOfIssue { max-width: 23.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ghaOutExpiry { max-width: 33.5%; overflow: hidden; }
+    #ghaOutAuthority { max-width: 23.5%; overflow: hidden; text-overflow: ellipsis; }
+    #ghaMrzLine1, #ghaMrzLine2 { max-width: 88.0%; overflow: hidden; }
+
+    /* Rwanda National ID */
+    #rwaOutNames { max-width: 52.0%; overflow: hidden; text-overflow: ellipsis; }
+    #rwaOutDob { max-width: 52.0%; overflow: hidden; }
+    #rwaOutSex { max-width: 15.5%; overflow: hidden; }
+    #rwaOutPlaceOfIssue { max-width: 35.0%; overflow: hidden; text-overflow: ellipsis; }
+    #rwaOutSignature { max-width: 38.0%; overflow: hidden; }
+    #rwaOutIdNo { max-width: 34.0%; overflow: hidden; }
   </style>
 
   <script>
 // Early global controllers guaranteed to be defined before body buttons render
     window.$ = window.$ || (id => document.getElementById(id));
+
+    // Universal Automatic Text-Sizing Engine for all Passport & National ID Previews
+    window.autoFitDocumentFields = function(rootSelectorOrEl) {
+      try {
+        const root = typeof rootSelectorOrEl === 'string'
+          ? document.querySelector(rootSelectorOrEl)
+          : (rootSelectorOrEl || document.getElementById('verification-workbench') || document.body);
+        if (!root) return;
+
+        const selector = [
+          'article [id^="preview"]',
+          'article [id*="Preview"]',
+          'article [id*="Out"]',
+          'article [id*="Showcase"]',
+          'article [id*="Single"]',
+          'article [id*="Spread"]',
+          'article [data-sen]'
+        ].join(', ');
+
+        const applyRatioToFont = (el, ratio) => {
+          const origFs = el.dataset.origInlineFs || '';
+          if (origFs && origFs.endsWith('cqw')) {
+            const baseCqw = parseFloat(origFs);
+            if (baseCqw > 0) {
+              el.style.fontSize = (baseCqw * ratio).toFixed(2) + 'cqw';
+              return;
+            }
+          }
+          const computedPx = parseFloat(window.getComputedStyle(el).fontSize);
+          if (computedPx > 5) {
+            el.style.fontSize = (computedPx * ratio).toFixed(2) + 'px';
+          } else if (origFs) {
+            const num = parseFloat(origFs);
+            const unit = origFs.replace(/[0-9.+-]/g, '') || 'px';
+            if (num > 0) el.style.fontSize = (num * ratio).toFixed(2) + unit;
+          } else {
+            el.style.fontSize = Math.round(ratio * 100) + '%';
+          }
+        };
+
+        const elements = root.querySelectorAll(selector);
+        elements.forEach(el => {
+          if (!el || el.tagName === 'IMG' || el.tagName === 'CANVAS' || el.tagName === 'SVG' || el.tagName === 'PATH' || el.tagName === 'PATTERN' || el.tagName === 'RADIALGRADIENT' || el.tagName === 'LINEARGRADIENT') return;
+          const id = el.id || '';
+          if (id.includes('Photo') || id.includes('Wrap') || id.includes('Container') || id.includes('Overlay') || id.includes('Page') || id.includes('Perforated') || id.includes('Barcode') || id.includes('RedactBar') || id.includes('Mrz') || id.includes('mrz')) return;
+          if (el.children.length > 0 && id !== 'somSmartIdPreviewName' && id !== 'rwaOutNames') return;
+
+          // Store original inline font-size once
+          if (el.dataset.origInlineFs === undefined) {
+            el.dataset.origInlineFs = el.style.fontSize || '';
+          }
+
+          // Reset to original font size first so short names return to normal size
+          el.style.fontSize = el.dataset.origInlineFs;
+
+          const text = (el.textContent || '').trim();
+          if (!text) return;
+
+          // Handle multi-line name (e.g. Somalia Smart ID Name)
+          if (id === 'somSmartIdPreviewName') {
+            const parentWidth = el.parentElement ? el.parentElement.clientWidth : el.clientWidth;
+            if (parentWidth > 10 && el.scrollWidth > parentWidth + 2) {
+              const ratio = Math.max(0.62, (parentWidth - 2) / el.scrollWidth);
+              applyRatioToFont(el, ratio);
+            } else if (parentWidth === 0 && text.length > 22) {
+              applyRatioToFont(el, Math.max(0.62, 22 / text.length));
+            }
+            return;
+          }
+
+          // Single-line field measurement: if scrollWidth exceeds clientWidth, proportionally shrink fontSize
+          const cw = el.clientWidth;
+          const sw = el.scrollWidth;
+          if (cw > 6 && sw > cw + 1) {
+            const ratio = Math.max(0.55, (cw - 1) / sw);
+            applyRatioToFont(el, ratio);
+          } else if (cw === 0 && text.length > 18) {
+            // Fallback when card is in an unrendered/inactive tab or headless environment
+            const maxChars = (id.includes('Dob') || id.includes('Issue') || id.includes('Expiry') || id.includes('Pob') || id.includes('Place') || id.includes('Authority')) ? 18 : 22;
+            if (text.length > maxChars) {
+              const ratio = Math.max(0.58, maxChars / text.length);
+              applyRatioToFont(el, ratio);
+            }
+          }
+        });
+      } catch (err) {
+        // Non-blocking layout guard
+      }
+    };
 
     // Homepage Navigation & Clean URL Management (ensures homepage is https://kycapproved.online/ without #hero-section)
     window.goToHomePage = function(e) {
@@ -5884,27 +6240,6 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function randomizePakCard() {
       const pakProfiles = [
-        {
-          name: "Full name",
-          nameUrdu: "نام",
-          relType: "Father's Name",
-          relName: "Full name",
-          relUrdu: "والد کا نام",
-          gender: "M",
-          countryStay: "Pakistan",
-          dob: "DD.MM.YYYY",
-          issue: "DD.MM.YYYY",
-          expiry: "DD.MM.YYYY",
-          cnic: "00000-0000000-0",
-          trackNum: "0000000000",
-          presAddr1: "House number,",
-          presAddr2: "Name of a street,",
-          presAddr3: "City, Country",
-          permAddr1: "House number,",
-          permAddr2: "Name of a street,",
-          permAddr3: "City, Country",
-          signature: "Signature"
-        },
         {
           name: "Muhammad Usman",
           nameUrdu: "محمد عثمان",
@@ -12635,6 +12970,9 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 </button>
               </div>
               <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
                 <span class="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-bold">
                   No: <span id="kenyaPassToolbarNo">BK569259</span>
                 </span>
@@ -12647,8 +12985,6 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
                 <article id="passport-card"
                          class="relative w-full aspect-[720/965] bg-white rounded-xl shadow-2xl border border-slate-300 overflow-hidden text-slate-900 select-none"
                          style="container-type: inline-size;">
-
-                  <div id="sampleWatermark" class="sample-watermark hidden"><span id="watermarkLabel">SPECIMEN</span></div>
 
                   <!-- Clean Harmonically Inpainted 2-Page Reference Spread Plate (Preserves Guilloche, Lion, Maasai Shield, Hologram, Officer Signature & Trilingual Labels) -->
                   <img src="/assets/aistudio/kenya_passport_spread_plate.png"
@@ -14058,7 +14394,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <span class="w-2.5 h-2.5 rounded-full bg-sky-700"></span>
                     1. SOMALI PASSPORT · BIOMETRIC BOOKLET SPREAD
                   </span>
-                  <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO DOC 9303 · PASSPORT</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                      SAMPLE / DEMO — NOT VALID
+                    </span>
+                    <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO DOC 9303 · PASSPORT</span>
+                  </div>
                 </div>
 
                 <div id="somalia-passport-spread" class="w-full">
@@ -14114,11 +14455,6 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <!-- MRZ Lines 1 & 2 -->
                       <div id="somPassSpreadMrzLine1" class="absolute font-mono-code font-bold text-[#141414] whitespace-nowrap" style="left: 5.65%; top: 86.05%; font-size: 2.32cqw; letter-spacing: 0.42cqw;">P&lt;SOMMOHAMED&lt;&lt;ABDIRIZAK&lt;IBRAHIM&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
                       <div id="somPassSpreadMrzLine2" class="absolute font-mono-code font-bold text-[#141414] whitespace-nowrap" style="left: 5.65%; top: 89.60%; font-size: 2.32cqw; letter-spacing: 0.42cqw;">P015811346SOM0505044M29092553050504162307394</div>
-                    </div>
-
-                    <!-- Optional Diagonal Specimen Watermark -->
-                    <div id="somPassSampleWatermark" style="display: none;" class="absolute inset-0 items-center justify-center pointer-events-none z-40">
-                      <span id="somPassWatermarkLabel" class="font-mono-code font-black text-4xl sm:text-5xl tracking-[0.25em] text-red-600/25 border-4 border-red-600/25 px-6 py-2 rounded-xl -rotate-12 uppercase select-none">SPECIMEN</span>
                     </div>
 
                     <!-- 1:1 Reference Specimen Overlay (Active when unmodified default specimen data is displayed) -->
@@ -14444,11 +14780,17 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
               <!-- 1. INTERACTIVE SPECIMEN CARD -->
               <div id="somalia-driverlicense-specimen-wrap" class="w-full">
+                <div class="flex items-center justify-between px-1 no-print mb-2">
+                  <span class="text-[11px] font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-sky-600"></span>
+                    SOMALIA DRIVING LICENSE · SPECIMEN PREVIEW
+                  </span>
+                  <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                    SAMPLE / DEMO — NOT VALID
+                  </span>
+                </div>
                 <article id="somalia-driverlicense-card" class="somali-driver-license-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
                   
-                  <!-- Diagonal Watermark Overlay -->
-                  <div id="somLicSampleWatermark" class="sample-watermark hidden"><span>SPECIMEN</span></div>
-
                   <!-- Central Coat of Arms Security Hologram / Watermark -->
                   <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.07] z-0">
                     <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-64 h-auto filter grayscale">
@@ -14711,6 +15053,15 @@ MUQDISHO, BANAADIR, SOMALIA</span>
           <section class="lg:col-span-7 flex justify-center items-start min-w-0">
             <!-- Dynamic Interactive Card Container -->
             <div id="ethiopia-card-container" class="w-full max-w-[620px]">
+              <div class="flex items-center justify-between text-xs px-1 mb-2 text-slate-500 no-print">
+                <span class="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                  ETHIOPIA FAYDA DIGITAL ID · PREVIEW
+                </span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
+              </div>
               
               <!-- THE EXACT ETHIOPIAN DIGITAL ID CARD (FAYDA) SPECIMEN ARTICLE -->
               <article id="ethiopia-fayda-card" class="ethiopia-fayda-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border border-slate-300/80 p-3.5 sm:p-5 overflow-hidden text-slate-900 select-none">
@@ -15087,9 +15438,14 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
                     <span>OFFICIAL NIMC SPECIMEN (1:1 REFERENCE)</span>
                   </div>
-                  <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    CR-80 Standard · 85.6 × 53.98 mm
-                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                      SAMPLE / DEMO — NOT VALID
+                    </span>
+                    <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      CR-80 Standard · 85.6 × 53.98 mm
+                    </span>
+                  </div>
                 </div>
 
                 <!-- THE EXACT NIGERIAN NATIONAL IDENTITY CARD (NIMC) CANVAS ARTICLE -->
@@ -15199,12 +15555,6 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <div id="ngaPreviewDocNo">4812640614</div>
                     </div>
                   </div>
-
-                  <!-- Floating Watermark Pill Overlay -->
-                  <div class="absolute bottom-2 right-2 bg-slate-950/85 backdrop-blur-xs text-white text-[9px] px-2 py-0.5 rounded font-mono-code font-bold flex items-center gap-1 shadow-md pointer-events-none no-print">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Official NIMC Specimen · 1:1 Reference</span>
-                  </div>
                 </article>
               </div>
             </section>
@@ -15227,6 +15577,9 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   </h1>
                   <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full border border-emerald-300">
                     Live e-Passport Editor
+                  </span>
+                  <span class="text-xs bg-amber-50 text-amber-800 font-bold px-2.5 py-0.5 rounded-full border border-amber-200">
+                    SAMPLE / DEMO — NOT VALID
                   </span>
                   <span class="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded-full border border-slate-200 font-mono-code">
                     ICAO Doc 9303 Compliant
@@ -15523,6 +15876,9 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </h1>
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-blue-100 text-blue-900 border border-blue-300">
                   GBR · British Citizen
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-50 text-amber-800 border border-amber-200">
+                  SAMPLE / DEMO — NOT VALID
                 </span>
               </div>
               <p class="text-xs text-slate-500 mt-1">
@@ -16578,9 +16934,14 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
                     <span>PAKISTAN CNIC SPECIMEN (1:1 REFERENCE REPLICA)</span>
                   </div>
-                  <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    CR-80 Standard · 85.6 × 53.98 mm
-                  </span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                      SAMPLE / DEMO — NOT VALID
+                    </span>
+                    <span class="font-mono-code text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      CR-80 Standard · 85.6 × 53.98 mm
+                    </span>
+                  </div>
                 </div>
 
                 <!-- ================= 1. SHOWCASE PRESENTATION CANVAS (EXACT 1:1 REPLICA OF UPLOADED SCREENSHOT) ================= -->
@@ -16656,15 +17017,6 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                     <!-- SHOWCASE BACK CARD WITH ANGLED LONG SHADOW -->
                     <article id="pak-showcase-back" class="pakistan-cnic-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-cnic-cast border border-emerald-900/30 overflow-hidden text-slate-900 flex flex-col justify-between">
-                      <!-- Watermark "SAMPLE — NOT VALID" -->
-                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
-                        <div class="transform -rotate-12 px-4 py-1.5 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
-                          <span class="font-mono-code font-black text-red-700/60 text-[10px] sm:text-xs tracking-[0.22em] uppercase">
-                            SAMPLE — NOT VALID
-                          </span>
-                        </div>
-                      </div>
-
                       <!-- Center Background Crescent/Star Watermark -->
                       <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.07]">
                         <svg viewBox="0 0 100 100" class="w-32 h-32" xmlns="http://www.w3.org/2000/svg">
@@ -16838,15 +17190,6 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                         </button>
                       </div>
                       <article id="pakistan-id-back" class="pakistan-cnic-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-xl border border-emerald-900/30 overflow-hidden text-slate-900 flex flex-col justify-between">
-                        <!-- Watermark "SAMPLE — NOT VALID" -->
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
-                          <div class="transform -rotate-12 px-4 py-1.5 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
-                            <span class="font-mono-code font-black text-red-700/60 text-[10px] sm:text-xs tracking-[0.22em] uppercase">
-                              SAMPLE — NOT VALID
-                            </span>
-                          </div>
-                        </div>
-
                         <!-- Upper Back Content -->
                         <div class="relative z-10 p-3 sm:p-4 pb-1 flex items-start justify-between gap-3">
                           <div class="flex-1 min-w-0 flex items-start gap-2">
@@ -16981,15 +17324,6 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <!-- ================= 4. BACK ONLY VIEW ================= -->
                 <div id="pak-view-back" class="hidden w-full">
                   <article id="pak-single-back-card" class="pakistan-cnic-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-2xl border border-emerald-900/30 overflow-hidden text-slate-900 flex flex-col justify-between">
-                    <!-- Watermark "SAMPLE — NOT VALID" -->
-                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-30">
-                      <div class="transform -rotate-12 px-6 py-2 border-2 border-red-600/40 bg-red-600/10 rounded-xl backdrop-blur-[1px]">
-                        <span class="font-mono-code font-black text-red-700/60 text-xs sm:text-sm tracking-[0.25em] uppercase">
-                          SAMPLE — NOT VALID
-                        </span>
-                      </div>
-                    </div>
-
                     <!-- Upper Back Content -->
                     <div class="relative z-10 p-4 sm:p-5 pb-1 flex items-start justify-between gap-4">
                       <div class="flex-1 min-w-0 flex items-start gap-3">
@@ -17300,6 +17634,9 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px] text-slate-700">
                     <span class="w-2.5 h-2.5 rounded-full bg-sky-600 animate-pulse"></span>
                     <span>OFFICIAL SEYCHELLES SPECIMEN (1:1 REFERENCE)</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                      SAMPLE / DEMO — NOT VALID
+                    </span>
                   </div>
                   
                   <!-- Display Mode Buttons: Both / Front / Back -->
@@ -17573,6 +17910,9 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </button>
               </div>
               <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-1 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
                 <span class="text-[11px] font-mono text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold">
                   N°: <span id="zafToolbarIdNum">1 02 19910828 00011 3</span>
                 </span>
@@ -17842,6 +18182,9 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 </button>
               </div>
               <div class="flex items-center gap-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-1 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
                 <button type="button" id="sen-randomize-btn" onclick="randomizeSenegalPassport()" title="Générer un titulaire fictif" class="px-2.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"><i class="fa-solid fa-dice"></i> Aléatoire</button>
                 <button type="button" onclick="loadSenegalPreset('reference')" title="Revenir au spécimen de référence" class="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 text-[11px] flex items-center gap-1 cursor-pointer transition-colors"><i class="fa-solid fa-rotate-left text-[10px]"></i> Spécimen</button>
                 <button type="button" onclick="downloadSenegalPassPNG()" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg font-bold text-emerald-800 text-[11px] flex items-center gap-1 cursor-pointer transition-colors"><i class="fa-solid fa-image text-[10px]"></i> PNG</button>
@@ -18905,9 +19248,14 @@ COD REP DEM CONGO</textarea>
               <div class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-id-card text-indigo-700"></i> Data page preview
               </div>
-              <a href="/assets/aistudio/drc_passport_reference.jpg" download="drc_passport_reference.jpg" class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 inline-flex items-center gap-1.5">
-                <i class="fa-solid fa-image"></i> Reference specimen (JPG)
-              </a>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
+                <a href="/assets/aistudio/drc_passport_reference.jpg" download="drc_passport_reference.jpg" class="text-[11px] font-bold text-indigo-700 hover:text-indigo-900 inline-flex items-center gap-1.5">
+                  <i class="fa-solid fa-image"></i> Reference specimen (JPG)
+                </a>
+              </div>
             </div>
 
             <article id="drc-passport-card" class="relative w-full max-w-[520px] mx-auto rounded-md shadow-2xl border border-slate-300/90 overflow-hidden select-none text-[#16161d]" style="/* aspect-ratio: 443 / 1214 */ aspect-ratio: 443 / 607; container-type: inline-size; font-family: Arial, Helvetica, sans-serif; background: #f7f5f0;">
@@ -19401,9 +19749,14 @@ COD REP DEM CONGO</div>
               <div class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-id-card text-emerald-700"></i> Authentic 2-Page Passport Spread Preview
               </div>
-              <a href="/assets/aistudio/1793535919782_9b492622.jpg" download="bangladesh_passport_specimen.jpg" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1.5">
-                <i class="fa-solid fa-image"></i> Reference Photo (JPG)
-              </a>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
+                <a href="/assets/aistudio/1793535919782_9b492622.jpg" download="bangladesh_passport_specimen.jpg" class="text-[11px] font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1.5">
+                  <i class="fa-solid fa-image"></i> Reference Photo (JPG)
+                </a>
+              </div>
             </div>
 
             <!-- CARD SPREAD -->
@@ -19639,9 +19992,14 @@ COD REP DEM CONGO</div>
               <div class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
                 <i class="fa-solid fa-id-card text-amber-700"></i> Authentic German Reisepass 2-Page Spread Preview
               </div>
-              <a href="/assets/aistudio/image_f62ff4c3.png" download="germany_passport_specimen.png" class="text-[11px] font-bold text-amber-800 hover:text-amber-950 inline-flex items-center gap-1.5">
-                <i class="fa-solid fa-image"></i> Reference Photo (PNG)
-              </a>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
+                <a href="/assets/aistudio/image_f62ff4c3.png" download="germany_passport_specimen.png" class="text-[11px] font-bold text-amber-800 hover:text-amber-950 inline-flex items-center gap-1.5">
+                  <i class="fa-solid fa-image"></i> Reference Photo (PNG)
+                </a>
+              </div>
             </div>
 
             <!-- CARD SPREAD -->
@@ -20088,6 +20446,9 @@ COD REP DEM CONGO</div>
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Canada Biometric e-Passport 2-Page Spread</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
               </div>
               <div class="flex items-center gap-2 text-xs">
                 <button type="button" onclick="downloadCanPassPNG()" class="text-red-700 hover:text-red-800 font-bold flex items-center gap-1 cursor-pointer">
@@ -20353,6 +20714,9 @@ COD REP DEM CONGO</div>
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Republic of Ghana Biometric e-Passport 2-Page Spread</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
               </div>
               <div class="flex items-center gap-2 text-xs">
                 <button type="button" onclick="downloadGhaPassPNG()" class="text-amber-700 hover:text-amber-800 font-bold flex items-center gap-1 cursor-pointer">
@@ -20572,6 +20936,9 @@ COD REP DEM CONGO</div>
               <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></span>
                 <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Republika y'u Rwanda · Indangamuntu (National ID Card)</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
               </div>
               <div class="flex items-center gap-2 text-xs">
                 <button type="button" onclick="downloadRwaCardPNG()" class="text-cyan-700 hover:text-cyan-800 font-bold flex items-center gap-1 cursor-pointer">
@@ -20818,7 +21185,12 @@ COD REP DEM CONGO</div>
               <span class="font-semibold flex items-center gap-1 text-slate-700">
                 <i class="fa-solid fa-eye text-amber-600"></i> Live 2-Page Passport Spread
               </span>
-              <span>ICAO Doc 9303 Biometric Compliance</span>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
+                <span>ICAO Doc 9303 Biometric Compliance</span>
+              </div>
             </div>
 
             <!-- CARD SPREAD -->
@@ -21157,6 +21529,9 @@ COD REP DEM CONGO</div>
               </div>
 
               <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
                 <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" target="_blank" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
                   <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Open PDF in Tab
                 </a>
@@ -22063,7 +22438,6 @@ COD REP DEM CONGO</div>
         <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
         <div class="text-slate-500 font-medium flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1">
           <span>&copy; 2026 <strong>GetKYCApproved</strong>. All rights reserved. Identity &amp; Virtual Banking Verification.</span>
-          <a href="mailto:getkycapproved@gmail.com" class="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1 transition-colors"><i class="fa-regular fa-envelope"></i><span>getkycapproved@gmail.com</span></a>
         </div>
       </div>
       <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-slate-600">
@@ -22931,107 +23305,30 @@ COD REP DEM CONGO</div>
         }
       }
 
-      // Stamp visible SAMPLE • DEMO SPECIMEN watermark onto any exported canvas
+      // Keep exported canvas background clean, clear, and sharp without stamps inside document
       function stampDemoWatermarkOnCanvas(canvas) {
-        if (!canvas || typeof canvas.getContext !== 'function') return canvas;
-        try {
-          const ctx = canvas.getContext('2d');
-          if (!ctx) return canvas;
-          const w = canvas.width || 600;
-          const h = canvas.height || 400;
-
-          ctx.save();
-          // Subtle diagonal SAMPLE / DEMO watermark across center
-          ctx.translate(w / 2, h / 2);
-          ctx.rotate(-Math.atan2(h, w) * 0.65);
-          const fontSize = Math.max(16, Math.round(Math.min(w, h) * 0.065));
-          ctx.font = `900 ${fontSize}px "Inter", "Arial", sans-serif`;
-          ctx.fillStyle = 'rgba(220, 38, 38, 0.16)';
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
-          ctx.lineWidth = Math.max(1, Math.round(fontSize * 0.06));
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          const watermarkText = 'SAMPLE • DEMO SPECIMEN';
-          ctx.strokeText(watermarkText, 0, 0);
-          ctx.fillText(watermarkText, 0, 0);
-          ctx.restore();
-
-          // Bottom corner compliance badge
-          ctx.save();
-          const badgeH = Math.max(18, Math.round(h * 0.042));
-          const badgeFont = Math.max(10, Math.round(badgeH * 0.54));
-          ctx.font = `700 ${badgeFont}px "JetBrains Mono", monospace`;
-          const badgeLabel = 'SAMPLE / DEMO SPECIMEN — NOT AN OFFICIAL DOCUMENT';
-          const textMetrics = ctx.measureText(badgeLabel);
-          const badgeW = Math.min(w - 16, Math.ceil(textMetrics.width + 20));
-          const bx = w - badgeW - 8;
-          const by = h - badgeH - 8;
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
-          ctx.fillRect(bx, by, badgeW, badgeH);
-          ctx.strokeStyle = 'rgba(245, 158, 11, 0.65)';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(bx, by, badgeW, badgeH);
-          ctx.fillStyle = '#fde68a';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(badgeLabel, bx + badgeW / 2, by + badgeH / 2);
-          ctx.restore();
-        } catch (e) {}
         return canvas;
       }
 
-      // Ensure visible SAMPLE / DEMO markings on the live preview cards
+      // Keep SAMPLE / DEMO warning visible outside the document; ensure inside previews have no SAMPLE or DEMO text
       function ensureVisibleSampleDemoMarkings() {
         const wm = document.getElementById('sampleWatermark');
         if (wm) {
-          wm.classList.remove('hidden');
-          wm.style.pointerEvents = 'none';
+          wm.classList.add('hidden');
+          wm.style.display = 'none';
         }
-        const previewIds = [
-          'passport-card',
-          'kenya-id-front',
-          'kenya-id-back',
-          'somali-smart-id-card',
-          'somalia-card',
-          'somalia-passport-spread',
-          'somalia-passport-id-card',
-          'somalia-driverlicense-card',
-          'ethiopia-fayda-card',
-          'ethiopia-passport-card',
-          'nigeria-id-card',
-          'nigeria-passport-card',
-          'uk-passport-card',
-          'uganda-refugee-card',
-          'pakistan-id-card',
-          'pakistan-id-back',
-          'seychelles-id-front',
-          'senegal-id-card',
-          'senegal-passport-spread',
-          'sa-passport-card',
-          'usa-passport-card',
-          'drc-passport-card',
-          'bangladesh-passport-card',
-          'germany-passport-card',
-          'canada-passport-card',
-          'ghana-passport-card',
-          'rwanda-id-front',
-          'rwanda-id-back',
-          'proof-of-account-card'
-        ];
-        previewIds.forEach((id) => {
-          const el = document.getElementById(id);
-          if (!el || el.querySelector('.ogads-demo-specimen-tag')) return;
-          const computedPos = window.getComputedStyle(el).position;
-          if (computedPos === 'static') {
-            el.style.position = 'relative';
+
+        // Remove any demo tags or watermarks from inside document cards
+        const internalBadges = document.querySelectorAll(
+          '#verification-workbench article .ogads-demo-specimen-tag, ' +
+          '#verification-workbench article .sample-watermark, ' +
+          '.static-passport .ogads-demo-specimen-tag'
+        );
+        for (let i = 0; i < internalBadges.length; i++) {
+          if (internalBadges[i].parentNode) {
+            internalBadges[i].parentNode.removeChild(internalBadges[i]);
           }
-          const badge = document.createElement('div');
-          badge.className = 'ogads-demo-specimen-tag pointer-events-none select-none';
-          badge.setAttribute('aria-hidden', 'true');
-          badge.style.cssText = 'position:absolute;bottom:4px;right:6px;z-index:45;padding:1px 6px;border-radius:3px;background:rgba(15,23,42,0.58);border:1px solid rgba(245,158,11,0.45);color:#fde68a;font-family:monospace;font-size:8px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;pointer-events:none;user-select:none;';
-          badge.textContent = 'SAMPLE • DEMO';
-          el.appendChild(badge);
-        });
+        }
       }
 
       // Custom server-authorized export handler for Kenya Passport (#downloadBtn)
@@ -24435,7 +24732,7 @@ COD REP DEM CONGO</div>
           }
         }
         if (metaEl) {
-          metaEl.textContent = 'WATERMARK SESSION: ' + shortSid + ' • ' + ts;
+          metaEl.textContent = 'SESSION: ' + shortSid + ' • ' + ts;
         }
       }
 
@@ -24450,7 +24747,7 @@ COD REP DEM CONGO</div>
         }
 
         var attemptCount = recentSecurityTimestamps.length;
-        var isSuspicious = attemptCount >= SUSPICIOUS_THRESHOLD || eventType === 'watermark_tamper_detected';
+        var isSuspicious = attemptCount >= SUSPICIOUS_THRESHOLD;
 
         updateStatusBar();
 
@@ -24502,31 +24799,21 @@ COD REP DEM CONGO</div>
         }, 2600);
       }
 
-      // Build dynamic canvas watermark pattern + multi-point DOM stamps
-      function buildWatermarkPatternDataUrl(sessionTag, timestampStr, cycle) {
+      function removeDistractingWatermarks() {
         try {
-          var canvas = document.createElement('canvas');
-          canvas.width = 340;
-          canvas.height = 170;
-          var ctx = canvas.getContext('2d');
-          if (!ctx) return '';
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.save();
-          ctx.translate(170, 85);
-          var angleDeg = -21 + ((cycle % 5) - 2) * 0.9;
-          ctx.rotate((angleDeg * Math.PI) / 180);
-          ctx.font = '700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.105)';
-          ctx.textAlign = 'center';
-          ctx.fillText('KYC PROTECTED • ' + sessionTag, 0, -6);
-          ctx.font = '600 9px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-          ctx.fillStyle = 'rgba(30, 41, 59, 0.095)';
-          ctx.fillText(timestampStr + ' • DO NOT CAPTURE', 0, 10);
-          ctx.restore();
-          return canvas.toDataURL('image/png');
-        } catch (e) {
-          return '';
-        }
+          var overlays = document.querySelectorAll('.kyc-dynamic-watermark-overlay, .kyc-wm-stamp, .kyc-react-watermark-layer, .kyc-react-wm-item');
+          for (var i = 0; i < overlays.length; i++) {
+            var el = overlays[i];
+            if (el && el.parentNode) {
+              el.parentNode.removeChild(el);
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Keep document backgrounds clean, sharp, and visually clear without decorative overlays
+      function buildWatermarkPatternDataUrl() {
+        return '';
       }
 
       function getAllProtectedSurfaceNodes() {
@@ -24553,131 +24840,22 @@ COD REP DEM CONGO</div>
       }
 
       function renderAndRefreshWatermarks() {
-        isRestoringWatermark = true;
-        try {
-          watermarkCycleCount += 1;
-          var sessionTag = getShortSessionTag();
-          var ts = getFormattedTimestamp();
-          var bgDataUrl = buildWatermarkPatternDataUrl(sessionTag, ts, watermarkCycleCount);
-          var surfaces = getAllProtectedSurfaceNodes();
-
-          var positions = [
-            { top: 14, left: 8, rot: -16 },
-            { top: 46, left: 26, rot: -14 },
-            { top: 76, left: 12, rot: -17 },
-            { top: 24, left: 52, rot: -15 }
-          ];
-
-          for (var i = 0; i < surfaces.length; i++) {
-            var surface = surfaces[i];
-            if (!surface.classList.contains('kyc-protected-surface')) {
-              surface.classList.add('kyc-protected-surface');
-            }
-            var computedPos = window.getComputedStyle(surface).position;
-            if (computedPos === 'static') {
-              surface.style.position = 'relative';
-            }
-
-            var overlay = surface.querySelector(':scope > .kyc-dynamic-watermark-overlay');
-            if (!overlay) {
-              overlay = document.createElement('div');
-              overlay.className = 'kyc-dynamic-watermark-overlay';
-              overlay.setAttribute('data-kyc-wm', 'true');
-              overlay.setAttribute('aria-hidden', 'true');
-              for (var p = 0; p < positions.length; p++) {
-                var stamp = document.createElement('div');
-                stamp.className = 'kyc-wm-stamp';
-                stamp.setAttribute('data-kyc-wm-stamp', String(p));
-                overlay.appendChild(stamp);
-              }
-              surface.appendChild(overlay);
-            }
-
-            // Ensure overlay style integrity
-            overlay.style.cssText =
-              'position:absolute !important;inset:0 !important;z-index:46 !important;pointer-events:none !important;' +
-              'user-select:none !important;-webkit-user-select:none !important;overflow:hidden !important;border-radius:inherit;' +
-              (bgDataUrl ? 'background-image:url("' + bgDataUrl + '");background-repeat:repeat;' : '');
-
-            var stamps = overlay.querySelectorAll('.kyc-wm-stamp');
-            if (stamps.length < positions.length) {
-              overlay.innerHTML = '';
-              for (var k = 0; k < positions.length; k++) {
-                var newStamp = document.createElement('div');
-                newStamp.className = 'kyc-wm-stamp';
-                newStamp.setAttribute('data-kyc-wm-stamp', String(k));
-                overlay.appendChild(newStamp);
-              }
-              stamps = overlay.querySelectorAll('.kyc-wm-stamp');
-            }
-
-            for (var s = 0; s < stamps.length; s++) {
-              var base = positions[s % positions.length];
-              var jitterTop = ((watermarkCycleCount + s * 3) % 5) - 2;
-              var jitterLeft = ((watermarkCycleCount * 2 + s * 5) % 7) - 3;
-              var jitterRot = base.rot + (((watermarkCycleCount + s) % 3) - 1) * 1.1;
-              var st = stamps[s];
-              st.style.top = (base.top + jitterTop) + '%';
-              st.style.left = (base.left + jitterLeft) + '%';
-              st.style.transform = 'rotate(' + jitterRot.toFixed(1) + 'deg)';
-              st.textContent = sessionTag + ' • ' + ts;
-            }
-          }
-
-          updateStatusBar();
-        } finally {
-          isRestoringWatermark = false;
-        }
+        // Keeps document previews visually clear, clean, and sharp without distracting decorative watermarks
+        removeDistractingWatermarks();
       }
 
       function setupWatermarkTamperObserver() {
+        // Document clarity observer: ensures specimen backgrounds stay clean and unobstructed
         var workbench = document.getElementById('verification-workbench');
         if (!workbench || typeof MutationObserver === 'undefined') return;
 
-        var observer = new MutationObserver(function(mutations) {
-          if (isRestoringWatermark) return;
-          var tampered = false;
-
-          for (var i = 0; i < mutations.length; i++) {
-            var m = mutations[i];
-            if (m.type === 'childList' && m.removedNodes && m.removedNodes.length > 0) {
-              for (var r = 0; r < m.removedNodes.length; r++) {
-                var node = m.removedNodes[r];
-                if (node && node.nodeType === 1) {
-                  if (
-                    node.classList.contains('kyc-dynamic-watermark-overlay') ||
-                    node.classList.contains('kyc-wm-stamp') ||
-                    (node.querySelector && node.querySelector('.kyc-dynamic-watermark-overlay'))
-                  ) {
-                    tampered = true;
-                    break;
-                  }
-                }
-              }
-            } else if (m.type === 'attributes' && m.target && m.target.nodeType === 1) {
-              var t = m.target;
-              if (t.classList.contains('kyc-dynamic-watermark-overlay') || t.classList.contains('kyc-wm-stamp')) {
-                var cs = window.getComputedStyle(t);
-                if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity || '1') < 0.05) {
-                  tampered = true;
-                  break;
-                }
-              }
-            }
-          }
-
-          if (tampered) {
-            renderAndRefreshWatermarks();
-            recordSecurityEvent('watermark_tamper_detected', 'Watermark overlay modification or removal blocked', true);
-            showProtectionToast('Watermark Integrity Enforced', 'Dynamic session watermark restored automatically.');
-          }
+        var observer = new MutationObserver(function() {
+          removeDistractingWatermarks();
         });
 
         observer.observe(workbench, {
           childList: true,
-          subtree: true,
-          attributes: true,
-          attributeFilter: ['style', 'class', 'hidden']
+          subtree: true
         });
       }
 
@@ -24859,16 +25037,87 @@ COD REP DEM CONGO</div>
         });
       }
 
+      function initUniversalAutoFitHooks() {
+        const runFit = () => {
+          if (typeof window.autoFitDocumentFields === 'function') {
+            window.autoFitDocumentFields();
+          }
+        };
+
+        const fnNames = [
+          'updatePreview', 'randomizeKenyaPassport', 'randomizeActiveDocument',
+          'updateDrcPreview', 'randomizeDrcPassport',
+          'updateBgdPreview', 'randomizeBgdPassport',
+          'updateDeuPreview', 'randomizeDeuPassport',
+          'updateCanPreview', 'randomizeCanPassport',
+          'updateGhaPreview', 'randomizeGhaPassport',
+          'updateRwaIdPreview', 'randomizeRwaId', 'switchRwaSide',
+          'updateEthPassPreview', 'randomizeEthPassport',
+          'updateProofOfAccountPreview', 'randomizeProofOfAccount',
+          'randomizeUgandaNin', 'updateUgandaPreview', 'randomizeUgandaRefugeeCard',
+          'updatePakPreview', 'randomizePakCnic', 'randomizePakCard',
+          'updateSenPreview', 'randomizeSenegalPassport',
+          'updateZafIdPreview', 'randomizeZafIdCard',
+          'updateSaPassPreview', 'randomizeSaPassport',
+          'updateUsaPassPreview', 'randomizeUsaPassport',
+          'updateSycPreview', 'randomizeSycId', 'randomizeSycCard',
+          'updateKidPreview', 'randomizeKenyaIdCard',
+          'updateEthPreview', 'randomizeEthiopiaIdCard',
+          'updateNgaPreview', 'randomizeNgaCardNumber', 'randomizeNgaCard',
+          'randomizeNgaPassport', 'updateNgaPassPreview',
+          'updateUkPassPreview', 'randomizeUkPassport',
+          'updateSomSmartIdPreview', 'randomizeSomaliaIdCard', 'updateSomPreview',
+          'updateSomPassPreview', 'randomizeSomaliaPassport', 'updateSomPassIdCardPreview',
+          'updateSomLicPreview', 'randomizeSomaliaDriverLicense',
+          'selectCountry', 'selectDocumentType', 'syncWorkbenchView'
+        ];
+
+        fnNames.forEach(name => {
+          const orig = window[name];
+          if (typeof orig === 'function' && !orig._autoFitWrapped) {
+            const wrapped = function(...args) {
+              const res = orig.apply(this, args);
+              runFit();
+              requestAnimationFrame(runFit);
+              return res;
+            };
+            wrapped._autoFitWrapped = true;
+            window[name] = wrapped;
+          }
+        });
+
+        let rafId = null;
+        const scheduleFit = () => {
+          if (rafId) cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(() => {
+            rafId = null;
+            runFit();
+          });
+        };
+
+        window.addEventListener('resize', scheduleFit, { passive: true });
+        document.addEventListener('input', scheduleFit, { passive: true });
+        document.addEventListener('change', scheduleFit, { passive: true });
+        document.addEventListener('click', () => {
+          setTimeout(scheduleFit, 16);
+        }, { passive: true });
+
+        const wb = document.getElementById('verification-workbench');
+        if (wb && typeof MutationObserver !== 'undefined') {
+          const obs = new MutationObserver(scheduleFit);
+          obs.observe(wb, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+        }
+
+        runFit();
+        setTimeout(runFit, 120);
+      }
+
       function initKycContentProtection() {
         ensureProtectionUiElements();
-        renderAndRefreshWatermarks();
+        removeDistractingWatermarks();
         setupWatermarkTamperObserver();
         installInteractionProtections();
-
-        // Continuously update watermark timestamp & subtle micro-jitter every 1 second
-        setInterval(function() {
-          renderAndRefreshWatermarks();
-        }, 1000);
+        initUniversalAutoFitHooks();
       }
 
       if (document.readyState === 'loading') {

@@ -116,6 +116,15 @@ export const EthiopiaPassportCard: React.FC<{
 
   const isCustomPhoto = Boolean(data.photoUrl && data.photoUrl !== defaultEthiopiaPassportData.photoUrl);
 
+  const fitCqw = (text: string, baseCqw: number, maxChars: number, minCqw = baseCqw * 0.58) => {
+    const len = (text || "").trim().length;
+    if (len <= maxChars) return `${baseCqw}cqw`;
+    return `${Math.max(minCqw, +(baseCqw * (maxChars / len)).toFixed(2))}cqw`;
+  };
+
+  const surnameText = data.surnameAmharic ? `${data.surnameAmharic}/${data.surname}` : data.surname;
+  const givenText = data.givenNameAmharic ? `${data.givenNameAmharic}/${data.givenNames}` : data.givenNames;
+
   return (
     <div
       className={`relative w-full overflow-hidden select-none shadow-2xl rounded-sm border border-stone-300 bg-[#f6f6e9] ${className}`}
@@ -171,57 +180,57 @@ export const EthiopiaPassportCard: React.FC<{
 
         {/* Row 1: Type, Country Code, Passport No */}
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "32.48%", top: "55.88%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+          style={{ left: "32.48%", top: "55.88%", maxWidth: "15.0%", fontSize: "1.95cqw" }}
         >
           P
         </div>
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "49.91%", top: "55.88%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+          style={{ left: "49.91%", top: "55.88%", maxWidth: "22.0%", fontSize: "1.95cqw" }}
         >
           ETH
         </div>
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "75.56%", top: "55.88%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+          style={{ left: "75.56%", top: "55.88%", maxWidth: "20.0%", fontSize: fitCqw(data.passportNo, 1.95, 11) }}
         >
           {data.passportNo}
         </div>
 
         {/* Row 2: Surname (Amharic / English) */}
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "32.48%", top: "58.95%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+          style={{ left: "32.48%", top: "58.95%", maxWidth: "62.0%", fontSize: fitCqw(surnameText, 1.95, 32) }}
         >
-          {data.surnameAmharic ? `${data.surnameAmharic}/${data.surname}` : data.surname}
+          {surnameText}
         </div>
 
         {/* Row 3: Given Name (Amharic / English) */}
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "32.48%", top: "61.89%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+          style={{ left: "32.48%", top: "61.89%", maxWidth: "62.0%", fontSize: fitCqw(givenText, 1.95, 32) }}
         >
-          {data.givenNameAmharic ? `${data.givenNameAmharic}/${data.givenNames}` : data.givenNames}
+          {givenText}
         </div>
 
         {/* Row 4: Nationality, Sex, Personal No */}
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "32.48%", top: "64.83%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+          style={{ left: "32.48%", top: "64.83%", maxWidth: "22.5%", fontSize: fitCqw(data.nationality, 1.95, 13) }}
         >
           {data.nationality}
         </div>
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "55.90%", top: "64.83%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+          style={{ left: "55.90%", top: "64.83%", maxWidth: "12.0%", fontSize: "1.95cqw" }}
         >
           {data.sex}
         </div>
         {data.personalNo && (
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-            style={{ left: "70.09%", top: "64.83%", fontSize: "1.95cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+            style={{ left: "70.09%", top: "64.83%", maxWidth: "25.0%", fontSize: fitCqw(data.personalNo, 1.95, 15) }}
           >
             {data.personalNo}
           </div>
@@ -229,36 +238,36 @@ export const EthiopiaPassportCard: React.FC<{
 
         {/* Row 5: Date of Birth & Place of Birth */}
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "32.48%", top: "67.77%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+          style={{ left: "32.48%", top: "67.77%", maxWidth: "25.5%", fontSize: fitCqw(data.dateOfBirth, 1.95, 15) }}
         >
           {data.dateOfBirth}
         </div>
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "70.09%", top: "67.77%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+          style={{ left: "70.09%", top: "67.77%", maxWidth: "25.5%", fontSize: fitCqw(data.placeOfBirth, 1.95, 15) }}
         >
           {data.placeOfBirth}
         </div>
 
         {/* Row 6: Date of Issue & Date of Expiry */}
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "32.48%", top: "70.72%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+          style={{ left: "32.48%", top: "70.72%", maxWidth: "25.5%", fontSize: fitCqw(data.dateOfIssue, 1.95, 15) }}
         >
           {data.dateOfIssue}
         </div>
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "70.09%", top: "70.72%", fontSize: "1.95cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden"
+          style={{ left: "70.09%", top: "70.72%", maxWidth: "25.5%", fontSize: fitCqw(data.dateOfExpiry, 1.95, 15) }}
         >
           {data.dateOfExpiry}
         </div>
 
         {/* Row 7: Issuing Authority */}
         <div
-          className="absolute font-semibold uppercase whitespace-nowrap leading-none"
-          style={{ left: "32.48%", top: "73.79%", fontSize: "1.72cqw" }}
+          className="absolute font-semibold uppercase whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+          style={{ left: "32.48%", top: "73.79%", maxWidth: "62.5%", fontSize: fitCqw(data.issuingAuthority, 1.72, 56) }}
         >
           {data.issuingAuthority}
         </div>

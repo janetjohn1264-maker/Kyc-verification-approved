@@ -158,6 +158,12 @@ export const CanadaPassportCard: React.FC<CanadaPassportCardProps> = ({ data }) 
   const isDefaultSig =
     data.signatureText.trim().replace(/\s+/g, "").toUpperCase() === "DOUGTHOMAS"
 
+  const fitCqw = (text: string, baseCqw: number, maxChars: number, minCqw = baseCqw * 0.58) => {
+    const len = (text || "").trim().length
+    if (len <= maxChars) return `${baseCqw}cqw`
+    return `${Math.max(minCqw, +(baseCqw * (maxChars / len)).toFixed(2))}cqw`
+  }
+
   return (
     <div
       className="relative w-full mx-auto select-none overflow-hidden rounded-[6px] shadow-[0_20px_50px_rgba(15,23,42,0.28)] bg-[#f8faf7]"
@@ -204,7 +210,7 @@ export const CanadaPassportCard: React.FC<CanadaPassportCardProps> = ({ data }) 
 
       {/* Top Page Signature */}
       <div
-        className="absolute flex items-center pointer-events-none select-none"
+        className="absolute flex items-center pointer-events-none select-none overflow-hidden"
         style={{
           left: "13.61%",
           top: "13.17%",
@@ -221,10 +227,10 @@ export const CanadaPassportCard: React.FC<CanadaPassportCardProps> = ({ data }) 
           />
         ) : (
           <div
-            className="text-[#18191b] whitespace-nowrap"
+            className="text-[#18191b] whitespace-nowrap overflow-hidden text-ellipsis max-w-full"
             style={{
               fontFamily: "'Snell Roundhand', 'Brush Script MT', 'Segoe Script', cursive",
-              fontSize: "5.2cqw",
+              fontSize: fitCqw(data.signatureText, 5.2, 16, 2.8),
               fontWeight: 500,
               letterSpacing: "0.03em",
               lineHeight: 1,
@@ -351,90 +357,90 @@ export const CanadaPassportCard: React.FC<CanadaPassportCardProps> = ({ data }) 
 
       {/* Row 1: Type (P), Issuing Country (CAN), Passport No. */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.54%", top: "57.37%", fontSize: "2.05cqw", letterSpacing: "0.04em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden"
+        style={{ left: "32.54%", top: "57.37%", maxWidth: "11.0%", fontSize: "2.05cqw", letterSpacing: "0.04em" }}
       >
         P
       </div>
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "45.12%", top: "57.37%", fontSize: "2.05cqw", letterSpacing: "0.06em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden"
+        style={{ left: "45.12%", top: "57.37%", maxWidth: "28.0%", fontSize: "2.05cqw", letterSpacing: "0.06em" }}
       >
         CAN
       </div>
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "75.89%", top: "57.25%", fontSize: "2.75cqw", letterSpacing: "0.04em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden"
+        style={{ left: "75.89%", top: "57.25%", maxWidth: "19.0%", fontSize: fitCqw(data.passportNo, 2.75, 10), letterSpacing: "0.04em" }}
       >
         {data.passportNo.toUpperCase()}
       </div>
 
       {/* Row 2: Surname */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.25%", top: "60.49%", fontSize: "2.05cqw", letterSpacing: "0.05em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+        style={{ left: "32.25%", top: "60.49%", maxWidth: "60.0%", fontSize: fitCqw(data.surname, 2.05, 30), letterSpacing: "0.05em" }}
       >
         {data.surname.toUpperCase()}
       </div>
 
       {/* Row 3: Given names */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.54%", top: "64.06%", fontSize: "2.05cqw", letterSpacing: "0.05em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+        style={{ left: "32.54%", top: "64.06%", maxWidth: "60.0%", fontSize: fitCqw(data.givenNames, 2.05, 30), letterSpacing: "0.05em" }}
       >
         {data.givenNames.toUpperCase()}
       </div>
 
       {/* Row 4: Nationality */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.69%", top: "67.30%", fontSize: "2.05cqw", letterSpacing: "0.05em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+        style={{ left: "32.69%", top: "67.30%", maxWidth: "58.5%", fontSize: fitCqw(data.nationality, 2.05, 28), letterSpacing: "0.05em" }}
       >
         {data.nationality.toUpperCase()}
       </div>
 
       {/* Row 5: Date of birth */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.84%", top: "71.09%", fontSize: "2.05cqw", letterSpacing: "0.04em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden"
+        style={{ left: "32.84%", top: "71.09%", maxWidth: "58.0%", fontSize: fitCqw(data.dateOfBirth, 2.05, 26), letterSpacing: "0.04em" }}
       >
         {data.dateOfBirth.toUpperCase()}
       </div>
 
       {/* Row 6: Sex & Place of birth */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.40%", top: "74.11%", fontSize: "2.05cqw", letterSpacing: "0.04em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden"
+        style={{ left: "32.40%", top: "74.11%", maxWidth: "8.5%", fontSize: "2.05cqw", letterSpacing: "0.04em" }}
       >
         {data.sex.toUpperCase()}
       </div>
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "42.16%", top: "74.33%", fontSize: "2.05cqw", letterSpacing: "0.05em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+        style={{ left: "42.16%", top: "74.33%", maxWidth: "48.5%", fontSize: fitCqw(data.placeOfBirth, 2.05, 24), letterSpacing: "0.05em" }}
       >
         {data.placeOfBirth.toUpperCase()}
       </div>
 
       {/* Row 7: Date of issue */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.54%", top: "77.79%", fontSize: "2.05cqw", letterSpacing: "0.04em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden"
+        style={{ left: "32.54%", top: "77.79%", maxWidth: "58.0%", fontSize: fitCqw(data.dateOfIssue, 2.05, 26), letterSpacing: "0.04em" }}
       >
         {data.dateOfIssue.toUpperCase()}
       </div>
 
       {/* Row 8: Date of expiry */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.54%", top: "81.14%", fontSize: "2.05cqw", letterSpacing: "0.04em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden"
+        style={{ left: "32.54%", top: "81.14%", maxWidth: "58.5%", fontSize: fitCqw(data.dateOfExpiry, 2.05, 26), letterSpacing: "0.04em" }}
       >
         {data.dateOfExpiry.toUpperCase()}
       </div>
 
       {/* Row 9: Issuing Authority */}
       <div
-        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none"
-        style={{ left: "32.40%", top: "84.60%", fontSize: "2.05cqw", letterSpacing: "0.05em" }}
+        className="absolute font-bold text-[#18191b] whitespace-nowrap leading-none overflow-hidden text-ellipsis"
+        style={{ left: "32.40%", top: "84.60%", maxWidth: "58.5%", fontSize: fitCqw(data.authority, 2.05, 28), letterSpacing: "0.05em" }}
       >
         {data.authority.toUpperCase()}
       </div>

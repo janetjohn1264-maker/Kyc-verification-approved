@@ -115,6 +115,12 @@ export const GhanaPassportCard: React.FC<{
 
   const isCustomPhoto = Boolean(data.photoUrl && data.photoUrl !== defaultGhanaPassportData.photoUrl);
 
+  const fitCqw = (text: string, baseCqw: number, maxChars: number, minCqw = baseCqw * 0.58) => {
+    const len = (text || "").trim().length;
+    if (len <= maxChars) return `${baseCqw}cqw`;
+    return `${Math.max(minCqw, +(baseCqw * (maxChars / len)).toFixed(2))}cqw`;
+  };
+
   return (
     <div
       className={`relative w-full overflow-hidden select-none shadow-2xl rounded-sm border border-stone-300 bg-[#fdfbf6] ${className}`}
@@ -189,94 +195,94 @@ export const GhanaPassportCard: React.FC<{
 
           {/* Row 1 Values: Type (35.86%, 58.25%), Country Code (49.14%, 58.25%), Passport No (76.72%, 58.25%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "35.86%", top: "58.25%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden"
+            style={{ left: "35.86%", top: "58.25%", maxWidth: "11.0%", fontSize: "2.25cqw" }}
           >
             P
           </div>
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "49.14%", top: "58.25%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden"
+            style={{ left: "49.14%", top: "58.25%", maxWidth: "24.0%", fontSize: "2.25cqw" }}
           >
             GHA
           </div>
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "76.72%", top: "58.25%", fontSize: "2.25cqw", letterSpacing: "0.02em" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden"
+            style={{ left: "76.72%", top: "58.25%", maxWidth: "18.0%", fontSize: fitCqw(data.passportNo, 2.25, 10), letterSpacing: "0.02em" }}
           >
             {data.passportNo}
           </div>
 
           {/* Row 2 Value: Surname (35.69%, 61.38%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "35.69%", top: "61.38%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden text-ellipsis"
+            style={{ left: "35.69%", top: "61.38%", maxWidth: "58.0%", fontSize: fitCqw(data.surname, 2.25, 28) }}
           >
             {data.surname}
           </div>
 
           {/* Row 3 Value: Given Names (35.86%, 64.38%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "35.86%", top: "64.38%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden text-ellipsis"
+            style={{ left: "35.86%", top: "64.38%", maxWidth: "31.5%", fontSize: fitCqw(data.givenNames, 2.25, 16) }}
           >
             {data.givenNames}
           </div>
 
           {/* Row 4 Value: Nationality (35.86%, 67.50%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "35.86%", top: "67.50%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden text-ellipsis"
+            style={{ left: "35.86%", top: "67.50%", maxWidth: "31.5%", fontSize: fitCqw(data.nationality, 2.25, 16) }}
           >
             {data.nationality}
           </div>
 
           {/* Row 5 Value: Date of birth (36.03%, 70.50%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "36.03%", top: "70.50%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden"
+            style={{ left: "36.03%", top: "70.50%", maxWidth: "31.0%", fontSize: fitCqw(data.dateOfBirth, 2.25, 16) }}
           >
             {data.dateOfBirth}
           </div>
 
           {/* Row 6 Values: Sex (35.86%, 73.75%) & Place of birth (46.72%, 73.75%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "35.86%", top: "73.75%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden"
+            style={{ left: "35.86%", top: "73.75%", maxWidth: "9.5%", fontSize: "2.25cqw" }}
           >
             {data.sex}
           </div>
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "46.72%", top: "73.75%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden text-ellipsis"
+            style={{ left: "46.72%", top: "73.75%", maxWidth: "20.5%", fontSize: fitCqw(data.placeOfBirth, 2.25, 11) }}
           >
             {data.placeOfBirth}
           </div>
 
           {/* Row 7 Values: Date of issue (35.86%, 76.75%) & Place of issue (71.03%, 76.75%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "35.86%", top: "76.75%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden"
+            style={{ left: "35.86%", top: "76.75%", maxWidth: "33.5%", fontSize: fitCqw(data.dateOfIssue, 2.25, 17) }}
           >
             {data.dateOfIssue}
           </div>
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "71.03%", top: "76.75%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden text-ellipsis"
+            style={{ left: "71.03%", top: "76.75%", maxWidth: "23.5%", fontSize: fitCqw(data.placeOfIssue, 2.25, 13) }}
           >
             {data.placeOfIssue}
           </div>
 
           {/* Row 8 Values: Date of expiry (35.86%, 79.75%) & Authority (71.21%, 79.75%) */}
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "35.86%", top: "79.75%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden"
+            style={{ left: "35.86%", top: "79.75%", maxWidth: "33.5%", fontSize: fitCqw(data.dateOfExpiry, 2.25, 17) }}
           >
             {data.dateOfExpiry}
           </div>
           <div
-            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328]"
-            style={{ left: "71.21%", top: "79.75%", fontSize: "2.25cqw" }}
+            className="absolute font-semibold uppercase whitespace-nowrap leading-none text-[#1f2328] overflow-hidden text-ellipsis"
+            style={{ left: "71.21%", top: "79.75%", maxWidth: "23.5%", fontSize: fitCqw(data.authority, 2.25, 15) }}
           >
             {data.authority}
           </div>
