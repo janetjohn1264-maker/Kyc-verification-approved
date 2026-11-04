@@ -1017,6 +1017,20 @@
     #rwaOutPlaceOfIssue { max-width: 35.0%; overflow: hidden; text-overflow: ellipsis; }
     #rwaOutSignature { max-width: 38.0%; overflow: hidden; }
     #rwaOutIdNo { max-width: 34.0%; overflow: hidden; }
+
+    /* Nepal Passport (NPL) */
+    #nplOutPassNoHeader { max-width: 26.0%; overflow: hidden; }
+    #nplOutSurname { max-width: 48.0%; overflow: hidden; text-overflow: ellipsis; }
+    #nplOutGivenNames { max-width: 48.0%; overflow: hidden; text-overflow: ellipsis; }
+    #nplOutNationality { max-width: 48.0%; overflow: hidden; text-overflow: ellipsis; }
+    #nplOutDob { max-width: 29.0%; overflow: hidden; }
+    #nplOutCitizenshipNo { max-width: 30.0%; overflow: hidden; }
+    #nplOutSex { max-width: 15.0%; overflow: hidden; }
+    #nplOutPob { max-width: 30.0%; overflow: hidden; text-overflow: ellipsis; }
+    #nplOutIssue { max-width: 29.0%; overflow: hidden; }
+    #nplOutAuthority { max-width: 31.5%; overflow: hidden; text-overflow: ellipsis; }
+    #nplOutExpiry { max-width: 29.0%; overflow: hidden; }
+    #nplMrzLine1, #nplMrzLine2 { max-width: 91.0%; overflow: hidden; }
   </style>
 
   <script>
@@ -2300,6 +2314,29 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateRwaIdPreview === 'function') updateRwaIdPreview();
+      } else if (countryKey === 'nepal') {
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-pink-600 bg-gradient-to-br from-pink-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-pink-500/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-pink-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateNplPreview === 'function') updateNplPreview();
       } else if (countryKey === 'somalia') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -2410,6 +2447,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-cyan-600 bg-gradient-to-br from-cyan-50 via-white to-emerald-50/50 text-cyan-950 text-left shadow-sm ring-2 ring-cyan-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-cyan-50/40 hover:border-cyan-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-cyan-600"
+        },
+        nepal: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-pink-600 bg-gradient-to-br from-pink-50 via-white to-emerald-50/50 text-pink-950 text-left shadow-sm ring-2 ring-pink-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-pink-50/40 hover:border-pink-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-pink-600"
         }
       };
 
@@ -2443,7 +2485,8 @@ var $ = window.$ || (id => document.getElementById(id));
         germany: 'Germany',
         canada: 'Canada',
         ghana: 'Ghana',
-        rwanda: 'Rwanda'
+        rwanda: 'Rwanda',
+        nepal: 'Nepal'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -2475,6 +2518,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const canPassView = $('canada-passport-view');
       const ghaPassView = $('ghana-passport-view');
       const rwandaDocView = $('rwanda-doc-view');
+      const nplPassView = $('nepal-passport-view');
       const ethPassView = $('ethiopia-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
@@ -2501,10 +2545,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (canPassView) canPassView.classList.add('hidden');
       if (ghaPassView) ghaPassView.classList.add('hidden');
       if (rwandaDocView) rwandaDocView.classList.add('hidden');
+      if (nplPassView) nplPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'nepal') {
+        if (nplPassView) nplPassView.classList.remove('hidden');
       } else if (currentCountry === 'rwanda') {
         if (rwandaDocView) rwandaDocView.classList.remove('hidden');
       } else if (currentCountry === 'ghana') {
@@ -2568,6 +2615,8 @@ var $ = window.$ || (id => document.getElementById(id));
     function randomizeActiveDocument() {
       if (currentDocType === 'proofofaccount') {
         if (typeof randomizeProofOfAccount === 'function') randomizeProofOfAccount();
+      } else if (currentCountry === 'nepal') {
+        if (typeof randomizeNplPassport === 'function') randomizeNplPassport();
       } else if (currentCountry === 'rwanda') {
         if (typeof randomizeRwaId === 'function') randomizeRwaId();
       } else if (currentCountry === 'ghana') {
@@ -4610,6 +4659,336 @@ var $ = window.$ || (id => document.getElementById(id));
       document.addEventListener('DOMContentLoaded', initGhaPassport);
     } else {
       initGhaPassport();
+    }
+
+    // ================= NEPAL PASSPORT / राहदानी (NPL) CONTROLLER =================
+    const NPL_DEFAULT_PHOTO = '/assets/aistudio/nepal_passport_portrait.png';
+    const NPL_GHOST = '/assets/aistudio/nepal_passport_ghost.png';
+    const NPL_SIGNATURE = '/assets/aistudio/nepal_passport_signature.png';
+
+    const NPL_SPECIMEN = {
+      surname: 'YADAV',
+      givenNames: 'MITHLESH KUMAR',
+      passNo: '12524139',
+      citizenshipNo: '161053-301',
+      dob: '1993-05-22',
+      sex: 'M',
+      nationality: 'NEPALESE',
+      pob: 'SAPTARI',
+      issue: '2021-11-19',
+      expiry: '2031-11-18',
+      authority: 'MOFA, DEPARTMENT OF PASSPORT'
+    };
+
+    const NPL_SPECIMEN_MRZ = {
+      line1: 'P<NPLYADAV<<MITHLESH<KUMAR<<<<<<<<<<<<<<<<<<',
+      line2: '12524139<3NPL9305225M3111183161053301<<<<<60'
+    };
+
+    function nplSetText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = (value == null ? '' : String(value));
+    }
+
+    function nplFormatDate(isoStr) {
+      if (!isoStr) return '';
+      const parts = String(isoStr).split('-');
+      if (parts.length !== 3) return String(isoStr).toUpperCase();
+      const yr = parts[0];
+      const mIdx = parseInt(parts[1], 10) - 1;
+      const day = parts[2];
+      const mStr = GHA_MONTHS[mIdx] || 'MAY';
+      return `${day} ${mStr} ${yr}`;
+    }
+
+    function nplMrzClean(str) {
+      return String(str || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    function buildNplMrz(fields) {
+      const surname = nplMrzClean(fields.surname || 'YADAV');
+      const givenWords = String(fields.givenNames || 'MITHLESH KUMAR').toUpperCase().trim().split(/\s+/).map(nplMrzClean).filter(Boolean).join('<');
+      const nameField = `${surname}<<${givenWords}`;
+      const line1 = ('P<NPL' + nameField + '<'.repeat(44)).slice(0, 44);
+
+      const passClean = nplMrzClean(fields.passNo || '12524139').slice(0, 9);
+      const passPad = (passClean + '<'.repeat(9)).slice(0, 9);
+      const passCheck = ghaCalculateCheckDigit(passPad);
+
+      const dobParts = String(fields.dob || '1993-05-22').split('-');
+      const dobStr = (dobParts.length === 3)
+        ? (dobParts[0].slice(-2) + dobParts[1] + dobParts[2])
+        : '930522';
+      const dobCheck = ghaCalculateCheckDigit(dobStr);
+
+      let sexChar = 'M';
+      const rawSex = String(fields.sex || 'M').toUpperCase();
+      if (rawSex.includes('F')) sexChar = 'F';
+      else if (rawSex.includes('M')) sexChar = 'M';
+
+      const expParts = String(fields.expiry || '2031-11-18').split('-');
+      const expStr = (expParts.length === 3)
+        ? (expParts[0].slice(-2) + expParts[1] + expParts[2])
+        : '311118';
+      const expCheck = ghaCalculateCheckDigit(expStr);
+
+      const citClean = nplMrzClean(fields.citizenshipNo || '161053301');
+      const optionalData14 = (citClean + '<'.repeat(14)).slice(0, 14);
+      const optionalCheck = ghaCalculateCheckDigit(optionalData14);
+
+      const compStr = passPad + passCheck + dobStr + dobCheck + expStr + expCheck + optionalData14 + optionalCheck;
+      const compositeCheck = ghaCalculateCheckDigit(compStr);
+
+      const line2 = (passPad + passCheck + 'NPL' + dobStr + dobCheck + sexChar + expStr + expCheck + optionalData14 + optionalCheck + compositeCheck + '<'.repeat(44)).slice(0, 44);
+      return { line1, line2 };
+    }
+
+    function readNplFields() {
+      return {
+        surname: $('nplInpSurname') ? $('nplInpSurname').value.trim() : NPL_SPECIMEN.surname,
+        givenNames: $('nplInpGivenNames') ? $('nplInpGivenNames').value.trim() : NPL_SPECIMEN.givenNames,
+        passNo: $('nplInpPassNo') ? $('nplInpPassNo').value.trim() : NPL_SPECIMEN.passNo,
+        citizenshipNo: $('nplInpCitizenshipNo') ? $('nplInpCitizenshipNo').value.trim() : NPL_SPECIMEN.citizenshipNo,
+        dob: $('nplInpDob') ? $('nplInpDob').value : NPL_SPECIMEN.dob,
+        sex: $('nplInpSex') ? $('nplInpSex').value.trim() : NPL_SPECIMEN.sex,
+        nationality: $('nplInpNationality') ? $('nplInpNationality').value.trim() : NPL_SPECIMEN.nationality,
+        pob: $('nplInpPob') ? $('nplInpPob').value.trim() : NPL_SPECIMEN.pob,
+        issue: $('nplInpIssue') ? $('nplInpIssue').value : NPL_SPECIMEN.issue,
+        expiry: $('nplInpExpiry') ? $('nplInpExpiry').value : NPL_SPECIMEN.expiry,
+        authority: $('nplInpAuthority') ? $('nplInpAuthority').value.trim() : NPL_SPECIMEN.authority
+      };
+    }
+
+    function isNplSpecimen(fields) {
+      const keys = ['surname', 'givenNames', 'passNo', 'citizenshipNo', 'sex', 'nationality', 'pob', 'authority'];
+      for (let i = 0; i < keys.length; i++) {
+        if (nplMrzClean(fields[keys[i]]) !== nplMrzClean(NPL_SPECIMEN[keys[i]])) return false;
+      }
+      if (String(fields.dob || '') !== NPL_SPECIMEN.dob) return false;
+      if (String(fields.issue || '') !== NPL_SPECIMEN.issue) return false;
+      if (String(fields.expiry || '') !== NPL_SPECIMEN.expiry) return false;
+      return true;
+    }
+
+    let nplCustomPhotoActive = false;
+
+    function updateNplPreview() {
+      const fields = readNplFields();
+      const passClean = (fields.passNo || '12524139').toUpperCase();
+      const spacedPass = passClean.split('').join(' ');
+
+      nplSetText('nplOutPassNoHeader', passClean);
+      nplSetText('nplOutPassNoPage3Perforated', spacedPass);
+
+      nplSetText('nplOutSurname', (fields.surname || 'YADAV').toUpperCase());
+      nplSetText('nplOutGivenNames', (fields.givenNames || 'MITHLESH KUMAR').toUpperCase());
+      nplSetText('nplOutNationality', (fields.nationality || 'NEPALESE').toUpperCase());
+      nplSetText('nplOutDob', nplFormatDate(fields.dob));
+      nplSetText('nplOutCitizenshipNo', (fields.citizenshipNo || '161053-301').toUpperCase());
+      nplSetText('nplOutSex', (fields.sex || 'M').toUpperCase());
+      nplSetText('nplOutPob', (fields.pob || 'SAPTARI').toUpperCase());
+      nplSetText('nplOutIssue', nplFormatDate(fields.issue));
+      nplSetText('nplOutAuthority', (fields.authority || 'MOFA, DEPARTMENT OF PASSPORT').toUpperCase());
+      nplSetText('nplOutExpiry', nplFormatDate(fields.expiry));
+
+      const specimenMatch = isNplSpecimen(fields);
+      const mrz = specimenMatch ? NPL_SPECIMEN_MRZ : buildNplMrz(fields);
+      nplSetText('nplMrzLine1', mrz.line1);
+      nplSetText('nplMrzLine2', mrz.line2);
+
+      const refOverlay = $('nplRefSpecimenOverlay');
+      if (refOverlay) {
+        refOverlay.style.display = (specimenMatch && !nplCustomPhotoActive) ? 'block' : 'none';
+      }
+    }
+
+    function setNplFieldValues(data) {
+      const map = {
+        nplInpSurname: data.surname,
+        nplInpGivenNames: data.givenNames,
+        nplInpPassNo: data.passNo,
+        nplInpCitizenshipNo: data.citizenshipNo,
+        nplInpDob: data.dob,
+        nplInpSex: data.sex,
+        nplInpNationality: data.nationality,
+        nplInpPob: data.pob,
+        nplInpIssue: data.issue,
+        nplInpExpiry: data.expiry,
+        nplInpAuthority: data.authority
+      };
+      Object.keys(map).forEach(id => {
+        const el = $(id);
+        if (el && map[id] !== undefined) el.value = map[id];
+      });
+      updateNplPreview();
+    }
+
+    function resetNplPassportSpecimen() {
+      setNplFieldValues(NPL_SPECIMEN);
+      resetNplPhoto();
+    }
+
+    function randomizeNplPassport() {
+      const surnames = ['YADAV', 'SHRESTHA', 'GURUNG', 'TAMANG', 'THAPA', 'ADHIKARI', 'KARKI', 'POUDEL', 'BHANDARI', 'CHAUDHARY', 'RAI', 'LIMBU', 'MAGAR', 'KHADKA', 'PANDEY', 'GHIMIRE', 'DAHAL', 'BASNET'];
+      const maleGiven = ['MITHLESH KUMAR', 'DIPENDRA PRASAD', 'RAMESH BAHADUR', 'SANTOSH KUMAR', 'BISHAL RAJ', 'PRAKASH CHANDRA', 'NARESH KUMAR', 'SUJAN PRASAD', 'BINOD KUMAR', 'ANIL BAHADUR', 'RAJESH KUMAR', 'KIRAN PRASAD'];
+      const femaleGiven = ['SUNITA KUMARI', 'ANITA DEVI', 'PUJA SHARMA', 'SABINA KUMARI', 'GITA DEVI', 'KABITA RANI', 'ROSHANI KUMARI', 'LAXMI DEVI', 'BIMALA KUMARI', 'SARITA DEVI'];
+      const districts = ['SAPTARI', 'KATHMANDU', 'LALITPUR', 'POKHARA', 'CHITWAN', 'MORANG', 'JHAPA', 'SUNSARI', 'RUPANDEHI', 'DHANUSHA', 'PARSA', 'KASKI', 'BANKE', 'KAILALI', 'SIRHA'];
+
+      const isFemale = Math.random() < 0.4;
+      const surname = surnames[Math.floor(Math.random() * surnames.length)];
+      const givenNames = isFemale
+        ? femaleGiven[Math.floor(Math.random() * femaleGiven.length)]
+        : maleGiven[Math.floor(Math.random() * maleGiven.length)];
+
+      const birthYear = 1978 + Math.floor(Math.random() * 26);
+      const birthMonth = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
+      const birthDay = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
+      const dob = `${birthYear}-${birthMonth}-${birthDay}`;
+
+      const issueYear = 2019 + Math.floor(Math.random() * 5);
+      const issueMonth = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
+      const issueDay = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');
+      const issue = `${issueYear}-${issueMonth}-${issueDay}`;
+
+      const expYear = issueYear + 10;
+      const expDay = String(Math.max(1, parseInt(issueDay, 10) - 1)).padStart(2, '0');
+      const expiry = `${expYear}-${issueMonth}-${expDay}`;
+
+      const pob = districts[Math.floor(Math.random() * districts.length)];
+      const passNo = String(10000000 + Math.floor(Math.random() * 89999999));
+      const citPart1 = String(100000 + Math.floor(Math.random() * 899999));
+      const citPart2 = String(100 + Math.floor(Math.random() * 899));
+      const citizenshipNo = `${citPart1}-${citPart2}`;
+
+      setNplFieldValues({
+        surname,
+        givenNames,
+        passNo,
+        citizenshipNo,
+        dob,
+        sex: isFemale ? 'F' : 'M',
+        nationality: 'NEPALESE',
+        pob,
+        issue,
+        expiry,
+        authority: 'MOFA, DEPARTMENT OF PASSPORT'
+      });
+      showToast('Randomized!', 'Generated realistic Nepal passport data & MRZ.');
+    }
+
+    function resetNplPhoto() {
+      nplCustomPhotoActive = false;
+      const el = $('nplOutPhotoMain');
+      if (el) el.setAttribute('src', NPL_DEFAULT_PHOTO);
+      const ghost = $('nplOutGhostPhoto');
+      if (ghost) ghost.setAttribute('src', NPL_GHOST);
+      const photoWrap = $('nplCustomPhotoWrap');
+      if (photoWrap) photoWrap.style.opacity = '0';
+      const ghostWrap = $('nplCustomGhostWrap');
+      if (ghostWrap) ghostWrap.style.opacity = '0';
+      const input = $('nplPhotoUpload');
+      if (input) input.value = '';
+      updateNplPreview();
+      showToast('Photo Reset', 'Restored Nepal reference specimen portrait.');
+    }
+
+    function initNplPassport() {
+      const uploader = $('nplPhotoUpload');
+      if (uploader) {
+        uploader.addEventListener('change', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (evt) {
+            const src = evt.target.result;
+            nplCustomPhotoActive = true;
+            const el = $('nplOutPhotoMain');
+            if (el) el.setAttribute('src', src);
+            const ghost = $('nplOutGhostPhoto');
+            if (ghost) ghost.setAttribute('src', src);
+            const photoWrap = $('nplCustomPhotoWrap');
+            if (photoWrap) photoWrap.style.opacity = '1';
+            const ghostWrap = $('nplCustomGhostWrap');
+            if (ghostWrap) ghostWrap.style.opacity = '0.68';
+            updateNplPreview();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      updateNplPreview();
+    }
+
+    function nplSpecimenText() {
+      const fields = readNplFields();
+      const mrz = isNplSpecimen(fields) ? NPL_SPECIMEN_MRZ : buildNplMrz(fields);
+      return [
+        'नेपाल NEPAL / राहदानी · PASSPORT (NPL)',
+        'Type: P  |  Country Code: NPL  |  Passport No: ' + (fields.passNo || ''),
+        'Surname / थर: ' + (fields.surname || ''),
+        'Given Names / नाम: ' + (fields.givenNames || ''),
+        'Nationality / राष्ट्रियता: ' + (fields.nationality || ''),
+        'Date of Birth / जन्म मिति: ' + nplFormatDate(fields.dob),
+        'Citizenship No. / नागरिकता नं.: ' + (fields.citizenshipNo || ''),
+        'Sex / लिङ्ग: ' + (fields.sex || ''),
+        'Place of Birth / जन्मस्थान: ' + (fields.pob || ''),
+        'Date of Issue / जारी मिति: ' + nplFormatDate(fields.issue),
+        'Issuing Authority / जारी गर्ने निकाय: ' + (fields.authority || ''),
+        'Date of Expiry / म्याद सकिने मिति: ' + nplFormatDate(fields.expiry),
+        '',
+        mrz.line1,
+        mrz.line2
+      ].join('\n');
+    }
+
+    function copyNplSpecimenData() {
+      const text = nplSpecimenText();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          showToast('Copied', 'Nepal passport details copied to clipboard.');
+        }).catch(function () {
+          showToast('Copy Failed', 'Clipboard permission was denied.');
+        });
+      } else {
+        showToast('Copy Failed', 'Clipboard is not available in this browser.');
+      }
+    }
+
+    function downloadNplPassPNG() {
+      const card = $('nepal-passport-card');
+      if (!card) return;
+      if (typeof html2canvas !== 'function') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Nepal passport spread PNG');
+      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+        const link = document.createElement('a');
+        link.download = 'nepal-passport-' + (readNplFields().passNo || '12524139') + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Ready!', 'Nepal Passport PNG generated successfully');
+      }).catch(function () {
+        showToast('Download Error', 'Could not export passport image');
+      });
+    }
+
+    function printNplPassport() {
+      window.print();
+    }
+
+    window.updateNplPreview = updateNplPreview;
+    window.randomizeNplPassport = randomizeNplPassport;
+    window.resetNplPassportSpecimen = resetNplPassportSpecimen;
+    window.resetNplPhoto = resetNplPhoto;
+    window.copyNplSpecimenData = copyNplSpecimenData;
+    window.downloadNplPassPNG = downloadNplPassPNG;
+    window.printNplPassport = printNplPassport;
+    window.initNplPassport = initNplPassport;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initNplPassport);
+    } else {
+      initNplPassport();
     }
 
     // ================= REPUBLIC OF RWANDA / INDANGAMUNTU (NATIONAL ID CARD / RWA) CONTROLLER =================
@@ -12800,6 +13179,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Rwanda</div>
                 <div class="text-[10px] font-medium text-slate-500">ID Card (Indangamuntu)</div>
+              </div>
+            </button>
+
+            <!-- Nepal -->
+            <button type="button" id="country-btn-nepal" onclick="switchVerificationCountry('nepal')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-pink-50/40 hover:border-pink-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇳🇵</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Nepal</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport / राहदानी (NPL)</div>
               </div>
             </button>
           </div>
@@ -21408,6 +21799,242 @@ COD REP DEM CONGO</div>
         </main>
       </div>
 
+      <!-- ================= STEP 3H-9: NEPAL (राहदानी / PASSPORT / NPL) VIEW ================= -->
+      <div id="nepal-passport-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-pink-50 text-pink-800 border border-pink-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-pink-600"></span>
+                  <span>नेपाल · Nepal</span>
+                </span>
+                <h2 class="text-lg font-black text-slate-900 mt-1">Nepal Passport / राहदानी (NPL)</h2>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="resetNplPassportSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Mithlesh Kumar Yadav reference specimen">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
+                </button>
+              </div>
+            </div>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeNplPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Nepalese passport sample bio-data &amp; TD3 MRZ</div>
+                </div>
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <!-- Surname -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpSurname">थर / Surname</label>
+                <input id="nplInpSurname" type="text" value="YADAV" oninput="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Given Names -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpGivenNames">नाम / Given Names</label>
+                <input id="nplInpGivenNames" type="text" value="MITHLESH KUMAR" oninput="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Passport No. -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpPassNo">राहदानी नं. / Passport No.</label>
+                <input id="nplInpPassNo" type="text" value="12524139" maxlength="9" oninput="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-mono font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Citizenship No. -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpCitizenshipNo">नागरिकता नं. / Citizenship No.</label>
+                <input id="nplInpCitizenshipNo" type="text" value="161053-301" oninput="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-mono font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Date of Birth -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpDob">जन्म मिति / Date of Birth</label>
+                <input id="nplInpDob" type="date" value="1993-05-22" onchange="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 text-slate-800">
+              </div>
+
+              <!-- Sex -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpSex">लिङ्ग / Sex</label>
+                <select id="nplInpSex" onchange="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold text-slate-800 bg-white">
+                  <option value="M" selected>M (Male)</option>
+                  <option value="F">F (Female)</option>
+                </select>
+              </div>
+
+              <!-- Nationality -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpNationality">राष्ट्रियता / Nationality</label>
+                <input id="nplInpNationality" type="text" value="NEPALESE" oninput="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Place of Birth -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpPob">जन्मस्थान / Place of Birth</label>
+                <input id="nplInpPob" type="text" value="SAPTARI" oninput="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold uppercase text-slate-800">
+              </div>
+
+              <!-- Date of Issue -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpIssue">जारी मिति / Date of Issue</label>
+                <input id="nplInpIssue" type="date" value="2021-11-19" onchange="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 text-slate-800">
+              </div>
+
+              <!-- Date of Expiry -->
+              <div class="space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpExpiry">म्याद सकिने मिति / Date of Expiry</label>
+                <input id="nplInpExpiry" type="date" value="2031-11-18" onchange="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 text-slate-800">
+              </div>
+
+              <!-- Issuing Authority -->
+              <div class="col-span-1 sm:col-span-2 space-y-1">
+                <label class="font-bold text-slate-600" for="nplInpAuthority">जारी गर्ने निकाय / Issuing Authority</label>
+                <input id="nplInpAuthority" type="text" value="MOFA, DEPARTMENT OF PASSPORT" oninput="updateNplPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-pink-500 font-bold uppercase text-slate-800">
+              </div>
+            </div>
+
+            <!-- Photo Upload & Controls -->
+            <div class="pt-3 border-t border-slate-100 space-y-2">
+              <label class="font-bold text-xs text-slate-700 block">Bearer Photograph</label>
+              <div class="flex items-center gap-3">
+                <label class="grow px-3 py-2 rounded-xl border border-dashed border-pink-300 hover:border-pink-500 bg-pink-50/40 hover:bg-pink-50 text-pink-900 font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span>Upload Passport Photo</span>
+                  <input id="nplPhotoUpload" type="file" accept="image/*" class="hidden">
+                </label>
+                <button type="button" onclick="resetNplPhoto()" class="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs flex items-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Export & Copy Actions -->
+            <div class="pt-3 border-t border-slate-100 flex flex-wrap gap-2">
+              <button type="button" onclick="downloadNplPassPNG()" class="grow px-4 py-2.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download"></i> Download PNG (Spread)
+              </button>
+              <button type="button" onclick="printNplPassport()" class="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors cursor-pointer flex items-center gap-2">
+                <i class="fa-solid fa-print"></i> Print
+              </button>
+              <button type="button" onclick="copyNplSpecimenData()" class="px-3 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors cursor-pointer" title="Copy text data to clipboard">
+                <i class="fa-solid fa-copy"></i> Copy
+              </button>
+            </div>
+          </section>
+
+          <!-- Passport Preview Column -->
+          <section class="lg:col-span-7 flex flex-col items-center gap-4">
+            <div class="w-full flex items-center justify-between no-print px-1">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-black text-slate-800 uppercase tracking-wider">Nepal Passport / राहदानी 2-Page Spread</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                  SAMPLE / DEMO — NOT VALID
+                </span>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <button type="button" onclick="downloadNplPassPNG()" class="text-pink-700 hover:text-pink-800 font-bold flex items-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-image"></i> High-Res PNG
+                </button>
+                <span class="text-slate-300">|</span>
+                <button type="button" onclick="printNplPassport()" class="text-slate-600 hover:text-slate-900 font-bold flex items-center gap-1 cursor-pointer">
+                  <i class="fa-solid fa-print"></i> Print / PDF
+                </button>
+                <span class="text-slate-300">|</span>
+                <a href="/assets/aistudio/1793811400554_8171bfc4.jpg" target="_blank" rel="noopener noreferrer" class="text-slate-500 hover:text-slate-700 flex items-center gap-1">
+                  <i class="fa-solid fa-image"></i> Reference Photo (JPG)
+                </a>
+              </div>
+            </div>
+
+            <!-- CARD SPREAD (688 x 966) -->
+            <article id="nepal-passport-card" class="relative w-full max-w-[580px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#181b1f] bg-[#f7faf2]" style="aspect-ratio: 688 / 966; container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', Arial, Helvetica, sans-serif;">
+              <!-- Base Plate: 1:1 Reference Scan with Only Dynamic Value Text Cleanly Inpainted -->
+              <img src="/assets/aistudio/nepal_passport_clean_bg.png" alt="Nepal Passport Spread Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+              <!-- ============ PAGE 3: REQUEST & EMBASSY SEAL (TOP HALF: y=0..483) ============ -->
+              <section id="nplTopPage" class="relative w-full overflow-hidden z-10" style="height: 50%; container-type: inline-size; background: transparent;">
+                <!-- Left Vertical Laser-Perforated Passport Number (Dot Matrix, reading bottom-to-top) -->
+                <div class="absolute flex items-center justify-center pointer-events-none select-none" style="left: 4.07%; top: 20.08%; width: 6.69%; height: 57.56%;">
+                  <div id="nplOutPassNoPage3Perforated" style="writing-mode: vertical-lr; transform: rotate(180deg); font-family: 'Courier New', Courier, monospace; font-weight: 800; font-size: 4.2cqw; letter-spacing: 0.16em; color: rgba(56, 51, 47, 0.82); filter: contrast(1.12); text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.85); white-space: nowrap;">
+                    1 2 5 2 4 1 3 9
+                  </div>
+                </div>
+              </section>
+
+              <!-- ============ PAGE 2: BIO-DATA & MRZ (BOTTOM HALF: y=483..966) ============ -->
+              <section id="nplDataPage" class="relative w-full overflow-hidden z-10" style="height: 50%; container-type: inline-size; background: transparent;">
+                <!-- Custom Portrait Overlay (visible when user uploads a custom portrait) -->
+                <div id="nplCustomPhotoWrap" class="absolute overflow-hidden rounded-[2px] pointer-events-none transition-opacity" style="left: 3.78%; top: 24.64%; width: 27.62%; height: 46.58%; opacity: 0;">
+                  <img id="nplOutPhotoMain" src="/assets/aistudio/nepal_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/nepal_passport_portrait.png'">
+                </div>
+
+                <!-- Custom Ghost Portrait Overlay (visible when user uploads a custom portrait) -->
+                <div id="nplCustomGhostWrap" class="absolute overflow-hidden rounded-[2px] pointer-events-none mix-blend-multiply transition-opacity" style="left: 83.72%; top: 22.98%; width: 11.05%; height: 18.43%; opacity: 0;">
+                  <img id="nplOutGhostPhoto" src="/assets/aistudio/nepal_passport_ghost.png" alt="Ghost portrait" class="w-full h-full object-cover" style="filter: contrast(0.95) brightness(1.04);">
+                </div>
+
+                <!-- Preserved Holder Signature Element -->
+                <div class="absolute pointer-events-none opacity-0" style="left: 73.40%; top: 64.18%; width: 14.10%; height: 8.70%;">
+                  <img id="nplOutSignatureImg" src="/assets/aistudio/nepal_passport_signature.png" alt="Signature" class="w-full h-full object-contain">
+                </div>
+
+                <!-- Row 1: Type (P), Country Code (NPL), Passport No. (12524139) -->
+                <div class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.72%; top: 13.04%; font-size: 2.1cqw;">P</div>
+                <div class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 45.78%; top: 13.04%; font-size: 2.1cqw; letter-spacing: 0.02em;">NPL</div>
+                <div id="nplOutPassNoHeader" class="absolute font-bold text-[#14171a] whitespace-nowrap leading-none" style="left: 67.44%; top: 12.84%; font-size: 2.38cqw; letter-spacing: 0.02em;">12524139</div>
+
+                <!-- Row 2: Surname -->
+                <div id="nplOutSurname" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.72%; top: 19.88%; font-size: 2.05cqw; letter-spacing: 0.015em;">YADAV</div>
+
+                <!-- Row 3: Given Names -->
+                <div id="nplOutGivenNames" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.58%; top: 26.50%; font-size: 2.05cqw; letter-spacing: 0.015em;">MITHLESH KUMAR</div>
+
+                <!-- Row 4: Nationality -->
+                <div id="nplOutNationality" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.58%; top: 34.16%; font-size: 2.05cqw; letter-spacing: 0.015em;">NEPALESE</div>
+
+                <!-- Row 5: Date of Birth & Citizenship No. -->
+                <div id="nplOutDob" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.58%; top: 41.41%; font-size: 2.05cqw; letter-spacing: 0.015em;">22 MAY 1993</div>
+                <div id="nplOutCitizenshipNo" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 65.70%; top: 41.41%; font-size: 2.05cqw; letter-spacing: 0.015em;">161053-301</div>
+
+                <!-- Row 6: Sex & Place of Birth -->
+                <div id="nplOutSex" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.58%; top: 48.86%; font-size: 2.05cqw;">M</div>
+                <div id="nplOutPob" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 65.41%; top: 48.86%; font-size: 2.05cqw; letter-spacing: 0.015em;">SAPTARI</div>
+
+                <!-- Row 7: Date of Issue & Issuing Authority -->
+                <div id="nplOutIssue" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.72%; top: 56.11%; font-size: 2.05cqw; letter-spacing: 0.015em;">19 NOV 2021</div>
+                <div id="nplOutAuthority" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 65.41%; top: 56.52%; font-size: 1.48cqw; letter-spacing: 0.01em;">MOFA, DEPARTMENT OF PASSPORT</div>
+
+                <!-- Row 8: Date of Expiry -->
+                <div id="nplOutExpiry" class="absolute font-bold text-[#181b1f] whitespace-nowrap leading-none" style="left: 33.72%; top: 62.94%; font-size: 2.05cqw; letter-spacing: 0.015em;">18 NOV 2031</div>
+
+                <!-- Machine Readable Zone (MRZ: ICAO Doc 9303 TD3 2 lines × 44 chars) -->
+                <div id="nplMrzLine1" class="absolute whitespace-nowrap leading-none" style="left: 4.51%; top: 80.54%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 800; font-size: 2.36cqw; letter-spacing: 0.155em; color: #181b1f;">P&lt;NPLYADAV&lt;&lt;MITHLESH&lt;KUMAR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                <div id="nplMrzLine2" class="absolute whitespace-nowrap leading-none" style="left: 4.51%; top: 87.37%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 800; font-size: 2.36cqw; letter-spacing: 0.155em; color: #181b1f;">12524139&lt;3NPL9305225M3111183161053301&lt;&lt;&lt;&lt;&lt;60</div>
+              </section>
+
+              <!-- Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active -->
+              <img id="nplRefSpecimenOverlay" src="/assets/aistudio/nepal_passport_reference.png" alt="Nepal Passport Specimen Reference" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
+            </article>
+
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic passport reproduction · Nepal (नेपाल NEPAL · राहदानी / Passport · NPL) 2-page spread matching reference specimen with bilingual Nepali/English fields, Coat of Arms of Nepal, Embassy of Nepal Kuala Lumpur seal, laser-perforated number, and ICAO Doc 9303 TD3 machine-readable zone.</p>
+          </section>
+        </main>
+      </div>
+
       <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY BANK LETTER & PDF) VIEW ================= -->
       <div id="proofofaccount-doc-view" class="hidden">
         <!-- Active Country & PDF Verification Banner -->
@@ -23260,6 +23887,22 @@ COD REP DEM CONGO</div>
           docType: 'passport',
           staticAssetPath: '/assets/aistudio/1793559368456_a809bb91.jpg'
         },
+        'nepal-passport-png': {
+          fileId: 'nepal-passport-png',
+          fileName: 'nepal-passport-demo.png',
+          docTitle: 'Nepal — Biometric Passport / राहदानी (HD PNG)',
+          country: 'nepal',
+          docType: 'passport',
+          fnName: 'downloadNplPassPNG'
+        },
+        'nepal-reference-jpg': {
+          fileId: 'nepal-reference-jpg',
+          fileName: 'Nepal-Passport-Reference-Specimen.jpg',
+          docTitle: 'Nepal Biometric Passport Reference Specimen (JPG)',
+          country: 'nepal',
+          docType: 'passport',
+          staticAssetPath: '/assets/aistudio/1793811400554_8171bfc4.jpg'
+        },
         'rwanda-id-png': {
           fileId: 'rwanda-id-png',
           fileName: 'rwanda-national-id-demo.png',
@@ -23306,6 +23949,7 @@ COD REP DEM CONGO</div>
         const c = (typeof currentCountry !== 'undefined' && currentCountry) ? currentCountry : 'kenya';
         const d = (typeof currentDocType !== 'undefined' && currentDocType) ? currentDocType : 'passport';
         if (d === 'proofofaccount') return 'proof-of-account-png';
+        if (c === 'nepal') return 'nepal-passport-png';
         if (c === 'rwanda') return 'rwanda-id-png';
         if (c === 'ghana') return 'ghana-passport-png';
         if (c === 'canada') return 'canada-passport-png';
@@ -24613,6 +25257,7 @@ COD REP DEM CONGO</div>
         'germany-passport-card',
         'canada-passport-card',
         'ghana-passport-card',
+        'nepal-passport-card',
         'rwanda-id-front',
         'rwanda-id-back',
         'proof-of-account-card',
@@ -25140,6 +25785,7 @@ COD REP DEM CONGO</div>
           'updateDeuPreview', 'randomizeDeuPassport',
           'updateCanPreview', 'randomizeCanPassport',
           'updateGhaPreview', 'randomizeGhaPassport',
+          'updateNplPreview', 'randomizeNplPassport',
           'updateRwaIdPreview', 'randomizeRwaId', 'switchRwaSide',
           'updateEthPassPreview', 'randomizeEthPassport',
           'updateProofOfAccountPreview', 'randomizeProofOfAccount',

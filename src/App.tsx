@@ -10,6 +10,7 @@ import { GhanaPassportCard, GhanaPassportData, defaultGhanaPassportData, generat
 import { CanadaPassportCard, CanadaPassportData, defaultCanadaPassportData, generateCanadaMRZ } from "./CanadaPassportCard"
 import { EthiopiaPassportCard, EthiopiaPassportData, defaultEthiopiaPassportData, generateEthiopiaMRZ } from "./EthiopiaPassportCard"
 import { NigeriaPassportCard, NigeriaPassportData, defaultNigeriaPassportData, generateNigeriaMRZ } from "./NigeriaPassportCard"
+import { NepalPassportCard, NepalPassportData, defaultNepalPassportData, generateNepalMRZ, nepalRandomSpecimens } from "./NepalPassportCard"
 import { RwandaIdCard, RwandaIdData, defaultRwandaIdData, rwandaRandomSpecimens } from "./RwandaIdCard"
 
 const defaultContent = {
@@ -536,6 +537,7 @@ function App() {
   const [ethiopiaData, setEthiopiaData] = useState<EthiopiaPassportData>(defaultEthiopiaPassportData)
   const [canadaData, setCanadaData] = useState<CanadaPassportData>(defaultCanadaPassportData)
   const [ghanaData, setGhanaData] = useState<GhanaPassportData>(defaultGhanaPassportData)
+  const [nepalData, setNepalData] = useState<NepalPassportData>(defaultNepalPassportData)
   const [bangladeshData, setBangladeshData] = useState<BangladeshPassportData>(defaultBangladeshPassportData)
   const [otherData, setOtherData] = useState<Record<string, OtherDocumentData>>(defaultOtherCountryData)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -704,6 +706,12 @@ function App() {
     setGhanaData((prev) => ({ ...prev, [key]: value }))
   }
 
+  const updateNepal = <K extends keyof NepalPassportData>(key: K, value: NepalPassportData[K]) => {
+    setSaved(false)
+    setDetectedText(null)
+    setNepalData((prev) => ({ ...prev, [key]: value }))
+  }
+
   const updateBangladesh = <K extends keyof BangladeshPassportData>(key: K, value: BangladeshPassportData[K]) => {
     setSaved(false)
     setDetectedText(null)
@@ -736,6 +744,8 @@ function App() {
         updateCanada("photoUrl", url)
       } else if (country === "GHA") {
         updateGhana("photoUrl", url)
+      } else if (country === "NPL") {
+        updateNepal("photoUrl", url)
       } else if (country === "BGD") {
         updateBangladesh("photoUrl", url)
       } else {
@@ -750,6 +760,7 @@ function App() {
   const isEthiopia = country === "ETH"
   const isCanada = country === "CAN"
   const isGhana = country === "GHA"
+  const isNepal = country === "NPL"
   const isBangladesh = country === "BGD"
   const isSouthAfrica = country === "RSA"
   const isPapuaNewGuinea = country === "PNG"
@@ -767,6 +778,8 @@ function App() {
     ? "/assets/aistudio/canada_passport_reference.png"
     : isGhana
     ? "/assets/aistudio/ghana_passport_reference.png"
+    : isNepal
+    ? "/assets/aistudio/nepal_passport_reference.png"
     : isBangladesh
     ? "/assets/aistudio/bgd_passport_reference.png"
     : isUganda
@@ -791,6 +804,8 @@ function App() {
     ? "Canada biometric e-Passport reference specimen"
     : isGhana
     ? "Republic of Ghana biometric e-Passport reference specimen"
+    : isNepal
+    ? "Nepal biometric machine-readable passport (नेपाल NEPAL) reference specimen"
     : isBangladesh
     ? "People's Republic of Bangladesh e-Passport reference specimen"
     : isUganda
@@ -815,6 +830,8 @@ function App() {
     ? "Canada e-Passport (2-Page Spread) reference specimen"
     : isGhana
     ? "Republic of Ghana e-Passport (2-Page Spread) reference specimen"
+    : isNepal
+    ? "Nepal Passport / राहदानी (2-Page Spread) reference specimen"
     : isBangladesh
     ? "Bangladesh e-Passport (2-Page Spread) reference specimen"
     : isUganda
@@ -917,6 +934,24 @@ function App() {
         `MRZ L1: ${mrz.line1}`,
         `MRZ L2: ${mrz.line2}`,
       ])
+    } else if (isNepal) {
+      const pool = nepalRandomSpecimens.filter((s) => s.passportNo !== nepalData.passportNo)
+      const chosen = pool[Math.floor(Math.random() * pool.length)] || nepalRandomSpecimens[0]
+      setNepalData(chosen)
+      const mrz = generateNepalMRZ(chosen)
+      setDetectedText([
+        "नेपाल NEPAL / राहदानी · PASSPORT (NPL)",
+        `TYPE: P | COUNTRY CODE: NPL | PASSPORT NO: ${chosen.passportNo}`,
+        `SURNAME: ${chosen.surname}`,
+        `GIVEN NAMES: ${chosen.givenNames}`,
+        `NATIONALITY: ${chosen.nationality}`,
+        `DATE OF BIRTH: ${chosen.dateOfBirth} | CITIZENSHIP NO: ${chosen.citizenshipNo}`,
+        `SEX: ${chosen.sex} | PLACE OF BIRTH: ${chosen.placeOfBirth}`,
+        `DATE OF ISSUE: ${chosen.dateOfIssue} | AUTHORITY: ${chosen.issuingAuthority}`,
+        `DATE OF EXPIRY: ${chosen.dateOfExpiry}`,
+        `MRZ L1: ${mrz.line1}`,
+        `MRZ L2: ${mrz.line2}`,
+      ])
     } else if (isBangladesh) {
       const pool = bangladeshRandomSpecimens.filter((s) => s.passportNo !== bangladeshData.passportNo)
       const chosen = pool[Math.floor(Math.random() * pool.length)] || bangladeshRandomSpecimens[0]
@@ -980,6 +1015,11 @@ function App() {
     setDetectedText(null)
   }
 
+  const resetNepalToDefault = () => {
+    setNepalData(defaultNepalPassportData)
+    setDetectedText(null)
+  }
+
   const resetBangladeshToDefault = () => {
     setBangladeshData(defaultBangladeshPassportData)
     setDetectedText(null)
@@ -999,6 +1039,7 @@ function App() {
     else if (isEthiopia) resetEthiopiaToDefault()
     else if (isCanada) resetCanadaToDefault()
     else if (isGhana) resetGhanaToDefault()
+    else if (isNepal) resetNepalToDefault()
     else if (isBangladesh) resetBangladeshToDefault()
     else resetOtherToDefault()
   }
@@ -1009,6 +1050,7 @@ function App() {
       NGA: "nigeria-passport-png",
       ETH: "ethiopia-passport-png",
       GHA: "ghana-passport-png",
+      NPL: "nepal-passport-png",
       CAN: "canada-passport-png",
       BGD: "bangladesh-passport-png",
       UGA: "uganda-refugee-png",
@@ -1114,6 +1156,8 @@ function App() {
                         setContent((c) => ({ ...c, title: "Canada Passport Verification", accent: "#b91c1c" }))
                       } else if (newCountry === "GHA") {
                         setContent((c) => ({ ...c, title: "Ghana Passport Verification", accent: "#b45309" }))
+                      } else if (newCountry === "NPL") {
+                        setContent((c) => ({ ...c, title: "Nepal Passport Verification", accent: "#be185d" }))
                       } else if (newCountry === "BGD") {
                         setContent((c) => ({ ...c, title: "Bangladesh Passport Verification", accent: "#166534" }))
                       } else if (newCountry === "UGA") {
@@ -1131,6 +1175,7 @@ function App() {
                       }
                     }}
                   >
+                    <option value="NPL">Nepal — Biometric Passport / राहदानी (NPL)</option>
                     <option value="RWA">Republic of Rwanda — National Identity Card (Indangamuntu)</option>
                     <option value="NGA">Federal Republic of Nigeria — Biometric e-Passport</option>
                     <option value="ETH">Federal Democratic Republic of Ethiopia — Biometric e-Passport</option>
@@ -1829,6 +1874,131 @@ function App() {
                 </div>
               )}
 
+              {/* Nepal-specific interactive fields */}
+              {isNepal && (
+                <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Nepal Passport (राहदानी) Fields</span>
+                    <button
+                      type="button"
+                      onClick={resetNepalToDefault}
+                      className="text-[11px] flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 font-semibold cursor-pointer"
+                    >
+                      <RotateCcw size={12} /> Reset to Specimen
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={randomizeSpecimen}
+                    className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group"
+                  >
+                    <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                      <Dices size={20} />
+                    </div>
+                    <div className="text-left">
+                      <div className="leading-none text-sm font-extrabold flex items-center gap-2">
+                        <span>Randomize Card</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                      </div>
+                      <div className="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Nepalese passport sample data &amp; MRZ</div>
+                    </div>
+                  </button>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      थर / Surname
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={nepalData.surname}
+                        onChange={(e) => updateNepal("surname", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      नाम / Given Names
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={nepalData.givenNames}
+                        onChange={(e) => updateNepal("givenNames", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      राहदानी नं. / Passport No.
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={nepalData.passportNo}
+                        onChange={(e) => updateNepal("passportNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      नागरिकता नं. / Citizenship No.
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono font-bold"
+                        value={nepalData.citizenshipNo}
+                        onChange={(e) => updateNepal("citizenshipNo", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      राष्ट्रियता / Nationality
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nepalData.nationality}
+                        onChange={(e) => updateNepal("nationality", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      लिङ्ग / Sex
+                      <select
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nepalData.sex}
+                        onChange={(e) => updateNepal("sex", e.target.value as 'M' | 'F')}
+                      >
+                        <option value="M">M - Male</option>
+                        <option value="F">F - Female</option>
+                      </select>
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      जन्म मिति / Date of Birth
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nepalData.dateOfBirth}
+                        onChange={(e) => updateNepal("dateOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      जन्मस्थान / Place of Birth
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nepalData.placeOfBirth}
+                        onChange={(e) => updateNepal("placeOfBirth", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      जारी मिति / Date of Issue
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nepalData.dateOfIssue}
+                        onChange={(e) => updateNepal("dateOfIssue", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-1 flex flex-col gap-1 text-slate-600 font-semibold">
+                      म्याद सकिने मिति / Date of Expiry
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nepalData.dateOfExpiry}
+                        onChange={(e) => updateNepal("dateOfExpiry", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                    <label className="col-span-2 flex flex-col gap-1 text-slate-600 font-semibold">
+                      जारी गर्ने निकाय / Issuing Authority
+                      <input
+                        className="p-2 border rounded border-slate-300 text-xs font-mono"
+                        value={nepalData.issuingAuthority}
+                        onChange={(e) => updateNepal("issuingAuthority", e.target.value.toUpperCase())}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+
               {/* Bangladesh-specific interactive fields */}
               {isBangladesh && (
                 <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
@@ -2044,7 +2214,7 @@ function App() {
               )}
 
               {/* Interactive Document Data Fields + Randomize for all other countries (UGA, KEN, SEN, DRC, RSA, PNG) */}
-              {!isNigeria && !isEthiopia && !isCanada && !isGhana && !isBangladesh && (
+              {!isRwanda && !isNigeria && !isEthiopia && !isCanada && !isGhana && !isNepal && !isBangladesh && (
                 <div className="mt-6 pt-5 border-t border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Document Data Fields</span>
@@ -2282,6 +2452,10 @@ function App() {
                         <div className="w-full max-w-[340px] mx-auto my-1">
                           <GhanaPassportCard data={ghanaData} />
                         </div>
+                      ) : isNepal ? (
+                        <div className="w-full max-w-[340px] mx-auto my-1">
+                          <NepalPassportCard data={nepalData} />
+                        </div>
                       ) : isBangladesh ? (
                         <div className="w-full max-w-[340px] mx-auto my-1">
                           <BangladeshPassportCard data={bangladeshData} />
@@ -2313,7 +2487,7 @@ function App() {
                       <div className="placeholder-copy">
                         <strong>{specimenLabel}</strong>
                         <span>
-                          {isNigeria || isEthiopia || isCanada || isGhana || isBangladesh
+                          {isNigeria || isEthiopia || isCanada || isGhana || isNepal || isBangladesh
                             ? "Authentic 2-page e-Passport spread with live interactive field and MRZ updates."
                             : "Interactive specimen reference with live field and randomize support."}
                         </span>
