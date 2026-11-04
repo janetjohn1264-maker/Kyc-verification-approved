@@ -562,11 +562,13 @@ function App() {
       recentAttemptsRef.current.push(now)
       const attemptCount = recentAttemptsRef.current.length
       const suspicious = attemptCount >= 3
-      setSecurityNotice(
-        suspicious
-          ? `Repeated protected-content access detected (${attemptCount} events). Security event recorded.`
-          : details
-      )
+      if (suspicious) {
+        setSecurityNotice(
+          `Repeated protected-content access detected (${attemptCount} events). Security event recorded.`
+        )
+      } else if (eventType !== "copy_blocked" && eventType !== "cut_blocked" && details) {
+        setSecurityNotice(details)
+      }
       fetch("/api/ogads/security-event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1010,7 +1012,7 @@ function App() {
           <a className="active" href="#passport"><FileText size={18} /> Passport verification</a>
           <a href="#settings"><Settings size={18} /> Settings</a>
         </nav>
-        <div className="sidebar-footer"><div className="help-card"><strong>Need help?</strong><span>Visit our support center</span><a href="#support">Get support <span aria-hidden="true">→</span></a></div><button className="logout"><LogOut size={17} /> Log out</button></div>
+        <div className="sidebar-footer"><div className="help-card"><strong>Need help?</strong><span>getkycapproved@gmail.com</span><a href="mailto:getkycapproved@gmail.com">Email support <span aria-hidden="true">→</span></a></div><button className="logout"><LogOut size={17} /> Log out</button></div>
       </aside>
 
       <main className="main-content">
@@ -2171,11 +2173,11 @@ function App() {
                 }}
                 onCopy={(e) => {
                   e.preventDefault()
-                  reportSecurityEvent("copy_blocked", "Copying sensitive KYC verification data is disabled")
+                  reportSecurityEvent("copy_blocked", "Copy attempt prevented")
                 }}
                 onCut={(e) => {
                   e.preventDefault()
-                  reportSecurityEvent("cut_blocked", "Cutting sensitive KYC verification data is disabled")
+                  reportSecurityEvent("cut_blocked", "Cut attempt prevented")
                 }}
                 onDragStart={(e) => {
                   e.preventDefault()
@@ -2301,7 +2303,7 @@ function App() {
                     <button type="button" onClick={triggerCountryOgadsLocker} className="preview-primary" style={{ backgroundColor: content.accent }}>{content.button}<span aria-hidden="true">→</span></button>
                     <div className="secure-note"><ShieldCheck size={14} /> Your information is encrypted and secure</div>
                   </div>
-                  <div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span></div>
+                  <div className="preview-footer">KYC Verify <span>Privacy</span><span>Terms</span><a href="mailto:getkycapproved@gmail.com" className="text-slate-400 hover:text-slate-600 no-underline">getkycapproved@gmail.com</a></div>
                 </div>
               </div>
             </section>

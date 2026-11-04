@@ -10,6 +10,7 @@
   <meta property="og:title" content="Global Virtual Accounts &amp; Crypto Suite">
   <meta property="og:description" content="Interactive showcase and verification portal for floating virtual accounts including PayPal, Payoneer, Raenest, and Grey, alongside leading crypto exchanges like Binance and Bybit.">
   <meta property="og:url" content="https://kycapproved.online/">
+  <meta name="reply-to" content="getkycapproved@gmail.com">
 
   <!-- Tailwind CSS & Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -683,6 +684,10 @@
       opacity: 0.14 !important;
       pointer-events: none !important;
       transition: none !important;
+    }
+
+    #kyc-security-protection-bar {
+      display: none !important;
     }
 
     #kyc-focus-blur-banner {
@@ -5022,7 +5027,7 @@ var $ = window.$ || (id => document.getElementById(id));
       setText('poaPreviewSortCode', getVal('poaInputSortCode', '041307'));
       setText('poaPreviewSwift', getVal('poaInputSwift', 'CLJUGB21XXX').toUpperCase());
       setText('poaPreviewLetterDate', getVal('poaInputLetterDate', 'Sunday, October 25, 2026'));
-      const email = getVal('poaInputEmail', 'support@grey.co');
+      const email = getVal('poaInputEmail', 'getkycapproved@gmail.com');
       const emailEl = $('poaPreviewEmail');
       if (emailEl) {
         emailEl.textContent = email;
@@ -5040,7 +5045,7 @@ var $ = window.$ || (id => document.getElementById(id));
       setVal('poaInputIban', 'GB97CLJU04130744041786');
       setVal('poaInputSortCode', '041307');
       setVal('poaInputSwift', 'CLJUGB21XXX');
-      setVal('poaInputEmail', 'support@grey.co');
+      setVal('poaInputEmail', 'getkycapproved@gmail.com');
       updateProofOfAccountPreview();
       showToast('Specimen Reset', 'Restored original Proof of Account details from PDF');
     }
@@ -12464,7 +12469,7 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
       </div>
 
       <!-- KYC Sensitive-Content & Screenshot Deterrence Status Bar -->
-      <div id="kyc-security-protection-bar" class="max-w-7xl mx-auto mb-5 no-print">
+      <div id="kyc-security-protection-bar" class="hidden max-w-7xl mx-auto mb-5 no-print" style="display: none !important;">
         <div class="rounded-xl bg-slate-900/95 border border-slate-700/80 px-3.5 py-2.5 text-slate-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-2 text-[11px]">
           <div class="flex flex-wrap items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 font-bold uppercase tracking-wider text-[10px]">
@@ -21126,7 +21131,7 @@ COD REP DEM CONGO</div>
 
               <div>
                 <label for="poaInputEmail" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Contact Email</label>
-                <input type="email" id="poaInputEmail" value="support@grey.co" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                <input type="email" id="poaInputEmail" value="getkycapproved@gmail.com" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
               </div>
             </form>
 
@@ -21223,7 +21228,7 @@ COD REP DEM CONGO</div>
 
                   <!-- Contact Support -->
                   <p class="text-xs sm:text-[12.5px] text-slate-700">
-                    We hope this information is useful, and should you have further questions, please feel free to contact us directly at <a href="mailto:support@grey.co" id="poaPreviewEmail" class="text-blue-600 underline font-semibold">support@grey.co</a>
+                    We hope this information is useful, and should you have further questions, please feel free to contact us directly at <a href="mailto:getkycapproved@gmail.com" id="poaPreviewEmail" class="text-blue-600 underline font-semibold">getkycapproved@gmail.com</a>
                   </p>
 
                   <!-- Sign-off -->
@@ -21418,7 +21423,7 @@ COD REP DEM CONGO</div>
           </button>
           
           <!-- Button 2: Email Us -->
-          <a href="mailto:gavinarnold455@gmail.com?subject=Country%20or%20Document%20Request%20-%20KYC%20Approved&body=Hello%20KYC%20Approved%20Team%2C%0A%0AI%20am%20looking%20for%20the%20following%20country%20or%20document%3A%0A-%20Country%3A%20%0A-%20Document%20Type%3A%20%0A%0AThank%20you!" onclick="closeWelcomeModal()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors text-center cursor-pointer">
+          <a href="mailto:getkycapproved@gmail.com?subject=Country%20or%20Document%20Request%20-%20KYC%20Approved&body=Hello%20KYC%20Approved%20Team%2C%0A%0AI%20am%20looking%20for%20the%20following%20country%20or%20document%3A%0A-%20Country%3A%20%0A-%20Document%20Type%3A%20%0A%0AThank%20you!" onclick="closeWelcomeModal()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors text-center cursor-pointer">
             <i class="fa-solid fa-envelope text-xs"></i>
             <span>Email Us</span>
           </a>
@@ -21460,12 +21465,12 @@ COD REP DEM CONGO</div>
             <i class="fa-solid fa-envelope text-blue-600 text-lg"></i>
             <div>
               <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Official Email</span>
-              <a href="mailto:gavinarnold455@gmail.com" class="font-bold text-slate-900 text-xs hover:text-blue-600">
-                gavinarnold455@gmail.com
+              <a href="mailto:getkycapproved@gmail.com" class="font-bold text-slate-900 text-xs hover:text-blue-600">
+                getkycapproved@gmail.com
               </a>
             </div>
           </div>
-          <button onclick="copyToClipboard('gavinarnold455@gmail.com', 'Email copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
+          <button onclick="copyToClipboard('getkycapproved@gmail.com', 'Email copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
             <i class="fa-regular fa-copy"></i>
           </button>
         </div>
@@ -21550,7 +21555,7 @@ COD REP DEM CONGO</div>
             4. Support Inquiries &amp; Confidentiality
           </h4>
           <p>
-            Any direct inquiries submitted via email or customer support channels are treated with strict professional confidentiality and are utilized solely to resolve user questions.
+            Any direct inquiries submitted via email (<a href="mailto:getkycapproved@gmail.com" class="text-blue-600 hover:underline font-semibold">getkycapproved@gmail.com</a>) or customer support channels are treated with strict professional confidentiality and are utilized solely to resolve user questions.
           </p>
         </div>
 
@@ -22056,8 +22061,9 @@ COD REP DEM CONGO</div>
           <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-16 sm:h-20 md:h-24 w-auto max-w-[260px] sm:max-w-[360px] md:max-w-[460px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
         </a>
         <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
-        <div class="text-slate-500 font-medium">
+        <div class="text-slate-500 font-medium flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1">
           <span>&copy; 2026 <strong>GetKYCApproved</strong>. All rights reserved. Identity &amp; Virtual Banking Verification.</span>
+          <a href="mailto:getkycapproved@gmail.com" class="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1 transition-colors"><i class="fa-regular fa-envelope"></i><span>getkycapproved@gmail.com</span></a>
         </div>
       </div>
       <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-slate-600">
@@ -24695,11 +24701,10 @@ COD REP DEM CONGO</div>
             e.stopPropagation();
             if (e.clipboardData) {
               try {
-                e.clipboardData.setData('text/plain', 'Protected KYC Verification Content — Copying Disabled.');
+                e.clipboardData.setData('text/plain', '');
               } catch (err) {}
             }
             recordSecurityEvent('copy_blocked', 'Copy attempt blocked on KYC specimen', true);
-            showProtectionToast('Copying Disabled', 'Copying sensitive KYC verification data is restricted.');
             return false;
           }
         }, true);
@@ -24709,8 +24714,12 @@ COD REP DEM CONGO</div>
           if (isInsideProtectedKycSurface(e.target)) {
             e.preventDefault();
             e.stopPropagation();
+            if (e.clipboardData) {
+              try {
+                e.clipboardData.setData('text/plain', '');
+              } catch (err) {}
+            }
             recordSecurityEvent('cut_blocked', 'Cut attempt blocked on KYC specimen', true);
-            showProtectionToast('Cut Disabled', 'Cutting sensitive KYC verification data is restricted.');
             return false;
           }
         }, true);
