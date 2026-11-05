@@ -1031,7 +1031,7 @@
     #nplOutExpiry { max-width: 29.0%; overflow: hidden; }
     #nplMrzLine1, #nplMrzLine2 { max-width: 91.0%; overflow: hidden; }
 
-    /* Malawi / Mali Passport (MWI) */
+    /* Malawi Passport (MWI) */
     #mwiOutType { max-width: 10.0%; overflow: hidden; }
     #mwiOutCountryCode { max-width: 14.0%; overflow: hidden; }
     #mwiOutPassNoHeader { max-width: 24.0%; overflow: hidden; }
@@ -2535,7 +2535,7 @@ var $ = window.$ || (id => document.getElementById(id));
         ghana: 'Ghana',
         rwanda: 'Rwanda',
         nepal: 'Nepal',
-        malawi: 'Republic of Malawi (Mali / MWI)'
+        malawi: 'Malawi'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -5043,7 +5043,7 @@ var $ = window.$ || (id => document.getElementById(id));
       initNplPassport();
     }
 
-    // ================= REPUBLIC OF MALAWI (MALI / MWI PASSPORT) CONTROLLER =================
+    // ================= REPUBLIC OF MALAWI (MWI PASSPORT) CONTROLLER =================
     const MWI_DEFAULT_PHOTO = '/assets/aistudio/malawi_passport_portrait.png';
     const MWI_SIGNATURE = '/assets/aistudio/malawi_passport_signature.png';
 
@@ -13698,14 +13698,14 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               </div>
             </button>
 
-            <!-- Malawi / Mali (MWI) -->
+            <!-- Malawi (MWI) -->
             <button type="button" id="country-btn-malawi" onclick="switchVerificationCountry('malawi')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-rose-50/40 hover:border-rose-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
               <div class="flex items-center justify-between">
                 <span class="text-2xl drop-shadow-xs">🇲🇼</span>
                 <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
               </div>
               <div class="mt-2.5">
-                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Malawi / Mali</div>
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Malawi</div>
                 <div class="text-[10px] font-medium text-slate-500">Passport / Passeport (MWI)</div>
               </div>
             </button>
@@ -22288,7 +22288,7 @@ COD REP DEM CONGO</div>
         </main>
       </div>
 
-      <!-- ================= STEP 3T: REPUBLIC OF MALAWI (MALI / MWI PASSPORT) 2-PAGE SPREAD VIEW ================= -->
+      <!-- ================= STEP 3T: REPUBLIC OF MALAWI (MWI PASSPORT) 2-PAGE SPREAD VIEW ================= -->
       <div id="malawi-passport-view" class="hidden">
         <!-- Top Action Bar -->
         <div class="max-w-7xl mx-auto mb-5 flex flex-wrap items-center justify-between gap-3 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3.5 shadow-xs no-print">
@@ -22303,8 +22303,8 @@ COD REP DEM CONGO</div>
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="randomizeMwiPassport()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 via-red-600 to-emerald-600 hover:from-rose-500 hover:to-emerald-500 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center gap-1.5">
-              <i class="fa-solid fa-shuffle"></i> Randomize Card
+            <button type="button" onclick="randomizeMwiPassport()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white text-xs font-black shadow-md shadow-indigo-700/25 border border-indigo-300/40 transition-all transform hover:-translate-y-0.5 cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-dice text-amber-300"></i> Randomize Card
             </button>
             <button type="button" onclick="resetMwiPassportSpecimen()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5">
               <i class="fa-solid fa-rotate-left"></i> Reset Specimen
@@ -22323,10 +22323,34 @@ COD REP DEM CONGO</div>
           <section class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm space-y-4 no-print">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h2 class="text-base font-bold text-slate-900">Malawi Passport Details (PASSPORT / PASSEPORT)</h2>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                  <span>Malawi · Republic of Malawi</span>
+                </span>
+                <h2 class="text-base font-bold text-slate-900 mt-1">Malawi Passport Details (PASSPORT / PASSEPORT)</h2>
                 <p class="text-xs text-slate-500">Edit fields to dynamically update the 2-page spread &amp; ICAO Doc 9303 MRZ</p>
               </div>
-              <span class="px-2.5 py-1 text-[11px] font-semibold rounded-md bg-rose-50 text-rose-700 border border-rose-200">ICAO Doc 9303</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="resetMwiPassportSpecimen()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Reset to Joel Chintokoma reference specimen">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
+                </button>
+              </div>
+            </div>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeMwiPassport()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Malawian passport sample bio-data &amp; TD3 MRZ</div>
+                </div>
+              </button>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
