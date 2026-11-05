@@ -891,6 +891,8 @@
     #pakShowcaseIssueDate, #pakPreviewIssueDate, #pakSingleFrontIssueDate { max-width: 22.5%; overflow: hidden; }
     #pakShowcaseExpiryDate, #pakPreviewExpiryDate, #pakSingleFrontExpiryDate { max-width: 22.5%; overflow: hidden; }
     #pakShowcaseSignature, #pakPreviewSignature, #pakSingleFrontSignature { max-width: 24.0%; overflow: hidden; }
+    #pakBackShowcaseCnic, #pakBackPreviewCnic, #pakSingleBackCnic { max-width: 22.0%; overflow: hidden; }
+    #pakBackShowcaseTrackNum, #pakBackPreviewTrackNum, #pakSingleBackTrackNum { max-width: 18.0%; overflow: hidden; }
 
     /* Seychelles National ID */
     #sycPreviewId { max-width: 50.0%; overflow: hidden; }
@@ -6409,9 +6411,10 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     // ================= ISLAMIC REPUBLIC OF PAKISTAN (NADRA SNIC) CONTROLLER =================
-    const officialPakSpecimenSrc = '/assets/aistudio/1792952087537_9a2ef351.jpg';
+    const officialPakSpecimenSrc = '/assets/aistudio/1793900551692_16340a21.jpg';
+    const officialPakBackSpecimenSrc = '/assets/aistudio/1793900567935_774b9e76.jpg';
     let currentPakPhotoSrc = '/assets/aistudio/pakistan_portrait_exact.jpg';
-    let currentPakGhostSrc = '/assets/aistudio/pakistan_ghost_exact.png';
+    let currentPakGhostSrc = '/assets/aistudio/pakistan_back_portrait_exact.jpg';
 
     function initPakDefaultPhoto() {
       updateSenPreview();
@@ -6420,7 +6423,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
     // Pakistan CNIC State & View Mode
     var pakCurrentViewMode = 'showcase';
-    var pakCurrentAvatarMode = 'reference'; // 'reference' (suit silhouette avatar) or 'custom'
+    var pakCurrentAvatarMode = 'reference'; // 'reference' or 'custom'
     var pakCustomPhotoSrc = '';
 
     function setPakViewMode(mode) {
@@ -6490,7 +6493,7 @@ var $ = window.$ || (id => document.getElementById(id));
         pakCustomPhotoSrc = customUrl;
       }
       updatePakPreview();
-      showToast('Avatar Updated', type === 'reference' ? 'Restored reference photo of Sobia Bashir' : 'Applied custom photo');
+      showToast('Avatar Updated', type === 'reference' ? 'Restored reference photo of Muhammad Shahzad' : 'Applied custom photo');
     }
 
     function resetPakPhoto() {
@@ -6499,37 +6502,37 @@ var $ = window.$ || (id => document.getElementById(id));
       const photoInput = $('pakPhotoInput');
       if (photoInput) photoInput.value = '';
       updatePakPreview();
-      showToast('Photo Reset', 'Restored exact reference photo of Sobia Bashir');
+      showToast('Photo Reset', 'Restored exact reference photo of Muhammad Shahzad');
     }
 
     function updatePakPreview() {
-      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+      const getVal = (id, fallback) => ($(id) && $(id).value !== undefined ? $(id).value.trim() : fallback);
       const setText = (id, val) => {
         const el = $(id);
         if (el) el.textContent = val;
       };
 
-      const name = getVal('pakInputName', 'Sobia Bashir');
-      const nameUrdu = getVal('pakInputNameUrdu', 'ثوبیہ بشیر');
-      const relType = getVal('pakInputRelType', "Husband Name");
-      const relName = getVal('pakInputRelName', 'Muhammad Zaki Mazhar');
-      const relUrdu = getVal('pakInputRelUrdu', 'محمد زکی مظہر');
-      const gender = getVal('pakInputGender', 'F');
-      const countryStay = getVal('pakInputCountryStay', 'Pakistan');
-      const cnic = getVal('pakInputCnic', '35202-9962070-2');
-      const dob = getVal('pakInputDob', '03.07.1991');
-      const issue = getVal('pakInputIssueDate', '06.01.2021');
-      const expiry = getVal('pakInputExpiryDate', '06.01.2031');
-      const trackNum = getVal('pakInputTrackNum', '68413');
-      const sigName = getVal('pakInputSignature', 'Sobia Bashir');
+      const name = getVal('pakInputName', 'Muhammad Shahzad') || 'Muhammad Shahzad';
+      const nameUrdu = getVal('pakInputNameUrdu', 'محمد شہزاد') || 'محمد شہزاد';
+      const relType = getVal('pakInputRelType', 'Father Name') || 'Father Name';
+      const relName = getVal('pakInputRelName', 'Malik Siraj Din') || 'Malik Siraj Din';
+      const relUrdu = getVal('pakInputRelUrdu', 'ملک سراج دین') || 'ملک سراج دین';
+      const gender = getVal('pakInputGender', 'M') || 'M';
+      const countryStay = getVal('pakInputCountryStay', 'Pakistan') || 'Pakistan';
+      const cnic = getVal('pakInputCnic', '38303-4160324-9') || '38303-4160324-9';
+      const dob = getVal('pakInputDob', '08.12.1987') || '08.12.1987';
+      const issue = getVal('pakInputIssueDate', '09.12.2019') || '09.12.2019';
+      const expiry = getVal('pakInputExpiryDate', '09.12.2029') || '09.12.2029';
+      const trackNum = getVal('pakInputTrackNum', '505681029619') || '505681029619';
+      const sigName = getVal('pakInputSignature', 'Muhammad Shahzad') || 'Muhammad Shahzad';
 
-      const presAddr1 = getVal('pakInputPresentAddr1', 'House No. 12, Street 4,');
-      const presAddr2 = getVal('pakInputPresentAddr2', 'Sector G-9/1,');
-      const presAddr3 = getVal('pakInputPresentAddr3', 'Islamabad, Pakistan');
+      const presAddr1 = getVal('pakInputPresentAddr1', 'موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل');
+      const presAddr2 = getVal('pakInputPresentAddr2', 'پپلاں، ضلع میانوالی');
+      const presAddr3 = getVal('pakInputPresentAddr3', '');
 
-      const permAddr1 = getVal('pakInputPermAddr1', 'House No. 12, Street 4,');
-      const permAddr2 = getVal('pakInputPermAddr2', 'Sector G-9/1,');
-      const permAddr3 = getVal('pakInputPermAddr3', 'Islamabad, Pakistan');
+      const permAddr1 = getVal('pakInputPermAddr1', 'مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،');
+      const permAddr2 = getVal('pakInputPermAddr2', 'تحصیل فیروز والا، ضلع شیخوپورہ');
+      const permAddr3 = getVal('pakInputPermAddr3', '');
 
       // Update Front Card Elements (all instances: dual, front, showcase)
       ['pakPreviewName', 'pakShowcaseName', 'pakSingleFrontName'].forEach(id => setText(id, name));
@@ -6548,6 +6551,25 @@ var $ = window.$ || (id => document.getElementById(id));
 
       ['pakPreviewSignature', 'pakShowcaseSignature', 'pakSingleFrontSignature'].forEach(id => setText(id, sigName));
 
+      // Toggle Front Urdu Reference Ink Overlays vs Live Urdu Text
+      const isRefNameUrdu = (nameUrdu === 'محمد شہزاد');
+      document.querySelectorAll('.pak-urdu-name-img').forEach(img => {
+        img.classList.toggle('hidden', !isRefNameUrdu);
+      });
+      ['pakPreviewNameUrdu', 'pakShowcaseNameUrdu', 'pakSingleFrontNameUrdu'].forEach(id => {
+        const el = $(id);
+        if (el) el.classList.toggle('hidden', isRefNameUrdu);
+      });
+
+      const isRefRelUrdu = (relUrdu === 'ملک سراج دین');
+      document.querySelectorAll('.pak-urdu-rel-img').forEach(img => {
+        img.classList.toggle('hidden', !isRefRelUrdu);
+      });
+      ['pakPreviewRelUrdu', 'pakShowcaseRelUrdu', 'pakSingleFrontRelUrdu'].forEach(id => {
+        const el = $(id);
+        if (el) el.classList.toggle('hidden', isRefRelUrdu);
+      });
+
       // Update Back Card Elements (all instances: dual, back, showcase)
       ['pakBackPreviewCnic', 'pakBackShowcaseCnic', 'pakSingleBackCnic'].forEach(id => setText(id, cnic));
       ['pakBackPreviewTrackNum', 'pakBackShowcaseTrackNum', 'pakSingleBackTrackNum'].forEach(id => setText(id, trackNum));
@@ -6560,10 +6582,41 @@ var $ = window.$ || (id => document.getElementById(id));
       ['pakPreviewPermAddr2', 'pakShowcasePermAddr2', 'pakSingleBackPermAddr2'].forEach(id => setText(id, permAddr2));
       ['pakPreviewPermAddr3', 'pakShowcasePermAddr3', 'pakSingleBackPermAddr3'].forEach(id => setText(id, permAddr3));
 
-      // Update Portrait Photos (Exact Reference Photo of Sobia Bashir vs Custom Upload)
+      // Toggle Back Urdu Present & Permanent Address Reference Overlays vs Live Urdu Text
+      const isRefPresAddr = (
+        presAddr1 === 'موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل' &&
+        presAddr2 === 'پپلاں، ضلع میانوالی' &&
+        !presAddr3
+      );
+      document.querySelectorAll('.pak-urdu-pres-img').forEach(img => {
+        img.classList.toggle('hidden', !isRefPresAddr);
+      });
+      document.querySelectorAll('.pak-urdu-pres-text-wrap').forEach(el => {
+        el.classList.toggle('hidden', isRefPresAddr);
+      });
+
+      const isRefPermAddr = (
+        permAddr1 === 'مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،' &&
+        permAddr2 === 'تحصیل فیروز والا، ضلع شیخوپورہ' &&
+        !permAddr3
+      );
+      document.querySelectorAll('.pak-urdu-perm-img').forEach(img => {
+        img.classList.toggle('hidden', !isRefPermAddr);
+      });
+      document.querySelectorAll('.pak-urdu-perm-text-wrap').forEach(el => {
+        el.classList.toggle('hidden', isRefPermAddr);
+      });
+
+      // Update Portrait Photos (Exact Reference Photo of Muhammad Shahzad vs Custom Upload)
       const isCustomPhoto = pakCurrentAvatarMode === 'custom' && pakCustomPhotoSrc;
       document.querySelectorAll('.pak-avatar-img').forEach(img => {
         img.src = isCustomPhoto ? pakCustomPhotoSrc : '/assets/aistudio/pakistan_portrait_exact.jpg';
+        img.classList.toggle('grayscale', Boolean(isCustomPhoto));
+        img.classList.remove('hidden');
+      });
+      document.querySelectorAll('.pak-back-avatar-img').forEach(img => {
+        img.src = isCustomPhoto ? pakCustomPhotoSrc : '/assets/aistudio/pakistan_back_portrait_exact.jpg';
+        img.classList.toggle('grayscale', Boolean(isCustomPhoto));
         img.classList.remove('hidden');
       });
       document.querySelectorAll('.pak-avatar-svg').forEach(svg => {
@@ -6571,12 +6624,12 @@ var $ = window.$ || (id => document.getElementById(id));
       });
 
       // Update Holder's Signature Image vs Custom Typed Name
-      const isCustomSig = sigName && sigName !== 'Signature' && sigName !== 'Sobia Bashir';
+      const isCustomSig = sigName && sigName !== 'Signature' && sigName !== 'Muhammad Shahzad' && sigName !== 'Sobia Bashir';
       document.querySelectorAll('.pak-sig-img').forEach(img => {
         if (isCustomSig) {
           img.classList.add('hidden');
         } else {
-          img.src = '/assets/aistudio/pakistan_signature_exact.png';
+          img.src = '/assets/aistudio/pakistan_signature_transparent.png';
           img.classList.remove('hidden');
         }
       });
@@ -6589,19 +6642,17 @@ var $ = window.$ || (id => document.getElementById(id));
         }
       });
 
-      // Update 3-Line TD-1 MRZ on Back Card
+      // Update MRZ compatibility elements
       updatePakMRZ(cnic, dob, expiry, gender, name, relName);
     }
 
     function updatePakMRZ(cnicRaw, dobRaw, expiryRaw, genderRaw, nameRaw, fatherRaw) {
-      // Line 1: I<PAK000000000<0000000000<<<<<
       const digitsOnly = (cnicRaw || '0000000000000').replace(/[^0-9]/g, '');
       const cnicPadded = (digitsOnly.length >= 9 ? digitsOnly.substring(0, 9) : digitsOnly.padEnd(9, '0'));
       const restDigits = (digitsOnly.length > 9 ? digitsOnly.substring(9) : '0000').padEnd(10, '0');
       let mrz1 = ('I<PAK' + cnicPadded + '<' + restDigits + '<<<<<<<<<<<<<<<<<<').substring(0, 30);
 
-      // Line 2: 00000000000000PAK000000<<<<<<0
-      let bYY = '92', bMM = '08', bDD = '14';
+      let bYY = '87', bMM = '12', bDD = '08';
       if (dobRaw && dobRaw.includes('.')) {
         const parts = dobRaw.split('.');
         if (parts.length === 3) {
@@ -6610,7 +6661,7 @@ var $ = window.$ || (id => document.getElementById(id));
           bYY = parts[2].slice(-2);
         }
       }
-      let eYY = '31', eMM = '05', eDD = '12';
+      let eYY = '29', eMM = '12', eDD = '09';
       if (expiryRaw && expiryRaw.includes('.')) {
         const parts = expiryRaw.split('.');
         if (parts.length === 3) {
@@ -6622,7 +6673,6 @@ var $ = window.$ || (id => document.getElementById(id));
       const g = (genderRaw || 'M').charAt(0).toUpperCase();
       let mrz2 = (bYY + bMM + bDD + '7' + g + eYY + eMM + eDD + '2PAK' + restDigits + '<<<<<<0').substring(0, 30);
 
-      // Line 3: SURNAME << NAME < FATHERS NAME <<<<<<
       const cleanName = (nameRaw || 'FULL NAME').toUpperCase().replace(/[^A-Z]/g, '<');
       const cleanFather = (fatherRaw || 'FULL NAME').toUpperCase().replace(/[^A-Z]/g, '<');
       let mrz3 = (cleanName + '<<' + cleanFather + '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<').substring(0, 30);
@@ -6656,9 +6706,30 @@ var $ = window.$ || (id => document.getElementById(id));
     function randomizePakCard() {
       const pakProfiles = [
         {
+          name: "Muhammad Shahzad",
+          nameUrdu: "محمد شہزاد",
+          relType: "Father Name",
+          relName: "Malik Siraj Din",
+          relUrdu: "ملک سراج دین",
+          gender: "M",
+          countryStay: "Pakistan",
+          dob: "08.12.1987",
+          issue: "09.12.2019",
+          expiry: "09.12.2029",
+          cnic: "38303-4160324-9",
+          trackNum: "505681029619",
+          presAddr1: "موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل",
+          presAddr2: "پپلاں، ضلع میانوالی",
+          presAddr3: "",
+          permAddr1: "مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،",
+          permAddr2: "تحصیل فیروز والا، ضلع شیخوپورہ",
+          permAddr3: "",
+          signature: "Muhammad Shahzad"
+        },
+        {
           name: "Muhammad Usman",
           nameUrdu: "محمد عثمان",
-          relType: "Father's Name",
+          relType: "Father Name",
           relName: "Tariq Mehmood",
           relUrdu: "طارق محمود",
           gender: "M",
@@ -6667,19 +6738,19 @@ var $ = window.$ || (id => document.getElementById(id));
           issue: "12.05.2021",
           expiry: "12.05.2031",
           cnic: "35202-1849204-1",
-          trackNum: "6841392015",
-          presAddr1: "House No. 142, Street 7,",
-          presAddr2: "Sector F-8/3,",
-          presAddr3: "Islamabad, Pakistan",
-          permAddr1: "Village & P.O. Box 24,",
-          permAddr2: "Tehsil Gujar Khan,",
-          permAddr3: "Rawalpindi, Pakistan",
+          trackNum: "684139201548",
+          presAddr1: "موجودہ پتہ: مکان نمبر 142، گلی نمبر 7، سیکٹر ایف-8/3،",
+          presAddr2: "اسلام آباد، پاکستان",
+          presAddr3: "",
+          permAddr1: "مستقل پتہ: ڈاک خانہ خاص، موضع گوجر خان،",
+          permAddr2: "تحصیل گوجر خان، ضلع راولپنڈی",
+          permAddr3: "",
           signature: "M. Usman"
         },
         {
           name: "Fatima Zahra",
           nameUrdu: "فاطمہ زہرا",
-          relType: "Father's Name",
+          relType: "Father Name",
           relName: "Abdul Rehman",
           relUrdu: "عبدالرحمٰن",
           gender: "F",
@@ -6688,19 +6759,19 @@ var $ = window.$ || (id => document.getElementById(id));
           issue: "15.09.2022",
           expiry: "15.09.2032",
           cnic: "42101-7890123-2",
-          trackNum: "5920481729",
-          presAddr1: "Apartment 3B, Block 5,",
-          presAddr2: "Clifton,",
-          presAddr3: "Karachi, Pakistan",
-          permAddr1: "Flat 12, Gulshan-e-Iqbal,",
-          permAddr2: "Block 13-D,",
-          permAddr3: "Karachi, Pakistan",
+          trackNum: "592048172934",
+          presAddr1: "موجودہ پتہ: فلیٹ نمبر 3B، بلاک 5، کلفٹن،",
+          presAddr2: "کراچی، ضلع کراچی جنوبی",
+          presAddr3: "",
+          permAddr1: "مستقل پتہ: مکان نمبر 12، بلاک 13-D، گلشن اقبال،",
+          permAddr2: "کراچی، ضلع کراچی شرقی",
+          permAddr3: "",
           signature: "Fatima"
         },
         {
           name: "Tariq Bashir",
           nameUrdu: "طارق بشیر",
-          relType: "Father's Name",
+          relType: "Father Name",
           relName: "Bashir Ahmed",
           relUrdu: "بشیر احمد",
           gender: "M",
@@ -6709,18 +6780,22 @@ var $ = window.$ || (id => document.getElementById(id));
           issue: "05.06.2020",
           expiry: "05.06.2030",
           cnic: "37405-4819203-3",
-          trackNum: "7192840182",
-          presAddr1: "House 208, Westridge 1,",
-          presAddr2: "Peshawar Road,",
-          presAddr3: "Rawalpindi, Pakistan",
-          permAddr1: "Mohallah Eidgah,",
-          permAddr2: "Main Bazaar,",
-          permAddr3: "Chakwal, Pakistan",
+          trackNum: "719284018265",
+          presAddr1: "موجودہ پتہ: مکان نمبر 208، ویسٹریج 1، پشاور روڈ،",
+          presAddr2: "راولپنڈی، ضلع راولپنڈی",
+          presAddr3: "",
+          permAddr1: "مستقل پتہ: محلہ عید گاہ، مین بازار،",
+          permAddr2: "تحصیل و ضلع چکوال",
+          permAddr3: "",
           signature: "T. Bashir"
         }
       ];
 
-      const p = pakProfiles[Math.floor(Math.random() * pakProfiles.length)];
+      const currentName = $('pakInputName') ? $('pakInputName').value.trim() : '';
+      const filtered = pakProfiles.filter(item => item.name !== currentName);
+      const pool = filtered.length > 0 ? filtered : pakProfiles;
+      const p = pool[Math.floor(Math.random() * pool.length)];
+
       if ($('pakInputName')) $('pakInputName').value = p.name;
       if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = p.nameUrdu;
       if ($('pakInputRelType')) $('pakInputRelType').value = p.relType;
@@ -6742,35 +6817,38 @@ var $ = window.$ || (id => document.getElementById(id));
       if ($('pakInputSignature')) $('pakInputSignature').value = p.signature;
 
       updatePakPreview();
+      if (typeof window.scheduleUniversalAutoFit === 'function') {
+        window.scheduleUniversalAutoFit();
+      }
       showToast('Profile Randomized', `Generated fictional CNIC data for ${p.name}`);
     }
 
     function loadPakPreset(presetKey) {
       if (presetKey === 'reference' || presetKey === 'specimen') {
-        if ($('pakInputName')) $('pakInputName').value = 'Sobia Bashir';
-        if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = 'ثوبیہ بشیر';
-        if ($('pakInputRelType')) $('pakInputRelType').value = "Husband Name";
-        if ($('pakInputRelName')) $('pakInputRelName').value = 'Muhammad Zaki Mazhar';
-        if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = 'محمد زکی مظہر';
-        if ($('pakInputGender')) $('pakInputGender').value = 'F';
+        if ($('pakInputName')) $('pakInputName').value = 'Muhammad Shahzad';
+        if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = 'محمد شہزاد';
+        if ($('pakInputRelType')) $('pakInputRelType').value = 'Father Name';
+        if ($('pakInputRelName')) $('pakInputRelName').value = 'Malik Siraj Din';
+        if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = 'ملک سراج دین';
+        if ($('pakInputGender')) $('pakInputGender').value = 'M';
         if ($('pakInputCountryStay')) $('pakInputCountryStay').value = 'Pakistan';
-        if ($('pakInputCnic')) $('pakInputCnic').value = '35202-9962070-2';
-        if ($('pakInputDob')) $('pakInputDob').value = '03.07.1991';
-        if ($('pakInputIssueDate')) $('pakInputIssueDate').value = '06.01.2021';
-        if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = '06.01.2031';
-        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '68413';
-        if ($('pakInputPresentAddr1')) $('pakInputPresentAddr1').value = 'House No. 12, Street 4,';
-        if ($('pakInputPresentAddr2')) $('pakInputPresentAddr2').value = 'Sector G-9/1,';
-        if ($('pakInputPresentAddr3')) $('pakInputPresentAddr3').value = 'Islamabad, Pakistan';
-        if ($('pakInputPermAddr1')) $('pakInputPermAddr1').value = 'House No. 12, Street 4,';
-        if ($('pakInputPermAddr2')) $('pakInputPermAddr2').value = 'Sector G-9/1,';
-        if ($('pakInputPermAddr3')) $('pakInputPermAddr3').value = 'Islamabad, Pakistan';
-        if ($('pakInputSignature')) $('pakInputSignature').value = 'Sobia Bashir';
+        if ($('pakInputCnic')) $('pakInputCnic').value = '38303-4160324-9';
+        if ($('pakInputDob')) $('pakInputDob').value = '08.12.1987';
+        if ($('pakInputIssueDate')) $('pakInputIssueDate').value = '09.12.2019';
+        if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = '09.12.2029';
+        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '505681029619';
+        if ($('pakInputPresentAddr1')) $('pakInputPresentAddr1').value = 'موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل';
+        if ($('pakInputPresentAddr2')) $('pakInputPresentAddr2').value = 'پپلاں، ضلع میانوالی';
+        if ($('pakInputPresentAddr3')) $('pakInputPresentAddr3').value = '';
+        if ($('pakInputPermAddr1')) $('pakInputPermAddr1').value = 'مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،';
+        if ($('pakInputPermAddr2')) $('pakInputPermAddr2').value = 'تحصیل فیروز والا، ضلع شیخوپورہ';
+        if ($('pakInputPermAddr3')) $('pakInputPermAddr3').value = '';
+        if ($('pakInputSignature')) $('pakInputSignature').value = 'Muhammad Shahzad';
         resetPakPhoto();
       } else if (presetKey === 'usman' || presetKey === 'tariq') {
         if ($('pakInputName')) $('pakInputName').value = 'Muhammad Usman';
         if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = 'محمد عثمان';
-        if ($('pakInputRelType')) $('pakInputRelType').value = "Father's Name";
+        if ($('pakInputRelType')) $('pakInputRelType').value = 'Father Name';
         if ($('pakInputRelName')) $('pakInputRelName').value = 'Tariq Mehmood';
         if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = 'طارق محمود';
         if ($('pakInputGender')) $('pakInputGender').value = 'M';
@@ -6779,18 +6857,18 @@ var $ = window.$ || (id => document.getElementById(id));
         if ($('pakInputDob')) $('pakInputDob').value = '14.08.1992';
         if ($('pakInputIssueDate')) $('pakInputIssueDate').value = '12.05.2021';
         if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = '12.05.2031';
-        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '6841392015';
-        if ($('pakInputPresentAddr1')) $('pakInputPresentAddr1').value = 'House No. 142, Street 7,';
-        if ($('pakInputPresentAddr2')) $('pakInputPresentAddr2').value = 'Sector F-8/3,';
-        if ($('pakInputPresentAddr3')) $('pakInputPresentAddr3').value = 'Islamabad, Pakistan';
-        if ($('pakInputPermAddr1')) $('pakInputPermAddr1').value = 'Village & P.O. Box 24,';
-        if ($('pakInputPermAddr2')) $('pakInputPermAddr2').value = 'Tehsil Gujar Khan,';
-        if ($('pakInputPermAddr3')) $('pakInputPermAddr3').value = 'Rawalpindi, Pakistan';
+        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '684139201548';
+        if ($('pakInputPresentAddr1')) $('pakInputPresentAddr1').value = 'موجودہ پتہ: مکان نمبر 142، گلی نمبر 7، سیکٹر ایف-8/3،';
+        if ($('pakInputPresentAddr2')) $('pakInputPresentAddr2').value = 'اسلام آباد، پاکستان';
+        if ($('pakInputPresentAddr3')) $('pakInputPresentAddr3').value = '';
+        if ($('pakInputPermAddr1')) $('pakInputPermAddr1').value = 'مستقل پتہ: ڈاک خانہ خاص، موضع گوجر خان،';
+        if ($('pakInputPermAddr2')) $('pakInputPermAddr2').value = 'تحصیل گوجر خان، ضلع راولپنڈی';
+        if ($('pakInputPermAddr3')) $('pakInputPermAddr3').value = '';
         if ($('pakInputSignature')) $('pakInputSignature').value = 'M. Usman';
       } else if (presetKey === 'fatima' || presetKey === 'ayesha') {
         if ($('pakInputName')) $('pakInputName').value = 'Fatima Zahra';
         if ($('pakInputNameUrdu')) $('pakInputNameUrdu').value = 'فاطمہ زہرا';
-        if ($('pakInputRelType')) $('pakInputRelType').value = "Father's Name";
+        if ($('pakInputRelType')) $('pakInputRelType').value = 'Father Name';
         if ($('pakInputRelName')) $('pakInputRelName').value = 'Abdul Rehman';
         if ($('pakInputRelUrdu')) $('pakInputRelUrdu').value = 'عبدالرحمٰن';
         if ($('pakInputGender')) $('pakInputGender').value = 'F';
@@ -6799,16 +6877,19 @@ var $ = window.$ || (id => document.getElementById(id));
         if ($('pakInputDob')) $('pakInputDob').value = '23.03.1995';
         if ($('pakInputIssueDate')) $('pakInputIssueDate').value = '15.09.2022';
         if ($('pakInputExpiryDate')) $('pakInputExpiryDate').value = '15.09.2032';
-        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '5920481729';
-        if ($('pakInputPresentAddr1')) $('pakInputPresentAddr1').value = 'Apartment 3B, Block 5,';
-        if ($('pakInputPresentAddr2')) $('pakInputPresentAddr2').value = 'Clifton,';
-        if ($('pakInputPresentAddr3')) $('pakInputPresentAddr3').value = 'Karachi, Pakistan';
-        if ($('pakInputPermAddr1')) $('pakInputPermAddr1').value = 'Flat 12, Gulshan-e-Iqbal,';
-        if ($('pakInputPermAddr2')) $('pakInputPermAddr2').value = 'Block 13-D,';
-        if ($('pakInputPermAddr3')) $('pakInputPermAddr3').value = 'Karachi, Pakistan';
+        if ($('pakInputTrackNum')) $('pakInputTrackNum').value = '592048172934';
+        if ($('pakInputPresentAddr1')) $('pakInputPresentAddr1').value = 'موجودہ پتہ: فلیٹ نمبر 3B، بلاک 5، کلفٹن،';
+        if ($('pakInputPresentAddr2')) $('pakInputPresentAddr2').value = 'کراچی، ضلع کراچی جنوبی';
+        if ($('pakInputPresentAddr3')) $('pakInputPresentAddr3').value = '';
+        if ($('pakInputPermAddr1')) $('pakInputPermAddr1').value = 'مستقل پتہ: مکان نمبر 12، بلاک 13-D، گلشن اقبال،';
+        if ($('pakInputPermAddr2')) $('pakInputPermAddr2').value = 'کراچی، ضلع کراچی شرقی';
+        if ($('pakInputPermAddr3')) $('pakInputPermAddr3').value = '';
         if ($('pakInputSignature')) $('pakInputSignature').value = 'Fatima';
       }
       updatePakPreview();
+      if (typeof window.scheduleUniversalAutoFit === 'function') {
+        window.scheduleUniversalAutoFit();
+      }
       showToast('Preset Loaded', `Loaded preset: ${presetKey}`);
     }
 
@@ -17103,7 +17184,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Fictional Presets:</span>
                 <div class="grid grid-cols-3 gap-2 text-xs">
                   <button type="button" onclick="loadPakPreset('reference')" class="px-2 py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg font-bold text-emerald-900 text-left transition-colors cursor-pointer flex items-center justify-between shadow-2xs">
-                    <span class="truncate">1. Sobia B. (Ref)</span>
+                    <span class="truncate">1. M. Shahzad (Ref)</span>
                     <i class="fa-solid fa-rotate-left text-[10px] text-emerald-600"></i>
                   </button>
                   <button type="button" onclick="loadPakPreset('usman')" class="px-2 py-2 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg font-bold text-slate-800 hover:text-emerald-800 text-left transition-colors cursor-pointer flex items-center justify-between">
@@ -17145,30 +17226,31 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label for="pakInputName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NAME (ENGLISH)</label>
-                    <input id="pakInputName" type="text" value="Sobia Bashir" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white">
+                    <input id="pakInputName" type="text" value="Muhammad Shahzad" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-sm text-slate-900 bg-white">
                   </div>
                   <div>
                     <label for="pakInputNameUrdu" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">NAME (URDU / نام)</label>
-                    <input id="pakInputNameUrdu" type="text" value="ثوبیہ بشیر" dir="rtl" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-urdu text-base text-slate-900 bg-white text-right">
+                    <input id="pakInputNameUrdu" type="text" value="محمد شہزاد" dir="rtl" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-urdu text-base text-slate-900 bg-white text-right">
                   </div>
                 </div>
 
-                <!-- Relation Type (Father's Name / Husband's Name) -->
+                <!-- Relation Type (Father Name / Husband Name) -->
                 <div class="grid grid-cols-3 gap-2">
                   <div>
                     <label for="pakInputRelType" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">RELATION TYPE</label>
                     <select id="pakInputRelType" onchange="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs text-slate-900 bg-white">
-                      <option value="Husband Name" selected>Husband Name</option>
+                      <option value="Father Name" selected>Father Name</option>
                       <option value="Father's Name">Father's Name</option>
+                      <option value="Husband Name">Husband Name</option>
                     </select>
                   </div>
                   <div>
                     <label for="pakInputRelName" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">RELATIVE NAME</label>
-                    <input id="pakInputRelName" type="text" value="Muhammad Zaki Mazhar" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs text-slate-900 bg-white">
+                    <input id="pakInputRelName" type="text" value="Malik Siraj Din" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs text-slate-900 bg-white">
                   </div>
                   <div>
                     <label for="pakInputRelUrdu" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">RELATIVE (URDU)</label>
-                    <input id="pakInputRelUrdu" type="text" value="محمد زکی مظہر" dir="rtl" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-urdu text-sm text-slate-900 bg-white text-right">
+                    <input id="pakInputRelUrdu" type="text" value="ملک سراج دین" dir="rtl" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-urdu text-sm text-slate-900 bg-white text-right">
                   </div>
                 </div>
 
@@ -17177,8 +17259,8 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   <div>
                     <label for="pakInputGender" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">GENDER</label>
                     <select id="pakInputGender" onchange="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs bg-white">
-                      <option value="F" selected>F (Female)</option>
-                      <option value="M">M (Male)</option>
+                      <option value="M" selected>M (Male)</option>
+                      <option value="F">F (Female)</option>
                       <option value="X">X (Other)</option>
                     </select>
                   </div>
@@ -17197,51 +17279,51 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       <span>Generate CNIC</span>
                     </button>
                   </div>
-                  <input id="pakInputCnic" type="text" value="35202-9962070-2" maxlength="15" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-extrabold text-sm tracking-wider bg-white">
+                  <input id="pakInputCnic" type="text" value="38303-4160324-9" maxlength="15" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-extrabold text-sm tracking-wider bg-white">
                 </div>
 
                 <!-- Date of Birth, Date of Issue, Date of Expiry -->
                 <div class="grid grid-cols-3 gap-2">
                   <div>
                     <label for="pakInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF BIRTH</label>
-                    <input id="pakInputDob" type="text" value="03.07.1991" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="pakInputDob" type="text" value="08.12.1987" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label for="pakInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF ISSUE</label>
-                    <input id="pakInputIssueDate" type="text" value="06.01.2021" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="pakInputIssueDate" type="text" value="09.12.2019" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label for="pakInputExpiryDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">DATE OF EXPIRY</label>
-                    <input id="pakInputExpiryDate" type="text" value="06.01.2031" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="pakInputExpiryDate" type="text" value="09.12.2029" oninput="updatePakPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                 </div>
 
-                <!-- Family / Tracking Number -->
+                <!-- Family / Tracking Number (Back QR Code Serial) -->
                 <div>
-                  <label for="pakInputTrackNum" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">FAMILY / TRACKING CODE (BACK)</label>
-                  <input id="pakInputTrackNum" type="text" value="68413" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <label for="pakInputTrackNum" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">QR SERIAL / TRACKING CODE (BACK)</label>
+                  <input id="pakInputTrackNum" type="text" value="505681029619" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
 
-                <!-- Present Address (Back Card) -->
+                <!-- Present Address (Back Card - Urdu) -->
                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">PRESENT ADDRESS (BACK):</span>
-                  <input id="pakInputPresentAddr1" type="text" value="House No. 12, Street 4," oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded text-xs bg-white" placeholder="Line 1 (House number)">
-                  <input id="pakInputPresentAddr2" type="text" value="Sector G-9/1," oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded text-xs bg-white" placeholder="Line 2 (Street name)">
-                  <input id="pakInputPresentAddr3" type="text" value="Islamabad, Pakistan" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded text-xs bg-white" placeholder="Line 3 (City, Country)">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">PRESENT ADDRESS / موجودہ پتہ (BACK):</span>
+                  <input id="pakInputPresentAddr1" type="text" dir="rtl" value="موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded font-urdu text-xs bg-white text-right" placeholder="موجودہ پتہ لائن 1">
+                  <input id="pakInputPresentAddr2" type="text" dir="rtl" value="پپلاں، ضلع میانوالی" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded font-urdu text-xs bg-white text-right" placeholder="موجودہ پتہ لائن 2">
+                  <input id="pakInputPresentAddr3" type="text" dir="rtl" value="" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded font-urdu text-xs bg-white text-right" placeholder="موجودہ پتہ لائن 3 (اختیاری)">
                 </div>
 
-                <!-- Permanent Address (Back Card) -->
+                <!-- Permanent Address (Back Card - Urdu) -->
                 <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">PERMANENT ADDRESS (BACK):</span>
-                  <input id="pakInputPermAddr1" type="text" value="House No. 12, Street 4," oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded text-xs bg-white" placeholder="Line 1 (House number)">
-                  <input id="pakInputPermAddr2" type="text" value="Sector G-9/1," oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded text-xs bg-white" placeholder="Line 2 (Street name)">
-                  <input id="pakInputPermAddr3" type="text" value="Islamabad, Pakistan" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded text-xs bg-white" placeholder="Line 3 (City, Country)">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">PERMANENT ADDRESS / مستقل پتہ (BACK):</span>
+                  <input id="pakInputPermAddr1" type="text" dir="rtl" value="مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded font-urdu text-xs bg-white text-right" placeholder="مستقل پتہ لائن 1">
+                  <input id="pakInputPermAddr2" type="text" dir="rtl" value="تحصیل فیروز والا، ضلع شیخوپورہ" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded font-urdu text-xs bg-white text-right" placeholder="مستقل پتہ لائن 2">
+                  <input id="pakInputPermAddr3" type="text" dir="rtl" value="" oninput="updatePakPreview()" class="w-full px-2 py-1 border rounded font-urdu text-xs bg-white text-right" placeholder="مستقل پتہ لائن 3 (اختیاری)">
                 </div>
 
                 <!-- Signature Text -->
                 <div>
                   <label for="pakInputSignature" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">HOLDER'S SIGNATURE</label>
-                  <input id="pakInputSignature" type="text" value="Sobia Bashir" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-serif italic font-bold text-sm bg-white">
+                  <input id="pakInputSignature" type="text" value="Muhammad Shahzad" oninput="updatePakPreview()" class="w-full px-2.5 py-1.5 border rounded font-serif italic font-bold text-sm bg-white">
                 </div>
 
                 <!-- Copy Credential Record -->
@@ -17274,13 +17356,12 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                   </div>
                 </div>
 
-                <!-- ================= 1. SHOWCASE PRESENTATION CANVAS (EXACT 1:1 REPLICA OF UPLOADED SCREENSHOT) ================= -->
+                <!-- ================= 1. SHOWCASE PRESENTATION CANVAS (EXACT 1:1 REPLICA OF UPLOADED REFERENCE) ================= -->
                 <div id="pak-view-showcase" class="block w-full">
                   <div id="pak-showcase-canvas-inner" class="pakistan-showcase-canvas w-full rounded-3xl p-5 sm:p-7 md:p-8 flex flex-col items-center justify-center space-y-6 sm:space-y-7 shadow-xl border border-stone-400/40 select-none overflow-hidden relative">
                     
-                    <!-- Ambient Header matching screenshot -->
+                    <!-- Ambient Header -->
                     <div class="w-full flex items-center gap-3.5 pl-1 select-none">
-                      <!-- Pakistan Flag Badge (White border frame with crescent & star) -->
                       <div class="w-10 sm:w-12 h-6 sm:h-7.5 rounded-xs overflow-hidden border border-white/60 shadow-sm shrink-0">
                         <svg viewBox="0 0 60 40" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                           <rect width="60" height="40" fill="#00401a"/>
@@ -17296,176 +17377,95 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                       </div>
                     </div>
 
-                    <!-- SHOWCASE FRONT CARD WITH ANGLED LONG SHADOW (EXACT 1:1 REPLICA OF REFERENCE) -->
-                    <article id="pak-showcase-front" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-cnic-cast border border-stone-400/50 overflow-hidden text-[#121814] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
-                      <!-- 1:1 Clean Reference Background Plate (Preserves Emblem, Header, Flag, Chip, Guilloche, Dotted Microtext Dividers & Static Labels) -->
+                    <!-- SHOWCASE FRONT CARD (EXACT 1:1 REPLICA OF FRONT REFERENCE) -->
+                    <article id="pak-showcase-front" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-cnic-cast border border-stone-400/50 overflow-hidden text-[#1f2622] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                      <!-- 1:1 Clean Reference Background Plate -->
                       <img src="/assets/aistudio/pakistan_cnic_front_plate.png" alt="Pakistan National Identity Card Front Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                      <!-- Bearer Portrait (Exact pixel-aligned overlay at x=479, y=120, w=170, h=195 on 686x421 frame) -->
-                      <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.83%; top: 28.50%; width: 24.78%; height: 46.32%;">
-                        <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover grayscale contrast-105">
+                      <!-- Bearer Portrait (Exact pixel-aligned overlay at x=480, y=115, w=165, h=195 on 686x421 frame) -->
+                      <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.97%; top: 27.32%; width: 24.05%; height: 46.32%;">
+                        <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
                         <svg viewBox="0 0 100 120" class="pak-avatar-svg hidden w-full h-full"></svg>
                       </div>
 
-                      <!-- English Name (Sobia Bashir) -->
-                      <div id="pakShowcaseName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 23.28%; font-size: 2.95cqw;">Sobia Bashir</div>
+                      <!-- English Name (Muhammad Shahzad) -->
+                      <div id="pakShowcaseName" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[-0.01em]" style="left: 28.86%; top: 23.75%; font-size: 2.82cqw;">Muhammad Shahzad</div>
 
-                      <!-- Urdu Name (ثوبیہ بشیر) -->
-                      <div id="pakShowcaseNameUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.69%; top: 30.65%; font-size: 3.15cqw;">ثوبیہ بشیر</div>
+                      <!-- Urdu Name (محمد شہزاد - Reference Calligraphic Ink Overlay + Live Editable Fallback) -->
+                      <img src="/assets/aistudio/pak_urdu_name_ref.png" alt="Urdu Name" class="pak-urdu-name-img absolute z-20 object-contain pointer-events-none" style="left: 55.69%; top: 29.93%; width: 11.95%; height: 8.31%;">
+                      <div id="pakShowcaseNameUrdu" class="font-urdu hidden absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 33.24%; top: 29.80%; font-size: 2.75cqw;">محمد شہزاد</div>
 
-                      <!-- Relative Label (Husband Name / Father's Name) -->
-                      <div id="pakShowcaseRelLabel" class="absolute z-20 font-bold text-[#161d18] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 26.82%; top: 40.86%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Husband Name</div>
+                      <!-- Relative Label (Father Name) -->
+                      <div id="pakShowcaseRelLabel" class="absolute z-20 font-bold text-[#222925] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.70%; top: 39.90%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Father Name</div>
 
-                      <!-- Relative English Name (Muhammad Zaki Mazhar) -->
-                      <div id="pakShowcaseRelName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 44.18%; font-size: 2.92cqw;">Muhammad Zaki Mazhar</div>
+                      <!-- Relative English Name (Malik Siraj Din) -->
+                      <div id="pakShowcaseRelName" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[-0.01em]" style="left: 28.86%; top: 44.18%; font-size: 2.82cqw;">Malik Siraj Din</div>
 
-                      <!-- Relative Urdu Name (محمد زکی مظہر) -->
-                      <div id="pakShowcaseRelUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.40%; top: 50.35%; font-size: 3.15cqw;">محمد زکی مظہر</div>
+                      <!-- Relative Urdu Name (ملک سراج دین - Reference Calligraphic Ink Overlay + Live Editable Fallback) -->
+                      <img src="/assets/aistudio/pak_urdu_rel_ref.png" alt="Relative Urdu Name" class="pak-urdu-rel-img absolute z-20 object-contain pointer-events-none" style="left: 48.40%; top: 49.41%; width: 19.24%; height: 8.55%;">
+                      <div id="pakShowcaseRelUrdu" class="font-urdu hidden absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 33.24%; top: 49.50%; font-size: 2.75cqw;">ملک سراج دین</div>
 
-                      <!-- Gender Value (F) -->
-                      <div id="pakShowcaseGender" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 28.13%; top: 66.03%; font-size: 2.72cqw;">F</div>
+                      <!-- Gender Value (M) -->
+                      <div id="pakShowcaseGender" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none" style="left: 28.86%; top: 64.61%; font-size: 2.75cqw;">M</div>
 
                       <!-- Country of Stay Value (Pakistan) -->
-                      <div id="pakShowcaseCountryStay" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 37.76%; top: 66.03%; font-size: 2.72cqw;">Pakistan</div>
+                      <div id="pakShowcaseCountryStay" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none" style="left: 38.48%; top: 64.61%; font-size: 2.75cqw;">Pakistan</div>
 
-                      <!-- Identity Number Value (35202-9962070-2) -->
-                      <div id="pakShowcaseCnic" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">35202-9962070-2</div>
+                      <!-- Identity Number Value (38303-4160324-9) -->
+                      <div id="pakShowcaseCnic" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 28.72%; top: 76.96%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">38303-4160324-9</div>
 
-                      <!-- Date of Birth Value (03.07.1991) -->
-                      <div id="pakShowcaseDob" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 51.90%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">03.07.1991</div>
+                      <!-- Date of Birth Value (08.12.1987) -->
+                      <div id="pakShowcaseDob" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 52.48%; top: 76.96%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">08.12.1987</div>
 
-                      <!-- Date of Issue Value (06.01.2021) -->
-                      <div id="pakShowcaseIssueDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2021</div>
+                      <!-- Date of Issue Value (09.12.2019) -->
+                      <div id="pakShowcaseIssueDate" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 28.72%; top: 88.12%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">09.12.2019</div>
 
-                      <!-- Date of Expiry Value (06.01.2031) -->
-                      <div id="pakShowcaseExpiryDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 52.04%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2031</div>
+                      <!-- Date of Expiry Value (09.12.2029) -->
+                      <div id="pakShowcaseExpiryDate" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 52.62%; top: 88.12%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">09.12.2029</div>
 
                       <!-- Holder's Signature (Exact transparent reference stroke overlay or custom signature text) -->
-                      <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 73.76%; top: 75.06%; width: 13.99%; height: 14.73%;">
-                      <div id="pakShowcaseSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#121814] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Sobia Bashir</div>
+                      <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 74.05%; top: 74.11%; width: 17.20%; height: 14.73%;">
+                      <div id="pakShowcaseSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#1f2622] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Muhammad Shahzad</div>
                     </article>
 
-                    <!-- SHOWCASE BACK CARD WITH ANGLED LONG SHADOW -->
-                    <article id="pak-showcase-back" class="pakistan-cnic-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-cnic-cast border border-emerald-900/30 overflow-hidden text-slate-900 flex flex-col justify-between">
-                      <!-- Center Background Crescent/Star Watermark -->
-                      <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none opacity-[0.07]">
-                        <svg viewBox="0 0 100 100" class="w-32 h-32" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="50" cy="50" r="45" fill="#166534"/>
-                          <circle cx="56" cy="45" r="40" fill="#eef6ed"/>
-                          <polygon points="60,30 63,38 72,38 65,44 68,52 60,47 52,52 55,44 48,38 57,38" fill="#166534"/>
-                        </svg>
+                    <!-- SHOWCASE BACK CARD (EXACT 1:1 REPLICA OF BACK REFERENCE) -->
+                    <article id="pak-showcase-back" class="pakistan-cnic-back-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-cnic-cast border border-stone-400/50 overflow-hidden text-[#1f2622] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                      <!-- 1:1 Clean Back Reference Plate (Preserves Guilloche, Microtext Divider, Registrar General Signature, 2D QR Code & Bottom Urdu Return Inscription) -->
+                      <img src="/assets/aistudio/pakistan_cnic_back_plate.png" alt="Pakistan National Identity Card Back Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                      <!-- Top-Left Small Bearer Portrait (x=42, y=41, w=41, h=52 on 686x421) -->
+                      <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 6.12%; top: 9.74%; width: 5.98%; height: 12.35%;">
+                        <img src="/assets/aistudio/pakistan_back_portrait_exact.jpg" alt="Back Portrait" class="pak-back-avatar-img w-full h-full object-cover">
                       </div>
 
-                      <!-- Upper Back Content: Address Block (Left) & QR Code / CNIC (Right) -->
-                      <div class="relative z-10 p-3 sm:p-4 pb-1 flex items-start justify-between gap-3">
-                        
-                        <!-- Left: Small Avatar + Present/Permanent Address + Registrar Signature -->
-                        <div class="flex-1 min-w-0 flex items-start gap-2">
-                          <!-- Small Avatar Silhouette on Back -->
-                          <div class="w-6 sm:w-7 h-7 sm:h-8.5 rounded-sm overflow-hidden border border-emerald-900/20 bg-white/70 shadow-2xs shrink-0 mt-0.5">
-                            <svg viewBox="0 0 100 125" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                              <rect width="100" height="125" fill="#f8faf8"/>
-                              <circle cx="50" cy="42" r="22" fill="#9ca3af"/>
-                              <rect x="44" y="60" width="12" height="15" fill="#9ca3af"/>
-                              <path d="M 12 125 L 12 100 Q 14 74 38 72 L 44 86 L 50 102 L 56 86 L 62 72 Q 86 74 88 100 L 88 125 Z" fill="#374151"/>
-                              <polygon points="38,72 50,102 62,72 57,72 50,88 43,72" fill="#ffffff"/>
-                              <polygon points="48,74 52,74 54,98 50,118 46,98" fill="#111827"/>
-                            </svg>
-                          </div>
-
-                          <!-- Addresses -->
-                          <div class="flex-1 min-w-0 text-[7px] sm:text-[8.5px] leading-tight space-y-1">
-                            <div>
-                              <div class="font-bold text-[#1b4332]">Present Address:</div>
-                              <div id="pakShowcasePresentAddr1" class="text-slate-700 truncate">House number,</div>
-                              <div id="pakShowcasePresentAddr2" class="text-slate-700 truncate">Name of a street,</div>
-                              <div id="pakShowcasePresentAddr3" class="text-slate-700 truncate">City, Country</div>
-                            </div>
-                            <div>
-                              <div class="font-bold text-[#1b4332]">Permanent Address:</div>
-                              <div id="pakShowcasePermAddr1" class="text-slate-700 truncate">House number,</div>
-                              <div id="pakShowcasePermAddr2" class="text-slate-700 truncate">Name of a street,</div>
-                              <div id="pakShowcasePermAddr3" class="text-slate-700 truncate">City, Country</div>
-                            </div>
-
-                            <!-- Signature of Registrar -->
-                            <div class="pt-1 flex items-baseline gap-2">
-                              <div>
-                                <div class="font-serif italic font-bold text-[10px] sm:text-xs text-slate-800 leading-none">Signature</div>
-                                <div class="text-[5.5px] sm:text-[6.5px] text-[#406852] font-semibold mt-0.5">Registrar General of Pakistan</div>
-                              </div>
-                              <div class="text-[6.5px] text-slate-500">Name:</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <!-- Right: Identity Number, 2D QR Code & Tracking/Family Code -->
-                        <div class="flex flex-col items-end shrink-0 w-20 sm:w-24">
-                          <div id="pakBackShowcaseCnic" class="font-mono-code font-bold text-[8px] sm:text-[9.5px] text-slate-900 leading-none mb-1">
-                            00000-0000000-0
-                          </div>
-                          <!-- 2D QR Code Container -->
-                          <div class="w-14 sm:w-16 h-14 sm:h-16 bg-white p-1 rounded-sm border border-emerald-950/30 shadow-2xs flex items-center justify-center">
-                            <!-- Crisp SVG QR Code -->
-                            <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                              <rect width="100" height="100" fill="#ffffff"/>
-                              <!-- Top-Left Finder -->
-                              <rect x="5" y="5" width="28" height="28" fill="#1b4332"/>
-                              <rect x="9" y="9" width="20" height="20" fill="#ffffff"/>
-                              <rect x="13" y="13" width="12" height="12" fill="#1b4332"/>
-                              <!-- Top-Right Finder -->
-                              <rect x="67" y="5" width="28" height="28" fill="#1b4332"/>
-                              <rect x="71" y="9" width="20" height="20" fill="#ffffff"/>
-                              <rect x="75" y="13" width="12" height="12" fill="#1b4332"/>
-                              <!-- Bottom-Left Finder -->
-                              <rect x="5" y="67" width="28" height="28" fill="#1b4332"/>
-                              <rect x="9" y="71" width="20" height="20" fill="#ffffff"/>
-                              <rect x="13" y="75" width="12" height="12" fill="#1b4332"/>
-                              <!-- Data Matrix Pattern Modules -->
-                              <rect x="38" y="8" width="5" height="5" fill="#1b4332"/>
-                              <rect x="48" y="8" width="5" height="5" fill="#1b4332"/>
-                              <rect x="58" y="8" width="5" height="5" fill="#1b4332"/>
-                              <rect x="38" y="18" width="5" height="5" fill="#1b4332"/>
-                              <rect x="48" y="24" width="5" height="5" fill="#1b4332"/>
-                              <rect x="58" y="18" width="5" height="5" fill="#1b4332"/>
-                              <rect x="8" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="18" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="28" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="38" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="48" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="58" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="68" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="78" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="88" y="38" width="5" height="5" fill="#1b4332"/>
-                              <rect x="38" y="48" width="5" height="5" fill="#1b4332"/>
-                              <rect x="53" y="48" width="8" height="8" fill="#1b4332"/>
-                              <rect x="68" y="48" width="5" height="5" fill="#1b4332"/>
-                              <rect x="83" y="48" width="5" height="5" fill="#1b4332"/>
-                              <rect x="38" y="63" width="5" height="5" fill="#1b4332"/>
-                              <rect x="48" y="68" width="5" height="5" fill="#1b4332"/>
-                              <rect x="63" y="63" width="5" height="5" fill="#1b4332"/>
-                              <rect x="78" y="68" width="5" height="5" fill="#1b4332"/>
-                              <rect x="38" y="78" width="5" height="5" fill="#1b4332"/>
-                              <rect x="48" y="83" width="5" height="5" fill="#1b4332"/>
-                              <rect x="68" y="78" width="5" height="5" fill="#1b4332"/>
-                              <rect x="83" y="83" width="5" height="5" fill="#1b4332"/>
-                            </svg>
-                          </div>
-                          <!-- Tracking / Family Number -->
-                          <div id="pakBackShowcaseTrackNum" class="font-mono-code text-[6.5px] sm:text-[7.5px] text-slate-600 mt-1">
-                            0000000000
-                          </div>
-                        </div>
-
+                      <!-- Present Address in Urdu (Reference Calligraphic Overlay + Live Editable Urdu Text) -->
+                      <img src="/assets/aistudio/pak_urdu_pres_addr_ref.png" alt="Present Address Urdu" class="pak-urdu-pres-img absolute z-20 object-contain pointer-events-none" style="left: 17.49%; top: 2.85%; width: 55.10%; height: 19.95%;">
+                      <div class="pak-urdu-pres-text-wrap hidden absolute z-20 font-urdu font-bold text-[#1f2622] text-right leading-[1.65]" dir="rtl" style="left: 17.50%; top: 4.20%; width: 55.00%; font-size: 2.25cqw;">
+                        <div id="pakShowcasePresentAddr1" class="truncate">موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل</div>
+                        <div id="pakShowcasePresentAddr2" class="truncate text-center">پپلاں، ضلع میانوالی</div>
+                        <div id="pakShowcasePresentAddr3" class="truncate text-center"></div>
                       </div>
 
-                      <!-- Bottom: Machine Readable Zone (MRZ TD-1 Format) on Pale Cream Band -->
-                      <div class="relative z-10 w-full bg-[#f6f7ef] border-t border-emerald-900/20 px-3 py-1.5 font-mono-code text-[7px] sm:text-[8px] md:text-[9.5px] leading-tight tracking-[0.08em] sm:tracking-[0.14em] text-slate-800">
-                        <div id="pakShowcaseMrzLine1" class="truncate">I&lt;PAK000000000&lt;0000000000&lt;&lt;&lt;&lt;&lt;</div>
-                        <div id="pakShowcaseMrzLine2" class="truncate">00000000000000PAK000000&lt;&lt;&lt;&lt;&lt;&lt;0</div>
-                        <div id="pakShowcaseMrzLine3" class="truncate">SURNAME &lt;&lt; NAME &lt; FATHERS NAME &lt;&lt;&lt;&lt;&lt;&lt;</div>
+                      <!-- Permanent Address in Urdu (Reference Calligraphic Overlay + Live Editable Urdu Text) -->
+                      <img src="/assets/aistudio/pak_urdu_perm_addr_ref.png" alt="Permanent Address Urdu" class="pak-urdu-perm-img absolute z-20 object-contain pointer-events-none" style="left: 17.49%; top: 31.35%; width: 54.66%; height: 17.34%;">
+                      <div class="pak-urdu-perm-text-wrap hidden absolute z-20 font-urdu font-bold text-[#1f2622] text-right leading-[1.65]" dir="rtl" style="left: 17.50%; top: 32.50%; width: 54.50%; font-size: 2.25cqw;">
+                        <div id="pakShowcasePermAddr1" class="truncate">مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،</div>
+                        <div id="pakShowcasePermAddr2" class="truncate text-center">تحصیل فیروز والا، ضلع شیخوپورہ</div>
+                        <div id="pakShowcasePermAddr3" class="truncate text-center"></div>
                       </div>
 
+                      <!-- Top-Right Identity Number above QR Code (38303-4160324-9) -->
+                      <div id="pakBackShowcaseCnic" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 75.36%; top: 6.18%; font-size: 2.45cqw; font-variant-numeric: tabular-nums;">38303-4160324-9</div>
+
+                      <!-- Bottom-Right Serial / Tracking Number below QR Code (505681029619) -->
+                      <div id="pakBackShowcaseTrackNum" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 78.28%; top: 47.98%; font-size: 2.02cqw; font-variant-numeric: tabular-nums;">505681029619</div>
+
+                      <!-- Hidden MRZ compatibility nodes -->
+                      <div class="hidden">
+                        <span id="pakShowcaseMrzLine1"></span>
+                        <span id="pakShowcaseMrzLine2"></span>
+                        <span id="pakShowcaseMrzLine3"></span>
+                      </div>
                     </article>
 
                   </div>
@@ -17482,32 +17482,34 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                           <i class="fa-solid fa-download"></i> Download Front
                         </button>
                       </div>
-                      <article id="pakistan-id-card" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-xl border border-stone-400/50 overflow-hidden text-[#121814] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                      <article id="pakistan-id-card" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-xl border border-stone-400/50 overflow-hidden text-[#1f2622] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
                         <img src="/assets/aistudio/pakistan_cnic_front_plate.png" alt="Pakistan National Identity Card Front Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                        <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.83%; top: 28.50%; width: 24.78%; height: 46.32%;">
-                          <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover grayscale contrast-105">
+                        <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.97%; top: 27.32%; width: 24.05%; height: 46.32%;">
+                          <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
                           <svg viewBox="0 0 100 120" class="pak-avatar-svg hidden w-full h-full"></svg>
                         </div>
 
-                        <div id="pakPreviewName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 23.28%; font-size: 2.95cqw;">Sobia Bashir</div>
-                        <div id="pakPreviewNameUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.69%; top: 30.65%; font-size: 3.15cqw;">ثوبیہ بشیر</div>
+                        <div id="pakPreviewName" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[-0.01em]" style="left: 28.86%; top: 23.75%; font-size: 2.82cqw;">Muhammad Shahzad</div>
+                        <img src="/assets/aistudio/pak_urdu_name_ref.png" alt="Urdu Name" class="pak-urdu-name-img absolute z-20 object-contain pointer-events-none" style="left: 55.69%; top: 29.93%; width: 11.95%; height: 8.31%;">
+                        <div id="pakPreviewNameUrdu" class="font-urdu hidden absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 33.24%; top: 29.80%; font-size: 2.75cqw;">محمد شہزاد</div>
 
-                        <div id="pakPreviewRelLabel" class="absolute z-20 font-bold text-[#161d18] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 26.82%; top: 40.86%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Husband Name</div>
-                        <div id="pakPreviewRelName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 44.18%; font-size: 2.92cqw;">Muhammad Zaki Mazhar</div>
-                        <div id="pakPreviewRelUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.40%; top: 50.35%; font-size: 3.15cqw;">محمد زکی مظہر</div>
+                        <div id="pakPreviewRelLabel" class="absolute z-20 font-bold text-[#222925] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.70%; top: 39.90%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Father Name</div>
+                        <div id="pakPreviewRelName" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[-0.01em]" style="left: 28.86%; top: 44.18%; font-size: 2.82cqw;">Malik Siraj Din</div>
+                        <img src="/assets/aistudio/pak_urdu_rel_ref.png" alt="Relative Urdu Name" class="pak-urdu-rel-img absolute z-20 object-contain pointer-events-none" style="left: 48.40%; top: 49.41%; width: 19.24%; height: 8.55%;">
+                        <div id="pakPreviewRelUrdu" class="font-urdu hidden absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 33.24%; top: 49.50%; font-size: 2.75cqw;">ملک سراج دین</div>
 
-                        <div id="pakPreviewGender" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 28.13%; top: 66.03%; font-size: 2.72cqw;">F</div>
-                        <div id="pakPreviewCountryStay" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 37.76%; top: 66.03%; font-size: 2.72cqw;">Pakistan</div>
+                        <div id="pakPreviewGender" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none" style="left: 28.86%; top: 64.61%; font-size: 2.75cqw;">M</div>
+                        <div id="pakPreviewCountryStay" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none" style="left: 38.48%; top: 64.61%; font-size: 2.75cqw;">Pakistan</div>
 
-                        <div id="pakPreviewCnic" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">35202-9962070-2</div>
-                        <div id="pakPreviewDob" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 51.90%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">03.07.1991</div>
+                        <div id="pakPreviewCnic" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 28.72%; top: 76.96%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">38303-4160324-9</div>
+                        <div id="pakPreviewDob" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 52.48%; top: 76.96%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">08.12.1987</div>
 
-                        <div id="pakPreviewIssueDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2021</div>
-                        <div id="pakPreviewExpiryDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 52.04%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2031</div>
+                        <div id="pakPreviewIssueDate" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 28.72%; top: 88.12%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">09.12.2019</div>
+                        <div id="pakPreviewExpiryDate" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 52.62%; top: 88.12%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">09.12.2029</div>
 
-                        <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 73.76%; top: 75.06%; width: 13.99%; height: 14.73%;">
-                        <div id="pakPreviewSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#121814] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Sobia Bashir</div>
+                        <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 74.05%; top: 74.11%; width: 17.20%; height: 14.73%;">
+                        <div id="pakPreviewSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#1f2622] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Muhammad Shahzad</div>
                       </article>
                     </div>
 
@@ -17519,101 +17521,34 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                           <i class="fa-solid fa-download"></i> Download Back
                         </button>
                       </div>
-                      <article id="pakistan-id-back" class="pakistan-cnic-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-xl border border-emerald-900/30 overflow-hidden text-slate-900 flex flex-col justify-between">
-                        <!-- Upper Back Content -->
-                        <div class="relative z-10 p-3 sm:p-4 pb-1 flex items-start justify-between gap-3">
-                          <div class="flex-1 min-w-0 flex items-start gap-2">
-                            <div class="w-6 sm:w-7 h-7 sm:h-8.5 rounded-sm overflow-hidden border border-emerald-900/20 bg-white/70 shadow-2xs shrink-0 mt-0.5">
-                              <svg viewBox="0 0 100 125" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="100" height="125" fill="#f8faf8"/>
-                                <circle cx="50" cy="42" r="22" fill="#9ca3af"/>
-                                <rect x="44" y="60" width="12" height="15" fill="#9ca3af"/>
-                                <path d="M 12 125 L 12 100 Q 14 74 38 72 L 44 86 L 50 102 L 56 86 L 62 72 Q 86 74 88 100 L 88 125 Z" fill="#374151"/>
-                                <polygon points="38,72 50,102 62,72 57,72 50,88 43,72" fill="#ffffff"/>
-                                <polygon points="48,74 52,74 54,98 50,118 46,98" fill="#111827"/>
-                              </svg>
-                            </div>
+                      <article id="pakistan-id-back" class="pakistan-cnic-back-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-xl border border-stone-400/50 overflow-hidden text-[#1f2622] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                        <img src="/assets/aistudio/pakistan_cnic_back_plate.png" alt="Pakistan National Identity Card Back Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                            <div class="flex-1 min-w-0 text-[7px] sm:text-[8.5px] leading-tight space-y-1">
-                              <div>
-                                <div class="font-bold text-[#1b4332]">Present Address:</div>
-                                <div id="pakPreviewPresentAddr1" class="text-slate-700 truncate">House number,</div>
-                                <div id="pakPreviewPresentAddr2" class="text-slate-700 truncate">Name of a street,</div>
-                                <div id="pakPreviewPresentAddr3" class="text-slate-700 truncate">City, Country</div>
-                              </div>
-                              <div>
-                                <div class="font-bold text-[#1b4332]">Permanent Address:</div>
-                                <div id="pakPreviewPermAddr1" class="text-slate-700 truncate">House number,</div>
-                                <div id="pakPreviewPermAddr2" class="text-slate-700 truncate">Name of a street,</div>
-                                <div id="pakPreviewPermAddr3" class="text-slate-700 truncate">City, Country</div>
-                              </div>
-
-                              <div class="pt-1 flex items-baseline gap-2">
-                                <div>
-                                  <div class="font-serif italic font-bold text-[10px] sm:text-xs text-slate-800 leading-none">Signature</div>
-                                  <div class="text-[5.5px] sm:text-[6.5px] text-[#406852] font-semibold mt-0.5">Registrar General of Pakistan</div>
-                                </div>
-                                <div class="text-[6.5px] text-slate-500">Name:</div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div class="flex flex-col items-end shrink-0 w-20 sm:w-24">
-                            <div id="pakBackPreviewCnic" class="font-mono-code font-bold text-[8px] sm:text-[9.5px] text-slate-900 leading-none mb-1">
-                              00000-0000000-0
-                            </div>
-                            <div class="w-14 sm:w-16 h-14 sm:h-16 bg-white p-1 rounded-sm border border-emerald-950/30 shadow-2xs flex items-center justify-center">
-                              <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="100" height="100" fill="#ffffff"/>
-                                <rect x="5" y="5" width="28" height="28" fill="#1b4332"/>
-                                <rect x="9" y="9" width="20" height="20" fill="#ffffff"/>
-                                <rect x="13" y="13" width="12" height="12" fill="#1b4332"/>
-                                <rect x="67" y="5" width="28" height="28" fill="#1b4332"/>
-                                <rect x="71" y="9" width="20" height="20" fill="#ffffff"/>
-                                <rect x="75" y="13" width="12" height="12" fill="#1b4332"/>
-                                <rect x="5" y="67" width="28" height="28" fill="#1b4332"/>
-                                <rect x="9" y="71" width="20" height="20" fill="#ffffff"/>
-                                <rect x="13" y="75" width="12" height="12" fill="#1b4332"/>
-                                <rect x="38" y="8" width="5" height="5" fill="#1b4332"/>
-                                <rect x="48" y="8" width="5" height="5" fill="#1b4332"/>
-                                <rect x="58" y="8" width="5" height="5" fill="#1b4332"/>
-                                <rect x="38" y="18" width="5" height="5" fill="#1b4332"/>
-                                <rect x="48" y="24" width="5" height="5" fill="#1b4332"/>
-                                <rect x="58" y="18" width="5" height="5" fill="#1b4332"/>
-                                <rect x="8" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="18" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="28" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="38" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="48" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="58" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="68" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="78" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="88" y="38" width="5" height="5" fill="#1b4332"/>
-                                <rect x="38" y="48" width="5" height="5" fill="#1b4332"/>
-                                <rect x="53" y="48" width="8" height="8" fill="#1b4332"/>
-                                <rect x="68" y="48" width="5" height="5" fill="#1b4332"/>
-                                <rect x="83" y="48" width="5" height="5" fill="#1b4332"/>
-                                <rect x="38" y="63" width="5" height="5" fill="#1b4332"/>
-                                <rect x="48" y="68" width="5" height="5" fill="#1b4332"/>
-                                <rect x="63" y="63" width="5" height="5" fill="#1b4332"/>
-                                <rect x="78" y="68" width="5" height="5" fill="#1b4332"/>
-                                <rect x="38" y="78" width="5" height="5" fill="#1b4332"/>
-                                <rect x="48" y="83" width="5" height="5" fill="#1b4332"/>
-                                <rect x="68" y="78" width="5" height="5" fill="#1b4332"/>
-                                <rect x="83" y="83" width="5" height="5" fill="#1b4332"/>
-                              </svg>
-                            </div>
-                            <div id="pakBackPreviewTrackNum" class="font-mono-code text-[6.5px] sm:text-[7.5px] text-slate-600 mt-1">
-                              0000000000
-                            </div>
-                          </div>
+                        <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 6.12%; top: 9.74%; width: 5.98%; height: 12.35%;">
+                          <img src="/assets/aistudio/pakistan_back_portrait_exact.jpg" alt="Back Portrait" class="pak-back-avatar-img w-full h-full object-cover">
                         </div>
 
-                        <!-- Bottom MRZ -->
-                        <div class="relative z-10 w-full bg-[#f6f7ef] border-t border-emerald-900/20 px-3 py-1.5 font-mono-code text-[7px] sm:text-[8px] md:text-[9.5px] leading-tight tracking-[0.08em] sm:tracking-[0.14em] text-slate-800">
-                          <div id="pakMrzLine1" class="truncate">I&lt;PAK000000000&lt;0000000000&lt;&lt;&lt;&lt;&lt;</div>
-                          <div id="pakMrzLine2" class="truncate">00000000000000PAK000000&lt;&lt;&lt;&lt;&lt;&lt;0</div>
-                          <div id="pakMrzLine3" class="truncate">SURNAME &lt;&lt; NAME &lt; FATHERS NAME &lt;&lt;&lt;&lt;&lt;&lt;</div>
+                        <img src="/assets/aistudio/pak_urdu_pres_addr_ref.png" alt="Present Address Urdu" class="pak-urdu-pres-img absolute z-20 object-contain pointer-events-none" style="left: 17.49%; top: 2.85%; width: 55.10%; height: 19.95%;">
+                        <div class="pak-urdu-pres-text-wrap hidden absolute z-20 font-urdu font-bold text-[#1f2622] text-right leading-[1.65]" dir="rtl" style="left: 17.50%; top: 4.20%; width: 55.00%; font-size: 2.25cqw;">
+                          <div id="pakPreviewPresentAddr1" class="truncate">موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل</div>
+                          <div id="pakPreviewPresentAddr2" class="truncate text-center">پپلاں، ضلع میانوالی</div>
+                          <div id="pakPreviewPresentAddr3" class="truncate text-center"></div>
+                        </div>
+
+                        <img src="/assets/aistudio/pak_urdu_perm_addr_ref.png" alt="Permanent Address Urdu" class="pak-urdu-perm-img absolute z-20 object-contain pointer-events-none" style="left: 17.49%; top: 31.35%; width: 54.66%; height: 17.34%;">
+                        <div class="pak-urdu-perm-text-wrap hidden absolute z-20 font-urdu font-bold text-[#1f2622] text-right leading-[1.65]" dir="rtl" style="left: 17.50%; top: 32.50%; width: 54.50%; font-size: 2.25cqw;">
+                          <div id="pakPreviewPermAddr1" class="truncate">مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،</div>
+                          <div id="pakPreviewPermAddr2" class="truncate text-center">تحصیل فیروز والا، ضلع شیخوپورہ</div>
+                          <div id="pakPreviewPermAddr3" class="truncate text-center"></div>
+                        </div>
+
+                        <div id="pakBackPreviewCnic" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 75.36%; top: 6.18%; font-size: 2.45cqw; font-variant-numeric: tabular-nums;">38303-4160324-9</div>
+                        <div id="pakBackPreviewTrackNum" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 78.28%; top: 47.98%; font-size: 2.02cqw; font-variant-numeric: tabular-nums;">505681029619</div>
+
+                        <div class="hidden">
+                          <span id="pakMrzLine1"></span>
+                          <span id="pakMrzLine2"></span>
+                          <span id="pakMrzLine3"></span>
                         </div>
                       </article>
                     </div>
@@ -17622,153 +17557,98 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                 <!-- ================= 3. FRONT ONLY VIEW ================= -->
                 <div id="pak-view-front" class="hidden w-full">
-                  <article id="pak-single-front-card" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-2xl border border-stone-400/50 overflow-hidden text-[#121814] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                  <article id="pak-single-front-card" class="pakistan-cnic-front-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-2xl border border-stone-400/50 overflow-hidden text-[#1f2622] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
                     <img src="/assets/aistudio/pakistan_cnic_front_plate.png" alt="Pakistan National Identity Card Front Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                    <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.83%; top: 28.50%; width: 24.78%; height: 46.32%;">
-                      <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover grayscale contrast-105">
+                    <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 69.97%; top: 27.32%; width: 24.05%; height: 46.32%;">
+                      <img src="/assets/aistudio/pakistan_portrait_exact.jpg" alt="Portrait" class="pak-avatar-img w-full h-full object-cover">
                       <svg viewBox="0 0 100 120" class="pak-avatar-svg hidden w-full h-full"></svg>
                     </div>
 
-                    <div id="pakSingleFrontName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 23.28%; font-size: 2.95cqw;">Sobia Bashir</div>
-                    <div id="pakSingleFrontNameUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.69%; top: 30.65%; font-size: 3.15cqw;">ثوبیہ بشیر</div>
+                    <div id="pakSingleFrontName" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[-0.01em]" style="left: 28.86%; top: 23.75%; font-size: 2.82cqw;">Muhammad Shahzad</div>
+                    <img src="/assets/aistudio/pak_urdu_name_ref.png" alt="Urdu Name" class="pak-urdu-name-img absolute z-20 object-contain pointer-events-none" style="left: 55.69%; top: 29.93%; width: 11.95%; height: 8.31%;">
+                    <div id="pakSingleFrontNameUrdu" class="font-urdu hidden absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 33.24%; top: 29.80%; font-size: 2.75cqw;">محمد شہزاد</div>
 
-                    <div id="pakSingleFrontRelLabel" class="absolute z-20 font-bold text-[#161d18] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 26.82%; top: 40.86%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Husband Name</div>
-                    <div id="pakSingleFrontRelName" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.99%; top: 44.18%; font-size: 2.92cqw;">Muhammad Zaki Mazhar</div>
-                    <div id="pakSingleFrontRelUrdu" class="font-urdu absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 34.40%; top: 50.35%; font-size: 3.15cqw;">محمد زکی مظہر</div>
+                    <div id="pakSingleFrontRelLabel" class="absolute z-20 font-bold text-[#222925] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 27.70%; top: 39.90%; font-size: 1.88cqw; font-family: 'Helvetica Neue', Arial, sans-serif;">Father Name</div>
+                    <div id="pakSingleFrontRelName" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[-0.01em]" style="left: 28.86%; top: 44.18%; font-size: 2.82cqw;">Malik Siraj Din</div>
+                    <img src="/assets/aistudio/pak_urdu_rel_ref.png" alt="Relative Urdu Name" class="pak-urdu-rel-img absolute z-20 object-contain pointer-events-none" style="left: 48.40%; top: 49.41%; width: 19.24%; height: 8.55%;">
+                    <div id="pakSingleFrontRelUrdu" class="font-urdu hidden absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none text-right" dir="rtl" style="right: 33.24%; top: 49.50%; font-size: 2.75cqw;">ملک سراج دین</div>
 
-                    <div id="pakSingleFrontGender" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 28.13%; top: 66.03%; font-size: 2.72cqw;">F</div>
-                    <div id="pakSingleFrontCountryStay" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none" style="left: 37.76%; top: 66.03%; font-size: 2.72cqw;">Pakistan</div>
+                    <div id="pakSingleFrontGender" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none" style="left: 28.86%; top: 64.61%; font-size: 2.75cqw;">M</div>
+                    <div id="pakSingleFrontCountryStay" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none" style="left: 38.48%; top: 64.61%; font-size: 2.75cqw;">Pakistan</div>
 
-                    <div id="pakSingleFrontCnic" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">35202-9962070-2</div>
-                    <div id="pakSingleFrontDob" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 51.90%; top: 78.38%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">03.07.1991</div>
+                    <div id="pakSingleFrontCnic" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 28.72%; top: 76.96%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">38303-4160324-9</div>
+                    <div id="pakSingleFrontDob" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 52.48%; top: 76.96%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">08.12.1987</div>
 
-                    <div id="pakSingleFrontIssueDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 28.13%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2021</div>
-                    <div id="pakSingleFrontExpiryDate" class="absolute z-20 font-bold text-[#121814] whitespace-nowrap leading-none tracking-[0.015em]" style="left: 52.04%; top: 90.26%; font-size: 2.78cqw; font-variant-numeric: tabular-nums;">06.01.2031</div>
+                    <div id="pakSingleFrontIssueDate" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 28.72%; top: 88.12%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">09.12.2019</div>
+                    <div id="pakSingleFrontExpiryDate" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 52.62%; top: 88.12%; font-size: 2.72cqw; font-variant-numeric: tabular-nums;">09.12.2029</div>
 
-                    <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 73.76%; top: 75.06%; width: 13.99%; height: 14.73%;">
-                    <div id="pakSingleFrontSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#121814] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Sobia Bashir</div>
+                    <img src="/assets/aistudio/pakistan_signature_transparent.png" alt="Signature" class="pak-sig-img absolute z-20 object-contain pointer-events-none" style="left: 74.05%; top: 74.11%; width: 17.20%; height: 14.73%;">
+                    <div id="pakSingleFrontSignature" class="pak-sig-text hidden absolute z-20 font-serif italic font-bold text-[#1f2622] text-center whitespace-nowrap leading-none" style="left: 70.50%; top: 79.50%; width: 21.50%; font-size: 2.55cqw;">Muhammad Shahzad</div>
                   </article>
                 </div>
 
                 <!-- ================= 4. BACK ONLY VIEW ================= -->
                 <div id="pak-view-back" class="hidden w-full">
-                  <article id="pak-single-back-card" class="pakistan-cnic-back-bg relative w-full aspect-[1.586/1] rounded-2xl shadow-2xl border border-emerald-900/30 overflow-hidden text-slate-900 flex flex-col justify-between">
-                    <!-- Upper Back Content -->
-                    <div class="relative z-10 p-4 sm:p-5 pb-1 flex items-start justify-between gap-4">
-                      <div class="flex-1 min-w-0 flex items-start gap-3">
-                        <div class="w-8 sm:w-9 h-9 sm:h-11 rounded-sm overflow-hidden border border-emerald-900/20 bg-white/70 shadow-2xs shrink-0 mt-0.5">
-                          <svg viewBox="0 0 100 125" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="100" height="125" fill="#f8faf8"/>
-                            <circle cx="50" cy="42" r="22" fill="#9ca3af"/>
-                            <rect x="44" y="60" width="12" height="15" fill="#9ca3af"/>
-                            <path d="M 12 125 L 12 100 Q 14 74 38 72 L 44 86 L 50 102 L 56 86 L 62 72 Q 86 74 88 100 L 88 125 Z" fill="#374151"/>
-                            <polygon points="38,72 50,102 62,72 57,72 50,88 43,72" fill="#ffffff"/>
-                            <polygon points="48,74 52,74 54,98 50,118 46,98" fill="#111827"/>
-                          </svg>
-                        </div>
+                  <article id="pak-single-back-card" class="pakistan-cnic-back-bg relative w-full aspect-[686/421] rounded-[2.2cqw] shadow-2xl border border-stone-400/50 overflow-hidden text-[#1f2622] select-none" style="container-type: inline-size; font-family: 'Arial Narrow', 'Roboto Condensed', 'Helvetica Neue', Arial, sans-serif;">
+                    <img src="/assets/aistudio/pakistan_cnic_back_plate.png" alt="Pakistan National Identity Card Back Plate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                        <div class="flex-1 min-w-0 text-[8px] sm:text-[10px] leading-tight space-y-1.5">
-                          <div>
-                            <div class="font-bold text-[#1b4332]">Present Address:</div>
-                            <div id="pakSingleBackPresentAddr1" class="text-slate-700 truncate">House number,</div>
-                            <div id="pakSingleBackPresentAddr2" class="text-slate-700 truncate">Name of a street,</div>
-                            <div id="pakSingleBackPresentAddr3" class="text-slate-700 truncate">City, Country</div>
-                          </div>
-                          <div>
-                            <div class="font-bold text-[#1b4332]">Permanent Address:</div>
-                            <div id="pakSingleBackPermAddr1" class="text-slate-700 truncate">House number,</div>
-                            <div id="pakSingleBackPermAddr2" class="text-slate-700 truncate">Name of a street,</div>
-                            <div id="pakSingleBackPermAddr3" class="text-slate-700 truncate">City, Country</div>
-                          </div>
-
-                          <div class="pt-1.5 flex items-baseline gap-2">
-                            <div>
-                              <div class="font-serif italic font-bold text-xs sm:text-sm text-slate-800 leading-none">Signature</div>
-                              <div class="text-[6.5px] sm:text-[7.5px] text-[#406852] font-semibold mt-0.5">Registrar General of Pakistan</div>
-                            </div>
-                            <div class="text-[7.5px] text-slate-500">Name:</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="flex flex-col items-end shrink-0 w-24 sm:w-28">
-                        <div id="pakSingleBackCnic" class="font-mono-code font-bold text-[9px] sm:text-[11px] text-slate-900 leading-none mb-1">
-                          00000-0000000-0
-                        </div>
-                        <div class="w-16 sm:w-20 h-16 sm:h-20 bg-white p-1 rounded-sm border border-emerald-950/30 shadow-2xs flex items-center justify-center">
-                          <svg viewBox="0 0 100 100" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="100" height="100" fill="#ffffff"/>
-                            <rect x="5" y="5" width="28" height="28" fill="#1b4332"/>
-                            <rect x="9" y="9" width="20" height="20" fill="#ffffff"/>
-                            <rect x="13" y="13" width="12" height="12" fill="#1b4332"/>
-                            <rect x="67" y="5" width="28" height="28" fill="#1b4332"/>
-                            <rect x="71" y="9" width="20" height="20" fill="#ffffff"/>
-                            <rect x="75" y="13" width="12" height="12" fill="#1b4332"/>
-                            <rect x="5" y="67" width="28" height="28" fill="#1b4332"/>
-                            <rect x="9" y="71" width="20" height="20" fill="#ffffff"/>
-                            <rect x="13" y="75" width="12" height="12" fill="#1b4332"/>
-                            <rect x="38" y="8" width="5" height="5" fill="#1b4332"/>
-                            <rect x="48" y="8" width="5" height="5" fill="#1b4332"/>
-                            <rect x="58" y="8" width="5" height="5" fill="#1b4332"/>
-                            <rect x="38" y="18" width="5" height="5" fill="#1b4332"/>
-                            <rect x="48" y="24" width="5" height="5" fill="#1b4332"/>
-                            <rect x="58" y="18" width="5" height="5" fill="#1b4332"/>
-                            <rect x="8" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="18" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="28" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="38" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="48" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="58" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="68" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="78" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="88" y="38" width="5" height="5" fill="#1b4332"/>
-                            <rect x="38" y="48" width="5" height="5" fill="#1b4332"/>
-                            <rect x="53" y="48" width="8" height="8" fill="#1b4332"/>
-                            <rect x="68" y="48" width="5" height="5" fill="#1b4332"/>
-                            <rect x="83" y="48" width="5" height="5" fill="#1b4332"/>
-                            <rect x="38" y="63" width="5" height="5" fill="#1b4332"/>
-                            <rect x="48" y="68" width="5" height="5" fill="#1b4332"/>
-                            <rect x="63" y="63" width="5" height="5" fill="#1b4332"/>
-                            <rect x="78" y="68" width="5" height="5" fill="#1b4332"/>
-                            <rect x="38" y="78" width="5" height="5" fill="#1b4332"/>
-                            <rect x="48" y="83" width="5" height="5" fill="#1b4332"/>
-                            <rect x="68" y="78" width="5" height="5" fill="#1b4332"/>
-                            <rect x="83" y="83" width="5" height="5" fill="#1b4332"/>
-                          </svg>
-                        </div>
-                        <div id="pakSingleBackTrackNum" class="font-mono-code text-[7px] sm:text-[8px] text-slate-600 mt-1">
-                          0000000000
-                        </div>
-                      </div>
+                    <div class="absolute z-10 overflow-hidden pointer-events-none" style="left: 6.12%; top: 9.74%; width: 5.98%; height: 12.35%;">
+                      <img src="/assets/aistudio/pakistan_back_portrait_exact.jpg" alt="Back Portrait" class="pak-back-avatar-img w-full h-full object-cover">
                     </div>
 
-                    <!-- Bottom MRZ -->
-                    <div class="relative z-10 w-full bg-[#f6f7ef] border-t border-emerald-900/20 px-4 py-2 font-mono-code text-[8px] sm:text-[9.5px] md:text-[11px] leading-tight tracking-[0.12em] sm:tracking-[0.16em] text-slate-800">
-                      <div id="pakSingleMrzLine1" class="truncate">I&lt;PAK000000000&lt;0000000000&lt;&lt;&lt;&lt;&lt;</div>
-                      <div id="pakSingleMrzLine2" class="truncate">00000000000000PAK000000&lt;&lt;&lt;&lt;&lt;&lt;0</div>
-                      <div id="pakSingleMrzLine3" class="truncate">SURNAME &lt;&lt; NAME &lt; FATHERS NAME &lt;&lt;&lt;&lt;&lt;&lt;</div>
+                    <img src="/assets/aistudio/pak_urdu_pres_addr_ref.png" alt="Present Address Urdu" class="pak-urdu-pres-img absolute z-20 object-contain pointer-events-none" style="left: 17.49%; top: 2.85%; width: 55.10%; height: 19.95%;">
+                    <div class="pak-urdu-pres-text-wrap hidden absolute z-20 font-urdu font-bold text-[#1f2622] text-right leading-[1.65]" dir="rtl" style="left: 17.50%; top: 4.20%; width: 55.00%; font-size: 2.25cqw;">
+                      <div id="pakSingleBackPresentAddr1" class="truncate">موجودہ پتہ: ڈاک خانہ خاص، چک نمبر 110 ایم ایل، تحصیل</div>
+                      <div id="pakSingleBackPresentAddr2" class="truncate text-center">پپلاں، ضلع میانوالی</div>
+                      <div id="pakSingleBackPresentAddr3" class="truncate text-center"></div>
+                    </div>
+
+                    <img src="/assets/aistudio/pak_urdu_perm_addr_ref.png" alt="Permanent Address Urdu" class="pak-urdu-perm-img absolute z-20 object-contain pointer-events-none" style="left: 17.49%; top: 31.35%; width: 54.66%; height: 17.34%;">
+                    <div class="pak-urdu-perm-text-wrap hidden absolute z-20 font-urdu font-bold text-[#1f2622] text-right leading-[1.65]" dir="rtl" style="left: 17.50%; top: 32.50%; width: 54.50%; font-size: 2.25cqw;">
+                      <div id="pakSingleBackPermAddr1" class="truncate">مستقل پتہ: موضع ابوالخیر نزد حسن گارڈن، کوٹ عبدالمالک،</div>
+                      <div id="pakSingleBackPermAddr2" class="truncate text-center">تحصیل فیروز والا، ضلع شیخوپورہ</div>
+                      <div id="pakSingleBackPermAddr3" class="truncate text-center"></div>
+                    </div>
+
+                    <div id="pakSingleBackCnic" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 75.36%; top: 6.18%; font-size: 2.45cqw; font-variant-numeric: tabular-nums;">38303-4160324-9</div>
+                    <div id="pakSingleBackTrackNum" class="absolute z-20 font-bold text-[#1f2622] whitespace-nowrap leading-none tracking-[0.01em]" style="left: 78.28%; top: 47.98%; font-size: 2.02cqw; font-variant-numeric: tabular-nums;">505681029619</div>
+
+                    <div class="hidden">
+                      <span id="pakSingleMrzLine1"></span>
+                      <span id="pakSingleMrzLine2"></span>
+                      <span id="pakSingleMrzLine3"></span>
                     </div>
                   </article>
                 </div>
 
                 <!-- ================= 5. ORIGINAL 1:1 REFERENCE SPECIMEN VIEW ================= -->
                 <div id="pak-view-specimen" class="hidden w-full space-y-3">
-                  <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-4 sm:p-5 space-y-3">
+                  <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-4 sm:p-5 space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
                       <div>
                         <div class="flex items-center gap-2">
-                          <h3 class="text-sm font-bold text-slate-900">Official Reference Specimen (1:1 Exact Match)</h3>
+                          <h3 class="text-sm font-bold text-slate-900">Official Reference Specimen (Front &amp; Back 1:1 Exact Match)</h3>
                           <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200">User Reference</span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">Islamic Republic of Pakistan · National Identity Card (Smart CNIC / SNIC) for Sobia Bashir</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Islamic Republic of Pakistan · National Identity Card (Smart CNIC / SNIC) for Muhammad Shahzad</p>
                       </div>
-                      <a href="/assets/aistudio/1792952087537_9a2ef351.jpg" download="pakistan-cnic-specimen.jpg" class="px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
-                        <i class="fa-solid fa-download"></i> Download Specimen
-                      </a>
+                      <div class="flex items-center gap-2">
+                        <a href="/assets/aistudio/1793900551692_16340a21.jpg" download="pakistan-cnic-front-specimen.jpg" class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                          <i class="fa-solid fa-download"></i> Front Specimen
+                        </a>
+                        <a href="/assets/aistudio/1793900567935_774b9e76.jpg" download="pakistan-cnic-back-specimen.jpg" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                          <i class="fa-solid fa-download"></i> Back Specimen
+                        </a>
+                      </div>
                     </div>
-                    <div class="rounded-xl overflow-hidden border border-slate-200 bg-stone-100 flex items-center justify-center p-2 shadow-inner">
-                      <img src="/assets/aistudio/1792952087537_9a2ef351.jpg" alt="Pakistan CNIC Reference Specimen" class="max-w-full h-auto rounded-lg shadow-md">
+                    <div class="space-y-3">
+                      <div class="rounded-xl overflow-hidden border border-slate-200 bg-stone-100 flex items-center justify-center p-2 shadow-inner">
+                        <img src="/assets/aistudio/1793900551692_16340a21.jpg" alt="Pakistan CNIC Front Reference Specimen" class="max-w-full h-auto rounded-lg shadow-md">
+                      </div>
+                      <div class="rounded-xl overflow-hidden border border-slate-200 bg-stone-100 flex items-center justify-center p-2 shadow-inner">
+                        <img src="/assets/aistudio/1793900567935_774b9e76.jpg" alt="Pakistan CNIC Back Reference Specimen" class="max-w-full h-auto rounded-lg shadow-md">
+                      </div>
                     </div>
                   </div>
                 </div>
