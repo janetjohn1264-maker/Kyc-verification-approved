@@ -1030,6 +1030,23 @@
     #nplOutAuthority { max-width: 31.5%; overflow: hidden; text-overflow: ellipsis; }
     #nplOutExpiry { max-width: 29.0%; overflow: hidden; }
     #nplMrzLine1, #nplMrzLine2 { max-width: 91.0%; overflow: hidden; }
+
+    /* Malawi / Mali Passport (MWI) */
+    #mwiOutType { max-width: 10.0%; overflow: hidden; }
+    #mwiOutCountryCode { max-width: 14.0%; overflow: hidden; }
+    #mwiOutPassNoHeader { max-width: 24.0%; overflow: hidden; }
+    #mwiOutPassNoArch { max-width: 18.0%; overflow: hidden; }
+    #mwiOutSurname { max-width: 28.5%; overflow: hidden; text-overflow: ellipsis; }
+    #mwiOutSex { max-width: 12.0%; overflow: hidden; }
+    #mwiOutGivenNames { max-width: 44.0%; overflow: hidden; text-overflow: ellipsis; }
+    #mwiOutNationality { max-width: 28.5%; overflow: hidden; text-overflow: ellipsis; }
+    #mwiOutPersonalNo { max-width: 26.0%; overflow: hidden; text-overflow: ellipsis; }
+    #mwiOutDob { max-width: 28.5%; overflow: hidden; }
+    #mwiOutPob { max-width: 28.0%; overflow: hidden; text-overflow: ellipsis; }
+    #mwiOutIssue { max-width: 28.5%; overflow: hidden; }
+    #mwiOutAuthority { max-width: 28.0%; overflow: hidden; text-overflow: ellipsis; }
+    #mwiOutExpiry { max-width: 28.5%; overflow: hidden; }
+    #mwiMrzLine1, #mwiMrzLine2 { max-width: 90.0%; overflow: hidden; }
   </style>
 
   <script>
@@ -2313,6 +2330,33 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateRwaIdPreview === 'function') updateRwaIdPreview();
+      } else if (countryKey === 'malawi' || countryKey === 'mali') {
+        countryKey = 'malawi';
+        currentCountry = 'malawi';
+        currentDocType = 'passport';
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        const activeStyle = "doc-tab-btn p-4 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-rose-50/60 text-left transition-all shadow-sm ring-2 ring-emerald-500/20 cursor-pointer";
+        const inactiveStyle = "doc-tab-btn p-4 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50/80 text-left transition-all shadow-xs cursor-pointer";
+        if (passTab) passTab.className = activeStyle;
+        if (idTab) idTab.className = inactiveStyle;
+        if (dlTab) dlTab.className = inactiveStyle;
+        if (refTab) refTab.className = inactiveStyle;
+        if (poaTab) poaTab.className = inactiveStyle;
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateMwiPreview === 'function') updateMwiPreview();
       } else if (countryKey === 'nepal') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -2451,6 +2495,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-pink-600 bg-gradient-to-br from-pink-50 via-white to-emerald-50/50 text-pink-950 text-left shadow-sm ring-2 ring-pink-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-pink-50/40 hover:border-pink-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-pink-600"
+        },
+        malawi: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-rose-600 bg-gradient-to-br from-rose-50 via-white to-emerald-50/50 text-rose-950 text-left shadow-sm ring-2 ring-rose-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-rose-50/40 hover:border-rose-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-rose-600"
         }
       };
 
@@ -2485,7 +2534,8 @@ var $ = window.$ || (id => document.getElementById(id));
         canada: 'Canada',
         ghana: 'Ghana',
         rwanda: 'Rwanda',
-        nepal: 'Nepal'
+        nepal: 'Nepal',
+        malawi: 'Republic of Malawi (Mali / MWI)'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -2518,6 +2568,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const ghaPassView = $('ghana-passport-view');
       const rwandaDocView = $('rwanda-doc-view');
       const nplPassView = $('nepal-passport-view');
+      const mwiPassView = $('malawi-passport-view');
       const ethPassView = $('ethiopia-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
 
@@ -2545,10 +2596,13 @@ var $ = window.$ || (id => document.getElementById(id));
       if (ghaPassView) ghaPassView.classList.add('hidden');
       if (rwandaDocView) rwandaDocView.classList.add('hidden');
       if (nplPassView) nplPassView.classList.add('hidden');
+      if (mwiPassView) mwiPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentCountry === 'malawi' || currentCountry === 'mali') {
+        if (mwiPassView) mwiPassView.classList.remove('hidden');
       } else if (currentCountry === 'nepal') {
         if (nplPassView) nplPassView.classList.remove('hidden');
       } else if (currentCountry === 'rwanda') {
@@ -2611,6 +2665,8 @@ var $ = window.$ || (id => document.getElementById(id));
     function randomizeActiveDocument() {
       if (currentDocType === 'proofofaccount') {
         if (typeof randomizeProofOfAccount === 'function') randomizeProofOfAccount();
+      } else if (currentCountry === 'malawi' || currentCountry === 'mali') {
+        if (typeof randomizeMwiPassport === 'function') randomizeMwiPassport();
       } else if (currentCountry === 'nepal') {
         if (typeof randomizeNplPassport === 'function') randomizeNplPassport();
       } else if (currentCountry === 'rwanda') {
@@ -4985,6 +5041,414 @@ var $ = window.$ || (id => document.getElementById(id));
       document.addEventListener('DOMContentLoaded', initNplPassport);
     } else {
       initNplPassport();
+    }
+
+    // ================= REPUBLIC OF MALAWI (MALI / MWI PASSPORT) CONTROLLER =================
+    const MWI_DEFAULT_PHOTO = '/assets/aistudio/malawi_passport_portrait.png';
+    const MWI_SIGNATURE = '/assets/aistudio/malawi_passport_signature.png';
+
+    const MWI_SPECIMEN = {
+      type: 'P',
+      countryCode: 'MWI',
+      passNo: 'MWA058787',
+      surname: 'CHINTOKOMA',
+      givenNames: 'JOEL',
+      nationality: 'MALAWIAN',
+      dob: '1992-04-14',
+      personalNo: '5526110/2',
+      sex: 'M',
+      pob: 'BLANTYRE',
+      issue: '2022-01-27',
+      expiry: '2032-01-26',
+      authority: 'MANGOCHI',
+      photoUrl: MWI_DEFAULT_PHOTO
+    };
+
+    const MWI_RANDOM_PROFILES = [
+      {
+        surname: 'CHINTOKOMA',
+        givenNames: 'JOEL',
+        sex: 'M',
+        dob: '1992-04-14',
+        pob: 'BLANTYRE',
+        personalNo: '5526110/2',
+        passNo: 'MWA058787',
+        issue: '2022-01-27',
+        expiry: '2032-01-26',
+        authority: 'MANGOCHI',
+        photoUrl: MWI_DEFAULT_PHOTO
+      },
+      {
+        surname: 'BANDA',
+        givenNames: 'CHISOMO KONDWANI',
+        sex: 'M',
+        dob: '1990-08-19',
+        pob: 'LILONGWE',
+        personalNo: '4819204/1',
+        passNo: 'MWA074312',
+        issue: '2023-03-15',
+        expiry: '2033-03-14',
+        authority: 'LILONGWE',
+        photoUrl: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        surname: 'PHIRI',
+        givenNames: 'TIWONGE GRACE',
+        sex: 'F',
+        dob: '1995-11-05',
+        pob: 'MZUZU',
+        personalNo: '6193842/3',
+        passNo: 'MWA091548',
+        issue: '2022-07-11',
+        expiry: '2032-07-10',
+        authority: 'MZUZU',
+        photoUrl: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        surname: 'MWALE',
+        givenNames: 'YAMIKANI ARTHUR',
+        sex: 'M',
+        dob: '1988-02-23',
+        pob: 'ZOMBA',
+        personalNo: '3948105/2',
+        passNo: 'MWA063891',
+        issue: '2021-09-20',
+        expiry: '2031-09-19',
+        authority: 'BLANTYRE',
+        photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        surname: 'NKHOMA',
+        givenNames: 'MPHATSO ESTHER',
+        sex: 'F',
+        dob: '1997-06-30',
+        pob: 'KASUNGU',
+        personalNo: '7204918/1',
+        passNo: 'MWA085219',
+        issue: '2023-05-09',
+        expiry: '2033-05-08',
+        authority: 'LILONGWE',
+        photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'
+      }
+    ];
+
+    function mwiFormatDate(isoStr) {
+      if (!isoStr) return '';
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const parts = isoStr.split('-');
+      if (parts.length !== 3) return isoStr;
+      const y = parts[0];
+      const m = parseInt(parts[1], 10);
+      const d = parts[2];
+      if (isNaN(m) || m < 1 || m > 12) return isoStr;
+      return `${d.padStart(2, '0')} ${months[m - 1]} ${y}`;
+    }
+
+    function mwiToYYMMDD(isoStr) {
+      if (!isoStr) return '000000';
+      const parts = isoStr.split('-');
+      if (parts.length !== 3) return '000000';
+      return parts[0].slice(-2) + parts[1].padStart(2, '0') + parts[2].padStart(2, '0');
+    }
+
+    function mwiMrzCharVal(ch) {
+      if (ch === '<') return 0;
+      if (ch >= '0' && ch <= '9') return ch.charCodeAt(0) - 48;
+      if (ch >= 'A' && ch <= 'Z') return ch.charCodeAt(0) - 55;
+      return 0;
+    }
+
+    function mwiMrzCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        sum += mwiMrzCharVal(str[i]) * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function mwiMrzClean(str) {
+      return (str || '')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '<')
+        .replace(/<+/g, '<')
+        .replace(/^<|<$/g, '');
+    }
+
+    function buildMwiMrz(fields) {
+      const typeChar = ((fields.type || 'P').toUpperCase().replace(/[^A-Z]/g, '')[0]) || 'P';
+      const country = ((fields.countryCode || 'MWI').toUpperCase().replace(/[^A-Z]/g, '') + '<<<').slice(0, 3);
+      const sur = mwiMrzClean(fields.surname || 'CHINTOKOMA');
+      const giv = mwiMrzClean(fields.givenNames || 'JOEL');
+      const line1Body = `${typeChar}<${country}${sur}<<${giv}`;
+      const line1 = (line1Body + '<'.repeat(44)).slice(0, 44);
+
+      const passClean = (fields.passNo || 'MWA058787').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const passField = (passClean + '<'.repeat(9)).slice(0, 9);
+      const passCheck = mwiMrzCheckDigit(passField);
+
+      const dobStr = mwiToYYMMDD(fields.dob || '1992-04-14');
+      const dobCheck = mwiMrzCheckDigit(dobStr);
+
+      const sexChar = ((fields.sex || 'M').toUpperCase() === 'F') ? 'F' : (((fields.sex || 'M').toUpperCase() === 'X') ? '<' : 'M');
+
+      const expStr = mwiToYYMMDD(fields.expiry || '2032-01-26');
+      const expCheck = mwiMrzCheckDigit(expStr);
+
+      const personalClean = (fields.personalNo || '5526110/2').toUpperCase().replace(/[^A-Z0-9]/g, '<');
+      const personalField = (personalClean + '<'.repeat(14)).slice(0, 14);
+      const personalCheck = mwiMrzCheckDigit(personalField);
+
+      const compositeInput = passField + passCheck + dobStr + dobCheck + expStr + expCheck + personalField + personalCheck;
+      const compositeCheck = mwiMrzCheckDigit(compositeInput);
+
+      const line2 = `${passField}${passCheck}${country}${dobStr}${dobCheck}${sexChar}${expStr}${expCheck}${personalField}${personalCheck}${compositeCheck}`;
+      return { line1, line2 };
+    }
+
+    function readMwiFields() {
+      const getVal = (id, fallback) => {
+        const el = $(id);
+        return el ? el.value : fallback;
+      };
+      return {
+        type: getVal('mwiType', MWI_SPECIMEN.type),
+        countryCode: getVal('mwiCountryCode', MWI_SPECIMEN.countryCode),
+        passNo: getVal('mwiPassNo', MWI_SPECIMEN.passNo),
+        surname: getVal('mwiSurname', MWI_SPECIMEN.surname),
+        givenNames: getVal('mwiGivenNames', MWI_SPECIMEN.givenNames),
+        nationality: getVal('mwiNationality', MWI_SPECIMEN.nationality),
+        dob: getVal('mwiDob', MWI_SPECIMEN.dob),
+        personalNo: getVal('mwiPersonalNo', MWI_SPECIMEN.personalNo),
+        sex: getVal('mwiSex', MWI_SPECIMEN.sex),
+        pob: getVal('mwiPob', MWI_SPECIMEN.pob),
+        issue: getVal('mwiIssue', MWI_SPECIMEN.issue),
+        expiry: getVal('mwiExpiry', MWI_SPECIMEN.expiry),
+        authority: getVal('mwiAuthority', MWI_SPECIMEN.authority)
+      };
+    }
+
+    function mwiSetText(id, val) {
+      const el = $(id);
+      if (el) el.textContent = val;
+    }
+
+    function isMwiDefaultSpecimen(fields) {
+      const photoEl = $('mwiOutPhotoMain');
+      const currentPhoto = photoEl ? (photoEl.getAttribute('src') || '') : '';
+      const isDefaultPhoto = currentPhoto.indexOf('malawi_passport_portrait.png') !== -1;
+      return isDefaultPhoto &&
+        (fields.type || '').toUpperCase() === MWI_SPECIMEN.type &&
+        (fields.countryCode || '').toUpperCase() === MWI_SPECIMEN.countryCode &&
+        (fields.passNo || '').toUpperCase() === MWI_SPECIMEN.passNo &&
+        (fields.surname || '').toUpperCase() === MWI_SPECIMEN.surname &&
+        (fields.givenNames || '').toUpperCase() === MWI_SPECIMEN.givenNames &&
+        (fields.nationality || '').toUpperCase() === MWI_SPECIMEN.nationality &&
+        fields.dob === MWI_SPECIMEN.dob &&
+        (fields.personalNo || '').toUpperCase() === MWI_SPECIMEN.personalNo &&
+        (fields.sex || '').toUpperCase() === MWI_SPECIMEN.sex &&
+        (fields.pob || '').toUpperCase() === MWI_SPECIMEN.pob &&
+        fields.issue === MWI_SPECIMEN.issue &&
+        fields.expiry === MWI_SPECIMEN.expiry &&
+        (fields.authority || '').toUpperCase() === MWI_SPECIMEN.authority;
+    }
+
+    function updateMwiPreview() {
+      const fields = readMwiFields();
+      const passClean = (fields.passNo || 'MWA058787').toUpperCase();
+      const spacedPass = passClean.split('').join(' ');
+
+      mwiSetText('mwiOutType', (fields.type || 'P').toUpperCase());
+      mwiSetText('mwiOutCountryCode', (fields.countryCode || 'MWI').toUpperCase());
+      mwiSetText('mwiOutPassNoHeader', passClean);
+      mwiSetText('mwiOutPassNoArch', passClean);
+      mwiSetText('mwiOutPassNoPage3Perforated', spacedPass);
+
+      mwiSetText('mwiOutSurname', (fields.surname || 'CHINTOKOMA').toUpperCase());
+      mwiSetText('mwiOutSex', (fields.sex || 'M').toUpperCase());
+      mwiSetText('mwiOutGivenNames', (fields.givenNames || 'JOEL').toUpperCase());
+      mwiSetText('mwiOutNationality', (fields.nationality || 'MALAWIAN').toUpperCase());
+      mwiSetText('mwiOutPersonalNo', (fields.personalNo || '5526110/2').toUpperCase());
+      mwiSetText('mwiOutDob', mwiFormatDate(fields.dob));
+      mwiSetText('mwiOutPob', (fields.pob || 'BLANTYRE').toUpperCase());
+      mwiSetText('mwiOutIssue', mwiFormatDate(fields.issue));
+      mwiSetText('mwiOutAuthority', (fields.authority || 'MANGOCHI').toUpperCase());
+      mwiSetText('mwiOutExpiry', mwiFormatDate(fields.expiry));
+
+      const mrz = buildMwiMrz(fields);
+      mwiSetText('mwiMrzLine1', mrz.line1);
+      mwiSetText('mwiMrzLine2', mrz.line2);
+
+      const refOverlay = $('mwiRefSpecimenOverlay');
+      if (refOverlay) {
+        refOverlay.style.display = isMwiDefaultSpecimen(fields) ? 'block' : 'none';
+      }
+
+      if (typeof window.autoFitDocumentFields === 'function') {
+        window.autoFitDocumentFields('#malawi-passport-card');
+      }
+    }
+
+    function setMwiFormValues(data) {
+      const map = {
+        mwiType: data.type || 'P',
+        mwiCountryCode: data.countryCode || 'MWI',
+        mwiPassNo: data.passNo,
+        mwiSurname: data.surname,
+        mwiGivenNames: data.givenNames,
+        mwiNationality: data.nationality || 'MALAWIAN',
+        mwiDob: data.dob,
+        mwiPersonalNo: data.personalNo,
+        mwiSex: data.sex,
+        mwiPob: data.pob,
+        mwiIssue: data.issue,
+        mwiExpiry: data.expiry,
+        mwiAuthority: data.authority
+      };
+      Object.keys(map).forEach(id => {
+        const el = $(id);
+        if (el && map[id] !== undefined) el.value = map[id];
+      });
+      if (data.photoUrl) {
+        const photoEl = $('mwiOutPhotoMain');
+        if (photoEl) photoEl.src = data.photoUrl;
+        const urlInput = $('mwiPhotoUrl');
+        if (urlInput) urlInput.value = data.photoUrl === MWI_DEFAULT_PHOTO ? '' : data.photoUrl;
+      }
+      updateMwiPreview();
+    }
+
+    function resetMwiPassportSpecimen() {
+      setMwiFormValues(MWI_SPECIMEN);
+      showToast('Specimen Restored', 'Republic of Malawi (MWI) passport reset to reference specimen JOEL CHINTOKOMA');
+    }
+
+    let mwiRandomIdx = 0;
+    function randomizeMwiPassport() {
+      mwiRandomIdx = (mwiRandomIdx + 1) % MWI_RANDOM_PROFILES.length;
+      const p = MWI_RANDOM_PROFILES[mwiRandomIdx];
+      setMwiFormValues({
+        type: 'P',
+        countryCode: 'MWI',
+        passNo: p.passNo,
+        surname: p.surname,
+        givenNames: p.givenNames,
+        nationality: 'MALAWIAN',
+        dob: p.dob,
+        personalNo: p.personalNo,
+        sex: p.sex,
+        pob: p.pob,
+        issue: p.issue,
+        expiry: p.expiry,
+        authority: p.authority,
+        photoUrl: p.photoUrl
+      });
+      showToast('Randomized Malawi Passport', `Loaded specimen ${p.givenNames} ${p.surname} (${p.passNo})`);
+    }
+
+    function resetMwiPhoto() {
+      const el = $('mwiOutPhotoMain');
+      if (el) el.src = MWI_DEFAULT_PHOTO;
+      const urlInput = $('mwiPhotoUrl');
+      if (urlInput) urlInput.value = '';
+      const fileInput = $('mwiPhotoUpload');
+      if (fileInput) fileInput.value = '';
+      updateMwiPreview();
+      showToast('Portrait Reset', 'Restored original reference portrait');
+    }
+
+    function initMwiPassport() {
+      const uploadEl = $('mwiPhotoUpload');
+      if (uploadEl && !uploadEl.dataset.bound) {
+        uploadEl.dataset.bound = '1';
+        uploadEl.addEventListener('change', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            const src = ev.target.result;
+            const el = $('mwiOutPhotoMain');
+            if (el) el.src = src;
+            updateMwiPreview();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      const urlEl = $('mwiPhotoUrl');
+      if (urlEl && !urlEl.dataset.bound) {
+        urlEl.dataset.bound = '1';
+        urlEl.addEventListener('input', function (e) {
+          const val = (e.target.value || '').trim();
+          const target = val || MWI_DEFAULT_PHOTO;
+          const el = $('mwiOutPhotoMain');
+          if (el) el.src = target;
+          updateMwiPreview();
+        });
+      }
+
+      updateMwiPreview();
+    }
+
+    function copyMwiSpecimenData() {
+      const fields = readMwiFields();
+      const mrz = buildMwiMrz(fields);
+      const summary = [
+        'REPUBLIC OF MALAWI - PASSPORT / PASSEPORT (MWI)',
+        `Type: ${fields.type} | Country Code: ${fields.countryCode} | Passport No.: ${fields.passNo}`,
+        `Surname: ${fields.surname}`,
+        `Given Names: ${fields.givenNames}`,
+        `Nationality: ${fields.nationality} | Sex: ${fields.sex}`,
+        `Date of Birth: ${mwiFormatDate(fields.dob)} | Personal No.: ${fields.personalNo}`,
+        `Place of Birth: ${fields.pob}`,
+        `Date of Issue: ${mwiFormatDate(fields.issue)} | Issuing Authority: ${fields.authority}`,
+        `Date of Expiry: ${mwiFormatDate(fields.expiry)}`,
+        `MRZ Line 1: ${mrz.line1}`,
+        `MRZ Line 2: ${mrz.line2}`
+      ].join('\n');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(summary).then(() => {
+          showToast('Copied!', 'Malawi passport data & ICAO MRZ copied to clipboard');
+        });
+      }
+    }
+
+    function downloadMwiPassPNG() {
+      const card = $('malawi-passport-card');
+      if (!card || typeof html2canvas !== 'function') {
+        showToast('Export Notice', 'Preparing passport canvas for capture...');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Malawi Passport 2-page spread');
+      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'malawi-passport-' + (readMwiFields().passNo || 'MWA058787') + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Ready!', 'Malawi Passport PNG generated successfully');
+      }).catch(function () {
+        showToast('Download Error', 'Could not export passport image');
+      });
+    }
+
+    function printMwiPassport() {
+      window.print();
+    }
+
+    window.updateMwiPreview = updateMwiPreview;
+    window.randomizeMwiPassport = randomizeMwiPassport;
+    window.resetMwiPassportSpecimen = resetMwiPassportSpecimen;
+    window.resetMwiPhoto = resetMwiPhoto;
+    window.copyMwiSpecimenData = copyMwiSpecimenData;
+    window.downloadMwiPassPNG = downloadMwiPassPNG;
+    window.printMwiPassport = printMwiPassport;
+    window.initMwiPassport = initMwiPassport;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMwiPassport);
+    } else {
+      initMwiPassport();
     }
 
     // ================= REPUBLIC OF RWANDA / INDANGAMUNTU (NATIONAL ID CARD / RWA) CONTROLLER =================
@@ -13231,6 +13695,18 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Nepal</div>
                 <div class="text-[10px] font-medium text-slate-500">Passport / राहदानी (NPL)</div>
+              </div>
+            </button>
+
+            <!-- Malawi / Mali (MWI) -->
+            <button type="button" id="country-btn-malawi" onclick="switchVerificationCountry('malawi')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-rose-50/40 hover:border-rose-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇲🇼</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Malawi / Mali</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport / Passeport (MWI)</div>
               </div>
             </button>
           </div>
@@ -21812,6 +22288,212 @@ COD REP DEM CONGO</div>
         </main>
       </div>
 
+      <!-- ================= STEP 3T: REPUBLIC OF MALAWI (MALI / MWI PASSPORT) 2-PAGE SPREAD VIEW ================= -->
+      <div id="malawi-passport-view" class="hidden">
+        <!-- Top Action Bar -->
+        <div class="max-w-7xl mx-auto mb-5 flex flex-wrap items-center justify-between gap-3 bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl p-3.5 shadow-xs no-print">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-600 via-slate-900 to-emerald-700 text-white flex items-center justify-center font-black text-lg shadow-xs">🇲🇼</div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">Republic of Malawi — National Passport (MWI)</h2>
+                <span class="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-[10px] font-extrabold uppercase">MWI · TD3 Spread</span>
+              </div>
+              <p class="text-xs text-slate-500">Exact 2-page vertical passport spread matching reference specimen (JOEL CHINTOKOMA · MWA058787 · BLANTYRE · MANGOCHI)</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="randomizeMwiPassport()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-600 via-red-600 to-emerald-600 hover:from-rose-500 hover:to-emerald-500 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-shuffle"></i> Randomize Card
+            </button>
+            <button type="button" onclick="resetMwiPassportSpecimen()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate-left"></i> Reset Specimen
+            </button>
+            <button type="button" onclick="copyMwiSpecimenData()" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-regular fa-copy"></i> Copy Data &amp; MRZ
+            </button>
+            <button type="button" onclick="downloadMwiPassPNG()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-download"></i> Download PNG
+            </button>
+          </div>
+        </div>
+
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <!-- Left Column: Editor Controls -->
+          <section class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm space-y-4 no-print">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h2 class="text-base font-bold text-slate-900">Malawi Passport Details (PASSPORT / PASSEPORT)</h2>
+                <p class="text-xs text-slate-500">Edit fields to dynamically update the 2-page spread &amp; ICAO Doc 9303 MRZ</p>
+              </div>
+              <span class="px-2.5 py-1 text-[11px] font-semibold rounded-md bg-rose-50 text-rose-700 border border-rose-200">ICAO Doc 9303</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Type / Type</label>
+                <input id="mwiType" type="text" maxlength="2" value="P" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Country / Pays</label>
+                <input id="mwiCountryCode" type="text" maxlength="3" value="MWI" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Passport No / No du Passeport</label>
+                <input id="mwiPassNo" type="text" maxlength="9" value="MWA058787" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Surname / Nom</label>
+                <input id="mwiSurname" type="text" value="CHINTOKOMA" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Sex / Sexe</label>
+                <select id="mwiSex" onchange="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+                  <option value="M" selected>M</option>
+                  <option value="F">F</option>
+                  <option value="X">X</option>
+                </select>
+              </div>
+
+              <div class="sm:col-span-3">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Given Names / Prénoms</label>
+                <input id="mwiGivenNames" type="text" value="JOEL" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Nationality / Nationalité</label>
+                <input id="mwiNationality" type="text" value="MALAWIAN" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Personal No / No Personnel</label>
+                <input id="mwiPersonalNo" type="text" value="5526110/2" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Birth / Date de Naissance</label>
+                <input id="mwiDob" type="date" value="1992-04-14" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Place of Birth / Lieu de Naissance</label>
+                <input id="mwiPob" type="text" value="BLANTYRE" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Issue / Date de Délivrance</label>
+                <input id="mwiIssue" type="date" value="2022-01-27" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Issuing Authority / Autorité</label>
+                <input id="mwiAuthority" type="text" value="MANGOCHI" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+
+              <div class="sm:col-span-3">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Expiry / Date d'Expiration</label>
+                <input id="mwiExpiry" type="date" value="2032-01-26" oninput="updateMwiPreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+            </div>
+
+            <!-- Portrait Upload / URL -->
+            <div class="pt-3 border-t border-slate-100 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600">Bearer Portrait Photo</label>
+                <button type="button" onclick="resetMwiPhoto()" class="text-[11px] font-semibold text-rose-700 hover:text-rose-900 cursor-pointer">Restore Reference Portrait</button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <input id="mwiPhotoUpload" type="file" accept="image/*" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 cursor-pointer">
+                <input id="mwiPhotoUrl" type="url" placeholder="Or paste image URL..." class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-600">
+              </div>
+            </div>
+
+            <div class="pt-2 flex flex-wrap gap-2">
+              <button type="button" onclick="printMwiPassport()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-print"></i> Print Spread
+              </button>
+              <button type="button" onclick="downloadMwiPassPNG()" class="flex-1 px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-file-image"></i> Save High-Res PNG
+              </button>
+            </div>
+          </section>
+
+          <!-- Right Column: Exact 2-Page Vertical Passport Spread Preview -->
+          <section class="lg:col-span-7 flex flex-col items-center space-y-4">
+            <!-- Passport 2-Page Spread Container matching exact reference proportions (688 × 968) -->
+            <article id="malawi-passport-card" class="relative w-full max-w-[580px] mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#16191d] bg-[#f7faf6]" style="aspect-ratio: 688 / 968; container-type: inline-size; font-family: Arial, Helvetica, 'Liberation Sans', sans-serif;">
+              <!-- Clean Authentic Reference Base Plate (Lion Upper Page + Guilloche Bio-Data Lower Page) -->
+              <img src="/assets/aistudio/malawi_passport_clean_bg.png" alt="Republic of Malawi Passport Spread Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+              <!-- ================= TOP PAGE (PAGE 3: LION ARTWORK & PERFORATED SERIAL) ================= -->
+              <section class="absolute inset-x-0 top-0 h-[50%] overflow-hidden pointer-events-none z-10">
+                <!-- Vertical Laser-Perforated Passport Number on Left Margin (reads bottom-to-top) -->
+                <div class="absolute" style="left: 5.38%; top: 18.39%; width: 6.40%; height: 72.73%; display: flex; align-items: center; justify-content: center;">
+                  <div id="mwiOutPassNoPage3Perforated" style="writing-mode: vertical-lr; transform: rotate(180deg); font-family: 'Courier New', Courier, monospace; font-weight: 900; font-size: 3.95cqw; letter-spacing: 0.14em; color: rgba(38, 35, 33, 0.85); filter: contrast(1.15); text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.85); white-space: nowrap;">
+                    M W A 0 5 8 7 8 7
+                  </div>
+                </div>
+              </section>
+
+              <!-- ================= BOTTOM PAGE (PAGE 2: BIO-DATA & MRZ PAGE) ================= -->
+              <section class="absolute inset-x-0 bottom-0 h-[50%] overflow-hidden z-10">
+                <!-- Rainbow Arch Passport Number above portrait -->
+                <div id="mwiOutPassNoArch" class="absolute font-bold whitespace-nowrap leading-none pointer-events-none" style="left: 11.05%; top: 23.35%; font-size: 2.15cqw; letter-spacing: 0.04em; color: rgba(118, 92, 82, 0.78);">MWA058787</div>
+
+                <!-- Main Bearer Portrait -->
+                <div class="absolute overflow-hidden" style="left: 7.27%; top: 28.93%; width: 22.09%; height: 39.05%;">
+                  <img id="mwiOutPhotoMain" src="/assets/aistudio/malawi_passport_portrait.png" alt="Bearer portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/malawi_passport_portrait.png'">
+                </div>
+
+                <!-- Gold MWI Hologram Patch overlapping bottom-left corner of portrait -->
+                <div class="absolute pointer-events-none" style="left: 2.62%; top: 63.64%; width: 9.88%; height: 8.68%;">
+                  <img src="/assets/aistudio/malawi_passport_mwi_patch.png" alt="MWI Hologram Patch" class="w-full h-full object-contain">
+                </div>
+
+                <!-- Holder's Signature Graphic -->
+                <div id="mwiOutSignatureBox" class="absolute pointer-events-none" style="left: 70.06%; top: 64.67%; width: 10.17%; height: 9.09%;">
+                  <img id="mwiOutSignatureImg" src="/assets/aistudio/malawi_passport_signature.png" alt="Signature" class="w-full h-full object-contain">
+                </div>
+
+                <!-- Row 1: Type / Country / Passport No. -->
+                <div id="mwiOutType" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 34.74%; top: 20.04%; font-size: 1.92cqw;">P</div>
+                <div id="mwiOutCountryCode" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 47.53%; top: 20.04%; font-size: 1.92cqw; letter-spacing: 0.02em;">MWI</div>
+                <div id="mwiOutPassNoHeader" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 64.68%; top: 19.83%; font-size: 1.92cqw; letter-spacing: 0.02em;">MWA058787</div>
+
+                <!-- Row 2: Surname & Sex -->
+                <div id="mwiOutSurname" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 34.59%; top: 26.65%; font-size: 1.90cqw; letter-spacing: 0.015em;">CHINTOKOMA</div>
+                <div id="mwiOutSex" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 64.97%; top: 26.45%; font-size: 1.90cqw;">M</div>
+
+                <!-- Row 3: Given Names -->
+                <div id="mwiOutGivenNames" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 34.45%; top: 34.50%; font-size: 1.90cqw; letter-spacing: 0.015em;">JOEL</div>
+
+                <!-- Row 4: Nationality & Personal No. -->
+                <div id="mwiOutNationality" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 34.30%; top: 42.36%; font-size: 1.90cqw; letter-spacing: 0.015em;">MALAWIAN</div>
+                <div id="mwiOutPersonalNo" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 65.26%; top: 42.36%; font-size: 1.88cqw; letter-spacing: 0.015em;">5526110/2</div>
+
+                <!-- Row 5: Date of Birth & Place of Birth -->
+                <div id="mwiOutDob" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 34.30%; top: 50.00%; font-size: 1.88cqw; letter-spacing: 0.01em;">14 Apr 1992</div>
+                <div id="mwiOutPob" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 65.26%; top: 49.59%; font-size: 1.88cqw; letter-spacing: 0.015em;">BLANTYRE</div>
+
+                <!-- Row 6: Date of Issue & Issuing Authority -->
+                <div id="mwiOutIssue" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 34.01%; top: 57.64%; font-size: 1.88cqw; letter-spacing: 0.01em;">27 Jan 2022</div>
+                <div id="mwiOutAuthority" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 65.41%; top: 57.44%; font-size: 1.88cqw; letter-spacing: 0.015em;">MANGOCHI</div>
+
+                <!-- Row 7: Date of Expiry -->
+                <div id="mwiOutExpiry" class="absolute font-bold text-[#16191d] whitespace-nowrap leading-none" style="left: 34.01%; top: 65.70%; font-size: 1.88cqw; letter-spacing: 0.01em;">26 Jan 2032</div>
+
+                <!-- Machine Readable Zone (MRZ: ICAO Doc 9303 TD3 2 lines × 44 chars) -->
+                <div id="mwiMrzLine1" class="absolute whitespace-nowrap leading-none" style="left: 6.10%; top: 80.58%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 800; font-size: 2.30cqw; letter-spacing: 0.142em; color: #16191d;">P&lt;MWICHINTOKOMA&lt;&lt;JOEL&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                <div id="mwiMrzLine2" class="absolute whitespace-nowrap leading-none" style="left: 6.10%; top: 87.60%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 800; font-size: 2.30cqw; letter-spacing: 0.142em; color: #16191d;">MWA0587873MWI9204144M32012665526110&lt;2&lt;&lt;&lt;&lt;&lt;02</div>
+              </section>
+
+              <!-- Exact 1:1 Reference Specimen Overlay when default specimen values & portrait are active -->
+              <img id="mwiRefSpecimenOverlay" src="/assets/aistudio/malawi_passport_reference.png" alt="Republic of Malawi Passport Specimen Reference" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
+            </article>
+
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Authentic passport reproduction · Republic of Malawi (PASSPORT / PASSEPORT · MWI) 2-page spread matching reference specimen with red/orange lion illustration, bilingual English/French fields, rainbow security arch, MWI gold patch, laser-perforated number, and ICAO Doc 9303 TD3 machine-readable zone.</p>
+          </section>
+        </main>
+      </div>
+
       <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY BANK LETTER & PDF) VIEW ================= -->
       <div id="proofofaccount-doc-view" class="hidden">
         <!-- Active Country & PDF Verification Banner -->
@@ -22963,6 +23645,7 @@ COD REP DEM CONGO</div>
         'canada-passport-card',
         'ghana-passport-card',
         'nepal-passport-card',
+        'malawi-passport-card',
         'rwanda-id-front',
         'rwanda-id-back',
         'proof-of-account-card',
