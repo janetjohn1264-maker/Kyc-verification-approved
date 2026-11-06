@@ -1826,11 +1826,15 @@ var $ = window.$ || (id => document.getElementById(id));
       // Update tip
       const tip = $('platform-kyc-tip');
       if (tip) {
-        if (currentVirtualAccount === 'grey') {
-          tip.innerHTML = `<strong>Grey Account:</strong> Requires a valid <strong>Proof of Account</strong> letter (Clear Junction Ltd IBAN &amp; Sort Code) or Passport/National ID. <button type="button" onclick="switchVerificationDoc('proofofaccount')" class="underline font-bold text-slate-900 ml-1 cursor-pointer">Open Proof of Account Card &rarr;</button>`;
+        if (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut') {
+          tip.innerHTML = `<strong>${meta.name}:</strong> Supports official <strong>Proof of Account</strong> confirmation letters (<strong>Grey Account</strong>, <strong>Wise Account</strong>, or <strong>Revolut</strong>) as well as Passport &amp; National ID. <button type="button" onclick="switchVerificationDoc('proofofaccount'); switchPoaProvider('${currentVirtualAccount}');" class="underline font-bold text-slate-900 ml-1 cursor-pointer">Open ${meta.name} Proof of Account &rarr;</button>`;
         } else {
-          tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong>, <strong>National Identity Card</strong>, <strong>Refugee Identity Card</strong>, or <strong>Proof of Account</strong> (from Kenya, the United Kingdom, Somalia, Ethiopia, Nigeria, or Uganda) for instant ${meta.badge} verification and payout clearance.`;
+          tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong>, <strong>National Identity Card</strong>, <strong>Refugee Identity Card</strong>, or <strong>Proof of Account</strong> (Grey, Wise, Revolut) for instant ${meta.badge} verification and payout clearance.`;
         }
+      }
+
+      if (currentDocType === 'proofofaccount' && (accountKey === 'grey' || accountKey === 'wise' || accountKey === 'revolut')) {
+        if (typeof switchPoaProvider === 'function') switchPoaProvider(accountKey, true);
       }
 
       // Highlight active button
@@ -1894,6 +1898,11 @@ var $ = window.$ || (id => document.getElementById(id));
         poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       }
 
+      const poaAccountBar = $('poa-step2-account-selector');
+      if (poaAccountBar) {
+        poaAccountBar.classList.toggle('hidden', docType !== 'proofofaccount');
+      }
+
       // Activate selected tab
       if (docType === 'passport') {
         if (passTab) {
@@ -1931,8 +1940,16 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaRadio) {
           poaRadio.className = "w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
-        switchPoaViewMode('pdf', true);
+        switchPoaViewMode('letter', true);
         updatePoaCountryDisplay(currentCountry);
+        if (typeof switchPoaProvider === 'function') {
+          const initialProvider = (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut')
+            ? currentVirtualAccount
+            : (window.currentPoaProvider || 'wise');
+          switchPoaProvider(initialProvider, true);
+        } else if (typeof updateProofOfAccountPreview === 'function') {
+          updateProofOfAccountPreview();
+        }
       }
 
       renderActiveDocumentView();
@@ -1990,9 +2007,10 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
 
-        // Show the PDF of proof of address
-        switchPoaViewMode('pdf', true);
+        // Show the interactive live preview editor of Proof of Account
+        switchPoaViewMode('letter', true);
         updatePoaCountryDisplay(countryKey);
+        if (typeof updateProofOfAccountPreview === 'function') updateProofOfAccountPreview();
       } else if (countryKey === 'uk') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -6264,90 +6282,522 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
 
-    function updateProofOfAccountPreview() {
-      const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
+    window.currentPoaProvider = 'wise';
+
+    function switchPoaProvider(providerKey, silent) {
+      const validProviders = ['grey', 'wise', 'revolut'];
+      const provider = validProviders.includes(providerKey) ? providerKey : 'wise';
+      window.currentPoaProvider = provider;
+
+      // Update button styles across Step 2 bar, Top POA bar, and Builder Panel
+      validProviders.forEach((p) => {
+        const isSelected = p === provider;
+        const step2Btn = $(`poa-step2-btn-${p}`);
+        const topBtn = $(`poa-top-btn-${p}`);
+        const formBtn = $(`poa-form-btn-${p}`);
+        const step2Radio = $(`poa-step2-radio-${p}`);
+
+        if (step2Btn) {
+          if (isSelected) {
+            const activeRing = p === 'wise'
+              ? 'border-2 border-[#163300] bg-gradient-to-br from-[#9fe870]/25 via-white to-emerald-50/40 ring-2 ring-[#163300]/15 shadow-md'
+              : p === 'revolut'
+              ? 'border-2 border-[#0075EB] bg-gradient-to-br from-sky-50 via-white to-blue-50/40 ring-2 ring-[#0075EB]/20 shadow-md'
+              : 'border-2 border-slate-900 bg-gradient-to-br from-slate-100 via-white to-slate-50 ring-2 ring-slate-900/15 shadow-md';
+            step2Btn.className = `p-3.5 rounded-2xl text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${activeRing}`;
+          } else {
+            step2Btn.className = 'p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs';
+          }
+        }
+        if (step2Radio) {
+          if (isSelected) {
+            const radioBg = p === 'wise' ? 'bg-[#163300] text-[#9fe870]' : p === 'revolut' ? 'bg-[#0075EB] text-white' : 'bg-slate-900 text-amber-300';
+            step2Radio.className = `w-6 h-6 rounded-full ${radioBg} flex items-center justify-center text-xs shadow-xs shrink-0`;
+          } else {
+            step2Radio.className = 'w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0';
+          }
+        }
+        if (topBtn) {
+          if (isSelected) {
+            const topActive = p === 'wise'
+              ? 'bg-[#9fe870] text-[#163300] border-[#9fe870] shadow-md font-black'
+              : p === 'revolut'
+              ? 'bg-[#0075EB] text-white border-[#0075EB] shadow-md font-black'
+              : 'bg-amber-400 text-slate-950 border-amber-300 shadow-md font-black';
+            topBtn.className = `px-3.5 py-2 rounded-xl text-xs border transition-all cursor-pointer inline-flex items-center gap-2 ${topActive}`;
+          } else {
+            topBtn.className = 'px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-all cursor-pointer inline-flex items-center gap-2';
+          }
+        }
+        if (formBtn) {
+          if (isSelected) {
+            const formActive = p === 'wise'
+              ? 'bg-[#163300] text-[#9fe870] border-[#163300] shadow-xs'
+              : p === 'revolut'
+              ? 'bg-[#0075EB] text-white border-[#0075EB] shadow-xs'
+              : 'bg-slate-900 text-white border-slate-900 shadow-xs';
+            formBtn.className = `py-2 px-3 rounded-xl font-black text-xs border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${formActive}`;
+          } else {
+            formBtn.className = 'py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 transition-all cursor-pointer flex items-center justify-center gap-1.5';
+          }
+        }
+      });
+
+      // Toggle form sections
+      const formGrey = $('poaFormSectionGrey');
+      const formWise = $('poaFormSectionWise');
+      const formRevolut = $('poaFormSectionRevolut');
+      if (formGrey) formGrey.classList.toggle('hidden', provider !== 'grey');
+      if (formWise) formWise.classList.toggle('hidden', provider !== 'wise');
+      if (formRevolut) formRevolut.classList.toggle('hidden', provider !== 'revolut');
+
+      // Toggle document preview cards
+      const cardGrey = $('proof-of-account-card');
+      const cardWise = $('poa-wise-card');
+      const cardRevolut = $('poa-revolut-card');
+      if (cardGrey) cardGrey.classList.toggle('hidden', provider !== 'grey');
+      if (cardWise) cardWise.classList.toggle('hidden', provider !== 'wise');
+      if (cardRevolut) cardRevolut.classList.toggle('hidden', provider !== 'revolut');
+
+      // Update Builder Header subtitle, badge, and reference download links
+      const subEl = $('poaBuilderSubtitle');
+      const badgeEl = $('poaBuilderBadge');
+      const footerBadgeEl = $('poaBuilderFooterBadge');
+      const refDownloadBtn = $('poaQuickDownloadRefLink');
+      const refViewBtn = $('poaViewRefImgLink');
+
+      if (provider === 'wise') {
+        if (subEl) subEl.textContent = 'Wise Payments Ltd. · Wise Europe SA (EUR / Multi-Currency) Account Details';
+        if (badgeEl) {
+          badgeEl.textContent = 'WISE · EUR';
+          badgeEl.className = 'text-xs bg-[#163300] text-[#9fe870] font-bold px-2.5 py-1 rounded-full border border-[#163300]';
+        }
+        if (footerBadgeEl) footerBadgeEl.innerHTML = '<i class="fa-solid fa-shield-halved text-emerald-600"></i> Wise FCA Authorised EMI (#900507)';
+        if (refDownloadBtn) {
+          refDownloadBtn.href = '/assets/aistudio/1793954988317_80f3f77d.jpg';
+          refDownloadBtn.download = 'wise-proof-of-account-reference.jpg';
+        }
+        if (refViewBtn) refViewBtn.href = '/assets/aistudio/1793954988317_80f3f77d.jpg';
+      } else if (provider === 'revolut') {
+        if (subEl) subEl.textContent = 'Revolut Bank UAB · European IBAN & BIC Account Confirmation Statement';
+        if (badgeEl) {
+          badgeEl.textContent = 'REVOLUT · EUR';
+          badgeEl.className = 'text-xs bg-[#0075EB] text-white font-bold px-2.5 py-1 rounded-full border border-blue-600';
+        }
+        if (footerBadgeEl) footerBadgeEl.innerHTML = '<i class="fa-solid fa-shield-halved text-blue-600"></i> Revolut Bank UAB Licensed';
+        if (refDownloadBtn) {
+          refDownloadBtn.href = '/assets/aistudio/1793954988317_80f3f77d.jpg';
+          refDownloadBtn.download = 'revolut-proof-of-account.jpg';
+        }
+        if (refViewBtn) refViewBtn.href = '/assets/aistudio/1793954988317_80f3f77d.jpg';
+      } else {
+        if (subEl) subEl.textContent = 'Grey Inc. Delaware · Community Federal Savings Bank (USD) Confirmation Letter';
+        if (badgeEl) {
+          badgeEl.textContent = 'GREY · USD';
+          badgeEl.className = 'text-xs bg-slate-900 text-white font-bold px-2.5 py-1 rounded-full border border-slate-700';
+        }
+        if (footerBadgeEl) footerBadgeEl.innerHTML = '<i class="fa-solid fa-shield-halved text-emerald-600"></i> Grey Inc. Delaware Registered';
+        if (refDownloadBtn) {
+          refDownloadBtn.href = '/assets/aistudio/1793954903894_cb01dc06.jpg';
+          refDownloadBtn.download = 'grey-proof-of-account-reference.jpg';
+        }
+        if (refViewBtn) refViewBtn.href = '/assets/aistudio/1793954903894_cb01dc06.jpg';
+      }
+
+      switchPoaViewMode('letter', true);
+      updateProofOfAccountPreview(false);
+
+      if (!silent) {
+        const labels = { grey: 'Grey Account', wise: 'Wise Account', revolut: 'Revolut Account' };
+        showToast(`${labels[provider]} Selected`, `Switched Proof of Account live editor to ${labels[provider]}`);
+      }
+    }
+    window.switchPoaProvider = switchPoaProvider;
+
+    function updateProofOfAccountPreview(fromUserInput) {
+      if (fromUserInput) {
+        const letterContainer = $('poaLetterContainer');
+        if (letterContainer && letterContainer.classList.contains('hidden')) {
+          switchPoaViewMode('letter', true);
+        }
+      }
+
+      const getVal = (id, fallback) => {
+        const el = $(id);
+        return el && typeof el.value === 'string' && el.value.trim().length > 0 ? el.value.trim() : fallback;
+      };
       const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
 
-      setText('poaPreviewName', getVal('poaInputName', 'ABDIRAHMAN MOHAMED ADAN').toUpperCase());
-      setText('poaPreviewBank', getVal('poaInputBank', 'Clear Junction Limited'));
-      setText('poaPreviewOpened', getVal('poaInputOpened', 'Sep 29, 2026'));
-      setText('poaPreviewAccNum', getVal('poaInputAccNum', '44041786'));
-      setText('poaPreviewIban', getVal('poaInputIban', 'GB97CLJU04130744041786').toUpperCase());
-      setText('poaPreviewSortCode', getVal('poaInputSortCode', '041307'));
-      setText('poaPreviewSwift', getVal('poaInputSwift', 'CLJUGB21XXX').toUpperCase());
-      setText('poaPreviewLetterDate', getVal('poaInputLetterDate', 'Sunday, October 25, 2026'));
-      const email = getVal('poaInputEmail', 'getkycapproved@gmail.com');
+      // 1. Update Grey Account Live Preview
+      const nameVal = getVal('poaInputName', 'Chidubem Uchegbu');
+      const bankVal = getVal('poaInputBank', 'Community Federal Savings Bank');
+      const openedVal = getVal('poaInputOpened', 'Aug 16, 2024');
+      const accNumVal = getVal('poaInputAccNum', '8398090100');
+      const achRoutingVal = getVal('poaInputAchRouting', '026073150');
+      const letterDateVal = getVal('poaInputLetterDate', 'Thursday, September 12, 2024');
+      const addrLine1Val = getVal('poaInputAddrLine1', '651 N Broad Street, Suite');
+      const addrLine2Val = getVal('poaInputAddrLine2', '206 Middletown, DE 19709');
+      const addrLine3Val = getVal('poaInputAddrLine3', 'USA.');
+      const emailVal = getVal('poaInputEmail', 'support@grey.co');
+      const signoffVal = getVal('poaInputSignoff', 'Grey Team');
+
+      const sortCodeEl = $('poaInputSortCode');
+      const ibanEl = $('poaInputIban');
+      const swiftEl = $('poaInputSwift');
+      const sortCodeVal = sortCodeEl && sortCodeEl.value ? sortCodeEl.value.trim() : '';
+      const ibanVal = ibanEl && ibanEl.value ? ibanEl.value.trim() : '';
+      const swiftVal = swiftEl && swiftEl.value ? swiftEl.value.trim() : '';
+
+      setText('poaPreviewName', nameVal);
+      setText('poaPreviewBank', bankVal);
+      setText('poaPreviewOpened', openedVal);
+      setText('poaPreviewAccNum', accNumVal);
+      setText('poaPreviewAchRouting', achRoutingVal);
+      setText('poaPreviewAddrLine1', addrLine1Val);
+      setText('poaPreviewAddrLine2', addrLine2Val);
+      setText('poaPreviewAddrLine3', addrLine3Val);
+
+      const letterDateEl = $('poaPreviewLetterDate');
+      if (letterDateEl) {
+        const commaYearMatch = letterDateVal.match(/^(.*,\s*[A-Za-z]+\s+\d{1,2},)\s*(\d{4})$/);
+        if (commaYearMatch) {
+          letterDateEl.innerHTML = `${commaYearMatch[1]}<br>${commaYearMatch[2]}`;
+        } else {
+          letterDateEl.textContent = letterDateVal;
+        }
+      }
+
+      setText('poaPreviewIban', ibanVal);
+      setText('poaPreviewSortCode', sortCodeVal);
+      setText('poaPreviewSwift', swiftVal);
+
+      const ukExtraRows = $('poaUkExtraRows');
+      const achRow = $('poaAchRoutingRow');
+      const isUkMode = Boolean(ibanVal || sortCodeVal || swiftVal);
+      if (ukExtraRows) ukExtraRows.classList.toggle('hidden', !isUkMode);
+      if (achRow) achRow.classList.toggle('hidden', isUkMode && !achRoutingVal);
+
       const emailEl = $('poaPreviewEmail');
       if (emailEl) {
-        emailEl.textContent = email;
-        emailEl.href = 'mailto:' + email;
+        emailEl.textContent = emailVal;
+        if (emailEl.tagName === 'A') emailEl.href = 'mailto:' + emailVal;
+      }
+      setText('poaPreviewSignoff', signoffVal);
+
+      const isDefaultGreySpecimen =
+        nameVal === 'Chidubem Uchegbu' &&
+        bankVal === 'Community Federal Savings Bank' &&
+        openedVal === 'Aug 16, 2024' &&
+        accNumVal === '8398090100' &&
+        achRoutingVal === '026073150' &&
+        letterDateVal === 'Thursday, September 12, 2024' &&
+        addrLine1Val === '651 N Broad Street, Suite' &&
+        addrLine2Val === '206 Middletown, DE 19709' &&
+        addrLine3Val === 'USA.' &&
+        emailVal === 'support@grey.co' &&
+        signoffVal === 'Grey Team' &&
+        !isUkMode;
+
+      const greyRefOverlay = $('poaRefSpecimenOverlay');
+      if (greyRefOverlay) {
+        greyRefOverlay.style.display = isDefaultGreySpecimen ? 'block' : 'none';
+      }
+
+      // 2. Update Wise Account Live Preview
+      const wiseHolder = getVal('poaWiseInputHolder', 'Stefan Pecic');
+      const wiseCurrency = getVal('poaWiseInputCurrency', 'EUR');
+      const wiseDate = getVal('poaWiseInputDate', '7 July 2023');
+      const wiseIban = getVal('poaWiseInputIban', 'BE63 9674 6535 2008');
+      const wiseBic = getVal('poaWiseInputBic', 'TRWIBEB1XXX');
+      const wiseBankName = getVal('poaWiseInputBankName', 'Wise Europe SA');
+      const wiseBankStreet = getVal('poaWiseInputBankStreet', 'Avenue Louise 54, Room S52');
+      const wiseBankCity = getVal('poaWiseInputBankCity', 'Brussels');
+      const wiseBankZip = getVal('poaWiseInputBankZip', '1050');
+      const wiseBankCountry = getVal('poaWiseInputBankCountry', 'Belgium');
+      const wiseSignoff = getVal('poaWiseInputSignoff', 'Wise Customer Support');
+
+      setText('poaWisePreviewHolder', wiseHolder);
+      setText('poaWisePreviewInlineName', wiseHolder);
+      setText('poaWisePreviewCurrency', wiseCurrency);
+      setText('poaWisePreviewDate', wiseDate);
+      setText('poaWisePreviewIban', wiseIban);
+      setText('poaWisePreviewBic', wiseBic);
+      setText('poaWisePreviewSignoff', wiseSignoff);
+
+      const wiseBankAddrEl = $('poaWisePreviewBankAddr');
+      if (wiseBankAddrEl) {
+        wiseBankAddrEl.innerHTML = [wiseBankName, wiseBankStreet, wiseBankCity, wiseBankZip, wiseBankCountry]
+          .filter(Boolean)
+          .map(line => line.replace(/</g, '&lt;').replace(/>/g, '&gt;'))
+          .join('<br>');
+      }
+
+      const isDefaultWiseSpecimen =
+        wiseHolder === 'Stefan Pecic' &&
+        wiseCurrency === 'EUR' &&
+        wiseDate === '7 July 2023' &&
+        wiseIban === 'BE63 9674 6535 2008' &&
+        wiseBic === 'TRWIBEB1XXX' &&
+        wiseBankName === 'Wise Europe SA' &&
+        wiseBankStreet === 'Avenue Louise 54, Room S52' &&
+        wiseBankCity === 'Brussels' &&
+        wiseBankZip === '1050' &&
+        wiseBankCountry === 'Belgium' &&
+        wiseSignoff === 'Wise Customer Support';
+
+      const wiseRefOverlay = $('poaWiseRefSpecimenOverlay');
+      if (wiseRefOverlay) {
+        wiseRefOverlay.style.display = isDefaultWiseSpecimen ? 'block' : 'none';
+      }
+
+      // 3. Update Revolut Account Live Preview
+      const revHolder = getVal('poaRevInputHolder', 'Stefan Pecic');
+      const revCurrency = getVal('poaRevInputCurrency', 'EUR');
+      const revDate = getVal('poaRevInputDate', '12 September 2024');
+      const revIban = getVal('poaRevInputIban', 'LT68 3250 0984 5120 3319');
+      const revBic = getVal('poaRevInputBic', 'REVOLT21');
+      const revBankName = getVal('poaRevInputBankName', 'Revolut Bank UAB');
+      const revBankAddr = getVal('poaRevInputBankAddr', 'Konstitucijos ave. 21B, 08130 Vilnius, Lithuania');
+      const revHolderAddr = getVal('poaRevInputHolderAddr', 'Avenue Louise 54, 1050 Brussels, Belgium');
+
+      setText('poaRevPreviewHolder', revHolder);
+      setText('poaRevPreviewInlineName', revHolder);
+      setText('poaRevPreviewCurrency', revCurrency);
+      setText('poaRevPreviewDate', revDate);
+      setText('poaRevPreviewIban', revIban);
+      setText('poaRevPreviewBic', revBic);
+      setText('poaRevPreviewBankName', revBankName);
+      setText('poaRevPreviewBankAddr', revBankAddr);
+      setText('poaRevPreviewHolderAddr', revHolderAddr);
+    }
+
+    function resetProofOfAccountDefaults(targetProvider) {
+      const provider = targetProvider || window.currentPoaProvider || 'wise';
+      if (targetProvider && targetProvider !== window.currentPoaProvider) {
+        switchPoaProvider(targetProvider, true);
+      }
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+
+      if (provider === 'wise') {
+        setVal('poaWiseInputHolder', 'Stefan Pecic');
+        setVal('poaWiseInputCurrency', 'EUR');
+        setVal('poaWiseInputDate', '7 July 2023');
+        setVal('poaWiseInputIban', 'BE63 9674 6535 2008');
+        setVal('poaWiseInputBic', 'TRWIBEB1XXX');
+        setVal('poaWiseInputBankName', 'Wise Europe SA');
+        setVal('poaWiseInputBankStreet', 'Avenue Louise 54, Room S52');
+        setVal('poaWiseInputBankCity', 'Brussels');
+        setVal('poaWiseInputBankZip', '1050');
+        setVal('poaWiseInputBankCountry', 'Belgium');
+        setVal('poaWiseInputSignoff', 'Wise Customer Support');
+        switchPoaViewMode('letter', true);
+        updateProofOfAccountPreview(false);
+        showToast('Wise Specimen Reset', 'Restored Wise Proof of account details reference (Stefan Pecic)');
+      } else if (provider === 'revolut') {
+        setVal('poaRevInputHolder', 'Stefan Pecic');
+        setVal('poaRevInputCurrency', 'EUR');
+        setVal('poaRevInputDate', '12 September 2024');
+        setVal('poaRevInputIban', 'LT68 3250 0984 5120 3319');
+        setVal('poaRevInputBic', 'REVOLT21');
+        setVal('poaRevInputBankName', 'Revolut Bank UAB');
+        setVal('poaRevInputBankAddr', 'Konstitucijos ave. 21B, 08130 Vilnius, Lithuania');
+        setVal('poaRevInputHolderAddr', 'Avenue Louise 54, 1050 Brussels, Belgium');
+        switchPoaViewMode('letter', true);
+        updateProofOfAccountPreview(false);
+        showToast('Revolut Specimen Reset', 'Restored Revolut Account Confirmation defaults');
+      } else {
+        setVal('poaInputName', 'Chidubem Uchegbu');
+        setVal('poaInputBank', 'Community Federal Savings Bank');
+        setVal('poaInputOpened', 'Aug 16, 2024');
+        setVal('poaInputAccNum', '8398090100');
+        setVal('poaInputAchRouting', '026073150');
+        setVal('poaInputLetterDate', 'Thursday, September 12, 2024');
+        setVal('poaInputAddrLine1', '651 N Broad Street, Suite');
+        setVal('poaInputAddrLine2', '206 Middletown, DE 19709');
+        setVal('poaInputAddrLine3', 'USA.');
+        setVal('poaInputEmail', 'support@grey.co');
+        setVal('poaInputSignoff', 'Grey Team');
+        setVal('poaInputIban', '');
+        setVal('poaInputSortCode', '');
+        setVal('poaInputSwift', '');
+        const noteEl = $('poaPreviewNoteBox');
+        if (noteEl) {
+          noteEl.innerHTML = '<strong class="font-bold text-[#1f2328]">Please Note:</strong> Payments can only be received from countries within the permitted jurisdictions. Click this <strong class="font-bold text-[#1f2328]">link</strong> to view the restricted jurisdictions.';
+        }
+        switchPoaViewMode('letter', true);
+        updateProofOfAccountPreview(false);
+        showToast('Grey Specimen Reset', 'Restored Grey USD Proof of Account reference details (Chidubem Uchegbu)');
       }
     }
 
-    function resetProofOfAccountDefaults() {
+    function loadPoaUkClearJunctionPreset() {
+      switchPoaProvider('grey', true);
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('poaInputName', 'ABDIRAHMAN MOHAMED ADAN');
       setVal('poaInputBank', 'Clear Junction Limited');
       setVal('poaInputOpened', 'Sep 29, 2026');
       setVal('poaInputLetterDate', 'Sunday, October 25, 2026');
       setVal('poaInputAccNum', '44041786');
+      setVal('poaInputAchRouting', '041307');
       setVal('poaInputIban', 'GB97CLJU04130744041786');
       setVal('poaInputSortCode', '041307');
       setVal('poaInputSwift', 'CLJUGB21XXX');
-      setVal('poaInputEmail', 'getkycapproved@gmail.com');
-      updateProofOfAccountPreview();
-      showToast('Specimen Reset', 'Restored original Proof of Account details from PDF');
+      setVal('poaInputAddrLine1', '651 N Broad Street, Suite');
+      setVal('poaInputAddrLine2', '206 Middletown, DE 19709');
+      setVal('poaInputAddrLine3', 'USA.');
+      setVal('poaInputEmail', 'support@grey.co');
+      setVal('poaInputSignoff', 'Grey Team');
+      switchPoaViewMode('letter', true);
+      updateProofOfAccountPreview(false);
+      showToast('UK GBP Specimen Loaded', 'Loaded Clear Junction Limited GBP Proof of Account preset');
     }
+    window.loadPoaUkClearJunctionPreset = loadPoaUkClearJunctionPreset;
 
     function randomizeProofOfAccount() {
+      const provider = window.currentPoaProvider || 'wise';
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      const monthsShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthsFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+      if (provider === 'wise') {
+        const wiseNames = [
+          'Stefan Pecic',
+          'Lukas Lindqvist',
+          'Mateo Rossi',
+          'Chidubem Uchegbu',
+          'Elena Rostova',
+          'Henrik Vandenberg',
+          'Clara Moreau',
+          'David Alaba Mensah',
+          'nikolaos Papadopoulos',
+          'Sofia Lindholm'
+        ];
+        const randomName = wiseNames[Math.floor(Math.random() * wiseNames.length)];
+        const d1 = String(Math.floor(10 + Math.random() * 89));
+        const b1 = String(Math.floor(1000 + Math.random() * 8999));
+        const b2 = String(Math.floor(1000 + Math.random() * 8999));
+        const b3 = String(Math.floor(1000 + Math.random() * 8999));
+        const iban = `BE${d1} 9674 ${b2} ${b3}`;
+        const day = Math.floor(1 + Math.random() * 28);
+        const month = monthsFull[Math.floor(Math.random() * monthsFull.length)];
+        const year = ['2023', '2024'][Math.floor(Math.random() * 2)];
+
+        setVal('poaWiseInputHolder', randomName);
+        setVal('poaWiseInputCurrency', 'EUR');
+        setVal('poaWiseInputDate', `${day} ${month} ${year}`);
+        setVal('poaWiseInputIban', iban);
+        setVal('poaWiseInputBic', 'TRWIBEB1XXX');
+        setVal('poaWiseInputBankName', 'Wise Europe SA');
+        setVal('poaWiseInputBankStreet', 'Avenue Louise 54, Room S52');
+        setVal('poaWiseInputBankCity', 'Brussels');
+        setVal('poaWiseInputBankZip', '1050');
+        setVal('poaWiseInputBankCountry', 'Belgium');
+        setVal('poaWiseInputSignoff', 'Wise Customer Support');
+
+        switchPoaViewMode('letter', true);
+        updateProofOfAccountPreview(true);
+        showToast('Wise Account Randomized!', `Generated Wise EUR Proof of Account for ${randomName}`);
+        return;
+      }
+
+      if (provider === 'revolut') {
+        const revNames = [
+          'Stefan Pecic',
+          'Chidubem Uchegbu',
+          'Marcus Vance',
+          'Elena Kovalenko',
+          'Liam O\'Connor',
+          'Amina Al-Mansoor',
+          'Jonas Kazlauskas',
+          'Tariq El-Amin'
+        ];
+        const randomName = revNames[Math.floor(Math.random() * revNames.length)];
+        const chk = String(Math.floor(10 + Math.random() * 89));
+        const p1 = String(Math.floor(1000 + Math.random() * 8999));
+        const p2 = String(Math.floor(1000 + Math.random() * 8999));
+        const p3 = String(Math.floor(1000 + Math.random() * 8999));
+        const iban = `LT${chk} 3250 0${p1.slice(0, 3)} ${p2} ${p3}`;
+        const day = Math.floor(1 + Math.random() * 28);
+        const month = monthsFull[Math.floor(Math.random() * monthsFull.length)];
+
+        setVal('poaRevInputHolder', randomName);
+        setVal('poaRevInputCurrency', 'EUR');
+        setVal('poaRevInputDate', `${day} ${month} 2024`);
+        setVal('poaRevInputIban', iban);
+        setVal('poaRevInputBic', 'REVOLT21');
+        setVal('poaRevInputBankName', 'Revolut Bank UAB');
+        setVal('poaRevInputBankAddr', 'Konstitucijos ave. 21B, 08130 Vilnius, Lithuania');
+
+        switchPoaViewMode('letter', true);
+        updateProofOfAccountPreview(true);
+        showToast('Revolut Randomized!', `Generated Revolut Proof of Account for ${randomName}`);
+        return;
+      }
+
       const names = [
-        'ABDIRAHMAN MOHAMED ADAN',
-        'FATIMA ALI HASSAN',
-        'OMAR FAROOQ IBRAHIM',
-        'ZAINAB AHMED NOOR',
-        'HAMZA KHALID WARSAME',
-        'AISHA MUSTAFA BASHIR',
-        'BILAL TARIQ JAMA',
-        'MARIAM YUSUF OSMAN'
+        'Chidubem Uchegbu',
+        'Oluwaseun Adeyemi',
+        'Chinedu Okafor',
+        'Abdirahman Mohamed Adan',
+        'Temitope Balogun',
+        'Ngozi Ezeife',
+        'Kofi Mensah',
+        'Fatima Ali Hassan',
+        'Ibrahim Musa Bello',
+        'Amara Nwosu'
+      ];
+      const banks = [
+        'Community Federal Savings Bank',
+        'Community Federal Savings Bank',
+        'Lead Bank',
+        'Evolve Bank & Trust'
       ];
       const randomName = names[Math.floor(Math.random() * names.length)];
-      const accNum = String(Math.floor(10000000 + Math.random() * 89999999));
-      const sortCode = '041307';
-      const ibanCheck = String(Math.floor(10 + Math.random() * 89));
-      const iban = `GB${ibanCheck}CLJU${sortCode}${accNum}`;
+      const randomBank = banks[Math.floor(Math.random() * banks.length)];
+      const accNum = '83' + String(Math.floor(10000000 + Math.random() * 89999999));
+      const achRoutingPool = ['026073150', '026073008', '101019644', '084106768'];
+      const achRouting = achRoutingPool[Math.floor(Math.random() * achRoutingPool.length)];
 
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const opDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const opMonth = months[Math.floor(Math.random() * months.length)];
-      const opYear = '2026';
-      const openedDate = `${opMonth} ${opDay}, ${opYear}`;
+      const opMonthIdx = Math.floor(Math.random() * monthsShort.length);
+      const opYear = '2024';
+      const openedDate = `${monthsShort[opMonthIdx]} ${opDay}, ${opYear}`;
 
-      const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const today = new Date();
-      const dayName = daysOfWeek[today.getDay()];
-      const letterDate = `${dayName}, ${months[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+      const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      const dayName = daysOfWeek[Math.floor(Math.random() * daysOfWeek.length)];
+      const letMonthIdx = Math.min(11, opMonthIdx + 1);
+      const letDay = Math.floor(5 + Math.random() * 20);
+      const letterDate = `${dayName}, ${monthsFull[letMonthIdx]} ${letDay}, 2024`;
 
-      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('poaInputName', randomName);
-      setVal('poaInputBank', 'Clear Junction Limited');
+      setVal('poaInputBank', randomBank);
       setVal('poaInputOpened', openedDate);
       setVal('poaInputLetterDate', letterDate);
       setVal('poaInputAccNum', accNum);
-      setVal('poaInputIban', iban);
-      setVal('poaInputSortCode', sortCode);
-      setVal('poaInputSwift', 'CLJUGB21XXX');
+      setVal('poaInputAchRouting', achRouting);
+      setVal('poaInputAddrLine1', '651 N Broad Street, Suite');
+      setVal('poaInputAddrLine2', '206 Middletown, DE 19709');
+      setVal('poaInputAddrLine3', 'USA.');
+      setVal('poaInputEmail', 'support@grey.co');
+      setVal('poaInputSignoff', 'Grey Team');
+      setVal('poaInputIban', '');
+      setVal('poaInputSortCode', '');
+      setVal('poaInputSwift', '');
 
-      updateProofOfAccountPreview();
-      showToast('Account Randomized!', `Generated Proof of Account for ${randomName}`);
+      switchPoaViewMode('letter', true);
+      updateProofOfAccountPreview(true);
+      showToast('Grey Account Randomized!', `Generated Grey USD Proof of Account for ${randomName}`);
     }
 
     async function downloadProofOfAccountPNG() {
-      const card = $('proof-of-account-card');
+      const provider = window.currentPoaProvider || 'wise';
+      const cardId = provider === 'wise' ? 'poa-wise-card' : provider === 'revolut' ? 'poa-revolut-card' : 'proof-of-account-card';
+      const card = $(cardId);
       if (!card || typeof html2canvas === 'undefined') {
         showToast('Export Error', 'Rendering engine unavailable');
         return;
       }
-      showToast('Generating PNG...', 'Rendering high-resolution Proof of Account Letter PNG');
+      showToast('Generating PNG...', `Rendering high-resolution ${provider.toUpperCase()} Proof of Account PNG`);
       try {
         const canvas = await html2canvas(card, {
           scale: 3,
@@ -6358,14 +6808,14 @@ var $ = window.$ || (id => document.getElementById(id));
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'proof-of-account-grey.png';
+          $('fallbackDownloadLink').download = `proof-of-account-${provider}.png`;
         }
         const modal = $('imageModal');
         if (modal) {
           modal.classList.remove('hidden');
           modal.classList.add('flex');
         }
-        showToast('Ready!', 'Proof of Account PNG generated successfully');
+        showToast('Ready!', `${provider.toUpperCase()} Proof of Account PNG generated successfully`);
       } catch (err) {
         console.error(err);
         showToast('Download Error', 'Could not export letter image');
@@ -13611,13 +14061,73 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 </div>
               </div>
               <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2 text-[11px] text-slate-500 font-medium">
-                <span class="inline-flex items-center gap-1 font-bold text-red-600"><i class="fa-solid fa-file-pdf text-[10px]"></i> Proof of Address</span>
+                <span class="inline-flex items-center gap-1 font-bold text-slate-900"><i class="fa-solid fa-building-columns text-[10px]"></i> Grey Account</span>
                 <span class="text-slate-300">•</span>
-                <span>All Countries Verified</span>
+                <span class="font-bold text-[#163300]">Wise Account</span>
                 <span class="text-slate-300">•</span>
-                <span class="text-emerald-700 font-bold">PDF Ready</span>
+                <span class="text-[#0075EB] font-bold">Revolut</span>
               </div>
             </button>
+          </div>
+
+          <!-- Proof of Account Provider Selector (Shown when Proof of Account is selected) -->
+          <div id="poa-step2-account-selector" class="hidden mt-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/90 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-slate-900"></i>
+                Select Proof of Account Provider (Grey Account, Wise Account, Revolut):
+              </span>
+              <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">Live Preview Editor Active</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- 1. Grey Account -->
+              <button type="button" id="poa-step2-btn-grey" onclick="switchPoaProvider('grey')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-950 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+                    GREY
+                  </div>
+                  <div>
+                    <div class="text-xs sm:text-sm font-black text-slate-900">Grey Account</div>
+                    <div class="text-[10px] font-semibold text-slate-500">Community Federal Savings Bank · USD</div>
+                  </div>
+                </div>
+                <div id="poa-step2-radio-grey" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </button>
+
+              <!-- 2. Wise Account -->
+              <button type="button" id="poa-step2-btn-wise" onclick="switchPoaProvider('wise')" class="p-3.5 rounded-2xl border-2 border-[#163300] bg-gradient-to-br from-[#9fe870]/25 via-white to-emerald-50/40 ring-2 ring-[#163300]/15 shadow-md text-left transition-all cursor-pointer flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-[#163300] text-[#9fe870] flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+                    WISE
+                  </div>
+                  <div>
+                    <div class="text-xs sm:text-sm font-black text-slate-900">Wise Account</div>
+                    <div class="text-[10px] font-semibold text-[#163300]">Wise Payments Ltd · EUR IBAN &amp; SWIFT</div>
+                  </div>
+                </div>
+                <div id="poa-step2-radio-wise" class="w-6 h-6 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center text-xs shadow-xs shrink-0">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </button>
+
+              <!-- 3. Revolut -->
+              <button type="button" id="poa-step2-btn-revolut" onclick="switchPoaProvider('revolut')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-[#0075EB] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
+                    REV
+                  </div>
+                  <div>
+                    <div class="text-xs sm:text-sm font-black text-slate-900">Revolut</div>
+                    <div class="text-[10px] font-semibold text-slate-500">Revolut Bank UAB · Global IBAN</div>
+                  </div>
+                </div>
+                <div id="poa-step2-radio-revolut" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0">
+                  <i class="fa-solid fa-check"></i>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -22584,36 +23094,36 @@ COD REP DEM CONGO</div>
         </main>
       </div>
 
-      <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY BANK LETTER & PDF) VIEW ================= -->
+      <!-- ================= STEP 3I: PROOF OF ACCOUNT (GREY, WISE & REVOLUT) VIEW ================= -->
       <div id="proofofaccount-doc-view" class="hidden">
-        <!-- Active Country & PDF Verification Banner -->
+        <!-- Active Country & Provider Selector Banner -->
         <div class="max-w-7xl mx-auto mb-6 no-print">
           <div id="poaCountryBanner" class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 border-2 border-slate-700/80 text-white shadow-xl flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3.5">
-              <div id="poaCountryBannerDot" class="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center text-2xl shrink-0 shadow-inner">
-                <i class="fa-solid fa-file-pdf"></i>
+              <div id="poaCountryBannerDot" class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
               </div>
               <div>
                 <div class="flex items-center gap-2.5 flex-wrap">
                   <span id="poaCountryBannerBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 border-emerald-500/40">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Proof of Address Verified</span>
+                    <span>Proof of Account Verified</span>
                   </span>
-                  <span id="poaCountryBannerCountry" class="text-base sm:text-lg font-black text-white">United Kingdom</span>
+                  <span id="poaCountryBannerCountry" class="text-base sm:text-lg font-black text-white">Grey · Wise · Revolut</span>
                 </div>
-                <p id="poaCountryBannerText" class="text-xs text-slate-300 mt-1">Official Proof of Address &amp; Account confirmation PDF loaded for <strong class="text-amber-300">United Kingdom</strong>.</p>
+                <p id="poaCountryBannerText" class="text-xs text-slate-300 mt-1">Select <strong class="text-amber-300">Grey Account</strong>, <strong class="text-[#9fe870]">Wise Account</strong>, or <strong class="text-sky-300">Revolut</strong> below to edit and download the official Proof of Account confirmation.</p>
               </div>
             </div>
-            <div class="flex items-center gap-2.5 flex-wrap">
-              <button type="button" onclick="switchPoaViewMode('pdf')" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition-colors cursor-pointer inline-flex items-center gap-2">
-                <i class="fa-solid fa-file-pdf"></i> Official PDF Viewer
+            <div class="flex items-center gap-2 flex-wrap">
+              <button type="button" id="poa-top-btn-grey" onclick="switchPoaProvider('grey')" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-all cursor-pointer inline-flex items-center gap-2">
+                <i class="fa-solid fa-building-columns"></i> Grey Account
               </button>
-              <button type="button" onclick="switchPoaViewMode('letter')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-600 transition-colors cursor-pointer inline-flex items-center gap-2">
-                <i class="fa-solid fa-file-lines"></i> Interactive Letter
+              <button type="button" id="poa-top-btn-wise" onclick="switchPoaProvider('wise')" class="px-3.5 py-2 rounded-xl bg-[#9fe870] text-[#163300] border border-[#9fe870] shadow-md font-black text-xs transition-all cursor-pointer inline-flex items-center gap-2">
+                <i class="fa-solid fa-globe"></i> Wise Account
               </button>
-              <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" download="proof_of_account__1__3c9d9253.pdf" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-colors cursor-pointer inline-flex items-center gap-2">
-                <i class="fa-solid fa-download"></i> Download PDF
-              </a>
+              <button type="button" id="poa-top-btn-revolut" onclick="switchPoaProvider('revolut')" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-all cursor-pointer inline-flex items-center gap-2">
+                <i class="fa-solid fa-arrow-trend-up"></i> Revolut
+              </button>
             </div>
           </div>
         </div>
@@ -22626,9 +23136,28 @@ COD REP DEM CONGO</div>
                   <i class="fa-solid fa-file-invoice-dollar text-slate-900"></i>
                   Proof of Account Builder
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">Grey Inc. Delaware · Clear Junction Limited (UK/EEA) Bank Confirmation Letter</p>
+                <p id="poaBuilderSubtitle" class="text-xs text-slate-500 mt-0.5">Wise Payments Ltd. · Wise Europe SA (EUR / Multi-Currency) Account Details</p>
               </div>
-              <span class="text-xs bg-slate-900 text-white font-bold px-2.5 py-1 rounded-full border border-slate-700">GREY · GBP</span>
+              <span id="poaBuilderBadge" class="text-xs bg-[#163300] text-[#9fe870] font-bold px-2.5 py-1 rounded-full border border-[#163300]">WISE · EUR</span>
+            </div>
+
+            <!-- Account Type Switcher: Grey Account | Wise Account | Revolut -->
+            <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Select Account Provider:</span>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" id="poa-form-btn-grey" onclick="switchPoaProvider('grey')" class="py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-landmark text-[11px]"></i>
+                  <span>Grey Account</span>
+                </button>
+                <button type="button" id="poa-form-btn-wise" onclick="switchPoaProvider('wise')" class="py-2 px-3 rounded-xl bg-[#163300] text-[#9fe870] font-black text-xs border border-[#163300] shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-globe text-[11px]"></i>
+                  <span>Wise Account</span>
+                </button>
+                <button type="button" id="poa-form-btn-revolut" onclick="switchPoaProvider('revolut')" class="py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-slate-200 transition-all cursor-pointer flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-arrow-trend-up text-[11px]"></i>
+                  <span>Revolut</span>
+                </button>
+              </div>
             </div>
 
             <!-- Big Randomize Button -->
@@ -22639,19 +23168,19 @@ COD REP DEM CONGO</div>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                    <span>Randomize Card</span>
+                    <span>Randomize Proof of Account</span>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional UK IBAN, Sort Code, Swift &amp; client holder sample data</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate realistic holder name, IBAN/Routing &amp; bank details for active provider</div>
                 </div>
               </button>
             </div>
 
             <!-- Quick Action Buttons -->
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" download="proof_of_account__1__3c9d9253.pdf" class="py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs">
-                <i class="fa-solid fa-file-pdf text-red-600"></i>
-                <span>Download PDF</span>
+              <a id="poaQuickDownloadRefLink" href="/assets/aistudio/1793954988317_80f3f77d.jpg" download="wise-proof-of-account-reference.jpg" class="py-2.5 px-3 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs">
+                <i class="fa-solid fa-file-arrow-down text-red-600"></i>
+                <span>Download Reference</span>
               </a>
               <button type="button" onclick="downloadProofOfAccountPNG()" class="py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-2xs">
                 <i class="fa-solid fa-image text-amber-300"></i>
@@ -22661,72 +23190,215 @@ COD REP DEM CONGO</div>
 
             <!-- Sample Presets -->
             <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Specimen Presets:</span>
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <button type="button" onclick="resetProofOfAccountDefaults()" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-400 rounded-lg font-bold text-slate-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                  <span class="truncate">1. Original PDF (Abdirahman)</span>
-                  <i class="fa-solid fa-rotate-left text-[10px] text-slate-600 shrink-0 ml-1"></i>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Reference Specimen Presets:</span>
+              <div class="grid grid-cols-3 gap-1.5 text-[11px]">
+                <button type="button" onclick="resetProofOfAccountDefaults('wise')" class="px-2 py-2 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-400 rounded-lg font-bold text-slate-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                  <span class="truncate">Wise (Stefan)</span>
+                  <i class="fa-solid fa-rotate-left text-[10px] text-[#163300] shrink-0 ml-1"></i>
                 </button>
-                <button type="button" onclick="randomizeProofOfAccount()" class="px-2.5 py-2 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-400 rounded-lg font-bold text-slate-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                  <span class="truncate">2. Random Account</span>
-                  <i class="fa-solid fa-shuffle text-[10px] text-slate-600 shrink-0 ml-1"></i>
+                <button type="button" onclick="resetProofOfAccountDefaults('grey')" class="px-2 py-2 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-400 rounded-lg font-bold text-slate-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                  <span class="truncate">Grey (Chidubem)</span>
+                  <i class="fa-solid fa-rotate-left text-[10px] text-slate-700 shrink-0 ml-1"></i>
+                </button>
+                <button type="button" onclick="resetProofOfAccountDefaults('revolut')" class="px-2 py-2 bg-white hover:bg-slate-100 border border-slate-200 hover:border-slate-400 rounded-lg font-bold text-slate-800 text-left transition-colors cursor-pointer flex items-center justify-between">
+                  <span class="truncate">Revolut (EUR)</span>
+                  <i class="fa-solid fa-rotate-left text-[10px] text-[#0075EB] shrink-0 ml-1"></i>
                 </button>
               </div>
             </div>
 
             <!-- Controls Form -->
             <form id="poaDocForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
-              <div>
-                <label for="poaInputName" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Name on Account</label>
-                <input type="text" id="poaInputName" value="ABDIRAHMAN MOHAMED ADAN" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+              <!-- ================= 1. WISE ACCOUNT FORM FIELDS (DEFAULT ACTIVE) ================= -->
+              <div id="poaFormSectionWise" class="space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div class="sm:col-span-2">
+                    <label for="poaWiseInputHolder" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Account holder</label>
+                    <input type="text" id="poaWiseInputHolder" value="Stefan Pecic" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-semibold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaWiseInputCurrency" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Currency</label>
+                    <input type="text" id="poaWiseInputCurrency" value="EUR" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaWiseInputIban" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">IBAN</label>
+                    <input type="text" id="poaWiseInputIban" value="BE63 9674 6535 2008" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaWiseInputBic" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank code (SWIFT/BIC)</label>
+                    <input type="text" id="poaWiseInputBic" value="TRWIBEB1XXX" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaWiseInputDate" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Letter Date</label>
+                    <input type="text" id="poaWiseInputDate" value="7 July 2023" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaWiseInputBankName" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank Entity Name</label>
+                    <input type="text" id="poaWiseInputBankName" value="Wise Europe SA" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaWiseInputBankStreet" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank Street Address</label>
+                    <input type="text" id="poaWiseInputBankStreet" value="Avenue Louise 54, Room S52" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div class="grid grid-cols-3 gap-1.5">
+                    <div>
+                      <label for="poaWiseInputBankCity" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">City</label>
+                      <input type="text" id="poaWiseInputBankCity" value="Brussels" class="w-full px-2 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                    </div>
+                    <div>
+                      <label for="poaWiseInputBankZip" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Postal</label>
+                      <input type="text" id="poaWiseInputBankZip" value="1050" class="w-full px-2 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                    </div>
+                    <div>
+                      <label for="poaWiseInputBankCountry" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Country</label>
+                      <input type="text" id="poaWiseInputBankCountry" value="Belgium" class="w-full px-2 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label for="poaWiseInputSignoff" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Sign-off</label>
+                  <input type="text" id="poaWiseInputSignoff" value="Wise Customer Support" class="w-full px-3 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                </div>
               </div>
 
-              <div class="grid grid-cols-2 gap-2">
+              <!-- ================= 2. GREY ACCOUNT FORM FIELDS ================= -->
+              <div id="poaFormSectionGrey" class="hidden space-y-3">
                 <div>
-                  <label for="poaInputBank" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank Name</label>
-                  <input type="text" id="poaInputBank" value="Clear Junction Limited" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                  <label for="poaInputName" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Name on Account</label>
+                  <input type="text" id="poaInputName" value="Chidubem Uchegbu" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-semibold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
                 </div>
-                <div>
-                  <label for="poaInputOpened" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Date Opened</label>
-                  <input type="text" id="poaInputOpened" value="Sep 29, 2026" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaInputBank" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank Name</label>
+                    <input type="text" id="poaInputBank" value="Community Federal Savings Bank" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaInputOpened" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Date Account Opened</label>
+                    <input type="text" id="poaInputOpened" value="Aug 16, 2024" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
                 </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaInputAccNum" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Account Number</label>
+                    <input type="text" id="poaInputAccNum" value="8398090100" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaInputAchRouting" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">ACH Routing</label>
+                    <input type="text" id="poaInputAchRouting" value="026073150" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaInputLetterDate" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Letter Date</label>
+                    <input type="text" id="poaInputLetterDate" value="Thursday, September 12, 2024" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaInputEmail" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Contact Email</label>
+                    <input type="email" id="poaInputEmail" value="support@grey.co" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div>
+                    <label for="poaInputAddrLine1" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Address Line 1</label>
+                    <input type="text" id="poaInputAddrLine1" value="651 N Broad Street, Suite" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaInputAddrLine2" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Address Line 2</label>
+                    <input type="text" id="poaInputAddrLine2" value="206 Middletown, DE 19709" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaInputAddrLine3" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Country / Sign-off</label>
+                    <div class="grid grid-cols-2 gap-1">
+                      <input type="text" id="poaInputAddrLine3" value="USA." class="w-full px-2 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)" title="Country Line">
+                      <input type="text" id="poaInputSignoff" value="Grey Team" class="w-full px-2 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)" title="Sign-off Team">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Optional UK GBP Fields (Collapsible) -->
+                <details class="pt-1 border-t border-slate-100">
+                  <summary class="text-[11px] font-bold text-slate-500 hover:text-slate-800 cursor-pointer select-none">Optional UK / SEPA Fields (IBAN, Sort Code, Swift)</summary>
+                  <div class="grid grid-cols-3 gap-2 mt-2">
+                    <div>
+                      <label for="poaInputSortCode" class="block font-bold uppercase tracking-wider text-slate-500 mb-1 text-[10px]">Sort Code</label>
+                      <input type="text" id="poaInputSortCode" value="" placeholder="Optional" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 font-mono text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                    </div>
+                    <div>
+                      <label for="poaInputIban" class="block font-bold uppercase tracking-wider text-slate-500 mb-1 text-[10px]">IBAN</label>
+                      <input type="text" id="poaInputIban" value="" placeholder="Optional" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 font-mono text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                    </div>
+                    <div>
+                      <label for="poaInputSwift" class="block font-bold uppercase tracking-wider text-slate-500 mb-1 text-[10px]">Swift Code</label>
+                      <input type="text" id="poaInputSwift" value="" placeholder="Optional" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 font-mono text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                    </div>
+                  </div>
+                </details>
               </div>
 
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label for="poaInputAccNum" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Account Number</label>
-                  <input type="text" id="poaInputAccNum" value="44041786" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+              <!-- ================= 3. REVOLUT ACCOUNT FORM FIELDS ================= -->
+              <div id="poaFormSectionRevolut" class="hidden space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div class="sm:col-span-2">
+                    <label for="poaRevInputHolder" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Account Holder</label>
+                    <input type="text" id="poaRevInputHolder" value="Stefan Pecic" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-semibold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaRevInputCurrency" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Currency</label>
+                    <input type="text" id="poaRevInputCurrency" value="EUR" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
                 </div>
-                <div>
-                  <label for="poaInputSortCode" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Sort Code</label>
-                  <input type="text" id="poaInputSortCode" value="041307" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
-                </div>
-              </div>
 
-              <div>
-                <label for="poaInputIban" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">IBAN</label>
-                <input type="text" id="poaInputIban" value="GB97CLJU04130744041786" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label for="poaInputSwift" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Swift Code</label>
-                  <input type="text" id="poaInputSwift" value="CLJUGB21XXX" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaRevInputIban" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">IBAN</label>
+                    <input type="text" id="poaRevInputIban" value="LT68 3250 0984 5120 3319" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaRevInputBic" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">BIC / SWIFT</label>
+                    <input type="text" id="poaRevInputBic" value="REVOLT21" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
                 </div>
-                <div>
-                  <label for="poaInputLetterDate" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Letter Date</label>
-                  <input type="text" id="poaInputLetterDate" value="Sunday, October 25, 2026" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
-                </div>
-              </div>
 
-              <div>
-                <label for="poaInputEmail" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Contact Email</label>
-                <input type="email" id="poaInputEmail" value="getkycapproved@gmail.com" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview()">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaRevInputDate" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Statement Date</label>
+                    <input type="text" id="poaRevInputDate" value="12 September 2024" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaRevInputBankName" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank Institution</label>
+                    <input type="text" id="poaRevInputBankName" value="Revolut Bank UAB" class="w-full px-3 py-2 bg-white rounded-lg border border-slate-200 font-medium focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="poaRevInputHolderAddr" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Account Holder Address</label>
+                    <input type="text" id="poaRevInputHolderAddr" value="Avenue Louise 54, 1050 Brussels, Belgium" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                  <div>
+                    <label for="poaRevInputBankAddr" class="block font-bold uppercase tracking-wider text-slate-600 mb-1">Bank Registered Address</label>
+                    <input type="text" id="poaRevInputBankAddr" value="Konstitucijos ave. 21B, 08130 Vilnius, Lithuania" class="w-full px-2.5 py-1.5 bg-white rounded-lg border border-slate-200 text-[11px] focus:ring-2 focus:ring-slate-900 focus:outline-hidden" oninput="updateProofOfAccountPreview(true)">
+                  </div>
+                </div>
               </div>
             </form>
 
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-              <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-600"></i> Grey Delaware Registered</span>
+              <span id="poaBuilderFooterBadge" class="inline-flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-600"></i> Wise FCA Authorised EMI (#900507)</span>
               <button type="button" onclick="printProofOfAccount()" class="text-slate-700 hover:text-slate-900 font-bold inline-flex items-center gap-1 cursor-pointer">
                 <i class="fa-solid fa-print"></i> Print Letter
               </button>
@@ -22738,20 +23410,20 @@ COD REP DEM CONGO</div>
             <!-- View Mode Switcher -->
             <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-2xs no-print">
               <div class="inline-flex p-1 bg-slate-100 rounded-xl">
-                <button type="button" id="poaViewTabPdf" onclick="switchPoaViewMode('pdf')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs cursor-pointer">
-                  <i class="fa-solid fa-file-pdf mr-1.5 text-red-600"></i>Attached PDF Viewer
+                <button type="button" id="poaViewTabLetter" onclick="switchPoaViewMode('letter')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-2xs cursor-pointer">
+                  <i class="fa-solid fa-file-lines mr-1.5 text-slate-900"></i>Interactive Letter (Live Preview)
                 </button>
-                <button type="button" id="poaViewTabLetter" onclick="switchPoaViewMode('letter')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900 cursor-pointer">
-                  <i class="fa-solid fa-file-lines mr-1.5 text-slate-900"></i>Interactive Letter
+                <button type="button" id="poaViewTabPdf" onclick="switchPoaViewMode('pdf')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-600 hover:text-slate-900 cursor-pointer">
+                  <i class="fa-solid fa-file-pdf mr-1.5 text-red-600"></i>Attached Specimens &amp; PDF
                 </button>
               </div>
 
               <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
-                  SAMPLE / DEMO — NOT VALID
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-lg">
+                  LIVE PREVIEW EDITOR
                 </span>
-                <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" target="_blank" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
-                  <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Open PDF in Tab
+                <a id="poaViewRefImgLink" href="/assets/aistudio/1793954988317_80f3f77d.jpg" target="_blank" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-[11px]"></i> Reference Image
                 </a>
                 <button type="button" onclick="downloadProofOfAccountPNG()" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
                   <i class="fa-solid fa-download text-[11px] text-amber-300"></i> Save PNG
@@ -22759,87 +23431,241 @@ COD REP DEM CONGO</div>
               </div>
             </div>
 
-            <!-- 1. Interactive Letter Container -->
-            <div id="poaLetterContainer" class="hidden">
-              <article id="proof-of-account-card" class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden font-sans max-w-2xl mx-auto transition-all">
+            <!-- 1. Interactive Letter Container (Default Active Live Preview Editor) -->
+            <div id="poaLetterContainer" class="block">
+              <!-- ================= A. WISE PROOF OF ACCOUNT DETAILS CARD (EXACT 1:1 REFERENCE DESIGN) ================= -->
+              <article id="poa-wise-card" class="relative bg-white shadow-xl border border-[#d8dce0] overflow-hidden mx-auto transition-all select-none flex flex-col justify-between" style="max-width: 690px; aspect-ratio: 720 / 1004; padding: 5.7% 6.9% 5.2% 6.9%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1f2328;">
+                <div>
+                  <!-- Wise Logo Top-Left -->
+                  <div class="select-none">
+                    <img src="/assets/aistudio/wise_logo_header.png" alt="WISE" class="h-[22px] sm:h-[23px] w-auto object-contain block">
+                  </div>
+
+                  <!-- Wise Payments Ltd. Header Address -->
+                  <div class="mt-5 text-[10.5px] sm:text-[11px] leading-[1.42]">
+                    <p class="font-bold text-[#1f2328]">Wise Payments Ltd.</p>
+                    <div class="mt-1 font-normal text-[#5d646b]">
+                      <p>6th Floor, The Tea Building, 56 Shoreditch High Street</p>
+                      <p>London</p>
+                      <p>E1 6JJ</p>
+                      <p>United Kingdom</p>
+                    </div>
+                  </div>
+
+                  <!-- Main Heading -->
+                  <h2 class="mt-6 text-[23px] sm:text-[26px] font-bold text-[#0e0f0c] tracking-[-0.015em] leading-[1.2]">Proof of account details</h2>
+
+                  <!-- Letter Date -->
+                  <p id="poaWisePreviewDate" class="mt-4 text-[12px] sm:text-[12.5px] font-normal text-[#3b4045]">7 July 2023</p>
+
+                  <!-- Salutation -->
+                  <p class="mt-6 text-[12px] sm:text-[12.5px] font-normal text-[#1f2328]">To whom it may concern,</p>
+
+                  <!-- Confirmation Paragraph -->
+                  <p class="mt-6 text-[12px] sm:text-[12.5px] font-normal text-[#1f2328] leading-[1.52]">
+                    This letter is to confirm that the following <span id="poaWisePreviewCurrency">EUR</span> account details allow <strong id="poaWisePreviewInlineName" class="font-bold text-[#0e0f0c]">Stefan Pecic</strong> to receive payments into their Wise account:
+                  </p>
+
+                  <!-- Account Details Vertical Stack -->
+                  <div class="mt-8 pl-1 space-y-5 text-[12px] sm:text-[12.5px] leading-[1.45]">
+                    <div>
+                      <div class="font-bold text-[#1f2328]">Account holder</div>
+                      <div id="poaWisePreviewHolder" class="font-normal text-[#3b4045] mt-0.5">Stefan Pecic</div>
+                    </div>
+
+                    <div>
+                      <div class="font-bold text-[#1f2328]">IBAN</div>
+                      <div id="poaWisePreviewIban" class="font-normal text-[#3b4045] mt-0.5">BE63 9674 6535 2008</div>
+                    </div>
+
+                    <div>
+                      <div class="font-bold text-[#1f2328]">Bank code (SWIFT/BIC)</div>
+                      <div id="poaWisePreviewBic" class="font-normal text-[#3b4045] mt-0.5">TRWIBEB1XXX</div>
+                    </div>
+
+                    <div>
+                      <div class="font-bold text-[#1f2328]">Address</div>
+                      <div id="poaWisePreviewBankAddr" class="font-normal text-[#3b4045] leading-[1.5] mt-0.5">
+                        Wise Europe SA<br>Avenue Louise 54, Room S52<br>Brussels<br>1050<br>Belgium
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Sign-off -->
+                  <div class="mt-7 text-[12px] sm:text-[12.5px] font-normal text-[#1f2328] leading-[1.52]">
+                    <p>Sincerely,</p>
+                    <p id="poaWisePreviewSignoff" class="mt-0.5">Wise Customer Support</p>
+                  </div>
+                </div>
+
+                <!-- Regulatory Footer -->
+                <div class="pt-10 text-[9px] sm:text-[9.4px] font-normal text-[#5d646b] leading-[1.48]">
+                  <p>
+                    Wise Payments Limited, trading as Wise, is an Authorised Electronic Money Institution under firm reference number 900507 with the UK Financial Conduct Authority (FCA). Wise Payments Limited is registered in England and Wales with Companies House under company number 07209813. Tel: +44 (0) 203 6950 999 <strong class="font-semibold text-[#1f2328]">https://www.wise.com</strong>
+                  </p>
+                  <p class="mt-2">
+                    Need help? Visit <strong class="font-semibold text-[#1f2328]">wise.com/help</strong>
+                  </p>
+                </div>
+
+                <!-- Exact 1:1 Reference Specimen Overlay when default Stefan Pecic Wise values are active -->
+                <img id="poaWiseRefSpecimenOverlay" src="/assets/aistudio/1793954988317_80f3f77d.jpg" alt="Wise Proof of account details Reference Specimen" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10" onerror="this.style.display='none'">
+              </article>
+
+              <!-- ================= B. GREY PROOF OF ACCOUNT CARD (EXACT 1:1 REFERENCE DESIGN) ================= -->
+              <article id="proof-of-account-card" class="hidden relative bg-white shadow-xl border border-[#dedede] overflow-hidden mx-auto transition-all select-none" style="max-width: 690px; aspect-ratio: 720 / 967; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1f2328;">
                 <!-- Header Banner -->
                 <div class="w-full relative overflow-hidden bg-black text-white select-none">
                   <img src="/assets/aistudio/proof_of_account_header.png" alt="Proof of Account - Grey" class="w-full h-auto object-cover block">
                 </div>
 
-                <!-- Letter Body -->
-                <div class="p-6 sm:p-10 text-slate-900 space-y-5 text-[13px] sm:text-[14px] leading-relaxed">
-                  <!-- Address block -->
-                  <div class="text-xs sm:text-[13px] text-slate-700 leading-snug">
-                    <p>651 N Broad Street, Suite</p>
-                    <p>206 Middletown, DE 19709</p>
-                    <p>USA.</p>
-                    <p id="poaPreviewLetterDate" class="mt-1 font-semibold text-slate-900">Sunday, October 25, 2026</p>
+                <!-- Letter Body matching exact proportions and layout of reference specimen -->
+                <div class="px-[7.2%] pt-[5.2%] pb-[6.5%] text-[#1f2328] text-[13px] sm:text-[13.5px] leading-[1.52]">
+                  <!-- Address & Date Block -->
+                  <div class="text-[12.5px] sm:text-[13.2px] text-[#1f2328] leading-[1.48] font-normal">
+                    <p id="poaPreviewAddrLine1">651 N Broad Street, Suite</p>
+                    <p id="poaPreviewAddrLine2">206 Middletown, DE 19709</p>
+                    <p id="poaPreviewAddrLine3">USA.</p>
+                    <p id="poaPreviewLetterDate" class="font-normal text-[#1f2328]">Thursday, September 12,<br>2024</p>
                   </div>
 
                   <!-- Salutation -->
-                  <p class="font-medium text-slate-900 pt-1">To whom it may concern,</p>
+                  <p class="mt-4 font-normal text-[#1f2328] text-[12.5px] sm:text-[13.2px]">To whom it may concern,</p>
 
                   <!-- Confirmation Statement -->
-                  <p class="text-slate-800">This letter is being furnished by Grey to confirm the following client account details as of the date listed above</p>
+                  <p class="mt-3.5 font-normal text-[#1f2328] text-[12.5px] sm:text-[13.2px] leading-[1.5]">This letter is being furnished by Grey to confirm the following client account details as of the date listed above</p>
 
-                  <!-- Details Table / Key-Value Grid -->
-                  <div class="my-4 border border-slate-200 rounded-xl bg-slate-50/70 p-4 sm:p-5 shadow-2xs">
-                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-y-2.5 sm:gap-y-3 text-xs sm:text-[13px]">
-                      <div class="sm:col-span-4 font-semibold text-slate-600">Name on Account:</div>
-                      <div class="sm:col-span-8 font-black text-slate-900 uppercase tracking-wide" id="poaPreviewName">ABDIRAHMAN MOHAMED ADAN</div>
+                  <!-- Central Rounded Light-Grey Account Details & Please Note Container -->
+                  <div class="mt-4 rounded-[12px] bg-[#f8f9fa] px-5 py-5 sm:px-6 sm:py-6">
+                    <div class="grid grid-cols-12 gap-y-3 text-[12.5px] sm:text-[13.2px] leading-[1.4] text-[#1f2328]">
+                      <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">Name on Account:</div>
+                      <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328] break-words" id="poaPreviewName">Chidubem Uchegbu</div>
 
-                      <div class="sm:col-span-4 font-semibold text-slate-600">Bank Name:</div>
-                      <div class="sm:col-span-8 font-bold text-slate-800" id="poaPreviewBank">Clear Junction Limited</div>
+                      <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">Bank Name:</div>
+                      <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328] break-words" id="poaPreviewBank">Community Federal Savings Bank</div>
 
-                      <div class="sm:col-span-4 font-semibold text-slate-600">Date Account Opened:</div>
-                      <div class="sm:col-span-8 font-medium text-slate-800" id="poaPreviewOpened">Sep 29, 2026</div>
+                      <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">Date Account Opened:</div>
+                      <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328]" id="poaPreviewOpened">Aug 16, 2024</div>
 
-                      <div class="sm:col-span-4 font-semibold text-slate-600">Account Number:</div>
-                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 text-sm" id="poaPreviewAccNum">44041786</div>
+                      <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">Account Number:</div>
+                      <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328]" id="poaPreviewAccNum">8398090100</div>
 
-                      <div class="sm:col-span-4 font-semibold text-slate-600">IBAN:</div>
-                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 tracking-wider text-sm break-all" id="poaPreviewIban">GB97CLJU04130744041786</div>
+                      <div id="poaAchRoutingRow" class="col-span-12 grid grid-cols-12">
+                        <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">ACH Routing:</div>
+                        <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328]" id="poaPreviewAchRouting">026073150</div>
+                      </div>
 
-                      <div class="sm:col-span-4 font-semibold text-slate-600">Sort Code:</div>
-                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 text-sm" id="poaPreviewSortCode">041307</div>
+                      <!-- Optional UK GBP Rows (shown only when UK preset/fields are populated) -->
+                      <div id="poaUkExtraRows" class="col-span-12 hidden grid-cols-12 gap-y-3">
+                        <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">IBAN:</div>
+                        <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328] break-all" id="poaPreviewIban"></div>
 
-                      <div class="sm:col-span-4 font-semibold text-slate-600">Swift Code:</div>
-                      <div class="sm:col-span-8 font-mono font-bold text-slate-900 text-sm" id="poaPreviewSwift">CLJUGB21XXX</div>
+                        <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">Sort Code:</div>
+                        <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328]" id="poaPreviewSortCode"></div>
+
+                        <div class="col-span-5 sm:col-span-4 font-normal text-[#1f2328]">Swift Code:</div>
+                        <div class="col-span-7 sm:col-span-8 font-normal text-[#1f2328]" id="poaPreviewSwift"></div>
+                      </div>
+                    </div>
+
+                    <!-- Please Note Light-Blue Box Inside the Rounded Grey Container -->
+                    <div id="poaPreviewNoteBox" class="mt-5 bg-[#ebf2fc] rounded-[4px] px-4 py-3.5 text-[11px] sm:text-[11.5px] leading-[1.55] text-[#374151]">
+                      <strong class="font-bold text-[#1f2328]">Please Note:</strong> Payments can only be received from countries within the permitted jurisdictions. Click this <strong class="font-bold text-[#1f2328]">link</strong> to view the restricted jurisdictions.
                     </div>
                   </div>
 
-                  <!-- Please Note Blue Callout Box -->
-                  <div class="bg-[#f0f7ff] rounded-xl p-4 sm:p-5 border border-sky-100 text-xs sm:text-[12.5px] leading-relaxed text-slate-700">
-                    <span class="font-bold text-sky-950">Please Note:</span> This account only support payments via Faster payments (FPS), Bacs and CHAPS payment schemes from EEA regions. Account can only receive funds in the Great Britain Pounds (GBP) You'll be charged 0.8% fee on payments via FPS and GBP with a minimum value of 2 GBP, capped at 10 GBP. You'll be charged 15 GBP flat fee for BACS. You'll be charged 25 GBP flat fee for CHAPS. Incoming payments can take between 1-3 days depending on the payment scheme used by the sending bank
-                  </div>
-
                   <!-- Confidentiality Notice -->
-                  <p class="text-[11.5px] sm:text-xs text-slate-600 leading-relaxed pt-1">
+                  <p class="mt-6 text-[12px] sm:text-[12.8px] text-[#1f2328] leading-[1.52] font-normal">
                     In strict confidence and for the informational purposes solely of the intended audience, it is understood that this letter makes no representations whatsoever as to the financial or general operating condition of the aforementioned Grey client, nor does it attach any liability or financial responsibility to Grey, its officers or employees, or any affiliated entities thereof.
                   </p>
 
                   <!-- Contact Support -->
-                  <p class="text-xs sm:text-[12.5px] text-slate-700">
-                    We hope this information is useful, and should you have further questions, please feel free to contact us directly at <a href="mailto:getkycapproved@gmail.com" id="poaPreviewEmail" class="text-blue-600 underline font-semibold">getkycapproved@gmail.com</a>
+                  <p class="mt-4 text-[12px] sm:text-[12.8px] text-[#1f2328] leading-[1.52] font-normal">
+                    We hope this information is useful, and should you have further questions, please feel free to contact us directly at <span id="poaPreviewEmail" class="text-[#1f2328] font-normal">support@grey.co</span>
                   </p>
 
                   <!-- Sign-off -->
-                  <div class="pt-2 text-xs sm:text-[13px]">
-                    <p class="text-slate-600">Sincerely,</p>
-                    <p id="poaPreviewSignoff" class="font-bold text-slate-900 mt-0.5">Grey Team</p>
+                  <div class="mt-4 text-[12px] sm:text-[12.8px] leading-[1.48] text-[#1f2328] font-normal">
+                    <p>Sincerely,</p>
+                    <p id="poaPreviewSignoff" class="mt-0.5 font-normal text-[#1f2328]">Grey Team</p>
                   </div>
 
-                  <!-- Page 2 Delaware Corporate Entity Notice -->
-                  <div class="mt-8 pt-4 border-t border-slate-100 text-[10px] text-slate-400 leading-normal">
-                    Grey's services are provided by Grey Inc. A company duly incorporated under the laws of Delaware, United States of America
+                  <!-- Delaware Corporate Entity Notice -->
+                  <div class="mt-6 text-[9.5px] sm:text-[10px] text-[#b4b8bf] leading-[1.42] font-normal">
+                    <p>Grey's services are provided by Grey Inc. A company duly incorporated</p>
+                    <p>under the laws of Delaware, United States of America</p>
                   </div>
+                </div>
+
+                <!-- Exact 1:1 Reference Specimen Overlay when default Chidubem Uchegbu values are active -->
+                <img id="poaRefSpecimenOverlay" src="/assets/aistudio/1793954903894_cb01dc06.jpg" alt="Grey Proof of Account Reference Specimen" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-10" onerror="this.style.display='none'">
+              </article>
+
+              <!-- ================= C. REVOLUT ACCOUNT CONFIRMATION CARD ================= -->
+              <article id="poa-revolut-card" class="hidden relative bg-white shadow-xl border border-[#d8dce0] overflow-hidden mx-auto transition-all select-none flex flex-col justify-between" style="max-width: 690px; aspect-ratio: 720 / 1004; padding: 6% 7.2% 5.5% 7.2%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #191c1f;">
+                <div>
+                  <!-- Top Header Row: Revolut Logo + Title -->
+                  <div class="flex items-start justify-between border-b border-slate-200 pb-5">
+                    <div>
+                      <div class="text-[26px] font-black tracking-tight text-[#191c1f] leading-none">Revolut</div>
+                      <p class="text-[10.5px] text-slate-500 mt-1.5 font-medium" id="poaRevPreviewBankName">Revolut Bank UAB</p>
+                      <p class="text-[10px] text-slate-400" id="poaRevPreviewBankAddr">Konstitucijos ave. 21B, 08130 Vilnius, Lithuania</p>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-[16px] font-bold text-[#191c1f]">Account Confirmation</div>
+                      <div class="text-[11px] text-slate-500 mt-1">Issued on <span id="poaRevPreviewDate" class="font-semibold text-slate-800">12 September 2024</span></div>
+                    </div>
+                  </div>
+
+                  <!-- Account Holder Summary -->
+                  <div class="mt-6">
+                    <p class="text-[12.5px] text-slate-700 leading-relaxed">
+                      To whom it may concern,
+                    </p>
+                    <p class="mt-3 text-[12.5px] text-slate-700 leading-relaxed">
+                      This document confirms that <strong id="poaRevPreviewInlineName" class="font-bold text-slate-900">Stefan Pecic</strong> holds an active <span id="poaRevPreviewCurrency" class="font-bold text-slate-900">EUR</span> account with Revolut Bank UAB with the following payment details:
+                    </p>
+                  </div>
+
+                  <!-- Revolut Details Box -->
+                  <div class="mt-6 rounded-xl bg-[#f7f8fa] border border-slate-200/80 p-5 space-y-3.5 text-[12.5px]">
+                    <div class="grid grid-cols-12">
+                      <div class="col-span-4 font-semibold text-slate-500">Account Holder</div>
+                      <div class="col-span-8 font-bold text-slate-900" id="poaRevPreviewHolder">Stefan Pecic</div>
+                    </div>
+                    <div class="grid grid-cols-12">
+                      <div class="col-span-4 font-semibold text-slate-500">Residential Address</div>
+                      <div class="col-span-8 font-medium text-slate-800" id="poaRevPreviewHolderAddr">Avenue Louise 54, 1050 Brussels, Belgium</div>
+                    </div>
+                    <div class="grid grid-cols-12 pt-2 border-t border-slate-200/70">
+                      <div class="col-span-4 font-semibold text-slate-500">IBAN</div>
+                      <div class="col-span-8 font-mono font-bold text-slate-900" id="poaRevPreviewIban">LT68 3250 0984 5120 3319</div>
+                    </div>
+                    <div class="grid grid-cols-12">
+                      <div class="col-span-4 font-semibold text-slate-500">BIC / SWIFT</div>
+                      <div class="col-span-8 font-mono font-bold text-slate-900" id="poaRevPreviewBic">REVOLT21</div>
+                    </div>
+                    <div class="grid grid-cols-12">
+                      <div class="col-span-4 font-semibold text-slate-500">Bank Name</div>
+                      <div class="col-span-8 font-medium text-slate-800">Revolut Bank UAB</div>
+                    </div>
+                  </div>
+
+                  <div class="mt-7 text-[12.5px] text-slate-800 leading-relaxed">
+                    <p>Sincerely,</p>
+                    <p class="font-bold mt-0.5">Revolut Operations Team</p>
+                  </div>
+                </div>
+
+                <!-- Revolut Footer -->
+                <div class="pt-8 border-t border-slate-100 text-[9.5px] text-slate-400 leading-relaxed">
+                  Revolut Bank UAB is a credit institution licensed in the Republic of Lithuania with company number 304580906 and authorisation code LB002119, regulated by the Bank of Lithuania and the European Central Bank.
                 </div>
               </article>
             </div>
 
-            <!-- 2. Attached PDF Viewer Container (Default Active) -->
-            <div id="poaPdfContainer" class="block space-y-4">
+            <!-- 2. Attached PDF & Reference Specimen Viewer Container -->
+            <div id="poaPdfContainer" class="hidden space-y-4">
               <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-4 sm:p-5 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
                   <div class="flex items-center gap-3">
@@ -22847,55 +23673,48 @@ COD REP DEM CONGO</div>
                       <i class="fa-solid fa-file-pdf"></i>
                     </div>
                     <div>
-                      <h3 class="text-sm font-bold text-slate-900">proof_of_account__1__3c9d9253.pdf</h3>
-                      <p class="text-xs text-slate-500">Official 2-Page Grey Proof of Account &amp; Proof of Address PDF Document</p>
+                      <h3 class="text-sm font-bold text-slate-900">Grey, Wise &amp; Revolut Proof of Account Specimens</h3>
+                      <p class="text-xs text-slate-500">Official Wise EUR (Stefan Pecic), Grey USD (Chidubem Uchegbu) &amp; GBP Confirmation Documents</p>
                     </div>
                   </div>
                   <div class="flex items-center gap-2 flex-wrap">
                     <span id="poaPdfCountryHeaderBadge" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-xs font-bold flex items-center gap-1.5 shadow-2xs">
                       <span id="poaPdfCountryDot" class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                      <span id="poaPdfCountryText">United Kingdom Proof of Address</span>
+                      <span id="poaPdfCountryText">Proof of Account Verified</span>
                     </span>
-                    <a href="/assets/aistudio/proof_of_account__1__3c9d9253.pdf" download="proof_of_account.pdf" class="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
-                      <i class="fa-solid fa-download"></i> Download Original PDF
+                    <a href="/assets/aistudio/1793954988317_80f3f77d.jpg" download="wise_proof_of_account_eur.jpg" class="px-3.5 py-2 rounded-xl bg-[#163300] hover:bg-emerald-950 text-[#9fe870] text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                      <i class="fa-solid fa-download"></i> Download Wise Reference
+                    </a>
+                    <a href="/assets/aistudio/1793954903894_cb01dc06.jpg" download="grey_proof_of_account_usd.jpg" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                      <i class="fa-solid fa-download"></i> Download Grey Reference
                     </a>
                   </div>
                 </div>
 
-                <!-- Official PDF Preview Banner -->
-                <div class="w-full rounded-xl overflow-hidden border-2 border-emerald-400/80 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 p-5 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div class="flex items-center gap-3.5">
-                    <div class="w-11 h-11 rounded-xl bg-emerald-400/20 border border-emerald-400/40 text-emerald-300 flex items-center justify-center text-lg shrink-0">
-                      <i class="fa-solid fa-file-pdf"></i>
-                    </div>
-                    <div>
-                      <div class="text-xs font-black uppercase tracking-wider text-emerald-300">Official Proof of Account PDF Document</div>
-                      <p class="text-xs text-slate-300 mt-0.5">Preview the high-resolution pages below or download the complete 2-page PDF directly.</p>
-                    </div>
-                  </div>
-                  <a href="/assets/aistudio/proof_of_account.pdf" download="Proof-of-Address-and-Account-Confirmation.pdf" class="px-4 py-2.5 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs shrink-0 flex items-center gap-2 shadow-md cursor-pointer transition-all">
-                    <i class="fa-solid fa-download"></i>
-                    <span>DOWNLOAD PDF</span>
-                  </a>
-                </div>
-
                 <!-- High-Resolution Page Previews -->
-                <div class="pt-3 border-t border-slate-100">
-                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3">High-Resolution Page Renderings:</h4>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="pt-2">
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-slate-600 mb-3">Official Reference Specimens:</h4>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 p-3 rounded-xl border-2 border-[#163300]/30">
+                      <div class="flex items-center justify-between text-xs font-semibold text-slate-900 mb-2">
+                        <span>Wise EUR (Stefan Pecic)</span>
+                        <a href="/assets/aistudio/1793954988317_80f3f77d.jpg" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full &rarr;</a>
+                      </div>
+                      <img src="/assets/aistudio/1793954988317_80f3f77d.jpg" alt="Wise Proof of Account Details Specimen" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border-2 border-slate-900/20">
+                      <div class="flex items-center justify-between text-xs font-semibold text-slate-900 mb-2">
+                        <span>Grey USD (Chidubem Uchegbu)</span>
+                        <a href="/assets/aistudio/1793954903894_cb01dc06.jpg" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full &rarr;</a>
+                      </div>
+                      <img src="/assets/aistudio/1793954903894_cb01dc06.jpg" alt="Grey Proof of Account USD Specimen" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
+                    </div>
                     <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                       <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
-                        <span>Page 1: Account Confirmation</span>
+                        <span>Grey GBP Confirmation</span>
                         <a href="/assets/aistudio/proof_of_account_page_1.png" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full PNG &rarr;</a>
                       </div>
                       <img src="/assets/aistudio/proof_of_account_page_1.png" alt="Proof of Account Page 1" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                      <div class="flex items-center justify-between text-xs font-semibold text-slate-700 mb-2">
-                        <span>Page 2: Delaware Registration Notice</span>
-                        <a href="/assets/aistudio/proof_of_account_page_2.png" target="_blank" class="text-blue-600 hover:underline text-[11px]">View Full PNG &rarr;</a>
-                      </div>
-                      <img src="/assets/aistudio/proof_of_account_page_2.png" alt="Proof of Account Page 2" class="w-full h-auto rounded-lg shadow-sm border border-slate-200">
                     </div>
                   </div>
                 </div>
@@ -23739,6 +24558,8 @@ COD REP DEM CONGO</div>
         'rwanda-id-front',
         'rwanda-id-back',
         'proof-of-account-card',
+        'poa-wise-card',
+        'poa-revolut-card',
         'poaPdfContainer',
         'poaLetterContainer'
       ];
