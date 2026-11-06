@@ -1829,7 +1829,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut') {
           tip.innerHTML = `<strong>${meta.name}:</strong> Supports official <strong>Proof of Account</strong> confirmation letters (<strong>Grey Account</strong>, <strong>Wise Account</strong>, or <strong>Revolut</strong>) as well as Passport &amp; National ID. <button type="button" onclick="switchVerificationDoc('proofofaccount'); switchPoaProvider('${currentVirtualAccount}');" class="underline font-bold text-slate-900 ml-1 cursor-pointer">Open ${meta.name} Proof of Account &rarr;</button>`;
         } else {
-          tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong>, <strong>National Identity Card</strong>, <strong>Refugee Identity Card</strong>, or <strong>Proof of Account</strong> (Grey, Wise, Revolut) for instant ${meta.badge} verification and payout clearance.`;
+          tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong>, <strong>National Identity Card</strong>, <strong>Proof of Address</strong>, or <strong>Proof of Account</strong> (Grey, Wise, Revolut) for instant ${meta.badge} verification and payout clearance.`;
         }
       }
 
@@ -1964,14 +1964,14 @@ var $ = window.$ || (id => document.getElementById(id));
         passport: 'Passport Selected',
         idcard: 'National ID Selected',
         driverlicense: "Driver's License Selected",
-        refugeecard: "Refugee Card Selected",
+        refugeecard: "Proof of Address Selected",
         proofofaccount: "Proof of Address & Account Selected"
       };
       const docDescs = {
         passport: 'official biometric passport',
         idcard: 'official national ID card',
         driverlicense: "International Driver's License",
-        refugeecard: "Republic of Uganda Refugee Identity Card",
+        refugeecard: "Proof of Address specimen",
         proofofaccount: "official Proof of Address & Account confirmation PDF"
       };
       showToast(docTitles[docType] || 'Document Selected', `Switched specimen generator to ${docDescs[docType] || 'official document'}`);
@@ -14022,10 +14022,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                   </div>
                   <div>
                     <div class="flex items-center gap-2">
-                      <h3 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">Refugee Card</h3>
-                      <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Republic of Uganda</span>
+                      <h3 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">Proof of Address</h3>
+                      <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300">Verified</span>
                     </div>
-                    <p class="text-xs text-slate-600 mt-0.5 font-medium">Refugee Identity Card Specimen</p>
+                    <p class="text-xs text-slate-600 mt-0.5 font-medium">Proof of Address Specimen</p>
                   </div>
                 </div>
                 <div id="refugeecard-radio-indicator" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0">
