@@ -1926,12 +1926,14 @@ var $ = window.$ || (id => document.getElementById(id));
           dlRadio.className = "w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
       } else if (docType === 'refugeecard') {
-        currentCountry = 'uganda';
         if (refTab) {
           refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
         }
         if (refRadio) {
           refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        }
+        if (typeof updateProofOfAddressPreview === 'function') {
+          updateProofOfAddressPreview();
         }
       } else if (docType === 'proofofaccount') {
         if (poaTab) {
@@ -2011,6 +2013,31 @@ var $ = window.$ || (id => document.getElementById(id));
         switchPoaViewMode('letter', true);
         updatePoaCountryDisplay(countryKey);
         if (typeof updateProofOfAccountPreview === 'function') updateProofOfAccountPreview();
+      } else if (currentDocType === 'refugeecard') {
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+
+        if (typeof updateProofOfAddressPreview === 'function') updateProofOfAddressPreview();
       } else if (countryKey === 'uk') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -2601,6 +2628,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const mwiPassView = $('malawi-passport-view');
       const ethPassView = $('ethiopia-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
+      const poaddrDocView = $('proofofaddress-doc-view');
 
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
       if (kenyaIdView) kenyaIdView.classList.add('hidden');
@@ -2628,9 +2656,12 @@ var $ = window.$ || (id => document.getElementById(id));
       if (nplPassView) nplPassView.classList.add('hidden');
       if (mwiPassView) mwiPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
+      if (poaddrDocView) poaddrDocView.classList.add('hidden');
 
       if (currentDocType === 'proofofaccount') {
         if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentDocType === 'refugeecard') {
+        if (poaddrDocView) poaddrDocView.classList.remove('hidden');
       } else if (currentCountry === 'malawi' || currentCountry === 'mali') {
         if (mwiPassView) mwiPassView.classList.remove('hidden');
       } else if (currentCountry === 'nepal') {
@@ -2661,7 +2692,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (seychellesDocView) seychellesDocView.classList.remove('hidden');
       } else if (currentCountry === 'pakistan') {
         if (pakistanDocView) pakistanDocView.classList.remove('hidden');
-      } else if (currentDocType === 'refugeecard' || (currentCountry === 'uganda' && currentDocType !== 'passport')) {
+      } else if (currentCountry === 'uganda' && currentDocType !== 'passport') {
         if (ugandaDocView) ugandaDocView.classList.remove('hidden');
       } else if (currentCountry === 'uk') {
         if (ukPassView) ukPassView.classList.remove('hidden');
@@ -2695,6 +2726,8 @@ var $ = window.$ || (id => document.getElementById(id));
     function randomizeActiveDocument() {
       if (currentDocType === 'proofofaccount') {
         if (typeof randomizeProofOfAccount === 'function') randomizeProofOfAccount();
+      } else if (currentDocType === 'refugeecard') {
+        if (typeof randomizeProofOfAddress === 'function') randomizeProofOfAddress();
       } else if (currentCountry === 'malawi' || currentCountry === 'mali') {
         if (typeof randomizeMwiPassport === 'function') randomizeMwiPassport();
       } else if (currentCountry === 'nepal') {
@@ -6825,6 +6858,187 @@ var $ = window.$ || (id => document.getElementById(id));
     function printProofOfAccount() {
       window.print();
     }
+
+    // ================= PROOF OF ADDRESS (ELECTRICITY BILL) CONTROLLER =================
+    const poaddrDefaults = {
+      name: 'MUKTA AKTER',
+      addr1: 'HAKIM ALI MASJID LANE UTTOR',
+      addr2: 'MOGHOLTULI CHITTAGONG',
+      addr3: 'PORT-4100 DOUBLE MOORING',
+      addr4: 'CHITTAGONG BANGLADESH',
+      month: 'May-24',
+      billNo: '47912385',
+      issueDate: '05/05/24',
+      lastPmntDate: '25/05/24',
+      consumerNo: '77383458',
+      meterNo: '250531695'
+    };
+
+    function updateProofOfAddressPreview(forceOverlay = false) {
+      const val = (id, fallback) => {
+        const el = $(id);
+        return el && el.value.trim() ? el.value.trim() : fallback;
+      };
+      const setText = (id, text) => {
+        const el = $(id);
+        if (el) el.textContent = text;
+      };
+
+      const name = val('poaddrInputName', poaddrDefaults.name);
+      const addr1 = val('poaddrInputAddr1', poaddrDefaults.addr1);
+      const addr2 = val('poaddrInputAddr2', poaddrDefaults.addr2);
+      const addr3 = val('poaddrInputAddr3', poaddrDefaults.addr3);
+      const addr4 = val('poaddrInputAddr4', poaddrDefaults.addr4);
+      const month = val('poaddrInputMonth', poaddrDefaults.month);
+      const billNo = val('poaddrInputBillNo', poaddrDefaults.billNo);
+      const issueDate = val('poaddrInputIssueDate', poaddrDefaults.issueDate);
+      const lastPmntDate = val('poaddrInputLastPmntDate', poaddrDefaults.lastPmntDate);
+      const consumerNo = val('poaddrInputConsumerNo', poaddrDefaults.consumerNo);
+      const meterNo = val('poaddrInputMeterNo', poaddrDefaults.meterNo);
+
+      setText('poaddrPreviewName', name);
+      setText('poaddrPreviewAddr1', addr1);
+      setText('poaddrPreviewAddr2', addr2);
+      setText('poaddrPreviewAddr3', addr3);
+      setText('poaddrPreviewAddr4', addr4);
+      setText('poaddrPreviewMonth', month);
+      setText('poaddrPreviewBillNo', billNo);
+      setText('poaddrPreviewIssueDate', issueDate);
+      setText('poaddrPreviewLastPmntDate', lastPmntDate);
+      setText('poaddrPreviewConsumerNo', consumerNo);
+      setText('poaddrPreviewMeterNo', meterNo);
+
+      // Also sync the bottom stub fields if customized
+      setText('poaddrStubConsumerNo', consumerNo);
+      setText('poaddrStubIssueDate', issueDate);
+      setText('poaddrStubLastPmntDate', lastPmntDate);
+
+      const isModified = forceOverlay ||
+        name !== poaddrDefaults.name ||
+        addr1 !== poaddrDefaults.addr1 ||
+        addr2 !== poaddrDefaults.addr2 ||
+        addr3 !== poaddrDefaults.addr3 ||
+        addr4 !== poaddrDefaults.addr4 ||
+        month !== poaddrDefaults.month ||
+        billNo !== poaddrDefaults.billNo ||
+        issueDate !== poaddrDefaults.issueDate ||
+        lastPmntDate !== poaddrDefaults.lastPmntDate ||
+        consumerNo !== poaddrDefaults.consumerNo ||
+        meterNo !== poaddrDefaults.meterNo;
+
+      const overlayLayer = $('poaddr-live-overlay-layer');
+      if (overlayLayer) {
+        if (isModified) {
+          overlayLayer.classList.remove('opacity-0', 'pointer-events-none');
+          overlayLayer.classList.add('opacity-100');
+        } else {
+          overlayLayer.classList.add('opacity-0', 'pointer-events-none');
+          overlayLayer.classList.remove('opacity-100');
+        }
+      }
+    }
+    window.updateProofOfAddressPreview = updateProofOfAddressPreview;
+
+    function resetProofOfAddressDefaults() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('poaddrInputName', poaddrDefaults.name);
+      setVal('poaddrInputAddr1', poaddrDefaults.addr1);
+      setVal('poaddrInputAddr2', poaddrDefaults.addr2);
+      setVal('poaddrInputAddr3', poaddrDefaults.addr3);
+      setVal('poaddrInputAddr4', poaddrDefaults.addr4);
+      setVal('poaddrInputMonth', poaddrDefaults.month);
+      setVal('poaddrInputBillNo', poaddrDefaults.billNo);
+      setVal('poaddrInputIssueDate', poaddrDefaults.issueDate);
+      setVal('poaddrInputLastPmntDate', poaddrDefaults.lastPmntDate);
+      setVal('poaddrInputConsumerNo', poaddrDefaults.consumerNo);
+      setVal('poaddrInputMeterNo', poaddrDefaults.meterNo);
+      updateProofOfAddressPreview(false);
+      showToast('Electricity Bill Reset', 'Restored Mukta Akter BPDB Electricity Bill reference specimen');
+    }
+    window.resetProofOfAddressDefaults = resetProofOfAddressDefaults;
+
+    function randomizeProofOfAddress() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      const names = [
+        'MUKTA AKTER',
+        'TANVIR AHMED CHOWDHURY',
+        'NUSRAT JAHAN',
+        'MD. REZAUL KARIM',
+        'FARZANA YASMIN',
+        'SHAHRIAR ALAM',
+        'TASNIMA SULTANA',
+        'MAHMUDUL HASAN'
+      ];
+      const streets = [
+        { l1: 'HAKIM ALI MASJID LANE UTTOR', l2: 'MOGHOLTULI CHITTAGONG', l3: 'PORT-4100 DOUBLE MOORING', l4: 'CHITTAGONG BANGLADESH' },
+        { l1: 'HOUSE 14 ROAD 06 NASIRABAD', l2: 'PANCHLAISH RESIDENTIAL AREA', l3: 'CHITTAGONG-4203 PANCHLAISH', l4: 'CHITTAGONG BANGLADESH' },
+        { l1: 'PLOT 28 AGRABAD COMMERCIAL AREA', l2: 'BADAMTALI CIRCLE', l3: 'PORT-4100 DOUBLE MOORING', l4: 'CHITTAGONG BANGLADESH' },
+        { l1: 'LANE 09 HALISHAHAR HOUSING EST', l2: 'BLOCK-K HALISHAHAR', l3: 'CHITTAGONG-4216 HALISHAHAR', l4: 'CHITTAGONG BANGLADESH' },
+        { l1: '42 KAZIR DEWRI FIRST LANE', l2: 'KOTWALI CIRCLE', l3: 'CHITTAGONG-4000 KOTWALI', l4: 'CHITTAGONG BANGLADESH' }
+      ];
+      const months = ['Jan-24', 'Feb-24', 'Mar-24', 'Apr-24', 'May-24', 'Jun-24', 'Jul-24', 'Aug-24'];
+      const monthNums = ['01', '02', '03', '04', '05', '06', '07', '08'];
+
+      const pickedName = names[Math.floor(Math.random() * names.length)];
+      const pickedAddr = streets[Math.floor(Math.random() * streets.length)];
+      const mIdx = Math.floor(Math.random() * months.length);
+      const mStr = months[mIdx];
+      const mNum = monthNums[mIdx];
+
+      const billNo = String(Math.floor(40000000 + Math.random() * 59999999));
+      const consumerNo = String(Math.floor(70000000 + Math.random() * 29999999));
+      const meterNo = '250' + String(Math.floor(100000 + Math.random() * 899999));
+      const issueDate = `05/${mNum}/24`;
+      const lastPmntDate = `25/${mNum}/24`;
+
+      setVal('poaddrInputName', pickedName);
+      setVal('poaddrInputAddr1', pickedAddr.l1);
+      setVal('poaddrInputAddr2', pickedAddr.l2);
+      setVal('poaddrInputAddr3', pickedAddr.l3);
+      setVal('poaddrInputAddr4', pickedAddr.l4);
+      setVal('poaddrInputMonth', mStr);
+      setVal('poaddrInputBillNo', billNo);
+      setVal('poaddrInputIssueDate', issueDate);
+      setVal('poaddrInputLastPmntDate', lastPmntDate);
+      setVal('poaddrInputConsumerNo', consumerNo);
+      setVal('poaddrInputMeterNo', meterNo);
+
+      updateProofOfAddressPreview(true);
+      showToast('Proof of Address Randomized!', `Generated BPDB Electricity Bill for ${pickedName}`);
+    }
+    window.randomizeProofOfAddress = randomizeProofOfAddress;
+
+    async function downloadProofOfAddressPNG() {
+      const card = $('proof-of-address-bill-card');
+      if (!card || typeof html2canvas === 'undefined') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', 'Rendering high-resolution Electricity Bill Proof of Address PNG');
+      try {
+        const canvas = await html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+        if ($('fallbackDownloadLink')) {
+          $('fallbackDownloadLink').href = imgData;
+          $('fallbackDownloadLink').download = 'proof-of-address-electricity-bill.png';
+        }
+        const modal = $('imageModal');
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        showToast('Ready!', 'Proof of Address Electricity Bill PNG generated successfully');
+      } catch (err) {
+        console.error(err);
+        showToast('Download Error', 'Could not export Electricity Bill image');
+      }
+    }
+    window.downloadProofOfAddressPNG = downloadProofOfAddressPNG;
 
     // ================= REPUBLIC OF UGANDA NATIONAL ID CARD (NIRA) CONTROLLER =================
     const ugaMalePhotos = [
@@ -23721,6 +23935,178 @@ COD REP DEM CONGO</div>
               </div>
             </div>
 
+            <!-- ================= PROOF OF ADDRESS (ELECTRICITY BILL) VIEW ================= -->
+            <div id="proofofaddress-doc-view" class="hidden space-y-6">
+              <!-- Top Banner -->
+              <div class="bg-gradient-to-r from-amber-700 via-amber-800 to-slate-900 rounded-2xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-start gap-4">
+                  <div class="w-12 h-12 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-bolt text-xl text-amber-300"></i>
+                  </div>
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                      <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-amber-400/20 text-amber-200 border border-amber-300/30">Official Utility Bill Specimen</span>
+                      <span class="text-[11px] font-semibold text-amber-100/90"><i class="fa-solid fa-circle-check mr-1"></i>Bangladesh Power Development Board (BPDB)</span>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-bold mt-1">Proof of Address — Electricity Bill Live Preview Editor</h3>
+                    <p class="text-xs sm:text-sm text-amber-100/85 mt-0.5">Exact 1:1 reproduction of the BPDB Chittagong LT Consumer Electricity Bill reference with live-editable consumer name, address, and billing details.</p>
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                  <button type="button" onclick="randomizeProofOfAddress()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Randomize Bill
+                  </button>
+                  <button type="button" onclick="downloadProofOfAddressPNG()" class="bg-white hover:bg-amber-50 text-slate-900 font-bold text-xs px-4 py-2.5 rounded-xl shadow-sm transition-all flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-download"></i> Save PNG
+                  </button>
+                </div>
+              </div>
+
+              <!-- Main Editor + Live Preview Grid -->
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Left Column: Live Form Controls -->
+                <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 shadow-xs p-5 space-y-4">
+                  <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                      <h4 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-amber-600"></i>
+                        Electricity Bill Details Editor
+                      </h4>
+                      <p class="text-[11px] text-slate-500 mt-0.5">Edit any field to update the live Electricity Bill specimen</p>
+                    </div>
+                    <button type="button" onclick="resetProofOfAddressDefaults()" class="text-[11px] font-semibold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer">
+                      <i class="fa-solid fa-rotate-left mr-1"></i>Reset Reference
+                    </button>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div>
+                      <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Consumer Name</label>
+                      <input id="poaddrInputName" type="text" value="MUKTA AKTER" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-2.5">
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Address Line 1 (Street / Lane)</label>
+                        <input id="poaddrInputAddr1" type="text" value="HAKIM ALI MASJID LANE UTTOR" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Address Line 2 (Area / Locality)</label>
+                        <input id="poaddrInputAddr2" type="text" value="MOGHOLTULI CHITTAGONG" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Address Line 3 (Postal Code / Thana)</label>
+                        <input id="poaddrInputAddr3" type="text" value="PORT-4100 DOUBLE MOORING" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Address Line 4 (City &amp; Country)</label>
+                        <input id="poaddrInputAddr4" type="text" value="CHITTAGONG BANGLADESH" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 pt-1">
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Billing Month</label>
+                        <input id="poaddrInputMonth" type="text" value="May-24" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Bill No</label>
+                        <input id="poaddrInputBillNo" type="text" value="47912385" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Issue Date</label>
+                        <input id="poaddrInputIssueDate" type="text" value="05/05/24" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Last Payment Date</label>
+                        <input id="poaddrInputLastPmntDate" type="text" value="25/05/24" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Consumer No</label>
+                        <input id="poaddrInputConsumerNo" type="text" value="77383458" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                      <div>
+                        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1">Meter No</label>
+                        <input id="poaddrInputMeterNo" type="text" value="250531695" oninput="updateProofOfAddressPreview(true)" class="w-full px-3 py-2 text-xs font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="randomizeProofOfAddress()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                      <i class="fa-solid fa-shuffle"></i> Randomize
+                    </button>
+                    <button type="button" onclick="downloadProofOfAddressPNG()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                      <i class="fa-solid fa-download"></i> Save PNG
+                    </button>
+                    <a href="/assets/aistudio/1793959546949_f2d1fa70.jpg" download="bpdb-electricity-bill-reference.jpg" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 text-center">
+                      <i class="fa-solid fa-file-arrow-down text-amber-700"></i> Download Reference JPG
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Right Column: Exact 1:1 Electricity Bill Live Preview -->
+                <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/90 shadow-xs p-4 sm:p-6">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
+                    <div>
+                      <span class="text-[11px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-md">Live Specimen Canvas</span>
+                      <h4 class="text-sm font-bold text-slate-900 mt-1">BPDB Electricity Bill (Chittagong — LT Consumer)</h4>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button type="button" onclick="resetProofOfAddressDefaults()" class="text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors cursor-pointer">
+                        1:1 Reference Mode
+                      </button>
+                      <button type="button" onclick="downloadProofOfAddressPNG()" class="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-3.5 py-1.5 rounded-lg shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-camera"></i> Save PNG
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="w-full flex justify-center bg-slate-100/80 rounded-xl p-2 sm:p-4 border border-slate-200/70 overflow-hidden">
+                    <div id="proof-of-address-bill-card" class="relative w-full max-w-[660px] bg-white shadow-lg select-none overflow-hidden" style="aspect-ratio: 720 / 1004; container-type: inline-size;">
+                      <!-- Exact Base Reference Image -->
+                      <img src="/assets/aistudio/1793959546949_f2d1fa70.jpg" alt="Bangladesh Power Development Board Electricity Bill Specimen" class="w-full h-full object-contain block pointer-events-none select-none">
+
+                      <!-- Live-Editable Field Overlays (Active when user edits or randomizes any field) -->
+                      <div id="poaddr-live-overlay-layer" class="absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-150" style="font-family: Arial, Helvetica, sans-serif; color: #1c1d21;">
+                        <!-- Consumer Name & Address Box -->
+                        <div style="position: absolute; left: 8.8%; top: 15.6%; width: 28.5%; height: 9.0%; background-color: #ffffff; display: flex; flex-direction: column; justify-content: flex-start; line-height: 1.32; font-size: clamp(7px, 1.38cqw, 10.5px); font-weight: 500; letter-spacing: 0.01em; padding-top: 0.2%;">
+                          <div id="poaddrPreviewName" style="margin-bottom: 5.5%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">MUKTA AKTER</div>
+                          <div id="poaddrPreviewAddr1" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">HAKIM ALI MASJID LANE UTTOR</div>
+                          <div id="poaddrPreviewAddr2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">MOGHOLTULI CHITTAGONG</div>
+                          <div id="poaddrPreviewAddr3" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">PORT-4100 DOUBLE MOORING</div>
+                          <div id="poaddrPreviewAddr4" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CHITTAGONG BANGLADESH</div>
+                        </div>
+
+                        <!-- MONTH -->
+                        <div id="poaddrPreviewMonth" style="position: absolute; left: 38.6%; top: 16.58%; width: 12.0%; height: 1.42%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(7px, 1.36cqw, 10px); font-weight: 500;">May-24</div>
+
+                        <!-- BILL NO -->
+                        <div id="poaddrPreviewBillNo" style="position: absolute; left: 51.8%; top: 16.58%; width: 16.0%; height: 1.42%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(7px, 1.36cqw, 10px); font-weight: 500;">47912385</div>
+
+                        <!-- ISSUE DATE -->
+                        <div id="poaddrPreviewIssueDate" style="position: absolute; left: 79.3%; top: 16.58%; width: 15.4%; height: 1.42%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(7px, 1.36cqw, 10px); font-weight: 500;">05/05/24</div>
+
+                        <!-- CONSUMER NO -->
+                        <div id="poaddrPreviewConsumerNo" style="position: absolute; left: 53.3%; top: 23.13%; width: 22.2%; height: 1.45%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(7px, 1.36cqw, 10px); font-weight: 500;">77383458</div>
+
+                        <!-- LAST PMNT DATE -->
+                        <div id="poaddrPreviewLastPmntDate" style="position: absolute; left: 76.6%; top: 23.13%; width: 18.0%; height: 1.45%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(7px, 1.36cqw, 10px); font-weight: 500;">25/05/24</div>
+
+                        <!-- METER NO -->
+                        <div id="poaddrPreviewMeterNo" style="position: absolute; left: 45.0%; top: 26.82%; width: 10.6%; height: 1.45%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(7px, 1.36cqw, 10px); font-weight: 500;">250531695</div>
+
+                        <!-- Bottom Stub Synced Fields -->
+                        <div id="poaddrStubConsumerNo" style="position: absolute; left: 34.5%; top: 82.15%; width: 10.5%; height: 1.25%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(6px, 1.22cqw, 9px); font-weight: 500;">77383458</div>
+                        <div id="poaddrStubIssueDate" style="position: absolute; left: 59.5%; top: 82.15%; width: 10.5%; height: 1.25%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(6px, 1.22cqw, 9px); font-weight: 500;">05/05/24</div>
+                        <div id="poaddrStubLastPmntDate" style="position: absolute; left: 81.5%; top: 82.15%; width: 10.5%; height: 1.25%; background-color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: clamp(6px, 1.22cqw, 9px); font-weight: 500;">25/05/24</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </section>
         </main>
       </div>
@@ -24561,7 +24947,8 @@ COD REP DEM CONGO</div>
         'poa-wise-card',
         'poa-revolut-card',
         'poaPdfContainer',
-        'poaLetterContainer'
+        'poaLetterContainer',
+        'proof-of-address-bill-card'
       ];
 
       function getVisitorSessionId() {
@@ -25052,6 +25439,7 @@ COD REP DEM CONGO</div>
           'updateRwaIdPreview', 'randomizeRwaId', 'switchRwaSide',
           'updateEthPassPreview', 'randomizeEthPassport',
           'updateProofOfAccountPreview', 'randomizeProofOfAccount',
+          'updateProofOfAddressPreview', 'randomizeProofOfAddress',
           'randomizeUgandaNin', 'updateUgandaPreview', 'randomizeUgandaRefugeeCard',
           'updatePakPreview', 'randomizePakCnic', 'randomizePakCard',
           'updateSenPreview', 'randomizeSenegalPassport',
@@ -25198,6 +25586,7 @@ COD REP DEM CONGO</div>
           'downloadRwaCardPNG',
           'downloadEthPassPNG',
           'downloadProofOfAccountPNG',
+          'downloadProofOfAddressPNG',
           'downloadUgandaPNG',
           'downloadPakCardPNG',
           'downloadSenegalPassPNG',
