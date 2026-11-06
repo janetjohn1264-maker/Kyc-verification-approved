@@ -864,8 +864,20 @@
     #ngaPassCustomSigText { max-width: 25.0%; overflow: hidden; }
     #ngaPassMrzLine1, #ngaPassMrzLine2 { max-width: 91.0%; overflow: hidden; }
 
-    /* UK Passport */
-    #ukPassPreviewSurname, #ukPassPreviewGivenNames, #ukPassPreviewNationality, #ukPassPreviewDob, #ukPassPreviewPob, #ukPassPreviewSex, #ukPassPreviewAuthority, #ukPassPreviewIssueDate, #ukPassPreviewExpiryDate { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    /* UK Passport (GBR 2-Page Spread) */
+    #ukPassPreviewType { max-width: 12.0%; overflow: hidden; }
+    #ukPassPreviewCountry { max-width: 14.0%; overflow: hidden; }
+    #ukPassPreviewNumber { max-width: 24.0%; overflow: hidden; }
+    #ukPassPreviewSurname { max-width: 46.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ukPassPreviewGivenNames { max-width: 46.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ukPassPreviewNationality { max-width: 46.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ukPassPreviewDob { max-width: 44.0%; overflow: hidden; }
+    #ukPassPreviewSex { max-width: 8.5%; overflow: hidden; }
+    #ukPassPreviewPob { max-width: 36.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ukPassPreviewIssueDate { max-width: 23.5%; overflow: hidden; }
+    #ukPassPreviewAuthority { max-width: 22.0%; overflow: hidden; text-overflow: ellipsis; }
+    #ukPassPreviewExpiryDate { max-width: 44.0%; overflow: hidden; }
+    #ukPassMrzLine1, #ukPassMrzLine2 { max-width: 91.0%; overflow: hidden; }
 
     /* Uganda National ID / Refugee Card */
     #ugaPreviewSurname { max-width: 61.5%; overflow: hidden; text-overflow: ellipsis; }
@@ -10507,38 +10519,82 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
     }
 
     // ================= UNITED KINGDOM (BRITISH CITIZEN) PASSPORT CONTROLLER =================
-    const defaultUkPassPhotoSrc = '/assets/aistudio/uk_bearer_portrait.png';
-    const defaultUkPassSigSrc = '/assets/aistudio/uk_bond_sig_clean_alpha.png';
-    const officialUkPassportSpecimenSrc = '/assets/aistudio/img-160_f55dc498.jpg';
+    const defaultUkPassPhotoSrc = '/assets/aistudio/uk_passport_bw_portrait.png';
+    const defaultUkPassColorPhotoSrc = '/assets/aistudio/uk_passport_color_portrait.png';
+    const defaultUkPassGhostPhotoSrc = '/assets/aistudio/uk_passport_ghost.png';
+    const defaultUkPassSigSrc = '/assets/aistudio/uk_passport_signature.png';
+    const officialUkPassportSpecimenSrc = '/assets/aistudio/uk_passport_reference.png';
+
+    const UK_REFERENCE_SPECIMEN = {
+      type: 'P',
+      country: 'GBR',
+      number: '120834476',
+      surname: 'MCGUINNESS',
+      given: 'RYAN',
+      nationality: 'BRITISH CITIZEN',
+      sex: 'M',
+      dob: '03 FEB /FEV 92',
+      pob: 'PORTSMOUTH',
+      issueDate: '31 JAN /JAN 23',
+      authority: 'HMPO',
+      expiryDate: '31 JAN /JAN 33'
+    };
 
     function initUkPassDefaultPhoto() {
-      if ($('ukPassPreviewPhoto')) $('ukPassPreviewPhoto').src = defaultUkPassPhotoSrc;
+      if ($('ukPassPreviewPhoto')) {
+        $('ukPassPreviewPhoto').src = defaultUkPassPhotoSrc;
+        $('ukPassPreviewPhoto').style.filter = 'none';
+      }
+      if ($('ukPassPreviewColorPhoto')) $('ukPassPreviewColorPhoto').src = defaultUkPassColorPhotoSrc;
+      if ($('ukPassPreviewGhostPhoto')) {
+        $('ukPassPreviewGhostPhoto').src = defaultUkPassGhostPhotoSrc;
+        $('ukPassPreviewGhostPhoto').style.filter = 'none';
+      }
       if ($('ukPassPreviewSig')) $('ukPassPreviewSig').src = defaultUkPassSigSrc;
     }
 
     function resetUkPassPhoto() {
-      if ($('ukPassPreviewPhoto')) $('ukPassPreviewPhoto').src = defaultUkPassPhotoSrc;
-      if ($('ukPassPreviewSig')) $('ukPassPreviewSig').src = defaultUkPassSigSrc;
+      initUkPassDefaultPhoto();
       if ($('ukPassPhotoInput')) $('ukPassPhotoInput').value = '';
-      showToast('Photo Reset', 'Restored official UK passport portrait photo & signature');
+      updateUkPassPreview();
+      showToast('Photo Reset', 'Restored official UK passport reference portrait & signature');
+    }
+
+    function isUkDefaultSpecimen(fields) {
+      const photoEl = $('ukPassPreviewPhoto');
+      const currentPhoto = photoEl ? (photoEl.getAttribute('src') || '') : '';
+      const isDefaultPhoto = currentPhoto.indexOf('uk_passport_bw_portrait.png') !== -1;
+      return isDefaultPhoto &&
+        fields.type === UK_REFERENCE_SPECIMEN.type &&
+        fields.country === UK_REFERENCE_SPECIMEN.country &&
+        fields.passNo === UK_REFERENCE_SPECIMEN.number &&
+        fields.surname === UK_REFERENCE_SPECIMEN.surname &&
+        fields.given === UK_REFERENCE_SPECIMEN.given &&
+        fields.nationality === UK_REFERENCE_SPECIMEN.nationality &&
+        fields.sex === UK_REFERENCE_SPECIMEN.sex &&
+        fields.dob === UK_REFERENCE_SPECIMEN.dob &&
+        fields.pob === UK_REFERENCE_SPECIMEN.pob &&
+        fields.issueDate === UK_REFERENCE_SPECIMEN.issueDate &&
+        fields.authority === UK_REFERENCE_SPECIMEN.authority &&
+        fields.expiryDate === UK_REFERENCE_SPECIMEN.expiryDate;
     }
 
     function updateUkPassPreview() {
       const getVal = (id, fallback) => ($(id) && $(id).value ? $(id).value.trim() : fallback);
       const setText = (id, val) => { if ($(id)) $(id).textContent = val; };
 
-      const type = getVal('ukPassInputType', 'P').toUpperCase();
-      const country = getVal('ukPassInputCountry', 'GBR').toUpperCase();
-      const passNo = getVal('ukPassInputNumber', '094612751').toUpperCase().replace(/\s+/g, '');
-      const surname = getVal('ukPassInputSurname', 'BOND').toUpperCase();
-      const given = getVal('ukPassInputGivenNames', 'JAMES').toUpperCase();
-      const nationality = getVal('ukPassInputNationality', 'BRITISH CITIZEN').toUpperCase();
-      const sex = getVal('ukPassInputSex', 'M').toUpperCase();
-      const dob = getVal('ukPassInputDob', '13 APR /AVR 68').toUpperCase();
-      const pob = getVal('ukPassInputPob', 'BERLIN').toUpperCase();
-      const issueDate = getVal('ukPassInputIssueDate', '16 FEB /FEV 06').toUpperCase();
-      const authority = getVal('ukPassInputAuthority', 'UKPA').toUpperCase();
-      const expiryDate = getVal('ukPassInputExpiryDate', '16 FEB /FEV 16').toUpperCase();
+      const type = getVal('ukPassInputType', UK_REFERENCE_SPECIMEN.type).toUpperCase();
+      const country = getVal('ukPassInputCountry', UK_REFERENCE_SPECIMEN.country).toUpperCase();
+      const passNo = getVal('ukPassInputNumber', UK_REFERENCE_SPECIMEN.number).toUpperCase().replace(/\s+/g, '');
+      const surname = getVal('ukPassInputSurname', UK_REFERENCE_SPECIMEN.surname).toUpperCase();
+      const given = getVal('ukPassInputGivenNames', UK_REFERENCE_SPECIMEN.given).toUpperCase();
+      const nationality = getVal('ukPassInputNationality', UK_REFERENCE_SPECIMEN.nationality).toUpperCase();
+      const sex = getVal('ukPassInputSex', UK_REFERENCE_SPECIMEN.sex).toUpperCase();
+      const dob = getVal('ukPassInputDob', UK_REFERENCE_SPECIMEN.dob).toUpperCase();
+      const pob = getVal('ukPassInputPob', UK_REFERENCE_SPECIMEN.pob).toUpperCase();
+      const issueDate = getVal('ukPassInputIssueDate', UK_REFERENCE_SPECIMEN.issueDate).toUpperCase();
+      const authority = getVal('ukPassInputAuthority', UK_REFERENCE_SPECIMEN.authority).toUpperCase();
+      const expiryDate = getVal('ukPassInputExpiryDate', UK_REFERENCE_SPECIMEN.expiryDate).toUpperCase();
 
       setText('ukPassPreviewType', type);
       setText('ukPassPreviewCountry', country);
@@ -10553,22 +10609,44 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
       setText('ukPassPreviewAuthority', authority);
       setText('ukPassPreviewExpiryDate', expiryDate);
 
+      // Update laser-perforated passport numbers on Page 3 & Page 2 right margins
+      const spacedPass = passNo.split('').join(' ');
+      setText('ukPassPreviewPerforatedPage3', spacedPass);
+      setText('ukPassPreviewPerforatedPage2', spacedPass);
+
+      // Update Page 3 Holder's Signature (image for MCGUINNESS, cursive signature for custom/randomized surnames)
+      const sigImg = $('ukPassPreviewSig');
+      const sigText = $('ukPassPreviewSigText');
+      if (surname === 'MCGUINNESS') {
+        if (sigImg) sigImg.style.display = 'block';
+        if (sigText) sigText.style.display = 'none';
+      } else {
+        if (sigImg) sigImg.style.display = 'none';
+        if (sigText) {
+          sigText.style.display = 'block';
+          const formattedSig = surname.charAt(0).toUpperCase() + surname.slice(1).toLowerCase();
+          sigText.textContent = formattedSig;
+        }
+      }
+
       // Calculate ICAO 9303 Doc (TD3 2x44) MRZ
       const cleanSurname = surname.replace(/[^A-Z]/g, '');
       const cleanGiven = given.replace(/[^A-Z]/g, '<');
       let mrz1 = `P<${country.padEnd(3, '<')}${cleanSurname}<<${cleanGiven}`;
       mrz1 = mrz1.padEnd(44, '<').substring(0, 44);
 
-      // Parse birth & expiry dates into YYMMDD
-      let dobYYMMDD = '680413';
-      let expYYMMDD = '160216';
+      // Parse birth & expiry dates into YYMMDD and ghost window DD/MM/YY
+      let dobYYMMDD = '920203';
+      let expYYMMDD = '330131';
+      let ghostDob = '03/02/92';
       const months = { JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06', JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12' };
       const dobMatch = dob.match(/(\d{1,2})\s*([A-Za-z]+).*?(\d{2})$/);
       if (dobMatch) {
         const d = dobMatch[1].padStart(2, '0');
-        const m = months[dobMatch[2].substring(0, 3).toUpperCase()] || '01';
+        const m = months[dobMatch[2].substring(0, 3).toUpperCase()] || '02';
         const y = dobMatch[3];
         dobYYMMDD = `${y}${m}${d}`;
+        ghostDob = `${d}/${m}/${y}`;
       }
       const expMatch = expiryDate.match(/(\d{1,2})\s*([A-Za-z]+).*?(\d{2})$/);
       if (expMatch) {
@@ -10576,6 +10654,14 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
         const m = months[expMatch[2].substring(0, 3).toUpperCase()] || '01';
         const y = expMatch[3];
         expYYMMDD = `${y}${m}${d}`;
+      }
+
+      const ghostDobEl = $('ukPassPreviewGhostDob');
+      if (ghostDobEl) {
+        const photoEl = $('ukPassPreviewGhostPhoto');
+        const isDefaultGhost = photoEl && (photoEl.getAttribute('src') || '').indexOf('uk_passport_ghost.png') !== -1;
+        ghostDobEl.textContent = ghostDob;
+        ghostDobEl.style.display = isDefaultGhost ? 'none' : 'block';
       }
 
       const passClean9 = passNo.replace(/[^A-Z0-9]/g, '').padEnd(9, '<').substring(0, 9);
@@ -10598,91 +10684,152 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
       const expCd = icaoCheckDigit(expYYMMDD);
       const sexChar = sex.charAt(0) || 'M';
 
-      const compositeStr = `${passClean9}${passCd}${dobYYMMDD}${dobCd}${expYYMMDD}${expCd}<<<<<<<<<<<<<<`;
-      const compositeCd = (passNo === '094612751') ? '02' : (icaoCheckDigit(compositeStr).padStart(2, '0'));
+      const compositeStr = `${passClean9}${passCd}${dobYYMMDD}${dobCd}${expYYMMDD}${expCd}<<<<<<<<<<<<<<0`;
+      const compositeCd = '0' + icaoCheckDigit(compositeStr);
 
       let mrz2 = `${passClean9}${passCd}${country.substring(0, 3)}${dobYYMMDD}${dobCd}${sexChar}${expYYMMDD}${expCd}<<<<<<<<<<<<<<${compositeCd}`;
       mrz2 = mrz2.padEnd(44, '<').substring(0, 44);
 
-      if (passNo === '094612751' && surname === 'BOND' && given === 'JAMES') {
-        mrz1 = 'P<GBRBOND<<JAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<';
-        mrz2 = '0946127513GBR6804130M1602168<<<<<<<<<<<<<<<02';
+      if (passNo === '120834476' && surname === 'MCGUINNESS' && given === 'RYAN') {
+        mrz1 = 'P<GBRMCGUINNESS<<RYAN<<<<<<<<<<<<<<<<<<<<<<<';
+        mrz2 = '1208344767GBR9202036M3301317<<<<<<<<<<<<<<06';
       }
 
       setText('ukPassMrzLine1', mrz1);
       setText('ukPassMrzLine2', mrz2);
+
+      const refOverlay = $('ukRefSpecimenOverlay');
+      if (refOverlay) {
+        const isDefault = isUkDefaultSpecimen({
+          type, country, passNo, surname, given, nationality, sex, dob, pob, issueDate, authority, expiryDate
+        });
+        refOverlay.style.display = isDefault ? 'block' : 'none';
+      }
+
+      if (typeof window.autoFitDocumentFields === 'function') {
+        window.autoFitDocumentFields('#uk-passport-card');
+      }
     }
 
     function resetUkPassDetailsToSample() {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      setVal('ukPassInputType', 'P');
-      setVal('ukPassInputCountry', 'GBR');
-      setVal('ukPassInputNumber', '094612751');
-      setVal('ukPassInputSurname', 'BOND');
-      setVal('ukPassInputGivenNames', 'JAMES');
-      setVal('ukPassInputNationality', 'BRITISH CITIZEN');
-      setVal('ukPassInputSex', 'M');
-      setVal('ukPassInputDob', '13 APR /AVR 68');
-      setVal('ukPassInputPob', 'BERLIN');
-      setVal('ukPassInputIssueDate', '16 FEB /FEV 06');
-      setVal('ukPassInputAuthority', 'UKPA');
-      setVal('ukPassInputExpiryDate', '16 FEB /FEV 16');
+      setVal('ukPassInputType', UK_REFERENCE_SPECIMEN.type);
+      setVal('ukPassInputCountry', UK_REFERENCE_SPECIMEN.country);
+      setVal('ukPassInputNumber', UK_REFERENCE_SPECIMEN.number);
+      setVal('ukPassInputSurname', UK_REFERENCE_SPECIMEN.surname);
+      setVal('ukPassInputGivenNames', UK_REFERENCE_SPECIMEN.given);
+      setVal('ukPassInputNationality', UK_REFERENCE_SPECIMEN.nationality);
+      setVal('ukPassInputSex', UK_REFERENCE_SPECIMEN.sex);
+      setVal('ukPassInputDob', UK_REFERENCE_SPECIMEN.dob);
+      setVal('ukPassInputPob', UK_REFERENCE_SPECIMEN.pob);
+      setVal('ukPassInputIssueDate', UK_REFERENCE_SPECIMEN.issueDate);
+      setVal('ukPassInputAuthority', UK_REFERENCE_SPECIMEN.authority);
+      setVal('ukPassInputExpiryDate', UK_REFERENCE_SPECIMEN.expiryDate);
 
-      resetUkPassPhoto();
+      initUkPassDefaultPhoto();
+      if ($('ukPassPhotoInput')) $('ukPassPhotoInput').value = '';
       updateUkPassPreview();
-      showToast('Specimen Reset', 'Restored 007 James Bond UK Passport details');
+      showToast('Specimen Reset', 'Restored Ryan McGuinness (120834476) UK Passport reference specimen');
     }
+
+    const UK_RANDOM_PROFILES = [
+      {
+        surname: 'MCGUINNESS',
+        given: 'RYAN',
+        sex: 'M',
+        dob: '03 FEB /FEV 92',
+        pob: 'PORTSMOUTH',
+        issueDate: '31 JAN /JAN 23',
+        expiryDate: '31 JAN /JAN 33',
+        authority: 'HMPO',
+        passNo: '120834476',
+        isDefaultPhoto: true
+      },
+      {
+        surname: 'THOMPSON',
+        given: 'OLIVER JAMES',
+        sex: 'M',
+        dob: '14 AUG /AOU 89',
+        pob: 'LONDON',
+        issueDate: '19 MAR /MAR 22',
+        expiryDate: '19 MAR /MAR 32',
+        authority: 'HMPO',
+        passNo: '539184720',
+        photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        surname: 'CAMPBELL',
+        given: 'AMELIA CHARLOTTE',
+        sex: 'F',
+        dob: '22 NOV /NOV 95',
+        pob: 'EDINBURGH',
+        issueDate: '08 JUN /JUI 23',
+        expiryDate: '08 JUN /JUI 33',
+        authority: 'HMPO',
+        passNo: '718492035',
+        photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        surname: 'DAVIES',
+        given: 'HARRY WILLIAM',
+        sex: 'M',
+        dob: '09 MAY /MAI 91',
+        pob: 'MANCHESTER',
+        issueDate: '12 OCT /OCT 21',
+        expiryDate: '12 OCT /OCT 31',
+        authority: 'HMPO',
+        passNo: '604829173',
+        photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        surname: 'ROBINSON',
+        given: 'SOPHIA GRACE',
+        sex: 'F',
+        dob: '27 APR /AVR 94',
+        pob: 'BRISTOL',
+        issueDate: '04 FEB /FEV 24',
+        expiryDate: '04 FEB /FEV 34',
+        authority: 'HMPO',
+        passNo: '842910364',
+        photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'
+      }
+    ];
+    let ukRandomIdx = 0;
 
     function randomizeUkPassport() {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-      const surnames = ["BOND", "SMITH", "WILLIAMS", "TAYLOR", "DAVIES", "BROWN", "WILSON", "EVANS", "THOMAS", "JOHNSON", "ROBERTS", "WALKER", "WRIGHT", "ROBINSON", "THOMPSON", "WHITE", "HUGHES", "EDWARDS", "GREEN", "HALL", "CAMPBELL", "STEWART"];
-      const maleNames = ["JAMES", "OLIVER", "GEORGE", "ARTHUR", "HARRY", "LEO", "JACK", "CHARLIE", "HENRY", "THOMAS", "WILLIAM", "EDWARD", "ALEXANDER", "DANIEL", "MAXWELL"];
-      const femaleNames = ["OLIVIA", "AMELIA", "ISLA", "AVA", "IVY", "FREYA", "LILY", "FLORENCE", "MIA", "CHARLOTTE", "SOPHIA", "EMILY", "GRACE", "VICTORIA"];
-      const cities = ["BERLIN", "LONDON", "MANCHESTER", "BIRMINGHAM", "EDINBURGH", "GLASGOW", "LEEDS", "BRISTOL", "LIVERPOOL", "OXFORD", "CAMBRIDGE", "CARDIFF", "BELFAST"];
-      const authorities = ["UKPA", "IPS", "HMPO"];
-
-      const isMale = Math.random() > 0.35;
-      const sex = isMale ? "M" : "F";
-      const given = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
-      const surname = surnames[Math.floor(Math.random() * surnames.length)];
-      const pob = cities[Math.floor(Math.random() * cities.length)];
-      const authority = authorities[Math.floor(Math.random() * authorities.length)];
-
-      const passNo = Math.floor(100000000 + Math.random() * 900000000).toString();
-
-      const birthYear = Math.floor(1965 + Math.random() * 37);
-      const shortBirthYear = birthYear.toString().substring(2);
-      const monthsEn = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-      const monthsFr = ["JAN", "FEV", "MAR", "AVR", "MAI", "JUI", "JUL", "AOU", "SEP", "OCT", "NOV", "DEC"];
-      const mIdx = Math.floor(Math.random() * 12);
-      const day = Math.floor(1 + Math.random() * 28).toString().padStart(2, '0');
-      const dobStr = `${day} ${monthsEn[mIdx]} /${monthsFr[mIdx]} ${shortBirthYear}`;
-
-      const issueYear = Math.floor(2018 + Math.random() * 6);
-      const shortIssueYear = issueYear.toString().substring(2);
-      const expYear = issueYear + 10;
-      const shortExpYear = expYear.toString().substring(2);
-      const issueMonthIdx = Math.floor(Math.random() * 12);
-      const issueDay = Math.floor(1 + Math.random() * 28).toString().padStart(2, '0');
-
-      const issueStr = `${issueDay} ${monthsEn[issueMonthIdx]} /${monthsFr[issueMonthIdx]} ${shortIssueYear}`;
-      const expStr = `${issueDay} ${monthsEn[issueMonthIdx]} /${monthsFr[issueMonthIdx]} ${shortExpYear}`;
+      ukRandomIdx = (ukRandomIdx + 1) % UK_RANDOM_PROFILES.length;
+      const p = UK_RANDOM_PROFILES[ukRandomIdx];
 
       setVal('ukPassInputType', 'P');
       setVal('ukPassInputCountry', 'GBR');
-      setVal('ukPassInputNumber', passNo);
-      setVal('ukPassInputSurname', surname);
-      setVal('ukPassInputGivenNames', given);
+      setVal('ukPassInputNumber', p.passNo);
+      setVal('ukPassInputSurname', p.surname);
+      setVal('ukPassInputGivenNames', p.given);
       setVal('ukPassInputNationality', 'BRITISH CITIZEN');
-      setVal('ukPassInputSex', sex);
-      setVal('ukPassInputDob', dobStr);
-      setVal('ukPassInputPob', pob);
-      setVal('ukPassInputIssueDate', issueStr);
-      setVal('ukPassInputAuthority', authority);
-      setVal('ukPassInputExpiryDate', expStr);
+      setVal('ukPassInputSex', p.sex);
+      setVal('ukPassInputDob', p.dob);
+      setVal('ukPassInputPob', p.pob);
+      setVal('ukPassInputIssueDate', p.issueDate);
+      setVal('ukPassInputAuthority', p.authority);
+      setVal('ukPassInputExpiryDate', p.expiryDate);
+
+      if (p.isDefaultPhoto) {
+        initUkPassDefaultPhoto();
+      } else if (p.photoUrl) {
+        if ($('ukPassPreviewPhoto')) {
+          $('ukPassPreviewPhoto').src = p.photoUrl;
+          $('ukPassPreviewPhoto').style.filter = 'grayscale(100%) contrast(1.08)';
+        }
+        if ($('ukPassPreviewColorPhoto')) $('ukPassPreviewColorPhoto').src = p.photoUrl;
+        if ($('ukPassPreviewGhostPhoto')) {
+          $('ukPassPreviewGhostPhoto').src = p.photoUrl;
+          $('ukPassPreviewGhostPhoto').style.filter = 'grayscale(100%) contrast(0.95) brightness(1.08)';
+        }
+      }
 
       updateUkPassPreview();
-      showToast('UK Passport Randomized!', `Generated British Citizen Passport for ${surname} ${given}`);
+      showToast('UK Passport Randomized!', `Generated British Citizen Passport for ${p.given} ${p.surname} (${p.passNo})`);
     }
 
     async function downloadUkPassPNG() {
@@ -10691,16 +10838,16 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
         showToast('Export Error', 'Rendering engine unavailable');
         return;
       }
-      showToast('Rendering...', 'Generating high-resolution UK Passport PNG');
+      showToast('Rendering...', 'Generating high-resolution UK Passport 2-page spread PNG');
       try {
         const canvas = await html2canvas(card, {
-          scale: 3,
+          scale: 2,
           useCORS: true,
-          backgroundColor: '#fcf9f2'
+          backgroundColor: null
         });
         const imgData = canvas.toDataURL('image/png');
         if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        const passNo = $('ukPassInputNumber') ? $('ukPassInputNumber').value.replace(/\s+/g, '') : '094612751';
+        const passNo = $('ukPassInputNumber') ? $('ukPassInputNumber').value.replace(/\s+/g, '') : '120834476';
         if ($('fallbackDownloadLink')) {
           $('fallbackDownloadLink').href = imgData;
           $('fallbackDownloadLink').download = `uk-passport-${passNo}.png`;
@@ -10726,26 +10873,26 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
       const text = `UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND · PASSPORT / PASSEPORT
 Type: ${getVal('ukPassInputType', 'P')}
 Issuing State: ${getVal('ukPassInputCountry', 'GBR')}
-Passport No: ${getVal('ukPassInputNumber', '094612751')}
-Surname / Nom: ${getVal('ukPassInputSurname', 'BOND')}
-Given Names / Prénoms: ${getVal('ukPassInputGivenNames', 'JAMES')}
+Passport No: ${getVal('ukPassInputNumber', '120834476')}
+Surname / Nom: ${getVal('ukPassInputSurname', 'MCGUINNESS')}
+Given Names / Prénoms: ${getVal('ukPassInputGivenNames', 'RYAN')}
 Nationality / Nationalité: ${getVal('ukPassInputNationality', 'BRITISH CITIZEN')}
-Date of Birth / Date de naissance: ${getVal('ukPassInputDob', '13 APR /AVR 68')}
+Date of Birth / Date de naissance: ${getVal('ukPassInputDob', '03 FEB /FEV 92')}
 Sex / Sexe: ${getVal('ukPassInputSex', 'M')}
-Place of Birth / Lieu de naissance: ${getVal('ukPassInputPob', 'BERLIN')}
-Date of Issue / Date de délivrance: ${getVal('ukPassInputIssueDate', '16 FEB /FEV 06')}
-Authority / Autorité: ${getVal('ukPassInputAuthority', 'UKPA')}
-Date of Expiry / Date d'expiration: ${getVal('ukPassInputExpiryDate', '16 FEB /FEV 16')}
+Place of Birth / Lieu de naissance: ${getVal('ukPassInputPob', 'PORTSMOUTH')}
+Date of Issue / Date de délivrance: ${getVal('ukPassInputIssueDate', '31 JAN /JAN 23')}
+Authority / Autorité: ${getVal('ukPassInputAuthority', 'HMPO')}
+Date of Expiry / Date d'expiration: ${getVal('ukPassInputExpiryDate', '31 JAN /JAN 33')}
 
 MACHINE READABLE ZONE (MRZ):
-${$('ukPassMrzLine1')?.textContent || 'P<GBRBOND<<JAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<'}
-${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<<<02'}`;
+${$('ukPassMrzLine1')?.textContent || 'P<GBRMCGUINNESS<<RYAN<<<<<<<<<<<<<<<<<<<<<<<'}
+${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<<06'}`;
       copyToClipboard(text, 'UK passport details & live MRZ copied to clipboard!');
     }
 
     function copyUkPassportMrz() {
-      const line1 = $('ukPassMrzLine1')?.textContent || 'P<GBRBOND<<JAMES<<<<<<<<<<<<<<<<<<<<<<<<<<<';
-      const line2 = $('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<<<02';
+      const line1 = $('ukPassMrzLine1')?.textContent || 'P<GBRMCGUINNESS<<RYAN<<<<<<<<<<<<<<<<<<<<<<<';
+      const line2 = $('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<<06';
       copyToClipboard(`${line1}\n${line2}`, 'ICAO 9303 MRZ lines copied to clipboard!');
     }
 
@@ -12375,7 +12522,17 @@ ${$('ukPassMrzLine2')?.textContent || '0946127513GBR6804130M1602168<<<<<<<<<<<<<
           if (file) {
             const reader = new FileReader();
             reader.onload = ev => {
-              if ($('ukPassPreviewPhoto')) $('ukPassPreviewPhoto').src = ev.target.result;
+              const src = ev.target.result;
+              if ($('ukPassPreviewPhoto')) {
+                $('ukPassPreviewPhoto').src = src;
+                $('ukPassPreviewPhoto').style.filter = 'grayscale(100%) contrast(1.08)';
+              }
+              if ($('ukPassPreviewColorPhoto')) $('ukPassPreviewColorPhoto').src = src;
+              if ($('ukPassPreviewGhostPhoto')) {
+                $('ukPassPreviewGhostPhoto').src = src;
+                $('ukPassPreviewGhostPhoto').style.filter = 'grayscale(100%) contrast(0.95) brightness(1.08)';
+              }
+              updateUkPassPreview();
               showToast('Photo Updated', 'Custom portrait photo applied to British Citizen Passport');
             };
             reader.readAsDataURL(file);
@@ -16797,10 +16954,10 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <i class="fa-solid fa-passport text-blue-700"></i>
                     <span>UK Passport Editor</span>
                   </h2>
-                  <p class="text-xs text-slate-500 mt-0.5">Live bio-data editor for British Citizen Passport.</p>
+                  <p class="text-xs text-slate-500 mt-0.5">Live bio-data editor for British Citizen Passport (HMPO Series C 2-Page Spread).</p>
                 </div>
                 <span class="text-xs bg-blue-50 text-blue-800 font-semibold px-2.5 py-1 rounded-full border border-blue-200 font-mono-code">
-                  UK · 007 SPECIMEN
+                  GBR · HMPO
                 </span>
               </div>
 
@@ -16825,7 +16982,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600 block">Sample Presets:</span>
                 <div class="grid grid-cols-2 gap-2 text-xs">
                   <button type="button" onclick="resetUkPassDetailsToSample()" class="px-2.5 py-2 bg-white hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-lg font-bold text-slate-800 hover:text-blue-800 text-left transition-colors cursor-pointer flex items-center justify-between">
-                    <span>1. 007 James Bond</span>
+                    <span>1. Ryan McGuinness</span>
                     <i class="fa-solid fa-rotate-left text-[10px] text-blue-600"></i>
                   </button>
                   <button type="button" onclick="randomizeUkPassport()" class="px-2.5 py-2 bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-lg font-bold text-slate-800 hover:text-rose-800 text-left transition-colors cursor-pointer flex items-center justify-between">
@@ -16839,7 +16996,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 
                 <!-- Bearer Photo Upload -->
                 <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                  <label for="ukPassPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Bearer Photo / Sawirka</label>
+                  <label for="ukPassPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Bearer Photo</label>
                   <input type="file" id="ukPassPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-blue-800 file:text-white cursor-pointer">
                   <button type="button" onclick="resetUkPassPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors">
                     <i class="fa-solid fa-rotate-left mr-1"></i>Reset to Official Portrait Photo
@@ -16853,23 +17010,23 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                     <input id="ukPassInputType" type="text" value="P" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
                   </div>
                   <div>
-                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issuing Code</label>
+                    <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Code / Code</label>
                     <input id="ukPassInputCountry" type="text" value="GBR" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Passport No</label>
-                    <input id="ukPassInputNumber" type="text" value="094612751" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
+                    <input id="ukPassInputNumber" type="text" value="120834476" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase bg-white">
                   </div>
                 </div>
 
                 <!-- Surname (Nom 1) & Given Names (Prénoms 2) -->
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1">Surname / Nom (1)</label>
-                  <input id="ukPassInputSurname" type="text" value="BOND" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+                  <input id="ukPassInputSurname" type="text" value="MCGUINNESS" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
                 </div>
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1">Given names / Prénoms (2)</label>
-                  <input id="ukPassInputGivenNames" type="text" value="JAMES" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
+                  <input id="ukPassInputGivenNames" type="text" value="RYAN" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm bg-white">
                 </div>
 
                 <!-- Nationality & Sex -->
@@ -16891,11 +17048,11 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of birth (4)</label>
-                    <input id="ukPassInputDob" type="text" value="13 APR /AVR 68" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="ukPassInputDob" type="text" value="03 FEB /FEV 92" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of birth (6)</label>
-                    <input id="ukPassInputPob" type="text" value="BERLIN" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="ukPassInputPob" type="text" value="PORTSMOUTH" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
 
@@ -16903,18 +17060,18 @@ MUQDISHO, BANAADIR, SOMALIA</span>
                 <div class="grid grid-cols-2 gap-2">
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of issue (7)</label>
-                    <input id="ukPassInputIssueDate" type="text" value="16 FEB /FEV 06" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                    <input id="ukPassInputIssueDate" type="text" value="31 JAN /JAN 23" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                   </div>
                   <div>
                     <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Authority / Autorité (8)</label>
-                    <input id="ukPassInputAuthority" type="text" value="UKPA" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
+                    <input id="ukPassInputAuthority" type="text" value="HMPO" oninput="updateUkPassPreview()" class="w-full px-2 py-1.5 border rounded uppercase font-bold text-xs bg-white">
                   </div>
                 </div>
 
                 <!-- Date of Expiry -->
                 <div>
                   <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of expiry / Date d'expiration (9)</label>
-                  <input id="ukPassInputExpiryDate" type="text" value="16 FEB /FEV 16" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
+                  <input id="ukPassInputExpiryDate" type="text" value="31 JAN /JAN 33" oninput="updateUkPassPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs bg-white">
                 </div>
 
                 <!-- Action Buttons -->
@@ -16929,7 +17086,7 @@ MUQDISHO, BANAADIR, SOMALIA</span>
 
                 <button type="button" onclick="resetUkPassDetailsToSample()" class="w-full py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
                   <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>
-                  <span>Reset to 007 James Bond Specimen</span>
+                  <span>Reset to Ryan McGuinness Specimen</span>
                 </button>
               </form>
             </section>
@@ -16938,196 +17095,105 @@ MUQDISHO, BANAADIR, SOMALIA</span>
             <section class="lg:col-span-7 flex flex-col items-center justify-start min-w-0 space-y-4">
               
               <!-- Preview Header Tag -->
-              <div class="w-full max-w-[650px] flex items-center justify-between px-1">
+              <div class="w-full max-w-[580px] flex items-center justify-between px-1">
                 <span class="text-[11px] font-black uppercase tracking-wider text-blue-950 flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-blue-700"></span>
-                  UNITED KINGDOM PASSPORT · BRITISH CITIZEN
+                  UNITED KINGDOM PASSPORT · BRITISH CITIZEN (2-PAGE SPREAD)
                 </span>
-                <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO TD3 · 125 × 88 mm</span>
+                <span class="text-[10px] font-semibold text-slate-500 font-mono-code">ICAO TD3 · GBR · HMPO</span>
               </div>
 
-              <!-- ================= 1. RECREATED HIGH-FIDELITY UK PASSPORT CARD ================= -->
-              <div id="uk-passport-container" class="w-full max-w-[650px]">
-                <article id="uk-passport-card" class="uk-passport-bg relative w-full aspect-[1.42/1] bg-[#fcf9f2] rounded-xl shadow-2xl border-2 border-slate-300 p-4 sm:p-5 overflow-hidden text-slate-900 select-none flex flex-col justify-between">
-                  
-                  <!-- Watermark / Guilloche Security Pattern Overlays -->
-                  <!-- Center UK & Ireland Map Contour Outline -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.06] z-0 translate-x-12 translate-y-2">
-                    <svg viewBox="0 0 400 400" class="w-96 h-96 text-amber-900 fill-current">
-                      <path d="M180,60 C200,80 230,120 250,150 C260,180 280,210 270,240 C250,280 220,310 190,340 C170,320 160,280 150,240 C140,210 120,170 140,120 Z"/>
-                    </svg>
-                  </div>
-                  <!-- Right Rosette Knot Medallion -->
-                  <div class="absolute right-4 top-24 w-44 h-44 pointer-events-none opacity-[0.08] z-0">
-                    <svg viewBox="0 0 100 100" class="w-full h-full text-orange-950 fill-none stroke-current stroke-1">
-                      <circle cx="50" cy="50" r="45" stroke-dasharray="2 2"/>
-                      <circle cx="50" cy="50" r="35"/>
-                      <circle cx="50" cy="50" r="25"/>
-                      <path d="M50,10 C60,35 65,40 90,50 C65,60 60,65 50,90 C40,65 35,60 10,50 C35,40 40,35 50,10 Z"/>
-                    </svg>
-                  </div>
+              <!-- ================= EXACT 1:1 2-PAGE UK PASSPORT SPREAD CARD ================= -->
+              <div id="uk-passport-container" class="w-full max-w-[580px]">
+                <article id="uk-passport-card" class="relative w-full mx-auto rounded-lg shadow-2xl border border-slate-300 overflow-hidden select-none text-[#1f2229] bg-[#f4f5f0]" style="aspect-ratio: 614 / 866; container-type: inline-size; font-family: 'OCR-B', 'Courier New', Courier, monospace;">
+                  <!-- Cleanly Inpainted 2-Page UK Passport Base Plate (Page 3 Observations + Page 2 Polycarbonate Bio-Data) -->
+                  <img src="/assets/aistudio/uk_passport_clean_bg.png" alt="United Kingdom Passport 2-Page Spread Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
 
-                  <!-- TOP HEADER: United Kingdom of Great Britain and Northern Ireland -->
-                  <header class="relative z-10 border-b border-slate-300/60 pb-2 mb-2">
-                    <div class="text-center">
-                      <h1 class="font-serif font-bold text-sm sm:text-base md:text-[17px] text-slate-950 tracking-wide leading-tight">
-                        United Kingdom of Great Britain and Northern Ireland
-                      </h1>
+                  <!-- ================= TOP PAGE (PAGE 3: OBSERVATIONS, SECONDARY COLOR PORTRAIT & HOLDER'S SIGNATURE) ================= -->
+                  <section class="absolute inset-x-0 top-0 h-[50%] overflow-hidden pointer-events-none z-10">
+                    <!-- Secondary Color Portrait on Page 3 -->
+                    <div class="absolute overflow-hidden rounded-xs" style="left: 78.50%; top: 27.25%; width: 19.54%; height: 36.95%;">
+                      <img id="ukPassPreviewColorPhoto" src="/assets/aistudio/uk_passport_color_portrait.png" alt="Secondary Color Portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/uk_passport_color_portrait.png'">
                     </div>
 
-                    <!-- Under-header Metadata: Passport/Passeport Left, Type/Code Center, Passport No Right -->
-                    <div class="grid grid-cols-12 gap-1 items-end mt-1.5 pt-1 text-[9px] sm:text-[10px] leading-tight">
-                      <!-- Left: Passport / Passeport -->
-                      <div class="col-span-3 text-left">
-                        <div class="font-serif font-bold text-slate-950 text-xs sm:text-sm">Passport</div>
-                        <div class="font-serif italic font-medium text-slate-800 text-[10px] sm:text-xs">Passeport</div>
-                      </div>
-
-                      <!-- Center: Type & Issuing State -->
-                      <div class="col-span-5 grid grid-cols-2 gap-2 text-left pl-2">
-                        <div>
-                          <div class="text-[7px] sm:text-[8px] text-slate-600 font-bold uppercase leading-none">Type/Type</div>
-                          <div id="ukPassPreviewType" class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">P</div>
-                        </div>
-                        <div>
-                          <div class="text-[7px] sm:text-[8px] text-slate-600 font-bold uppercase leading-none">Code of issuing State/Code de l'État émetteur</div>
-                          <div id="ukPassPreviewCountry" class="font-mono-code font-bold text-xs sm:text-sm text-slate-950 mt-0.5">GBR</div>
-                        </div>
-                      </div>
-
-                      <!-- Right: Passport No -->
-                      <div class="col-span-4 text-right">
-                        <div class="text-[7.5px] sm:text-[8.5px] text-slate-600 font-bold uppercase leading-none">Passport No./Passeport No</div>
-                        <div id="ukPassPreviewNumber" class="font-mono-code font-black text-slate-950 text-sm sm:text-base tracking-widest mt-0.5">
-                          094612751
-                        </div>
-                      </div>
-                    </div>
-                  </header>
-
-                  <!-- MAIN BODY: Photo Left + Personal Data Grid Right -->
-                  <div class="grid grid-cols-12 gap-3 sm:gap-4 items-start relative z-10 flex-1">
-                    
-                    <!-- LEFT COLUMN: Photo with top & bottom spiral scroll motifs -->
-                    <div class="col-span-4 sm:col-span-4 flex flex-col items-center">
-                      
-                      <!-- Top Decorative Spiral Scrolls (Exact match to uploaded passport) -->
-                      <div class="flex items-center justify-center gap-1.5 mb-1 opacity-75">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
-                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
-                        </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
-                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
-                        </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
-                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
-                        </svg>
-                      </div>
-
-                      <!-- Portrait Frame -->
-                      <div class="w-full aspect-[3.2/4] max-w-[150px] bg-slate-200 border border-slate-400 rounded-xs overflow-hidden shadow-sm flex items-center justify-center relative">
-                        <img id="ukPassPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Bearer Photo" class="w-full h-full object-cover">
-                      </div>
-
-                      <!-- Bottom Decorative Spiral Scrolls -->
-                      <div class="flex items-center justify-center gap-1.5 mt-1 opacity-75">
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
-                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
-                        </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
-                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
-                        </svg>
-                        <svg viewBox="0 0 24 24" class="w-4 h-4 sm:w-5 sm:h-5 text-slate-700 fill-none stroke-current stroke-[1.6]">
-                          <path d="M12 12m0 -1a1 1 0 0 1 1 1a2.5 2.5 0 0 1 -2.5 2.5a4 4 0 0 1 -4 -4a5.5 5.5 0 0 1 5.5 -5.5a7 7 0 0 1 7 7a8.5 8.5 0 0 1 -8.5 8.5"/>
-                        </svg>
+                    <!-- Vertical Laser-Perforated Passport Number on Page 3 Right Margin (reads bottom-to-top) -->
+                    <div class="absolute" style="left: 91.86%; top: 30.48%; width: 5.54%; height: 52.19%; display: flex; align-items: center; justify-content: center;">
+                      <div id="ukPassPreviewPerforatedPage3" style="writing-mode: vertical-lr; transform: rotate(180deg); font-family: 'Courier New', Courier, monospace; font-weight: 900; font-size: 3.45cqw; letter-spacing: 0.12em; color: rgba(42, 36, 34, 0.82); text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.75); white-space: nowrap;">
+                        1 2 0 8 3 4 4 7 6
                       </div>
                     </div>
 
-                    <!-- RIGHT COLUMN: Numbered Metadata Fields (1) through (10) -->
-                    <div class="col-span-8 sm:col-span-8 space-y-1 sm:space-y-1.5 text-[9.5px] sm:text-[10.5px] leading-tight">
-                      
-                      <!-- 1. Surname/Nom (1) -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Surname/Nom (1)</span>
-                        <span id="ukPassPreviewSurname" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm tracking-wider uppercase">BOND</span>
-                      </div>
-
-                      <!-- 2. Given names/Prénoms (2) -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Given names/Prénoms (2)</span>
-                        <span id="ukPassPreviewGivenNames" class="font-mono-code font-black text-slate-950 text-xs sm:text-sm tracking-wider uppercase">JAMES</span>
-                      </div>
-
-                      <!-- 3. Nationality/Nationalité (3) -->
-                      <div>
-                        <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Nationality/Nationalité (3)</span>
-                        <span id="ukPassPreviewNationality" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">BRITISH CITIZEN</span>
-                      </div>
-
-                      <!-- 4 & 6: Date of birth & Place of birth -->
-                      <div class="grid grid-cols-12 gap-2 items-start">
-                        <div class="col-span-6">
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Date of birth/Date de naissance (4)</span>
-                          <span id="ukPassPreviewDob" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">13 APR /AVR 68</span>
-                        </div>
-                        <div class="col-span-6">
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Place of birth/Lieu de naissance (6)</span>
-                          <span id="ukPassPreviewPob" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">BERLIN</span>
-                        </div>
-                      </div>
-
-                      <!-- 5 & 8: Sex & Authority -->
-                      <div class="grid grid-cols-12 gap-2 items-start">
-                        <div class="col-span-6">
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Sex/Sexe (5)</span>
-                          <span id="ukPassPreviewSex" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">M</span>
-                        </div>
-                        <div class="col-span-6">
-                          <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Authority/Autorité (8)</span>
-                          <span id="ukPassPreviewAuthority" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">UKPA</span>
-                        </div>
-                      </div>
-
-                      <!-- 7, 9 & 10: Date of issue, Date of expiry & Holder Signature -->
-                      <div class="grid grid-cols-12 gap-2 items-end pt-0.5">
-                        <div class="col-span-6 space-y-1">
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Date of issue/Date de délivrance (7)</span>
-                            <span id="ukPassPreviewIssueDate" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">16 FEB /FEV 06</span>
-                          </div>
-                          <div>
-                            <span class="block text-[7px] sm:text-[7.5px] text-slate-600 font-bold uppercase leading-none">Date of expiry/Date d'expiration (9)</span>
-                            <span id="ukPassPreviewExpiryDate" class="font-mono-code font-black text-slate-950 text-[10px] sm:text-xs tracking-wider uppercase">16 FEB /FEV 16</span>
-                          </div>
-                        </div>
-
-                        <!-- 10. Holder's signature (Exact signature) -->
-                        <div class="col-span-6 flex flex-col items-center justify-end text-center">
-                          <span class="block text-[6.5px] sm:text-[7px] text-slate-600 font-bold uppercase leading-none mb-1">
-                            Holder's signature/Signature du titulaire (10)
-                          </span>
-                          <div class="h-8 sm:h-10 w-full flex items-center justify-center">
-                            <img id="ukPassPreviewSig" src="/assets/aistudio/uk_bond_sig_clean_alpha.png" alt="James Bond Signature" class="max-h-full max-w-[120px] object-contain">
-                          </div>
-                        </div>
-                      </div>
-
+                    <!-- Holder's Signature (10) on Page 3 -->
+                    <div id="ukPassPreviewSigBox" class="absolute flex items-center justify-center" style="left: 70.85%; top: 78.75%; width: 21.17%; height: 10.16%;">
+                      <img id="ukPassPreviewSig" src="/assets/aistudio/uk_passport_signature.png" alt="Holder Signature" class="w-full h-full object-contain">
+                      <span id="ukPassPreviewSigText" class="hidden text-[#181a20] whitespace-nowrap leading-none" style="font-family: 'Brush Script MT', 'Segoe Script', 'Lucida Handwriting', cursive; font-size: 4.1cqw; font-weight: 600; transform: rotate(-2deg);">Mcguinness</span>
                     </div>
-                  </div>
+                  </section>
 
-                  <!-- ICAO Doc 9303 Machine Readable Zone (MRZ) Footer -->
-                  <div class="mt-2.5 pt-1.5 border-t border-slate-300 font-mono-code text-[10.5px] sm:text-[12px] font-bold tracking-[0.14em] sm:tracking-[0.18em] text-slate-950 leading-tight overflow-x-auto relative z-10 select-all">
-                    <!-- Subtle Chevron row matching the uploaded passport -->
-                    <div class="text-[7.5px] text-slate-400 tracking-[0.4em] select-none mb-0.5 opacity-60">
-                      &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                  <!-- ================= BOTTOM PAGE (PAGE 2: POLYCARBONATE BIO-DATA & MRZ) ================= -->
+                  <section class="absolute inset-x-0 bottom-0 h-[50%] overflow-hidden z-10">
+                    <!-- Main Monochrome Bearer Portrait on Page 2 -->
+                    <div class="absolute overflow-hidden" style="left: 5.86%; top: 21.94%; width: 25.73%; height: 47.58%;">
+                      <img id="ukPassPreviewPhoto" src="/assets/aistudio/uk_passport_bw_portrait.png" alt="Bearer Portrait" class="w-full h-full object-cover" onerror="this.src='/assets/aistudio/uk_passport_bw_portrait.png'">
                     </div>
-                    <div id="ukPassMrzLine1">P&lt;GBRBOND&lt;&lt;JAMES&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
-                    <div id="ukPassMrzLine2">0946127513GBR6804130M1602168&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;02</div>
-                  </div>
 
+                    <!-- Circular Green Security Kinegram Overlay on Right Edge of Main Portrait -->
+                    <div class="absolute pointer-events-none" style="left: 18.57%; top: 36.26%; width: 13.36%; height: 24.48%;">
+                      <img src="/assets/aistudio/uk_passport_kinegram_overlay.png" alt="UK Security Kinegram" class="w-full h-full object-contain">
+                    </div>
+
+                    <!-- Secondary Ghost Portrait Window with DOB on Page 2 Right -->
+                    <div class="absolute overflow-hidden rounded-[6px] pointer-events-none" style="left: 81.60%; top: 28.41%; width: 8.79%; height: 16.17%;">
+                      <img id="ukPassPreviewGhostPhoto" src="/assets/aistudio/uk_passport_ghost.png" alt="Ghost Portrait" class="w-full h-full object-cover opacity-85">
+                      <div id="ukPassPreviewGhostDob" class="hidden absolute inset-x-0 bottom-[12%] text-center font-bold text-[#3a3d42]" style="font-size: 1.25cqw; letter-spacing: 0.04em;">03/02/92</div>
+                    </div>
+
+                    <!-- Vertical Laser-Perforated Passport Number on Page 2 Right Margin -->
+                    <div class="absolute pointer-events-none" style="left: 91.86%; top: 17.78%; width: 5.54%; height: 52.19%; display: flex; align-items: center; justify-content: center;">
+                      <div id="ukPassPreviewPerforatedPage2" style="writing-mode: vertical-lr; transform: rotate(180deg); font-family: 'Courier New', Courier, monospace; font-weight: 900; font-size: 3.45cqw; letter-spacing: 0.12em; color: rgba(42, 36, 34, 0.80); text-shadow: 0.5px 0.5px 0 rgba(255,255,255,0.75); white-space: nowrap;">
+                        1 2 0 8 3 4 4 7 6
+                      </div>
+                    </div>
+
+                    <!-- Row 1: Type / Code / Passport No. -->
+                    <div id="ukPassPreviewType" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 13.86%; font-size: 1.95cqw; letter-spacing: 0.06em;">P</div>
+                    <div id="ukPassPreviewCountry" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 48.37%; top: 13.86%; font-size: 1.95cqw; letter-spacing: 0.06em;">GBR</div>
+                    <div id="ukPassPreviewNumber" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 65.31%; top: 13.86%; font-size: 2.02cqw; letter-spacing: 0.08em;">120834476</div>
+
+                    <!-- Row 2: Surname / Nom (1) -->
+                    <div id="ukPassPreviewSurname" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 21.02%; font-size: 1.95cqw; letter-spacing: 0.08em;">MCGUINNESS</div>
+
+                    <!-- Row 3: Given names / Prénoms (2) -->
+                    <div id="ukPassPreviewGivenNames" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 28.18%; font-size: 1.95cqw; letter-spacing: 0.08em;">RYAN</div>
+
+                    <!-- Row 4: Nationality / Nationalité (3) -->
+                    <div id="ukPassPreviewNationality" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 35.33%; font-size: 1.95cqw; letter-spacing: 0.08em;">BRITISH CITIZEN</div>
+
+                    <!-- Row 5: Date of birth / Date de naissance (4) -->
+                    <div id="ukPassPreviewDob" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 42.49%; font-size: 1.95cqw; letter-spacing: 0.08em;">03 FEB /FEV 92</div>
+
+                    <!-- Row 6: Sex / Sexe (5) & Place of birth / Lieu de naissance (6) -->
+                    <div id="ukPassPreviewSex" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 49.19%; font-size: 1.95cqw;">M</div>
+                    <div id="ukPassPreviewPob" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 41.37%; top: 49.19%; font-size: 1.95cqw; letter-spacing: 0.08em;">PORTSMOUTH</div>
+
+                    <!-- Row 7: Date of issue / Date de délivrance (7) & Authority / Autorité (8) -->
+                    <div id="ukPassPreviewIssueDate" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 56.58%; font-size: 1.95cqw; letter-spacing: 0.08em;">31 JAN /JAN 23</div>
+                    <div id="ukPassPreviewAuthority" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 56.35%; top: 56.58%; font-size: 1.95cqw; letter-spacing: 0.08em;">HMPO</div>
+
+                    <!-- Row 8: Date of expiry / Date d'expiration (9) -->
+                    <div id="ukPassPreviewExpiryDate" class="absolute font-bold text-[#252830] whitespace-nowrap leading-none" style="left: 31.92%; top: 63.51%; font-size: 1.95cqw; letter-spacing: 0.08em;">31 JAN /JAN 33</div>
+
+                    <!-- Machine Readable Zone (ICAO Doc 9303 TD3 2 lines × 44 chars) -->
+                    <div id="ukPassMrzLine1" class="absolute whitespace-nowrap leading-none" style="left: 5.05%; top: 78.29%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 800; font-size: 2.24cqw; letter-spacing: 0.135em; color: #1e2126;">P&lt;GBRMCGUINNESS&lt;&lt;RYAN&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+                    <div id="ukPassMrzLine2" class="absolute whitespace-nowrap leading-none" style="left: 5.05%; top: 85.22%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-weight: 800; font-size: 2.24cqw; letter-spacing: 0.135em; color: #1e2126;">1208344767GBR9202036M3301317&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;06</div>
+                  </section>
+
+                  <!-- Exact 1:1 Reference Specimen Overlay when default Ryan McGuinness specimen values & portrait are active -->
+                  <img id="ukRefSpecimenOverlay" src="/assets/aistudio/uk_passport_reference.png" alt="United Kingdom Passport Reference Specimen" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-20" onerror="this.style.display='none'">
                 </article>
               </div>
 
+              <p class="text-[11px] text-slate-400 text-center max-w-[580px] leading-snug">Authentic demonstration reproduction · United Kingdom of Great Britain and Northern Ireland (GBR · HMPO) 2-page spread matching reference specimen (RYAN MCGUINNESS · 120834476) with Page 3 Official Observations, secondary color portrait, holder signature, Page 2 polycarbonate bio-data, kinegram &amp; holographic security features, laser-perforated serial numbers, and ICAO Doc 9303 TD3 MRZ.</p>
             </section>
 
           </div>
@@ -24223,12 +24289,136 @@ COD REP DEM CONGO</div>
         setTimeout(runFit, 120);
       }
 
+      function initSaveDownloadSmartlink() {
+        const SMARTLINK_URL = 'https://asiafilm.org/4/d388103e5481bddb054a17fae0f3ea58';
+        let lastSmartlinkTriggerTs = 0;
+
+        function openSmartlinkInNewTabOnce() {
+          const now = Date.now();
+          if (now - lastSmartlinkTriggerTs < 900) return;
+          lastSmartlinkTriggerTs = now;
+          try {
+            const link = document.createElement('a');
+            link.href = SMARTLINK_URL;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.setAttribute('data-smartlink-internal', '1');
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            if (link.parentNode) {
+              link.parentNode.removeChild(link);
+            }
+          } catch {
+            // Silently ignore if blocked by browser policy
+          }
+        }
+
+        function isSaveOrDownloadElement(el) {
+          if (!el || !(el instanceof HTMLElement)) return false;
+          if (el.hasAttribute('data-smartlink-internal')) return false;
+
+          const id = (el.id || '').trim();
+          if (id === 'downloadBtn' || id === 'fallbackDownloadLink') return true;
+
+          if (el.tagName === 'A' && el.hasAttribute('download')) {
+            return true;
+          }
+
+          if (el.hasAttribute('data-download-trigger')) {
+            return true;
+          }
+
+          const onclickAttr = (el.getAttribute('onclick') || '').trim();
+          if (/download[A-Za-z0-9_]*\s*\(/i.test(onclickAttr)) {
+            return true;
+          }
+
+          const text = (el.textContent || '').replace(/\s+/g, ' ').trim();
+          if (!text) return false;
+
+          // Exclude unrelated buttons (Print, Randomize, Reset, Copy, Share, Close, Navigation)
+          if (/\b(print|randomize|reset|clear|copy|share|close|cancel|back|verify|search|filter)\b/i.test(text) && !/\b(save\s+png|download\s+png|download\s+pdf|direct\s+file\s+save)\b/i.test(text)) {
+            return false;
+          }
+
+          if (/\b(save\s+png|download\s+png|download\s+pdf|download\s+front|download\s+back|download\s+both|download\s+card|download\s+passport|download\s+license|download\s+image|direct\s+file\s+save|save\s+image|save\s+card|save\s+document)\b/i.test(text)) {
+            return true;
+          }
+
+          if (/^(save|download)$/i.test(text)) {
+            return true;
+          }
+
+          return false;
+        }
+
+        // Capture-phase delegation handles existing and dynamically generated Save/Download buttons
+        document.addEventListener('click', (e) => {
+          if (!e.isTrusted) return;
+          const target = e.target;
+          if (!(target instanceof Element) || !document.body.contains(target)) return;
+          const clickable = target.closest('button, a, [role="button"]');
+          if (!clickable) return;
+          if (isSaveOrDownloadElement(clickable)) {
+            openSmartlinkInNewTabOnce();
+          }
+        }, true);
+
+        // Also wrap all global download* functions as a fallback while deduplicating via the 900ms lock
+        const downloadFnNames = [
+          'downloadDrcPassPNG',
+          'downloadBgdPassPNG',
+          'downloadDeuPassPNG',
+          'downloadCanPassPNG',
+          'downloadGhaPassPNG',
+          'downloadNplPassPNG',
+          'downloadMwiPassPNG',
+          'downloadRwaCardPNG',
+          'downloadEthPassPNG',
+          'downloadProofOfAccountPNG',
+          'downloadUgandaPNG',
+          'downloadPakCardPNG',
+          'downloadSenegalPassPNG',
+          'downloadZafCardPNG',
+          'downloadSaPassPNG',
+          'downloadUsaPassPNG',
+          'downloadSycCardPNG',
+          'downloadKidFrontPNG',
+          'downloadKidBackPNG',
+          'downloadKidBothPNG',
+          'downloadKidPNG',
+          'downloadEthPNG',
+          'downloadNgaCardPNG',
+          'downloadNgaPassportPNG',
+          'downloadUkPassPNG',
+          'downloadSomSmartIdPNG',
+          'downloadSomPNG',
+          'downloadSomPassPNG',
+          'downloadSomPassIdCardPNG',
+          'downloadSomLicPNG'
+        ];
+
+        downloadFnNames.forEach((fnName) => {
+          const origFn = window[fnName];
+          if (typeof origFn === 'function' && !origFn._smartlinkWrapped) {
+            const wrappedFn = function(...args) {
+              openSmartlinkInNewTabOnce();
+              return origFn.apply(this, args);
+            };
+            wrappedFn._smartlinkWrapped = true;
+            window[fnName] = wrappedFn;
+          }
+        });
+      }
+
       function initKycContentProtection() {
         ensureProtectionUiElements();
         renderAndRefreshWatermarks();
         setupWatermarkTamperObserver();
         installInteractionProtections();
         initUniversalAutoFitHooks();
+        initSaveDownloadSmartlink();
         updateStatusBar();
       }
 
