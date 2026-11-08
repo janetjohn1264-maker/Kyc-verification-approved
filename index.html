@@ -1980,11 +1980,36 @@ var $ = window.$ || (id => document.getElementById(id));
     }
     window.switchVerificationDocType = switchVerificationDoc;
 
-    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'uae'
+    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'uae', 'turkey'
     function switchVerificationCountry(countryKey) {
       currentCountry = countryKey;
 
-      if (countryKey === 'uae') {
+      if (countryKey === 'turkey') {
+        currentDocType = 'idcard';
+        const poaAccountBar = $('poa-step2-account-selector');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        const passTab = $('tab-doc-passport');
+        const idTab = $('tab-doc-idcard');
+        const dlTab = $('tab-doc-driverlicense');
+        const refTab = $('tab-doc-refugeecard');
+        const poaTab = $('tab-doc-proofofaccount');
+        const passRadio = $('passport-radio-indicator');
+        const idRadio = $('idcard-radio-indicator');
+        const dlRadio = $('driverlicense-radio-indicator');
+        const refRadio = $('refugeecard-radio-indicator');
+        const poaRadio = $('proofofaccount-radio-indicator');
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-red-600 bg-gradient-to-br from-red-50/90 via-white to-cyan-50/30 text-slate-900 shadow-md ring-2 ring-red-500/20 transition-all cursor-pointer relative group";
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateTurIdPreview === 'function') updateTurIdPreview();
+      } else if (countryKey === 'uae') {
         currentDocType = 'idcard';
         const poaAccountBar = $('poa-step2-account-selector');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
@@ -2610,6 +2635,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-teal-600 bg-gradient-to-br from-teal-50 via-white to-amber-50/50 text-teal-950 text-left shadow-sm ring-2 ring-teal-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-teal-50/40 hover:border-teal-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-teal-600"
+        },
+        turkey: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-red-600 bg-gradient-to-br from-red-50 via-white to-cyan-50/50 text-red-950 text-left shadow-sm ring-2 ring-red-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-red-600"
         }
       };
 
@@ -2646,7 +2676,8 @@ var $ = window.$ || (id => document.getElementById(id));
         rwanda: 'Rwanda',
         nepal: 'Nepal',
         malawi: 'Malawi',
-        uae: 'United Arab Emirates'
+        uae: 'United Arab Emirates',
+        turkey: 'Turkey'
       };
       if (currentDocType === 'proofofaccount') {
         showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
@@ -2681,6 +2712,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const nplPassView = $('nepal-passport-view');
       const mwiPassView = $('malawi-passport-view');
       const uaeDocView = $('uae-doc-view');
+      const turkeyDocView = $('turkey-doc-view');
       const ethPassView = $('ethiopia-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
       const poaddrDocView = $('proofofaddress-doc-view');
@@ -2711,6 +2743,7 @@ var $ = window.$ || (id => document.getElementById(id));
       if (nplPassView) nplPassView.classList.add('hidden');
       if (mwiPassView) mwiPassView.classList.add('hidden');
       if (uaeDocView) uaeDocView.classList.add('hidden');
+      if (turkeyDocView) turkeyDocView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
       if (poaddrDocView) poaddrDocView.classList.add('hidden');
 
@@ -2718,6 +2751,8 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaDocView) poaDocView.classList.remove('hidden');
       } else if (currentDocType === 'refugeecard') {
         if (poaddrDocView) poaddrDocView.classList.remove('hidden');
+      } else if (currentCountry === 'turkey') {
+        if (turkeyDocView) turkeyDocView.classList.remove('hidden');
       } else if (currentCountry === 'uae') {
         if (uaeDocView) uaeDocView.classList.remove('hidden');
       } else if (currentCountry === 'malawi' || currentCountry === 'mali') {
@@ -2786,6 +2821,8 @@ var $ = window.$ || (id => document.getElementById(id));
         if (typeof randomizeProofOfAccount === 'function') randomizeProofOfAccount();
       } else if (currentDocType === 'refugeecard') {
         if (typeof randomizeProofOfAddress === 'function') randomizeProofOfAddress();
+      } else if (currentCountry === 'turkey') {
+        if (typeof randomizeTurId === 'function') randomizeTurId();
       } else if (currentCountry === 'uae') {
         if (typeof randomizeUaeId === 'function') randomizeUaeId();
       } else if (currentCountry === 'malawi' || currentCountry === 'mali') {
@@ -6430,6 +6467,482 @@ var $ = window.$ || (id => document.getElementById(id));
       document.addEventListener('DOMContentLoaded', initUaeIdCard);
     } else {
       initUaeIdCard();
+    }
+
+    // ================= REPUBLIC OF TURKEY IDENTITY CARD (TÜRKİYE CUMHURİYETİ KİMLİK KARTI) CONTROLLER =================
+    const TUR_DEFAULT_PORTRAIT = '/assets/aistudio/tur_id_portrait.jpg';
+    const TUR_DEFAULT_GHOST = '/assets/aistudio/tur_id_ghost.jpg';
+    let turCustomPhotoData = '';
+    let turCurrentSide = 'both';
+    let turForceSpecimenOverlay = false;
+
+    const TUR_SPECIMEN_DEFAULT = {
+      idNo: '11723364782',
+      surname: 'IŞIK',
+      givenName: 'SABANUR',
+      dob: '14.09.2006',
+      sex: 'K / F',
+      docNo: 'A08O02389',
+      nat: 'T.C./TUR',
+      expiry: '28.01.2028',
+      ghostCode: 'K2112R',
+      sigText: '',
+      motherName: 'BELKIS',
+      fatherName: 'İSMET ÖNDER',
+      authority: 'T.C. İÇİŞLERİ BAKANLIĞI',
+      penNo: '063604'
+    };
+
+    const TUR_RANDOM_PROFILES = [
+      {
+        idNo: '11723364782',
+        surname: 'IŞIK',
+        givenName: 'SABANUR',
+        dob: '14.09.2006',
+        sex: 'K / F',
+        docNo: 'A08O02389',
+        nat: 'T.C./TUR',
+        expiry: '28.01.2028',
+        ghostCode: 'K2112R',
+        sigText: '',
+        motherName: 'BELKIS',
+        fatherName: 'İSMET ÖNDER',
+        authority: 'T.C. İÇİŞLERİ BAKANLIĞI',
+        penNo: '063604'
+      },
+      {
+        idNo: '28491053648',
+        surname: 'YILMAZ',
+        givenName: 'ELİF NUR',
+        dob: '21.04.2001',
+        sex: 'K / F',
+        docNo: 'A14G58291',
+        nat: 'T.C./TUR',
+        expiry: '15.06.2031',
+        ghostCode: 'K4819M',
+        sigText: 'E. Yılmaz',
+        motherName: 'AYŞE',
+        fatherName: 'MEHMET ALİ',
+        authority: 'T.C. İÇİŞLERİ BAKANLIĞI',
+        penNo: '084219'
+      },
+      {
+        idNo: '39184726104',
+        surname: 'DEMİR',
+        givenName: 'KEREM CAN',
+        dob: '08.11.1997',
+        sex: 'E / M',
+        docNo: 'A19K84012',
+        nat: 'T.C./TUR',
+        expiry: '19.03.2032',
+        ghostCode: 'E7392T',
+        sigText: 'K. Demir',
+        motherName: 'FATMA',
+        fatherName: 'MUSTAFA KEMAL',
+        authority: 'T.C. İÇİŞLERİ BAKANLIĞI',
+        penNo: '051942'
+      },
+      {
+        idNo: '46291830572',
+        surname: 'KAYA',
+        givenName: 'ZEYNEP SU',
+        dob: '03.02.2003',
+        sex: 'K / F',
+        docNo: 'A22M19483',
+        nat: 'T.C./TUR',
+        expiry: '11.09.2030',
+        ghostCode: 'K9104B',
+        sigText: 'Zeynep Kaya',
+        motherName: 'HATİCE',
+        fatherName: 'HASAN HÜSEYİN',
+        authority: 'T.C. İÇİŞLERİ BAKANLIĞI',
+        penNo: '072815'
+      },
+      {
+        idNo: '51902847362',
+        surname: 'ÇELİK',
+        givenName: 'BURAK EMRE',
+        dob: '29.07.1995',
+        sex: 'E / M',
+        docNo: 'A11T40928',
+        nat: 'T.C./TUR',
+        expiry: '04.12.2029',
+        ghostCode: 'E3518C',
+        sigText: 'B. Çelik',
+        motherName: 'EMİNE',
+        fatherName: 'AHMET TARIK',
+        authority: 'T.C. İÇİŞLERİ BAKANLIĞI',
+        penNo: '093410'
+      }
+    ];
+
+    function normalizeTurkishAscii(str) {
+      const map = {
+        'Ç': 'C', 'ç': 'C',
+        'Ğ': 'G', 'ğ': 'G',
+        'İ': 'I', 'I': 'I', 'ı': 'I', 'i': 'I',
+        'Ö': 'O', 'ö': 'O',
+        'Ş': 'S', 'ş': 'S',
+        'Ü': 'U', 'ü': 'U'
+      };
+      return String(str || '').split('').map(ch => map[ch] || ch).join('').toUpperCase();
+    }
+
+    function dmyDotToMrz6(dotStr, fallback) {
+      const m = String(dotStr || '').trim().match(/^(\d{2})[.\/-](\d{2})[.\/-](\d{4})$/);
+      if (!m) return fallback || '060914';
+      return m[3].slice(-2) + m[2] + m[1];
+    }
+
+    function buildTurMrzLines(f) {
+      const isDefaultMrz = (
+        f.idNo === TUR_SPECIMEN_DEFAULT.idNo &&
+        f.surname === TUR_SPECIMEN_DEFAULT.surname &&
+        f.givenName === TUR_SPECIMEN_DEFAULT.givenName &&
+        f.dob === TUR_SPECIMEN_DEFAULT.dob &&
+        f.sex === TUR_SPECIMEN_DEFAULT.sex &&
+        f.docNo === TUR_SPECIMEN_DEFAULT.docNo &&
+        f.expiry === TUR_SPECIMEN_DEFAULT.expiry
+      );
+      if (isDefaultMrz) {
+        return {
+          line1: 'I<TURA08O023892<11723364782<<<',
+          line2: '0609148F2801289TUR<<<<<<<<<<<6',
+          line3: 'ISIK<<SABANUR<<<<<<<<<<<<<<<<<'
+        };
+      }
+
+      const rawDoc = normalizeTurkishAscii(f.docNo || 'A08O02389').replace(/[^A-Z0-9]/g, '').padEnd(9, '0').slice(0, 9);
+      const docCd = computeIcaoCheckDigit(rawDoc);
+      const rawTc = String(f.idNo || '11723364782').replace(/[^0-9]/g, '').padEnd(11, '0').slice(0, 11);
+      const line1 = ('I<TUR' + rawDoc + docCd + '<' + rawTc + '<<<').slice(0, 30);
+
+      const dob6 = dmyDotToMrz6(f.dob, '060914');
+      const dobCd = computeIcaoCheckDigit(dob6);
+      const sexUp = String(f.sex || 'K / F').toUpperCase();
+      const sexMrz = (sexUp.includes('M') || sexUp.startsWith('E')) && !sexUp.includes('F') ? 'M' : 'F';
+      const exp6 = dmyDotToMrz6(f.expiry, '280128');
+      const expCd = computeIcaoCheckDigit(exp6);
+      const compositeStr = line1.slice(5, 30) + dob6 + dobCd + exp6 + expCd + '<<<<<<<<<<<';
+      const compCd = computeIcaoCheckDigit(compositeStr);
+      const line2 = (dob6 + dobCd + sexMrz + exp6 + expCd + 'TUR<<<<<<<<<<<' + compCd).slice(0, 30);
+
+      const surAscii = normalizeTurkishAscii(f.surname || 'ISIK').replace(/[^A-Z\s]/g, ' ').trim().split(/\s+/).filter(Boolean).join('<');
+      const givAscii = normalizeTurkishAscii(f.givenName || 'SABANUR').replace(/[^A-Z\s]/g, ' ').trim().split(/\s+/).filter(Boolean).join('<');
+      const line3 = (surAscii + '<<' + givAscii + '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<').slice(0, 30);
+
+      return { line1, line2, line3 };
+    }
+
+    function readTurFields() {
+      const g = (id, fallback) => {
+        const el = $(id);
+        if (!el) return fallback;
+        return el.value.trim() !== '' ? el.value.trim() : fallback;
+      };
+      const sigEl = $('turSigText');
+      return {
+        idNo: g('turIdNo', TUR_SPECIMEN_DEFAULT.idNo),
+        surname: g('turSurname', TUR_SPECIMEN_DEFAULT.surname),
+        givenName: g('turGivenName', TUR_SPECIMEN_DEFAULT.givenName),
+        dob: g('turDob', TUR_SPECIMEN_DEFAULT.dob),
+        sex: g('turSex', TUR_SPECIMEN_DEFAULT.sex),
+        docNo: g('turDocNo', TUR_SPECIMEN_DEFAULT.docNo),
+        nat: g('turNat', TUR_SPECIMEN_DEFAULT.nat),
+        expiry: g('turExpiry', TUR_SPECIMEN_DEFAULT.expiry),
+        ghostCode: g('turGhostCode', TUR_SPECIMEN_DEFAULT.ghostCode),
+        sigText: sigEl ? sigEl.value.trim() : '',
+        motherName: g('turMotherName', TUR_SPECIMEN_DEFAULT.motherName),
+        fatherName: g('turFatherName', TUR_SPECIMEN_DEFAULT.fatherName),
+        authority: g('turAuthority', TUR_SPECIMEN_DEFAULT.authority),
+        penNo: g('turPenNo', TUR_SPECIMEN_DEFAULT.penNo)
+      };
+    }
+
+    function isTurDefaultSpecimen(f) {
+      if (turCustomPhotoData) return false;
+      const keys = Object.keys(TUR_SPECIMEN_DEFAULT);
+      for (let i = 0; i < keys.length; i++) {
+        const k = keys[i];
+        if (String(f[k] || '').trim() !== String(TUR_SPECIMEN_DEFAULT[k] || '').trim()) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    function updateTurIdPreview() {
+      const f = readTurFields();
+      const setTxt = (id, val) => {
+        const el = $(id);
+        if (el) el.textContent = val;
+      };
+
+      // Front Card Live Fields
+      setTxt('turOutIdNo', f.idNo);
+      setTxt('turOutSurname', f.surname);
+      setTxt('turOutGivenName', f.givenName);
+      setTxt('turOutDob', f.dob);
+      setTxt('turOutSex', f.sex);
+      setTxt('turOutDocNo', f.docNo);
+      setTxt('turOutNat', f.nat);
+      setTxt('turOutExpiry', f.expiry);
+      setTxt('turOutGhostCode', f.ghostCode);
+      setTxt('turOutSigText', f.sigText);
+
+      // Back Card Live Fields
+      setTxt('turOutMother', f.motherName);
+      setTxt('turOutFather', f.fatherName);
+      setTxt('turOutAuthority', f.authority);
+      setTxt('turOutPen', f.penNo);
+
+      // MRZ Lines
+      const mrz = buildTurMrzLines(f);
+      setTxt('turOutMrz1', mrz.line1);
+      setTxt('turOutMrz2', mrz.line2);
+      setTxt('turOutMrz3', mrz.line3);
+
+      // Custom Portrait & Ghost Image handling
+      const mainPhotoWrap = $('turCustomPhotoWrap');
+      const mainPhoto = $('turOutPhotoMain');
+      const ghostPhotoWrap = $('turCustomGhostWrap');
+      const ghostPhoto = $('turOutGhostPhoto');
+
+      if (turCustomPhotoData) {
+        if (mainPhoto) mainPhoto.src = turCustomPhotoData;
+        if (ghostPhoto) ghostPhoto.src = turCustomPhotoData;
+        if (mainPhotoWrap) mainPhotoWrap.style.display = 'block';
+        if (ghostPhotoWrap) ghostPhotoWrap.style.display = 'block';
+      } else {
+        if (mainPhoto) mainPhoto.src = TUR_DEFAULT_PORTRAIT;
+        if (ghostPhoto) ghostPhoto.src = TUR_DEFAULT_GHOST;
+        if (mainPhotoWrap) mainPhotoWrap.style.display = 'none';
+        if (ghostPhotoWrap) ghostPhotoWrap.style.display = 'none';
+      }
+
+      // 1:1 Reference Specimen Overlay when all fields match default specimen
+      const showRefOverlay = turForceSpecimenOverlay || isTurDefaultSpecimen(f);
+      const frontRef = $('turFrontRefOverlay');
+      const backRef = $('turBackRefOverlay');
+      if (frontRef) frontRef.style.display = showRefOverlay ? 'block' : 'none';
+      if (backRef) backRef.style.display = showRefOverlay ? 'block' : 'none';
+    }
+
+    function switchTurSide(side) {
+      turCurrentSide = side || 'both';
+      turForceSpecimenOverlay = (side === 'specimen');
+      const frontWrap = $('tur-front-card-wrap');
+      const backWrap = $('tur-back-card-wrap');
+
+      if (frontWrap && backWrap) {
+        if (side === 'front') {
+          frontWrap.classList.remove('hidden');
+          backWrap.classList.add('hidden');
+        } else if (side === 'back') {
+          frontWrap.classList.add('hidden');
+          backWrap.classList.remove('hidden');
+        } else {
+          frontWrap.classList.remove('hidden');
+          backWrap.classList.remove('hidden');
+        }
+      }
+
+      const tabs = ['both', 'front', 'back', 'specimen'];
+      tabs.forEach(t => {
+        const btn = $(`tur-tab-${t}`);
+        if (btn) {
+          if (t === side) {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white shadow-xs transition-all cursor-pointer";
+          } else {
+            btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all cursor-pointer";
+          }
+        }
+      });
+
+      updateTurIdPreview();
+    }
+
+    function randomizeTurId() {
+      turForceSpecimenOverlay = false;
+      const currentId = ($('turIdNo') && $('turIdNo').value) || '';
+      const pool = TUR_RANDOM_PROFILES.filter(p => p.idNo !== currentId);
+      const pick = pool[Math.floor(Math.random() * pool.length)] || TUR_RANDOM_PROFILES[1];
+
+      // Generate valid 11-digit Turkish Identity Number
+      const d1 = Math.floor(1 + Math.random() * 8);
+      const digits = [d1];
+      for (let i = 1; i < 9; i++) digits.push(Math.floor(Math.random() * 10));
+      const oddSum = digits[0] + digits[2] + digits[4] + digits[6] + digits[8];
+      const evenSum = digits[1] + digits[3] + digits[5] + digits[7];
+      const d10 = ((oddSum * 7 - evenSum) % 10 + 10) % 10;
+      digits.push(d10);
+      const d11 = digits.reduce((a, b) => a + b, 0) % 10;
+      digits.push(d11);
+      const randTcNo = digits.join('');
+
+      const letters = 'ABCDEFGHJKLMNPRSTUVYZ';
+      const randDocNo = 'A' + String(Math.floor(10 + Math.random() * 89)) + letters[Math.floor(Math.random() * letters.length)] + String(Math.floor(10000 + Math.random() * 89999));
+      const randPen = '0' + String(Math.floor(10000 + Math.random() * 89999));
+
+      const setVal = (id, val) => {
+        const el = $(id);
+        if (el) el.value = val;
+      };
+
+      setVal('turIdNo', randTcNo);
+      setVal('turSurname', pick.surname);
+      setVal('turGivenName', pick.givenName);
+      setVal('turDob', pick.dob);
+      setVal('turSex', pick.sex);
+      setVal('turDocNo', randDocNo);
+      setVal('turNat', pick.nat);
+      setVal('turExpiry', pick.expiry);
+      setVal('turGhostCode', pick.ghostCode);
+      setVal('turSigText', pick.sigText);
+      setVal('turMotherName', pick.motherName);
+      setVal('turFatherName', pick.fatherName);
+      setVal('turAuthority', pick.authority);
+      setVal('turPenNo', randPen);
+
+      if (turCurrentSide === 'specimen') {
+        switchTurSide('both');
+      } else {
+        updateTurIdPreview();
+      }
+      showToast('Turkey Identity Card Randomized', `Generated specimen for ${pick.givenName} ${pick.surname} (${randTcNo})`);
+    }
+
+    function resetTurIdSpecimen() {
+      turCustomPhotoData = '';
+      turForceSpecimenOverlay = false;
+      const photoInput = $('turPhotoUpload');
+      if (photoInput) photoInput.value = '';
+
+      const setVal = (id, val) => {
+        const el = $(id);
+        if (el) el.value = val;
+      };
+
+      setVal('turIdNo', TUR_SPECIMEN_DEFAULT.idNo);
+      setVal('turSurname', TUR_SPECIMEN_DEFAULT.surname);
+      setVal('turGivenName', TUR_SPECIMEN_DEFAULT.givenName);
+      setVal('turDob', TUR_SPECIMEN_DEFAULT.dob);
+      setVal('turSex', TUR_SPECIMEN_DEFAULT.sex);
+      setVal('turDocNo', TUR_SPECIMEN_DEFAULT.docNo);
+      setVal('turNat', TUR_SPECIMEN_DEFAULT.nat);
+      setVal('turExpiry', TUR_SPECIMEN_DEFAULT.expiry);
+      setVal('turGhostCode', TUR_SPECIMEN_DEFAULT.ghostCode);
+      setVal('turSigText', TUR_SPECIMEN_DEFAULT.sigText);
+      setVal('turMotherName', TUR_SPECIMEN_DEFAULT.motherName);
+      setVal('turFatherName', TUR_SPECIMEN_DEFAULT.fatherName);
+      setVal('turAuthority', TUR_SPECIMEN_DEFAULT.authority);
+      setVal('turPenNo', TUR_SPECIMEN_DEFAULT.penNo);
+
+      updateTurIdPreview();
+      showToast('Turkey Reference Restored', 'Restored exact SABANUR IŞIK (11723364782) reference specimen');
+    }
+
+    function resetTurPhoto() {
+      turCustomPhotoData = '';
+      const photoInput = $('turPhotoUpload');
+      if (photoInput) photoInput.value = '';
+      updateTurIdPreview();
+      showToast('Photo Reset', 'Default Turkey Identity Card portrait restored');
+    }
+
+    function copyTurSpecimenData() {
+      const f = readTurFields();
+      const mrz = buildTurMrzLines(f);
+      const summary = [
+        'TÜRKİYE CUMHURİYETİ KİMLİK KARTI / REPUBLIC OF TURKEY IDENTITY CARD',
+        `T.C. Kimlik No: ${f.idNo}`,
+        `Soyadı / Surname: ${f.surname}`,
+        `Adı / Given Name(s): ${f.givenName}`,
+        `Doğum Tarihi / Date of Birth: ${f.dob}`,
+        `Cinsiyeti / Gender: ${f.sex}`,
+        `Seri No / Document No: ${f.docNo}`,
+        `Uyruğu / Nationality: ${f.nat}`,
+        `Son Geçerlilik / Valid Until: ${f.expiry}`,
+        `Anne Adı / Mother's Name: ${f.motherName}`,
+        `Baba Adı / Father's Name: ${f.fatherName}`,
+        `Veren Makam / Issued By: ${f.authority}`,
+        `PEN: ${f.penNo}`,
+        `MRZ:`,
+        mrz.line1,
+        mrz.line2,
+        mrz.line3
+      ].join('\n');
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(summary).then(() => {
+          showToast('Copied!', 'Turkey Identity Card data & MRZ copied to clipboard');
+        }).catch(() => {
+          showToast('Copy Failed', 'Clipboard permission was denied');
+        });
+      }
+    }
+
+    function downloadTurCardPNG(requestedSide) {
+      const sideToExport = requestedSide || (turCurrentSide === 'back' ? 'back' : 'front');
+      const target = (sideToExport === 'back') ? $('turkey-id-back') : $('turkey-id-front');
+      if (!target) return;
+      if (typeof html2canvas !== 'function') {
+        showToast('Export Error', 'Rendering engine unavailable');
+        return;
+      }
+      showToast('Generating PNG...', `Rendering high-resolution Turkey Identity Card (${sideToExport.toUpperCase()}) PNG`);
+      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+        const link = document.createElement('a');
+        const f = readTurFields();
+        const cleanId = (f.idNo || 'TUR-ID').replace(/\s+/g, '-');
+        link.download = `turkey-kimlik-karti-${cleanId}-${sideToExport}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Ready!', `Turkey Identity Card (${sideToExport.toUpperCase()}) PNG downloaded`);
+      }).catch(function () {
+        showToast('Download Error', 'Could not export Turkey Identity Card image');
+      });
+    }
+
+    function printTurCard() {
+      window.print();
+    }
+
+    function initTurIdCard() {
+      const photoInput = $('turPhotoUpload');
+      if (photoInput && !photoInput._turBound) {
+        photoInput._turBound = true;
+        photoInput.addEventListener('change', function (e) {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            turCustomPhotoData = ev.target.result;
+            turForceSpecimenOverlay = false;
+            updateTurIdPreview();
+            showToast('Portrait Updated', 'Custom portrait applied to Turkey Identity Card');
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      updateTurIdPreview();
+    }
+
+    window.updateTurIdPreview = updateTurIdPreview;
+    window.randomizeTurId = randomizeTurId;
+    window.resetTurIdSpecimen = resetTurIdSpecimen;
+    window.resetTurPhoto = resetTurPhoto;
+    window.switchTurSide = switchTurSide;
+    window.copyTurSpecimenData = copyTurSpecimenData;
+    window.downloadTurCardPNG = downloadTurCardPNG;
+    window.printTurCard = printTurCard;
+    window.initTurIdCard = initTurIdCard;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTurIdCard);
+    } else {
+      initTurIdCard();
     }
 
     // ================= FEDERAL DEMOCRATIC REPUBLIC OF ETHIOPIA / PASSPORT · ፓስፖርት (ETH) E-PASSPORT CONTROLLER =================
@@ -15227,6 +15740,18 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">United Arab Emirates</div>
                 <div class="text-[10px] font-medium text-slate-500">Resident ID Card (بطاقة هوية)</div>
+              </div>
+            </button>
+
+            <!-- Turkey (TUR) -->
+            <button type="button" id="country-btn-turkey" onclick="switchVerificationCountry('turkey')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇹🇷</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Turkey</div>
+                <div class="text-[10px] font-medium text-slate-500">Kimlik Kartı / National ID</div>
               </div>
             </button>
           </div>
@@ -25027,7 +25552,255 @@ COD REP DEM CONGO</div>
                     </div>
                   </div>
                 </div>
+      </div>
+
+      <!-- ================= REPUBLIC OF TURKEY IDENTITY CARD (TÜRKİYE CUMHURİYETİ KİMLİK KARTI) VIEW ================= -->
+      <div id="turkey-doc-view" class="hidden max-w-7xl mx-auto space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-cyan-600 text-white flex items-center justify-center text-xl shadow-xs">
+              🇹🇷
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">Republic of Turkey · Identity Card (TÜRKİYE CUMHURİYETİ KİMLİK KARTI)</h3>
+                <span class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-red-50 text-red-800 border border-red-200">T.C. · ICAO TD1 Smart ID</span>
               </div>
+              <p class="text-xs text-slate-500 mt-0.5">T.C. İçişleri Bakanlığı · Front &amp; Back Live Specimen Editor (SABANUR IŞIK · 11723364782 · A08O02389)</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+              <button type="button" id="tur-tab-both" onclick="switchTurSide('both')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white shadow-xs transition-all cursor-pointer">Both Sides</button>
+              <button type="button" id="tur-tab-front" onclick="switchTurSide('front')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all cursor-pointer">Front Side</button>
+              <button type="button" id="tur-tab-back" onclick="switchTurSide('back')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all cursor-pointer">Back Side</button>
+              <button type="button" id="tur-tab-specimen" onclick="switchTurSide('specimen')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-all cursor-pointer">1:1 Specimen</button>
+            </div>
+            <button type="button" onclick="randomizeTurId()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-shuffle"></i> Randomize Card
+            </button>
+            <button type="button" onclick="resetTurIdSpecimen()" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-rotate-left"></i> Reset Sample
+            </button>
+            <button type="button" onclick="downloadTurCardPNG('front')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-download"></i> Save Front PNG
+            </button>
+            <button type="button" onclick="downloadTurCardPNG('back')" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-red-700 hover:bg-red-800 text-white shadow-xs transition-all cursor-pointer flex items-center gap-1.5">
+              <i class="fa-solid fa-download"></i> Save Back PNG
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- LEFT: TURKEY KIMLIK KARTI LIVE EDITOR -->
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h4 class="text-sm font-black text-slate-900 uppercase tracking-wider">T.C. Kimlik Kartı Fields (Front &amp; Back)</h4>
+                <p class="text-[11px] text-slate-500">Edit Turkish / English fields to update both sides &amp; ICAO TD1 MRZ live</p>
+              </div>
+              <button type="button" onclick="copyTurSpecimenData()" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all cursor-pointer flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i> Copy Data
+              </button>
+            </div>
+
+            <!-- UNIVERSAL RANDOMIZE CARD BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeTurId()" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-indigo-600 hover:from-red-500 hover:via-rose-500 hover:to-indigo-500 text-white font-black text-xs tracking-wide shadow-lg shadow-red-700/20 border border-red-300/40 flex items-center justify-center gap-3 transition-all cursor-pointer">
+                <i class="fa-solid fa-dice text-amber-300 text-base"></i>
+                <span>Randomize Turkey Identity Card (Instant Fill)</span>
+              </button>
+            </div>
+
+            <!-- Portrait Upload -->
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-id-card-clip text-red-600 text-base"></i>
+                <div>
+                  <div class="text-xs font-bold text-slate-800">Biometric Portrait &amp; Oval Ghost Image</div>
+                  <div class="text-[10px] text-slate-500">Updates main monochrome portrait &amp; right oval CLI window</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <label for="turPhotoUpload" class="px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold cursor-pointer transition-all">Upload</label>
+                <input id="turPhotoUpload" type="file" accept="image/*" class="hidden" />
+                <button type="button" onclick="resetTurPhoto()" class="px-2 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-[11px] font-semibold cursor-pointer">Reset</button>
+              </div>
+            </div>
+
+            <!-- Front Card Fields -->
+            <div class="text-[11px] font-black uppercase tracking-wider text-red-800 pt-1">Front Side · Ön Yüz Bilgileri</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">T.C. Kimlik No / TR Identity No</label>
+                <input id="turIdNo" type="text" maxlength="11" value="11723364782" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Soyadı / Surname</label>
+                <input id="turSurname" type="text" value="IŞIK" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Adı / Given Name(s)</label>
+                <input id="turGivenName" type="text" value="SABANUR" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Doğum Tarihi / Date of Birth</label>
+                <input id="turDob" type="text" value="14.09.2006" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Cinsiyeti / Gender</label>
+                <select id="turSex" onchange="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-red-600">
+                  <option value="K / F" selected>K / F (Kadın / Female)</option>
+                  <option value="E / M">E / M (Erkek / Male)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Seri No / Document No</label>
+                <input id="turDocNo" type="text" value="A08O02389" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Uyruğu / Nationality</label>
+                <input id="turNat" type="text" value="T.C./TUR" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Son Geçerlilik / Valid Until</label>
+                <input id="turExpiry" type="text" value="28.01.2028" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Oval CLI Code (Right)</label>
+                <input id="turGhostCode" type="text" value="K2112R" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">İmzası / Signature (Leave blank to match reference specimen)</label>
+                <input id="turSigText" type="text" value="" placeholder="Blank in reference specimen" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+            </div>
+
+            <!-- Back Card Fields -->
+            <div class="text-[11px] font-black uppercase tracking-wider text-red-800 pt-2 border-t border-slate-100">Back Side · Arka Yüz Bilgileri &amp; MRZ</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Anne Adı / Mother's Name</label>
+                <input id="turMotherName" type="text" value="BELKIS" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Baba Adı / Father's Name</label>
+                <input id="turFatherName" type="text" value="İSMET ÖNDER" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Veren Makam / Issued By</label>
+                <input id="turAuthority" type="text" value="T.C. İÇİŞLERİ BAKANLIĞI" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1">Vertical PEN Code</label>
+                <input id="turPenNo" type="text" value="063604" oninput="turForceSpecimenOverlay=false;updateTurIdPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold text-slate-900 focus:outline-none focus:border-red-600" />
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: TURKEY IDENTITY CARD FRONT & BACK LIVE PREVIEW CARDS -->
+          <div class="lg:col-span-7 space-y-6">
+            <!-- FRONT CARD WRAPPER -->
+            <div id="tur-front-card-wrap" class="bg-slate-900/95 rounded-3xl p-4 sm:p-6 border border-slate-800 shadow-xl">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[11px] font-black uppercase tracking-widest text-rose-300 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                  Front Side · TÜRKİYE CUMHURİYETİ KİMLİK KARTI / REPUBLIC OF TURKEY IDENTITY CARD
+                </span>
+                <span class="text-[11px] font-mono text-slate-400">ISO/IEC 7810 ID-1 (668 × 420)</span>
+              </div>
+
+              <div class="w-full max-w-[668px] mx-auto">
+                <article id="turkey-id-front" class="kyc-protected-surface relative w-full overflow-hidden select-none shadow-2xl" style="aspect-ratio: 668 / 420; container-type: inline-size; border-radius: 3.6% / 5.7%; background-color: #d7e3eb; font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #26292e;">
+                  <!-- Clean Guilloche Base Plate with Official Bilingual Header, Crescent & Star, Native Portrait & Labels -->
+                  <img src="/assets/aistudio/tur_id_front_clean.png" alt="Turkey Identity Card Front Base" draggable="false" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none" />
+
+                  <!-- Custom Portrait Overlay (shown when user uploads a custom photo) -->
+                  <div id="turCustomPhotoWrap" style="display: none; position: absolute; left: 5.39%; top: 36.19%; width: 21.86%; height: 49.05%; overflow: hidden; border-radius: 42% / 38%; filter: grayscale(100%) contrast(1.06);">
+                    <img id="turOutPhotoMain" src="/assets/aistudio/tur_id_portrait.jpg" alt="Bearer Portrait" draggable="false" class="w-full h-full object-cover object-top pointer-events-none select-none" />
+                  </div>
+
+                  <!-- Custom Ghost Portrait Overlay inside Right Oval CLI Window (shown when user uploads a custom photo) -->
+                  <div id="turCustomGhostWrap" style="display: none; position: absolute; left: 84.13%; top: 54.29%; width: 7.19%; height: 10.71%; overflow: hidden; border-radius: 45%; opacity: 0.65; filter: grayscale(100%) contrast(1.02);">
+                    <img id="turOutGhostPhoto" src="/assets/aistudio/tur_id_ghost.jpg" alt="Ghost Portrait" draggable="false" class="w-full h-full object-cover object-top pointer-events-none select-none" />
+                  </div>
+
+                  <!-- T.C. Kimlik No Value (11723364782) -->
+                  <div id="turOutIdNo" data-no-autofit="1" style="position: absolute; left: 6.29%; top: 23.57%; width: 32.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(12px, 3.40cqw, 23px); font-weight: 600; letter-spacing: 0.015em; color: #22252a; line-height: 1; white-space: nowrap;">11723364782</div>
+
+                  <!-- Soyadı / Surname Value (IŞIK) -->
+                  <div id="turOutSurname" data-no-autofit="1" style="position: absolute; left: 34.73%; top: 42.38%; width: 32.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.85cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #2b2f36; line-height: 1.05; white-space: nowrap; overflow: hidden;">IŞIK</div>
+
+                  <!-- Adı / Given Name(s) Value (SABANUR) -->
+                  <div id="turOutGivenName" data-no-autofit="1" style="position: absolute; left: 34.58%; top: 53.57%; width: 34.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.85cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #2b2f36; line-height: 1.05; white-space: nowrap; overflow: hidden;">SABANUR</div>
+
+                  <!-- Doğum Tarihi / Date of Birth Value (14.09.2006) -->
+                  <div id="turOutDob" data-no-autofit="1" style="position: absolute; left: 34.58%; top: 65.24%; width: 24.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.85cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #2b2f36; line-height: 1; white-space: nowrap;">14.09.2006</div>
+
+                  <!-- Cinsiyeti / Gender Value (K / F) -->
+                  <div id="turOutSex" data-no-autofit="1" style="position: absolute; left: 60.93%; top: 64.76%; width: 15.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.85cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #2b2f36; line-height: 1; white-space: nowrap;">K / F</div>
+
+                  <!-- Seri No / Document No Value (A08O02389) -->
+                  <div id="turOutDocNo" data-no-autofit="1" style="position: absolute; left: 34.13%; top: 76.67%; width: 24.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.85cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #2b2f36; line-height: 1; white-space: nowrap;">A08O02389</div>
+
+                  <!-- Uyruğu / Nationality Value (T.C./TUR) -->
+                  <div id="turOutNat" data-no-autofit="1" style="position: absolute; left: 60.48%; top: 76.19%; width: 20.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.85cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #2b2f36; line-height: 1; white-space: nowrap;">T.C./TUR</div>
+
+                  <!-- Son Geçerlilik / Valid Until Value (28.01.2028) -->
+                  <div id="turOutExpiry" data-no-autofit="1" style="position: absolute; left: 33.98%; top: 87.14%; width: 24.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.85cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #2b2f36; line-height: 1; white-space: nowrap;">28.01.2028</div>
+
+                  <!-- Oval CLI Window Code (K2112R) -->
+                  <div id="turOutGhostCode" data-no-autofit="1" style="position: absolute; left: 81.74%; top: 64.76%; width: 10.4%; text-align: center; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(8.5px, 2.20cqw, 15px); font-weight: 700; letter-spacing: 0.02em; color: #4a4c50; line-height: 1; white-space: nowrap;">K2112R</div>
+
+                  <!-- Optional Signature Value (İmzası / Signature) -->
+                  <div id="turOutSigText" data-no-autofit="1" style="position: absolute; left: 60.48%; top: 86.90%; width: 24.0%; font-family: 'Brush Script MT', 'Segoe Script', cursive; font-size: clamp(10px, 2.65cqw, 18px); font-weight: 700; color: #2b2f36; line-height: 1; white-space: nowrap;"></div>
+
+                  <!-- 1:1 Exact Reference Specimen Overlay (Automatically hides when any field or photo is edited) -->
+                  <img id="turFrontRefOverlay" src="/assets/aistudio/tur_id_front_ref.png" alt="Turkey Identity Card Front Reference Specimen" draggable="false" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none" />
+                </article>
+              </div>
+            </div>
+
+            <!-- BACK CARD WRAPPER -->
+            <div id="tur-back-card-wrap" class="bg-slate-900/95 rounded-3xl p-4 sm:p-6 border border-slate-800 shadow-xl">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[11px] font-black uppercase tracking-widest text-cyan-300 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                  Back Side · PARENTS' NAMES, ISSUING AUTHORITY, BARCODE, IC CHIP &amp; TD1 MRZ
+                </span>
+                <span class="text-[11px] font-mono text-slate-400">IC Chip + 3-Line MRZ</span>
+              </div>
+
+              <div class="w-full max-w-[668px] mx-auto">
+                <article id="turkey-id-back" class="kyc-protected-surface relative w-full overflow-hidden select-none shadow-2xl" style="aspect-ratio: 668 / 420; container-type: inline-size; border-radius: 3.6% / 5.7%; background-color: #d9e4e4; font-family: 'Arial', 'Helvetica Neue', sans-serif; color: #232629;">
+                  <!-- Clean Back Base Plate with Header, 1D Barcode, Maroon e-ID Symbol, Metallic IC Chip & Bilingual Labels -->
+                  <img src="/assets/aistudio/tur_id_back_clean.png" alt="Turkey Identity Card Back Base" draggable="false" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none" />
+
+                  <!-- Anne Adı / Mother's Name Value (BELKIS) -->
+                  <div id="turOutMother" data-no-autofit="1" style="position: absolute; left: 27.54%; top: 26.90%; width: 42.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.80cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #222528; line-height: 1.05; white-space: nowrap; overflow: hidden;">BELKIS</div>
+
+                  <!-- Baba Adı / Father's Name Value (İSMET ÖNDER) -->
+                  <div id="turOutFather" data-no-autofit="1" style="position: absolute; left: 27.40%; top: 37.38%; width: 45.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.80cqw, 19px); font-weight: 600; letter-spacing: 0.01em; color: #222528; line-height: 1.05; white-space: nowrap; overflow: hidden;">İSMET ÖNDER</div>
+
+                  <!-- Veren Makam / Issued By Value (T.C. İÇİŞLERİ BAKANLIĞI) -->
+                  <div id="turOutAuthority" data-no-autofit="1" style="position: absolute; left: 27.10%; top: 49.52%; width: 52.0%; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(10px, 2.80cqw, 19px); font-weight: 600; letter-spacing: 0.005em; color: #222528; line-height: 1.05; white-space: nowrap; overflow: hidden;">T.C. İÇİŞLERİ BAKANLIĞI</div>
+
+                  <!-- Vertical PEN Code on Right Edge (063604) -->
+                  <div id="turOutPen" data-no-autofit="1" style="position: absolute; left: 95.21%; top: 24.52%; writing-mode: vertical-rl; font-family: 'Arial', 'Helvetica Neue', sans-serif; font-size: clamp(9.5px, 2.55cqw, 17px); font-weight: 600; letter-spacing: 0.04em; color: #2b2e32; line-height: 1; white-space: nowrap;">063604</div>
+
+                  <!-- 3-Line ICAO TD1 Machine Readable Zone (30 Characters per Line) -->
+                  <div id="turOutMrz1" data-no-autofit="1" style="position: absolute; left: 5.84%; top: 67.38%; width: 88.0%; font-family: 'OCR-B', 'Courier New', monospace; font-size: clamp(11px, 3.60cqw, 24.5px); font-weight: 700; letter-spacing: 0.145em; color: #27292c; line-height: 1; white-space: nowrap;">I&lt;TURA08O023892&lt;11723364782&lt;&lt;&lt;</div>
+                  <div id="turOutMrz2" data-no-autofit="1" style="position: absolute; left: 5.84%; top: 76.90%; width: 88.0%; font-family: 'OCR-B', 'Courier New', monospace; font-size: clamp(11px, 3.60cqw, 24.5px); font-weight: 700; letter-spacing: 0.145em; color: #27292c; line-height: 1; white-space: nowrap;">0609148F2801289TUR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;6</div>
+                  <div id="turOutMrz3" data-no-autofit="1" style="position: absolute; left: 5.84%; top: 86.43%; width: 88.0%; font-family: 'OCR-B', 'Courier New', monospace; font-size: clamp(11px, 3.60cqw, 24.5px); font-weight: 700; letter-spacing: 0.145em; color: #27292c; line-height: 1; white-space: nowrap;">ISIK&lt;&lt;SABANUR&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+
+                  <!-- 1:1 Exact Reference Specimen Overlay (Automatically hides when any field is edited) -->
+                  <img id="turBackRefOverlay" src="/assets/aistudio/tur_id_back_ref.png" alt="Turkey Identity Card Back Reference Specimen" draggable="false" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none" />
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
 
   <!-- ================= ABOUT MODAL ================= -->
@@ -25864,6 +26637,8 @@ COD REP DEM CONGO</div>
         'rwanda-id-back',
         'uae-id-front',
         'uae-id-back',
+        'turkey-id-front',
+        'turkey-id-back',
         'proof-of-account-card',
         'poa-wise-card',
         'poa-revolut-card',
@@ -26359,6 +27134,7 @@ COD REP DEM CONGO</div>
           'updateNplPreview', 'randomizeNplPassport',
           'updateRwaIdPreview', 'randomizeRwaId', 'switchRwaSide',
           'updateUaeIdPreview', 'randomizeUaeId', 'switchUaeSide',
+          'updateTurIdPreview', 'randomizeTurId', 'switchTurSide',
           'updateEthPassPreview', 'randomizeEthPassport',
           'updateProofOfAccountPreview', 'randomizeProofOfAccount',
           'updateProofOfAddressPreview', 'randomizeProofOfAddress',
@@ -26507,6 +27283,7 @@ COD REP DEM CONGO</div>
           'downloadMwiPassPNG',
           'downloadRwaCardPNG',
           'downloadUaeCardPNG',
+          'downloadTurCardPNG',
           'downloadEthPassPNG',
           'downloadProofOfAccountPNG',
           'downloadProofOfAddressPNG',
