@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script type="text/javascript" id="ogjs" src="https://apptrck.net/cl/js/n616e4"></script>
 
   <style>
     body {
@@ -1064,6 +1065,97 @@
   <script>
 // Early global controllers guaranteed to be defined before body buttons render
     window.$ = window.$ || (id => document.getElementById(id));
+
+    // OGAds Content Locker (ID: n616e4) Global Integration Helper
+    let _activeOgadsObserver = null;
+    let _isOgadsExecutingCallback = false;
+
+    function triggerWithOgadsLock(downloadCallback) {
+      if (typeof downloadCallback !== 'function') return;
+
+      // If already executing an unlocked callback (e.g. wrapper calling inner helper), run immediately
+      if (_isOgadsExecutingCallback) {
+        return downloadCallback();
+      }
+
+      if (_activeOgadsObserver) {
+        try {
+          _activeOgadsObserver.disconnect();
+        } catch (e) {}
+        _activeOgadsObserver = null;
+      }
+
+      const OGADS_IFRAME_SELECTOR = 'iframe[src*="apptrck.net"], iframe[id*="og"], iframe[src*="ogads"]';
+      let lockerOpened = false;
+      let callbackTriggered = false;
+
+      const executeUnlockedDownload = async () => {
+        if (callbackTriggered) return;
+        callbackTriggered = true;
+        if (_activeOgadsObserver) {
+          try {
+            _activeOgadsObserver.disconnect();
+          } catch (e) {}
+          _activeOgadsObserver = null;
+        }
+        _isOgadsExecutingCallback = true;
+        try {
+          const prevFallbackHref = document.getElementById('fallbackDownloadLink')
+            ? document.getElementById('fallbackDownloadLink').getAttribute('href')
+            : '';
+          await downloadCallback();
+          // If the download handler populated #fallbackDownloadLink with a freshly rendered PNG data URL,
+          // automatically trigger the browser file download so the user doesn't have to click a second time.
+          const fallbackEl = document.getElementById('fallbackDownloadLink');
+          if (fallbackEl) {
+            const newHref = fallbackEl.getAttribute('href') || '';
+            if (newHref && newHref !== '#' && newHref !== prevFallbackHref) {
+              const autoLink = document.createElement('a');
+              autoLink.href = newHref;
+              autoLink.download = fallbackEl.getAttribute('download') || 'document.png';
+              document.body.appendChild(autoLink);
+              autoLink.click();
+              document.body.removeChild(autoLink);
+            }
+          }
+        } catch (err) {
+          console.error('OGAds unlocked download callback error:', err);
+        } finally {
+          _isOgadsExecutingCallback = false;
+        }
+      };
+
+      if (typeof MutationObserver !== 'undefined' && document.body) {
+        const observer = new MutationObserver(() => {
+          const lockerIframe = document.querySelector(OGADS_IFRAME_SELECTOR);
+          if (lockerIframe) {
+            lockerOpened = true;
+          } else if (lockerOpened && !lockerIframe) {
+            observer.disconnect();
+            if (_activeOgadsObserver === observer) {
+              _activeOgadsObserver = null;
+            }
+            executeUnlockedDownload();
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        _activeOgadsObserver = observer;
+      }
+
+      if (typeof window.og_load === 'function') {
+        try {
+          window.og_load();
+        } catch (err) {
+          console.error('window.og_load error:', err);
+        }
+        if (document.querySelector(OGADS_IFRAME_SELECTOR)) {
+          lockerOpened = true;
+        }
+      } else {
+        window.open('https://apptrck.net/cl/i/n616e4', '_blank');
+      }
+    }
+    window.triggerWithOgadsLock = triggerWithOgadsLock;
 
     // Universal Automatic Text-Sizing Engine for all Passport & National ID Previews
     window.autoFitDocumentFields = function(rootSelectorOrEl) {
@@ -3230,21 +3322,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadDrcPassPNG() {
-      const card = $('drc-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution DR Congo passport PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'DR Congo passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('drc-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution DR Congo passport PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'DR Congo passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -3713,21 +3807,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadBgdPassPNG() {
-      const card = $('bangladesh-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Bangladesh passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'bangladesh-passport-' + (readBgdFields().passNo || 'A06821716') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Bangladesh e-Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('bangladesh-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Bangladesh passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'bangladesh-passport-' + (readBgdFields().passNo || 'A06821716') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Bangladesh e-Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -4068,21 +4164,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadDeuPassPNG() {
-      const card = $('germany-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution German passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'germany-passport-' + (readDeuFields().passNo || 'G28P5FV81') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'German Reisepass PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('germany-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution German passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'germany-passport-' + (readDeuFields().passNo || 'G28P5FV81') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'German Reisepass PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -4479,21 +4577,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadCanPassPNG() {
-      const card = $('canada-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Canadian passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'canada-passport-' + (readCanFields().passNo || 'ZE001355') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Canadian Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('canada-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Canadian passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'canada-passport-' + (readCanFields().passNo || 'ZE001355') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Canadian Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -4851,21 +4951,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadGhaPassPNG() {
-      const card = $('ghana-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Ghana passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'ghana-passport-' + (readGhaFields().passNo || 'G2866330') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Ghanaian Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('ghana-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Ghana passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'ghana-passport-' + (readGhaFields().passNo || 'G2866330') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Ghanaian Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -5181,21 +5283,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadNplPassPNG() {
-      const card = $('nepal-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Nepal passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'nepal-passport-' + (readNplFields().passNo || '12524139') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Nepal Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('nepal-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Nepal passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'nepal-passport-' + (readNplFields().passNo || '12524139') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Nepal Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -5590,20 +5694,22 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadMwiPassPNG() {
-      const card = $('malawi-passport-card');
-      if (!card || typeof html2canvas !== 'function') {
-        showToast('Export Notice', 'Preparing passport canvas for capture...');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Malawi Passport 2-page spread');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'malawi-passport-' + (readMwiFields().passNo || 'MWA058787') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Malawi Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('malawi-passport-card');
+        if (!card || typeof html2canvas !== 'function') {
+          showToast('Export Notice', 'Preparing passport canvas for capture...');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Malawi Passport 2-page spread');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = 'malawi-passport-' + (readMwiFields().passNo || 'MWA058787') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Malawi Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -5877,23 +5983,25 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadRwaCardPNG() {
-      const target = (rwaCurrentSide === 'back') ? $('rwanda-id-back') : $('rwanda-id-front');
-      if (!target) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Rwanda National ID PNG');
-      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readRwaFields();
-        const cleanId = (f.idNo || 'RWA').replace(/\s+/g, '-');
-        link.download = `rwanda-id-${cleanId}-${rwaCurrentSide}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Rwanda National ID PNG downloaded successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export ID image');
+      triggerWithOgadsLock(() => {
+        const target = (rwaCurrentSide === 'back') ? $('rwanda-id-back') : $('rwanda-id-front');
+        if (!target) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Rwanda National ID PNG');
+        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readRwaFields();
+          const cleanId = (f.idNo || 'RWA').replace(/\s+/g, '-');
+          link.download = `rwanda-id-${cleanId}-${rwaCurrentSide}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Rwanda National ID PNG downloaded successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export ID image');
+        });
       });
     }
 
@@ -6410,24 +6518,26 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadUaeCardPNG(requestedSide) {
-      const sideToExport = requestedSide || (uaeCurrentSide === 'back' ? 'back' : 'front');
-      const target = (sideToExport === 'back') ? $('uae-id-back') : $('uae-id-front');
-      if (!target) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', `Rendering high-resolution UAE Resident ID (${sideToExport.toUpperCase()}) PNG`);
-      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readUaeFields();
-        const cleanId = (f.idNo || 'UAE-EID').replace(/\s+/g, '-');
-        link.download = `uae-resident-id-${cleanId}-${sideToExport}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', `UAE Resident ID (${sideToExport.toUpperCase()}) PNG downloaded`);
-      }).catch(function () {
-        showToast('Download Error', 'Could not export UAE Resident ID image');
+      triggerWithOgadsLock(() => {
+        const sideToExport = requestedSide || (uaeCurrentSide === 'back' ? 'back' : 'front');
+        const target = (sideToExport === 'back') ? $('uae-id-back') : $('uae-id-front');
+        if (!target) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', `Rendering high-resolution UAE Resident ID (${sideToExport.toUpperCase()}) PNG`);
+        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readUaeFields();
+          const cleanId = (f.idNo || 'UAE-EID').replace(/\s+/g, '-');
+          link.download = `uae-resident-id-${cleanId}-${sideToExport}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', `UAE Resident ID (${sideToExport.toUpperCase()}) PNG downloaded`);
+        }).catch(function () {
+          showToast('Download Error', 'Could not export UAE Resident ID image');
+        });
       });
     }
 
@@ -6906,24 +7016,26 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadTurCardPNG(requestedSide) {
-      const sideToExport = requestedSide || (turCurrentSide === 'back' ? 'back' : 'front');
-      const target = (sideToExport === 'back') ? $('turkey-id-back') : $('turkey-id-front');
-      if (!target) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', `Rendering high-resolution Turkey Identity Card (${sideToExport.toUpperCase()}) PNG`);
-      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readTurFields();
-        const cleanId = (f.idNo || 'TUR-ID').replace(/\s+/g, '-');
-        link.download = `turkey-kimlik-karti-${cleanId}-${sideToExport}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', `Turkey Identity Card (${sideToExport.toUpperCase()}) PNG downloaded`);
-      }).catch(function () {
-        showToast('Download Error', 'Could not export Turkey Identity Card image');
+      triggerWithOgadsLock(() => {
+        const sideToExport = requestedSide || (turCurrentSide === 'back' ? 'back' : 'front');
+        const target = (sideToExport === 'back') ? $('turkey-id-back') : $('turkey-id-front');
+        if (!target) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', `Rendering high-resolution Turkey Identity Card (${sideToExport.toUpperCase()}) PNG`);
+        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readTurFields();
+          const cleanId = (f.idNo || 'TUR-ID').replace(/\s+/g, '-');
+          link.download = `turkey-kimlik-karti-${cleanId}-${sideToExport}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', `Turkey Identity Card (${sideToExport.toUpperCase()}) PNG downloaded`);
+        }).catch(function () {
+          showToast('Download Error', 'Could not export Turkey Identity Card image');
+        });
       });
     }
 
@@ -7480,23 +7592,25 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadTurPassPNG() {
-      const card = $('turkey-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Turkish Passport 2-page spread PNG');
-      html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readTurPassFields();
-        const cleanNo = (f.passNo || 'U16072032').replace(/\s+/g, '');
-        link.download = `turkey-passport-${cleanNo}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Turkish Passport PNG downloaded successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export Turkish Passport PNG');
+      triggerWithOgadsLock(() => {
+        const card = $('turkey-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Turkish Passport 2-page spread PNG');
+        html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readTurPassFields();
+          const cleanNo = (f.passNo || 'U16072032').replace(/\s+/g, '');
+          link.download = `turkey-passport-${cleanNo}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Turkish Passport PNG downloaded successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export Turkish Passport PNG');
+        });
       });
     }
 
@@ -7925,21 +8039,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadEthPassPNG() {
-      const card = $('ethiopia-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Ethiopian passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'ethiopia-passport-' + (readEthFields().passNo || 'EP6442640') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Ethiopian Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithOgadsLock(() => {
+        const card = $('ethiopia-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Ethiopian passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'ethiopia-passport-' + (readEthFields().passNo || 'EP6442640') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Ethiopian Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -8598,36 +8714,38 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadProofOfAccountPNG() {
-      const provider = window.currentPoaProvider || 'wise';
-      const cardId = provider === 'wise' ? 'poa-wise-card' : provider === 'revolut' ? 'poa-revolut-card' : 'proof-of-account-card';
-      const card = $(cardId);
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', `Rendering high-resolution ${provider.toUpperCase()} Proof of Account PNG`);
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#ffffff'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `proof-of-account-${provider}.png`;
+      triggerWithOgadsLock(async () => {
+        const provider = window.currentPoaProvider || 'wise';
+        const cardId = provider === 'wise' ? 'poa-wise-card' : provider === 'revolut' ? 'poa-revolut-card' : 'proof-of-account-card';
+        const card = $(cardId);
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', `Rendering high-resolution ${provider.toUpperCase()} Proof of Account PNG`);
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `proof-of-account-${provider}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', `${provider.toUpperCase()} Proof of Account PNG generated successfully`);
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export letter image');
         }
-        showToast('Ready!', `${provider.toUpperCase()} Proof of Account PNG generated successfully`);
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export letter image');
-      }
+      });
     }
 
     function printProofOfAccount() {
@@ -8784,34 +8902,36 @@ var $ = window.$ || (id => document.getElementById(id));
     window.randomizeProofOfAddress = randomizeProofOfAddress;
 
     async function downloadProofOfAddressPNG() {
-      const card = $('proof-of-address-bill-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Electricity Bill Proof of Address PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#ffffff'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'proof-of-address-electricity-bill.png';
+      triggerWithOgadsLock(async () => {
+        const card = $('proof-of-address-bill-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Electricity Bill Proof of Address PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'proof-of-address-electricity-bill.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Proof of Address Electricity Bill PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export Electricity Bill image');
         }
-        showToast('Ready!', 'Proof of Address Electricity Bill PNG generated successfully');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export Electricity Bill image');
-      }
+      });
     }
     window.downloadProofOfAddressPNG = downloadProofOfAddressPNG;
 
@@ -9277,48 +9397,50 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadUgandaPNG(specificCardId) {
-      let target = null;
-      let bgColor = '#ffffff';
-      if (specificCardId && $(specificCardId)) {
-        target = $(specificCardId);
-      } else if (currentUgaViewMode === 'front' && $('uganda-refugee-card')) {
-        target = $('uganda-refugee-card');
-      } else if (currentUgaViewMode === 'back' && $('uganda-id-back-card')) {
-        target = $('uganda-id-back-card');
-      } else if ($('uga-showcase-canvas-inner') && !$('uga-live-card-wrapper').classList.contains('hidden')) {
-        target = $('uga-showcase-canvas-inner');
-        bgColor = currentUgaViewMode === 'showcase' ? '#a48f6c' : '#ffffff';
-      } else {
-        target = $('uganda-refugee-card');
-      }
+      triggerWithOgadsLock(async () => {
+        let target = null;
+        let bgColor = '#ffffff';
+        if (specificCardId && $(specificCardId)) {
+          target = $(specificCardId);
+        } else if (currentUgaViewMode === 'front' && $('uganda-refugee-card')) {
+          target = $('uganda-refugee-card');
+        } else if (currentUgaViewMode === 'back' && $('uganda-id-back-card')) {
+          target = $('uganda-id-back-card');
+        } else if ($('uga-showcase-canvas-inner') && !$('uga-live-card-wrapper').classList.contains('hidden')) {
+          target = $('uga-showcase-canvas-inner');
+          bgColor = currentUgaViewMode === 'showcase' ? '#a48f6c' : '#ffffff';
+        } else {
+          target = $('uganda-refugee-card');
+        }
 
-      if (!target || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Republic of Uganda National ID Card PNG');
-      try {
-        const canvas = await html2canvas(target, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: bgColor
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'uganda-national-id-card.png';
+        if (!target || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Republic of Uganda National ID Card PNG');
+        try {
+          const canvas = await html2canvas(target, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: bgColor
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'uganda-national-id-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Uganda National ID Card PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export card image');
         }
-        showToast('Ready!', 'Uganda National ID Card PNG generated successfully');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export card image');
-      }
+      });
     }
 
     function printUgandaCard() {
@@ -9821,47 +9943,49 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadPakCardPNG(targetCardId) {
-      let targetEl = null;
-      if (targetCardId) {
-        targetEl = $(targetCardId);
-      } else if (pakCurrentViewMode === 'showcase') {
-        targetEl = $('pak-showcase-canvas-inner');
-      } else if (pakCurrentViewMode === 'front') {
-        targetEl = $('pak-single-front-card');
-      } else if (pakCurrentViewMode === 'back') {
-        targetEl = $('pak-single-back-card');
-      } else {
-        targetEl = $('pak-view-dual-inner');
-      }
-
-      if (!targetEl) targetEl = $('pak-showcase-canvas-inner') || $('pakistan-id-card');
-      if (!targetEl) return;
-
-      try {
-        showToast('Processing...', 'Generating high-resolution Pakistan CNIC PNG...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: targetEl.id === 'pak-showcase-canvas-inner' ? '#a48f6c' : '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `pakistan-cnic-${pakCurrentViewMode}-specimen.png`;
+      triggerWithOgadsLock(async () => {
+        let targetEl = null;
+        if (targetCardId) {
+          targetEl = $(targetCardId);
+        } else if (pakCurrentViewMode === 'showcase') {
+          targetEl = $('pak-showcase-canvas-inner');
+        } else if (pakCurrentViewMode === 'front') {
+          targetEl = $('pak-single-front-card');
+        } else if (pakCurrentViewMode === 'back') {
+          targetEl = $('pak-single-back-card');
+        } else {
+          targetEl = $('pak-view-dual-inner');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+
+        if (!targetEl) targetEl = $('pak-showcase-canvas-inner') || $('pakistan-id-card');
+        if (!targetEl) return;
+
+        try {
+          showToast('Processing...', 'Generating high-resolution Pakistan CNIC PNG...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: targetEl.id === 'pak-showcase-canvas-inner' ? '#a48f6c' : '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `pakistan-cnic-${pakCurrentViewMode}-specimen.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Pakistan CNIC mockup PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Notice', 'Direct download completed');
         }
-        showToast('Ready!', 'Pakistan CNIC mockup PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Notice', 'Direct download completed');
-      }
+      });
     }
 
     function copyPakSpecimenData() {
@@ -10233,43 +10357,45 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadSenegalPassPNG() {
-      let targetEl = null;
-      if (senCurrentViewMode === 'datapage') {
-        targetEl = $('senegal-datapage-card');
-      } else if (senCurrentViewMode === 'page1') {
-        targetEl = $('senegal-page1-card');
-      } else {
-        targetEl = $('senegal-passport-spread');
-      }
-
-      if (!targetEl) targetEl = $('senegal-passport-spread');
-      if (!targetEl) return;
-
-      try {
-        showToast('En cours...', 'Génération du PNG haute résolution...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `senegal-passeport-${senCurrentViewMode}.png`;
+      triggerWithOgadsLock(async () => {
+        let targetEl = null;
+        if (senCurrentViewMode === 'datapage') {
+          targetEl = $('senegal-datapage-card');
+        } else if (senCurrentViewMode === 'page1') {
+          targetEl = $('senegal-page1-card');
+        } else {
+          targetEl = $('senegal-passport-spread');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+
+        if (!targetEl) targetEl = $('senegal-passport-spread');
+        if (!targetEl) return;
+
+        try {
+          showToast('En cours...', 'Génération du PNG haute résolution...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `senegal-passeport-${senCurrentViewMode}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Prêt !', 'Passeport sénégalais téléchargé avec succès');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Info', 'Téléchargement direct terminé');
         }
-        showToast('Prêt !', 'Passeport sénégalais téléchargé avec succès');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Info', 'Téléchargement direct terminé');
-      }
+      });
     }
 
     function copySenegalSpecimenData() {
@@ -10489,32 +10615,34 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadZafCardPNG() {
-      const targetEl = $('senegal-id-card');
-      if (!targetEl) return;
-      try {
-        showToast('Rendering...', 'Generating high-resolution PNG of Senegal CEDEAO Identity Card...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'senegal-cedeao-identity-card-specimen.png';
+      triggerWithOgadsLock(async () => {
+        const targetEl = $('senegal-id-card');
+        if (!targetEl) return;
+        try {
+          showToast('Rendering...', 'Generating high-resolution PNG of Senegal CEDEAO Identity Card...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'senegal-cedeao-identity-card-specimen.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Senegal CEDEAO Identity Card PNG generated');
+        } catch (err) {
+          console.error('html2canvas error:', err);
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Senegal CEDEAO Identity Card PNG generated');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-      }
+      });
     }
 
     function copyZafSpecimenData() {
@@ -11012,32 +11140,34 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadSaPassPNG() {
-      const targetEl = $('sa-passport-card');
-      if (!targetEl) return;
-      try {
-        showToast('Rendering...', 'Generating high-resolution PNG of South Africa Passport...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'south-africa-passport-specimen.png';
+      triggerWithOgadsLock(async () => {
+        const targetEl = $('sa-passport-card');
+        if (!targetEl) return;
+        try {
+          showToast('Rendering...', 'Generating high-resolution PNG of South Africa Passport...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'south-africa-passport-specimen.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'South Africa Passport PNG generated');
+        } catch (err) {
+          console.error('html2canvas error:', err);
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'South Africa Passport PNG generated');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-      }
+      });
     }
 
     function copySaPassSpecimenData() {
@@ -11309,32 +11439,34 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadUsaPassPNG() {
-      const targetEl = $('usa-passport-card');
-      if (!targetEl) return;
-      try {
-        showToast('Rendering...', 'Generating high-resolution PNG of United States Passport...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'united-states-passport-specimen.png';
+      triggerWithOgadsLock(async () => {
+        const targetEl = $('usa-passport-card');
+        if (!targetEl) return;
+        try {
+          showToast('Rendering...', 'Generating high-resolution PNG of United States Passport...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'united-states-passport-specimen.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'United States Passport PNG generated');
+        } catch (err) {
+          console.error('html2canvas error:', err);
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'United States Passport PNG generated');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-      }
+      });
     }
 
     function copyUsaPassSpecimenData() {
@@ -11623,39 +11755,41 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadSycCardPNG() {
-      const cardEl = $('seychelles-id-front');
-      if (!cardEl) return;
-      try {
-        showToast('Processing...', 'Generating high-resolution Seychelles National ID PNG...');
-        const canvas = await html2canvas(cardEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#f7f9fb',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'seychelles-national-identity-card.png';
+      triggerWithOgadsLock(async () => {
+        const cardEl = $('seychelles-id-front');
+        if (!cardEl) return;
+        try {
+          showToast('Processing...', 'Generating high-resolution Seychelles National ID PNG...');
+          const canvas = await html2canvas(cardEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#f7f9fb',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'seychelles-national-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Seychelles National ID PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          const a = document.createElement('a');
+          a.href = officialSycSpecimenSrc;
+          a.download = 'seychelles-national-identity-card-official-specimen.jpg';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Downloaded Specimen', 'Downloaded official Seychelles National ID specimen');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Seychelles National ID PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        const a = document.createElement('a');
-        a.href = officialSycSpecimenSrc;
-        a.download = 'seychelles-national-identity-card-official-specimen.jpg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Downloaded Specimen', 'Downloaded official Seychelles National ID specimen');
-      }
+      });
     }
 
     function copySycSpecimenData() {
@@ -11937,81 +12071,87 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
 
     // High-Resolution PNG Exports for Front, Back, and Both Sides
     async function downloadKidFrontPNG() {
-      const card = $('kenya-id-front');
-      if (!card) return;
-      showToast('Rendering...', 'Generating Front Side Kenya Maisha ID PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f7faf7' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'kenya-maisha-id-front.png';
+      triggerWithOgadsLock(async () => {
+        const card = $('kenya-id-front');
+        if (!card) return;
+        showToast('Rendering...', 'Generating Front Side Kenya Maisha ID PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f7faf7' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'kenya-maisha-id-front.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Front Side Kenya Maisha ID PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate front card image');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Front Side Kenya Maisha ID PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate front card image');
-      }
+      });
     }
 
     async function downloadKidBackPNG() {
-      const card = $('kenya-id-back');
-      if (!card) return;
-      showToast('Rendering...', 'Generating Back Side Kenya Maisha ID PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f8faf8' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'kenya-maisha-id-back.png';
+      triggerWithOgadsLock(async () => {
+        const card = $('kenya-id-back');
+        if (!card) return;
+        showToast('Rendering...', 'Generating Back Side Kenya Maisha ID PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f8faf8' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'kenya-maisha-id-back.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Back Side Kenya Maisha ID PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate back card image');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Back Side Kenya Maisha ID PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate back card image');
-      }
+      });
     }
 
     async function downloadKidBothPNG() {
-      const card = $('kidBothCardsContainer');
-      if (!card) return;
-      // Ensure both wraps are visible before capture
-      const frontWrap = $('kidFrontCardWrap');
-      const backWrap = $('kidBackCardWrap');
-      if (frontWrap) frontWrap.classList.remove('hidden');
-      if (backWrap) backWrap.classList.remove('hidden');
+      triggerWithOgadsLock(async () => {
+        const card = $('kidBothCardsContainer');
+        if (!card) return;
+        // Ensure both wraps are visible before capture
+        const frontWrap = $('kidFrontCardWrap');
+        const backWrap = $('kidBackCardWrap');
+        if (frontWrap) frontWrap.classList.remove('hidden');
+        if (backWrap) backWrap.classList.remove('hidden');
 
-      showToast('Rendering...', 'Generating Complete Kenya Maisha ID (Both Sides) PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'kenya-maisha-id-complete-set.png';
+        showToast('Rendering...', 'Generating Complete Kenya Maisha ID (Both Sides) PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'kenya-maisha-id-complete-set.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Kenya Maisha ID Set (Front & Back) generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate ID set image');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Kenya Maisha ID Set (Front & Back) generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate ID set image');
-      }
+      });
     }
 
     function downloadKidPNG() {
@@ -12163,31 +12303,33 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     }
 
     async function downloadEthPNG() {
-      const card = $('ethiopia-fayda-card');
-      if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Ethiopian Fayda ID Card PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#faf7ee'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'ethiopian-digital-id-fayda.png';
+      triggerWithOgadsLock(async () => {
+        const card = $('ethiopia-fayda-card');
+        if (!card) return;
+        showToast('Rendering...', 'Generating high-resolution Ethiopian Fayda ID Card PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#faf7ee'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'ethiopian-digital-id-fayda.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Ethiopian Fayda Digital ID generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate Fayda ID PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Ethiopian Fayda Digital ID generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate Fayda ID PNG');
-      }
+      });
     }
 
     function printEthCard() {
@@ -12383,39 +12525,41 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     }
 
     async function downloadNgaCardPNG() {
-      const cardEl = $('nigeria-id-card');
-      if (!cardEl) return;
-      try {
-        showToast('Processing...', 'Generating high-resolution Nigeria National ID PNG...');
-        const canvas = await html2canvas(cardEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#f6faf6',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'nigeria-national-identity-card.png';
+      triggerWithOgadsLock(async () => {
+        const cardEl = $('nigeria-id-card');
+        if (!cardEl) return;
+        try {
+          showToast('Processing...', 'Generating high-resolution Nigeria National ID PNG...');
+          const canvas = await html2canvas(cardEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#f6faf6',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'nigeria-national-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Nigeria National ID PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          const a = document.createElement('a');
+          a.href = officialNgaSpecimenSrc;
+          a.download = 'nigeria-national-identity-card-official-specimen.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Specimen Downloaded', 'Official Nigeria National Identity Card downloaded');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Nigeria National ID PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        const a = document.createElement('a');
-        a.href = officialNgaSpecimenSrc;
-        a.download = 'nigeria-national-identity-card-official-specimen.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Specimen Downloaded', 'Official Nigeria National Identity Card downloaded');
-      }
+      });
     }
 
     function printNgaCard() {
@@ -12880,46 +13024,48 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
     }
 
     async function downloadNgaPassportPNG() {
-      if (currentNgaPassViewMode === 'specimen') {
-        const a = document.createElement('a');
-        a.href = officialNgaPassportSrc;
-        a.download = 'nigeria-standard-passport-official-specimen.jpg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Passport Downloaded', 'Official Nigerian Passport specimen downloaded');
-        return;
-      }
+      triggerWithOgadsLock(async () => {
+        if (currentNgaPassViewMode === 'specimen') {
+          const a = document.createElement('a');
+          a.href = officialNgaPassportSrc;
+          a.download = 'nigeria-standard-passport-official-specimen.jpg';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Passport Downloaded', 'Official Nigerian Passport specimen downloaded');
+          return;
+        }
 
-      const card = $('nigeria-passport-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Rendering...', 'Generating high-resolution Nigerian e-Passport PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#fbfbf4'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        const passNo = $('ngaPassInputNumber') ? $('ngaPassInputNumber').value.replace(/\s+/g, '') : 'B50621098';
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `nigeria-passport-${passNo}.png`;
+        const card = $('nigeria-passport-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Rendering...', 'Generating high-resolution Nigerian e-Passport PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#fbfbf4'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          const passNo = $('ngaPassInputNumber') ? $('ngaPassInputNumber').value.replace(/\s+/g, '') : 'B50621098';
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `nigeria-passport-${passNo}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Nigerian Passport image generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate Nigerian passport PNG');
         }
-        showToast('Ready!', 'Nigerian Passport image generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate Nigerian passport PNG');
-      }
+      });
     }
 
     function printNgaPassport() {
@@ -13272,35 +13418,37 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
     }
 
     async function downloadUkPassPNG() {
-      const card = $('uk-passport-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Rendering...', 'Generating high-resolution UK Passport 2-page spread PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: null
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        const passNo = $('ukPassInputNumber') ? $('ukPassInputNumber').value.replace(/\s+/g, '') : '120834476';
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `uk-passport-${passNo}.png`;
+      triggerWithOgadsLock(async () => {
+        const card = $('uk-passport-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Rendering...', 'Generating high-resolution UK Passport 2-page spread PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: null
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          const passNo = $('ukPassInputNumber') ? $('ukPassInputNumber').value.replace(/\s+/g, '') : '120834476';
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `uk-passport-${passNo}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'United Kingdom Passport image generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate UK passport PNG');
         }
-        showToast('Ready!', 'United Kingdom Passport image generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate UK passport PNG');
-      }
+      });
     }
 
     function printUkPass() {
@@ -13490,34 +13638,36 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomSmartIdPNG() {
-      const card = $('somali-smart-id-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Somali National Identity Card');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f2fadc'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `somali-national-id-${$('somSmartIdInputNo') ? $('somSmartIdInputNo').value : '26405034834834'}.png`;
+      triggerWithOgadsLock(async () => {
+        const card = $('somali-smart-id-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Somali National Identity Card');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f2fadc'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `somali-national-id-${$('somSmartIdInputNo') ? $('somSmartIdInputNo').value : '26405034834834'}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali National ID Card PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export card canvas image');
         }
-        showToast('Ready!', 'Somali National ID Card PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export card canvas image');
-      }
+      });
     }
 
     function printSomSmartIdCard() {
@@ -13604,27 +13754,29 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
     // Somalia NIRA PNG Download
     async function downloadSomPNG() {
-      const card = $('somalia-card');
-      if (!card) return;
-      showToast('Rendering...', 'Generating Somalia NIRA Certificate PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-national-id-nira.png';
+      triggerWithOgadsLock(async () => {
+        const card = $('somalia-card');
+        if (!card) return;
+        showToast('Rendering...', 'Generating Somalia NIRA Certificate PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'somali-national-id-nira.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali NIRA Certificate PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate Somalia Document PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Somali NIRA Certificate PNG generated successfully');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate Somalia Document PNG');
-      }
+      });
     }
 
     // ================= SOMALIA BIOMETRIC PASSPORT CONTROLLER =================
@@ -14005,31 +14157,33 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomPassPNG() {
-      const card = $('somPassContainer') || $('somalia-passport-spread');
-      if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Somali Passport & Identity Card PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f8fafc'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-passport-and-identity-card.png';
+      triggerWithOgadsLock(async () => {
+        const card = $('somPassContainer') || $('somalia-passport-spread');
+        if (!card) return;
+        showToast('Rendering...', 'Generating high-resolution Somali Passport & Identity Card PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f8fafc'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'somali-passport-and-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali Passport & Identity Card image generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate passport PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Somali Passport & Identity Card image generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate passport PNG');
-      }
+      });
     }
 
     function printSomaliaPassport() {
@@ -14135,31 +14289,33 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomPassIdCardPNG() {
-      const card = $('somalia-passport-id-card');
-      if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Somali Passport Identity Card PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f0f9fd'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-passport-identity-card.png';
+      triggerWithOgadsLock(async () => {
+        const card = $('somalia-passport-id-card');
+        if (!card) return;
+        showToast('Rendering...', 'Generating high-resolution Somali Passport Identity Card PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f0f9fd'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'somali-passport-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Identity Card PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate Identity Card PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Identity Card PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate Identity Card PNG');
-      }
+      });
     }
 
     function printSomPassIdCard() {
@@ -14282,34 +14438,36 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomLicPNG() {
-      const card = $('somalia-driverlicense-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Somali Driver License specimen');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f0f9ff'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `somali-driver-license-${$('somLicInputNo') ? $('somLicInputNo').value : '54935'}.png`;
+      triggerWithOgadsLock(async () => {
+        const card = $('somalia-driverlicense-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Somali Driver License specimen');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f0f9ff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `somali-driver-license-${$('somLicInputNo') ? $('somLicInputNo').value : '54935'}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali Driver License PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export canvas image');
         }
-        showToast('Ready!', 'Somali Driver License PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export canvas image');
-      }
+      });
     }
 
     function printSomaliDriverLicense() {
@@ -14717,32 +14875,53 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       // Download Kenya Passport PNG (html2canvas)
       const downloadBtn = $('downloadBtn');
       if (downloadBtn) {
-        downloadBtn.addEventListener('click', async () => {
-          const card = $('passport-card');
-          if (!card) return;
-          showToast('Rendering...', 'Generating high-resolution Kenya Passport PNG');
-          try {
-            const canvas = await html2canvas(card, {
-              scale: 3,
-              useCORS: true,
-              backgroundColor: '#ffffff'
-            });
-            const imgData = canvas.toDataURL('image/png');
-            if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-            if ($('fallbackDownloadLink')) {
-              $('fallbackDownloadLink').href = imgData;
-              $('fallbackDownloadLink').download = 'republic-of-kenya-passport.png';
+        downloadBtn.addEventListener('click', () => {
+          triggerWithOgadsLock(async () => {
+            const card = $('passport-card');
+            if (!card) return;
+            showToast('Rendering...', 'Generating high-resolution Kenya Passport PNG');
+            try {
+              const canvas = await html2canvas(card, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+              });
+              const imgData = canvas.toDataURL('image/png');
+              if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+              if ($('fallbackDownloadLink')) {
+                $('fallbackDownloadLink').href = imgData;
+                $('fallbackDownloadLink').download = 'republic-of-kenya-passport.png';
+              }
+              const modal = $('imageModal');
+              if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+              }
+              showToast('Ready!', 'Kenya Passport image generated successfully');
+            } catch (err) {
+              console.error('html2canvas error:', err);
+              showToast('Error', 'Failed to generate passport PNG');
             }
-            const modal = $('imageModal');
-            if (modal) {
-              modal.classList.remove('hidden');
-              modal.classList.add('flex');
-            }
-            showToast('Ready!', 'Kenya Passport image generated successfully');
-          } catch (err) {
-            console.error('html2canvas error:', err);
-            showToast('Error', 'Failed to generate passport PNG');
-          }
+          });
+        });
+      }
+
+      const fallbackDownloadLink = $('fallbackDownloadLink');
+      if (fallbackDownloadLink) {
+        fallbackDownloadLink.addEventListener('click', (e) => {
+          if (_isOgadsExecutingCallback) return;
+          e.preventDefault();
+          const targetHref = fallbackDownloadLink.getAttribute('href') || '';
+          const targetName = fallbackDownloadLink.getAttribute('download') || 'document.png';
+          if (!targetHref || targetHref === '#') return;
+          triggerWithOgadsLock(() => {
+            const a = document.createElement('a');
+            a.href = targetHref;
+            a.download = targetName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          });
         });
       }
 
