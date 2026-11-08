@@ -7160,6 +7160,10 @@ var $ = window.$ || (id => document.getElementById(id));
       return true;
     }
 
+    function computeTurMrzCheckDigit(str) {
+      return computeIcaoCheckDigit(str);
+    }
+
     function buildTurPassMrzLines(f) {
       if (isTurPassDefaultSpecimen(f)) {
         return {
@@ -7173,18 +7177,18 @@ var $ = window.$ || (id => document.getElementById(id));
       const line1 = (`P<${countryCode}${surAscii}<<${givAscii}` + '<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<').slice(0, 44);
 
       const passClean = normalizeTurkishAscii(f.passNo || '').replace(/[^A-Z0-9]/g, '').padEnd(9, '<').slice(0, 9);
-      const passCd = computeTurMrzCheckDigit(passClean);
+      const passCd = computeIcaoCheckDigit(passClean);
       const natClean = normalizeTurkishAscii(f.nat || 'TUR').replace(/[^A-Z]/g, '').padEnd(3, '<').slice(0, 3);
       const dobYYMMDD = parseTurPassDateToYYMMDD(f.dob, '981023');
-      const dobCd = computeTurMrzCheckDigit(dobYYMMDD);
+      const dobCd = computeIcaoCheckDigit(dobYYMMDD);
       const sexUp = String(f.sex || 'E/M').toUpperCase();
       const sexChar = (sexUp.indexOf('K') !== -1 || sexUp.indexOf('F') !== -1) ? 'F' : 'M';
       const expYYMMDD = parseTurPassDateToYYMMDD(f.expiryDate, '280326');
-      const expCd = computeTurMrzCheckDigit(expYYMMDD);
+      const expCd = computeIcaoCheckDigit(expYYMMDD);
       const personalField = (String(f.idNo || '').replace(/[^0-9A-Z]/g, '') + '<<<<<<<<<<<<<<').slice(0, 14);
-      const personalCd = computeTurMrzCheckDigit(personalField);
+      const personalCd = computeIcaoCheckDigit(personalField);
       const compositeInput = passClean + passCd + dobYYMMDD + dobCd + expYYMMDD + expCd + personalField + personalCd;
-      const compositeCd = computeTurMrzCheckDigit(compositeInput);
+      const compositeCd = computeIcaoCheckDigit(compositeInput);
       const line2 = (passClean + passCd + natClean + dobYYMMDD + dobCd + sexChar + expYYMMDD + expCd + personalField + personalCd + compositeCd).slice(0, 44);
 
       return { line1, line2 };
@@ -7555,6 +7559,8 @@ var $ = window.$ || (id => document.getElementById(id));
       updateTurIdPreview();
     }
 
+    window.computeTurMrzCheckDigit = computeTurMrzCheckDigit;
+    window.computeIcaoCheckDigit = computeIcaoCheckDigit;
     window.updateTurPassPreview = updateTurPassPreview;
     window.randomizeTurPassport = randomizeTurPassport;
     window.resetTurPassSpecimen = resetTurPassSpecimen;
