@@ -638,46 +638,20 @@
       position: relative !important;
     }
 
-    /* Hide SAMPLE / DEMO watermarks inside document previews so backgrounds stay clean and sharp */
+    /* Hide all watermarks inside document previews so backgrounds stay clean and sharp */
     #verification-workbench article .sample-watermark,
     #verification-workbench article [id*="SampleWatermark"],
     #verification-workbench article [id*="sampleWatermark"],
-    .static-passport .sample-watermark {
+    .static-passport .sample-watermark,
+    .kyc-dynamic-watermark-overlay,
+    .kyc-wm-stamp,
+    [data-kyc-wm] {
       display: none !important;
       visibility: hidden !important;
       opacity: 0 !important;
       pointer-events: none !important;
       height: 0 !important;
       width: 0 !important;
-    }
-
-    /* Discreet dynamic user-specific session watermark on protected previews */
-    .kyc-dynamic-watermark-overlay {
-      position: absolute !important;
-      inset: 0 !important;
-      pointer-events: none !important;
-      z-index: 35 !important;
-      overflow: hidden !important;
-      background: transparent !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      padding: 6% 7% !important;
-      -webkit-user-select: none !important;
-      user-select: none !important;
-    }
-
-    .kyc-wm-stamp {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-      font-size: clamp(7px, 1.05cqw, 10px) !important;
-      font-weight: 700 !important;
-      letter-spacing: 0.08em !important;
-      color: rgba(15, 23, 42, 0.10) !important;
-      text-shadow: 0 0 1px rgba(255, 255, 255, 0.22) !important;
-      white-space: nowrap !important;
-      pointer-events: none !important;
-      transform: rotate(-12deg) !important;
-      line-height: 1.1 !important;
     }
 
     /* ================= DOCUMENT PREVIEW VISUAL CLARITY & SHARPNESS ================= */
@@ -27857,114 +27831,24 @@ COD REP DEM CONGO</div>
       }
 
       function renderAndRefreshWatermarks() {
-        if (isRestoringWatermark) return;
-        isRestoringWatermark = true;
         try {
-          watermarkCycleCount += 1;
-          var shortSid = getShortSessionTag();
-          var tsShort = getFormattedTimestamp().slice(0, 16) + ' UTC';
-          var stampText = 'UID:' + shortSid + ' • ' + tsShort;
-          var nodes = getAllProtectedSurfaceNodes();
-
-          for (var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
-            if (!node) continue;
-            if (!node.classList.contains('kyc-protected-surface')) {
-              node.classList.add('kyc-protected-surface');
-            }
-
-            // Skip parent wrapper if it already contains child <article> elements that get their own watermark
-            if (node.tagName !== 'ARTICLE' && node.querySelector && node.querySelector('article')) {
-              continue;
-            }
-
-            var overlay = node.querySelector(':scope > .kyc-dynamic-watermark-overlay');
-            if (!overlay) {
-              overlay = document.createElement('div');
-              overlay.className = 'kyc-dynamic-watermark-overlay';
-              overlay.setAttribute('aria-hidden', 'true');
-              overlay.setAttribute('data-kyc-wm', '1');
-
-              var rowTop = document.createElement('div');
-              rowTop.style.cssText = 'display:flex;justify-content:flex-end;width:100%;pointer-events:none;';
-              var stampTop = document.createElement('span');
-              stampTop.className = 'kyc-wm-stamp';
-              rowTop.appendChild(stampTop);
-
-              var rowMid = document.createElement('div');
-              rowMid.style.cssText = 'display:flex;justify-content:center;width:100%;pointer-events:none;';
-              var stampMid = document.createElement('span');
-              stampMid.className = 'kyc-wm-stamp';
-              rowMid.appendChild(stampMid);
-
-              var rowBot = document.createElement('div');
-              rowBot.style.cssText = 'display:flex;justify-content:flex-start;width:100%;pointer-events:none;';
-              var stampBot = document.createElement('span');
-              stampBot.className = 'kyc-wm-stamp';
-              rowBot.appendChild(stampBot);
-
-              overlay.appendChild(rowTop);
-              overlay.appendChild(rowMid);
-              overlay.appendChild(rowBot);
-              node.appendChild(overlay);
-            }
-
-            var stamps = overlay.querySelectorAll('.kyc-wm-stamp');
-            for (var s = 0; s < stamps.length; s++) {
-              if (stamps[s].textContent !== stampText) {
-                stamps[s].textContent = stampText;
-              }
+          // Remove any dynamic or specimen watermark overlays from all country documents
+          var overlays = document.querySelectorAll('.kyc-dynamic-watermark-overlay, [data-kyc-wm], .sample-watermark, [id*="SampleWatermark"], [id*="sampleWatermark"]');
+          for (var i = 0; i < overlays.length; i++) {
+            var el = overlays[i];
+            if (el.classList.contains('kyc-dynamic-watermark-overlay') || el.hasAttribute('data-kyc-wm')) {
+              if (el.parentNode) el.parentNode.removeChild(el);
+            } else {
+              el.style.display = 'none';
+              el.classList.add('hidden');
             }
           }
-
           enforceNonDraggableImages(document);
-        } catch (e) {
-        } finally {
-          isRestoringWatermark = false;
-        }
+        } catch (e) {}
       }
 
       function setupWatermarkTamperObserver() {
-        var workbench = document.getElementById('verification-workbench');
-        if (!workbench || typeof MutationObserver === 'undefined') return;
-
-        var tamperTimer = null;
-        var observer = new MutationObserver(function(mutations) {
-          if (isRestoringWatermark) return;
-          var needsRestore = false;
-          for (var i = 0; i < mutations.length; i++) {
-            var m = mutations[i];
-            if (m.type === 'childList' && m.removedNodes && m.removedNodes.length > 0) {
-              for (var r = 0; r < m.removedNodes.length; r++) {
-                var rn = m.removedNodes[r];
-                if (rn && rn.nodeType === 1 && (rn.classList.contains('kyc-dynamic-watermark-overlay') || rn.classList.contains('kyc-wm-stamp'))) {
-                  needsRestore = true;
-                  break;
-                }
-              }
-            } else if (m.type === 'attributes' && m.target && m.target.classList &&
-                       (m.target.classList.contains('kyc-dynamic-watermark-overlay') || m.target.classList.contains('kyc-wm-stamp'))) {
-              needsRestore = true;
-            }
-            if (needsRestore) break;
-          }
-          if (needsRestore) {
-            if (tamperTimer) clearTimeout(tamperTimer);
-            tamperTimer = setTimeout(function() {
-              renderAndRefreshWatermarks();
-            }, 40);
-          }
-        });
-
-        observer.observe(workbench, {
-          childList: true,
-          subtree: true,
-          attributes: true,
-          attributeFilter: ['style', 'class', 'hidden']
-        });
-
         setInterval(function() {
-          renderAndRefreshWatermarks();
           updateStatusBar();
         }, 30000);
       }
