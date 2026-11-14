@@ -1081,7 +1081,7 @@
       background: linear-gradient(180deg, #62e562 0%, #28cc44 100%);
     }
     .kyc-wave-footer {
-      background: linear-gradient(180deg, #f3f9ff 0%, #e4f2ff 52%, #d8ecff 100%);
+      background: linear-gradient(180deg, #ffffff 0%, #f4faff 48%, #e4f3ff 100%);
     }
   </style>
 
@@ -28778,45 +28778,59 @@ COD REP DEM CONGO</div>
   </section>
 
   <!-- ================= FLOWING WAVE FOOTER ================= -->
-  <footer class="no-print kyc-wave-footer relative overflow-hidden border-t border-blue-100 pt-10 pb-8 px-4 sm:px-6 lg:px-8 text-[#1e3a6e]">
-    <!-- Subtle Flowing Wave Decoration -->
-    <svg aria-hidden="true" class="absolute inset-x-0 top-0 w-full h-full pointer-events-none opacity-65" preserveAspectRatio="none" viewBox="0 0 1440 200">
-      <path d="M0,48 C280,115 580,5 960,55 C1200,88 1340,38 1440,22 L1440,200 L0,200 Z" fill="#dbeeff"/>
-      <path d="M0,96 C360,36 740,145 1140,85 C1300,62 1380,82 1440,98 L1440,200 L0,200 Z" fill="#cde6ff" opacity="0.7"/>
+  <footer class="no-print kyc-wave-footer relative overflow-hidden pt-16 sm:pt-20 pb-8 px-4 sm:px-6 lg:px-8 text-[#0d2658]">
+    <!-- Layered Flowing Cyan-Blue & Emerald Wave Ribbon Matching Reference -->
+    <svg aria-hidden="true" class="absolute inset-x-0 top-0 w-full h-24 sm:h-28 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1440 160">
+      <defs>
+        <linearGradient id="footerWaveMain" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+          <stop offset="35%" stop-color="#0ea5e9" stop-opacity="0.58"/>
+          <stop offset="68%" stop-color="#10b981" stop-opacity="0.48"/>
+          <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.28"/>
+        </linearGradient>
+        <linearGradient id="footerWaveAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#0284c7" stop-opacity="0.52"/>
+          <stop offset="48%" stop-color="#14b8a6" stop-opacity="0.62"/>
+          <stop offset="100%" stop-color="#22c55e" stop-opacity="0.42"/>
+        </linearGradient>
+        <linearGradient id="footerWaveBase" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="#e8f5ff" stop-opacity="0.95"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,18 C240,86 510,-12 830,44 C1090,88 1280,10 1440,34 L1440,160 L0,160 Z" fill="url(#footerWaveMain)"/>
+      <path d="M0,48 C300,-6 610,102 960,42 C1170,6 1320,66 1440,42 L1440,160 L0,160 Z" fill="url(#footerWaveAccent)"/>
+      <path d="M0,74 C360,118 710,36 1080,82 C1260,104 1370,68 1440,78 L1440,160 L0,160 Z" fill="url(#footerWaveBase)"/>
     </svg>
 
-    <div class="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 pt-2">
       <!-- Brand Logo -->
       <a href="/" onclick="goToHomePage(event)" class="inline-flex items-center cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
-        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-12 sm:h-14 w-auto max-w-[240px] object-contain">
+        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-11 sm:h-13 w-auto max-w-[230px] object-contain">
       </a>
 
       <!-- Policy & Support Links -->
-      <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm font-semibold text-[#1e3a6e]">
+      <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm font-bold text-[#0f295c]">
         <button type="button" onclick="openTermsModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Terms of Service</button>
-        <span class="text-blue-300">|</span>
+        <span class="text-slate-300 font-normal" aria-hidden="true">|</span>
         <button type="button" onclick="openPrivacyModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Privacy Policy</button>
-        <span class="text-blue-300">|</span>
+        <span class="text-slate-300 font-normal" aria-hidden="true">|</span>
         <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Support</button>
-        <span class="text-blue-300">|</span>
-        <button type="button" onclick="openDisclaimerModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Disclaimer</button>
-        <span class="text-blue-300">|</span>
-        <button type="button" onclick="openCookieModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Cookie Policy</button>
       </nav>
 
       <!-- Social Action Icons -->
-      <div class="flex items-center gap-2.5 shrink-0">
-        <button type="button" onclick="openContactModal()" aria-label="Facebook Support" class="w-9 h-9 rounded-full bg-[#1877F2] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
-          <i class="fa-brands fa-facebook-f text-sm"></i>
+      <div class="flex items-center gap-3 shrink-0">
+        <button type="button" onclick="openContactModal()" aria-label="Facebook Support" class="w-10 h-10 rounded-full bg-[#1877F2] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-facebook-f text-base"></i>
         </button>
-        <button type="button" onclick="openContactModal()" aria-label="WhatsApp Support" class="w-9 h-9 rounded-full bg-[#25D366] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
-          <i class="fa-brands fa-whatsapp text-base"></i>
+        <button type="button" onclick="openContactModal()" aria-label="WhatsApp Support" class="w-10 h-10 rounded-full bg-[#25D366] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-whatsapp text-lg"></i>
         </button>
-        <button type="button" onclick="openContactModal()" aria-label="Telegram Support" class="w-9 h-9 rounded-full bg-[#229ED9] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
-          <i class="fa-brands fa-telegram text-sm"></i>
+        <button type="button" onclick="openContactModal()" aria-label="Telegram Support" class="w-10 h-10 rounded-full bg-[#229ED9] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-telegram text-base"></i>
         </button>
-        <button type="button" onclick="openAboutModal()" aria-label="YouTube Guide" class="w-9 h-9 rounded-full bg-[#FF0000] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
-          <i class="fa-brands fa-youtube text-sm"></i>
+        <button type="button" onclick="openAboutModal()" aria-label="YouTube Guide" class="w-10 h-10 rounded-full bg-[#FF0000] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-youtube text-base"></i>
         </button>
       </div>
     </div>
