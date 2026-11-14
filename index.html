@@ -1269,12 +1269,23 @@
       }
     };
 
-    // Homepage Navigation & Clean URL Management (ensures homepage is https://kycapproved.online/ without #hero-section)
+    // Homepage Navigation & Clean URL Management (hides all workflow sections & returns to clean homepage)
     window.goToHomePage = function(e) {
       if (e && typeof e.preventDefault === 'function') {
         e.preventDefault();
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window.setWorkflowViewStep === 'function') {
+        window.setWorkflowViewStep('home', { silent: true });
+      }
+      if (typeof window.closeAccountCountryFlow === 'function') {
+        window.closeAccountCountryFlow();
+      }
+      if (typeof window.closeCryptoExchangesHub === 'function') {
+        window.closeCryptoExchangesHub();
+      }
+      if (window.scrollTo) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       if (window.location.hash) {
         history.replaceState(null, document.title, window.location.pathname + window.location.search);
       }
@@ -2372,30 +2383,300 @@ var $ = window.$ || (id => document.getElementById(id));
     }
     window.closeSearchableCountryDropdowns = closeSearchableCountryDropdowns;
 
+    let workflowStep = 'home';
+    let workflowActiveAccount = '';
+    let workflowSelectedCountry = '';
+    let workflowSelectedDoc = '';
+
     function selectCountryFromDropdown(scope, countryKey) {
       closeSearchableCountryDropdowns();
       if (scope === 'flow') {
         handleFlowCountryChange(countryKey, { advanceToDocs: true });
       } else {
-        switchVerificationCountry(countryKey);
+        workflowSelectedCountry = countryKey || '';
+        workflowSelectedDoc = '';
+        switchVerificationCountry(countryKey, { silent: true });
+        syncWorkbenchCountryDropdownUI(countryKey);
+        renderWorkflowDocumentsGrid(countryKey);
+        setWorkflowViewStep('documents');
       }
     }
     window.selectCountryFromDropdown = selectCountryFromDropdown;
 
     function syncWorkbenchCountryDropdownUI(countryKey) {
       const countries = getExistingWebsiteCountries();
-      const info = countries.find(c => c.key === countryKey);
+      const info = countryKey ? countries.find(c => c.key === countryKey) : null;
       const flagEl = $('wbCountrySelectedFlag');
       const nameEl = $('wbCountrySelectedName');
       const countEl = $('wbCountryCountText');
+      const promptEl = $('wbCountrySelectPrompt');
+      const continueBtn = $('wbCountryContinueBtn');
+      const continueLabel = $('wbCountryContinueLabel');
+
       if (info) {
         if (flagEl) flagEl.textContent = info.flag || '🌍';
         if (nameEl) nameEl.textContent = info.name || countryKey;
+        if (promptEl) promptEl.classList.add('hidden');
+        if (continueBtn) {
+          continueBtn.classList.remove('hidden');
+          continueBtn.classList.add('inline-flex');
+        }
+        if (continueLabel) continueLabel.textContent = `Continue to ${info.name} Documents`;
+      } else {
+        if (flagEl) flagEl.textContent = '🌍';
+        if (nameEl) nameEl.textContent = '-- Select your country --';
+        if (promptEl) promptEl.classList.remove('hidden');
+        if (continueBtn) {
+          continueBtn.classList.add('hidden');
+          continueBtn.classList.remove('inline-flex');
+        }
       }
       if (countEl) {
         countEl.textContent = `${countries.length} countries`;
       }
     }
+
+    function renderWorkflowDocumentsGrid(countryKey) {
+      const grid = $('wb-country-documents-grid');
+      const emptyEl = $('wb-doc-tabs-empty');
+      const emptyNameEl = $('wbNoDocsCountryName');
+      const flagEl = $('wbDocsCountryFlag');
+      const nameEl = $('wbDocsCountryName');
+      const platEl = $('wbDocsPlatformName');
+      const countEl = $('wbDocsCountLabel');
+
+      const countries = getExistingWebsiteCountries();
+      const countryInfo = countries.find(c => c.key === countryKey);
+      const displayName = countryInfo ? countryInfo.name : (countryKey || 'Selected Country');
+      const displayFlag = countryInfo ? (countryInfo.flag || '🌍') : '🌍';
+      const platformMeta = platformData[workflowActiveAccount || currentVirtualAccount] || platformData.paypal;
+
+      if (flagEl) flagEl.textContent = displayFlag;
+      if (nameEl) nameEl.textContent = displayName;
+      if (platEl) platEl.textContent = platformMeta.name;
+      if (emptyNameEl) emptyNameEl.textContent = displayName;
+
+      const items = getCountryDocumentItems(countryKey);
+      if (countEl) {
+        countEl.textContent = items.length === 1 ? '1 template available' : `${items.length} templates available`;
+      }
+
+      if (!grid) return;
+      if (items.length === 0) {
+        grid.innerHTML = '';
+        grid.classList.add('hidden');
+        if (emptyEl) emptyEl.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyEl) emptyEl.classList.add('hidden');
+      grid.classList.remove('hidden');
+      grid.className = items.length === 1
+        ? 'grid grid-cols-1 max-w-xl gap-4'
+        : items.length === 2
+        ? 'grid grid-cols-1 sm:grid-cols-2 gap-4'
+        : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+
+      grid.innerHTML = items.map(item => {
+        const isCurrent = workflowSelectedDoc === item.docType;
+        const thumbHtml = item.thumbnail
+          ? `<div class="w-20 h-14 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative flex items-center justify-center">
+               <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+               <div class="hidden w-full h-full ${item.accent.bg} text-white flex items-center justify-center text-lg"><i class="${item.icon}"></i></div>
+             </div>`
+          : `<div class="w-14 h-14 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-xl shrink-0"><i class="${item.icon}"></i></div>`;
+
+        return `
+          <button
+            type="button"
+            onclick="openCountryDocumentEditor('${countryKey.replace(/'/g, "\\'")}', '${item.docType.replace(/'/g, "\\'")}', { scrollToEditor: true })"
+            class="p-4 sm:p-5 rounded-2xl border ${isCurrent ? 'border-2 border-[#0d2658] ring-2 ring-blue-500/20' : item.accent.border} bg-gradient-to-br ${item.accent.tint} hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-4 group">
+            ${thumbHtml}
+            <div class="min-w-0 flex-1 space-y-1">
+              <div class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                <span>${item.category}</span>
+                <span aria-hidden="true">·</span>
+                <span>${item.countryName}</span>
+              </div>
+              <div class="text-sm sm:text-base font-extrabold text-[#0d2658] leading-snug">${item.name}</div>
+              <div class="text-xs text-slate-600 line-clamp-2 leading-snug">${item.description}</div>
+              <div class="pt-1.5 inline-flex items-center gap-1.5 text-xs font-bold ${item.accent.arrow} group-hover:translate-x-0.5 transition-transform">
+                <span>Open Live Preview Editor</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </div>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+    window.renderWorkflowDocumentsGrid = renderWorkflowDocumentsGrid;
+
+    function syncWorkflowAccountsHighlight() {
+      document.querySelectorAll('#our-virtual-accounts [data-va-card]').forEach(el => {
+        const key = el.getAttribute('data-va-card');
+        const isActive = Boolean(workflowActiveAccount && key === workflowActiveAccount);
+        el.classList.toggle('ring-2', isActive);
+        el.classList.toggle('ring-[#0d5bd9]', isActive);
+        el.classList.toggle('border-[#0d5bd9]', isActive);
+      });
+    }
+
+    function setWorkflowViewStep(step, opts) {
+      const options = opts || {};
+      let nextStep = step || 'home';
+
+      if (nextStep === 'country' && !workflowActiveAccount) {
+        nextStep = 'accounts';
+      }
+      if (nextStep === 'documents' && !workflowSelectedCountry) {
+        nextStep = workflowActiveAccount ? 'country' : 'accounts';
+      }
+      if (nextStep === 'editor' && (!workflowSelectedCountry || !workflowSelectedDoc)) {
+        nextStep = workflowSelectedCountry ? 'documents' : (workflowActiveAccount ? 'country' : 'accounts');
+      }
+
+      workflowStep = nextStep;
+      closeSearchableCountryDropdowns();
+
+      const heroSection = $('hero-section');
+      const heroHomeContent = $('homepage-hero-content');
+      const whySection = $('homepage-why-section');
+      const vaSection = $('our-virtual-accounts');
+      const workbench = $('verification-workbench');
+      const countryPanel = $('wb-step-country-panel');
+      const docsPanel = $('wb-step-documents-panel');
+      const editorBar = $('active-editor-workflow-bar');
+      const poaAccountBar = $('poa-step2-account-selector');
+      const noDocView = $('wb-no-document-view');
+
+      if (nextStep === 'home') {
+        if (heroSection) heroSection.classList.remove('hidden');
+        if (heroHomeContent) heroHomeContent.classList.remove('hidden');
+        if (whySection) whySection.classList.remove('hidden');
+        if (vaSection) vaSection.classList.remove('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (countryPanel) countryPanel.classList.add('hidden');
+        if (docsPanel) docsPanel.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        syncWorkflowAccountsHighlight();
+      } else if (nextStep === 'accounts') {
+        if (heroSection) heroSection.classList.remove('hidden');
+        if (heroHomeContent) heroHomeContent.classList.remove('hidden');
+        if (whySection) whySection.classList.remove('hidden');
+        if (vaSection) vaSection.classList.remove('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (countryPanel) countryPanel.classList.add('hidden');
+        if (docsPanel) docsPanel.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        syncWorkflowAccountsHighlight();
+        if (!options.noScroll && vaSection) {
+          vaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'country') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (workbench) workbench.classList.remove('hidden');
+        if (countryPanel) countryPanel.classList.remove('hidden');
+        if (docsPanel) docsPanel.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+
+        const meta = platformData[workflowActiveAccount] || platformData.paypal;
+        const pName = $('wbCountryPlatformName');
+        const pMeta = $('wbCountryPlatformMeta');
+        const pIconWrap = $('wbCountryPlatformIconWrap');
+        const pIcon = $('wbCountryPlatformIcon');
+        if (pName) pName.textContent = meta.name;
+        if (pMeta) pMeta.textContent = `${meta.currency} · ${meta.kycLevel || 'Select issuing country'}`;
+        if (pIconWrap) pIconWrap.style.backgroundColor = meta.color || '#003087';
+        if (pIcon) pIcon.className = `${meta.icon} text-lg text-white`;
+
+        syncWorkbenchCountryDropdownUI(workflowSelectedCountry);
+        renderSearchableCountryOptions('wb', '');
+        if (!options.noScroll && workbench) {
+          workbench.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'documents') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (workbench) workbench.classList.remove('hidden');
+        if (countryPanel) countryPanel.classList.add('hidden');
+        if (docsPanel) docsPanel.classList.remove('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+
+        renderWorkflowDocumentsGrid(workflowSelectedCountry);
+        if (!options.noScroll && workbench) {
+          workbench.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'editor') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (workbench) workbench.classList.remove('hidden');
+        if (countryPanel) countryPanel.classList.add('hidden');
+        if (docsPanel) docsPanel.classList.add('hidden');
+        if (editorBar) editorBar.classList.remove('hidden');
+        if (poaAccountBar) {
+          poaAccountBar.classList.toggle('hidden', workflowSelectedDoc !== 'proofofaccount');
+        }
+        renderActiveDocumentView();
+        syncActiveWorkflowBar();
+        if (!options.noScroll && workbench) {
+          workbench.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+    window.setWorkflowViewStep = setWorkflowViewStep;
+
+    function selectWorkflowAccount(accountKey, opts) {
+      const options = opts || {};
+      const resolvedKey = (accountKey && platformData[accountKey]) ? accountKey : 'paypal';
+      const switchedAccount = Boolean(workflowActiveAccount && workflowActiveAccount !== resolvedKey);
+
+      workflowActiveAccount = resolvedKey;
+      if (switchedAccount || !options.preserveCountry) {
+        workflowSelectedCountry = '';
+        workflowSelectedDoc = '';
+        flowSelectedCountry = '';
+        const wbSearch = $('wbCountrySearchInput');
+        if (wbSearch) wbSearch.value = '';
+      }
+
+      selectVirtualAccount(resolvedKey, { silent: true });
+      setWorkflowViewStep('country', options);
+    }
+    window.selectWorkflowAccount = selectWorkflowAccount;
+
+    function openWorkflowDocumentsShortcut() {
+      if (!workflowActiveAccount) {
+        showToast('Select a Virtual Account', 'Choose a virtual account platform first to continue.');
+        setWorkflowViewStep('accounts');
+        return;
+      }
+      if (!workflowSelectedCountry) {
+        showToast('Select Your Country', 'Choose an issuing country to view its configured documents.');
+        setWorkflowViewStep('country');
+        return;
+      }
+      setWorkflowViewStep('documents');
+    }
+    window.openWorkflowDocumentsShortcut = openWorkflowDocumentsShortcut;
 
     function syncWorkbenchDocTabsForCountry(countryKey) {
       const items = getCountryDocumentItems(countryKey);
@@ -2474,104 +2755,41 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function selectFlowPlatform(accountKey) {
-      selectVirtualAccount(accountKey, { silent: true });
-      const meta = platformData[currentVirtualAccount] || platformData.paypal;
-      const titleEl = $('flowModalAccountTitle');
-      const subEl = $('flowModalAccountSub');
-      const iconWrap = $('flowModalIconWrap');
-      const iconEl = $('flowModalIcon');
-      if (titleEl) titleEl.textContent = meta.name;
-      if (subEl) subEl.textContent = `${meta.currency} · ${meta.kycLevel || 'Select your country to view documents'}`;
-      if (iconWrap) iconWrap.style.backgroundColor = meta.color || '#003087';
-      if (iconEl) iconEl.className = `${meta.icon} text-xl text-white`;
-      goToFlowStep('country');
+      selectWorkflowAccount(accountKey);
     }
     window.selectFlowPlatform = selectFlowPlatform;
 
     function goToFlowStep(step) {
-      flowActiveStep = step || 'country';
-      const accView = $('flowStepAccountsView');
-      const countryView = $('flowStepCountryView');
-      const docsView = $('flowStepDocumentsView');
-      if (accView) accView.classList.toggle('hidden', flowActiveStep !== 'accounts');
-      if (countryView) countryView.classList.toggle('hidden', flowActiveStep !== 'country');
-      if (docsView) docsView.classList.toggle('hidden', flowActiveStep !== 'documents');
-
-      const stepMap = { accounts: 1, country: 2, documents: 3 };
-      const currentNum = stepMap[flowActiveStep] || 2;
-      [1, 2, 3].forEach(num => {
-        const indicator = $(`flowStepperItem-${num}`);
-        const badge = $(`flowStepperNum-${num}`);
-        if (!indicator || !badge) return;
-        if (num === currentNum) {
-          indicator.className = 'flex items-center gap-2 text-xs font-extrabold text-[#0d2658]';
-          badge.className = 'w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-black shrink-0';
-        } else if (num < currentNum) {
-          indicator.className = 'flex items-center gap-2 text-xs font-bold text-emerald-700 cursor-pointer';
-          badge.className = 'w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] font-black shrink-0';
-        } else {
-          indicator.className = 'flex items-center gap-2 text-xs font-semibold text-slate-400';
-          badge.className = 'w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[11px] font-bold shrink-0';
-        }
-      });
-
-      if (flowActiveStep === 'accounts') {
-        renderFlowAccountsGrid();
-      } else if (flowActiveStep === 'country') {
-        const continueBtn = $('flowContinueToDocsBtn');
-        if (continueBtn) {
-          continueBtn.classList.toggle('hidden', !flowSelectedCountry);
-          continueBtn.classList.toggle('inline-flex', Boolean(flowSelectedCountry));
-        }
+      if (step === 'accounts' || step === 'country' || step === 'documents') {
+        setWorkflowViewStep(step);
       }
     }
     window.goToFlowStep = goToFlowStep;
 
     function openAccountCountryFlow(accountKey, opts) {
       const options = opts || {};
-      selectVirtualAccount(accountKey || currentVirtualAccount || 'paypal', { silent: true });
-      const meta = platformData[currentVirtualAccount] || platformData.paypal;
-
-      const titleEl = $('flowModalAccountTitle');
-      const subEl = $('flowModalAccountSub');
-      const iconWrap = $('flowModalIconWrap');
-      const iconEl = $('flowModalIcon');
-      const flagEl = $('flowCountrySelectedFlag');
-      const nameEl = $('flowCountrySelectedName');
-      const searchEl = $('flowCountrySearchInput');
-
-      if (titleEl) titleEl.textContent = meta.name;
-      if (subEl) subEl.textContent = `${meta.currency} · ${meta.kycLevel || 'Select your country to unlock documents'}`;
-      if (iconWrap) iconWrap.style.backgroundColor = meta.color || '#003087';
-      if (iconEl) iconEl.className = `${meta.icon} text-xl text-white`;
-
-      if (options.countryKey) {
-        flowSelectedCountry = options.countryKey;
-      } else if (!options.preserveCountry) {
-        flowSelectedCountry = '';
+      closeAccountCountryFlow();
+      const requestedStep = options.step || (accountKey ? 'country' : 'accounts');
+      if (requestedStep === 'accounts') {
+        if (accountKey && platformData[accountKey]) {
+          workflowActiveAccount = accountKey;
+          selectVirtualAccount(accountKey, { silent: true });
+        }
+        setWorkflowViewStep('accounts', options);
+        return;
       }
-
-      if (flowSelectedCountry) {
-        const info = getExistingWebsiteCountries().find(c => c.key === flowSelectedCountry);
-        if (flagEl) flagEl.textContent = info ? (info.flag || '🌍') : '🌍';
-        if (nameEl) nameEl.textContent = info ? info.name : flowSelectedCountry;
-        handleFlowCountryChange(flowSelectedCountry, { advanceToDocs: options.step === 'documents' });
+      if (accountKey) {
+        if (options.countryKey) {
+          workflowActiveAccount = platformData[accountKey] ? accountKey : 'paypal';
+          workflowSelectedCountry = options.countryKey;
+          selectVirtualAccount(workflowActiveAccount, { silent: true });
+          switchVerificationCountry(workflowSelectedCountry, { silent: true });
+          setWorkflowViewStep(requestedStep, options);
+        } else {
+          selectWorkflowAccount(accountKey, options);
+        }
       } else {
-        if (flagEl) flagEl.textContent = '🌍';
-        if (nameEl) nameEl.textContent = '-- Select your country --';
-        const promptEl = $('flowSelectCountryPrompt');
-        if (promptEl) promptEl.classList.remove('hidden');
-      }
-
-      if (searchEl) searchEl.value = '';
-      closeSearchableCountryDropdowns();
-      renderSearchableCountryOptions('flow', '');
-      goToFlowStep(options.step || 'country');
-
-      const modal = $('accountCountryFlowModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        setWorkflowViewStep(requestedStep, options);
       }
     }
     window.openAccountCountryFlow = openAccountCountryFlow;
@@ -2589,96 +2807,12 @@ var $ = window.$ || (id => document.getElementById(id));
     function handleFlowCountryChange(countryKey, opts) {
       const options = opts || {};
       flowSelectedCountry = countryKey || '';
-      const docsGrid = $('flowDocumentsGrid');
-      const emptyStateEl = $('flowNoDocumentsState');
-      const emptyCountryNameEl = $('flowNoDocsCountryName');
-      const promptEl = $('flowSelectCountryPrompt');
-      const countryLabel = $('flowChosenCountryLabel');
-      const countrySummaryFlag = $('flowDocsCountryFlag');
-      const countrySummaryName = $('flowDocsCountryName');
-      const countrySummaryMeta = $('flowDocsCountryMeta');
-      const flagEl = $('flowCountrySelectedFlag');
-      const nameEl = $('flowCountrySelectedName');
-      const continueBtn = $('flowContinueToDocsBtn');
-
-      if (!flowSelectedCountry) {
-        if (flagEl) flagEl.textContent = '🌍';
-        if (nameEl) nameEl.textContent = '-- Select your country --';
-        if (promptEl) promptEl.classList.remove('hidden');
-        if (continueBtn) {
-          continueBtn.classList.add('hidden');
-          continueBtn.classList.remove('inline-flex');
-        }
-        return;
-      }
-
-      const info = getExistingWebsiteCountries().find(c => c.key === flowSelectedCountry);
-      const displayName = info ? info.name : flowSelectedCountry;
-      const displayFlag = info ? (info.flag || '🌍') : '🌍';
-
-      if (flagEl) flagEl.textContent = displayFlag;
-      if (nameEl) nameEl.textContent = displayName;
-      if (countryLabel) countryLabel.textContent = `${displayFlag} ${displayName}`;
-      if (countrySummaryFlag) countrySummaryFlag.textContent = displayFlag;
-      if (countrySummaryName) countrySummaryName.textContent = displayName;
-      if (continueBtn) {
-        continueBtn.classList.remove('hidden');
-        continueBtn.classList.add('inline-flex');
-      }
-
-      const items = getCountryDocumentItems(flowSelectedCountry);
-      if (countrySummaryMeta) {
-        const metaPlatform = platformData[currentVirtualAccount] || platformData.paypal;
-        countrySummaryMeta.textContent = `${metaPlatform.name} · ${items.length === 1 ? '1 template available' : `${items.length} templates available`}`;
-      }
-
-      if (docsGrid) {
-        if (items.length === 0) {
-          docsGrid.innerHTML = '';
-          docsGrid.classList.add('hidden');
-          if (emptyCountryNameEl) emptyCountryNameEl.textContent = displayName;
-          if (emptyStateEl) emptyStateEl.classList.remove('hidden');
-        } else {
-          if (emptyStateEl) emptyStateEl.classList.add('hidden');
-          docsGrid.classList.remove('hidden');
-          docsGrid.className = items.length === 1 ? 'grid grid-cols-1 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-3';
-          docsGrid.innerHTML = items.map(item => {
-            const thumbHtml = item.thumbnail
-              ? `<div class="w-16 h-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative flex items-center justify-center">
-                   <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-                   <div class="hidden w-full h-full ${item.accent.bg} text-white flex items-center justify-center text-base"><i class="${item.icon}"></i></div>
-                 </div>`
-              : `<div class="w-12 h-12 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-lg shrink-0"><i class="${item.icon}"></i></div>`;
-
-            return `
-              <button
-                type="button"
-                onclick="selectFlowDocument('${item.docType.replace(/'/g, "\\'")}')"
-                class="p-4 rounded-2xl border ${item.accent.border} bg-gradient-to-br ${item.accent.tint} hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
-                ${thumbHtml}
-                <div class="min-w-0 flex-1 space-y-1">
-                  <div class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
-                    <span>${item.category}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>${item.countryName}</span>
-                  </div>
-                  <div class="text-sm font-extrabold text-[#0d2658] leading-snug truncate">${item.name}</div>
-                  <div class="text-[11px] text-slate-600 line-clamp-2 leading-snug">${item.description}</div>
-                  <div class="pt-1 inline-flex items-center gap-1.5 text-xs font-bold ${item.accent.arrow} group-hover:translate-x-0.5 transition-transform">
-                    <span>Open Live Editor</span>
-                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                  </div>
-                </div>
-              </button>
-            `;
-          }).join('');
-        }
-      }
-
-      if (promptEl) promptEl.classList.add('hidden');
+      workflowSelectedCountry = flowSelectedCountry;
+      if (!flowSelectedCountry) return;
       switchVerificationCountry(flowSelectedCountry, { silent: true });
+      renderWorkflowDocumentsGrid(flowSelectedCountry);
       if (options.advanceToDocs) {
-        goToFlowStep('documents');
+        setWorkflowViewStep('documents', options);
       }
     }
     window.handleFlowCountryChange = handleFlowCountryChange;
@@ -2690,37 +2824,35 @@ var $ = window.$ || (id => document.getElementById(id));
         ? docType
         : (configuredDocs[0] || '');
 
+      if (!workflowActiveAccount) {
+        workflowActiveAccount = currentVirtualAccount || 'paypal';
+      }
+      workflowSelectedCountry = countryKey || '';
+      workflowSelectedDoc = targetDoc;
+
       switchVerificationCountry(countryKey, { silent: true, preferredDocType: targetDoc });
       if (targetDoc) {
         switchVerificationDoc(targetDoc, true);
       }
       refreshActiveDocumentPreview(countryKey, targetDoc);
-      syncActiveWorkflowBar();
+      setWorkflowViewStep('editor', { noScroll: !options.scrollToEditor });
 
       const items = getCountryDocumentItems(countryKey);
       const activeItem = items.find(it => it.docType === targetDoc);
       if (!options.silent && activeItem) {
         showToast(`${activeItem.countryFlag} ${activeItem.name}`, `Live preview editor ready for ${activeItem.countryName}`);
       }
-
-      if (options.scrollToEditor) {
-        const targetView = activeItem && activeItem.viewId ? $(activeItem.viewId) : null;
-        const bar = $('active-editor-workflow-bar') || $('verification-workbench');
-        const scrollTarget = bar || targetView;
-        if (scrollTarget) {
-          scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
     }
     window.openCountryDocumentEditor = openCountryDocumentEditor;
 
     function selectFlowDocument(docType) {
-      if (!flowSelectedCountry) {
+      const countryKey = workflowSelectedCountry || flowSelectedCountry;
+      if (!countryKey) {
         showToast('Select Country First', 'Please choose a country from the drop-down list.');
         return;
       }
       closeAccountCountryFlow();
-      openCountryDocumentEditor(flowSelectedCountry, docType, { scrollToEditor: true });
+      openCountryDocumentEditor(countryKey, docType, { scrollToEditor: true });
     }
     window.selectFlowDocument = selectFlowDocument;
 
@@ -15582,6 +15714,18 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     function scrollToSection(id) {
+      if (id === 'hero-section') {
+        window.goToHomePage();
+        return;
+      }
+      if (id === 'our-virtual-accounts') {
+        setWorkflowViewStep('accounts');
+        return;
+      }
+      if (id === 'verification-workbench') {
+        openWorkflowDocumentsShortcut();
+        return;
+      }
       const el = $(id);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -16155,6 +16299,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       updateGhaPreview();
       updateEthPreview();
       switchVerificationCountry('somalia', { silent: true });
+      setWorkflowViewStep('home', { silent: true, noScroll: true });
     });
 
     // Explicit Window Bindings for all inline event handlers:
@@ -16163,6 +16308,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     if (typeof openAboutModal !== "undefined") window.openAboutModal = openAboutModal;
     if (typeof openContactModal !== "undefined") window.openContactModal = openContactModal;
     if (typeof selectVirtualAccount !== "undefined") window.selectVirtualAccount = selectVirtualAccount;
+    if (typeof setWorkflowViewStep !== "undefined") window.setWorkflowViewStep = setWorkflowViewStep;
+    if (typeof selectWorkflowAccount !== "undefined") window.selectWorkflowAccount = selectWorkflowAccount;
+    if (typeof openWorkflowDocumentsShortcut !== "undefined") window.openWorkflowDocumentsShortcut = openWorkflowDocumentsShortcut;
+    if (typeof renderWorkflowDocumentsGrid !== "undefined") window.renderWorkflowDocumentsGrid = renderWorkflowDocumentsGrid;
     if (typeof openAccountCountryFlow !== "undefined") window.openAccountCountryFlow = openAccountCountryFlow;
     if (typeof closeAccountCountryFlow !== "undefined") window.closeAccountCountryFlow = closeAccountCountryFlow;
     if (typeof goToFlowStep !== "undefined") window.goToFlowStep = goToFlowStep;
@@ -16313,8 +16462,8 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       <!-- Clean Single-Line Nav Links -->
       <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-[#1e3a6e]">
         <button type="button" onclick="goToHomePage(event)" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Home</button>
-        <button type="button" onclick="scrollToSection('our-virtual-accounts')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Virtual Accounts</button>
-        <button type="button" onclick="scrollToSection('verification-workbench')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Documents</button>
+        <button type="button" onclick="setWorkflowViewStep('accounts')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Virtual Accounts</button>
+        <button type="button" onclick="openWorkflowDocumentsShortcut()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Documents</button>
         <button type="button" onclick="openAboutModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">About Us</button>
         <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Support</button>
       </nav>
@@ -16332,13 +16481,13 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <span class="text-xs font-extrabold text-[#0f295c]">Account Updates</span>
               <span class="text-[10px] font-bold text-emerald-700">2 Ready</span>
             </div>
-            <button type="button" onclick="openAccountCountryFlow('paypal'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-blue-50/70 hover:bg-blue-100/70 transition-colors cursor-pointer">
+            <button type="button" onclick="setWorkflowViewStep('accounts'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-blue-50/70 hover:bg-blue-100/70 transition-colors cursor-pointer">
               <div class="text-xs font-bold text-[#0f295c]">KYC Verified Status Active</div>
               <div class="text-[11px] text-slate-600 mt-0.5">Select any virtual account &amp; country to load Passport, ID, Driver's License, Proof of Address &amp; Account.</div>
             </button>
-            <button type="button" onclick="switchVerificationDoc('proofofaccount'); scrollToSection('verification-workbench'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/70 transition-colors cursor-pointer">
+            <button type="button" onclick="setWorkflowViewStep('accounts'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/70 transition-colors cursor-pointer">
               <div class="text-xs font-bold text-emerald-900">Proof of Account PDF Ready</div>
-              <div class="text-[11px] text-slate-600 mt-0.5">Wise, Grey &amp; Revolut bank confirmation letters available now.</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">Select Wise, Grey, or Revolut virtual account to continue.</div>
             </button>
           </div>
         </div>
@@ -16354,11 +16503,11 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             <i class="fa-solid fa-chevron-down text-[10px] text-[#1e3a6e]"></i>
           </button>
           <div id="headerProfilePopover" class="hidden absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-blue-100 shadow-xl p-2 space-y-1 z-[150] text-xs font-semibold text-slate-700">
-            <button type="button" onclick="scrollToSection('our-virtual-accounts'); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-wallet text-blue-600 w-4"></i> Our Virtual Accounts
+            <button type="button" onclick="setWorkflowViewStep('accounts'); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-wallet text-blue-600 w-4"></i> Virtual Accounts
             </button>
-            <button type="button" onclick="scrollToSection('verification-workbench'); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-id-card text-emerald-600 w-4"></i> Document Workbench
+            <button type="button" onclick="openWorkflowDocumentsShortcut(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-id-card text-emerald-600 w-4"></i> Documents
             </button>
             <button type="button" onclick="openCryptoExchangesHub(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
               <i class="fa-brands fa-bitcoin text-amber-500 w-4"></i> Crypto Exchanges
@@ -16396,8 +16545,8 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           <span>Support</span>
         </button>
       </div>
-      <button type="button" onclick="scrollToSection('our-virtual-accounts'); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50/70 text-[#0f295c] font-bold text-xs border border-blue-200/70 cursor-pointer">
-        <span class="flex items-center gap-2"><i class="fa-solid fa-wallet text-blue-600"></i> Our Virtual Accounts</span>
+      <button type="button" onclick="setWorkflowViewStep('accounts'); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50/70 text-[#0f295c] font-bold text-xs border border-blue-200/70 cursor-pointer">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-wallet text-blue-600"></i> Virtual Accounts</span>
         <span>PayPal · Wise · Payoneer</span>
       </button>
     </div>
@@ -16425,6 +16574,8 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     </svg>
 
     <div class="max-w-6xl mx-auto relative z-10 space-y-8">
+      <!-- ================= CLEAN HOMEPAGE HERO + KYC BANNER ================= -->
+      <div id="homepage-hero-content" class="space-y-8">
       <!-- Hero Split: Bold Headline Left + Glowing Digital Globe & Currency Orbs Right -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         <div class="lg:col-span-7 space-y-4 text-center lg:text-left">
@@ -16535,7 +16686,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               Your account is fully verified and ready to use.
             </p>
             <div class="pt-2">
-              <button type="button" onclick="scrollToSection('our-virtual-accounts')" class="kyc-green-pill inline-flex items-center gap-2 px-7 py-2.5 rounded-full text-white font-bold text-sm transition-transform hover:-translate-y-0.5 cursor-pointer">
+              <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill inline-flex items-center gap-2 px-7 py-2.5 rounded-full text-white font-bold text-sm transition-transform hover:-translate-y-0.5 cursor-pointer">
                 <span>View Details</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
               </button>
@@ -16543,9 +16694,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </div>
         </div>
       </div>
+      </div>
 
-      <!-- ================= OUR VIRTUAL ACCOUNTS SECTION ================= -->
-      <div id="our-virtual-accounts" class="pt-4 space-y-6">
+      <!-- ================= OUR VIRTUAL ACCOUNTS SECTION (VISIBLE ON HOMEPAGE DASHBOARD) ================= -->
+      <div id="our-virtual-accounts" class="pt-2 space-y-6">
         <div class="flex items-center gap-3.5">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white flex items-center justify-center text-xl shadow-md shadow-blue-600/25 shrink-0">
             <i class="fa-solid fa-wallet"></i>
@@ -16561,37 +16713,43 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         <!-- Row 1: 3 Primary Virtual Account Cards (PayPal, Wise, Payoneer) -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
           <!-- 1. PayPal -->
-          <div onclick="openAccountCountryFlow('paypal')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('paypal')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
+          <div data-va-card="paypal" onclick="selectWorkflowAccount('paypal')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('paypal')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
             <div class="h-14 flex items-center justify-center">
               <svg viewBox="0 0 64 64" class="w-14 h-14" aria-hidden="true">
                 <path d="M24 12h17c8.5 0 13.5 4.2 12.2 12.4-1.2 8-7.4 12.6-16 12.6h-5.8l-2.6 15H17L24 12Z" fill="#003087"/>
                 <path d="M29.5 22h15c7.2 0 11.4 3.6 10.3 10.6-1 6.8-6.3 10.8-13.5 10.8h-5l-2.2 12.6H23.5L29.5 22Z" fill="#0079C1" opacity="0.92"/>
               </svg>
             </div>
-            <div class="text-lg font-extrabold text-[#0d2658]">PayPal</div>
-            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('paypal');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
+            <div class="space-y-1">
+              <div class="text-lg font-extrabold text-[#0d2658]">PayPal</div>
+              <div class="text-xs text-[#47608e]">Personal &amp; Business Global Wallet</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('paypal');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
           </div>
 
           <!-- 2. Wise -->
-          <div onclick="openAccountCountryFlow('wise')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('wise')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
+          <div data-va-card="wise" onclick="selectWorkflowAccount('wise')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('wise')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
             <div class="h-14 flex items-center justify-center gap-2">
               <svg viewBox="0 0 40 40" class="w-9 h-9" aria-hidden="true">
                 <path d="M12 8h22l-5 8h6l-16 16 4-11H11l5-6-4-7Z" fill="#16a34a"/>
               </svg>
               <span class="text-2xl font-black tracking-tight text-[#163300]">WISE</span>
             </div>
-            <div class="text-lg font-extrabold text-[#0d2658]">Wise</div>
-            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('wise');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
+            <div class="space-y-1">
+              <div class="text-lg font-extrabold text-[#0d2658]">Wise</div>
+              <div class="text-xs text-[#47608e]">Multi-Currency Local Routing</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('wise');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
           </div>
 
           <!-- 3. Payoneer -->
-          <div onclick="openAccountCountryFlow('payoneer')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('payoneer')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
+          <div data-va-card="payoneer" onclick="selectWorkflowAccount('payoneer')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('payoneer')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
             <div class="h-14 flex items-center justify-center">
               <svg viewBox="0 0 64 64" class="w-14 h-14" aria-hidden="true">
                 <defs>
@@ -16606,8 +16764,11 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 <circle cx="32" cy="32" r="20" fill="none" stroke="url(#payoRing)" stroke-width="7"/>
               </svg>
             </div>
-            <div class="text-lg font-extrabold text-[#0d2658]">Payoneer</div>
-            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('payoneer');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
+            <div class="space-y-1">
+              <div class="text-lg font-extrabold text-[#0d2658]">Payoneer</div>
+              <div class="text-xs text-[#47608e]">Global Receiving &amp; Marketplace Payouts</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('payoneer');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
@@ -16617,7 +16778,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         <!-- Row 2: 4 Platform Cards (Binance, Paxum, Bybit, Raenest Account) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           <!-- 4. Binance -->
-          <div onclick="openAccountCountryFlow('binance')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('binance')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+          <div data-va-card="binance" onclick="selectWorkflowAccount('binance')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('binance')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
             <div class="h-12 flex items-center justify-center">
               <svg viewBox="0 0 64 64" class="w-12 h-12" aria-hidden="true">
                 <g fill="#F0B90B">
@@ -16629,50 +16790,62 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 </g>
               </svg>
             </div>
-            <div class="text-base font-extrabold text-[#0d2658]">Binance</div>
-            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('binance');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">Binance</div>
+              <div class="text-[11px] text-[#47608e]">Crypto Exchange &amp; P2P Gateway</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('binance');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </button>
           </div>
 
           <!-- 5. Paxum -->
-          <div onclick="openAccountCountryFlow('paxum')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('paxum')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+          <div data-va-card="paxum" onclick="selectWorkflowAccount('paxum')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('paxum')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
             <div class="h-12 flex items-center justify-center">
               <svg viewBox="0 0 64 64" class="w-12 h-12" aria-hidden="true">
                 <path d="M18 12h19c8 0 13 4.5 13 11.5S45 35 37 35H28v17H18V12Zm10 15h8c3.2 0 5-1.5 5-3.5s-1.8-3.5-5-3.5h-8v7Z" fill="#0056B3"/>
                 <path d="M22 20h17c6.8 0 11 3.8 11 9.8 0 6-4.2 9.8-11 9.8h-7v12.4h-10V20Z" fill="#0ea5e9" opacity="0.65"/>
               </svg>
             </div>
-            <div class="text-base font-extrabold text-[#0d2658]">Paxum</div>
-            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('paxum');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">Paxum</div>
+              <div class="text-[11px] text-[#47608e]">Global eWallet &amp; Mass Payouts</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('paxum');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </button>
           </div>
 
           <!-- 6. Bybit -->
-          <div onclick="openAccountCountryFlow('bybit')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('bybit')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+          <div data-va-card="bybit" onclick="selectWorkflowAccount('bybit')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('bybit')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
             <div class="h-12 flex items-center justify-center">
               <span class="text-2xl font-black tracking-tight text-[#0f172a]">BYB<span class="text-[#F7A600]">I</span>T</span>
             </div>
-            <div class="text-base font-extrabold text-[#0d2658]">Bybit</div>
-            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('bybit');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">Bybit</div>
+              <div class="text-[11px] text-[#47608e]">Global Crypto &amp; Fiat Desk</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('bybit');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </button>
           </div>
 
           <!-- 7. Raenest Account -->
-          <div onclick="openAccountCountryFlow('raenest')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('raenest')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+          <div data-va-card="raenest" onclick="selectWorkflowAccount('raenest')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('raenest')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
             <div class="h-12 flex items-center justify-center">
               <svg viewBox="0 0 64 64" class="w-12 h-12" aria-hidden="true">
                 <path d="M18 14h21c7 0 11 4 11 10 0 5-3 8.5-8.5 9.8L51 50h-9.5l-8.5-14h-6v14h-9V14Zm9 15h10c3 0 4.5-1.5 4.5-4s-1.5-4-4.5-4H27v8Z" fill="#0284c7"/>
                 <path d="M18 33l16-14h10L24 39V33Z" fill="#2563eb"/>
               </svg>
             </div>
-            <div class="text-base font-extrabold text-[#0d2658]">Raenest Account</div>
-            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('raenest');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">Raenest Account</div>
+              <div class="text-[11px] text-[#47608e]">Freelance USD / GBP / EUR</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('raenest');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </button>
@@ -16682,163 +16855,72 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         <!-- Additional Supported Platforms Strip -->
         <div class="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
           <span class="text-[#47608e] font-semibold mr-1">More Platforms:</span>
-          <button type="button" onclick="openAccountCountryFlow('grey')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Grey Account</button>
-          <button type="button" onclick="openAccountCountryFlow('revolut')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Revolut</button>
-          <button type="button" onclick="openAccountCountryFlow('mercury')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Mercury Bank</button>
-          <button type="button" onclick="openAccountCountryFlow('elevate')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Elevate Pay</button>
-          <button type="button" onclick="openAccountCountryFlow('okx')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">OKX</button>
-          <button type="button" onclick="openAccountCountryFlow('kucoin')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">KuCoin</button>
-          <button type="button" onclick="openAccountCountryFlow('stripe')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Stripe</button>
+          <button type="button" data-va-card="grey" onclick="selectWorkflowAccount('grey')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Grey Account</button>
+          <button type="button" data-va-card="revolut" onclick="selectWorkflowAccount('revolut')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Revolut</button>
+          <button type="button" data-va-card="mercury" onclick="selectWorkflowAccount('mercury')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Mercury Bank</button>
+          <button type="button" data-va-card="elevate" onclick="selectWorkflowAccount('elevate')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Elevate Pay</button>
+          <button type="button" data-va-card="okx" onclick="selectWorkflowAccount('okx')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">OKX</button>
+          <button type="button" data-va-card="kucoin" onclick="selectWorkflowAccount('kucoin')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">KuCoin</button>
+          <button type="button" data-va-card="stripe" onclick="selectWorkflowAccount('stripe')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Stripe</button>
         </div>
       </div>
     </div>
   </section>
 
 
-  <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH ================= -->
-  <section id="verification-workbench" class="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
-    <div class="max-w-7xl mx-auto space-y-8">
-      
-      <!-- Section Header -->
-      <div class="text-center max-w-3xl mx-auto space-y-2">
-        <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-700">
-          <i class="fa-solid fa-unlock-keyhole text-blue-600"></i>
-          UNLOCK YOUR ACCESS TO VIRTUAL BANKING &amp; CRYPTO EXCHANGES
-        </span>
-        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
-          Unlock Your Access to Virtual Banking &amp; Crypto Exchanges
-        </h2>
-        <p class="text-slate-600 text-xs sm:text-sm">
-          Select your target virtual banking platform below, choose your required document type and country, and generate authentic, inspection-ready verification credentials.
-        </p>
+  <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH (HIDDEN ON HOMEPAGE) ================= -->
+  <section id="verification-workbench" class="hidden py-10 lg:py-14 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+      <!-- Legacy Header & Step 1 Preserved Hidden for DOM Hook Compatibility -->
+      <div id="wb-legacy-step1-accounts" class="hidden" aria-hidden="true">
+        <span id="active-account-badge">PayPal Selected</span>
+        <div class="hidden">
+          <button type="button" onclick="selectVirtualAccount('paypal', { openCountryFlow: true })" id="btn-va-paypal" class="va-select-btn">PayPal</button>
+          <button type="button" onclick="selectVirtualAccount('payoneer', { openCountryFlow: true })" id="btn-va-payoneer" class="va-select-btn">Payoneer</button>
+          <button type="button" onclick="selectVirtualAccount('raenest', { openCountryFlow: true })" id="btn-va-raenest" class="va-select-btn">Raenest</button>
+          <button type="button" onclick="selectVirtualAccount('grey', { openCountryFlow: true })" id="btn-va-grey" class="va-select-btn">Grey</button>
+          <button type="button" onclick="selectVirtualAccount('mercury', { openCountryFlow: true })" id="btn-va-mercury" class="va-select-btn">Mercury</button>
+          <button type="button" onclick="selectVirtualAccount('wise', { openCountryFlow: true })" id="btn-va-wise" class="va-select-btn">Wise</button>
+          <button type="button" onclick="selectVirtualAccount('revolut', { openCountryFlow: true })" id="btn-va-revolut" class="va-select-btn">Revolut</button>
+          <button type="button" onclick="selectVirtualAccount('elevate', { openCountryFlow: true })" id="btn-va-elevate" class="va-select-btn">Elevate</button>
+        </div>
       </div>
 
-      <!-- Step 1: Select Virtual Account (PayPal, Payoneer, Raenest, Grey, etc.) -->
-      <div class="bg-slate-50/90 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
-            Select Virtual Account Platform:
-          </span>
+      <!-- STEP 2: COUNTRY SELECTION PANEL (SHOWN ONLY AFTER SELECTING A VIRTUAL ACCOUNT) -->
+      <div id="wb-step-country-panel" class="hidden max-w-3xl mx-auto bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
           <div class="flex flex-wrap items-center gap-2">
-            <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'accounts', countryKey: currentCountry, preserveCountry: true })" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-slate-200 hover:border-blue-300 text-[#0d2658] inline-flex items-center gap-1.5 transition-colors cursor-pointer">
-              <i class="fa-solid fa-layer-group text-blue-600 text-[11px]"></i>
-              <span>All 14 Platforms</span>
+            <button type="button" onclick="setWorkflowViewStep('accounts')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-[#0d2658] text-xs font-bold transition-colors cursor-pointer">
+              <i class="fa-solid fa-arrow-left text-[10px] text-blue-600"></i>
+              <span>Back to Virtual Accounts</span>
             </button>
-            <span id="active-account-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#003087] text-white flex items-center gap-1.5 shadow-xs">
-              <i class="fa-brands fa-paypal"></i>
-              <span>PayPal Selected</span>
-            </span>
+            <button type="button" onclick="goToHomePage(event)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-600 text-xs font-semibold transition-colors cursor-pointer">
+              <i class="fa-solid fa-house text-[10px]"></i>
+              <span>Home</span>
+            </button>
+          </div>
+          <span class="text-xs font-bold text-[#0d2658] bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
+            Step 2 of 4 · Select Country
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div id="wbCountryPlatformIconWrap" class="w-11 h-11 rounded-xl bg-[#003087] text-white flex items-center justify-center shrink-0 shadow-xs">
+            <i id="wbCountryPlatformIcon" class="fa-brands fa-paypal text-lg"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-semibold text-slate-500">Selected Virtual Account</div>
+            <div id="wbCountryPlatformName" class="text-base font-extrabold text-[#0d2658] truncate">PayPal</div>
+            <div id="wbCountryPlatformMeta" class="text-xs text-slate-600 truncate">Select your issuing country below</div>
           </div>
         </div>
 
-        <!-- Virtual Accounts Selector Tabs / Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-          <!-- 1. PayPal -->
-          <button type="button" onclick="selectVirtualAccount('paypal', { openCountryFlow: true })" id="btn-va-paypal" class="va-select-btn p-2.5 rounded-xl border-2 border-[#003087] bg-blue-50/70 text-[#003087] text-left transition-all cursor-pointer shadow-xs">
-            <div class="w-7 h-7 rounded-lg bg-[#003087] text-white flex items-center justify-center text-xs mb-1">
-              <i class="fa-brands fa-paypal"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">PayPal</div>
-            <div class="text-[9px] text-slate-500 font-semibold">USD Personal</div>
-          </button>
+        <p id="platform-kyc-tip" class="text-xs text-slate-600 leading-relaxed">
+          Search and select your country from the drop-down list to view available verification documents.
+        </p>
 
-          <!-- 2. Payoneer -->
-          <button type="button" onclick="selectVirtualAccount('payoneer', { openCountryFlow: true })" id="btn-va-payoneer" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-[#FF4800] text-white flex items-center justify-center text-xs mb-1">
-              <i class="fa-solid fa-credit-card"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">Payoneer</div>
-            <div class="text-[9px] text-slate-500 font-semibold">USD Bank ABA</div>
-          </button>
-
-          <!-- 3. Raenest -->
-          <button type="button" onclick="selectVirtualAccount('raenest', { openCountryFlow: true })" id="btn-va-raenest" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-[#059669] text-white flex items-center justify-center text-xs mb-1">
-              <i class="fa-solid fa-briefcase"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">Raenest</div>
-            <div class="text-[9px] text-slate-500 font-semibold">Freelance USD</div>
-          </button>
-
-          <!-- 4. Grey Account -->
-          <button type="button" onclick="selectVirtualAccount('grey', { openCountryFlow: true })" id="btn-va-grey" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-slate-900 text-amber-300 flex items-center justify-center text-xs mb-1">
-              <i class="fa-solid fa-landmark"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">Grey</div>
-            <div class="text-[9px] text-slate-500 font-semibold">EUR/USD IBAN</div>
-          </button>
-
-          <!-- 5. Mercury Bank -->
-          <button type="button" onclick="selectVirtualAccount('mercury', { openCountryFlow: true })" id="btn-va-mercury" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-[#4F46E5] text-white flex items-center justify-center text-xs mb-1">
-              <i class="fa-solid fa-building-columns"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">Mercury</div>
-            <div class="text-[9px] text-slate-500 font-semibold">US LLC Bank</div>
-          </button>
-
-          <!-- 6. Wise -->
-          <button type="button" onclick="selectVirtualAccount('wise', { openCountryFlow: true })" id="btn-va-wise" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-[#16A34A] text-white flex items-center justify-center text-xs mb-1">
-              <i class="fa-solid fa-globe"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">Wise</div>
-            <div class="text-[9px] text-slate-500 font-semibold">Multi-Cur.</div>
-          </button>
-
-          <!-- 7. Revolut -->
-          <button type="button" onclick="selectVirtualAccount('revolut', { openCountryFlow: true })" id="btn-va-revolut" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-[#0075EB] text-white flex items-center justify-center text-xs mb-1">
-              <i class="fa-solid fa-arrow-trend-up"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">Revolut</div>
-            <div class="text-[9px] text-slate-500 font-semibold">Global IBAN</div>
-          </button>
-
-          <!-- 8. Elevate Pay -->
-          <button type="button" onclick="selectVirtualAccount('elevate', { openCountryFlow: true })" id="btn-va-elevate" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
-            <div class="w-7 h-7 rounded-lg bg-[#0D9488] text-white flex items-center justify-center text-xs mb-1">
-              <i class="fa-solid fa-coins"></i>
-            </div>
-            <div class="font-black text-xs text-slate-900 leading-tight">Elevate</div>
-            <div class="text-[9px] text-slate-500 font-semibold">USD Remote</div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 2: Document Type & Country Selection Bar -->
-      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-        <!-- Section Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-100">
-          <div>
-            <span class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-              <span class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-black shadow-xs">2</span>
-              Required Verification Document &amp; Country:
-            </span>
-            <p id="platform-kyc-tip" class="text-xs text-slate-500 mt-1">
-              Select government-issued Passport or National Identity Card specimen with high-tier compliance matching your target platform.
-            </p>
-          </div>
-          <div class="flex items-center gap-2 text-[11px] font-bold text-slate-500">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold">
-              <i class="fa-solid fa-circle-check text-emerald-600"></i> High Acceptance Tier
-            </span>
-          </div>
-        </div>
-
-        <!-- Document Type Color Cards: Passport vs National Identity Card -->
-        <div>
-          <div class="flex items-center justify-between mb-3">
-            <label class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-              <i class="fa-solid fa-id-card-clip text-slate-400"></i>
-              Select Document Specimen:
-            </label>
-            <span class="text-[11px] font-medium text-slate-400">Tap card to switch preview</span>
-          </div>
-
-          <div id="workbench-doc-tabs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
+          <div id="workbench-doc-tabs-grid" class="hidden" aria-hidden="true">
             <!-- 1. PASSPORT COLOR CARD (Deep Emerald Green & Gold) -->
             <button type="button" id="tab-doc-passport" onclick="switchVerificationDoc('passport')" class="doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group">
               <div class="flex items-start justify-between gap-3">
@@ -16980,108 +17062,46 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
           </div>
 
-          <!-- Empty State if selected country has no configured documents -->
-          <div id="wb-doc-tabs-empty" class="hidden mt-4 p-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-center space-y-2">
-            <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center mx-auto">
-              <i class="fa-solid fa-folder-open"></i>
-            </div>
-            <div class="text-sm font-extrabold text-[#0d2658]">No documents are currently available for this country</div>
-            <p class="text-xs text-slate-500 max-w-md mx-auto">Please choose another issuing country from the dropdown below to view available document templates.</p>
-          </div>
-
-          <!-- Proof of Account Provider Selector (Shown when Proof of Account is selected) -->
-          <div id="poa-step2-account-selector" class="hidden mt-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/90 space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <span class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-file-invoice-dollar text-slate-900"></i>
-                Select Proof of Account Provider (Grey Account, Wise Account, Revolut):
-              </span>
-              <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">Live Preview Editor Active</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <!-- 1. Grey Account -->
-              <button type="button" id="poa-step2-btn-grey" onclick="switchPoaProvider('grey')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-slate-950 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-                    GREY
-                  </div>
-                  <div>
-                    <div class="text-xs sm:text-sm font-black text-slate-900">Grey Account</div>
-                    <div class="text-[10px] font-semibold text-slate-500">Community Federal Savings Bank · USD</div>
-                  </div>
-                </div>
-                <div id="poa-step2-radio-grey" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0">
-                  <i class="fa-solid fa-check"></i>
-                </div>
-              </button>
-
-              <!-- 2. Wise Account -->
-              <button type="button" id="poa-step2-btn-wise" onclick="switchPoaProvider('wise')" class="p-3.5 rounded-2xl border-2 border-[#163300] bg-gradient-to-br from-[#9fe870]/25 via-white to-emerald-50/40 ring-2 ring-[#163300]/15 shadow-md text-left transition-all cursor-pointer flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-[#163300] text-[#9fe870] flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-                    WISE
-                  </div>
-                  <div>
-                    <div class="text-xs sm:text-sm font-black text-slate-900">Wise Account</div>
-                    <div class="text-[10px] font-semibold text-[#163300]">Wise Payments Ltd · EUR IBAN &amp; SWIFT</div>
-                  </div>
-                </div>
-                <div id="poa-step2-radio-wise" class="w-6 h-6 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center text-xs shadow-xs shrink-0">
-                  <i class="fa-solid fa-check"></i>
-                </div>
-              </button>
-
-              <!-- 3. Revolut -->
-              <button type="button" id="poa-step2-btn-revolut" onclick="switchPoaProvider('revolut')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-[#0075EB] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">
-                    REV
-                  </div>
-                  <div>
-                    <div class="text-xs sm:text-sm font-black text-slate-900">Revolut</div>
-                    <div class="text-[10px] font-semibold text-slate-500">Revolut Bank UAB · Global IBAN</div>
-                  </div>
-                </div>
-                <div id="poa-step2-radio-revolut" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0">
-                  <i class="fa-solid fa-check"></i>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Searchable Issuing Country Dropdown (Single Source of Truth from Existing Countries) -->
-        <div>
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <label for="wbCountryDropdownBtn" class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-              <i class="fa-solid fa-earth-africa text-emerald-700"></i>
-              Select Issuing Country:
+          <!-- Searchable Issuing Country Dropdown (Single Source of Truth from Existing Countries) -->
+          <div class="space-y-4">
+            <label for="wbCountryDropdownBtn" class="block text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
+              Select Issuing Country
             </label>
-            <button type="button" id="universal-randomize-country-btn" onclick="randomizeActiveDocument()" class="px-4 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white rounded-2xl text-xs font-black tracking-wide transition-all flex items-center gap-2 shadow-lg shadow-indigo-700/25 border border-indigo-300/40 transform hover:-translate-y-0.5 cursor-pointer" title="Randomize whichever country document is currently active">
-              <i class="fa-solid fa-dice text-amber-300 text-sm"></i>
-              <span>Randomize Card</span>
-              <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
-            </button>
-          </div>
 
-          <div id="wbCountryDropdownRoot" class="relative max-w-xl">
-            <button type="button" id="wbCountryDropdownBtn" onclick="toggleSearchableCountryDropdown('wb')" aria-haspopup="listbox" aria-expanded="false" class="w-full px-4 py-3 rounded-2xl border-2 border-blue-200 bg-blue-50/40 hover:border-blue-400 focus:border-blue-600 focus:outline-none flex items-center justify-between gap-3 text-left transition-colors cursor-pointer">
-              <span class="flex items-center gap-3 min-w-0">
-                <span id="wbCountrySelectedFlag" class="text-2xl leading-none shrink-0">🇸🇴</span>
-                <span id="wbCountrySelectedName" class="text-sm font-extrabold text-[#0d2658] truncate">Somalia</span>
-              </span>
-              <span class="flex items-center gap-2.5 shrink-0">
-                <span id="wbCountryCountText" class="text-[11px] font-semibold text-slate-500"></span>
-                <i class="fa-solid fa-chevron-down text-xs text-blue-600"></i>
-              </span>
-            </button>
+            <div id="wbCountryDropdownRoot" class="relative">
+              <button type="button" id="wbCountryDropdownBtn" onclick="toggleSearchableCountryDropdown('wb')" aria-haspopup="listbox" aria-expanded="false" class="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200 bg-blue-50/40 hover:border-blue-400 focus:border-blue-600 focus:outline-none flex items-center justify-between gap-3 text-left transition-colors cursor-pointer">
+                <span class="flex items-center gap-3 min-w-0">
+                  <span id="wbCountrySelectedFlag" class="text-2xl leading-none shrink-0">🌍</span>
+                  <span id="wbCountrySelectedName" class="text-sm font-extrabold text-[#0d2658] truncate">-- Select your country --</span>
+                </span>
+                <span class="flex items-center gap-2.5 shrink-0">
+                  <span id="wbCountryCountText" class="text-[11px] font-semibold text-slate-500"></span>
+                  <i class="fa-solid fa-chevron-down text-xs text-blue-600"></i>
+                </span>
+              </button>
 
-            <div id="wbCountryDropdownMenu" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-blue-200 shadow-2xl z-[80] overflow-hidden">
-              <div class="relative border-b border-slate-100 bg-slate-50">
-                <i class="fa-solid fa-magnifying-glass text-xs text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                <input id="wbCountrySearchInput" type="text" placeholder="Search country..." autocomplete="off" oninput="renderSearchableCountryOptions('wb', this.value)" onkeydown="handleCountrySearchKeydown(event, 'wb')" class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-[#0d2658] bg-transparent focus:outline-none focus:bg-white">
+              <div id="wbCountryDropdownMenu" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-blue-200 shadow-2xl z-[80] overflow-hidden">
+                <div class="relative border-b border-slate-100 bg-slate-50">
+                  <i class="fa-solid fa-magnifying-glass text-xs text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                  <input id="wbCountrySearchInput" type="text" placeholder="Search country..." autocomplete="off" oninput="renderSearchableCountryOptions('wb', this.value)" onkeydown="handleCountrySearchKeydown(event, 'wb')" class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-[#0d2658] bg-transparent focus:outline-none focus:bg-white">
+                </div>
+                <div id="wbCountryOptionsList" role="listbox" class="max-h-72 overflow-y-auto p-1.5 space-y-0.5"></div>
               </div>
-              <div id="wbCountryOptionsList" role="listbox" class="max-h-72 overflow-y-auto p-1.5 space-y-0.5"></div>
+            </div>
+
+            <div id="wbCountrySelectPrompt" class="rounded-2xl border border-dashed border-blue-200 bg-[#f6fbff] p-5 text-center space-y-1.5">
+              <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto">
+                <i class="fa-solid fa-earth-africa"></i>
+              </div>
+              <p class="text-xs font-bold text-[#0d2658]">Search and select a country above to view its configured documents</p>
+              <p class="text-[11px] text-slate-500">Only the verification documents already configured in your website for that country will appear next.</p>
+            </div>
+
+            <div class="flex items-center justify-end">
+              <button type="button" id="wbCountryContinueBtn" onclick="setWorkflowViewStep('documents')" class="hidden items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-extrabold shadow-sm transition-colors cursor-pointer">
+                <span id="wbCountryContinueLabel">Continue to Documents</span>
+                <i class="fa-solid fa-arrow-right text-[11px]"></i>
+              </button>
             </div>
           </div>
 
@@ -17342,6 +17362,57 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         </div>
       </div>
 
+      <!-- STEP 3: COUNTRY-SPECIFIC DOCUMENT LIST PANEL (SHOWN ONLY AFTER SELECTING A COUNTRY) -->
+      <div id="wb-step-documents-panel" class="hidden max-w-5xl mx-auto bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="setWorkflowViewStep('country')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-[#0d2658] text-xs font-bold transition-colors cursor-pointer">
+              <i class="fa-solid fa-arrow-left text-[10px] text-blue-600"></i>
+              <span>Back to Country Selection</span>
+            </button>
+            <button type="button" onclick="setWorkflowViewStep('accounts')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-700 text-xs font-semibold transition-colors cursor-pointer">
+              <i class="fa-solid fa-wallet text-[10px] text-blue-600"></i>
+              <span>Change Virtual Account</span>
+            </button>
+            <button type="button" onclick="goToHomePage(event)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-600 text-xs font-semibold transition-colors cursor-pointer">
+              <i class="fa-solid fa-house text-[10px]"></i>
+              <span>Home</span>
+            </button>
+          </div>
+          <span class="text-xs font-bold text-[#0d2658] bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
+            Step 3 of 4 · Select Document
+          </span>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <span id="wbDocsCountryFlag" class="text-3xl leading-none shrink-0">🌍</span>
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-slate-500">
+                <span id="wbDocsPlatformName">PayPal</span> · Available Document Templates
+              </div>
+              <h3 id="wbDocsCountryName" class="text-lg font-extrabold text-[#0d2658] truncate">Country</h3>
+            </div>
+          </div>
+          <span id="wbDocsCountLabel" class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl shrink-0">0 templates</span>
+        </div>
+
+        <div id="wb-country-documents-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+        <!-- Empty State if selected country has no configured documents -->
+        <div id="wb-doc-tabs-empty" class="hidden p-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center mx-auto text-lg">
+            <i class="fa-regular fa-folder-open"></i>
+          </div>
+          <div class="text-base font-extrabold text-[#0d2658]">No documents are currently available for <span id="wbNoDocsCountryName">this country</span></div>
+          <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">Please go back and select another issuing country to view available document templates.</p>
+          <button type="button" onclick="setWorkflowViewStep('country')" class="px-4 py-2 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+            <span>Back to Country Selection</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Instant Focus-Loss / Screenshot Shortcut Privacy Shield Notice -->
       <div id="kyc-focus-blur-banner" class="fixed inset-0 z-[105] pointer-events-none items-center justify-center p-4">
         <div class="max-w-md w-full rounded-2xl bg-slate-950/95 border border-amber-500/50 p-5 text-center shadow-2xl backdrop-blur-md">
@@ -17356,8 +17427,8 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         </div>
       </div>
 
-      <!-- Active Workflow Navigation & Back Controls Bar -->
-      <div id="active-editor-workflow-bar" class="no-print bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- STEP 4: ACTIVE LIVE EDITOR WORKFLOW BAR & BACK CONTROLS (SHOWN ONLY IN LIVE EDITOR) -->
+      <div id="active-editor-workflow-bar" class="hidden no-print bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
           <span class="inline-flex items-center gap-1.5 font-extrabold text-[#0d2658] bg-white border border-slate-200 px-2.5 py-1 rounded-xl">
             <i id="wbBarPlatformIcon" class="fa-brands fa-paypal text-xs text-blue-600"></i>
@@ -17365,25 +17436,76 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </span>
           <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
           <span class="inline-flex items-center gap-1.5 font-bold text-[#0d2658] bg-white border border-slate-200 px-2.5 py-1 rounded-xl">
-            <span id="wbBarCountryFlag" class="text-base leading-none">🇸🇴</span>
-            <span id="wbBarCountryName">Somalia</span>
+            <span id="wbBarCountryFlag" class="text-base leading-none">🌍</span>
+            <span id="wbBarCountryName">Country</span>
           </span>
           <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
-          <span id="wbBarDocName" class="font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl">Somalia Biometric e-Passport</span>
+          <span id="wbBarDocName" class="font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl">Document Editor</span>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'documents', countryKey: currentCountry, preserveCountry: true })" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-[#0d2658] text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+          <button type="button" onclick="setWorkflowViewStep('documents')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-[#0d2658] text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
             <i class="fa-solid fa-arrow-left text-[10px] text-blue-600"></i>
-            <span id="wbBackToDocsLabel">Back to Somalia Documents</span>
+            <span id="wbBackToDocsLabel">Back to Documents</span>
           </button>
-          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'country', countryKey: currentCountry, preserveCountry: true })" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+          <button type="button" onclick="setWorkflowViewStep('country')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
             <i class="fa-solid fa-earth-africa text-[11px] text-emerald-700"></i>
             <span>Change Country</span>
           </button>
-          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'accounts', countryKey: currentCountry, preserveCountry: true })" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+          <button type="button" onclick="setWorkflowViewStep('accounts')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
             <i class="fa-solid fa-wallet text-[11px] text-blue-600"></i>
             <span>Change Account</span>
+          </button>
+          <button type="button" id="universal-randomize-country-btn" onclick="randomizeActiveDocument()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer" title="Randomize active document fields">
+            <i class="fa-solid fa-dice text-amber-300 text-[11px]"></i>
+            <span>Randomize</span>
+          </button>
+          <button type="button" onclick="goToHomePage(event)" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-600 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+            <i class="fa-solid fa-house text-[10px]"></i>
+            <span>Home</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Proof of Account Provider Selector (Shown ONLY when Proof of Account editor is active) -->
+      <div id="poa-step2-account-selector" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-file-invoice-dollar text-slate-900"></i>
+            Select Proof of Account Provider (Grey Account, Wise Account, Revolut):
+          </span>
+          <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">Live Preview Editor Active</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <button type="button" id="poa-step2-btn-grey" onclick="switchPoaProvider('grey')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-950 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">GREY</div>
+              <div>
+                <div class="text-xs sm:text-sm font-black text-slate-900">Grey Account</div>
+                <div class="text-[10px] font-semibold text-slate-500">Community Federal Savings Bank · USD</div>
+              </div>
+            </div>
+            <div id="poa-step2-radio-grey" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0"><i class="fa-solid fa-check"></i></div>
+          </button>
+          <button type="button" id="poa-step2-btn-wise" onclick="switchPoaProvider('wise')" class="p-3.5 rounded-2xl border-2 border-[#163300] bg-gradient-to-br from-[#9fe870]/25 via-white to-emerald-50/40 ring-2 ring-[#163300]/15 shadow-md text-left transition-all cursor-pointer flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-[#163300] text-[#9fe870] flex items-center justify-center font-black text-xs shrink-0 shadow-xs">WISE</div>
+              <div>
+                <div class="text-xs sm:text-sm font-black text-slate-900">Wise Account</div>
+                <div class="text-[10px] font-semibold text-[#163300]">Wise Payments Ltd · EUR IBAN &amp; SWIFT</div>
+              </div>
+            </div>
+            <div id="poa-step2-radio-wise" class="w-6 h-6 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center text-xs shadow-xs shrink-0"><i class="fa-solid fa-check"></i></div>
+          </button>
+          <button type="button" id="poa-step2-btn-revolut" onclick="switchPoaProvider('revolut')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-[#0075EB] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">REV</div>
+              <div>
+                <div class="text-xs sm:text-sm font-black text-slate-900">Revolut</div>
+                <div class="text-[10px] font-semibold text-slate-500">Revolut Bank UAB · Global IBAN</div>
+              </div>
+            </div>
+            <div id="poa-step2-radio-revolut" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0"><i class="fa-solid fa-check"></i></div>
           </button>
         </div>
       </div>
@@ -17400,7 +17522,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </p>
         </div>
         <div class="pt-1 flex flex-wrap items-center justify-center gap-2.5">
-          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'country', countryKey: currentCountry, preserveCountry: true })" class="px-4 py-2 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-bold inline-flex items-center gap-2 cursor-pointer transition-colors">
+          <button type="button" onclick="setWorkflowViewStep('country')" class="px-4 py-2 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-bold inline-flex items-center gap-2 cursor-pointer transition-colors">
             <i class="fa-solid fa-arrow-left text-[11px]"></i>
             <span>Back to Country Selection</span>
           </button>
@@ -17408,7 +17530,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       </div>
 
       <!-- ================= STEP 3: EXACT KENYA REPUBLIC PASSPORT GENERATOR (1:1 REFERENCE MATCH) ================= -->
-      <div id="kenya-passport-view" class="block">
+      <div id="kenya-passport-view" class="hidden">
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
           <!-- Controls Form -->
           <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
@@ -28529,7 +28651,7 @@ COD REP DEM CONGO</div>
 
       <!-- Modal Footer -->
       <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-        <button onclick="switchVerificationDoc('idcard'); switchVerificationCountry('somalia'); closeCryptoExchangesHub(); scrollToSection('verification-workbench');" class="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer">
+        <button type="button" onclick="closeCryptoExchangesHub(); setWorkflowViewStep('accounts');" class="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer">
           <i class="fa-solid fa-passport"></i>
           <span>Prepare Somali ID / Passport for Exchange KYC &rarr;</span>
         </button>
@@ -28570,7 +28692,7 @@ COD REP DEM CONGO</div>
   </div>
 
   <!-- ================= WHY CHOOSE GETKYCAPPROVED & SUPPORT CTA BANNER ================= -->
-  <section class="no-print py-10 px-4 sm:px-6 lg:px-8 bg-white">
+  <section id="homepage-why-section" class="no-print py-10 px-4 sm:px-6 lg:px-8 bg-white">
     <div class="max-w-6xl mx-auto space-y-6">
       <!-- Why Choose GetKYCApproved? Strip -->
       <div class="kyc-why-strip rounded-3xl p-6 sm:p-7 space-y-5">
@@ -28637,7 +28759,7 @@ COD REP DEM CONGO</div>
           </div>
         </div>
 
-        <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount || 'paypal')" class="kyc-green-pill px-8 py-3 rounded-full text-[#052e16] font-extrabold text-sm inline-flex items-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer shrink-0">
+        <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill px-8 py-3 rounded-full text-[#052e16] font-extrabold text-sm inline-flex items-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer shrink-0">
           <span>Verify Your Accounts</span>
           <i class="fa-solid fa-arrow-right text-xs"></i>
         </button>
