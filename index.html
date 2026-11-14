@@ -16,16 +16,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script type="text/javascript" id="ogjs" src="https://apptrck.net/cl/js/n616e4"></script>
 
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: #ffffff;
-      color: #0f172a;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background: #f5f9ff;
+      color: #0f295c;
     }
     .font-mono-code {
       font-family: 'JetBrains Mono', monospace;
@@ -1034,6 +1034,55 @@
     #mwiOutAuthority { max-width: 28.0%; overflow: hidden; text-overflow: ellipsis; }
     #mwiOutExpiry { max-width: 28.5%; overflow: hidden; }
     #mwiMrzLine1, #mwiMrzLine2 { max-width: 90.0%; overflow: hidden; }
+
+    /* ================= GETKYCAPPROVED DASHBOARD THEME ================= */
+    .kyc-hero-surface {
+      background:
+        radial-gradient(circle at 82% 28%, rgba(56, 189, 248, 0.24) 0%, transparent 48%),
+        radial-gradient(circle at 15% 18%, rgba(191, 219, 254, 0.45) 0%, transparent 50%),
+        linear-gradient(180deg, #eff7ff 0%, #f7fbff 55%, #ffffff 100%);
+    }
+    .kyc-verified-banner {
+      background: linear-gradient(100deg, #0ba358 0%, #0d9488 38%, #106cd9 76%, #1648c4 100%);
+      box-shadow: 0 18px 36px -14px rgba(16, 108, 217, 0.42), 0 8px 16px -8px rgba(11, 163, 88, 0.28);
+    }
+    .kyc-va-card {
+      background: #ffffff;
+      border: 1px solid #e2ecfb;
+      box-shadow: 0 10px 26px -12px rgba(15, 41, 92, 0.14), 0 2px 6px rgba(15, 41, 92, 0.04);
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+    .kyc-va-card:hover {
+      transform: translateY(-3px);
+      border-color: #93c5fd;
+      box-shadow: 0 18px 32px -14px rgba(29, 78, 216, 0.22), 0 4px 10px rgba(15, 41, 92, 0.06);
+    }
+    .kyc-va-cta {
+      background: linear-gradient(180deg, #1a78f2 0%, #0d5bd9 100%);
+      box-shadow: 0 6px 14px -4px rgba(13, 91, 217, 0.45);
+    }
+    .kyc-va-cta:hover {
+      background: linear-gradient(180deg, #2583fc 0%, #1164e8 100%);
+    }
+    .kyc-why-strip {
+      background: linear-gradient(135deg, #edf6ff 0%, #f6fbff 52%, #e8f4ff 100%);
+      border: 1px solid #d7e8fc;
+      box-shadow: 0 10px 28px -16px rgba(15, 41, 92, 0.15);
+    }
+    .kyc-support-banner {
+      background: linear-gradient(95deg, #0b2458 0%, #123c8a 52%, #0e2e6d 100%);
+      box-shadow: 0 18px 34px -14px rgba(11, 36, 88, 0.48);
+    }
+    .kyc-green-pill {
+      background: linear-gradient(180deg, #54db54 0%, #24be3e 100%);
+      box-shadow: 0 8px 18px -6px rgba(36, 190, 62, 0.55);
+    }
+    .kyc-green-pill:hover {
+      background: linear-gradient(180deg, #62e562 0%, #28cc44 100%);
+    }
+    .kyc-wave-footer {
+      background: linear-gradient(180deg, #f3f9ff 0%, #e4f2ff 52%, #d8ecff 100%);
+    }
   </style>
 
   <script>
@@ -1873,6 +1922,25 @@ var $ = window.$ || (id => document.getElementById(id));
           'Proof of Business Entity / Tax ID',
           'Proof of Address'
         ]
+      },
+      paxum: {
+        name: 'Paxum',
+        category: 'Global eWallet & Creator Mass Payouts',
+        badge: 'Verified Global Payouts',
+        color: '#0066CC',
+        icon: 'fa-solid fa-p',
+        accType: 'Paxum Verified Personal & Business eWallet',
+        currency: 'USD, EUR, GBP, CAD, AUD',
+        kycLevel: 'Full ID & Address Verification',
+        limit: 'Global wire, EFT, and prepaid card payouts',
+        tip: 'Submit a valid International Passport or National ID Card along with matching Proof of Address.',
+        url: 'https://www.paxum.com',
+        kycReq: [
+          'Valid International Passport or National ID Card',
+          'Proof of Residential Address (Utility Bill or Bank Letter)',
+          'Matching Legal Name & Date of Birth',
+          'Selfie / Liveness Identity Confirmation'
+        ]
       }
     };
     if (typeof window !== 'undefined') window.platformData = platformData;
@@ -1916,6 +1984,125 @@ var $ = window.$ || (id => document.getElementById(id));
 
       showToast(`Selected ${meta.name}`, `Loaded document verification for ${meta.name}`);
     }
+
+    // Guided Account -> Country Dropdown -> Document Types Flow
+    const countryCatalog = [
+      { key: 'kenya', name: 'Kenya', flag: '🇰🇪', subtitle: 'Maisha Namba & E-Passport' },
+      { key: 'somalia', name: 'Somalia', flag: '🇸🇴', subtitle: 'National ID, E-Passport & Driver License' },
+      { key: 'ethiopia', name: 'Ethiopia', flag: '🇪🇹', subtitle: 'E-Passport & Fayda ID' },
+      { key: 'nigeria', name: 'Nigeria', flag: '🇳🇬', subtitle: 'National ID & E-Passport' },
+      { key: 'uk', name: 'United Kingdom', flag: '🇬🇧', subtitle: 'British Citizen Passport' },
+      { key: 'uganda', name: 'Uganda', flag: '🇺🇬', subtitle: 'National ID Card (NIRA)' },
+      { key: 'pakistan', name: 'Pakistan', flag: '🇵🇰', subtitle: 'National Identity Card (SNIC)' },
+      { key: 'senegal', name: 'Senegal', flag: '🇸🇳', subtitle: 'National ID Card & E-Passport' },
+      { key: 'southafrica', name: 'South Africa', flag: '🇿🇦', subtitle: 'Passport / Passeport (ZAF)' },
+      { key: 'usa', name: 'United States', flag: '🇺🇸', subtitle: 'U.S. Passport (USA)' },
+      { key: 'seychelles', name: 'Seychelles', flag: '🇸🇨', subtitle: 'National Identity Card' },
+      { key: 'drcongo', name: 'DR Congo', flag: '🇨🇩', subtitle: 'Passeport Biométrique (COD)' },
+      { key: 'bangladesh', name: 'Bangladesh', flag: '🇧🇩', subtitle: 'e-Passport (BGD)' },
+      { key: 'germany', name: 'Germany', flag: '🇩🇪', subtitle: 'Reisepass (Deutschland)' },
+      { key: 'canada', name: 'Canada', flag: '🇨🇦', subtitle: 'Passeport / Passport (CAN)' },
+      { key: 'ghana', name: 'Ghana', flag: '🇬🇭', subtitle: 'Passport / Passeport (GHA)' },
+      { key: 'rwanda', name: 'Rwanda', flag: '🇷🇼', subtitle: 'ID Card (Indangamuntu)' },
+      { key: 'nepal', name: 'Nepal', flag: '🇳🇵', subtitle: 'Passport (NPL)' },
+      { key: 'malawi', name: 'Malawi', flag: '🇲🇼', subtitle: 'Passport / Passeport (MWI)' },
+      { key: 'uae', name: 'United Arab Emirates', flag: '🇦🇪', subtitle: 'Resident ID Card' },
+      { key: 'turkey', name: 'Turkey', flag: '🇹🇷', subtitle: 'Pasaport & Kimlik Kartı' }
+    ];
+
+    let flowSelectedCountry = '';
+
+    function openAccountCountryFlow(accountKey) {
+      selectVirtualAccount(accountKey || 'paypal');
+      const meta = platformData[currentVirtualAccount] || platformData.paypal;
+
+      const titleEl = $('flowModalAccountTitle');
+      const subEl = $('flowModalAccountSub');
+      const iconWrap = $('flowModalIconWrap');
+      const iconEl = $('flowModalIcon');
+      const selectEl = $('flowCountrySelect');
+      const docsWrap = $('flowDocumentsSection');
+      const promptEl = $('flowSelectCountryPrompt');
+
+      if (titleEl) titleEl.textContent = meta.name;
+      if (subEl) subEl.textContent = `${meta.currency} · Select your country to unlock documents`;
+      if (iconWrap) iconWrap.style.backgroundColor = meta.color || '#003087';
+      if (iconEl) iconEl.className = `${meta.icon} text-xl text-white`;
+
+      flowSelectedCountry = '';
+      if (selectEl) {
+        selectEl.value = '';
+      }
+      if (docsWrap) {
+        docsWrap.classList.add('hidden');
+      }
+      if (promptEl) {
+        promptEl.classList.remove('hidden');
+      }
+
+      const modal = $('accountCountryFlowModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+    window.openAccountCountryFlow = openAccountCountryFlow;
+
+    function closeAccountCountryFlow() {
+      const modal = $('accountCountryFlowModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+    window.closeAccountCountryFlow = closeAccountCountryFlow;
+
+    function handleFlowCountryChange(countryKey) {
+      flowSelectedCountry = countryKey || '';
+      const docsWrap = $('flowDocumentsSection');
+      const promptEl = $('flowSelectCountryPrompt');
+      const countryLabel = $('flowChosenCountryLabel');
+
+      if (!flowSelectedCountry) {
+        if (docsWrap) docsWrap.classList.add('hidden');
+        if (promptEl) promptEl.classList.remove('hidden');
+        return;
+      }
+
+      const info = countryCatalog.find(c => c.key === flowSelectedCountry);
+      if (countryLabel && info) {
+        countryLabel.textContent = `${info.flag} ${info.name}`;
+      }
+      if (promptEl) promptEl.classList.add('hidden');
+      if (docsWrap) docsWrap.classList.remove('hidden');
+
+      switchVerificationCountry(flowSelectedCountry);
+    }
+    window.handleFlowCountryChange = handleFlowCountryChange;
+
+    function selectFlowDocument(docType) {
+      if (!flowSelectedCountry) {
+        showToast('Select Country First', 'Please choose a country from the drop-down list.');
+        return;
+      }
+      switchVerificationCountry(flowSelectedCountry);
+      switchVerificationDoc(docType);
+      closeAccountCountryFlow();
+      const wb = $('verification-workbench');
+      if (wb) {
+        wb.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    window.selectFlowDocument = selectFlowDocument;
+
+    function toggleHeaderMenuPopover(id) {
+      const target = $(id);
+      const otherId = id === 'headerNotifPopover' ? 'headerProfilePopover' : 'headerNotifPopover';
+      const other = $(otherId);
+      if (other) other.classList.add('hidden');
+      if (target) target.classList.toggle('hidden');
+    }
+    window.toggleHeaderMenuPopover = toggleHeaderMenuPopover;
 
     // Switch Document Type: 'passport' vs 'idcard' vs 'driverlicense' vs 'refugeecard'
     function switchVerificationDoc(docType) {
@@ -2725,6 +2912,11 @@ var $ = window.$ || (id => document.getElementById(id));
           }
         }
       });
+
+      const wbDropdown = $('workbenchCountrySelect');
+      if (wbDropdown && wbDropdown.value !== countryKey) {
+        wbDropdown.value = countryKey;
+      }
 
       renderActiveDocumentView();
       const countryNames = {
@@ -14745,7 +14937,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     window.addEventListener('DOMContentLoaded', () => {
       // Backdrop dismissal for modal dialogs
       window.addEventListener('click', (e) => {
-        const modalIds = ['welcomeModal', 'aboutModal', 'contactModal', 'privacyModal', 'termsModal', 'disclaimerModal', 'cookieModal', 'cryptoExchangesHubModal', 'kycPlatformModal'];
+        const modalIds = ['welcomeModal', 'aboutModal', 'contactModal', 'privacyModal', 'termsModal', 'disclaimerModal', 'cookieModal', 'cryptoExchangesHubModal', 'kycPlatformModal', 'accountCountryFlowModal'];
         modalIds.forEach(id => {
           const m = $(id);
           if (m && e.target === m) {
@@ -14757,26 +14949,28 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             }
           }
         });
+        const notifPop = $('headerNotifPopover');
+        const profilePop = $('headerProfilePopover');
+        const notifBtn = $('headerNotifBtn');
+        const profileBtn = $('headerProfileBtn');
+        if (notifPop && !notifPop.contains(e.target) && notifBtn && !notifBtn.contains(e.target)) {
+          notifPop.classList.add('hidden');
+        }
+        if (profilePop && !profilePop.contains(e.target) && profileBtn && !profileBtn.contains(e.target)) {
+          profilePop.classList.add('hidden');
+        }
       });
 
-      // Escape key dismissal for welcome popup and modals
+      // Escape key dismissal for modals
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+          closeAccountCountryFlow();
           const welcome = $('welcomeModal');
           if (welcome && !welcome.classList.contains('hidden')) {
             window.closeWelcomeModal();
           }
         }
       });
-
-      // Show welcome popup once per session shortly after load
-      try {
-        if (!sessionStorage.getItem('kyc_welcome_v2_shown')) {
-          setTimeout(() => {
-            window.openWelcomeModal();
-          }, 400);
-        }
-      } catch (err) {}
 
       filterHeroPlatforms('all');
       selectVirtualAccount('paypal');
@@ -15414,521 +15608,395 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-900">
 
-  <!-- ================= TOP NAVIGATION (CLEAN & RESPONSIVE MAIN MENU) ================= -->
-  <header id="mainHeader" class="no-print bg-white/98 backdrop-blur-md border-b border-slate-200 sticky top-0 z-[100] shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-24 sm:min-h-28 md:min-h-32 lg:min-h-36 py-2.5 sm:py-3 flex items-center justify-between gap-4">
-      <!-- Clean Brand Logo & Identity: GetKYCApproved -->
-      <a id="site-brand-logo-link" href="/" onclick="goToHomePage(event)" class="flex items-center gap-3 group cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
-        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-18 sm:h-24 md:h-28 lg:h-32 w-auto max-w-[280px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
-        <span class="hidden 2xl:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
-          <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
-          <span>VERIFIED</span>
-        </span>
+  <!-- ================= TOP NAVIGATION (GETKYCAPPROVED DASHBOARD HEADER) ================= -->
+  <header id="mainHeader" class="no-print sticky top-0 z-[100] bg-gradient-to-r from-[#eff7ff]/95 via-white/95 to-[#eaf4ff]/95 backdrop-blur-md border-b border-blue-100/80 shadow-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
+      <!-- Brand Logo -->
+      <a id="site-brand-logo-link" href="/" onclick="goToHomePage(event)" class="flex items-center gap-2.5 group cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
+        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-12 sm:h-14 w-auto max-w-[230px] sm:max-w-[280px] object-contain group-hover:opacity-95 transition-opacity">
       </a>
 
-      <!-- Desktop Main Menu: Home, About Us, Contact Us, Virtual Accounts, Crypto Exchanges -->
-      <nav class="hidden lg:flex items-center gap-1.5 font-semibold text-xs sm:text-sm text-slate-600">
-        <button onclick="goToHomePage(event)" class="px-3.5 py-2 rounded-lg text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer font-bold">
-          <i class="fa-solid fa-house text-xs text-blue-600"></i>
-          Home
-        </button>
-        <button onclick="openAboutModal()" class="px-3.5 py-2 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-circle-info text-xs text-slate-400"></i>
-          About Us
-        </button>
-        <button onclick="openContactModal()" class="px-3.5 py-2 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5 cursor-pointer">
-          <i class="fa-solid fa-headset text-xs text-emerald-600"></i>
-          Contact Us
-        </button>
-        <span class="w-px h-5 bg-slate-200 mx-1"></span>
-        <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench');" class="px-3 py-2 rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors flex items-center gap-1.5 font-bold border border-blue-200/60 cursor-pointer">
-          <i class="fa-solid fa-credit-card text-xs text-blue-600"></i>
-          Virtual Accounts
-        </button>
+      <!-- Clean Single-Line Nav Links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-[#1e3a6e]">
+        <button type="button" onclick="goToHomePage(event)" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Home</button>
+        <button type="button" onclick="scrollToSection('our-virtual-accounts')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Virtual Accounts</button>
+        <button type="button" onclick="scrollToSection('verification-workbench')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Documents</button>
+        <button type="button" onclick="openAboutModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">About Us</button>
+        <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Support</button>
       </nav>
 
-      <!-- Right Action & Mobile Controls -->
-      <div class="flex items-center gap-2">
+      <!-- Right Controls: Notification Bell (2) | User Avatar Dropdown & Mobile Menu -->
+      <div class="flex items-center gap-3 shrink-0 relative">
+        <!-- Notification Bell -->
+        <div class="relative">
+          <button type="button" id="headerNotifBtn" onclick="toggleHeaderMenuPopover('headerNotifPopover')" aria-label="Notifications" class="relative w-10 h-10 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#1e3a6e] flex items-center justify-center shadow-xs transition-colors cursor-pointer">
+            <i class="fa-regular fa-bell text-lg"></i>
+            <span class="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white">2</span>
+          </button>
+          <div id="headerNotifPopover" class="hidden absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-blue-100 shadow-xl p-3 space-y-2 z-[150]">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <span class="text-xs font-extrabold text-[#0f295c]">Account Updates</span>
+              <span class="text-[10px] font-bold text-emerald-700">2 Ready</span>
+            </div>
+            <button type="button" onclick="openAccountCountryFlow('paypal'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-blue-50/70 hover:bg-blue-100/70 transition-colors cursor-pointer">
+              <div class="text-xs font-bold text-[#0f295c]">KYC Verified Status Active</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">Select any virtual account &amp; country to load Passport, ID, Driver's License, Proof of Address &amp; Account.</div>
+            </button>
+            <button type="button" onclick="switchVerificationDoc('proofofaccount'); scrollToSection('verification-workbench'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/70 transition-colors cursor-pointer">
+              <div class="text-xs font-bold text-emerald-900">Proof of Account PDF Ready</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">Wise, Grey &amp; Revolut bank confirmation letters available now.</div>
+            </button>
+          </div>
+        </div>
 
-        <!-- Mobile Menu Hamburger Button -->
-        <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu" class="lg:hidden p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl border border-slate-200 cursor-pointer transition-colors flex items-center justify-center">
-          <i id="mobileMenuIcon" class="fa-solid fa-bars text-lg"></i>
+        <span class="hidden sm:block w-px h-6 bg-blue-200/80"></span>
+
+        <!-- Profile Avatar Dropdown -->
+        <div class="relative">
+          <button type="button" id="headerProfileBtn" onclick="toggleHeaderMenuPopover('headerProfilePopover')" aria-label="Account Menu" class="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-white border border-blue-100 hover:border-blue-300 shadow-xs transition-colors cursor-pointer">
+            <span class="w-8 h-8 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] text-white flex items-center justify-center text-sm shadow-inner">
+              <i class="fa-solid fa-user"></i>
+            </span>
+            <i class="fa-solid fa-chevron-down text-[10px] text-[#1e3a6e]"></i>
+          </button>
+          <div id="headerProfilePopover" class="hidden absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-blue-100 shadow-xl p-2 space-y-1 z-[150] text-xs font-semibold text-slate-700">
+            <button type="button" onclick="scrollToSection('our-virtual-accounts'); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-wallet text-blue-600 w-4"></i> Our Virtual Accounts
+            </button>
+            <button type="button" onclick="scrollToSection('verification-workbench'); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-id-card text-emerald-600 w-4"></i> Document Workbench
+            </button>
+            <button type="button" onclick="openCryptoExchangesHub(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
+              <i class="fa-brands fa-bitcoin text-amber-500 w-4"></i> Crypto Exchanges
+            </button>
+            <div class="border-t border-slate-100 my-1"></div>
+            <button type="button" onclick="openAboutModal(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-circle-info text-slate-400 w-4"></i> About Us
+            </button>
+            <button type="button" onclick="openContactModal(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-headset text-emerald-600 w-4"></i> Contact Support
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu" class="md:hidden p-2 text-[#1e3a6e] hover:bg-blue-50 rounded-xl border border-blue-200 cursor-pointer transition-colors flex items-center justify-center">
+          <i id="mobileMenuIcon" class="fa-solid fa-bars text-base"></i>
         </button>
       </div>
     </div>
 
-    <!-- Mobile Navigation Drawer / Dropdown Panel -->
-    <div id="mobileNavDrawer" class="hidden lg:hidden border-t border-slate-200 bg-white/98 backdrop-blur-xl px-4 py-4 space-y-3 shadow-xl transition-all animate-in slide-in-from-top-3 duration-200">
-      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-14 sm:h-16 w-auto max-w-[240px] sm:max-w-[300px] object-contain">
-        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-300">
-          <i class="fa-solid fa-circle-check text-[9px] text-emerald-600"></i>
-          <span>VERIFIED</span>
-        </span>
-      </div>
-      <div class="grid grid-cols-3 gap-2 pb-3 border-b border-slate-100 text-center">
-        <button onclick="goToHomePage(event); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-blue-50 text-blue-700 font-bold text-xs gap-1 border border-blue-100 cursor-pointer">
-          <i class="fa-solid fa-house text-base"></i>
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobileNavDrawer" class="hidden md:hidden border-t border-blue-100 bg-white/98 backdrop-blur-xl px-4 py-4 space-y-2 shadow-xl">
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <button type="button" onclick="goToHomePage(event); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-blue-50 text-[#0f295c] font-bold text-xs gap-1 border border-blue-100 cursor-pointer">
+          <i class="fa-solid fa-house text-sm text-blue-600"></i>
           <span>Home</span>
         </button>
-        <button onclick="openAboutModal(); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-50 text-slate-700 hover:bg-slate-100 font-bold text-xs gap-1 border border-slate-200 cursor-pointer">
-          <i class="fa-solid fa-circle-info text-base text-slate-500"></i>
+        <button type="button" onclick="openAboutModal(); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-50 text-slate-700 font-bold text-xs gap-1 border border-slate-200 cursor-pointer">
+          <i class="fa-solid fa-circle-info text-sm text-slate-500"></i>
           <span>About Us</span>
         </button>
-        <button onclick="openContactModal(); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold text-xs gap-1 border border-emerald-200 cursor-pointer">
-          <i class="fa-solid fa-headset text-base text-emerald-600"></i>
-          <span>Contact Us</span>
+        <button type="button" onclick="openContactModal(); closeMobileMenu();" class="flex flex-col items-center justify-center p-2.5 rounded-xl bg-emerald-50 text-emerald-800 font-bold text-xs gap-1 border border-emerald-200 cursor-pointer">
+          <i class="fa-solid fa-headset text-sm text-emerald-600"></i>
+          <span>Support</span>
         </button>
       </div>
-
-      <div class="space-y-1.5 text-xs font-semibold text-slate-700">
-
-        <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench'); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50/60 hover:bg-blue-50 text-blue-900 border border-blue-200/60 cursor-pointer">
-          <span class="flex items-center gap-2.5">
-            <i class="fa-solid fa-credit-card text-blue-600 text-sm"></i>
-            <span>Virtual Accounts</span>
-          </span>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">PayPal · Payoneer · Grey</span>
-        </button>
-
-      </div>
+      <button type="button" onclick="scrollToSection('our-virtual-accounts'); closeMobileMenu();" class="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50/70 text-[#0f295c] font-bold text-xs border border-blue-200/70 cursor-pointer">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-wallet text-blue-600"></i> Our Virtual Accounts</span>
+        <span>PayPal · Wise · Payoneer</span>
+      </button>
     </div>
   </header>
 
-  <!-- ================= HERO SECTION (CRISP WHITE BACKGROUND) ================= -->
-  <section id="hero-section" class="no-print relative bg-white text-slate-900 py-10 lg:py-16 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-slate-200">
-    
-    <!-- Ambient Luminous Glow Circles on Pure White -->
-    <div class="absolute -top-32 -left-32 w-96 h-96 bg-blue-100/60 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[550px] bg-sky-50/70 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:24px_24px] opacity-70 pointer-events-none"></div>
+  <!-- ================= HERO SECTION & KYC VERIFIED BANNER ================= -->
+  <section id="hero-section" class="no-print kyc-hero-surface relative overflow-hidden pt-8 sm:pt-12 pb-10 px-4 sm:px-6 lg:px-8">
+    <!-- Subtle Dotted World Map SVG Backdrop -->
+    <svg aria-hidden="true" class="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" viewBox="0 0 1200 520" fill="none">
+      <defs>
+        <pattern id="heroWorldDots" width="14" height="14" patternUnits="userSpaceOnUse">
+          <circle cx="3" cy="3" r="1.4" fill="#93c5fd" />
+        </pattern>
+      </defs>
+      <rect width="1200" height="520" fill="url(#heroWorldDots)" mask="url(#worldMask)" />
+      <mask id="worldMask">
+        <rect width="1200" height="520" fill="black" />
+        <ellipse cx="260" cy="180" rx="160" ry="95" fill="white" />
+        <ellipse cx="320" cy="310" rx="85" ry="95" fill="white" />
+        <ellipse cx="620" cy="170" rx="185" ry="90" fill="white" />
+        <ellipse cx="640" cy="300" rx="95" ry="105" fill="white" />
+        <ellipse cx="890" cy="210" rx="170" ry="110" fill="white" />
+        <ellipse cx="980" cy="370" rx="90" ry="60" fill="white" />
+      </mask>
+    </svg>
 
-    <div class="max-w-7xl mx-auto relative z-10">
-      
-      <!-- Top Pill Bar: Global Virtual Accounts & Crypto Exchanges Badges -->
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-8 pb-4 border-b border-slate-200">
-        <div class="flex items-center gap-2.5">
-          <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-blue-700 shadow-xs">
-            <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-            GLOBAL VIRTUAL ACCOUNTS &amp; EXCHANGES
-          </span>
-          <span class="hidden sm:inline-flex items-center px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800">
-            <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-amber-500"></i> Tier 1-3 KYC Ready
-          </span>
+    <div class="max-w-6xl mx-auto relative z-10 space-y-8">
+      <!-- Hero Split: Bold Headline Left + Glowing Digital Globe & Currency Orbs Right -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class="lg:col-span-7 space-y-4 text-center lg:text-left">
+          <h1 class="text-4xl sm:text-5xl lg:text-[3.45rem] font-extrabold text-[#0d2658] tracking-tight leading-[1.08]" style="text-wrap: balance;">
+            Unlock Global<br />Digital Finance!
+          </h1>
+          <p class="text-base sm:text-lg lg:text-xl font-bold text-[#14306b] max-w-xl mx-auto lg:mx-0 leading-snug">
+            Get Your Fully Verified Virtual Banking &amp; Exchange Accounts Now!
+          </p>
+          <!-- Green Curved Accent Underline -->
+          <div class="flex justify-center lg:justify-start pt-0.5">
+            <svg width="260" height="16" viewBox="0 0 260 16" fill="none" aria-hidden="true">
+              <path d="M4 11C75 3 185 3 256 12" stroke="url(#heroGreenSwoop)" stroke-width="5" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="heroGreenSwoop" x1="4" y1="8" x2="256" y2="8" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#16a34a" />
+                  <stop offset="0.6" stop-color="#22c55e" />
+                  <stop offset="1" stop-color="#22c55e" stop-opacity="0.1" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
         </div>
-        <div class="flex items-center gap-2 text-xs font-medium text-slate-600">
-          <span class="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-xs">
-            <i class="fa-solid fa-circle-check text-emerald-600"></i>
-            USD / EUR / GBP Virtual Accounts
-          </span>
-          <span class="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-xs">
-            <i class="fa-brands fa-bitcoin text-amber-500"></i>
-            Binance &amp; Bybit Verified
-          </span>
-          <span class="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 flex items-center gap-1.5 shadow-xs">
-            <i class="fa-solid fa-shield-halved text-blue-600"></i>
-            100% Approval Rate
-          </span>
+
+        <!-- Right Visual: Glowing Digital Globe with Floating Currency Orbs ($, €, £, ₿) -->
+        <div class="lg:col-span-5 flex items-center justify-center relative">
+          <div class="relative w-72 h-72 sm:w-80 sm:h-80 flex items-center justify-center">
+            <!-- Outer luminous aura -->
+            <div class="absolute inset-4 rounded-full bg-gradient-to-tr from-[#1d4ed8]/30 via-[#0ea5e9]/35 to-[#38bdf8]/25 blur-2xl pointer-events-none"></div>
+
+            <!-- 3D Digital Globe SVG -->
+            <svg viewBox="0 0 320 320" class="w-64 h-64 sm:w-72 sm:h-72 drop-shadow-[0_18px_35px_rgba(37,99,235,0.35)]" aria-label="Global Digital Finance Network">
+              <defs>
+                <radialGradient id="globeSphere" cx="38%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#7dd3fc" />
+                  <stop offset="35%" stop-color="#2563eb" />
+                  <stop offset="78%" stop-color="#1e3a8a" />
+                  <stop offset="100%" stop-color="#0f172a" />
+                </radialGradient>
+                <linearGradient id="orbitRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#bae6fd" stop-opacity="0.9" />
+                  <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.35" />
+                  <stop offset="100%" stop-color="#93c5fd" stop-opacity="0.85" />
+                </linearGradient>
+                <clipPath id="globeClip">
+                  <circle cx="160" cy="160" r="102" />
+                </clipPath>
+              </defs>
+
+              <!-- Orbital Rings -->
+              <ellipse cx="160" cy="160" rx="146" ry="52" transform="rotate(-24 160 160)" stroke="url(#orbitRing)" stroke-width="1.75" fill="none" />
+              <ellipse cx="160" cy="160" rx="138" ry="44" transform="rotate(20 160 160)" stroke="url(#orbitRing)" stroke-width="1.5" fill="none" stroke-dasharray="5 5" />
+
+              <!-- Sphere Base -->
+              <circle cx="160" cy="160" r="102" fill="url(#globeSphere)" />
+
+              <!-- Latitude / Longitude & Dotted Continents inside Globe -->
+              <g clip-path="url(#globeClip)" opacity="0.72">
+                <ellipse cx="160" cy="160" rx="102" ry="34" stroke="#93c5fd" stroke-width="1" fill="none" />
+                <ellipse cx="160" cy="160" rx="102" ry="68" stroke="#93c5fd" stroke-width="0.9" fill="none" />
+                <ellipse cx="160" cy="160" rx="46" ry="102" stroke="#93c5fd" stroke-width="1" fill="none" />
+                <line x1="160" y1="58" x2="160" y2="262" stroke="#bae6fd" stroke-width="1" />
+                <line x1="58" y1="160" x2="262" y2="160" stroke="#bae6fd" stroke-width="1" />
+                <!-- Stylized Dotted Continents -->
+                <path d="M98 112 C112 96, 144 98, 150 118 C154 134, 136 144, 138 158 C142 172, 162 176, 156 198 C150 220, 128 226, 122 206 C118 190, 124 176, 114 162 C98 148, 86 126, 98 112 Z" fill="#e0f2fe" opacity="0.6" />
+                <path d="M172 104 C194 94, 224 106, 232 130 C238 148, 220 164, 206 160 C192 156, 184 168, 198 182 C210 194, 206 218, 188 224 C172 228, 164 202, 170 182 C176 162, 162 126, 172 104 Z" fill="#e0f2fe" opacity="0.58" />
+                <!-- Glowing Network Nodes -->
+                <circle cx="122" cy="134" r="3" fill="#ffffff" />
+                <circle cx="144" cy="186" r="2.5" fill="#7dd3fc" />
+                <circle cx="192" cy="128" r="3" fill="#ffffff" />
+                <circle cx="212" cy="168" r="2.5" fill="#7dd3fc" />
+                <path d="M122 134 Q158 114 192 128" stroke="#e0f2fe" stroke-width="1.3" fill="none" />
+                <path d="M144 186 Q178 164 212 168" stroke="#7dd3fc" stroke-width="1.2" fill="none" />
+              </g>
+              <circle cx="160" cy="160" r="102" stroke="#7dd3fc" stroke-width="1.5" stroke-opacity="0.65" fill="none" />
+            </svg>
+
+            <!-- Floating Currency Orbs ($, €, £, ₿) -->
+            <div class="absolute top-2 right-12 w-11 h-11 rounded-full bg-gradient-to-br from-[#38bdf8] to-[#0284c7] text-white font-extrabold text-xl flex items-center justify-center shadow-lg border-2 border-white/80 animate-float-slow">$</div>
+            <div class="absolute top-16 right-1 w-10 h-10 rounded-full bg-gradient-to-br from-[#2563eb] to-[#1e40af] text-white font-extrabold text-lg flex items-center justify-center shadow-lg border-2 border-white/80 animate-float-reverse">€</div>
+            <div class="absolute bottom-20 right-4 w-10 h-10 rounded-full bg-gradient-to-br from-[#1e3a8a] to-[#0f172a] text-white font-extrabold text-lg flex items-center justify-center shadow-lg border-2 border-white/80 animate-float-diag">£</div>
+            <div class="absolute bottom-7 right-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#fbbf24] to-[#d97706] text-white font-extrabold text-xl flex items-center justify-center shadow-lg border-2 border-white/90 animate-float-diag-alt">₿</div>
+          </div>
         </div>
       </div>
 
-      <!-- Hero Grid: Left Content & Right Floating Accounts Showcase -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center mb-8">
-        
-        <!-- Left Column: Copy & Actions -->
-        <div class="lg:col-span-6 space-y-6">
-          <div class="space-y-3">
-            <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.15]">
-              Unlock Your Access to <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Virtual Banking</span> &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-yellow-600">Crypto Exchanges</span>
-            </h2>
-            <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Explore authentic, inspection-ready virtual banking credentials and digital crypto exchange requirements. Instant approval specifications for <strong>PayPal, Payoneer, Raenest, Grey Account, Binance, Bybit</strong>, and international accounts with distinct brand colors and logos.
+      <!-- ================= KYC VERIFIED BANNER CARD ================= -->
+      <div class="kyc-verified-banner rounded-3xl p-6 sm:p-8 relative overflow-hidden text-white">
+        <!-- Subtle World Dot Pattern on Banner -->
+        <div class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.22)_1px,transparent_1px)] bg-[size:16px_16px] opacity-30 pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-8">
+          <!-- Glowing Shield Icon -->
+          <div class="relative shrink-0 flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28">
+            <div class="absolute inset-0 rounded-full bg-emerald-300/30 blur-xl"></div>
+            <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-white/15 backdrop-blur-sm border border-white/35 flex items-center justify-center shadow-inner">
+              <svg class="w-12 h-14 sm:w-14 sm:h-16 drop-shadow-md" viewBox="0 0 64 72" fill="none" aria-hidden="true">
+                <path d="M32 4L8 14V33C8 49.5 18.2 63.4 32 68C45.8 63.4 56 49.5 56 33V14L32 4Z" fill="#ffffff" stroke="rgba(255,255,255,0.8)" stroke-width="2"/>
+                <path d="M32 10L13 18V33C13 46.5 21.1 58 32 62C42.9 58 51 46.5 51 33V18L32 10Z" fill="#16a34a"/>
+                <path d="M22.5 35.5L28.8 41.8L42 28.5" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Banner Text & CTA -->
+          <div class="flex-1 text-center md:text-left space-y-2">
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">KYC Verified</h2>
+            <p class="text-sm sm:text-base text-white/90 font-medium max-w-xl">
+              Your account is fully verified and ready to use.
             </p>
-          </div>
-
-          <!-- Platform Launch Action Buttons -->
-          <div class="flex flex-wrap items-center gap-3 pt-1">
-            <button onclick="selectVirtualAccount('paypal'); scrollToSection('verification-workbench');" class="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/25 transition-all flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-credit-card text-amber-300"></i>
-              <span>Verify Virtual Accounts</span>
-            </button>
-            <button onclick="openContactModal()" class="px-4 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-bold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer shadow-xs">
-              <i class="fa-solid fa-headset text-emerald-600"></i>
-              <span>Contact 24/7 Support</span>
-            </button>
-          </div>
-
-          <!-- Interactive Platform Category Filter Bar -->
-          <div class="pt-2 space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-check-double text-blue-600 text-xs"></i>
-                Select Platform to View Specifications:
-              </span>
-              <div class="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[10px]">
-                <button id="hero-filter-all" onclick="filterHeroPlatforms('all')" class="px-2.5 py-1 rounded font-bold bg-blue-600 text-white transition-colors">
-                  All (12)
-                </button>
-                <button id="hero-filter-virtual" onclick="filterHeroPlatforms('virtual')" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition-colors">
-                  Virtual Accounts
-                </button>
-                <button id="hero-filter-crypto" onclick="filterHeroPlatforms('crypto')" class="px-2.5 py-1 rounded font-medium text-slate-600 hover:text-slate-900 transition-colors">
-                  Crypto Exchanges
-                </button>
-              </div>
-            </div>
-
-            <!-- Clickable Interactive Platform Badges (Own Brand Logos & Colors) -->
-            <div id="hero-platforms-pill-grid" class="flex flex-wrap items-center gap-2">
-              
-              <!-- 1. PayPal (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('paypal')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-blue-50/90 hover:bg-[#003087] border border-blue-200 text-[#003087] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#003087] group-hover:bg-white text-white group-hover:text-[#003087] flex items-center justify-center text-[11px] transition-colors">
-                  <i class="fa-brands fa-paypal"></i>
-                </div>
-                <span>PayPal</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-blue-100 text-[#003087] rounded group-hover:bg-white/20 group-hover:text-white">USD Biz</span>
+            <div class="pt-2">
+              <button type="button" onclick="scrollToSection('our-virtual-accounts')" class="kyc-green-pill inline-flex items-center gap-2 px-7 py-2.5 rounded-full text-white font-bold text-sm transition-transform hover:-translate-y-0.5 cursor-pointer">
+                <span>View Details</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
               </button>
-
-              <!-- 2. Payoneer (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('payoneer')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-orange-50/90 hover:bg-[#FF4800] border border-orange-200 text-[#FF4800] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#FF4800] group-hover:bg-white text-white group-hover:text-[#FF4800] flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-credit-card"></i>
-                </div>
-                <span>Payoneer</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-orange-100 text-[#FF4800] rounded group-hover:bg-white/20 group-hover:text-white">USD Bank</span>
-              </button>
-
-              <!-- 3. Raenest (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('raenest')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-emerald-50/90 hover:bg-[#059669] border border-emerald-200 text-[#059669] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#059669] group-hover:bg-white text-white group-hover:text-[#059669] flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-briefcase"></i>
-                </div>
-                <span>Raenest</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-emerald-100 text-[#059669] rounded group-hover:bg-white/20 group-hover:text-white">Freelance</span>
-              </button>
-
-              <!-- 4. Grey Account (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('grey')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-900 border border-slate-300 text-slate-800 hover:text-amber-300 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-slate-800 group-hover:bg-amber-400 text-amber-300 group-hover:text-slate-950 flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-landmark"></i>
-                </div>
-                <span>Grey Account</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded group-hover:bg-white/20 group-hover:text-white">EUR/USD</span>
-              </button>
-
-              <!-- 5. Binance (Crypto Exchange) -->
-              <button onclick="applyQuickKycPreset('binance')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-yellow-50/90 hover:bg-[#F0B90B] border border-yellow-300 text-slate-900 hover:text-slate-950 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#F0B90B] group-hover:bg-slate-950 text-slate-950 group-hover:text-[#F0B90B] flex items-center justify-center text-[11px] font-bold transition-colors">
-                  <i class="fa-brands fa-bitcoin"></i>
-                </div>
-                <span>Binance</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-yellow-200 text-yellow-950 rounded group-hover:bg-slate-950/20 group-hover:text-slate-950">Tier 2/3</span>
-              </button>
-
-              <!-- 6. Bybit (Crypto Exchange) -->
-              <button onclick="applyQuickKycPreset('bybit')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-amber-50/90 hover:bg-[#F7A600] border border-amber-300 text-amber-950 hover:text-slate-950 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#F7A600] group-hover:bg-slate-950 text-slate-950 group-hover:text-[#F7A600] flex items-center justify-center text-[10px] font-bold transition-colors">
-                  <i class="fa-solid fa-chart-line"></i>
-                </div>
-                <span>Bybit</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-amber-200 text-amber-950 rounded group-hover:bg-slate-950/20 group-hover:text-slate-950">Level 2</span>
-              </button>
-
-              <!-- 7. Mercury Bank (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('mercury')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-indigo-50/90 hover:bg-[#4F46E5] border border-indigo-200 text-[#4F46E5] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#4F46E5] group-hover:bg-white text-white group-hover:text-[#4F46E5] flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-building-columns"></i>
-                </div>
-                <span>Mercury Bank</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-indigo-100 text-[#4F46E5] rounded group-hover:bg-white/20 group-hover:text-white">US LLC</span>
-              </button>
-
-              <!-- 8. Wise Borderless (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('wise')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-green-50/90 hover:bg-[#16A34A] border border-green-200 text-[#16A34A] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#16A34A] group-hover:bg-white text-white group-hover:text-[#16A34A] flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-globe"></i>
-                </div>
-                <span>Wise</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-green-100 text-[#16A34A] rounded group-hover:bg-white/20 group-hover:text-white">Multi-Cur.</span>
-              </button>
-
-              <!-- 9. Revolut (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('revolut')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-sky-50/90 hover:bg-[#0075EB] border border-sky-200 text-[#0075EB] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#0075EB] group-hover:bg-white text-white group-hover:text-[#0075EB] flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-arrow-trend-up"></i>
-                </div>
-                <span>Revolut</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-sky-100 text-[#0075EB] rounded group-hover:bg-white/20 group-hover:text-white">Global IBAN</span>
-              </button>
-
-              <!-- 10. OKX (Crypto Exchange) -->
-              <button onclick="applyQuickKycPreset('okx')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-teal-50/90 hover:bg-slate-900 border border-teal-200 text-[#0F766E] hover:text-teal-300 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#0F766E] group-hover:bg-teal-400 text-white group-hover:text-slate-950 flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-cubes"></i>
-                </div>
-                <span>OKX</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-teal-100 text-[#0F766E] rounded group-hover:bg-white/20 group-hover:text-white">Web3 KYC</span>
-              </button>
-
-              <!-- 11. KuCoin (Crypto Exchange) -->
-              <button onclick="applyQuickKycPreset('kucoin')" data-category="crypto" class="platform-pill px-3 py-1.5 rounded-xl bg-emerald-50/90 hover:bg-[#24AE8F] border border-teal-300 text-[#24AE8F] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#24AE8F] group-hover:bg-white text-white group-hover:text-[#24AE8F] flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <span>KuCoin</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-teal-100 text-[#24AE8F] rounded group-hover:bg-white/20 group-hover:text-white">Verified</span>
-              </button>
-
-              <!-- 12. Elevate Pay (Virtual Account) -->
-              <button onclick="applyQuickKycPreset('elevate')" data-category="virtual" class="platform-pill px-3 py-1.5 rounded-xl bg-teal-50/90 hover:bg-[#0D9488] border border-teal-200 text-[#0D9488] hover:text-white text-xs font-bold transition-all flex items-center gap-2 cursor-pointer group shadow-xs">
-                <div class="w-5 h-5 rounded-md bg-[#0D9488] group-hover:bg-white text-white group-hover:text-[#0D9488] flex items-center justify-center text-[10px] transition-colors">
-                  <i class="fa-solid fa-coins"></i>
-                </div>
-                <span>Elevate Pay</span>
-                <span class="text-[9px] px-1.5 py-0.2 bg-teal-100 text-[#0D9488] rounded group-hover:bg-white/20 group-hover:text-white">USD Remote</span>
-              </button>
-
-            </div>
-          </div>
-
-          <!-- Feature Metrics (Light Card) -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-slate-200">
-            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
-              <div class="text-base sm:text-lg font-black text-blue-700 flex items-center gap-1">
-                12+ Hubs
-                <i class="fa-solid fa-wallet text-amber-500 text-xs"></i>
-              </div>
-              <span class="text-[10px] text-slate-500 font-semibold block">Virtual &amp; Crypto</span>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
-              <div class="text-base sm:text-lg font-black text-indigo-700 flex items-center gap-1">
-                USD / EUR
-              </div>
-              <span class="text-[10px] text-slate-500 font-semibold block">Receiving Accounts</span>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
-              <div class="text-base sm:text-lg font-black text-amber-700 flex items-center gap-1">
-                Tier 2/3
-              </div>
-              <span class="text-[10px] text-slate-500 font-semibold block">Exchange KYC Ready</span>
-            </div>
-            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 shadow-2xs">
-              <div class="text-base sm:text-lg font-black text-emerald-700 flex items-center gap-1">
-                100%
-              </div>
-              <span class="text-[10px] text-slate-500 font-semibold block">Verified Compliance</span>
             </div>
           </div>
         </div>
-
-        <!-- Right Column: Visual Stage with Floating Virtual Accounts & Crypto Exchanges -->
-        <div class="lg:col-span-6 relative flex flex-col items-center justify-center py-2">
-          
-          <!-- Outer Ambient Glow Rings -->
-          <div class="absolute -inset-4 bg-gradient-to-tr from-blue-200/40 via-amber-200/30 to-indigo-200/30 rounded-3xl filter blur-2xl pointer-events-none"></div>
-
-          <!-- ================= FLOATING VIRTUAL ACCOUNTS & CRYPTO EXCHANGES STAGE (WHITE BG) ================= -->
-          <div id="hero-accounts-showcase" class="relative w-full min-h-[500px] sm:min-h-[540px] rounded-3xl border border-slate-200 p-4 sm:p-6 overflow-hidden flex items-center justify-center bg-gradient-to-br from-slate-50/90 via-white to-blue-50/40 shadow-xl shadow-slate-200/70">
-            
-            <!-- Subtle Background Gradients & Grid -->
-            <div class="absolute -top-12 -left-12 w-64 h-64 bg-blue-100/60 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute -bottom-12 -right-12 w-64 h-64 bg-amber-100/60 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] bg-[size:16px_16px] opacity-40 pointer-events-none"></div>
-
-            <!-- Central Radar Pulse Circles & Grid -->
-            <div class="absolute w-72 h-72 rounded-full border border-blue-400/20 pointer-events-none animate-pulse-soft"></div>
-            <div class="absolute w-96 h-96 rounded-full border border-indigo-400/15 pointer-events-none"></div>
-
-            <!-- Center Verified Anchor Badge -->
-            <div class="relative z-10 text-center space-y-2 my-auto pointer-events-none">
-              <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 border-2 border-white">
-                <i class="fa-solid fa-shield-halved text-2xl text-amber-300"></i>
-              </div>
-              <div class="text-xs font-black text-slate-900 tracking-wide uppercase">
-                Verified FinTech Gateway
-              </div>
-              <p class="text-[10px] text-blue-700 font-mono-code font-bold bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200 inline-block shadow-2xs">
-                GLOBAL PLATFORM ACCEPTANCE
-              </p>
-            </div>
-
-            <!-- ================= FLOATING CARD 1: PAYPAL VIRTUAL ACCOUNT (Top Left) ================= -->
-            <div onclick="openKycPlatformModal('paypal')" class="absolute top-3 left-2 sm:left-4 z-20 w-[195px] sm:w-[215px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#003087] shadow-xl animate-float-slow cursor-pointer group">
-              <div class="flex items-center justify-between mb-1.5">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-6 h-6 rounded-lg bg-[#003087] flex items-center justify-center text-white text-xs shadow-xs">
-                    <i class="fa-brands fa-paypal"></i>
-                  </div>
-                  <span class="text-xs font-black text-slate-900">PayPal</span>
-                </div>
-                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Verified
-                </span>
-              </div>
-              <div class="text-[10px] text-slate-700 font-semibold mb-1">
-                USD Virtual Account
-              </div>
-              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
-                <span>WARSAME A.</span>
-                <span class="text-blue-700 font-bold">●●●● 8492</span>
-              </div>
-              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
-                <span class="text-slate-500 font-medium">Doc: Passport / ID</span>
-                <span class="text-[#003087] font-bold group-hover:underline flex items-center gap-0.5">
-                  View Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
-                </span>
-              </div>
-            </div>
-
-            <!-- ================= FLOATING CARD 2: BINANCE CRYPTO EXCHANGE (Top Right) ================= -->
-            <div onclick="openKycPlatformModal('binance')" class="absolute top-4 right-2 sm:right-4 z-20 w-[200px] sm:w-[220px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#F0B90B] shadow-xl animate-float-reverse cursor-pointer group">
-              <div class="flex items-center justify-between mb-1.5">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-6 h-6 rounded-lg bg-[#F0B90B] flex items-center justify-center text-slate-950 font-bold text-xs shadow-xs">
-                    <i class="fa-brands fa-bitcoin"></i>
-                  </div>
-                  <span class="text-xs font-black text-slate-900">Binance</span>
-                </div>
-                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8.5px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
-                  Tier 2 Passed
-                </span>
-              </div>
-              <div class="text-[10px] text-slate-700 font-semibold mb-1 flex items-center justify-between">
-                <span>ICAO 9303 Match</span>
-                <i class="fa-solid fa-circle-check text-emerald-600 text-[10px]"></i>
-              </div>
-              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
-                <span>LIMIT: $50,000/d</span>
-                <span class="text-emerald-700 font-bold">UNLOCKED</span>
-              </div>
-              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
-                <span class="text-slate-500 font-medium">Passport OCR</span>
-                <span class="text-amber-700 font-bold group-hover:underline flex items-center gap-0.5">
-                  Inspect KYC <i class="fa-solid fa-arrow-right text-[7px]"></i>
-                </span>
-              </div>
-            </div>
-
-            <!-- ================= FLOATING CARD 3: BYBIT CRYPTO PLATFORM (Middle Left) ================= -->
-            <div onclick="openKycPlatformModal('bybit')" class="absolute top-1/2 -translate-y-1/2 left-1 sm:left-3 z-20 w-[190px] sm:w-[210px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#F7A600] shadow-xl animate-float-diag cursor-pointer group">
-              <div class="flex items-center justify-between mb-1.5">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-6 h-6 rounded-lg bg-[#F7A600] flex items-center justify-center text-slate-950 font-bold text-xs shadow-xs">
-                    <i class="fa-solid fa-chart-line"></i>
-                  </div>
-                  <span class="text-xs font-black text-slate-900">Bybit</span>
-                </div>
-                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
-                  Level 2 KYC
-                </span>
-              </div>
-              <div class="text-[9.5px] text-slate-700 font-medium leading-tight mb-1">
-                Biometric Face &amp; ID Verification
-              </div>
-              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
-                <span>CONFIDENCE</span>
-                <span class="text-amber-700 font-bold">99.8% PASS</span>
-              </div>
-              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
-                <span class="text-slate-500">P2P Ready</span>
-                <span class="text-amber-700 font-bold group-hover:underline flex items-center gap-0.5">
-                  Inspect Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
-                </span>
-              </div>
-            </div>
-
-            <!-- ================= FLOATING CARD 4: PAYONEER GLOBAL BANK (Middle Right) ================= -->
-            <div onclick="openKycPlatformModal('payoneer')" class="absolute top-1/2 -translate-y-1/2 right-1 sm:right-3 z-20 w-[195px] sm:w-[215px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#FF4800] shadow-xl animate-float-diag-alt cursor-pointer group">
-              <div class="flex items-center justify-between mb-1.5">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-6 h-6 rounded-lg bg-[#FF4800] flex items-center justify-center text-white text-xs shadow-xs">
-                    <i class="fa-solid fa-credit-card"></i>
-                  </div>
-                  <span class="text-xs font-black text-slate-900">Payoneer</span>
-                </div>
-                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-200">
-                  USD Receiving
-                </span>
-              </div>
-              <div class="text-[9.5px] text-slate-600 font-mono-code leading-tight mb-1">
-                ROUTING: 021000021
-              </div>
-              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
-                <span>ACC: 849204910</span>
-                <span class="text-emerald-700 font-bold">ACTIVE</span>
-              </div>
-              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
-                <span class="text-slate-500">First Century Bank</span>
-                <span class="text-[#FF4800] font-bold group-hover:underline flex items-center gap-0.5">
-                  View Details <i class="fa-solid fa-arrow-right text-[7px]"></i>
-                </span>
-              </div>
-            </div>
-
-            <!-- ================= FLOATING CARD 5: RAENEST FREELANCE ACCOUNT (Bottom Left) ================= -->
-            <div onclick="openKycPlatformModal('raenest')" class="absolute bottom-3 left-2 sm:left-5 z-20 w-[190px] sm:w-[210px] p-3 rounded-2xl glass-light-card border-l-4 border-l-[#059669] shadow-xl animate-float-reverse cursor-pointer group">
-              <div class="flex items-center justify-between mb-1.5">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-6 h-6 rounded-lg bg-[#059669] flex items-center justify-center text-white text-xs shadow-xs">
-                    <i class="fa-solid fa-briefcase"></i>
-                  </div>
-                  <span class="text-xs font-black text-slate-900">Raenest</span>
-                </div>
-                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  USD Virtual Card
-                </span>
-              </div>
-              <div class="text-[9.5px] text-slate-700 font-semibold mb-1">
-                African Remote Invoicing
-              </div>
-              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
-                <span>CONTRACTOR</span>
-                <span class="text-emerald-700 font-bold">APPROVED</span>
-              </div>
-              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
-                <span class="text-slate-500">NIRA / Passport</span>
-                <span class="text-[#059669] font-bold group-hover:underline flex items-center gap-0.5">
-                  Inspect Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
-                </span>
-              </div>
-            </div>
-
-            <!-- ================= FLOATING CARD 6: GREY ACCOUNT FOREIGN BANKING (Bottom Right) ================= -->
-            <div onclick="openKycPlatformModal('grey')" class="absolute bottom-3 right-2 sm:right-5 z-20 w-[195px] sm:w-[215px] p-3 rounded-2xl glass-light-card border-l-4 border-l-amber-500 shadow-xl animate-float-slow cursor-pointer group">
-              <div class="flex items-center justify-between mb-1.5">
-                <div class="flex items-center gap-1.5">
-                  <div class="w-6 h-6 rounded-lg bg-slate-900 flex items-center justify-center text-amber-300 text-xs shadow-xs">
-                    <i class="fa-solid fa-landmark"></i>
-                  </div>
-                  <span class="text-xs font-black text-slate-900">Grey Account</span>
-                </div>
-                <span class="text-[8.5px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                  EUR / USD IBAN
-                </span>
-              </div>
-              <div class="text-[9.5px] text-slate-600 font-mono-code mb-1">
-                IBAN: GB92 GREY 8492
-              </div>
-              <div class="flex items-center justify-between text-[9px] text-slate-500 font-mono-code">
-                <span>EAST AFRICA ID</span>
-                <span class="text-blue-700 font-bold">READY</span>
-              </div>
-              <div class="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[9px]">
-                <span class="text-slate-500">Instant Approval</span>
-                <span class="text-slate-800 font-bold group-hover:underline flex items-center gap-0.5">
-                  Inspect Specs <i class="fa-solid fa-arrow-right text-[7px]"></i>
-                </span>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
       </div>
 
+      <!-- ================= OUR VIRTUAL ACCOUNTS SECTION ================= -->
+      <div id="our-virtual-accounts" class="pt-4 space-y-6">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white flex items-center justify-center text-xl shadow-md shadow-blue-600/25 shrink-0">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0d2658] tracking-tight">Our Virtual Accounts</h2>
+            <p class="text-xs sm:text-sm text-[#47608e] font-medium">Choose your preferred platform and get started instantly.</p>
+          </div>
+        </div>
+
+        <div class="border-t border-blue-100"></div>
+
+        <!-- Row 1: 3 Primary Virtual Account Cards (PayPal, Wise, Payoneer) -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+          <!-- 1. PayPal -->
+          <div onclick="openAccountCountryFlow('paypal')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('paypal')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
+            <div class="h-14 flex items-center justify-center">
+              <svg viewBox="0 0 64 64" class="w-14 h-14" aria-hidden="true">
+                <path d="M24 12h17c8.5 0 13.5 4.2 12.2 12.4-1.2 8-7.4 12.6-16 12.6h-5.8l-2.6 15H17L24 12Z" fill="#003087"/>
+                <path d="M29.5 22h15c7.2 0 11.4 3.6 10.3 10.6-1 6.8-6.3 10.8-13.5 10.8h-5l-2.2 12.6H23.5L29.5 22Z" fill="#0079C1" opacity="0.92"/>
+              </svg>
+            </div>
+            <div class="text-lg font-extrabold text-[#0d2658]">PayPal</div>
+            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('paypal');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <!-- 2. Wise -->
+          <div onclick="openAccountCountryFlow('wise')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('wise')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
+            <div class="h-14 flex items-center justify-center gap-2">
+              <svg viewBox="0 0 40 40" class="w-9 h-9" aria-hidden="true">
+                <path d="M12 8h22l-5 8h6l-16 16 4-11H11l5-6-4-7Z" fill="#16a34a"/>
+              </svg>
+              <span class="text-2xl font-black tracking-tight text-[#163300]">WISE</span>
+            </div>
+            <div class="text-lg font-extrabold text-[#0d2658]">Wise</div>
+            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('wise');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <!-- 3. Payoneer -->
+          <div onclick="openAccountCountryFlow('payoneer')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('payoneer')" class="kyc-va-card rounded-2xl p-6 flex flex-col items-center justify-between text-center gap-4 cursor-pointer">
+            <div class="h-14 flex items-center justify-center">
+              <svg viewBox="0 0 64 64" class="w-14 h-14" aria-hidden="true">
+                <defs>
+                  <linearGradient id="payoRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#f97316"/>
+                    <stop offset="28%" stop-color="#ec4899"/>
+                    <stop offset="56%" stop-color="#6366f1"/>
+                    <stop offset="82%" stop-color="#06b6d4"/>
+                    <stop offset="100%" stop-color="#22c55e"/>
+                  </linearGradient>
+                </defs>
+                <circle cx="32" cy="32" r="20" fill="none" stroke="url(#payoRing)" stroke-width="7"/>
+              </svg>
+            </div>
+            <div class="text-lg font-extrabold text-[#0d2658]">Payoneer</div>
+            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('payoneer');" class="kyc-va-cta w-full max-w-[190px] py-2.5 px-5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 2: 4 Platform Cards (Binance, Paxum, Bybit, Raenest Account) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <!-- 4. Binance -->
+          <div onclick="openAccountCountryFlow('binance')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('binance')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <svg viewBox="0 0 64 64" class="w-12 h-12" aria-hidden="true">
+                <g fill="#F0B90B">
+                  <polygon points="32,10 41,19 32,28 23,19"/>
+                  <polygon points="15,27 21,33 15,39 9,33"/>
+                  <polygon points="49,27 55,33 49,39 43,33"/>
+                  <polygon points="32,36 41,45 32,54 23,45"/>
+                  <polygon points="32,26 37,31 32,36 27,31"/>
+                </g>
+              </svg>
+            </div>
+            <div class="text-base font-extrabold text-[#0d2658]">Binance</div>
+            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('binance');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- 5. Paxum -->
+          <div onclick="openAccountCountryFlow('paxum')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('paxum')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <svg viewBox="0 0 64 64" class="w-12 h-12" aria-hidden="true">
+                <path d="M18 12h19c8 0 13 4.5 13 11.5S45 35 37 35H28v17H18V12Zm10 15h8c3.2 0 5-1.5 5-3.5s-1.8-3.5-5-3.5h-8v7Z" fill="#0056B3"/>
+                <path d="M22 20h17c6.8 0 11 3.8 11 9.8 0 6-4.2 9.8-11 9.8h-7v12.4h-10V20Z" fill="#0ea5e9" opacity="0.65"/>
+              </svg>
+            </div>
+            <div class="text-base font-extrabold text-[#0d2658]">Paxum</div>
+            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('paxum');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- 6. Bybit -->
+          <div onclick="openAccountCountryFlow('bybit')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('bybit')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <span class="text-2xl font-black tracking-tight text-[#0f172a]">BYB<span class="text-[#F7A600]">I</span>T</span>
+            </div>
+            <div class="text-base font-extrabold text-[#0d2658]">Bybit</div>
+            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('bybit');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- 7. Raenest Account -->
+          <div onclick="openAccountCountryFlow('raenest')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')openAccountCountryFlow('raenest')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <svg viewBox="0 0 64 64" class="w-12 h-12" aria-hidden="true">
+                <path d="M18 14h21c7 0 11 4 11 10 0 5-3 8.5-8.5 9.8L51 50h-9.5l-8.5-14h-6v14h-9V14Zm9 15h10c3 0 4.5-1.5 4.5-4s-1.5-4-4.5-4H27v8Z" fill="#0284c7"/>
+                <path d="M18 33l16-14h10L24 39V33Z" fill="#2563eb"/>
+              </svg>
+            </div>
+            <div class="text-base font-extrabold text-[#0d2658]">Raenest Account</div>
+            <button type="button" onclick="event.stopPropagation(); openAccountCountryFlow('raenest');" class="kyc-va-cta w-full py-2.5 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Additional Supported Platforms Strip -->
+        <div class="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
+          <span class="text-[#47608e] font-semibold mr-1">More Platforms:</span>
+          <button type="button" onclick="openAccountCountryFlow('grey')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Grey Account</button>
+          <button type="button" onclick="openAccountCountryFlow('revolut')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Revolut</button>
+          <button type="button" onclick="openAccountCountryFlow('mercury')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Mercury Bank</button>
+          <button type="button" onclick="openAccountCountryFlow('elevate')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Elevate Pay</button>
+          <button type="button" onclick="openAccountCountryFlow('okx')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">OKX</button>
+          <button type="button" onclick="openAccountCountryFlow('kucoin')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">KuCoin</button>
+          <button type="button" onclick="openAccountCountryFlow('stripe')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Stripe</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -16273,15 +16341,37 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </div>
         </div>
 
-        <!-- Country Selector Color Cards -->
+        <!-- Country Selector Color Cards + Drop-Down List -->
         <div>
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <label for="workbenchCountrySelect" class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
                 <i class="fa-solid fa-earth-africa text-emerald-700"></i>
                 Select Issuing Country:
               </label>
-              <span class="text-[11px] font-medium text-slate-400 hidden sm:inline">Jurisdiction &amp; registry formatting</span>
+              <select id="workbenchCountrySelect" onchange="switchVerificationCountry(this.value)" class="px-3 py-1.5 rounded-xl border border-blue-200 bg-blue-50/50 text-xs font-bold text-[#0d2658] focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                <option value="kenya">🇰🇪 Kenya</option>
+                <option value="somalia">🇸🇴 Somalia</option>
+                <option value="ethiopia">🇪🇹 Ethiopia</option>
+                <option value="nigeria">🇳🇬 Nigeria</option>
+                <option value="uk">🇬🇧 United Kingdom</option>
+                <option value="uganda">🇺🇬 Uganda</option>
+                <option value="pakistan">🇵🇰 Pakistan</option>
+                <option value="senegal">🇸🇳 Senegal</option>
+                <option value="southafrica">🇿🇦 South Africa</option>
+                <option value="usa">🇺🇸 United States</option>
+                <option value="seychelles">🇸🇨 Seychelles</option>
+                <option value="drcongo">🇨🇩 DR Congo</option>
+                <option value="bangladesh">🇧🇩 Bangladesh</option>
+                <option value="germany">🇩🇪 Germany</option>
+                <option value="canada">🇨🇦 Canada</option>
+                <option value="ghana">🇬🇭 Ghana</option>
+                <option value="rwanda">🇷🇼 Rwanda</option>
+                <option value="nepal">🇳🇵 Nepal</option>
+                <option value="malawi">🇲🇼 Malawi</option>
+                <option value="uae">🇦🇪 United Arab Emirates</option>
+                <option value="turkey">🇹🇷 Turkey</option>
+              </select>
             </div>
             <button type="button" id="universal-randomize-country-btn" onclick="randomizeActiveDocument()" class="px-4 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white rounded-2xl text-xs font-black tracking-wide transition-all flex items-center gap-2 shadow-lg shadow-indigo-700/25 border border-indigo-300/40 transform hover:-translate-y-0.5 cursor-pointer" title="Randomize whichever country document is currently active">
               <i class="fa-solid fa-dice text-amber-300 text-sm"></i>
@@ -26833,6 +26923,139 @@ COD REP DEM CONGO</div>
       </div>
       </div>
 
+  <!-- ================= VIRTUAL ACCOUNT -> COUNTRY DROPDOWN -> DOCUMENT TYPES FLOW MODAL ================= -->
+  <div id="accountCountryFlowModal" class="fixed inset-0 bg-slate-950/65 backdrop-blur-sm z-[160] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="flowModalAccountTitle">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-blue-100 relative max-h-[92vh] overflow-y-auto space-y-5">
+      <!-- Header -->
+      <div class="flex items-center justify-between gap-3 pb-4 border-b border-slate-100">
+        <div class="flex items-center gap-3.5">
+          <div id="flowModalIconWrap" class="w-12 h-12 rounded-2xl bg-[#003087] text-white flex items-center justify-center shadow-md shrink-0">
+            <i id="flowModalIcon" class="fa-brands fa-paypal text-xl"></i>
+          </div>
+          <div>
+            <h3 id="flowModalAccountTitle" class="text-lg sm:text-xl font-extrabold text-[#0d2658] leading-tight">PayPal</h3>
+            <p id="flowModalAccountSub" class="text-xs text-slate-500 font-medium mt-0.5">Select your country to unlock verification documents</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeAccountCountryFlow()" aria-label="Close modal" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Step 1: Country Drop-Down List -->
+      <div class="space-y-2">
+        <label for="flowCountrySelect" class="block text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
+          Step 1 · Select Your Country
+        </label>
+        <div class="relative">
+          <select id="flowCountrySelect" onchange="handleFlowCountryChange(this.value)" class="w-full appearance-none px-4 py-3.5 pr-10 rounded-2xl border-2 border-blue-200 bg-blue-50/40 hover:border-blue-400 focus:border-blue-600 focus:outline-none text-sm font-bold text-[#0d2658] cursor-pointer transition-colors">
+            <option value="">-- Choose a country from the drop-down list --</option>
+            <option value="kenya">🇰🇪 Kenya (Maisha Namba &amp; E-Passport)</option>
+            <option value="somalia">🇸🇴 Somalia (National ID, E-Passport &amp; Driver's License)</option>
+            <option value="ethiopia">🇪🇹 Ethiopia (E-Passport &amp; Fayda ID)</option>
+            <option value="nigeria">🇳🇬 Nigeria (National ID &amp; E-Passport)</option>
+            <option value="uk">🇬🇧 United Kingdom (British Citizen Passport)</option>
+            <option value="uganda">🇺🇬 Uganda (National ID Card - NIRA)</option>
+            <option value="pakistan">🇵🇰 Pakistan (National Identity Card - SNIC)</option>
+            <option value="senegal">🇸🇳 Senegal (National ID &amp; E-Passport)</option>
+            <option value="southafrica">🇿🇦 South Africa (Passport - ZAF)</option>
+            <option value="usa">🇺🇸 United States (U.S. Passport)</option>
+            <option value="seychelles">🇸🇨 Seychelles (National Identity Card)</option>
+            <option value="drcongo">🇨🇩 DR Congo (Passeport Biométrique)</option>
+            <option value="bangladesh">🇧🇩 Bangladesh (e-Passport - BGD)</option>
+            <option value="germany">🇩🇪 Germany (Reisepass - Deutschland)</option>
+            <option value="canada">🇨🇦 Canada (Passport / Passeport)</option>
+            <option value="ghana">🇬🇭 Ghana (Passport / Passeport)</option>
+            <option value="rwanda">🇷🇼 Rwanda (ID Card - Indangamuntu)</option>
+            <option value="nepal">🇳🇵 Nepal (Passport - NPL)</option>
+            <option value="malawi">🇲🇼 Malawi (Passport / Passeport)</option>
+            <option value="uae">🇦🇪 United Arab Emirates (Resident ID Card)</option>
+            <option value="turkey">🇹🇷 Turkey (Pasaport &amp; Kimlik Kartı)</option>
+          </select>
+          <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-blue-600">
+            <i class="fa-solid fa-chevron-down text-sm"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Prompt before country is selected -->
+      <div id="flowSelectCountryPrompt" class="rounded-2xl border border-dashed border-blue-200 bg-[#f6fbff] p-5 text-center space-y-1.5">
+        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto">
+          <i class="fa-solid fa-earth-africa"></i>
+        </div>
+        <p class="text-xs font-bold text-[#0d2658]">Choose a country above to reveal available documents</p>
+        <p class="text-[11px] text-slate-500">Passport, National Identity Card, Driver's License, Proof of Address &amp; Proof of Account will appear here.</p>
+      </div>
+
+      <!-- Step 2: Document Types (Revealed after selecting a country) -->
+      <div id="flowDocumentsSection" class="hidden space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
+            Step 2 · Choose Verification Document
+          </span>
+          <span id="flowChosenCountryLabel" class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full"></span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button type="button" onclick="selectFlowDocument('passport')" class="p-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 to-white hover:border-emerald-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
+            <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-passport"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-extrabold text-[#0d2658]">Passport</div>
+              <div class="text-[11px] text-slate-500">Official Biometric Travel Document</div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-xs text-emerald-600"></i>
+          </button>
+
+          <button type="button" onclick="selectFlowDocument('idcard')" class="p-4 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/70 to-white hover:border-blue-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
+            <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-extrabold text-[#0d2658]">National Identity</div>
+              <div class="text-[11px] text-slate-500">Citizen National ID Card Specimen</div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-xs text-blue-600"></i>
+          </button>
+
+          <button type="button" onclick="selectFlowDocument('driverlicense')" class="p-4 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50/70 to-white hover:border-sky-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
+            <div class="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-id-badge"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-extrabold text-[#0d2658]">Driver's License</div>
+              <div class="text-[11px] text-slate-500">International Driving License</div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-xs text-sky-600"></i>
+          </button>
+
+          <button type="button" onclick="selectFlowDocument('refugeecard')" class="p-4 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50/70 to-white hover:border-amber-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
+            <div class="w-11 h-11 rounded-xl bg-amber-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-address-card"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-extrabold text-[#0d2658]">Proof of Address</div>
+              <div class="text-[11px] text-slate-500">Official Residential Address Specimen</div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-xs text-amber-600"></i>
+          </button>
+
+          <button type="button" onclick="selectFlowDocument('proofofaccount')" class="sm:col-span-2 p-4 rounded-2xl border border-slate-300 bg-gradient-to-br from-slate-50 to-white hover:border-slate-700 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
+            <div class="w-11 h-11 rounded-xl bg-slate-900 text-amber-300 flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-sm font-extrabold text-[#0d2658]">Proof of Account</div>
+              <div class="text-[11px] text-slate-500">Grey, Wise &amp; Revolut Bank Confirmation Letter PDF</div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-xs text-slate-800"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= ABOUT MODAL ================= -->
   <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
@@ -27581,26 +27804,134 @@ COD REP DEM CONGO</div>
     </div>
   </div>
 
-  <!-- ================= FOOTER (LEGAL & POLICY MENU) ================= -->
-  <footer class="no-print mt-auto border-t border-slate-200 bg-white py-8 px-4 text-slate-600">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
-      <div class="flex flex-col sm:flex-row items-center gap-3.5 text-center sm:text-left">
-        <a href="/" onclick="goToHomePage(event)" class="inline-flex items-center cursor-pointer group" aria-label="GetKYCApproved Home">
-          <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-16 sm:h-20 md:h-24 w-auto max-w-[260px] sm:max-w-[360px] md:max-w-[460px] object-contain group-hover:opacity-95 transition-all drop-shadow-xs">
-        </a>
-        <div class="h-5 w-px bg-slate-200 hidden sm:block"></div>
-        <div class="text-slate-500 font-medium flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1">
-          <span>&copy; 2026 <strong>GetKYCApproved</strong>. All rights reserved. Identity &amp; Virtual Banking Verification.</span>
+  <!-- ================= WHY CHOOSE GETKYCAPPROVED & SUPPORT CTA BANNER ================= -->
+  <section class="no-print py-10 px-4 sm:px-6 lg:px-8 bg-white">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <!-- Why Choose GetKYCApproved? Strip -->
+      <div class="kyc-why-strip rounded-3xl p-6 sm:p-7 space-y-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-sm shrink-0">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.5 12 23C16.6 21.5 20 16.8 20 11.5V5.5L12 2Z" fill="#ffffff"/>
+              <path d="M8.5 12.2L10.8 14.5L15.8 9.5" stroke="#16a34a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight">
+            Why Choose <span class="text-[#0d2658]">Get</span><span class="text-[#16a34a]">KYC</span><span class="text-[#0d2658]">Approved?</span>
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-0 lg:divide-x lg:divide-blue-200/80 pt-1">
+          <div class="flex items-center gap-3 lg:pr-5">
+            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 text-base">
+              <i class="fa-solid fa-coins"></i>
+            </div>
+            <div class="text-xs sm:text-sm font-bold text-[#0d2658] leading-snug">
+              USD / EUR / GBP /<br class="hidden sm:inline" /> Multiple Currencies
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 lg:px-5">
+            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 text-base">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="text-xs sm:text-sm font-bold text-[#0d2658] leading-snug">
+              Verified Fintech<br class="hidden sm:inline" /> Gateways
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 lg:px-5">
+            <div class="w-10 h-10 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center shrink-0 text-base">
+              <i class="fa-solid fa-certificate"></i>
+            </div>
+            <div class="text-xs sm:text-sm font-bold text-[#0d2658] leading-snug">
+              100% Approval<br class="hidden sm:inline" /> Rate Guarantee
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 lg:pl-5">
+            <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 text-base">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div class="text-xs sm:text-sm font-bold text-[#0d2658] leading-snug">
+              Global Platform<br class="hidden sm:inline" /> Acceptance
+            </div>
+          </div>
         </div>
       </div>
-      <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-slate-600">
-        <button type="button" onclick="openPrivacyModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Privacy Policy</button>
-        <button type="button" onclick="openTermsModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Terms of Service</button>
-        <button type="button" onclick="openDisclaimerModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Disclaimer</button>
-        <button type="button" onclick="openCookieModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Cookie Policy</button>
-        <button type="button" onclick="openContactModal()" class="hover:text-slate-900 transition-colors cursor-pointer">Contact Us</button>
-        <button type="button" onclick="openAboutModal()" class="hover:text-slate-900 transition-colors cursor-pointer">About Us</button>
+
+      <!-- Dark Blue Need Help CTA Banner -->
+      <div class="kyc-support-banner rounded-3xl px-6 py-5 sm:px-8 sm:py-6 text-white flex flex-col lg:flex-row items-center justify-between gap-5">
+        <div class="flex items-center gap-4 text-center sm:text-left">
+          <div class="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl text-sky-300 shrink-0">
+            <i class="fa-solid fa-headset"></i>
+          </div>
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold leading-tight">Need Help?</h3>
+            <p class="text-xs sm:text-sm text-blue-100/90">Our support team is here to help you 24/7.</p>
+          </div>
+        </div>
+
+        <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount || 'paypal')" class="kyc-green-pill px-8 py-3 rounded-full text-[#052e16] font-extrabold text-sm inline-flex items-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer shrink-0">
+          <span>Verify Your Accounts</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+
+        <button type="button" onclick="openContactModal()" class="flex items-center gap-3 text-left hover:opacity-90 transition-opacity cursor-pointer">
+          <div class="w-11 h-11 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-lg text-sky-300 shrink-0">
+            <i class="fa-solid fa-phone-volume"></i>
+          </div>
+          <div>
+            <div class="text-xs text-blue-200 font-semibold">Contact Support</div>
+            <div class="text-base font-extrabold tracking-tight">+91 123-45-787</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FLOWING WAVE FOOTER ================= -->
+  <footer class="no-print kyc-wave-footer relative overflow-hidden border-t border-blue-100 pt-10 pb-8 px-4 sm:px-6 lg:px-8 text-[#1e3a6e]">
+    <!-- Subtle Flowing Wave Decoration -->
+    <svg aria-hidden="true" class="absolute inset-x-0 top-0 w-full h-full pointer-events-none opacity-65" preserveAspectRatio="none" viewBox="0 0 1440 200">
+      <path d="M0,48 C280,115 580,5 960,55 C1200,88 1340,38 1440,22 L1440,200 L0,200 Z" fill="#dbeeff"/>
+      <path d="M0,96 C360,36 740,145 1140,85 C1300,62 1380,82 1440,98 L1440,200 L0,200 Z" fill="#cde6ff" opacity="0.7"/>
+    </svg>
+
+    <div class="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <!-- Brand Logo -->
+      <a href="/" onclick="goToHomePage(event)" class="inline-flex items-center cursor-pointer shrink-0" aria-label="GetKYCApproved Home">
+        <img src="/assets/aistudio/getkycapproved_trimmed.png" alt="GetKYCApproved" class="h-12 sm:h-14 w-auto max-w-[240px] object-contain">
+      </a>
+
+      <!-- Policy & Support Links -->
+      <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm font-semibold text-[#1e3a6e]">
+        <button type="button" onclick="openTermsModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Terms of Service</button>
+        <span class="text-blue-300">|</span>
+        <button type="button" onclick="openPrivacyModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Privacy Policy</button>
+        <span class="text-blue-300">|</span>
+        <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Support</button>
+        <span class="text-blue-300">|</span>
+        <button type="button" onclick="openDisclaimerModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Disclaimer</button>
+        <span class="text-blue-300">|</span>
+        <button type="button" onclick="openCookieModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Cookie Policy</button>
       </nav>
+
+      <!-- Social Action Icons -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <button type="button" onclick="openContactModal()" aria-label="Facebook Support" class="w-9 h-9 rounded-full bg-[#1877F2] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-facebook-f text-sm"></i>
+        </button>
+        <button type="button" onclick="openContactModal()" aria-label="WhatsApp Support" class="w-9 h-9 rounded-full bg-[#25D366] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-whatsapp text-base"></i>
+        </button>
+        <button type="button" onclick="openContactModal()" aria-label="Telegram Support" class="w-9 h-9 rounded-full bg-[#229ED9] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-telegram text-sm"></i>
+        </button>
+        <button type="button" onclick="openAboutModal()" aria-label="YouTube Guide" class="w-9 h-9 rounded-full bg-[#FF0000] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <i class="fa-brands fa-youtube text-sm"></i>
+        </button>
+      </div>
     </div>
   </footer>
 
