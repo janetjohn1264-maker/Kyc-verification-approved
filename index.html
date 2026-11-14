@@ -1946,29 +1946,30 @@ var $ = window.$ || (id => document.getElementById(id));
     if (typeof window !== 'undefined') window.platformData = platformData;
 
     // Virtual Account Selection Handler
-    function selectVirtualAccount(accountKey) {
-      currentVirtualAccount = accountKey || 'paypal';
+    function selectVirtualAccount(accountKey, opts) {
+      const options = typeof opts === 'boolean' ? { silent: opts } : (opts || {});
+      currentVirtualAccount = (accountKey && platformData[accountKey]) ? accountKey : 'paypal';
       const meta = platformData[currentVirtualAccount] || platformData.paypal;
 
       // Update badge
       const badge = $('active-account-badge');
       if (badge) {
         badge.style.backgroundColor = meta.color || '#003087';
-        badge.innerHTML = `<i class="${meta.icon} text-sm"></i><span>${meta.name} Active</span>`;
+        badge.innerHTML = `<i class="${meta.icon} text-sm"></i><span>${meta.name} Selected</span>`;
       }
 
       // Update tip
       const tip = $('platform-kyc-tip');
       if (tip) {
         if (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut') {
-          tip.innerHTML = `<strong>${meta.name}:</strong> Supports official <strong>Proof of Account</strong> confirmation letters (<strong>Grey Account</strong>, <strong>Wise Account</strong>, or <strong>Revolut</strong>) as well as Passport &amp; National ID. <button type="button" onclick="switchVerificationDoc('proofofaccount'); switchPoaProvider('${currentVirtualAccount}');" class="underline font-bold text-slate-900 ml-1 cursor-pointer">Open ${meta.name} Proof of Account &rarr;</button>`;
+          tip.innerHTML = `<strong>${meta.name}:</strong> Supports official <strong>Proof of Account</strong> confirmation letters (<strong>Grey Account</strong>, <strong>Wise Account</strong>, or <strong>Revolut</strong>) as well as country-configured Passport &amp; National ID. <button type="button" onclick="if(getConfiguredDocsForCountry(currentCountry).includes('proofofaccount')){switchVerificationDoc('proofofaccount'); switchPoaProvider('${currentVirtualAccount}');}else{openAccountCountryFlow('${currentVirtualAccount}', { step: 'country' });}" class="underline font-bold text-slate-900 ml-1 cursor-pointer">Open ${meta.name} Verification &rarr;</button>`;
         } else {
-          tip.innerHTML = `<strong>${meta.name}:</strong> Requires a valid government-issued <strong>Passport</strong>, <strong>National Identity Card</strong>, <strong>Proof of Address</strong>, or <strong>Proof of Account</strong> (Grey, Wise, Revolut) for instant ${meta.badge} verification and payout clearance.`;
+          tip.innerHTML = `<strong>${meta.name}:</strong> ${meta.tip || 'Select your country to retrieve available government-issued Passport, National ID, or Proof documents.'}`;
         }
       }
 
-      if (currentDocType === 'proofofaccount' && (accountKey === 'grey' || accountKey === 'wise' || accountKey === 'revolut')) {
-        if (typeof switchPoaProvider === 'function') switchPoaProvider(accountKey, true);
+      if (currentDocType === 'proofofaccount' && (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut')) {
+        if (typeof switchPoaProvider === 'function') switchPoaProvider(currentVirtualAccount, true);
       }
 
       // Highlight active button
@@ -1982,63 +1983,590 @@ var $ = window.$ || (id => document.getElementById(id));
         activeBtn.classList.add('border-2', 'border-[#003087]', 'bg-blue-50/70', 'ring-2', 'ring-blue-500/30');
       }
 
-      showToast(`Selected ${meta.name}`, `Loaded document verification for ${meta.name}`);
+      if (typeof syncActiveWorkflowBar === 'function') syncActiveWorkflowBar();
+
+      if (options.openCountryFlow) {
+        openAccountCountryFlow(currentVirtualAccount, { step: 'country' });
+        return;
+      }
+
+      if (!options.silent) {
+        showToast(`Selected ${meta.name}`, `Choose a country to view verification documents for ${meta.name}`);
+      }
     }
 
-    // Guided Account -> Country Dropdown -> Document Types Flow
-    const countryCatalog = [
-      { key: 'kenya', name: 'Kenya', flag: '🇰🇪', subtitle: 'Maisha Namba & E-Passport' },
-      { key: 'somalia', name: 'Somalia', flag: '🇸🇴', subtitle: 'National ID, E-Passport & Driver License' },
-      { key: 'ethiopia', name: 'Ethiopia', flag: '🇪🇹', subtitle: 'E-Passport & Fayda ID' },
-      { key: 'nigeria', name: 'Nigeria', flag: '🇳🇬', subtitle: 'National ID & E-Passport' },
-      { key: 'uk', name: 'United Kingdom', flag: '🇬🇧', subtitle: 'British Citizen Passport' },
-      { key: 'uganda', name: 'Uganda', flag: '🇺🇬', subtitle: 'National ID Card (NIRA)' },
-      { key: 'pakistan', name: 'Pakistan', flag: '🇵🇰', subtitle: 'National Identity Card (SNIC)' },
-      { key: 'senegal', name: 'Senegal', flag: '🇸🇳', subtitle: 'National ID Card & E-Passport' },
-      { key: 'southafrica', name: 'South Africa', flag: '🇿🇦', subtitle: 'Passport / Passeport (ZAF)' },
-      { key: 'usa', name: 'United States', flag: '🇺🇸', subtitle: 'U.S. Passport (USA)' },
-      { key: 'seychelles', name: 'Seychelles', flag: '🇸🇨', subtitle: 'National Identity Card' },
-      { key: 'drcongo', name: 'DR Congo', flag: '🇨🇩', subtitle: 'Passeport Biométrique (COD)' },
-      { key: 'bangladesh', name: 'Bangladesh', flag: '🇧🇩', subtitle: 'e-Passport (BGD)' },
-      { key: 'germany', name: 'Germany', flag: '🇩🇪', subtitle: 'Reisepass (Deutschland)' },
-      { key: 'canada', name: 'Canada', flag: '🇨🇦', subtitle: 'Passeport / Passport (CAN)' },
-      { key: 'ghana', name: 'Ghana', flag: '🇬🇭', subtitle: 'Passport / Passeport (GHA)' },
-      { key: 'rwanda', name: 'Rwanda', flag: '🇷🇼', subtitle: 'ID Card (Indangamuntu)' },
-      { key: 'nepal', name: 'Nepal', flag: '🇳🇵', subtitle: 'Passport (NPL)' },
-      { key: 'malawi', name: 'Malawi', flag: '🇲🇼', subtitle: 'Passport / Passeport (MWI)' },
-      { key: 'uae', name: 'United Arab Emirates', flag: '🇦🇪', subtitle: 'Resident ID Card' },
-      { key: 'turkey', name: 'Turkey', flag: '🇹🇷', subtitle: 'Pasaport & Kimlik Kartı' }
-    ];
+    // Read countries dynamically from existing website country buttons (Single Source of Truth)
+    function getExistingWebsiteCountries() {
+      const buttons = document.querySelectorAll('#existing-country-registry .country-pill-btn[id^="country-btn-"], .country-pill-btn[id^="country-btn-"]');
+      const seen = new Set();
+      const list = [];
+      buttons.forEach(btn => {
+        const key = btn.id.replace('country-btn-', '').trim();
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        const flagEl = btn.querySelector('.text-2xl, [data-country-flag]');
+        const nameEl = btn.querySelector('.text-xs.sm\\:text-sm, .font-black, [data-country-name]');
+        const subEl = btn.querySelector('.text-\\[10px\\], [data-country-subtitle]');
+        list.push({
+          key,
+          flag: flagEl ? flagEl.textContent.trim() : '',
+          name: nameEl ? nameEl.textContent.trim() : key,
+          subtitle: subEl ? subEl.textContent.trim() : '',
+          docsAttr: (btn.getAttribute('data-docs') || '').trim()
+        });
+      });
+      return list;
+    }
+    window.getExistingWebsiteCountries = getExistingWebsiteCountries;
+
+    // Derive configured document types strictly from existing document views & configuration for that country
+    function getConfiguredDocsForCountry(countryKey) {
+      if (!countryKey) return [];
+      const btn = $('country-btn-' + countryKey);
+      const dataDocs = btn ? (btn.getAttribute('data-docs') || '').trim() : '';
+      if (dataDocs) {
+        return dataDocs.split(',').map(s => s.trim()).filter(Boolean);
+      }
+
+      const docs = [];
+      if ($(countryKey + '-passport-view')) {
+        docs.push('passport');
+      }
+      if ($(countryKey + '-idcard-view') || $(countryKey + '-doc-view')) {
+        docs.push('idcard');
+      }
+      if ($(countryKey + '-driverlicense-view')) {
+        docs.push('driverlicense');
+      }
+      if (countryKey === 'bangladesh' || $(countryKey + '-proofofaddress-view')) {
+        docs.push('refugeecard');
+      }
+      if ((Array.isArray(window.poaConfiguredCountryKeys) && window.poaConfiguredCountryKeys.includes(countryKey)) || $(countryKey + '-proofofaccount-view')) {
+        docs.push('proofofaccount');
+      }
+      return docs;
+    }
+    window.getConfiguredDocsForCountry = getConfiguredDocsForCountry;
+
+    function resolveCountryViewElement(countryKey, docType) {
+      if (!countryKey || !docType) return null;
+      if (docType === 'passport') return $(`${countryKey}-passport-view`);
+      if (docType === 'idcard') return $(`${countryKey}-idcard-view`) || $(`${countryKey}-doc-view`);
+      if (docType === 'driverlicense') return $(`${countryKey}-driverlicense-view`);
+      if (docType === 'refugeecard') {
+        return $(`${countryKey}-proofofaddress-view`) || (countryKey === 'bangladesh' ? $('proofofaddress-doc-view') : null);
+      }
+      if (docType === 'proofofaccount') {
+        const custom = $(`${countryKey}-proofofaccount-view`);
+        if (custom) return custom;
+        if (Array.isArray(window.poaConfiguredCountryKeys) && window.poaConfiguredCountryKeys.includes(countryKey)) {
+          return $('proofofaccount-doc-view');
+        }
+        return null;
+      }
+      return $(`${countryKey}-${docType}-view`);
+    }
+
+    function extractViewThumbnail(viewEl, docType) {
+      if (!viewEl) return '';
+      const imgs = Array.from(viewEl.querySelectorAll('img[src]'));
+      const candidates = imgs.map(img => img.getAttribute('src') || '').filter(src => {
+        if (!src || src.startsWith('data:')) return false;
+        return !/logo|chip|coat|emblem|sig|flag|watermark|patch|barcode|leaves|ghost|wave|seal|qr/i.test(src);
+      });
+      const preferred = candidates.find(src => /reference|plate|spread|clean_bg|passport|cnic|id_front|17939549|17939595/i.test(src));
+      if (preferred) return preferred;
+      if (candidates.length > 0) return candidates[0];
+      if (docType === 'proofofaccount') {
+        return currentVirtualAccount === 'grey'
+          ? '/assets/aistudio/1793954903894_cb01dc06.jpg'
+          : '/assets/aistudio/1793954988317_80f3f77d.jpg';
+      }
+      return '';
+    }
+
+    function getCountryDocumentItems(countryKey) {
+      if (!countryKey) return [];
+      const countries = getExistingWebsiteCountries();
+      const countryInfo = countries.find(c => c.key === countryKey);
+      const countryName = countryInfo ? countryInfo.name : countryKey;
+      const configuredDocs = getConfiguredDocsForCountry(countryKey);
+
+      const categoryLabels = {
+        passport: 'Passport',
+        idcard: 'National Identity',
+        driverlicense: "Driver's License",
+        refugeecard: 'Proof of Address',
+        proofofaccount: 'Proof of Account'
+      };
+      const iconMap = {
+        passport: 'fa-solid fa-passport',
+        idcard: 'fa-solid fa-id-card',
+        driverlicense: 'fa-solid fa-id-badge',
+        refugeecard: 'fa-solid fa-bolt',
+        proofofaccount: 'fa-solid fa-file-invoice-dollar'
+      };
+      const accentMap = {
+        passport: { bg: 'bg-emerald-600', border: 'border-emerald-200 hover:border-emerald-500', tint: 'from-emerald-50/75 to-white', arrow: 'text-emerald-700' },
+        idcard: { bg: 'bg-blue-600', border: 'border-blue-200 hover:border-blue-500', tint: 'from-blue-50/75 to-white', arrow: 'text-blue-700' },
+        driverlicense: { bg: 'bg-sky-600', border: 'border-sky-200 hover:border-sky-500', tint: 'from-sky-50/75 to-white', arrow: 'text-sky-700' },
+        refugeecard: { bg: 'bg-amber-600', border: 'border-amber-200 hover:border-amber-500', tint: 'from-amber-50/75 to-white', arrow: 'text-amber-700' },
+        proofofaccount: { bg: 'bg-slate-900', border: 'border-slate-300 hover:border-slate-700', tint: 'from-slate-50 to-white', arrow: 'text-slate-800' }
+      };
+
+      const viewTitleRefinements = {
+        'nigeria-doc-view': {
+          name: 'Nigeria NIMC National ID Card',
+          description: 'Federal Republic of Nigeria · NIMC Digital NIN Slip & National Identity Card Editor'
+        },
+        'nigeria-passport-view': {
+          name: 'Nigeria Biometric e-Passport',
+          description: 'Federal Republic of Nigeria · Official ICAO 9303 e-Passport Live Preview Editor'
+        },
+        'pakistan-doc-view': {
+          name: 'Pakistan CNIC / SNIC Identity Card',
+          description: 'Islamic Republic of Pakistan · NADRA Smart National Identity Card Live Editor'
+        },
+        'seychelles-doc-view': {
+          name: 'Seychelles National Identity Card',
+          description: 'Republic of Seychelles · Dual-Sided Biometric National ID Live Specimen Editor'
+        },
+        'senegal-passport-view': {
+          name: 'Senegal Passeport Biométrique',
+          description: 'République du Sénégal · CEDEAO / ECOWAS Biometric e-Passport Live Editor'
+        }
+      };
+
+      return configuredDocs.map(docType => {
+        const viewEl = resolveCountryViewElement(countryKey, docType);
+        const viewId = viewEl ? viewEl.id : '';
+        let name = categoryLabels[docType] || docType;
+        let description = `${countryName} official verification document editor`;
+
+        if (docType === 'proofofaccount' && (!viewEl || viewId === 'proofofaccount-doc-view')) {
+          const poaInfo = (typeof poaCountryMap !== 'undefined' && poaCountryMap[countryKey]) ? poaCountryMap[countryKey] : null;
+          name = `${countryName} Proof of Account Letter`;
+          description = poaInfo
+            ? `${poaInfo.bank} · Grey, Wise & Revolut PDF Confirmation Letter Editor`
+            : 'Grey, Wise & Revolut Account Confirmation Letter & Address PDF';
+        } else if (viewId && viewTitleRefinements[viewId]) {
+          name = viewTitleRefinements[viewId].name;
+          description = viewTitleRefinements[viewId].description;
+        } else if (viewEl) {
+          const headingEl = viewEl.querySelector('h1, h2, h3');
+          if (headingEl) {
+            const rawHeading = headingEl.textContent.replace(/\s+/g, ' ').trim();
+            const stripped = rawHeading.replace(/^[\u{1F1E6}-\u{1F1FF}]{2}\s*/u, '').trim();
+            if (stripped && stripped.toLowerCase() !== countryName.toLowerCase()) {
+              name = stripped;
+            }
+          }
+          const subEl = viewEl.querySelector('header p, section p, main p');
+          if (subEl) {
+            const rawSub = subEl.textContent.replace(/\s+/g, ' ').trim();
+            if (rawSub && rawSub.length <= 140) {
+              description = rawSub;
+            } else if (rawSub) {
+              description = rawSub.slice(0, 120).replace(/\s+\S*$/, '') + '…';
+            }
+          }
+        }
+
+        const thumbnail = extractViewThumbnail(viewEl, docType);
+        return {
+          countryKey,
+          countryName,
+          countryFlag: countryInfo ? countryInfo.flag : '',
+          docType,
+          viewId,
+          name,
+          category: categoryLabels[docType] || docType,
+          description,
+          thumbnail,
+          icon: iconMap[docType] || 'fa-solid fa-file-lines',
+          accent: accentMap[docType] || accentMap.passport
+        };
+      });
+    }
+    window.getCountryDocumentItems = getCountryDocumentItems;
+
+    function refreshActiveDocumentPreview(countryKey, docType) {
+      if (!countryKey || !docType) return;
+      if (docType === 'proofofaccount') {
+        if (typeof switchPoaViewMode === 'function') switchPoaViewMode('letter', true);
+        if (typeof updatePoaCountryDisplay === 'function') updatePoaCountryDisplay(countryKey);
+        if (typeof switchPoaProvider === 'function') {
+          const initialProvider = (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut')
+            ? currentVirtualAccount
+            : (window.currentPoaProvider || 'wise');
+          switchPoaProvider(initialProvider, true);
+        } else if (typeof updateProofOfAccountPreview === 'function') {
+          updateProofOfAccountPreview();
+        }
+        return;
+      }
+      if (docType === 'refugeecard') {
+        if (typeof updateProofOfAddressPreview === 'function') updateProofOfAddressPreview();
+        return;
+      }
+      const fnByCountryDoc = {
+        'kenya:passport': () => { if (typeof updatePreview === 'function') updatePreview(); },
+        'kenya:idcard': () => { if (typeof updateKidPreview === 'function') updateKidPreview(); },
+        'somalia:passport': () => { if (typeof updateSomPassPreview === 'function') updateSomPassPreview(); },
+        'somalia:idcard': () => {
+          if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
+          if (typeof updateSomPreview === 'function') updateSomPreview();
+        },
+        'somalia:driverlicense': () => { if (typeof updateSomLicPreview === 'function') updateSomLicPreview(); },
+        'ethiopia:passport': () => { if (typeof updateEthPassPreview === 'function') updateEthPassPreview(); },
+        'ethiopia:idcard': () => { if (typeof updateEthPreview === 'function') updateEthPreview(); },
+        'nigeria:passport': () => { if (typeof updateNgaPassPreview === 'function') updateNgaPassPreview(); },
+        'nigeria:idcard': () => { if (typeof updateNgaPreview === 'function') updateNgaPreview(); },
+        'uk:passport': () => { if (typeof updateUkPassPreview === 'function') updateUkPassPreview(); },
+        'uganda:idcard': () => { if (typeof updateUgandaPreview === 'function') updateUgandaPreview(); },
+        'pakistan:idcard': () => { if (typeof updatePakPreview === 'function') updatePakPreview(); },
+        'senegal:passport': () => { if (typeof updateSenPreview === 'function') updateSenPreview(); },
+        'senegal:idcard': () => { if (typeof updateZafIdPreview === 'function') updateZafIdPreview(); },
+        'southafrica:passport': () => { if (typeof updateSaPassPreview === 'function') updateSaPassPreview(); },
+        'usa:passport': () => { if (typeof updateUsaPassPreview === 'function') updateUsaPassPreview(); },
+        'seychelles:idcard': () => { if (typeof updateSycPreview === 'function') updateSycPreview(); },
+        'drcongo:passport': () => { if (typeof updateDrcPreview === 'function') updateDrcPreview(); },
+        'bangladesh:passport': () => { if (typeof updateBgdPreview === 'function') updateBgdPreview(); },
+        'germany:passport': () => { if (typeof updateDeuPreview === 'function') updateDeuPreview(); },
+        'canada:passport': () => { if (typeof updateCanPreview === 'function') updateCanPreview(); },
+        'ghana:passport': () => { if (typeof updateGhaPreview === 'function') updateGhaPreview(); },
+        'rwanda:idcard': () => { if (typeof updateRwaIdPreview === 'function') updateRwaIdPreview(); },
+        'nepal:passport': () => { if (typeof updateNplPreview === 'function') updateNplPreview(); },
+        'malawi:passport': () => { if (typeof updateMwiPreview === 'function') updateMwiPreview(); },
+        'uae:idcard': () => { if (typeof updateUaeIdPreview === 'function') updateUaeIdPreview(); },
+        'turkey:passport': () => { if (typeof updateTurPassPreview === 'function') updateTurPassPreview(); },
+        'turkey:idcard': () => { if (typeof updateTurIdPreview === 'function') updateTurIdPreview(); }
+      };
+      const fn = fnByCountryDoc[`${countryKey}:${docType}`];
+      if (fn) fn();
+    }
+    window.refreshActiveDocumentPreview = refreshActiveDocumentPreview;
+
+    function syncActiveWorkflowBar() {
+      const platformMeta = platformData[currentVirtualAccount] || platformData.paypal;
+      const countries = getExistingWebsiteCountries();
+      const countryInfo = countries.find(c => c.key === currentCountry);
+      const items = getCountryDocumentItems(currentCountry);
+      const activeItem = items.find(it => it.docType === currentDocType) || items[0] || null;
+
+      const platEl = $('wbBarPlatformName');
+      const platIconEl = $('wbBarPlatformIcon');
+      const countryFlagEl = $('wbBarCountryFlag');
+      const countryNameEl = $('wbBarCountryName');
+      const docNameEl = $('wbBarDocName');
+      const backDocsLabelEl = $('wbBackToDocsLabel');
+
+      if (platEl) platEl.textContent = platformMeta.name;
+      if (platIconEl) platIconEl.className = `${platformMeta.icon} text-xs text-blue-600`;
+      if (countryFlagEl) countryFlagEl.textContent = countryInfo ? countryInfo.flag : '🌍';
+      if (countryNameEl) countryNameEl.textContent = countryInfo ? countryInfo.name : currentCountry;
+      if (docNameEl) {
+        docNameEl.textContent = activeItem ? activeItem.name : 'No Document Available';
+      }
+      if (backDocsLabelEl) {
+        backDocsLabelEl.textContent = countryInfo ? `Back to ${countryInfo.name} Documents` : 'Back to Documents';
+      }
+    }
+    window.syncActiveWorkflowBar = syncActiveWorkflowBar;
+
+    function renderSearchableCountryOptions(scope, queryText) {
+      const listEl = $(scope === 'flow' ? 'flowCountryOptionsList' : 'wbCountryOptionsList');
+      if (!listEl) return;
+
+      const countries = getExistingWebsiteCountries();
+      const q = (queryText || '').trim().toLowerCase();
+      const filtered = q
+        ? countries.filter(c => c.name.toLowerCase().includes(q) || c.key.toLowerCase().includes(q) || c.subtitle.toLowerCase().includes(q))
+        : countries;
+
+      const activeKey = scope === 'flow' ? flowSelectedCountry : currentCountry;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="px-4 py-5 text-center text-xs font-semibold text-slate-500">No matching country found</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(c => {
+        const isSelected = c.key === activeKey;
+        const docCount = getConfiguredDocsForCountry(c.key).length;
+        const docLabel = docCount === 1 ? '1 document' : `${docCount} documents`;
+        return `
+          <button
+            type="button"
+            role="option"
+            data-country-key="${c.key}"
+            aria-selected="${isSelected ? 'true' : 'false'}"
+            onclick="selectCountryFromDropdown('${scope}', '${c.key.replace(/'/g, "\\'")}')"
+            class="w-full px-3.5 py-2.5 rounded-xl text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${isSelected ? 'bg-blue-50 text-[#0d2658] font-extrabold' : 'hover:bg-slate-50 text-slate-700 font-semibold'}">
+            <span class="flex items-center gap-3 min-w-0">
+              <span class="text-xl leading-none shrink-0">${c.flag}</span>
+              <span class="truncate text-xs sm:text-sm">${c.name}</span>
+            </span>
+            <span class="flex items-center gap-2 shrink-0">
+              <span class="text-[11px] font-medium text-slate-400 tabular-nums">${docLabel}</span>
+              ${isSelected ? '<i class="fa-solid fa-check text-xs text-blue-600"></i>' : ''}
+            </span>
+          </button>
+        `;
+      }).join('');
+    }
+    window.renderSearchableCountryOptions = renderSearchableCountryOptions;
+
+    function handleCountrySearchKeydown(event, scope) {
+      if (!event || event.key !== 'Enter') return;
+      const listEl = $(scope === 'flow' ? 'flowCountryOptionsList' : 'wbCountryOptionsList');
+      if (!listEl) return;
+      const firstOption = listEl.querySelector('button[data-country-key]');
+      if (firstOption) {
+        event.preventDefault();
+        const key = firstOption.getAttribute('data-country-key');
+        if (key) selectCountryFromDropdown(scope, key);
+      }
+    }
+    window.handleCountrySearchKeydown = handleCountrySearchKeydown;
+
+    function toggleSearchableCountryDropdown(scope) {
+      const menuId = scope === 'flow' ? 'flowCountryDropdownMenu' : 'wbCountryDropdownMenu';
+      const btnId = scope === 'flow' ? 'flowCountryDropdownBtn' : 'wbCountryDropdownBtn';
+      const searchId = scope === 'flow' ? 'flowCountrySearchInput' : 'wbCountrySearchInput';
+      const otherMenuId = scope === 'flow' ? 'wbCountryDropdownMenu' : 'flowCountryDropdownMenu';
+      const otherBtnId = scope === 'flow' ? 'wbCountryDropdownBtn' : 'flowCountryDropdownBtn';
+
+      const menu = $(menuId);
+      const btn = $(btnId);
+      const other = $(otherMenuId);
+      const otherBtn = $(otherBtnId);
+      if (other) other.classList.add('hidden');
+      if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+      if (!menu) return;
+
+      const willOpen = menu.classList.contains('hidden');
+      if (willOpen) {
+        const searchEl = $(searchId);
+        if (searchEl) searchEl.value = '';
+        renderSearchableCountryOptions(scope, '');
+        menu.classList.remove('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
+        setTimeout(() => { if (searchEl) searchEl.focus(); }, 20);
+      } else {
+        menu.classList.add('hidden');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+    window.toggleSearchableCountryDropdown = toggleSearchableCountryDropdown;
+
+    function closeSearchableCountryDropdowns() {
+      const wbMenu = $('wbCountryDropdownMenu');
+      const flowMenu = $('flowCountryDropdownMenu');
+      const wbBtn = $('wbCountryDropdownBtn');
+      const flowBtn = $('flowCountryDropdownBtn');
+      if (wbMenu) wbMenu.classList.add('hidden');
+      if (flowMenu) flowMenu.classList.add('hidden');
+      if (wbBtn) wbBtn.setAttribute('aria-expanded', 'false');
+      if (flowBtn) flowBtn.setAttribute('aria-expanded', 'false');
+    }
+    window.closeSearchableCountryDropdowns = closeSearchableCountryDropdowns;
+
+    function selectCountryFromDropdown(scope, countryKey) {
+      closeSearchableCountryDropdowns();
+      if (scope === 'flow') {
+        handleFlowCountryChange(countryKey, { advanceToDocs: true });
+      } else {
+        switchVerificationCountry(countryKey);
+      }
+    }
+    window.selectCountryFromDropdown = selectCountryFromDropdown;
+
+    function syncWorkbenchCountryDropdownUI(countryKey) {
+      const countries = getExistingWebsiteCountries();
+      const info = countries.find(c => c.key === countryKey);
+      const flagEl = $('wbCountrySelectedFlag');
+      const nameEl = $('wbCountrySelectedName');
+      const countEl = $('wbCountryCountText');
+      if (info) {
+        if (flagEl) flagEl.textContent = info.flag || '🌍';
+        if (nameEl) nameEl.textContent = info.name || countryKey;
+      }
+      if (countEl) {
+        countEl.textContent = `${countries.length} countries`;
+      }
+    }
+
+    function syncWorkbenchDocTabsForCountry(countryKey) {
+      const items = getCountryDocumentItems(countryKey);
+      const configuredDocs = items.map(it => it.docType);
+      const tabIds = {
+        passport: 'tab-doc-passport',
+        idcard: 'tab-doc-idcard',
+        driverlicense: 'tab-doc-driverlicense',
+        refugeecard: 'tab-doc-refugeecard',
+        proofofaccount: 'tab-doc-proofofaccount'
+      };
+
+      Object.keys(tabIds).forEach(docKey => {
+        const el = $(tabIds[docKey]);
+        if (!el) return;
+        const item = items.find(it => it.docType === docKey);
+        el.classList.toggle('hidden', !item);
+        if (item) {
+          const titleEl = el.querySelector('h3');
+          const descEl = el.querySelector('p');
+          const badgeEl = el.querySelector('h3 + span');
+          if (titleEl) titleEl.textContent = item.name;
+          if (descEl) descEl.textContent = item.description;
+          if (badgeEl) badgeEl.textContent = item.category;
+        }
+      });
+
+      const emptyTabsNotice = $('wb-doc-tabs-empty');
+      if (emptyTabsNotice) {
+        emptyTabsNotice.classList.toggle('hidden', configuredDocs.length > 0);
+      }
+
+      const grid = $('workbench-doc-tabs-grid');
+      if (grid) {
+        const colsClass = configuredDocs.length <= 1
+          ? 'grid grid-cols-1 max-w-md gap-3.5'
+          : configuredDocs.length === 2
+          ? 'grid grid-cols-1 sm:grid-cols-2 gap-3.5'
+          : configuredDocs.length === 3
+          ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5'
+          : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5';
+        grid.className = colsClass;
+      }
+
+      if (configuredDocs.length > 0 && !configuredDocs.includes(currentDocType)) {
+        switchVerificationDoc(configuredDocs[0], true);
+      }
+      syncActiveWorkflowBar();
+    }
 
     let flowSelectedCountry = '';
+    let flowActiveStep = 'country';
 
-    function openAccountCountryFlow(accountKey) {
-      selectVirtualAccount(accountKey || 'paypal');
+    function renderFlowAccountsGrid() {
+      const grid = $('flowAccountsGrid');
+      if (!grid || typeof platformData === 'undefined') return;
+      grid.innerHTML = Object.keys(platformData).map(key => {
+        const p = platformData[key];
+        const active = key === currentVirtualAccount;
+        return `
+          <button
+            type="button"
+            onclick="selectFlowPlatform('${key.replace(/'/g, "\\'")}')"
+            class="p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-3 ${active ? 'border-2 border-[#0d2658] bg-blue-50/75 shadow-sm' : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50'}">
+            <div class="w-10 h-10 rounded-xl text-white flex items-center justify-center shrink-0 text-base shadow-xs" style="background-color: ${p.color || '#003087'};">
+              <i class="${p.icon}"></i>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="text-xs sm:text-sm font-extrabold text-[#0d2658] truncate">${p.name}</div>
+              <div class="text-[11px] text-slate-500 truncate">${p.badge}</div>
+            </div>
+            ${active ? '<i class="fa-solid fa-circle-check text-blue-600 text-sm shrink-0"></i>' : '<i class="fa-solid fa-chevron-right text-[11px] text-slate-400 shrink-0"></i>'}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectFlowPlatform(accountKey) {
+      selectVirtualAccount(accountKey, { silent: true });
+      const meta = platformData[currentVirtualAccount] || platformData.paypal;
+      const titleEl = $('flowModalAccountTitle');
+      const subEl = $('flowModalAccountSub');
+      const iconWrap = $('flowModalIconWrap');
+      const iconEl = $('flowModalIcon');
+      if (titleEl) titleEl.textContent = meta.name;
+      if (subEl) subEl.textContent = `${meta.currency} · ${meta.kycLevel || 'Select your country to view documents'}`;
+      if (iconWrap) iconWrap.style.backgroundColor = meta.color || '#003087';
+      if (iconEl) iconEl.className = `${meta.icon} text-xl text-white`;
+      goToFlowStep('country');
+    }
+    window.selectFlowPlatform = selectFlowPlatform;
+
+    function goToFlowStep(step) {
+      flowActiveStep = step || 'country';
+      const accView = $('flowStepAccountsView');
+      const countryView = $('flowStepCountryView');
+      const docsView = $('flowStepDocumentsView');
+      if (accView) accView.classList.toggle('hidden', flowActiveStep !== 'accounts');
+      if (countryView) countryView.classList.toggle('hidden', flowActiveStep !== 'country');
+      if (docsView) docsView.classList.toggle('hidden', flowActiveStep !== 'documents');
+
+      const stepMap = { accounts: 1, country: 2, documents: 3 };
+      const currentNum = stepMap[flowActiveStep] || 2;
+      [1, 2, 3].forEach(num => {
+        const indicator = $(`flowStepperItem-${num}`);
+        const badge = $(`flowStepperNum-${num}`);
+        if (!indicator || !badge) return;
+        if (num === currentNum) {
+          indicator.className = 'flex items-center gap-2 text-xs font-extrabold text-[#0d2658]';
+          badge.className = 'w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-black shrink-0';
+        } else if (num < currentNum) {
+          indicator.className = 'flex items-center gap-2 text-xs font-bold text-emerald-700 cursor-pointer';
+          badge.className = 'w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] font-black shrink-0';
+        } else {
+          indicator.className = 'flex items-center gap-2 text-xs font-semibold text-slate-400';
+          badge.className = 'w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[11px] font-bold shrink-0';
+        }
+      });
+
+      if (flowActiveStep === 'accounts') {
+        renderFlowAccountsGrid();
+      } else if (flowActiveStep === 'country') {
+        const continueBtn = $('flowContinueToDocsBtn');
+        if (continueBtn) {
+          continueBtn.classList.toggle('hidden', !flowSelectedCountry);
+          continueBtn.classList.toggle('inline-flex', Boolean(flowSelectedCountry));
+        }
+      }
+    }
+    window.goToFlowStep = goToFlowStep;
+
+    function openAccountCountryFlow(accountKey, opts) {
+      const options = opts || {};
+      selectVirtualAccount(accountKey || currentVirtualAccount || 'paypal', { silent: true });
       const meta = platformData[currentVirtualAccount] || platformData.paypal;
 
       const titleEl = $('flowModalAccountTitle');
       const subEl = $('flowModalAccountSub');
       const iconWrap = $('flowModalIconWrap');
       const iconEl = $('flowModalIcon');
-      const selectEl = $('flowCountrySelect');
-      const docsWrap = $('flowDocumentsSection');
-      const promptEl = $('flowSelectCountryPrompt');
+      const flagEl = $('flowCountrySelectedFlag');
+      const nameEl = $('flowCountrySelectedName');
+      const searchEl = $('flowCountrySearchInput');
 
       if (titleEl) titleEl.textContent = meta.name;
-      if (subEl) subEl.textContent = `${meta.currency} · Select your country to unlock documents`;
+      if (subEl) subEl.textContent = `${meta.currency} · ${meta.kycLevel || 'Select your country to unlock documents'}`;
       if (iconWrap) iconWrap.style.backgroundColor = meta.color || '#003087';
       if (iconEl) iconEl.className = `${meta.icon} text-xl text-white`;
 
-      flowSelectedCountry = '';
-      if (selectEl) {
-        selectEl.value = '';
+      if (options.countryKey) {
+        flowSelectedCountry = options.countryKey;
+      } else if (!options.preserveCountry) {
+        flowSelectedCountry = '';
       }
-      if (docsWrap) {
-        docsWrap.classList.add('hidden');
+
+      if (flowSelectedCountry) {
+        const info = getExistingWebsiteCountries().find(c => c.key === flowSelectedCountry);
+        if (flagEl) flagEl.textContent = info ? (info.flag || '🌍') : '🌍';
+        if (nameEl) nameEl.textContent = info ? info.name : flowSelectedCountry;
+        handleFlowCountryChange(flowSelectedCountry, { advanceToDocs: options.step === 'documents' });
+      } else {
+        if (flagEl) flagEl.textContent = '🌍';
+        if (nameEl) nameEl.textContent = '-- Select your country --';
+        const promptEl = $('flowSelectCountryPrompt');
+        if (promptEl) promptEl.classList.remove('hidden');
       }
-      if (promptEl) {
-        promptEl.classList.remove('hidden');
-      }
+
+      if (searchEl) searchEl.value = '';
+      closeSearchableCountryDropdowns();
+      renderSearchableCountryOptions('flow', '');
+      goToFlowStep(options.step || 'country');
 
       const modal = $('accountCountryFlowModal');
       if (modal) {
@@ -2049,6 +2577,7 @@ var $ = window.$ || (id => document.getElementById(id));
     window.openAccountCountryFlow = openAccountCountryFlow;
 
     function closeAccountCountryFlow() {
+      closeSearchableCountryDropdowns();
       const modal = $('accountCountryFlowModal');
       if (modal) {
         modal.classList.add('hidden');
@@ -2057,41 +2586,141 @@ var $ = window.$ || (id => document.getElementById(id));
     }
     window.closeAccountCountryFlow = closeAccountCountryFlow;
 
-    function handleFlowCountryChange(countryKey) {
+    function handleFlowCountryChange(countryKey, opts) {
+      const options = opts || {};
       flowSelectedCountry = countryKey || '';
-      const docsWrap = $('flowDocumentsSection');
+      const docsGrid = $('flowDocumentsGrid');
+      const emptyStateEl = $('flowNoDocumentsState');
+      const emptyCountryNameEl = $('flowNoDocsCountryName');
       const promptEl = $('flowSelectCountryPrompt');
       const countryLabel = $('flowChosenCountryLabel');
+      const countrySummaryFlag = $('flowDocsCountryFlag');
+      const countrySummaryName = $('flowDocsCountryName');
+      const countrySummaryMeta = $('flowDocsCountryMeta');
+      const flagEl = $('flowCountrySelectedFlag');
+      const nameEl = $('flowCountrySelectedName');
+      const continueBtn = $('flowContinueToDocsBtn');
 
       if (!flowSelectedCountry) {
-        if (docsWrap) docsWrap.classList.add('hidden');
+        if (flagEl) flagEl.textContent = '🌍';
+        if (nameEl) nameEl.textContent = '-- Select your country --';
         if (promptEl) promptEl.classList.remove('hidden');
+        if (continueBtn) {
+          continueBtn.classList.add('hidden');
+          continueBtn.classList.remove('inline-flex');
+        }
         return;
       }
 
-      const info = countryCatalog.find(c => c.key === flowSelectedCountry);
-      if (countryLabel && info) {
-        countryLabel.textContent = `${info.flag} ${info.name}`;
-      }
-      if (promptEl) promptEl.classList.add('hidden');
-      if (docsWrap) docsWrap.classList.remove('hidden');
+      const info = getExistingWebsiteCountries().find(c => c.key === flowSelectedCountry);
+      const displayName = info ? info.name : flowSelectedCountry;
+      const displayFlag = info ? (info.flag || '🌍') : '🌍';
 
-      switchVerificationCountry(flowSelectedCountry);
+      if (flagEl) flagEl.textContent = displayFlag;
+      if (nameEl) nameEl.textContent = displayName;
+      if (countryLabel) countryLabel.textContent = `${displayFlag} ${displayName}`;
+      if (countrySummaryFlag) countrySummaryFlag.textContent = displayFlag;
+      if (countrySummaryName) countrySummaryName.textContent = displayName;
+      if (continueBtn) {
+        continueBtn.classList.remove('hidden');
+        continueBtn.classList.add('inline-flex');
+      }
+
+      const items = getCountryDocumentItems(flowSelectedCountry);
+      if (countrySummaryMeta) {
+        const metaPlatform = platformData[currentVirtualAccount] || platformData.paypal;
+        countrySummaryMeta.textContent = `${metaPlatform.name} · ${items.length === 1 ? '1 template available' : `${items.length} templates available`}`;
+      }
+
+      if (docsGrid) {
+        if (items.length === 0) {
+          docsGrid.innerHTML = '';
+          docsGrid.classList.add('hidden');
+          if (emptyCountryNameEl) emptyCountryNameEl.textContent = displayName;
+          if (emptyStateEl) emptyStateEl.classList.remove('hidden');
+        } else {
+          if (emptyStateEl) emptyStateEl.classList.add('hidden');
+          docsGrid.classList.remove('hidden');
+          docsGrid.className = items.length === 1 ? 'grid grid-cols-1 gap-3' : 'grid grid-cols-1 sm:grid-cols-2 gap-3';
+          docsGrid.innerHTML = items.map(item => {
+            const thumbHtml = item.thumbnail
+              ? `<div class="w-16 h-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative flex items-center justify-center">
+                   <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                   <div class="hidden w-full h-full ${item.accent.bg} text-white flex items-center justify-center text-base"><i class="${item.icon}"></i></div>
+                 </div>`
+              : `<div class="w-12 h-12 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-lg shrink-0"><i class="${item.icon}"></i></div>`;
+
+            return `
+              <button
+                type="button"
+                onclick="selectFlowDocument('${item.docType.replace(/'/g, "\\'")}')"
+                class="p-4 rounded-2xl border ${item.accent.border} bg-gradient-to-br ${item.accent.tint} hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
+                ${thumbHtml}
+                <div class="min-w-0 flex-1 space-y-1">
+                  <div class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                    <span>${item.category}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>${item.countryName}</span>
+                  </div>
+                  <div class="text-sm font-extrabold text-[#0d2658] leading-snug truncate">${item.name}</div>
+                  <div class="text-[11px] text-slate-600 line-clamp-2 leading-snug">${item.description}</div>
+                  <div class="pt-1 inline-flex items-center gap-1.5 text-xs font-bold ${item.accent.arrow} group-hover:translate-x-0.5 transition-transform">
+                    <span>Open Live Editor</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                  </div>
+                </div>
+              </button>
+            `;
+          }).join('');
+        }
+      }
+
+      if (promptEl) promptEl.classList.add('hidden');
+      switchVerificationCountry(flowSelectedCountry, { silent: true });
+      if (options.advanceToDocs) {
+        goToFlowStep('documents');
+      }
     }
     window.handleFlowCountryChange = handleFlowCountryChange;
+
+    function openCountryDocumentEditor(countryKey, docType, opts) {
+      const options = opts || {};
+      const configuredDocs = getConfiguredDocsForCountry(countryKey);
+      const targetDoc = (docType && configuredDocs.includes(docType))
+        ? docType
+        : (configuredDocs[0] || '');
+
+      switchVerificationCountry(countryKey, { silent: true, preferredDocType: targetDoc });
+      if (targetDoc) {
+        switchVerificationDoc(targetDoc, true);
+      }
+      refreshActiveDocumentPreview(countryKey, targetDoc);
+      syncActiveWorkflowBar();
+
+      const items = getCountryDocumentItems(countryKey);
+      const activeItem = items.find(it => it.docType === targetDoc);
+      if (!options.silent && activeItem) {
+        showToast(`${activeItem.countryFlag} ${activeItem.name}`, `Live preview editor ready for ${activeItem.countryName}`);
+      }
+
+      if (options.scrollToEditor) {
+        const targetView = activeItem && activeItem.viewId ? $(activeItem.viewId) : null;
+        const bar = $('active-editor-workflow-bar') || $('verification-workbench');
+        const scrollTarget = bar || targetView;
+        if (scrollTarget) {
+          scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+    window.openCountryDocumentEditor = openCountryDocumentEditor;
 
     function selectFlowDocument(docType) {
       if (!flowSelectedCountry) {
         showToast('Select Country First', 'Please choose a country from the drop-down list.');
         return;
       }
-      switchVerificationCountry(flowSelectedCountry);
-      switchVerificationDoc(docType);
       closeAccountCountryFlow();
-      const wb = $('verification-workbench');
-      if (wb) {
-        wb.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      openCountryDocumentEditor(flowSelectedCountry, docType, { scrollToEditor: true });
     }
     window.selectFlowDocument = selectFlowDocument;
 
@@ -2105,7 +2734,7 @@ var $ = window.$ || (id => document.getElementById(id));
     window.toggleHeaderMenuPopover = toggleHeaderMenuPopover;
 
     // Switch Document Type: 'passport' vs 'idcard' vs 'driverlicense' vs 'refugeecard'
-    function switchVerificationDoc(docType) {
+    function switchVerificationDoc(docType, silent) {
       currentDocType = docType;
       const passTab = $('tab-doc-passport');
       const idTab = $('tab-doc-idcard');
@@ -2233,13 +2862,20 @@ var $ = window.$ || (id => document.getElementById(id));
         refugeecard: "Proof of Address specimen",
         proofofaccount: "official Proof of Address & Account confirmation PDF"
       };
-      showToast(docTitles[docType] || 'Document Selected', `Switched specimen generator to ${docDescs[docType] || 'official document'}`);
+      if (!silent) {
+        showToast(docTitles[docType] || 'Document Selected', `Switched specimen generator to ${docDescs[docType] || 'official document'}`);
+      }
     }
     window.switchVerificationDocType = switchVerificationDoc;
 
-    // Switch Country: 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'uae', 'turkey'
-    function switchVerificationCountry(countryKey) {
+    // Switch Country: uses existing website countries as single source of truth
+    function switchVerificationCountry(countryKey, opts) {
+      const options = typeof opts === 'boolean' ? { silent: opts } : (opts || {});
       currentCountry = countryKey;
+      const configuredDocs = getConfiguredDocsForCountry(countryKey);
+      if (options.preferredDocType && configuredDocs.includes(options.preferredDocType)) {
+        currentDocType = options.preferredDocType;
+      }
 
       if (countryKey === 'turkey') {
         currentDocType = 'passport';
@@ -2483,7 +3119,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (typeof updateEthPassPreview === 'function') updateEthPassPreview();
         if (typeof updateEthPreview === 'function') updateEthPreview();
       } else if (countryKey === 'uganda') {
-        currentDocType = 'refugeecard';
+        currentDocType = 'idcard';
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
         const dlTab = $('tab-doc-driverlicense');
@@ -2495,15 +3131,16 @@ var $ = window.$ || (id => document.getElementById(id));
         const refRadio = $('refugeecard-radio-indicator');
         const poaRadio = $('proofofaccount-radio-indicator');
         if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
         if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof updateUgandaPreview === 'function') updateUgandaPreview();
       } else if (countryKey === 'pakistan') {
         currentDocType = 'idcard';
         const passTab = $('tab-doc-passport');
@@ -2913,11 +3550,8 @@ var $ = window.$ || (id => document.getElementById(id));
         }
       });
 
-      const wbDropdown = $('workbenchCountrySelect');
-      if (wbDropdown && wbDropdown.value !== countryKey) {
-        wbDropdown.value = countryKey;
-      }
-
+      syncWorkbenchCountryDropdownUI(countryKey);
+      syncWorkbenchDocTabsForCountry(countryKey);
       renderActiveDocumentView();
       const countryNames = {
         kenya: 'Kenya',
@@ -2942,10 +3576,14 @@ var $ = window.$ || (id => document.getElementById(id));
         uae: 'United Arab Emirates',
         turkey: 'Turkey'
       };
-      if (currentDocType === 'proofofaccount') {
-        showToast(`Proof of Address: ${countryNames[countryKey] || countryKey}`, `Displaying official ${countryNames[countryKey] || countryKey} Proof of Address & Account PDF document`);
-      } else {
-        showToast(`Country: ${countryNames[countryKey] || countryKey.toUpperCase()}`, `Displaying official ${countryNames[countryKey] || countryKey} verification specimen`);
+      const domCountry = getExistingWebsiteCountries().find(c => c.key === countryKey);
+      const displayCountryName = countryNames[countryKey] || (domCountry && domCountry.name) || countryKey.toUpperCase();
+      if (!options.silent) {
+        if (currentDocType === 'proofofaccount') {
+          showToast(`Proof of Address: ${displayCountryName}`, `Displaying official ${displayCountryName} Proof of Address & Account PDF document`);
+        } else {
+          showToast(`Country: ${displayCountryName}`, `Displaying official ${displayCountryName} verification specimen`);
+        }
       }
     }
 
@@ -2980,7 +3618,9 @@ var $ = window.$ || (id => document.getElementById(id));
       const ethPassView = $('ethiopia-passport-view');
       const poaDocView = $('proofofaccount-doc-view');
       const poaddrDocView = $('proofofaddress-doc-view');
+      const noDocView = $('wb-no-document-view');
 
+      document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
       if (kenyaIdView) kenyaIdView.classList.add('hidden');
       if (somaliaIdView) somaliaIdView.classList.add('hidden');
@@ -3011,16 +3651,28 @@ var $ = window.$ || (id => document.getElementById(id));
       if (turkeyPassView) turkeyPassView.classList.add('hidden');
       if (poaDocView) poaDocView.classList.add('hidden');
       if (poaddrDocView) poaddrDocView.classList.add('hidden');
+      if (noDocView) noDocView.classList.add('hidden');
+
+      const configuredDocs = getConfiguredDocsForCountry(currentCountry);
+      if (configuredDocs.length === 0 || !configuredDocs.includes(currentDocType)) {
+        if (noDocView) noDocView.classList.remove('hidden');
+        syncActiveWorkflowBar();
+        return;
+      }
 
       if (currentDocType === 'proofofaccount') {
-        if (poaDocView) poaDocView.classList.remove('hidden');
+        const customPoaView = $(`${currentCountry}-proofofaccount-view`);
+        if (customPoaView) customPoaView.classList.remove('hidden');
+        else if (poaDocView) poaDocView.classList.remove('hidden');
       } else if (currentDocType === 'refugeecard') {
-        if (poaddrDocView) poaddrDocView.classList.remove('hidden');
+        const customAddrView = $(`${currentCountry}-proofofaddress-view`);
+        if (customAddrView) customAddrView.classList.remove('hidden');
+        else if (poaddrDocView) poaddrDocView.classList.remove('hidden');
       } else if (currentCountry === 'turkey') {
-        if (currentDocType === 'idcard') {
-          if (turkeyDocView) turkeyDocView.classList.remove('hidden');
-        } else {
-          if (turkeyPassView) turkeyPassView.classList.remove('hidden');
+        if (currentDocType === 'idcard' && turkeyDocView) {
+          turkeyDocView.classList.remove('hidden');
+        } else if (turkeyPassView) {
+          turkeyPassView.classList.remove('hidden');
         }
       } else if (currentCountry === 'uae') {
         if (uaeDocView) uaeDocView.classList.remove('hidden');
@@ -3054,35 +3706,47 @@ var $ = window.$ || (id => document.getElementById(id));
         if (seychellesDocView) seychellesDocView.classList.remove('hidden');
       } else if (currentCountry === 'pakistan') {
         if (pakistanDocView) pakistanDocView.classList.remove('hidden');
-      } else if (currentCountry === 'uganda' && currentDocType !== 'passport') {
+      } else if (currentCountry === 'uganda') {
         if (ugandaDocView) ugandaDocView.classList.remove('hidden');
       } else if (currentCountry === 'uk') {
         if (ukPassView) ukPassView.classList.remove('hidden');
       } else if (currentDocType === 'driverlicense') {
-        if (somaliaDlView) somaliaDlView.classList.remove('hidden');
+        const customDlView = $(`${currentCountry}-driverlicense-view`);
+        if (customDlView) customDlView.classList.remove('hidden');
+        else if (somaliaDlView) somaliaDlView.classList.remove('hidden');
       } else if (currentCountry === 'nigeria') {
-        if (currentDocType === 'passport') {
-          if (nigeriaPassView) nigeriaPassView.classList.remove('hidden');
-        } else {
-          if (nigeriaDocView) nigeriaDocView.classList.remove('hidden');
+        if (currentDocType === 'passport' && nigeriaPassView) {
+          nigeriaPassView.classList.remove('hidden');
+        } else if (nigeriaDocView) {
+          nigeriaDocView.classList.remove('hidden');
         }
       } else if (currentCountry === 'ethiopia') {
-        if (currentDocType === 'idcard') {
-          if (ethiopiaDocView) ethiopiaDocView.classList.remove('hidden');
-        } else {
-          if (ethPassView) ethPassView.classList.remove('hidden');
+        if (currentDocType === 'idcard' && ethiopiaDocView) {
+          ethiopiaDocView.classList.remove('hidden');
+        } else if (ethPassView) {
+          ethPassView.classList.remove('hidden');
         }
       } else if (currentCountry === 'somalia') {
-        if (currentDocType === 'idcard') {
-          if (somaliaIdView) somaliaIdView.classList.remove('hidden');
-        } else {
-          if (somaliaPassView) somaliaPassView.classList.remove('hidden');
+        if (currentDocType === 'idcard' && somaliaIdView) {
+          somaliaIdView.classList.remove('hidden');
+        } else if (somaliaPassView) {
+          somaliaPassView.classList.remove('hidden');
         }
-      } else if (currentDocType === 'idcard') {
-        if (kenyaIdView) kenyaIdView.classList.remove('hidden');
+      } else if (currentCountry === 'kenya') {
+        if (currentDocType === 'idcard' && kenyaIdView) {
+          kenyaIdView.classList.remove('hidden');
+        } else if (kenyaPassView) {
+          kenyaPassView.classList.remove('hidden');
+        }
       } else {
-        if (kenyaPassView) kenyaPassView.classList.remove('hidden');
+        const dynamicView = resolveCountryViewElement(currentCountry, currentDocType);
+        if (dynamicView) {
+          dynamicView.classList.remove('hidden');
+        } else if (noDocView) {
+          noDocView.classList.remove('hidden');
+        }
       }
+      syncActiveWorkflowBar();
     }
 
     function randomizeActiveDocument() {
@@ -8266,92 +8930,93 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
 
-    function updatePoaCountryDisplay(countryKey) {
-      const countryMap = {
-        kenya: {
-          name: 'Kenya',
-          fullName: 'Republic of Kenya',
-          city: 'Nairobi',
-          address: 'Riverside Green Suites, Riverside Drive, Nairobi, Kenya',
-          bank: 'Equity Bank Kenya / Clear Junction',
-          dotColor: 'bg-emerald-600',
-          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-        },
-        somalia: {
-          name: 'Somalia',
-          fullName: 'Federal Republic of Somalia',
-          city: 'Mogadishu',
-          address: 'KM4 Airport Road, Wadajir District, Mogadishu, Somalia',
-          bank: 'Premier Bank / Clear Junction Global',
-          dotColor: 'bg-sky-600',
-          badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
-        },
-        ethiopia: {
-          name: 'Ethiopia',
-          fullName: 'Federal Democratic Republic of Ethiopia',
-          city: 'Addis Ababa',
-          address: 'Bole Sub-City, Africa Avenue, Addis Ababa, Ethiopia',
-          bank: 'Commercial Bank of Ethiopia / Clear Junction',
-          dotColor: 'bg-amber-600',
-          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-        },
-        nigeria: {
-          name: 'Nigeria',
-          fullName: 'Federal Republic of Nigeria',
-          city: 'Lagos',
-          address: '12 Admiralty Way, Lekki Phase 1, Lagos, Nigeria',
-          bank: 'Wema Bank / Clear Junction Limited',
-          dotColor: 'bg-emerald-600',
-          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-        },
-        uk: {
-          name: 'United Kingdom',
-          fullName: 'United Kingdom (Clear Junction Specimen)',
-          city: 'London',
-          address: '1 Canada Square, Canary Wharf, London E14 5AA, United Kingdom',
-          bank: 'Clear Junction Limited',
-          dotColor: 'bg-blue-600',
-          badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/40'
-        },
-        uganda: {
-          name: 'Uganda',
-          fullName: 'Republic of Uganda',
-          city: 'Kampala',
-          address: 'Plot 24 Jinja Road, Central Division, Kampala, Uganda',
-          bank: 'Stanbic Bank Uganda / Clear Junction',
-          dotColor: 'bg-amber-600',
-          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-        },
-        pakistan: {
-          name: 'Pakistan',
-          fullName: 'Islamic Republic of Pakistan',
-          city: 'Islamabad',
-          address: 'Blue Area, Jinnah Avenue, Islamabad 44000, Pakistan',
-          bank: 'Habib Bank Limited / Clear Junction Global',
-          dotColor: 'bg-emerald-700',
-          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-        },
-        seychelles: {
-          name: 'Seychelles',
-          fullName: 'Republic of Seychelles',
-          city: 'Victoria, Mahé',
-          address: 'Independence Avenue, Victoria, Mahé, Seychelles',
-          bank: 'Nouvobanq / Clear Junction Global',
-          dotColor: 'bg-sky-600',
-          badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
-        },
-        drcongo: {
-          name: 'DR Congo',
-          fullName: 'Democratic Republic of the Congo',
-          city: 'Kinshasa',
-          address: 'AV SANKURU N°01, Q/CAMP MUNGANGA, C/NGALIEMA, KINSHASA, COD REP DEM CONGO',
-          bank: 'Rawbank / Clear Junction Global',
-          dotColor: 'bg-indigo-600',
-          badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
-        }
-      };
+    const poaCountryMap = {
+      kenya: {
+        name: 'Kenya',
+        fullName: 'Republic of Kenya',
+        city: 'Nairobi',
+        address: 'Riverside Green Suites, Riverside Drive, Nairobi, Kenya',
+        bank: 'Equity Bank Kenya / Clear Junction',
+        dotColor: 'bg-emerald-600',
+        badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      },
+      somalia: {
+        name: 'Somalia',
+        fullName: 'Federal Republic of Somalia',
+        city: 'Mogadishu',
+        address: 'KM4 Airport Road, Wadajir District, Mogadishu, Somalia',
+        bank: 'Premier Bank / Clear Junction Global',
+        dotColor: 'bg-sky-600',
+        badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+      },
+      ethiopia: {
+        name: 'Ethiopia',
+        fullName: 'Federal Democratic Republic of Ethiopia',
+        city: 'Addis Ababa',
+        address: 'Bole Sub-City, Africa Avenue, Addis Ababa, Ethiopia',
+        bank: 'Commercial Bank of Ethiopia / Clear Junction',
+        dotColor: 'bg-amber-600',
+        badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+      },
+      nigeria: {
+        name: 'Nigeria',
+        fullName: 'Federal Republic of Nigeria',
+        city: 'Lagos',
+        address: '12 Admiralty Way, Lekki Phase 1, Lagos, Nigeria',
+        bank: 'Wema Bank / Clear Junction Limited',
+        dotColor: 'bg-emerald-600',
+        badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      },
+      uk: {
+        name: 'United Kingdom',
+        fullName: 'United Kingdom (Clear Junction Specimen)',
+        city: 'London',
+        address: '1 Canada Square, Canary Wharf, London E14 5AA, United Kingdom',
+        bank: 'Clear Junction Limited',
+        dotColor: 'bg-blue-600',
+        badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+      },
+      uganda: {
+        name: 'Uganda',
+        fullName: 'Republic of Uganda',
+        city: 'Kampala',
+        address: 'Plot 24 Jinja Road, Central Division, Kampala, Uganda',
+        bank: 'Stanbic Bank Uganda / Clear Junction',
+        dotColor: 'bg-amber-600',
+        badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+      },
+      pakistan: {
+        name: 'Pakistan',
+        fullName: 'Islamic Republic of Pakistan',
+        city: 'Islamabad',
+        address: 'Blue Area, Jinnah Avenue, Islamabad 44000, Pakistan',
+        bank: 'Habib Bank Limited / Clear Junction Global',
+        dotColor: 'bg-emerald-700',
+        badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+      },
+      seychelles: {
+        name: 'Seychelles',
+        fullName: 'Republic of Seychelles',
+        city: 'Victoria, Mahé',
+        address: 'Independence Avenue, Victoria, Mahé, Seychelles',
+        bank: 'Nouvobanq / Clear Junction Global',
+        dotColor: 'bg-sky-600',
+        badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+      },
+      drcongo: {
+        name: 'DR Congo',
+        fullName: 'Democratic Republic of the Congo',
+        city: 'Kinshasa',
+        address: 'AV SANKURU N°01, Q/CAMP MUNGANGA, C/NGALIEMA, KINSHASA, COD REP DEM CONGO',
+        bank: 'Rawbank / Clear Junction Global',
+        dotColor: 'bg-indigo-600',
+        badgeClass: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+      }
+    };
+    window.poaConfiguredCountryKeys = Object.keys(poaCountryMap);
 
-      const c = countryMap[countryKey] || countryMap['uk'];
+    function updatePoaCountryDisplay(countryKey) {
+      const c = poaCountryMap[countryKey] || poaCountryMap['uk'];
 
       const countryEl = $('poaCountryBannerCountry');
       const descEl = $('poaCountryBannerText');
@@ -14959,11 +15624,31 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         if (profilePop && !profilePop.contains(e.target) && profileBtn && !profileBtn.contains(e.target)) {
           profilePop.classList.add('hidden');
         }
+        const wbRoot = $('wbCountryDropdownRoot');
+        const flowRoot = $('flowCountryDropdownRoot');
+        if (wbRoot && !wbRoot.contains(e.target)) {
+          const m = $('wbCountryDropdownMenu');
+          const b = $('wbCountryDropdownBtn');
+          if (m) m.classList.add('hidden');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        }
+        if (flowRoot && !flowRoot.contains(e.target)) {
+          const m = $('flowCountryDropdownMenu');
+          const b = $('flowCountryDropdownBtn');
+          if (m) m.classList.add('hidden');
+          if (b) b.setAttribute('aria-expanded', 'false');
+        }
       });
 
-      // Escape key dismissal for modals
+      // Escape key dismissal for modals and searchable country dropdowns
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+          const wbMenu = $('wbCountryDropdownMenu');
+          const flowMenu = $('flowCountryDropdownMenu');
+          if ((wbMenu && !wbMenu.classList.contains('hidden')) || (flowMenu && !flowMenu.classList.contains('hidden'))) {
+            closeSearchableCountryDropdowns();
+            return;
+          }
           closeAccountCountryFlow();
           const welcome = $('welcomeModal');
           if (welcome && !welcome.classList.contains('hidden')) {
@@ -14973,7 +15658,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       });
 
       filterHeroPlatforms('all');
-      selectVirtualAccount('paypal');
+      selectVirtualAccount('paypal', { silent: true });
 
       // Bind all Kenya passport input fields to live preview & MRZ
       Object.keys(fields).forEach(id => {
@@ -15469,7 +16154,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       updateCanPreview();
       updateGhaPreview();
       updateEthPreview();
-      switchVerificationCountry('somalia');
+      switchVerificationCountry('somalia', { silent: true });
     });
 
     // Explicit Window Bindings for all inline event handlers:
@@ -15478,6 +16163,15 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     if (typeof openAboutModal !== "undefined") window.openAboutModal = openAboutModal;
     if (typeof openContactModal !== "undefined") window.openContactModal = openContactModal;
     if (typeof selectVirtualAccount !== "undefined") window.selectVirtualAccount = selectVirtualAccount;
+    if (typeof openAccountCountryFlow !== "undefined") window.openAccountCountryFlow = openAccountCountryFlow;
+    if (typeof closeAccountCountryFlow !== "undefined") window.closeAccountCountryFlow = closeAccountCountryFlow;
+    if (typeof goToFlowStep !== "undefined") window.goToFlowStep = goToFlowStep;
+    if (typeof selectFlowPlatform !== "undefined") window.selectFlowPlatform = selectFlowPlatform;
+    if (typeof handleFlowCountryChange !== "undefined") window.handleFlowCountryChange = handleFlowCountryChange;
+    if (typeof openCountryDocumentEditor !== "undefined") window.openCountryDocumentEditor = openCountryDocumentEditor;
+    if (typeof selectFlowDocument !== "undefined") window.selectFlowDocument = selectFlowDocument;
+    if (typeof handleCountrySearchKeydown !== "undefined") window.handleCountrySearchKeydown = handleCountrySearchKeydown;
+    if (typeof syncActiveWorkflowBar !== "undefined") window.syncActiveWorkflowBar = syncActiveWorkflowBar;
     if (typeof openCryptoExchangesHub !== "undefined") window.openCryptoExchangesHub = openCryptoExchangesHub;
     if (typeof toggleMobileMenu !== "undefined") window.toggleMobileMenu = toggleMobileMenu;
     if (typeof closeMobileMenu !== "undefined") window.closeMobileMenu = closeMobileMenu;
@@ -16026,16 +16720,22 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
             Select Virtual Account Platform:
           </span>
-          <span id="active-account-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#003087] text-white flex items-center gap-1.5 shadow-xs">
-            <i class="fa-brands fa-paypal"></i>
-            <span>PayPal Selected</span>
-          </span>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'accounts', countryKey: currentCountry, preserveCountry: true })" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-white border border-slate-200 hover:border-blue-300 text-[#0d2658] inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+              <i class="fa-solid fa-layer-group text-blue-600 text-[11px]"></i>
+              <span>All 14 Platforms</span>
+            </button>
+            <span id="active-account-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-[#003087] text-white flex items-center gap-1.5 shadow-xs">
+              <i class="fa-brands fa-paypal"></i>
+              <span>PayPal Selected</span>
+            </span>
+          </div>
         </div>
 
         <!-- Virtual Accounts Selector Tabs / Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
           <!-- 1. PayPal -->
-          <button type="button" onclick="selectVirtualAccount('paypal')" id="btn-va-paypal" class="va-select-btn p-2.5 rounded-xl border-2 border-[#003087] bg-blue-50/70 text-[#003087] text-left transition-all cursor-pointer shadow-xs">
+          <button type="button" onclick="selectVirtualAccount('paypal', { openCountryFlow: true })" id="btn-va-paypal" class="va-select-btn p-2.5 rounded-xl border-2 border-[#003087] bg-blue-50/70 text-[#003087] text-left transition-all cursor-pointer shadow-xs">
             <div class="w-7 h-7 rounded-lg bg-[#003087] text-white flex items-center justify-center text-xs mb-1">
               <i class="fa-brands fa-paypal"></i>
             </div>
@@ -16044,7 +16744,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
 
           <!-- 2. Payoneer -->
-          <button type="button" onclick="selectVirtualAccount('payoneer')" id="btn-va-payoneer" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+          <button type="button" onclick="selectVirtualAccount('payoneer', { openCountryFlow: true })" id="btn-va-payoneer" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
             <div class="w-7 h-7 rounded-lg bg-[#FF4800] text-white flex items-center justify-center text-xs mb-1">
               <i class="fa-solid fa-credit-card"></i>
             </div>
@@ -16053,7 +16753,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
 
           <!-- 3. Raenest -->
-          <button type="button" onclick="selectVirtualAccount('raenest')" id="btn-va-raenest" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+          <button type="button" onclick="selectVirtualAccount('raenest', { openCountryFlow: true })" id="btn-va-raenest" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
             <div class="w-7 h-7 rounded-lg bg-[#059669] text-white flex items-center justify-center text-xs mb-1">
               <i class="fa-solid fa-briefcase"></i>
             </div>
@@ -16062,7 +16762,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
 
           <!-- 4. Grey Account -->
-          <button type="button" onclick="selectVirtualAccount('grey')" id="btn-va-grey" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+          <button type="button" onclick="selectVirtualAccount('grey', { openCountryFlow: true })" id="btn-va-grey" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
             <div class="w-7 h-7 rounded-lg bg-slate-900 text-amber-300 flex items-center justify-center text-xs mb-1">
               <i class="fa-solid fa-landmark"></i>
             </div>
@@ -16071,7 +16771,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
 
           <!-- 5. Mercury Bank -->
-          <button type="button" onclick="selectVirtualAccount('mercury')" id="btn-va-mercury" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+          <button type="button" onclick="selectVirtualAccount('mercury', { openCountryFlow: true })" id="btn-va-mercury" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
             <div class="w-7 h-7 rounded-lg bg-[#4F46E5] text-white flex items-center justify-center text-xs mb-1">
               <i class="fa-solid fa-building-columns"></i>
             </div>
@@ -16080,7 +16780,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
 
           <!-- 6. Wise -->
-          <button type="button" onclick="selectVirtualAccount('wise')" id="btn-va-wise" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+          <button type="button" onclick="selectVirtualAccount('wise', { openCountryFlow: true })" id="btn-va-wise" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
             <div class="w-7 h-7 rounded-lg bg-[#16A34A] text-white flex items-center justify-center text-xs mb-1">
               <i class="fa-solid fa-globe"></i>
             </div>
@@ -16089,7 +16789,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
 
           <!-- 7. Revolut -->
-          <button type="button" onclick="selectVirtualAccount('revolut')" id="btn-va-revolut" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+          <button type="button" onclick="selectVirtualAccount('revolut', { openCountryFlow: true })" id="btn-va-revolut" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
             <div class="w-7 h-7 rounded-lg bg-[#0075EB] text-white flex items-center justify-center text-xs mb-1">
               <i class="fa-solid fa-arrow-trend-up"></i>
             </div>
@@ -16098,7 +16798,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
 
           <!-- 8. Elevate Pay -->
-          <button type="button" onclick="selectVirtualAccount('elevate')" id="btn-va-elevate" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
+          <button type="button" onclick="selectVirtualAccount('elevate', { openCountryFlow: true })" id="btn-va-elevate" class="va-select-btn p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-left transition-all cursor-pointer shadow-2xs">
             <div class="w-7 h-7 rounded-lg bg-[#0D9488] text-white flex items-center justify-center text-xs mb-1">
               <i class="fa-solid fa-coins"></i>
             </div>
@@ -16138,7 +16838,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             <span class="text-[11px] font-medium text-slate-400">Tap card to switch preview</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
+          <div id="workbench-doc-tabs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5">
             <!-- 1. PASSPORT COLOR CARD (Deep Emerald Green & Gold) -->
             <button type="button" id="tab-doc-passport" onclick="switchVerificationDoc('passport')" class="doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group">
               <div class="flex items-start justify-between gap-3">
@@ -16280,6 +16980,15 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
           </div>
 
+          <!-- Empty State if selected country has no configured documents -->
+          <div id="wb-doc-tabs-empty" class="hidden mt-4 p-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-center space-y-2">
+            <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center mx-auto">
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div class="text-sm font-extrabold text-[#0d2658]">No documents are currently available for this country</div>
+            <p class="text-xs text-slate-500 max-w-md mx-auto">Please choose another issuing country from the dropdown below to view available document templates.</p>
+          </div>
+
           <!-- Proof of Account Provider Selector (Shown when Proof of Account is selected) -->
           <div id="poa-step2-account-selector" class="hidden mt-4 p-4 rounded-2xl bg-slate-50 border-2 border-slate-200/90 space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2">
@@ -16341,38 +17050,13 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </div>
         </div>
 
-        <!-- Country Selector Color Cards + Drop-Down List -->
+        <!-- Searchable Issuing Country Dropdown (Single Source of Truth from Existing Countries) -->
         <div>
           <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <div class="flex flex-wrap items-center gap-2.5">
-              <label for="workbenchCountrySelect" class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                <i class="fa-solid fa-earth-africa text-emerald-700"></i>
-                Select Issuing Country:
-              </label>
-              <select id="workbenchCountrySelect" onchange="switchVerificationCountry(this.value)" class="px-3 py-1.5 rounded-xl border border-blue-200 bg-blue-50/50 text-xs font-bold text-[#0d2658] focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                <option value="kenya">🇰🇪 Kenya</option>
-                <option value="somalia">🇸🇴 Somalia</option>
-                <option value="ethiopia">🇪🇹 Ethiopia</option>
-                <option value="nigeria">🇳🇬 Nigeria</option>
-                <option value="uk">🇬🇧 United Kingdom</option>
-                <option value="uganda">🇺🇬 Uganda</option>
-                <option value="pakistan">🇵🇰 Pakistan</option>
-                <option value="senegal">🇸🇳 Senegal</option>
-                <option value="southafrica">🇿🇦 South Africa</option>
-                <option value="usa">🇺🇸 United States</option>
-                <option value="seychelles">🇸🇨 Seychelles</option>
-                <option value="drcongo">🇨🇩 DR Congo</option>
-                <option value="bangladesh">🇧🇩 Bangladesh</option>
-                <option value="germany">🇩🇪 Germany</option>
-                <option value="canada">🇨🇦 Canada</option>
-                <option value="ghana">🇬🇭 Ghana</option>
-                <option value="rwanda">🇷🇼 Rwanda</option>
-                <option value="nepal">🇳🇵 Nepal</option>
-                <option value="malawi">🇲🇼 Malawi</option>
-                <option value="uae">🇦🇪 United Arab Emirates</option>
-                <option value="turkey">🇹🇷 Turkey</option>
-              </select>
-            </div>
+            <label for="wbCountryDropdownBtn" class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+              <i class="fa-solid fa-earth-africa text-emerald-700"></i>
+              Select Issuing Country:
+            </label>
             <button type="button" id="universal-randomize-country-btn" onclick="randomizeActiveDocument()" class="px-4 py-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white rounded-2xl text-xs font-black tracking-wide transition-all flex items-center gap-2 shadow-lg shadow-indigo-700/25 border border-indigo-300/40 transform hover:-translate-y-0.5 cursor-pointer" title="Randomize whichever country document is currently active">
               <i class="fa-solid fa-dice text-amber-300 text-sm"></i>
               <span>Randomize Card</span>
@@ -16380,7 +17064,29 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-3">
+          <div id="wbCountryDropdownRoot" class="relative max-w-xl">
+            <button type="button" id="wbCountryDropdownBtn" onclick="toggleSearchableCountryDropdown('wb')" aria-haspopup="listbox" aria-expanded="false" class="w-full px-4 py-3 rounded-2xl border-2 border-blue-200 bg-blue-50/40 hover:border-blue-400 focus:border-blue-600 focus:outline-none flex items-center justify-between gap-3 text-left transition-colors cursor-pointer">
+              <span class="flex items-center gap-3 min-w-0">
+                <span id="wbCountrySelectedFlag" class="text-2xl leading-none shrink-0">🇸🇴</span>
+                <span id="wbCountrySelectedName" class="text-sm font-extrabold text-[#0d2658] truncate">Somalia</span>
+              </span>
+              <span class="flex items-center gap-2.5 shrink-0">
+                <span id="wbCountryCountText" class="text-[11px] font-semibold text-slate-500"></span>
+                <i class="fa-solid fa-chevron-down text-xs text-blue-600"></i>
+              </span>
+            </button>
+
+            <div id="wbCountryDropdownMenu" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-blue-200 shadow-2xl z-[80] overflow-hidden">
+              <div class="relative border-b border-slate-100 bg-slate-50">
+                <i class="fa-solid fa-magnifying-glass text-xs text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input id="wbCountrySearchInput" type="text" placeholder="Search country..." autocomplete="off" oninput="renderSearchableCountryOptions('wb', this.value)" onkeydown="handleCountrySearchKeydown(event, 'wb')" class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-[#0d2658] bg-transparent focus:outline-none focus:bg-white">
+              </div>
+              <div id="wbCountryOptionsList" role="listbox" class="max-h-72 overflow-y-auto p-1.5 space-y-0.5"></div>
+            </div>
+          </div>
+
+          <!-- Existing Website Country Entries Preserved Intact as Single Source of Truth -->
+          <div id="existing-country-registry" class="hidden" aria-hidden="true">
             <!-- Republic of Kenya (Default) -->
             <button type="button" id="country-btn-kenya" onclick="switchVerificationCountry('kenya')" class="country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-emerald-50/50 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-500/20 transition-all cursor-pointer">
               <div class="flex items-center justify-between">
@@ -16647,6 +17353,57 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             Verification document previews are automatically blurred when the browser tab loses focus, is minimized, or a capture shortcut is detected. Return focus to this window to restore the view.
           </p>
           <div id="kyc-focus-blur-meta" class="mt-3 pt-2.5 border-t border-slate-800 font-mono text-[10px] text-amber-300/90"></div>
+        </div>
+      </div>
+
+      <!-- Active Workflow Navigation & Back Controls Bar -->
+      <div id="active-editor-workflow-bar" class="no-print bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+          <span class="inline-flex items-center gap-1.5 font-extrabold text-[#0d2658] bg-white border border-slate-200 px-2.5 py-1 rounded-xl">
+            <i id="wbBarPlatformIcon" class="fa-brands fa-paypal text-xs text-blue-600"></i>
+            <span id="wbBarPlatformName">PayPal</span>
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+          <span class="inline-flex items-center gap-1.5 font-bold text-[#0d2658] bg-white border border-slate-200 px-2.5 py-1 rounded-xl">
+            <span id="wbBarCountryFlag" class="text-base leading-none">🇸🇴</span>
+            <span id="wbBarCountryName">Somalia</span>
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+          <span id="wbBarDocName" class="font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-xl">Somalia Biometric e-Passport</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'documents', countryKey: currentCountry, preserveCountry: true })" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-[#0d2658] text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+            <i class="fa-solid fa-arrow-left text-[10px] text-blue-600"></i>
+            <span id="wbBackToDocsLabel">Back to Somalia Documents</span>
+          </button>
+          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'country', countryKey: currentCountry, preserveCountry: true })" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+            <i class="fa-solid fa-earth-africa text-[11px] text-emerald-700"></i>
+            <span>Change Country</span>
+          </button>
+          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'accounts', countryKey: currentCountry, preserveCountry: true })" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+            <i class="fa-solid fa-wallet text-[11px] text-blue-600"></i>
+            <span>Change Account</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty State View when a Country has no Configured Document Template -->
+      <div id="wb-no-document-view" class="hidden max-w-2xl mx-auto my-8 bg-white border border-slate-200 rounded-3xl p-8 text-center shadow-sm space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto text-2xl">
+          <i class="fa-regular fa-folder-open"></i>
+        </div>
+        <div class="space-y-1.5">
+          <h3 class="text-lg font-extrabold text-[#0d2658]">No Documents Currently Available</h3>
+          <p class="text-xs sm:text-sm text-slate-600 max-w-md mx-auto">
+            No document templates are currently configured for this country and document selection. Choose another country to open an active live preview editor.
+          </p>
+        </div>
+        <div class="pt-1 flex flex-wrap items-center justify-center gap-2.5">
+          <button type="button" onclick="openAccountCountryFlow(currentVirtualAccount, { step: 'country', countryKey: currentCountry, preserveCountry: true })" class="px-4 py-2 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-bold inline-flex items-center gap-2 cursor-pointer transition-colors">
+            <i class="fa-solid fa-arrow-left text-[11px]"></i>
+            <span>Back to Country Selection</span>
+          </button>
         </div>
       </div>
 
@@ -26928,128 +27685,136 @@ COD REP DEM CONGO</div>
     <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-blue-100 relative max-h-[92vh] overflow-y-auto space-y-5">
       <!-- Header -->
       <div class="flex items-center justify-between gap-3 pb-4 border-b border-slate-100">
-        <div class="flex items-center gap-3.5">
+        <div class="flex items-center gap-3.5 min-w-0">
           <div id="flowModalIconWrap" class="w-12 h-12 rounded-2xl bg-[#003087] text-white flex items-center justify-center shadow-md shrink-0">
             <i id="flowModalIcon" class="fa-brands fa-paypal text-xl"></i>
           </div>
-          <div>
-            <h3 id="flowModalAccountTitle" class="text-lg sm:text-xl font-extrabold text-[#0d2658] leading-tight">PayPal</h3>
-            <p id="flowModalAccountSub" class="text-xs text-slate-500 font-medium mt-0.5">Select your country to unlock verification documents</p>
+          <div class="min-w-0">
+            <h3 id="flowModalAccountTitle" class="text-lg sm:text-xl font-extrabold text-[#0d2658] leading-tight truncate">PayPal</h3>
+            <p id="flowModalAccountSub" class="text-xs text-slate-500 font-medium mt-0.5 truncate">Select your country to unlock verification documents</p>
           </div>
         </div>
-        <button type="button" onclick="closeAccountCountryFlow()" aria-label="Close modal" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors">
+        <button type="button" onclick="closeAccountCountryFlow()" aria-label="Close modal" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors shrink-0">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <!-- Step 1: Country Drop-Down List -->
-      <div class="space-y-2">
-        <label for="flowCountrySelect" class="block text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
-          Step 1 · Select Your Country
-        </label>
-        <div class="relative">
-          <select id="flowCountrySelect" onchange="handleFlowCountryChange(this.value)" class="w-full appearance-none px-4 py-3.5 pr-10 rounded-2xl border-2 border-blue-200 bg-blue-50/40 hover:border-blue-400 focus:border-blue-600 focus:outline-none text-sm font-bold text-[#0d2658] cursor-pointer transition-colors">
-            <option value="">-- Choose a country from the drop-down list --</option>
-            <option value="kenya">🇰🇪 Kenya (Maisha Namba &amp; E-Passport)</option>
-            <option value="somalia">🇸🇴 Somalia (National ID, E-Passport &amp; Driver's License)</option>
-            <option value="ethiopia">🇪🇹 Ethiopia (E-Passport &amp; Fayda ID)</option>
-            <option value="nigeria">🇳🇬 Nigeria (National ID &amp; E-Passport)</option>
-            <option value="uk">🇬🇧 United Kingdom (British Citizen Passport)</option>
-            <option value="uganda">🇺🇬 Uganda (National ID Card - NIRA)</option>
-            <option value="pakistan">🇵🇰 Pakistan (National Identity Card - SNIC)</option>
-            <option value="senegal">🇸🇳 Senegal (National ID &amp; E-Passport)</option>
-            <option value="southafrica">🇿🇦 South Africa (Passport - ZAF)</option>
-            <option value="usa">🇺🇸 United States (U.S. Passport)</option>
-            <option value="seychelles">🇸🇨 Seychelles (National Identity Card)</option>
-            <option value="drcongo">🇨🇩 DR Congo (Passeport Biométrique)</option>
-            <option value="bangladesh">🇧🇩 Bangladesh (e-Passport - BGD)</option>
-            <option value="germany">🇩🇪 Germany (Reisepass - Deutschland)</option>
-            <option value="canada">🇨🇦 Canada (Passport / Passeport)</option>
-            <option value="ghana">🇬🇭 Ghana (Passport / Passeport)</option>
-            <option value="rwanda">🇷🇼 Rwanda (ID Card - Indangamuntu)</option>
-            <option value="nepal">🇳🇵 Nepal (Passport - NPL)</option>
-            <option value="malawi">🇲🇼 Malawi (Passport / Passeport)</option>
-            <option value="uae">🇦🇪 United Arab Emirates (Resident ID Card)</option>
-            <option value="turkey">🇹🇷 Turkey (Pasaport &amp; Kimlik Kartı)</option>
-          </select>
-          <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-blue-600">
-            <i class="fa-solid fa-chevron-down text-sm"></i>
-          </span>
+      <!-- 3-Step Guided Stepper -->
+      <nav aria-label="Verification Workflow Steps" class="grid grid-cols-3 gap-2 bg-slate-50 border border-slate-200/80 rounded-2xl p-2.5">
+        <button type="button" onclick="goToFlowStep('accounts')" id="flowStepperItem-1" class="flex items-center gap-2 text-xs font-bold text-emerald-700 cursor-pointer text-left">
+          <span id="flowStepperNum-1" class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] font-black shrink-0">1</span>
+          <span class="truncate">Virtual Account</span>
+        </button>
+        <button type="button" onclick="goToFlowStep('country')" id="flowStepperItem-2" class="flex items-center gap-2 text-xs font-extrabold text-[#0d2658] cursor-pointer text-left">
+          <span id="flowStepperNum-2" class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-black shrink-0">2</span>
+          <span class="truncate">Country</span>
+        </button>
+        <button type="button" onclick="if(flowSelectedCountry){goToFlowStep('documents');}else{showToast('Select Country','Choose a country first to view its documents.');}" id="flowStepperItem-3" class="flex items-center gap-2 text-xs font-semibold text-slate-400 text-left">
+          <span id="flowStepperNum-3" class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[11px] font-bold shrink-0">3</span>
+          <span class="truncate">Documents</span>
+        </button>
+      </nav>
+
+      <!-- Step 1 View: Select Virtual Account Platform -->
+      <div id="flowStepAccountsView" class="hidden space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">Step 1 · Select Virtual Account Platform</h4>
+            <p class="text-xs text-slate-500 mt-0.5">Choose your target banking or exchange platform to continue to country selection.</p>
+          </div>
+        </div>
+        <div id="flowAccountsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+      </div>
+
+      <!-- Step 2 View: Searchable Country Drop-Down List (Single Source of Truth) -->
+      <div id="flowStepCountryView" class="space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <button type="button" onclick="goToFlowStep('accounts')" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0d2658] hover:text-blue-700 bg-slate-100 hover:bg-blue-50 px-3 py-1.5 rounded-xl transition-colors cursor-pointer">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+            <span>Back to Virtual Accounts</span>
+          </button>
+          <span class="text-[11px] font-semibold text-slate-500">Uses existing configured countries only</span>
+        </div>
+
+        <div class="space-y-2">
+          <label for="flowCountryDropdownBtn" class="block text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
+            Step 2 · Select Your Country
+          </label>
+          <div id="flowCountryDropdownRoot" class="relative">
+            <button type="button" id="flowCountryDropdownBtn" onclick="toggleSearchableCountryDropdown('flow')" aria-haspopup="listbox" aria-expanded="false" class="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200 bg-blue-50/40 hover:border-blue-400 focus:border-blue-600 focus:outline-none flex items-center justify-between gap-3 text-left transition-colors cursor-pointer">
+              <span class="flex items-center gap-3 min-w-0">
+                <span id="flowCountrySelectedFlag" class="text-xl leading-none shrink-0">🌍</span>
+                <span id="flowCountrySelectedName" class="text-sm font-bold text-[#0d2658] truncate">-- Select your country --</span>
+              </span>
+              <i class="fa-solid fa-chevron-down text-sm text-blue-600 shrink-0"></i>
+            </button>
+
+            <div id="flowCountryDropdownMenu" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-blue-200 shadow-2xl z-[180] overflow-hidden">
+              <div class="relative border-b border-slate-100 bg-slate-50">
+                <i class="fa-solid fa-magnifying-glass text-xs text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input id="flowCountrySearchInput" type="text" placeholder="Search country..." autocomplete="off" oninput="renderSearchableCountryOptions('flow', this.value)" onkeydown="handleCountrySearchKeydown(event, 'flow')" class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-[#0d2658] bg-transparent focus:outline-none focus:bg-white">
+              </div>
+              <div id="flowCountryOptionsList" role="listbox" class="max-h-64 overflow-y-auto p-1.5 space-y-0.5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prompt before country is selected -->
+        <div id="flowSelectCountryPrompt" class="rounded-2xl border border-dashed border-blue-200 bg-[#f6fbff] p-5 text-center space-y-1.5">
+          <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto">
+            <i class="fa-solid fa-earth-africa"></i>
+          </div>
+          <p class="text-xs font-bold text-[#0d2658]">Search and select a country above to view its configured documents</p>
+          <p class="text-[11px] text-slate-500">Only the verification documents configured for your selected country will appear in the next step.</p>
+        </div>
+
+        <!-- Continue action when a country is already selected (e.g. after pressing Back) -->
+        <div class="flex items-center justify-end">
+          <button type="button" id="flowContinueToDocsBtn" onclick="goToFlowStep('documents')" class="hidden items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-extrabold shadow-sm transition-colors cursor-pointer">
+            <span>View Available Documents</span>
+            <i class="fa-solid fa-arrow-right text-[11px]"></i>
+          </button>
         </div>
       </div>
 
-      <!-- Prompt before country is selected -->
-      <div id="flowSelectCountryPrompt" class="rounded-2xl border border-dashed border-blue-200 bg-[#f6fbff] p-5 text-center space-y-1.5">
-        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center mx-auto">
-          <i class="fa-solid fa-earth-africa"></i>
-        </div>
-        <p class="text-xs font-bold text-[#0d2658]">Choose a country above to reveal available documents</p>
-        <p class="text-[11px] text-slate-500">Passport, National Identity Card, Driver's License, Proof of Address &amp; Proof of Account will appear here.</p>
-      </div>
-
-      <!-- Step 2: Document Types (Revealed after selecting a country) -->
-      <div id="flowDocumentsSection" class="hidden space-y-3">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
-            Step 2 · Choose Verification Document
-          </span>
-          <span id="flowChosenCountryLabel" class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full"></span>
+      <!-- Step 3 View: Country-Specific Document Cards -->
+      <div id="flowStepDocumentsView" class="hidden space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <button type="button" onclick="goToFlowStep('country')" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#0d2658] hover:text-blue-700 bg-slate-100 hover:bg-blue-50 px-3 py-1.5 rounded-xl transition-colors cursor-pointer">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+            <span>Back to Country Selection</span>
+          </button>
+          <button type="button" onclick="goToFlowStep('accounts')" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#0d2658] px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer">
+            <i class="fa-solid fa-wallet text-[11px]"></i>
+            <span>Change Account</span>
+          </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button type="button" onclick="selectFlowDocument('passport')" class="p-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 to-white hover:border-emerald-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
-            <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
-              <i class="fa-solid fa-passport"></i>
+        <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center gap-3 min-w-0">
+            <span id="flowDocsCountryFlag" class="text-2xl leading-none shrink-0">🌍</span>
+            <div class="min-w-0">
+              <div id="flowDocsCountryName" class="text-sm font-extrabold text-[#0d2658] truncate">Country</div>
+              <div id="flowDocsCountryMeta" class="text-xs text-slate-500 truncate">Configured document templates</div>
             </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-sm font-extrabold text-[#0d2658]">Passport</div>
-              <div class="text-[11px] text-slate-500">Official Biometric Travel Document</div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-emerald-600"></i>
-          </button>
+          </div>
+          <span id="flowChosenCountryLabel" class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full shrink-0"></span>
+        </div>
 
-          <button type="button" onclick="selectFlowDocument('idcard')" class="p-4 rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50/70 to-white hover:border-blue-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
-            <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
-              <i class="fa-solid fa-id-card"></i>
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-sm font-extrabold text-[#0d2658]">National Identity</div>
-              <div class="text-[11px] text-slate-500">Citizen National ID Card Specimen</div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-blue-600"></i>
-          </button>
+        <div id="flowDocumentsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
 
-          <button type="button" onclick="selectFlowDocument('driverlicense')" class="p-4 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50/70 to-white hover:border-sky-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
-            <div class="w-11 h-11 rounded-xl bg-sky-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
-              <i class="fa-solid fa-id-badge"></i>
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-sm font-extrabold text-[#0d2658]">Driver's License</div>
-              <div class="text-[11px] text-slate-500">International Driving License</div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-sky-600"></i>
-          </button>
-
-          <button type="button" onclick="selectFlowDocument('refugeecard')" class="p-4 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50/70 to-white hover:border-amber-500 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
-            <div class="w-11 h-11 rounded-xl bg-amber-600 text-white flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
-              <i class="fa-solid fa-address-card"></i>
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-sm font-extrabold text-[#0d2658]">Proof of Address</div>
-              <div class="text-[11px] text-slate-500">Official Residential Address Specimen</div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-amber-600"></i>
-          </button>
-
-          <button type="button" onclick="selectFlowDocument('proofofaccount')" class="sm:col-span-2 p-4 rounded-2xl border border-slate-300 bg-gradient-to-br from-slate-50 to-white hover:border-slate-700 hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-3.5 group">
-            <div class="w-11 h-11 rounded-xl bg-slate-900 text-amber-300 flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
-              <i class="fa-solid fa-file-invoice-dollar"></i>
-            </div>
-            <div class="min-w-0 flex-1">
-              <div class="text-sm font-extrabold text-[#0d2658]">Proof of Account</div>
-              <div class="text-[11px] text-slate-500">Grey, Wise &amp; Revolut Bank Confirmation Letter PDF</div>
-            </div>
-            <i class="fa-solid fa-arrow-right text-xs text-slate-800"></i>
+        <!-- Empty state when country has zero configured documents -->
+        <div id="flowNoDocumentsState" class="hidden rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center space-y-3">
+          <div class="w-11 h-11 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center mx-auto text-lg">
+            <i class="fa-regular fa-folder-open"></i>
+          </div>
+          <div class="space-y-1">
+            <p class="text-sm font-extrabold text-[#0d2658]">No documents are currently available for <span id="flowNoDocsCountryName">this country</span></p>
+            <p class="text-xs text-slate-500">Please go back and select another configured country.</p>
+          </div>
+          <button type="button" onclick="goToFlowStep('country')" class="px-4 py-2 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors">
+            <i class="fa-solid fa-arrow-left text-[10px]"></i>
+            <span>Back to Country Selection</span>
           </button>
         </div>
       </div>
