@@ -2006,6 +2006,186 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
 
+    const BASELINE_WEBSITE_COUNTRY_KEYS = [
+      'kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan',
+      'senegal', 'southafrica', 'usa', 'seychelles', 'drcongo', 'bangladesh',
+      'germany', 'canada', 'ghana', 'rwanda', 'nepal', 'malawi', 'uae', 'turkey'
+    ];
+
+    const PROVIDER_SUPPORTED_COUNTRIES = {
+      payoneer: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'usa', 'seychelles', 'bangladesh', 'germany', 'canada', 'ghana', 'rwanda', 'nepal', 'uae', 'turkey'],
+      paypal: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'usa', 'seychelles', 'drcongo', 'germany', 'canada', 'malawi', 'uae'],
+      wise: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'southafrica', 'usa', 'seychelles', 'bangladesh', 'germany', 'canada', 'ghana', 'nepal', 'uae', 'turkey'],
+      grey: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'usa', 'seychelles', 'drcongo', 'ghana', 'rwanda', 'malawi', 'uae'],
+      raenest: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'senegal', 'southafrica', 'drcongo', 'ghana', 'rwanda', 'malawi', 'usa'],
+      revolut: ['uk', 'germany', 'usa', 'canada', 'uae', 'turkey', 'seychelles', 'southafrica', 'kenya', 'somalia', 'nigeria', 'uganda', 'pakistan'],
+      mercury: ['usa', 'uk', 'canada', 'germany', 'uae', 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uganda', 'pakistan', 'southafrica', 'bangladesh', 'ghana', 'turkey'],
+      elevate: ['pakistan', 'bangladesh', 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uganda', 'ghana', 'rwanda', 'nepal', 'senegal', 'southafrica', 'turkey', 'uk', 'usa'],
+      paxum: ['uk', 'usa', 'canada', 'germany', 'kenya', 'somalia', 'ethiopia', 'nigeria', 'uganda', 'pakistan', 'southafrica', 'bangladesh', 'seychelles', 'uae', 'turkey'],
+      stripe: ['usa', 'uk', 'canada', 'germany', 'uae', 'kenya', 'nigeria', 'southafrica', 'ghana', 'seychelles', 'somalia', 'uganda'],
+      chipper: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'senegal', 'southafrica', 'ghana', 'rwanda', 'malawi', 'usa', 'drcongo'],
+      binance: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'bangladesh', 'germany', 'ghana', 'rwanda', 'nepal', 'malawi', 'uae', 'turkey'],
+      bybit: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'bangladesh', 'germany', 'ghana', 'rwanda', 'nepal', 'uae', 'turkey'],
+      okx: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'germany', 'ghana', 'rwanda', 'nepal', 'malawi', 'uae', 'turkey'],
+      kucoin: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'bangladesh', 'germany', 'canada', 'ghana', 'rwanda', 'nepal', 'uae', 'turkey']
+    };
+
+    const PROVIDER_SUPPORTED_DOCS = {
+      payoneer: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      paypal: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      wise: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      grey: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
+      raenest: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
+      revolut: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      mercury: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
+      elevate: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
+      paxum: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
+      stripe: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      chipper: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
+      binance: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
+      bybit: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
+      okx: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
+      kucoin: ['passport', 'idcard', 'driverlicense', 'refugeecard']
+    };
+
+    const COUNTRY_OFFICIAL_AUTHORITIES = {
+      kenya: {
+        authority: 'Directorate of Immigration & Citizen Services (NRB / eCitizen)',
+        portalName: 'Kenya eCitizen Immigration Portal',
+        portalUrl: 'https://fns.immigration.go.ke',
+        idStandard: 'East African Community Biometric e-Passport & Maisha Namba National ID'
+      },
+      somalia: {
+        authority: 'Immigration and Citizenship Agency (ICA) & National Identification and Registration Authority (NIRA)',
+        portalName: 'Federal Republic of Somalia NIRA / ICA',
+        portalUrl: 'https://nira.gov.so',
+        idStandard: 'Somali Biometric e-Passport, NIRA National Identity Card & Ministry of Transport Driving License'
+      },
+      ethiopia: {
+        authority: 'Immigration and Citizenship Service (ICS) & National ID Program (Fayda)',
+        portalName: 'Ethiopia Immigration & Fayda Digital ID',
+        portalUrl: 'https://id.gov.et',
+        idStandard: 'Ethiopian Biometric e-Passport & Fayda 12-Digit FIN National ID'
+      },
+      nigeria: {
+        authority: 'Nigeria Immigration Service (NIS) & National Identity Management Commission (NIMC)',
+        portalName: 'NIMC & Nigeria Immigration Portal',
+        portalUrl: 'https://nimc.gov.ng',
+        idStandard: 'ECOWAS Biometric e-Passport & 11-Digit NIN National Identity Card'
+      },
+      uk: {
+        authority: 'His Majesty’s Passport Office (HMPO) · Home Office',
+        portalName: 'GOV.UK Passport & Identity Guidance',
+        portalUrl: 'https://www.gov.uk/browse/abroad/passports',
+        idStandard: 'UK Series C Biometric Passport (ICAO Doc 9303) & FCA Address Verification'
+      },
+      uganda: {
+        authority: 'National Identification and Registration Authority (NIRA Uganda) & DCIC',
+        portalName: 'NIRA Republic of Uganda',
+        portalUrl: 'https://www.nira.go.ug',
+        idStandard: 'Uganda 14-Character NIN Polycarbonate National ID Card'
+      },
+      pakistan: {
+        authority: 'National Database & Registration Authority (NADRA) & DGI&P',
+        portalName: 'NADRA Official Identity Portal',
+        portalUrl: 'https://www.nadra.gov.pk',
+        idStandard: 'NADRA Smart National Identity Card (SNIC / CNIC) with ICAO Chip'
+      },
+      senegal: {
+        authority: 'Direction de l’Automatisation des Fichiers (DAF) · République du Sénégal',
+        portalName: 'Senegal CEDEAO Identity & Passport Service',
+        portalUrl: 'https://www.interieur.gouv.sn',
+        idStandard: 'CEDEAO / ECOWAS Biometric e-Passport & Biometric National ID Card'
+      },
+      southafrica: {
+        authority: 'Department of Home Affairs (DHA) · Republic of South Africa',
+        portalName: 'South Africa Department of Home Affairs',
+        portalUrl: 'https://www.dha.gov.za',
+        idStandard: 'South African Biometric Tourist / Regular Passport (ICAO Doc 9303)'
+      },
+      usa: {
+        authority: 'U.S. Department of State · Bureau of Consular Affairs',
+        portalName: 'Travel.State.Gov U.S. Passports',
+        portalUrl: 'https://travel.state.gov',
+        idStandard: 'Next Generation U.S. Passport (NGP) Polycarbonate Data Page'
+      },
+      seychelles: {
+        authority: 'Department of Immigration & Civil Status · Republic of Seychelles',
+        portalName: 'Seychelles Civil Status & Immigration',
+        portalUrl: 'https://www.ics.gov.sc',
+        idStandard: 'Seychelles National Identity Card (NIN) & Proof of Account'
+      },
+      drcongo: {
+        authority: 'Ministère des Affaires Étrangères · République Démocratique du Congo',
+        portalName: 'DRC Biometric Passport Portal',
+        portalUrl: 'https://passeport.gouv.cd',
+        idStandard: 'DRC Biometric e-Passport (COD) & Bank Address Confirmation'
+      },
+      bangladesh: {
+        authority: 'Department of Immigration & Passports (DIP) · People’s Republic of Bangladesh',
+        portalName: 'Bangladesh e-Passport Online Portal',
+        portalUrl: 'https://www.epassport.gov.bd',
+        idStandard: 'Bangladesh ICAO Biometric e-Passport & DESCO Utility Address Proof'
+      },
+      germany: {
+        authority: 'Bundesministerium des Innern und für Heimat (BMI) · Bundesdruckerei',
+        portalName: 'Germany Federal Interior Passport Portal',
+        portalUrl: 'https://www.personalausweisportal.de',
+        idStandard: 'Bundesrepublik Deutschland Biometric Reisepass (EU / ICAO)'
+      },
+      canada: {
+        authority: 'Immigration, Refugees and Citizenship Canada (IRCC)',
+        portalName: 'Government of Canada Passport Services',
+        portalUrl: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports.html',
+        idStandard: 'Next-Generation Canadian e-Passport (Polycarbonate Bio-Page)'
+      },
+      ghana: {
+        authority: 'Ministry of Foreign Affairs & Regional Integration · Republic of Ghana',
+        portalName: 'Ghana Passport Office Portal',
+        portalUrl: 'https://passport.mfa.gov.gh',
+        idStandard: 'ECOWAS / Republic of Ghana Biometric e-Passport (GHA)'
+      },
+      rwanda: {
+        authority: 'National Identification Agency (NIDA) · Republic of Rwanda',
+        portalName: 'Rwanda NIDA / IremboGov Portal',
+        portalUrl: 'https://www.nida.gov.rw',
+        idStandard: 'Rwanda Indangamuntu 16-Digit National Identity Card'
+      },
+      nepal: {
+        authority: 'Department of Passports (DoP) · Ministry of Foreign Affairs Nepal',
+        portalName: 'Nepal Department of Passports',
+        portalUrl: 'https://nepalpassport.gov.np',
+        idStandard: 'Nepal Biometric e-Passport (NPL · ICAO Doc 9303)'
+      },
+      malawi: {
+        authority: 'Department of Immigration and Citizenship Services · Republic of Malawi',
+        portalName: 'Malawi e-Passport Portal',
+        portalUrl: 'https://www.immigration.gov.mw',
+        idStandard: 'Republic of Malawi SADC Biometric e-Passport (MWI)'
+      },
+      uae: {
+        authority: 'Federal Authority for Identity, Citizenship, Customs & Port Security (ICP)',
+        portalName: 'UAE ICP Smart Services',
+        portalUrl: 'https://icp.gov.ae',
+        idStandard: 'UAE Emirates ID Resident Identity Card (784 Series)'
+      },
+      turkey: {
+        authority: 'Nüfus ve Vatandaşlık İşleri Genel Müdürlüğü (NVİ) · Republic of Türkiye',
+        portalName: 'Türkiye NVİ Identity & Passport Portal',
+        portalUrl: 'https://randevu.nvi.gov.tr',
+        idStandard: 'Türkiye Biometric Pasaport & T.C. Kimlik Kartı'
+      }
+    };
+
+    Object.keys(platformData).forEach(pKey => {
+      if (PROVIDER_SUPPORTED_COUNTRIES[pKey]) {
+        platformData[pKey].supportedCountries = PROVIDER_SUPPORTED_COUNTRIES[pKey].slice();
+      }
+      if (PROVIDER_SUPPORTED_DOCS[pKey]) {
+        platformData[pKey].supportedDocTypes = PROVIDER_SUPPORTED_DOCS[pKey].slice();
+      }
+    });
+
     // Read countries dynamically from existing website country buttons (Single Source of Truth)
     function getExistingWebsiteCountries() {
       const buttons = document.querySelectorAll('#existing-country-registry .country-pill-btn[id^="country-btn-"], .country-pill-btn[id^="country-btn-"]');
@@ -2023,37 +2203,67 @@ var $ = window.$ || (id => document.getElementById(id));
           flag: flagEl ? flagEl.textContent.trim() : '',
           name: nameEl ? nameEl.textContent.trim() : key,
           subtitle: subEl ? subEl.textContent.trim() : '',
-          docsAttr: (btn.getAttribute('data-docs') || '').trim()
+          docsAttr: (btn.getAttribute('data-docs') || '').trim(),
+          providersAttr: (btn.getAttribute('data-providers') || '').trim()
         });
       });
       return list;
     }
     window.getExistingWebsiteCountries = getExistingWebsiteCountries;
 
-    // Derive configured document types strictly from existing document views & configuration for that country
-    function getConfiguredDocsForCountry(countryKey) {
+    function getSupportedCountriesForProvider(providerKey) {
+      const allCountries = getExistingWebsiteCountries();
+      if (!providerKey) return allCountries;
+      const normalizedProvider = String(providerKey).toLowerCase().trim();
+      const allowedList = PROVIDER_SUPPORTED_COUNTRIES[normalizedProvider];
+      if (!allowedList) return allCountries;
+
+      return allCountries.filter(c => {
+        if (c.providersAttr) {
+          const explicitProviders = c.providersAttr.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+          return explicitProviders.includes(normalizedProvider) || explicitProviders.includes('all');
+        }
+        if (!BASELINE_WEBSITE_COUNTRY_KEYS.includes(c.key)) {
+          return true;
+        }
+        return allowedList.includes(c.key);
+      });
+    }
+    window.getSupportedCountriesForProvider = getSupportedCountriesForProvider;
+
+    // Derive configured document types strictly from existing document views & provider compatibility
+    function getConfiguredDocsForCountry(countryKey, providerKey) {
       if (!countryKey) return [];
       const btn = $('country-btn-' + countryKey);
       const dataDocs = btn ? (btn.getAttribute('data-docs') || '').trim() : '';
+      let docs = [];
       if (dataDocs) {
-        return dataDocs.split(',').map(s => s.trim()).filter(Boolean);
+        docs = dataDocs.split(',').map(s => s.trim()).filter(Boolean);
+      } else {
+        if ($(countryKey + '-passport-view')) {
+          docs.push('passport');
+        }
+        if ($(countryKey + '-idcard-view') || $(countryKey + '-doc-view')) {
+          docs.push('idcard');
+        }
+        if ($(countryKey + '-driverlicense-view')) {
+          docs.push('driverlicense');
+        }
+        if (countryKey === 'bangladesh' || $(countryKey + '-proofofaddress-view')) {
+          docs.push('refugeecard');
+        }
+        if ((Array.isArray(window.poaConfiguredCountryKeys) && window.poaConfiguredCountryKeys.includes(countryKey)) || $(countryKey + '-proofofaccount-view')) {
+          docs.push('proofofaccount');
+        }
       }
 
-      const docs = [];
-      if ($(countryKey + '-passport-view')) {
-        docs.push('passport');
-      }
-      if ($(countryKey + '-idcard-view') || $(countryKey + '-doc-view')) {
-        docs.push('idcard');
-      }
-      if ($(countryKey + '-driverlicense-view')) {
-        docs.push('driverlicense');
-      }
-      if (countryKey === 'bangladesh' || $(countryKey + '-proofofaddress-view')) {
-        docs.push('refugeecard');
-      }
-      if ((Array.isArray(window.poaConfiguredCountryKeys) && window.poaConfiguredCountryKeys.includes(countryKey)) || $(countryKey + '-proofofaccount-view')) {
-        docs.push('proofofaccount');
+      const activeProvider = providerKey ? String(providerKey).toLowerCase().trim() : '';
+      if (activeProvider && PROVIDER_SUPPORTED_DOCS[activeProvider]) {
+        const providerAllowed = PROVIDER_SUPPORTED_DOCS[activeProvider];
+        const filtered = docs.filter(d => providerAllowed.includes(d));
+        if (filtered.length > 0) {
+          return filtered;
+        }
       }
       return docs;
     }
@@ -2096,19 +2306,21 @@ var $ = window.$ || (id => document.getElementById(id));
       return '';
     }
 
-    function getCountryDocumentItems(countryKey) {
+    function getCountryDocumentItems(countryKey, providerKey) {
       if (!countryKey) return [];
+      const activeProvider = providerKey || workflowActiveAccount || currentVirtualAccount || '';
       const countries = getExistingWebsiteCountries();
       const countryInfo = countries.find(c => c.key === countryKey);
       const countryName = countryInfo ? countryInfo.name : countryKey;
-      const configuredDocs = getConfiguredDocsForCountry(countryKey);
+      const configuredDocs = getConfiguredDocsForCountry(countryKey, activeProvider);
+      const providerMeta = platformData[activeProvider] || platformData.paypal;
 
       const categoryLabels = {
         passport: 'Passport',
-        idcard: 'National Identity',
-        driverlicense: "Driver's License",
+        idcard: 'National Identity Card',
+        driverlicense: "Government-Issued Identity Document (Driver's License)",
         refugeecard: 'Proof of Address',
-        proofofaccount: 'Proof of Account'
+        proofofaccount: 'Proof of Address & Account Confirmation'
       };
       const iconMap = {
         passport: 'fa-solid fa-passport',
@@ -2127,24 +2339,24 @@ var $ = window.$ || (id => document.getElementById(id));
 
       const viewTitleRefinements = {
         'nigeria-doc-view': {
-          name: 'Nigeria NIMC National ID Card',
-          description: 'Federal Republic of Nigeria · NIMC Digital NIN Slip & National Identity Card Editor'
+          name: 'Nigeria NIMC National Identity Card',
+          description: `Federal Republic of Nigeria · Accepted by ${providerMeta.name} for National Identity Verification`
         },
         'nigeria-passport-view': {
           name: 'Nigeria Biometric e-Passport',
-          description: 'Federal Republic of Nigeria · Official ICAO 9303 e-Passport Live Preview Editor'
+          description: `Federal Republic of Nigeria · ICAO Doc 9303 e-Passport Accepted by ${providerMeta.name}`
         },
         'pakistan-doc-view': {
-          name: 'Pakistan CNIC / SNIC Identity Card',
-          description: 'Islamic Republic of Pakistan · NADRA Smart National Identity Card Live Editor'
+          name: 'Pakistan NADRA Smart National Identity Card (SNIC)',
+          description: `Islamic Republic of Pakistan · NADRA Biometric Identity Document Accepted by ${providerMeta.name}`
         },
         'seychelles-doc-view': {
           name: 'Seychelles National Identity Card',
-          description: 'Republic of Seychelles · Dual-Sided Biometric National ID Live Specimen Editor'
+          description: `Republic of Seychelles · Dual-Sided Biometric National ID Accepted by ${providerMeta.name}`
         },
         'senegal-passport-view': {
           name: 'Senegal Passeport Biométrique',
-          description: 'République du Sénégal · CEDEAO / ECOWAS Biometric e-Passport Live Editor'
+          description: `République du Sénégal · CEDEAO / ECOWAS Biometric e-Passport Accepted by ${providerMeta.name}`
         }
       };
 
@@ -2152,14 +2364,14 @@ var $ = window.$ || (id => document.getElementById(id));
         const viewEl = resolveCountryViewElement(countryKey, docType);
         const viewId = viewEl ? viewEl.id : '';
         let name = categoryLabels[docType] || docType;
-        let description = `${countryName} official verification document editor`;
+        let description = `${countryName} official verification document accepted for ${providerMeta.name} KYC`;
 
         if (docType === 'proofofaccount' && (!viewEl || viewId === 'proofofaccount-doc-view')) {
           const poaInfo = (typeof poaCountryMap !== 'undefined' && poaCountryMap[countryKey]) ? poaCountryMap[countryKey] : null;
-          name = `${countryName} Proof of Account Letter`;
+          name = `${countryName} Proof of Account & Address Confirmation`;
           description = poaInfo
-            ? `${poaInfo.bank} · Grey, Wise & Revolut PDF Confirmation Letter Editor`
-            : 'Grey, Wise & Revolut Account Confirmation Letter & Address PDF';
+            ? `${poaInfo.bank} · Official Account Ownership & Residential Address Proof for ${providerMeta.name}`
+            : `Official Account Confirmation & Residential Address Proof for ${providerMeta.name}`;
         } else if (viewId && viewTitleRefinements[viewId]) {
           name = viewTitleRefinements[viewId].name;
           description = viewTitleRefinements[viewId].description;
@@ -2259,11 +2471,14 @@ var $ = window.$ || (id => document.getElementById(id));
     window.refreshActiveDocumentPreview = refreshActiveDocumentPreview;
 
     function syncActiveWorkflowBar() {
-      const platformMeta = platformData[currentVirtualAccount] || platformData.paypal;
+      const activeAccountKey = workflowActiveAccount || currentVirtualAccount || 'paypal';
+      const platformMeta = platformData[activeAccountKey] || platformData.paypal;
       const countries = getExistingWebsiteCountries();
-      const countryInfo = countries.find(c => c.key === currentCountry);
-      const items = getCountryDocumentItems(currentCountry);
-      const activeItem = items.find(it => it.docType === currentDocType) || items[0] || null;
+      const activeCountryKey = workflowSelectedCountry || currentCountry;
+      const countryInfo = countries.find(c => c.key === activeCountryKey);
+      const items = getCountryDocumentItems(activeCountryKey, activeAccountKey);
+      const activeDocKey = workflowSelectedDoc || currentDocType;
+      const activeItem = items.find(it => it.docType === activeDocKey) || items[0] || null;
 
       const platEl = $('wbBarPlatformName');
       const platIconEl = $('wbBarPlatformIcon');
@@ -2275,36 +2490,119 @@ var $ = window.$ || (id => document.getElementById(id));
       if (platEl) platEl.textContent = platformMeta.name;
       if (platIconEl) platIconEl.className = `${platformMeta.icon} text-xs text-blue-600`;
       if (countryFlagEl) countryFlagEl.textContent = countryInfo ? countryInfo.flag : '🌍';
-      if (countryNameEl) countryNameEl.textContent = countryInfo ? countryInfo.name : currentCountry;
+      if (countryNameEl) countryNameEl.textContent = countryInfo ? countryInfo.name : activeCountryKey;
       if (docNameEl) {
-        docNameEl.textContent = activeItem ? activeItem.name : 'No Document Available';
+        docNameEl.textContent = activeItem ? activeItem.name : 'Document Information';
       }
       if (backDocsLabelEl) {
         backDocsLabelEl.textContent = countryInfo ? `Back to ${countryInfo.name} Documents` : 'Back to Documents';
       }
+      syncWorkbenchStepperUI();
     }
     window.syncActiveWorkflowBar = syncActiveWorkflowBar;
+
+    function syncWorkbenchStepperUI() {
+      const stepperEl = $('wb-workflow-stepper');
+      if (!stepperEl) return;
+      const activeAccountKey = workflowActiveAccount || currentVirtualAccount || '';
+      const platformMeta = activeAccountKey ? (platformData[activeAccountKey] || null) : null;
+      const countries = getExistingWebsiteCountries();
+      const countryInfo = workflowSelectedCountry ? countries.find(c => c.key === workflowSelectedCountry) : null;
+      const docItems = workflowSelectedCountry ? getCountryDocumentItems(workflowSelectedCountry, activeAccountKey) : [];
+      const docInfo = workflowSelectedDoc ? docItems.find(d => d.docType === workflowSelectedDoc) : null;
+
+      const s1Sub = $('wbStep1Summary');
+      const s2Sub = $('wbStep2Summary');
+      const s3Sub = $('wbStep3Summary');
+      const s4Sub = $('wbStep4Summary');
+
+      if (s1Sub) s1Sub.textContent = platformMeta ? platformMeta.name : 'Select Provider';
+      if (s2Sub) s2Sub.textContent = countryInfo ? `${countryInfo.flag} ${countryInfo.name}` : 'Select Country';
+      if (s3Sub) s3Sub.textContent = docInfo ? docInfo.category : 'Select Document Type';
+      if (s4Sub) s4Sub.textContent = (workflowStep === 'editor' && docInfo) ? 'Active Guidance' : 'Eligibility & Guidance';
+
+      const stepMap = { accounts: 1, country: 2, documents: 3, editor: 4 };
+      const activeIdx = stepMap[workflowStep] || 1;
+      for (let i = 1; i <= 4; i++) {
+        const btn = $(`wbStepperBtn-${i}`);
+        const badge = $(`wbStepperBadge-${i}`);
+        if (!btn || !badge) continue;
+        const isCurrent = i === activeIdx;
+        const isCompleted = (i === 1 && Boolean(activeAccountKey)) ||
+                            (i === 2 && Boolean(workflowSelectedCountry)) ||
+                            (i === 3 && Boolean(workflowSelectedDoc)) ||
+                            (i === 4 && workflowStep === 'editor');
+        if (isCurrent) {
+          btn.className = 'p-2.5 sm:p-3 rounded-2xl border-2 border-[#0d5bd9] bg-blue-50/80 text-left transition-all cursor-pointer flex items-center gap-2.5 shadow-2xs';
+          badge.className = 'w-6 h-6 rounded-full bg-[#0d5bd9] text-white flex items-center justify-center text-xs font-extrabold shrink-0';
+          badge.innerHTML = String(i);
+        } else if (isCompleted) {
+          btn.className = 'p-2.5 sm:p-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 text-left transition-all cursor-pointer flex items-center gap-2.5';
+          badge.className = 'w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-extrabold shrink-0';
+          badge.innerHTML = '<i class="fa-solid fa-check text-[10px]"></i>';
+        } else {
+          btn.className = 'p-2.5 sm:p-3 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center gap-2.5 opacity-75';
+          badge.className = 'w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold shrink-0';
+          badge.innerHTML = String(i);
+        }
+      }
+    }
+    window.syncWorkbenchStepperUI = syncWorkbenchStepperUI;
+
+    function attemptWorkflowStep(targetStep) {
+      if (targetStep === 'accounts') {
+        setWorkflowViewStep('accounts');
+        return;
+      }
+      if (!workflowActiveAccount) {
+        showToast('Select Virtual Account Provider', 'Please select a virtual account provider first to proceed.');
+        setWorkflowViewStep('accounts');
+        return;
+      }
+      if (targetStep === 'country') {
+        setWorkflowViewStep('country');
+        return;
+      }
+      if (!workflowSelectedCountry) {
+        showToast('Select Issuing Country', 'Please select a supported issuing country before choosing a document type.');
+        setWorkflowViewStep('country');
+        return;
+      }
+      if (targetStep === 'documents') {
+        setWorkflowViewStep('documents');
+        return;
+      }
+      if (!workflowSelectedDoc) {
+        showToast('Select Document Type', 'Please select a document category first to view document verification information.');
+        setWorkflowViewStep('documents');
+        return;
+      }
+      setWorkflowViewStep('editor');
+    }
+    window.attemptWorkflowStep = attemptWorkflowStep;
 
     function renderSearchableCountryOptions(scope, queryText) {
       const listEl = $(scope === 'flow' ? 'flowCountryOptionsList' : 'wbCountryOptionsList');
       if (!listEl) return;
 
-      const countries = getExistingWebsiteCountries();
+      const activeProvider = workflowActiveAccount || currentVirtualAccount || 'paypal';
+      const countries = getSupportedCountriesForProvider(activeProvider);
+      const providerMeta = platformData[activeProvider] || platformData.paypal;
       const q = (queryText || '').trim().toLowerCase();
       const filtered = q
         ? countries.filter(c => c.name.toLowerCase().includes(q) || c.key.toLowerCase().includes(q) || c.subtitle.toLowerCase().includes(q))
         : countries;
 
-      const activeKey = scope === 'flow' ? flowSelectedCountry : currentCountry;
+      const activeKey = scope === 'flow' ? flowSelectedCountry : workflowSelectedCountry;
 
       if (filtered.length === 0) {
-        listEl.innerHTML = `<div class="px-4 py-5 text-center text-xs font-semibold text-slate-500">No matching country found</div>`;
+        listEl.innerHTML = `<div class="px-4 py-5 text-center text-xs font-semibold text-slate-500">No supported country matching "${q}" for ${providerMeta.name}</div>`;
         return;
       }
 
       listEl.innerHTML = filtered.map(c => {
         const isSelected = c.key === activeKey;
-        const docCount = getConfiguredDocsForCountry(c.key).length;
+        const docCount = getConfiguredDocsForCountry(c.key, activeProvider).length;
         const docLabel = docCount === 1 ? '1 document' : `${docCount} documents`;
         return `
           <button
@@ -2340,6 +2638,19 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
     window.handleCountrySearchKeydown = handleCountrySearchKeydown;
+
+    function handleDocumentSearchKeydown(event) {
+      if (!event || event.key !== 'Enter') return;
+      const listEl = $('wbDocumentOptionsList');
+      if (!listEl) return;
+      const firstOption = listEl.querySelector('button[data-doc-type]');
+      if (firstOption) {
+        event.preventDefault();
+        const docType = firstOption.getAttribute('data-doc-type');
+        if (docType) selectDocumentFromDropdown(docType);
+      }
+    }
+    window.handleDocumentSearchKeydown = handleDocumentSearchKeydown;
 
     function toggleSearchableCountryDropdown(scope) {
       const menuId = scope === 'flow' ? 'flowCountryDropdownMenu' : 'wbCountryDropdownMenu';
@@ -2427,15 +2738,22 @@ var $ = window.$ || (id => document.getElementById(id));
     }
     window.closeWorkflowDocumentDropdown = closeWorkflowDocumentDropdown;
 
-    function openWorkflowDocumentDropdown() {
+    function openWorkflowDocumentDropdown(opts) {
+      const options = opts || {};
       const docMenu = $('wbDocumentDropdownMenu');
       const docBtn = $('wbDocumentDropdownBtn');
+      const docSearch = $('wbDocumentSearchInput');
       if (!docMenu) return;
       closeSearchableCountryDropdowns();
+      if (docSearch) docSearch.value = '';
+      renderWorkflowDocumentsDropdown(workflowSelectedCountry, '');
       docMenu.classList.remove('hidden');
       if (docBtn) docBtn.setAttribute('aria-expanded', 'true');
       skipNextDocOutsideClose = true;
       setTimeout(() => { skipNextDocOutsideClose = false; }, 0);
+      if (!options.noFocus && docSearch) {
+        setTimeout(() => { if (docSearch) docSearch.focus(); }, 20);
+      }
     }
     window.openWorkflowDocumentDropdown = openWorkflowDocumentDropdown;
 
@@ -2443,7 +2761,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const docMenu = $('wbDocumentDropdownMenu');
       if (!docMenu) return;
       if (docMenu.classList.contains('hidden')) {
-        openWorkflowDocumentDropdown();
+        openWorkflowDocumentDropdown({ noFocus: false });
       } else {
         closeWorkflowDocumentDropdown();
       }
@@ -2460,11 +2778,20 @@ var $ = window.$ || (id => document.getElementById(id));
       if (scope === 'flow') {
         handleFlowCountryChange(countryKey, { advanceToDocs: true });
       } else {
+        const activeProvider = workflowActiveAccount || currentVirtualAccount || 'paypal';
+        const supported = getSupportedCountriesForProvider(activeProvider);
+        if (countryKey && !supported.some(c => c.key === countryKey)) {
+          const pMeta = platformData[activeProvider] || platformData.paypal;
+          showToast('Unsupported Country', `${pMeta.name} does not support ${countryKey}. Please choose a supported country.`);
+          return;
+        }
         workflowSelectedCountry = countryKey || '';
         workflowSelectedDoc = '';
+        const docSearch = $('wbDocumentSearchInput');
+        if (docSearch) docSearch.value = '';
         switchVerificationCountry(countryKey, { silent: true });
         syncWorkbenchCountryDropdownUI(countryKey);
-        renderWorkflowDocumentsDropdown(countryKey);
+        renderWorkflowDocumentsDropdown(countryKey, '');
         setWorkflowViewStep('documents');
       }
     }
@@ -2484,7 +2811,8 @@ var $ = window.$ || (id => document.getElementById(id));
     window.selectDocumentFromDropdown = selectDocumentFromDropdown;
 
     function syncWorkbenchCountryDropdownUI(countryKey) {
-      const countries = getExistingWebsiteCountries();
+      const activeProvider = workflowActiveAccount || currentVirtualAccount || 'paypal';
+      const countries = getSupportedCountriesForProvider(activeProvider);
       const info = countryKey ? countries.find(c => c.key === countryKey) : null;
       const flagEl = $('wbCountrySelectedFlag');
       const nameEl = $('wbCountrySelectedName');
@@ -2498,18 +2826,13 @@ var $ = window.$ || (id => document.getElementById(id));
         if (nameEl) nameEl.textContent = info.name || countryKey;
         if (promptEl) promptEl.classList.add('hidden');
         if (continueBtn) {
-          if (workflowStep === 'documents') {
-            continueBtn.classList.add('hidden');
-            continueBtn.classList.remove('inline-flex');
-          } else {
-            continueBtn.classList.remove('hidden');
-            continueBtn.classList.add('inline-flex');
-          }
+          continueBtn.classList.remove('hidden');
+          continueBtn.classList.add('inline-flex');
         }
-        if (continueLabel) continueLabel.textContent = `Continue to ${info.name} Documents`;
+        if (continueLabel) continueLabel.textContent = `Continue to ${info.name} Document Types`;
       } else {
         if (flagEl) flagEl.textContent = '🌍';
-        if (nameEl) nameEl.textContent = '-- Select your country --';
+        if (nameEl) nameEl.textContent = '-- Select supported issuing country --';
         if (promptEl) promptEl.classList.remove('hidden');
         if (continueBtn) {
           continueBtn.classList.add('hidden');
@@ -2517,12 +2840,13 @@ var $ = window.$ || (id => document.getElementById(id));
         }
       }
       if (countEl) {
-        countEl.textContent = `${countries.length} countries`;
+        countEl.textContent = `${countries.length} supported countries`;
       }
     }
 
     function syncWorkbenchDocumentDropdownUI(countryKey) {
-      const items = getCountryDocumentItems(countryKey);
+      const activeProvider = workflowActiveAccount || currentVirtualAccount || 'paypal';
+      const items = getCountryDocumentItems(countryKey, activeProvider);
       const selectedItem = workflowSelectedDoc ? items.find(it => it.docType === workflowSelectedDoc) : null;
       const iconWrapEl = $('wbDocSelectedIconWrap');
       const iconEl = $('wbDocSelectedIcon');
@@ -2534,27 +2858,27 @@ var $ = window.$ || (id => document.getElementById(id));
       if (selectedItem) {
         if (iconWrapEl) iconWrapEl.className = `w-9 h-9 rounded-xl ${selectedItem.accent.bg} text-white flex items-center justify-center text-sm shrink-0 shadow-xs`;
         if (iconEl) iconEl.className = selectedItem.icon;
-        if (nameEl) nameEl.textContent = selectedItem.name;
+        if (nameEl) nameEl.textContent = `${selectedItem.category} — ${selectedItem.name}`;
         if (continueBtn) {
           continueBtn.classList.remove('hidden');
           continueBtn.classList.add('inline-flex');
         }
-        if (continueLabel) continueLabel.textContent = `Open ${selectedItem.name}`;
+        if (continueLabel) continueLabel.textContent = `View ${selectedItem.category} Information`;
       } else {
         if (iconWrapEl) iconWrapEl.className = 'w-9 h-9 rounded-xl bg-blue-100 text-[#0d5bd9] flex items-center justify-center text-sm shrink-0';
         if (iconEl) iconEl.className = 'fa-solid fa-file-shield';
-        if (nameEl) nameEl.textContent = '-- Select a document from drop-down --';
+        if (nameEl) nameEl.textContent = '-- Select a document category from drop-down --';
         if (continueBtn) {
           continueBtn.classList.add('hidden');
           continueBtn.classList.remove('inline-flex');
         }
       }
       if (countEl) {
-        countEl.textContent = items.length === 1 ? '1 document' : `${items.length} documents`;
+        countEl.textContent = items.length === 1 ? '1 category' : `${items.length} categories`;
       }
     }
 
-    function renderWorkflowDocumentsDropdown(countryKey) {
+    function renderWorkflowDocumentsDropdown(countryKey, queryText) {
       const wrapperEl = $('wbDocumentDropdownWrapper');
       const optionsListEl = $('wbDocumentOptionsList');
       const grid = $('wb-country-documents-grid');
@@ -2563,27 +2887,32 @@ var $ = window.$ || (id => document.getElementById(id));
       const flagEl = $('wbDocsCountryFlag');
       const nameEl = $('wbDocsCountryName');
       const platEl = $('wbDocsPlatformName');
+      const platIconWrapEl = $('wbDocsPlatformIconWrap');
+      const platIconEl = $('wbDocsPlatformIcon');
       const countEl = $('wbDocsCountLabel');
 
+      const activeProvider = workflowActiveAccount || currentVirtualAccount || 'paypal';
       const countries = getExistingWebsiteCountries();
       const countryInfo = countries.find(c => c.key === countryKey);
       const displayName = countryInfo ? countryInfo.name : (countryKey || 'Selected Country');
       const displayFlag = countryInfo ? (countryInfo.flag || '🌍') : '🌍';
-      const platformMeta = platformData[workflowActiveAccount || currentVirtualAccount] || platformData.paypal;
+      const platformMeta = platformData[activeProvider] || platformData.paypal;
 
       if (flagEl) flagEl.textContent = displayFlag;
       if (nameEl) nameEl.textContent = displayName;
       if (platEl) platEl.textContent = platformMeta.name;
+      if (platIconWrapEl) platIconWrapEl.style.backgroundColor = platformMeta.color || '#003087';
+      if (platIconEl) platIconEl.className = `${platformMeta.icon} text-sm text-white`;
       if (emptyNameEl) emptyNameEl.textContent = displayName;
 
-      const items = getCountryDocumentItems(countryKey);
+      const allItems = getCountryDocumentItems(countryKey, activeProvider);
       if (countEl) {
-        countEl.textContent = items.length === 1 ? '1 template available' : `${items.length} templates available`;
+        countEl.textContent = allItems.length === 1 ? '1 supported category' : `${allItems.length} supported categories`;
       }
 
       syncWorkbenchDocumentDropdownUI(countryKey);
 
-      if (items.length === 0) {
+      if (allItems.length === 0) {
         if (wrapperEl) wrapperEl.classList.add('hidden');
         if (optionsListEl) optionsListEl.innerHTML = '';
         if (grid) {
@@ -2597,7 +2926,21 @@ var $ = window.$ || (id => document.getElementById(id));
       if (emptyEl) emptyEl.classList.add('hidden');
       if (wrapperEl) wrapperEl.classList.remove('hidden');
 
+      const q = (queryText || '').trim().toLowerCase();
+      const items = q
+        ? allItems.filter(it =>
+            it.name.toLowerCase().includes(q) ||
+            it.category.toLowerCase().includes(q) ||
+            it.description.toLowerCase().includes(q) ||
+            it.docType.toLowerCase().includes(q)
+          )
+        : allItems;
+
       if (optionsListEl) {
+        if (items.length === 0) {
+          optionsListEl.innerHTML = `<div class="px-4 py-5 text-center text-xs font-semibold text-slate-500">No document category matching "${q}" for ${displayName}</div>`;
+          return;
+        }
         optionsListEl.innerHTML = items.map(item => {
           const isCurrent = workflowSelectedDoc === item.docType;
           const thumbHtml = item.thumbnail
@@ -2622,13 +2965,15 @@ var $ = window.$ || (id => document.getElementById(id));
                     <span>${item.category}</span>
                     <span aria-hidden="true">·</span>
                     <span>${item.countryName}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>${platformMeta.name}</span>
                   </span>
                   <span class="block text-xs sm:text-sm font-extrabold text-[#0d2658] truncate">${item.name}</span>
                   <span class="block text-[11px] text-slate-500 truncate">${item.description}</span>
                 </span>
               </span>
               <span class="flex items-center gap-2 shrink-0 text-xs font-bold ${item.accent.arrow}">
-                <span class="hidden sm:inline">${isCurrent ? 'Selected' : 'Select'}</span>
+                <span class="hidden sm:inline">${isCurrent ? 'Selected' : 'View Info'}</span>
                 ${isCurrent ? '<i class="fa-solid fa-check text-xs text-blue-600"></i>' : '<i class="fa-solid fa-chevron-right text-[10px]"></i>'}
               </span>
             </button>
@@ -2639,9 +2984,195 @@ var $ = window.$ || (id => document.getElementById(id));
     window.renderWorkflowDocumentsDropdown = renderWorkflowDocumentsDropdown;
 
     function renderWorkflowDocumentsGrid(countryKey) {
-      renderWorkflowDocumentsDropdown(countryKey);
+      renderWorkflowDocumentsDropdown(countryKey, '');
     }
     window.renderWorkflowDocumentsGrid = renderWorkflowDocumentsGrid;
+
+    function renderWorkflowDocumentInfo(countryKey, docType, providerKey) {
+      const infoPanel = $('wb-step-doc-info-panel');
+      if (!infoPanel) return;
+
+      const activeProvider = providerKey || workflowActiveAccount || currentVirtualAccount || 'paypal';
+      const providerMeta = platformData[activeProvider] || platformData.paypal;
+      const countries = getExistingWebsiteCountries();
+      const countryInfo = countries.find(c => c.key === countryKey);
+      const countryName = countryInfo ? countryInfo.name : (countryKey || 'Selected Country');
+      const countryFlag = countryInfo ? (countryInfo.flag || '🌍') : '🌍';
+      const authorityMeta = COUNTRY_OFFICIAL_AUTHORITIES[countryKey] || {
+        authority: `${countryName} National Civil & Immigration Registry`,
+        portalName: `${countryName} Official Government Portal`,
+        portalUrl: providerMeta.url || 'https://www.paypal.com',
+        idStandard: `${countryName} Official Government Identity & Verification Standard`
+      };
+
+      const items = getCountryDocumentItems(countryKey, activeProvider);
+      const docItem = items.find(it => it.docType === docType) || items[0] || {
+        name: 'Official Verification Document',
+        category: 'Government-Issued Identity Document',
+        description: `${countryName} official KYC verification document`,
+        icon: 'fa-solid fa-file-shield'
+      };
+
+      const docSpecsByType = {
+        passport: {
+          format: 'ICAO Doc 9303 Machine-Readable Biometric Travel Document (MRZ + Polycarbonate / Paper Bio-Page)',
+          validity: 'Must be unexpired with at least 6 months remaining validity from submission date',
+          eligibility: [
+            `Issued by ${authorityMeta.authority} to a citizen or legal national of ${countryName}`,
+            `Full legal name, date of birth, and nationality on the passport bio-page must exactly match your ${providerMeta.name} account registration`,
+            'Both lines of the bottom Machine Readable Zone (MRZ) and passport number must be unobstructed and clearly legible',
+            `Holder must meet ${providerMeta.name} minimum age (18+ years) and regional residency compliance`
+          ],
+          guidance: [
+            'Place the open passport bio-page flat on a dark, non-reflective surface in bright natural lighting',
+            'Ensure all 4 corners of the passport bio-page and the full MRZ strip are visible within the frame',
+            'Avoid flash glare over the holographic laminate, portrait photo, or security watermark',
+            `Submit directly through the official ${providerMeta.name} verification portal alongside your live selfie check`
+          ]
+        },
+        idcard: {
+          format: 'ISO/IEC 7810 ID-1 Government-Issued Biometric National Identity Card (Front & Back)',
+          validity: 'Must be an active, unexpired physical National Identity Card (temporary paper slips not accepted unless specified)',
+          eligibility: [
+            `Officially issued by ${authorityMeta.authority} (${countryName})`,
+            `Legal first name, surname, and date of birth must match your ${providerMeta.name} profile exactly`,
+            'National Identification Number (NIN / CNIC / ID Number) and biometric chip/QR zone must be intact and verifiable',
+            `Accepted for ${providerMeta.name} (${providerMeta.kycLevel || 'Standard & Enhanced KYC'}) identity verification`
+          ],
+          guidance: [
+            'Capture high-resolution color photographs of both the FRONT and BACK sides of the physical ID card',
+            'Ensure all 4 edges of the card are visible with no fingers covering the ID number, portrait, or issue/expiry dates',
+            'Do not crop, digitally alter, or apply filters to the captured document images',
+            `Complete the real-time facial liveness check inside ${providerMeta.name} using the same device camera`
+          ]
+        },
+        driverlicense: {
+          format: 'Government-Issued Photocard Driving License with Security Hologram & Vehicle Category Table',
+          validity: 'Must be currently valid and unexpired at the time of KYC submission',
+          eligibility: [
+            `Issued by the official transport & licensing authority of ${countryName} (${authorityMeta.authority})`,
+            `Full legal name, photograph, date of birth, and license number must match your ${providerMeta.name} account`,
+            `Supported as a government-issued photo identity document for ${providerMeta.name} verification`,
+            'Must be accompanied by a separate Proof of Residential Address if used as primary photo ID'
+          ],
+          guidance: [
+            'Provide clear color scans or photos of both the front photocard and back category/barcode side',
+            'Verify that the license number, issue date, expiry date, and portrait photo are sharp and free of glare',
+            `Upload directly in the ${providerMeta.name} identity verification center without watermarks or compression artifacts`
+          ]
+        },
+        refugeecard: {
+          format: 'Official Residential Utility Bill / Municipal Address Statement (A4 / PDF or High-Res Print)',
+          validity: 'Must be dated within the last 90 days (3 months) prior to submission',
+          eligibility: [
+            `Displays a valid physical residential street address in ${countryName}`,
+            `Account holder name on the utility statement must match the legal name on your ${providerMeta.name} account`,
+            'Contains official utility provider header, billing period, meter/account number, and residential address',
+            'P.O. Box addresses, mobile phone bills, and handwritten receipts are not eligible for KYC address proof'
+          ],
+          guidance: [
+            'Upload the complete, uncropped page showing the utility provider logo, issue date, legal name, and full residential address',
+            'PDF statements downloaded directly from the utility portal or full-page 300 DPI color scans provide the highest acceptance rate',
+            `Ensure the residential address entered in your ${providerMeta.name} profile matches the document line-for-line`
+          ]
+        },
+        proofofaccount: {
+          format: 'Official Bank / Virtual Account Confirmation Letter & Residential Address Statement (PDF / A4)',
+          validity: 'Must be issued within the last 90 days and signed/stamped or digitally verifiable',
+          eligibility: [
+            `Confirms active account ownership and residential address in ${countryName} for ${providerMeta.name} compliance`,
+            'Displays beneficiary full legal name, IBAN / Account Number, BIC / SWIFT code, and issuing financial institution',
+            `Matches the legal identity verified via your ${countryName} Passport or National ID Card`,
+            `Meets ${providerMeta.name} (${providerMeta.kycLevel || 'Tier 2/3'}) Proof of Account & Proof of Address requirements`
+          ],
+          guidance: [
+            'Export or download the official account confirmation statement as a clean, unaltered PDF or full-page image',
+            'Ensure the bank letterhead, issue date (within 90 days), account details, and residential address are clearly legible',
+            `Submit in the ${providerMeta.name} verification center under Bank Account Verification or Proof of Address`
+          ]
+        }
+      };
+
+      const spec = docSpecsByType[docType] || docSpecsByType.passport;
+
+      const pIconWrap = $('wbInfoProviderIconWrap');
+      const pIcon = $('wbInfoProviderIcon');
+      const pName = $('wbInfoProviderName');
+      const pBadge = $('wbInfoProviderBadge');
+      const pAccType = $('wbInfoProviderAccType');
+      const pKycLevel = $('wbInfoProviderKycLevel');
+      const pCurrency = $('wbInfoProviderCurrency');
+      const pTip = $('wbInfoProviderTip');
+      const pLink = $('wbInfoProviderLink');
+      const pLinkLabel = $('wbInfoProviderLinkLabel');
+
+      if (pIconWrap) pIconWrap.style.backgroundColor = providerMeta.color || '#003087';
+      if (pIcon) pIcon.className = `${providerMeta.icon} text-lg text-white`;
+      if (pName) pName.textContent = providerMeta.name;
+      if (pBadge) pBadge.textContent = providerMeta.badge || 'Verified Provider';
+      if (pAccType) pAccType.textContent = providerMeta.accType || '';
+      if (pKycLevel) pKycLevel.textContent = providerMeta.kycLevel || '';
+      if (pCurrency) pCurrency.textContent = providerMeta.currency || '';
+      if (pTip) pTip.textContent = providerMeta.tip || '';
+      if (pLink) pLink.href = providerMeta.url || 'https://www.paypal.com';
+      if (pLinkLabel) pLinkLabel.textContent = `Official ${providerMeta.name} Portal`;
+
+      const cFlag = $('wbInfoCountryFlag');
+      const cName = $('wbInfoCountryName');
+      const cAuth = $('wbInfoCountryAuthority');
+      const cStd = $('wbInfoCountryStandard');
+      const cLink = $('wbInfoAuthorityLink');
+      const cLinkLabel = $('wbInfoAuthorityLinkLabel');
+
+      if (cFlag) cFlag.textContent = countryFlag;
+      if (cName) cName.textContent = countryName;
+      if (cAuth) cAuth.textContent = authorityMeta.authority;
+      if (cStd) cStd.textContent = authorityMeta.idStandard;
+      if (cLink) cLink.href = authorityMeta.portalUrl;
+      if (cLinkLabel) cLinkLabel.textContent = authorityMeta.portalName;
+
+      const dCategory = $('wbInfoDocCategory');
+      const dTitle = $('wbInfoDocTitle');
+      const dFormat = $('wbInfoDocFormat');
+      const dValidity = $('wbInfoDocValidity');
+      const dEligibilityList = $('wbInfoEligibilityList');
+      const dGuidanceList = $('wbInfoGuidanceList');
+      const dProviderReqList = $('wbInfoProviderReqList');
+
+      if (dCategory) dCategory.textContent = docItem.category;
+      if (dTitle) dTitle.textContent = docItem.name;
+      if (dFormat) dFormat.textContent = spec.format;
+      if (dValidity) dValidity.textContent = spec.validity;
+
+      if (dEligibilityList) {
+        dEligibilityList.innerHTML = spec.eligibility.map(line => `
+          <li class="flex items-start gap-2.5 text-xs text-slate-700 leading-relaxed">
+            <i class="fa-solid fa-circle-check text-emerald-600 text-xs mt-0.5 shrink-0"></i>
+            <span>${line}</span>
+          </li>
+        `).join('');
+      }
+
+      if (dGuidanceList) {
+        dGuidanceList.innerHTML = spec.guidance.map(line => `
+          <li class="flex items-start gap-2.5 text-xs text-slate-700 leading-relaxed">
+            <i class="fa-solid fa-shield-halved text-blue-600 text-xs mt-0.5 shrink-0"></i>
+            <span>${line}</span>
+          </li>
+        `).join('');
+      }
+
+      if (dProviderReqList) {
+        const reqs = Array.isArray(providerMeta.kycReq) ? providerMeta.kycReq : [];
+        dProviderReqList.innerHTML = reqs.map(req => `
+          <li class="flex items-center gap-2 text-xs text-slate-700 bg-white px-3 py-2 rounded-xl border border-slate-200/80">
+            <i class="fa-solid fa-check text-emerald-600 text-[11px] shrink-0"></i>
+            <span>${req}</span>
+          </li>
+        `).join('');
+      }
+    }
+    window.renderWorkflowDocumentInfo = renderWorkflowDocumentInfo;
 
     function syncWorkflowAccountsHighlight() {
       document.querySelectorAll('#our-virtual-accounts [data-va-card]').forEach(el => {
@@ -2658,12 +3189,21 @@ var $ = window.$ || (id => document.getElementById(id));
       let nextStep = step || 'home';
 
       if (nextStep === 'country' && !workflowActiveAccount) {
+        if (!options.silent) {
+          showToast('Select Virtual Account Provider', 'Please select a virtual account provider first.');
+        }
         nextStep = 'accounts';
       }
       if (nextStep === 'documents' && !workflowSelectedCountry) {
+        if (!options.silent) {
+          showToast('Select Issuing Country', 'Please select a supported issuing country first.');
+        }
         nextStep = workflowActiveAccount ? 'country' : 'accounts';
       }
       if (nextStep === 'editor' && (!workflowSelectedCountry || !workflowSelectedDoc)) {
+        if (!options.silent) {
+          showToast('Select Document Type', 'Please select a document category first.');
+        }
         nextStep = workflowSelectedCountry ? 'documents' : (workflowActiveAccount ? 'country' : 'accounts');
       }
 
@@ -2676,8 +3216,10 @@ var $ = window.$ || (id => document.getElementById(id));
       const whySection = $('homepage-why-section');
       const vaSection = $('our-virtual-accounts');
       const workbench = $('verification-workbench');
+      const stepperBar = $('wb-workflow-stepper');
       const countryPanel = $('wb-step-country-panel');
       const docsPanel = $('wb-step-documents-panel');
+      const docInfoPanel = $('wb-step-doc-info-panel');
       const editorBar = $('active-editor-workflow-bar');
       const poaAccountBar = $('poa-step2-account-selector');
       const noDocView = $('wb-no-document-view');
@@ -2688,8 +3230,10 @@ var $ = window.$ || (id => document.getElementById(id));
         if (whySection) whySection.classList.remove('hidden');
         if (vaSection) vaSection.classList.remove('hidden');
         if (workbench) workbench.classList.add('hidden');
+        if (stepperBar) stepperBar.classList.add('hidden');
         if (countryPanel) countryPanel.classList.add('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docInfoPanel) docInfoPanel.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
         if (noDocView) noDocView.classList.add('hidden');
@@ -2701,8 +3245,10 @@ var $ = window.$ || (id => document.getElementById(id));
         if (whySection) whySection.classList.remove('hidden');
         if (vaSection) vaSection.classList.remove('hidden');
         if (workbench) workbench.classList.add('hidden');
+        if (stepperBar) stepperBar.classList.add('hidden');
         if (countryPanel) countryPanel.classList.add('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docInfoPanel) docInfoPanel.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
         if (noDocView) noDocView.classList.add('hidden');
@@ -2719,8 +3265,10 @@ var $ = window.$ || (id => document.getElementById(id));
         if (whySection) whySection.classList.add('hidden');
         if (vaSection) vaSection.classList.add('hidden');
         if (workbench) workbench.classList.remove('hidden');
+        if (stepperBar) stepperBar.classList.remove('hidden');
         if (countryPanel) countryPanel.classList.remove('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docInfoPanel) docInfoPanel.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
         if (noDocView) noDocView.classList.add('hidden');
@@ -2737,6 +3285,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (pIcon) pIcon.className = `${meta.icon} text-lg text-white`;
 
         syncWorkbenchCountryDropdownUI(workflowSelectedCountry);
+        syncWorkbenchStepperUI();
         openSearchableCountryDropdown('wb', { noFocus: true });
         if (!options.noScroll && workbench) {
           workbench.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2747,17 +3296,20 @@ var $ = window.$ || (id => document.getElementById(id));
         if (whySection) whySection.classList.add('hidden');
         if (vaSection) vaSection.classList.add('hidden');
         if (workbench) workbench.classList.remove('hidden');
-        if (countryPanel) countryPanel.classList.remove('hidden');
+        if (stepperBar) stepperBar.classList.remove('hidden');
+        if (countryPanel) countryPanel.classList.add('hidden');
         if (docsPanel) docsPanel.classList.remove('hidden');
+        if (docInfoPanel) docInfoPanel.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
         if (noDocView) noDocView.classList.add('hidden');
         document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
 
         syncWorkbenchCountryDropdownUI(workflowSelectedCountry);
-        renderWorkflowDocumentsDropdown(workflowSelectedCountry);
-        if (getCountryDocumentItems(workflowSelectedCountry).length > 0) {
-          openWorkflowDocumentDropdown();
+        syncWorkbenchStepperUI();
+        renderWorkflowDocumentsDropdown(workflowSelectedCountry, '');
+        if (getCountryDocumentItems(workflowSelectedCountry, workflowActiveAccount).length > 0) {
+          openWorkflowDocumentDropdown({ noFocus: true });
         }
         if (!options.noScroll && docsPanel) {
           docsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -2768,12 +3320,15 @@ var $ = window.$ || (id => document.getElementById(id));
         if (whySection) whySection.classList.add('hidden');
         if (vaSection) vaSection.classList.add('hidden');
         if (workbench) workbench.classList.remove('hidden');
+        if (stepperBar) stepperBar.classList.remove('hidden');
         if (countryPanel) countryPanel.classList.add('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docInfoPanel) docInfoPanel.classList.remove('hidden');
         if (editorBar) editorBar.classList.remove('hidden');
         if (poaAccountBar) {
           poaAccountBar.classList.toggle('hidden', workflowSelectedDoc !== 'proofofaccount');
         }
+        renderWorkflowDocumentInfo(workflowSelectedCountry, workflowSelectedDoc, workflowActiveAccount);
         renderActiveDocumentView();
         syncActiveWorkflowBar();
         if (!options.noScroll && workbench) {
@@ -2795,6 +3350,8 @@ var $ = window.$ || (id => document.getElementById(id));
         flowSelectedCountry = '';
         const wbSearch = $('wbCountrySearchInput');
         if (wbSearch) wbSearch.value = '';
+        const wbDocSearch = $('wbDocumentSearchInput');
+        if (wbDocSearch) wbDocSearch.value = '';
       }
 
       selectVirtualAccount(resolvedKey, { silent: true });
@@ -2818,7 +3375,7 @@ var $ = window.$ || (id => document.getElementById(id));
     window.openWorkflowDocumentsShortcut = openWorkflowDocumentsShortcut;
 
     function syncWorkbenchDocTabsForCountry(countryKey) {
-      const items = getCountryDocumentItems(countryKey);
+      const items = getCountryDocumentItems(countryKey, workflowActiveAccount);
       const configuredDocs = items.map(it => it.docType);
       const tabIds = {
         passport: 'tab-doc-passport',
@@ -2958,13 +3515,14 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function openCountryDocumentEditor(countryKey, docType, opts) {
       const options = opts || {};
-      const configuredDocs = getConfiguredDocsForCountry(countryKey);
+      const activeProvider = workflowActiveAccount || currentVirtualAccount || 'paypal';
+      const configuredDocs = getConfiguredDocsForCountry(countryKey, activeProvider);
       const targetDoc = (docType && configuredDocs.includes(docType))
         ? docType
         : (configuredDocs[0] || '');
 
       if (!workflowActiveAccount) {
-        workflowActiveAccount = currentVirtualAccount || 'paypal';
+        workflowActiveAccount = activeProvider;
       }
       workflowSelectedCountry = countryKey || '';
       workflowSelectedDoc = targetDoc;
@@ -2976,10 +3534,10 @@ var $ = window.$ || (id => document.getElementById(id));
       refreshActiveDocumentPreview(countryKey, targetDoc);
       setWorkflowViewStep('editor', { noScroll: !options.scrollToEditor });
 
-      const items = getCountryDocumentItems(countryKey);
+      const items = getCountryDocumentItems(countryKey, activeProvider);
       const activeItem = items.find(it => it.docType === targetDoc);
       if (!options.silent && activeItem) {
-        showToast(`${activeItem.countryFlag} ${activeItem.name}`, `Live preview editor ready for ${activeItem.countryName}`);
+        showToast(`${activeItem.countryFlag} ${activeItem.name}`, `Verification requirements & guidance loaded for ${activeItem.countryName}`);
       }
     }
     window.openCountryDocumentEditor = openCountryDocumentEditor;
@@ -17008,6 +17566,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           <button type="button" data-va-card="revolut" onclick="selectWorkflowAccount('revolut')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Revolut</button>
           <button type="button" data-va-card="mercury" onclick="selectWorkflowAccount('mercury')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Mercury Bank</button>
           <button type="button" data-va-card="elevate" onclick="selectWorkflowAccount('elevate')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Elevate Pay</button>
+          <button type="button" data-va-card="chipper" onclick="selectWorkflowAccount('chipper')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Chipper Cash</button>
           <button type="button" data-va-card="okx" onclick="selectWorkflowAccount('okx')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">OKX</button>
           <button type="button" data-va-card="kucoin" onclick="selectWorkflowAccount('kucoin')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">KuCoin</button>
           <button type="button" data-va-card="stripe" onclick="selectWorkflowAccount('stripe')" class="px-3.5 py-1.5 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#0d2658] font-bold shadow-2xs transition-colors cursor-pointer">Stripe</button>
@@ -17020,6 +17579,40 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
   <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH (HIDDEN ON HOMEPAGE) ================= -->
   <section id="verification-workbench" class="hidden scroll-mt-24 py-10 lg:py-14 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
     <div class="max-w-7xl mx-auto space-y-6">
+
+      <!-- 4-STEP SEQUENTIAL VERIFICATION PROGRESS STEPPER -->
+      <nav id="wb-workflow-stepper" aria-label="Verification Workflow Progress" class="hidden no-print max-w-4xl mx-auto bg-slate-50 border border-slate-200/90 rounded-3xl p-3 sm:p-4 shadow-2xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+          <button type="button" id="wbStepperBtn-1" onclick="attemptWorkflowStep('accounts')" class="p-2.5 sm:p-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 text-left transition-all cursor-pointer flex items-center gap-2.5">
+            <span id="wbStepperBadge-1" class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-extrabold shrink-0"><i class="fa-solid fa-check text-[10px]"></i></span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Step 1 · Provider</span>
+              <span id="wbStep1Summary" class="block text-xs font-extrabold text-[#0d2658] truncate">PayPal</span>
+            </span>
+          </button>
+          <button type="button" id="wbStepperBtn-2" onclick="attemptWorkflowStep('country')" class="p-2.5 sm:p-3 rounded-2xl border-2 border-[#0d5bd9] bg-blue-50/80 text-left transition-all cursor-pointer flex items-center gap-2.5">
+            <span id="wbStepperBadge-2" class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white flex items-center justify-center text-xs font-extrabold shrink-0">2</span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Step 2 · Country</span>
+              <span id="wbStep2Summary" class="block text-xs font-extrabold text-[#0d2658] truncate">Select Country</span>
+            </span>
+          </button>
+          <button type="button" id="wbStepperBtn-3" onclick="attemptWorkflowStep('documents')" class="p-2.5 sm:p-3 rounded-2xl border border-slate-200 bg-white text-left transition-all cursor-pointer flex items-center gap-2.5 opacity-75">
+            <span id="wbStepperBadge-3" class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold shrink-0">3</span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Step 3 · Document Type</span>
+              <span id="wbStep3Summary" class="block text-xs font-extrabold text-[#0d2658] truncate">Select Document Type</span>
+            </span>
+          </button>
+          <button type="button" id="wbStepperBtn-4" onclick="attemptWorkflowStep('editor')" class="p-2.5 sm:p-3 rounded-2xl border border-slate-200 bg-white text-left transition-all cursor-pointer flex items-center gap-2.5 opacity-75">
+            <span id="wbStepperBadge-4" class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold shrink-0">4</span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Step 4 · Document Info</span>
+              <span id="wbStep4Summary" class="block text-xs font-extrabold text-[#0d2658] truncate">Eligibility &amp; Guidance</span>
+            </span>
+          </button>
+        </div>
+      </nav>
 
       <!-- Legacy Header & Step 1 Preserved Hidden for DOM Hook Compatibility -->
       <div id="wb-legacy-step1-accounts" class="hidden" aria-hidden="true">
@@ -17044,25 +17637,35 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <i class="fa-solid fa-arrow-left text-[10px] text-blue-600"></i>
               <span>Back to Virtual Accounts</span>
             </button>
+            <button type="button" onclick="setWorkflowViewStep('accounts')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-700 text-xs font-semibold transition-colors cursor-pointer">
+              <i class="fa-solid fa-wallet text-[10px] text-blue-600"></i>
+              <span>Change Virtual Account</span>
+            </button>
             <button type="button" onclick="goToHomePage(event)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-600 text-xs font-semibold transition-colors cursor-pointer">
               <i class="fa-solid fa-house text-[10px]"></i>
               <span>Home</span>
             </button>
           </div>
           <span class="text-xs font-bold text-[#0d2658] bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
-            Step 2 of 4 · Select Country
+            Step 2 of 4 · Select Issuing Country
           </span>
         </div>
 
-        <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <div id="wbCountryPlatformIconWrap" class="w-11 h-11 rounded-xl bg-[#003087] text-white flex items-center justify-center shrink-0 shadow-xs">
-            <i id="wbCountryPlatformIcon" class="fa-brands fa-paypal text-lg"></i>
+        <div class="flex flex-wrap items-center justify-between gap-3.5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div id="wbCountryPlatformIconWrap" class="w-11 h-11 rounded-xl bg-[#003087] text-white flex items-center justify-center shrink-0 shadow-xs">
+              <i id="wbCountryPlatformIcon" class="fa-brands fa-paypal text-lg"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-semibold text-slate-500">Selected Virtual Account Provider</div>
+              <div id="wbCountryPlatformName" class="text-base font-extrabold text-[#0d2658] truncate">PayPal</div>
+              <div id="wbCountryPlatformMeta" class="text-xs text-slate-600 truncate">Select your supported issuing country below</div>
+            </div>
           </div>
-          <div class="min-w-0 flex-1">
-            <div class="text-xs font-semibold text-slate-500">Selected Virtual Account</div>
-            <div id="wbCountryPlatformName" class="text-base font-extrabold text-[#0d2658] truncate">PayPal</div>
-            <div id="wbCountryPlatformMeta" class="text-xs text-slate-600 truncate">Select your issuing country below</div>
-          </div>
+          <button type="button" onclick="setWorkflowViewStep('accounts')" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-400 text-[#0d2658] text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer shrink-0">
+            <i class="fa-solid fa-repeat text-[10px] text-blue-600"></i>
+            <span>Switch Provider</span>
+          </button>
         </div>
 
         <p id="platform-kyc-tip" class="text-xs text-slate-600 leading-relaxed">
@@ -17528,27 +18131,52 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
           </div>
           <span class="text-xs font-bold text-[#0d2658] bg-blue-50 border border-blue-100 px-3 py-1 rounded-xl">
-            Step 3 of 4 · Select Document
+            Step 3 of 4 · Select Document Type
           </span>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <div class="flex items-center gap-3.5 min-w-0">
-            <span id="wbDocsCountryFlag" class="text-3xl leading-none shrink-0">🌍</span>
-            <div class="min-w-0">
-              <div class="text-xs font-semibold text-slate-500">
-                <span id="wbDocsPlatformName">PayPal</span> · Available Document Templates
+        <!-- Clear Display of Currently Selected Provider & Country -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-white border border-slate-200/80">
+            <div class="flex items-center gap-3 min-w-0">
+              <div id="wbDocsPlatformIconWrap" class="w-10 h-10 rounded-xl bg-[#003087] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <i id="wbDocsPlatformIcon" class="fa-brands fa-paypal text-sm"></i>
               </div>
-              <h3 id="wbDocsCountryName" class="text-lg font-extrabold text-[#0d2658] truncate">Country</h3>
+              <div class="min-w-0">
+                <div class="text-[11px] font-semibold text-slate-500">Selected Provider</div>
+                <div id="wbDocsPlatformName" class="text-sm font-extrabold text-[#0d2658] truncate">PayPal</div>
+              </div>
             </div>
+            <button type="button" onclick="setWorkflowViewStep('accounts')" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer shrink-0">
+              Change
+            </button>
           </div>
-          <span id="wbDocsCountLabel" class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl shrink-0">0 templates</span>
+
+          <div class="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-white border border-slate-200/80">
+            <div class="flex items-center gap-3 min-w-0">
+              <span id="wbDocsCountryFlag" class="text-2xl leading-none shrink-0">🌍</span>
+              <div class="min-w-0">
+                <div class="text-[11px] font-semibold text-slate-500">Selected Issuing Country</div>
+                <h3 id="wbDocsCountryName" class="text-sm font-extrabold text-[#0d2658] truncate">Country</h3>
+              </div>
+            </div>
+            <button type="button" onclick="setWorkflowViewStep('country')" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer shrink-0">
+              Change
+            </button>
+          </div>
         </div>
 
-        <!-- Verification Documents Drop-Down Menu List -->
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs text-slate-600">
+            Select a supported verification document category below to view official document requirements and verification guidance.
+          </p>
+          <span id="wbDocsCountLabel" class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl shrink-0">0 categories</span>
+        </div>
+
+        <!-- Searchable Verification Document Categories Drop-Down Menu List -->
         <div id="wbDocumentDropdownWrapper" class="space-y-4">
           <label for="wbDocumentDropdownBtn" class="block text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
-            Select Verification Document
+            Select Document Category
           </label>
 
           <div id="wbDocumentDropdownRoot" class="relative">
@@ -17557,7 +18185,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 <span id="wbDocSelectedIconWrap" class="w-9 h-9 rounded-xl bg-blue-100 text-[#0d5bd9] flex items-center justify-center text-sm shrink-0">
                   <i id="wbDocSelectedIcon" class="fa-solid fa-file-shield"></i>
                 </span>
-                <span id="wbDocSelectedName" class="text-sm font-extrabold text-[#0d2658] truncate">-- Select a document from drop-down --</span>
+                <span id="wbDocSelectedName" class="text-sm font-extrabold text-[#0d2658] truncate">-- Select a document category from drop-down --</span>
               </span>
               <span class="flex items-center gap-2.5 shrink-0">
                 <span id="wbDocCountText" class="text-[11px] font-semibold text-slate-500"></span>
@@ -17566,9 +18194,9 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
 
             <div id="wbDocumentDropdownMenu" class="hidden relative mt-2 bg-white rounded-2xl border border-blue-200 shadow-xl z-[80] overflow-hidden">
-              <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                <span>Configured Verification Documents</span>
-                <span>Click to Open Editor</span>
+              <div class="relative border-b border-slate-100 bg-slate-50">
+                <i class="fa-solid fa-magnifying-glass text-xs text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input id="wbDocumentSearchInput" type="text" placeholder="Search document category (Passport, National ID, Proof of Address...)" autocomplete="off" oninput="renderWorkflowDocumentsDropdown(workflowSelectedCountry, this.value)" onkeydown="handleDocumentSearchKeydown(event)" class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-[#0d2658] bg-transparent focus:outline-none focus:bg-white">
               </div>
               <div id="wbDocumentOptionsList" role="listbox" class="max-h-96 overflow-y-auto p-1.5 space-y-1"></div>
             </div>
@@ -17576,7 +18204,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
           <div class="flex items-center justify-end">
             <button type="button" id="wbDocContinueBtn" onclick="if(workflowSelectedDoc){openCountryDocumentEditor(workflowSelectedCountry, workflowSelectedDoc, { scrollToEditor: true });}" class="hidden items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-extrabold shadow-sm transition-colors cursor-pointer">
-              <span id="wbDocContinueLabel">Open Live Preview Editor</span>
+              <span id="wbDocContinueLabel">View Document Information</span>
               <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </button>
           </div>
@@ -17590,11 +18218,147 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             <i class="fa-regular fa-folder-open"></i>
           </div>
           <div class="text-base font-extrabold text-[#0d2658]">No documents are currently available for <span id="wbNoDocsCountryName">this country</span></div>
-          <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">Please go back and select another issuing country to view available document templates.</p>
+          <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">Please go back and select another issuing country to view available document categories.</p>
           <button type="button" onclick="setWorkflowViewStep('country')" class="px-4 py-2 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors">
             <i class="fa-solid fa-arrow-left text-[10px]"></i>
             <span>Back to Country Selection</span>
           </button>
+        </div>
+      </div>
+
+      <!-- STEP 4: OFFICIAL DOCUMENT INFORMATION, ELIGIBILITY REQUIREMENTS & VERIFICATION GUIDANCE -->
+      <div id="wb-step-doc-info-panel" class="hidden no-print max-w-5xl mx-auto bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="setWorkflowViewStep('documents')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-[#0d2658] text-xs font-bold transition-colors cursor-pointer">
+              <i class="fa-solid fa-arrow-left text-[10px] text-blue-600"></i>
+              <span>Back to Document Selection</span>
+            </button>
+            <button type="button" onclick="setWorkflowViewStep('country')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-700 text-xs font-semibold transition-colors cursor-pointer">
+              <i class="fa-solid fa-earth-africa text-[10px] text-emerald-700"></i>
+              <span>Change Country</span>
+            </button>
+            <button type="button" onclick="setWorkflowViewStep('accounts')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-700 text-xs font-semibold transition-colors cursor-pointer">
+              <i class="fa-solid fa-wallet text-[10px] text-blue-600"></i>
+              <span>Change Virtual Account</span>
+            </button>
+            <button type="button" onclick="goToHomePage(event)" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-blue-300 text-slate-600 text-xs font-semibold transition-colors cursor-pointer">
+              <i class="fa-solid fa-house text-[10px]"></i>
+              <span>Home</span>
+            </button>
+          </div>
+          <span class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+            Step 4 of 4 · Document Information &amp; Verification Guidance
+          </span>
+        </div>
+
+        <!-- Selected Provider, Country & Document Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Selected Provider Card -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Virtual Account Provider</span>
+              <span id="wbInfoProviderBadge" class="text-[10px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">Verified</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div id="wbInfoProviderIconWrap" class="w-10 h-10 rounded-xl bg-[#003087] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <i id="wbInfoProviderIcon" class="fa-brands fa-paypal text-lg"></i>
+              </div>
+              <div class="min-w-0">
+                <div id="wbInfoProviderName" class="text-base font-extrabold text-[#0d2658] truncate">PayPal</div>
+                <div id="wbInfoProviderKycLevel" class="text-xs text-slate-600 truncate">Tier 2 KYC</div>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-600 pt-1 border-t border-slate-200/70">
+              <strong class="text-slate-800">Supported Currencies:</strong> <span id="wbInfoProviderCurrency">USD, EUR, GBP</span>
+            </div>
+          </div>
+
+          <!-- Selected Issuing Country Card -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Issuing Country &amp; Authority</span>
+              <button type="button" onclick="setWorkflowViewStep('country')" class="text-[11px] font-bold text-blue-600 hover:underline cursor-pointer">Change</button>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="wbInfoCountryFlag" class="text-3xl leading-none shrink-0">🌍</span>
+              <div class="min-w-0">
+                <div id="wbInfoCountryName" class="text-base font-extrabold text-[#0d2658] truncate">Country</div>
+                <div id="wbInfoCountryAuthority" class="text-xs text-slate-600 line-clamp-2">Official Issuing Authority</div>
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-600 pt-1 border-t border-slate-200/70">
+              <strong class="text-slate-800">Standard:</strong> <span id="wbInfoCountryStandard">ICAO Doc 9303</span>
+            </div>
+          </div>
+
+          <!-- Selected Document Category Card -->
+          <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-200 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-blue-900">Selected Document Type</span>
+              <button type="button" onclick="setWorkflowViewStep('documents')" class="text-[11px] font-bold text-blue-700 hover:underline cursor-pointer">Switch Type</button>
+            </div>
+            <div>
+              <div id="wbInfoDocCategory" class="text-xs font-extrabold uppercase tracking-wider text-emerald-700">Passport</div>
+              <div id="wbInfoDocTitle" class="text-base font-extrabold text-[#0d2658] mt-0.5">Official Biometric Passport</div>
+            </div>
+            <div class="text-[11px] text-slate-700 pt-1 border-t border-blue-200/60">
+              <strong class="text-[#0d2658]">Validity Rule:</strong> <span id="wbInfoDocValidity">Minimum 6 months validity</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technical Format & Provider Tip Banner -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-white to-emerald-50/60 border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
+              Document Format &amp; Compliance Specification
+            </div>
+            <div id="wbInfoDocFormat" class="text-xs sm:text-sm font-semibold text-slate-700">
+              ICAO Doc 9303 Machine-Readable Biometric Travel Document
+            </div>
+            <div id="wbInfoProviderTip" class="text-xs text-slate-600"></div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <a id="wbInfoProviderLink" href="https://www.paypal.com" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors">
+              <span id="wbInfoProviderLinkLabel">Official Provider Portal</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+            <a id="wbInfoAuthorityLink" href="https://www.gov.uk" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-white border border-slate-300 hover:border-blue-400 text-[#0d2658] text-xs font-bold inline-flex items-center gap-1.5 transition-colors">
+              <span id="wbInfoAuthorityLinkLabel">Official Issuing Authority</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Eligibility Requirements & Verification Guidance Columns -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center gap-2 text-sm font-extrabold text-[#0d2658]">
+              <i class="fa-solid fa-clipboard-check text-emerald-600"></i>
+              <h4>Document Eligibility Requirements</h4>
+            </div>
+            <ul id="wbInfoEligibilityList" class="space-y-2.5"></ul>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center gap-2 text-sm font-extrabold text-[#0d2658]">
+              <i class="fa-solid fa-user-shield text-blue-600"></i>
+              <h4>Legitimate KYC Verification Guidance</h4>
+            </div>
+            <ul id="wbInfoGuidanceList" class="space-y-2.5"></ul>
+          </div>
+        </div>
+
+        <!-- Provider KYC Checklist -->
+        <div class="p-4 sm:p-5 rounded-2xl bg-slate-50/70 border border-slate-200 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
+              Provider Verification Checklist (<span id="wbInfoProviderAccType">Standard &amp; Business Account</span>)
+            </div>
+            <span class="text-[11px] font-semibold text-slate-500">Official KYC / AML Compliance Requirements</span>
+          </div>
+          <ul id="wbInfoProviderReqList" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></ul>
         </div>
       </div>
 
