@@ -2358,6 +2358,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
       const willOpen = menu.classList.contains('hidden');
       if (willOpen) {
+        if (scope === 'wb') closeWorkflowDocumentDropdown();
         const searchEl = $(searchId);
         if (searchEl) searchEl.value = '';
         renderSearchableCountryOptions(scope, '');
@@ -2371,6 +2372,41 @@ var $ = window.$ || (id => document.getElementById(id));
     }
     window.toggleSearchableCountryDropdown = toggleSearchableCountryDropdown;
 
+    let skipNextCountryOutsideClose = false;
+    let skipNextDocOutsideClose = false;
+
+    function openSearchableCountryDropdown(scope, opts) {
+      const options = opts || {};
+      const menuId = scope === 'flow' ? 'flowCountryDropdownMenu' : 'wbCountryDropdownMenu';
+      const btnId = scope === 'flow' ? 'flowCountryDropdownBtn' : 'wbCountryDropdownBtn';
+      const searchId = scope === 'flow' ? 'flowCountrySearchInput' : 'wbCountrySearchInput';
+      const otherMenuId = scope === 'flow' ? 'wbCountryDropdownMenu' : 'flowCountryDropdownMenu';
+      const otherBtnId = scope === 'flow' ? 'wbCountryDropdownBtn' : 'flowCountryDropdownBtn';
+
+      const menu = $(menuId);
+      const btn = $(btnId);
+      const other = $(otherMenuId);
+      const otherBtn = $(otherBtnId);
+      if (other) other.classList.add('hidden');
+      if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+      if (!menu) return;
+
+      if (scope === 'wb') closeWorkflowDocumentDropdown();
+      const searchEl = $(searchId);
+      if (searchEl) searchEl.value = '';
+      renderSearchableCountryOptions(scope, '');
+      menu.classList.remove('hidden');
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+      if (scope === 'wb') {
+        skipNextCountryOutsideClose = true;
+        setTimeout(() => { skipNextCountryOutsideClose = false; }, 0);
+      }
+      if (!options.noFocus && searchEl) {
+        setTimeout(() => { if (searchEl) searchEl.focus(); }, 20);
+      }
+    }
+    window.openSearchableCountryDropdown = openSearchableCountryDropdown;
+
     function closeSearchableCountryDropdowns() {
       const wbMenu = $('wbCountryDropdownMenu');
       const flowMenu = $('flowCountryDropdownMenu');
@@ -2382,6 +2418,37 @@ var $ = window.$ || (id => document.getElementById(id));
       if (flowBtn) flowBtn.setAttribute('aria-expanded', 'false');
     }
     window.closeSearchableCountryDropdowns = closeSearchableCountryDropdowns;
+
+    function closeWorkflowDocumentDropdown() {
+      const docMenu = $('wbDocumentDropdownMenu');
+      const docBtn = $('wbDocumentDropdownBtn');
+      if (docMenu) docMenu.classList.add('hidden');
+      if (docBtn) docBtn.setAttribute('aria-expanded', 'false');
+    }
+    window.closeWorkflowDocumentDropdown = closeWorkflowDocumentDropdown;
+
+    function openWorkflowDocumentDropdown() {
+      const docMenu = $('wbDocumentDropdownMenu');
+      const docBtn = $('wbDocumentDropdownBtn');
+      if (!docMenu) return;
+      closeSearchableCountryDropdowns();
+      docMenu.classList.remove('hidden');
+      if (docBtn) docBtn.setAttribute('aria-expanded', 'true');
+      skipNextDocOutsideClose = true;
+      setTimeout(() => { skipNextDocOutsideClose = false; }, 0);
+    }
+    window.openWorkflowDocumentDropdown = openWorkflowDocumentDropdown;
+
+    function toggleWorkflowDocumentDropdown() {
+      const docMenu = $('wbDocumentDropdownMenu');
+      if (!docMenu) return;
+      if (docMenu.classList.contains('hidden')) {
+        openWorkflowDocumentDropdown();
+      } else {
+        closeWorkflowDocumentDropdown();
+      }
+    }
+    window.toggleWorkflowDocumentDropdown = toggleWorkflowDocumentDropdown;
 
     let workflowStep = 'home';
     let workflowActiveAccount = '';
@@ -2397,11 +2464,24 @@ var $ = window.$ || (id => document.getElementById(id));
         workflowSelectedDoc = '';
         switchVerificationCountry(countryKey, { silent: true });
         syncWorkbenchCountryDropdownUI(countryKey);
-        renderWorkflowDocumentsGrid(countryKey);
+        renderWorkflowDocumentsDropdown(countryKey);
         setWorkflowViewStep('documents');
       }
     }
     window.selectCountryFromDropdown = selectCountryFromDropdown;
+
+    function selectDocumentFromDropdown(docType) {
+      if (!workflowSelectedCountry) {
+        showToast('Select Country First', 'Please choose a country from the drop-down list.');
+        setWorkflowViewStep('country');
+        return;
+      }
+      workflowSelectedDoc = docType || '';
+      syncWorkbenchDocumentDropdownUI(workflowSelectedCountry);
+      closeWorkflowDocumentDropdown();
+      openCountryDocumentEditor(workflowSelectedCountry, docType, { scrollToEditor: true });
+    }
+    window.selectDocumentFromDropdown = selectDocumentFromDropdown;
 
     function syncWorkbenchCountryDropdownUI(countryKey) {
       const countries = getExistingWebsiteCountries();
@@ -2418,8 +2498,13 @@ var $ = window.$ || (id => document.getElementById(id));
         if (nameEl) nameEl.textContent = info.name || countryKey;
         if (promptEl) promptEl.classList.add('hidden');
         if (continueBtn) {
-          continueBtn.classList.remove('hidden');
-          continueBtn.classList.add('inline-flex');
+          if (workflowStep === 'documents') {
+            continueBtn.classList.add('hidden');
+            continueBtn.classList.remove('inline-flex');
+          } else {
+            continueBtn.classList.remove('hidden');
+            continueBtn.classList.add('inline-flex');
+          }
         }
         if (continueLabel) continueLabel.textContent = `Continue to ${info.name} Documents`;
       } else {
@@ -2436,7 +2521,42 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
 
-    function renderWorkflowDocumentsGrid(countryKey) {
+    function syncWorkbenchDocumentDropdownUI(countryKey) {
+      const items = getCountryDocumentItems(countryKey);
+      const selectedItem = workflowSelectedDoc ? items.find(it => it.docType === workflowSelectedDoc) : null;
+      const iconWrapEl = $('wbDocSelectedIconWrap');
+      const iconEl = $('wbDocSelectedIcon');
+      const nameEl = $('wbDocSelectedName');
+      const countEl = $('wbDocCountText');
+      const continueBtn = $('wbDocContinueBtn');
+      const continueLabel = $('wbDocContinueLabel');
+
+      if (selectedItem) {
+        if (iconWrapEl) iconWrapEl.className = `w-9 h-9 rounded-xl ${selectedItem.accent.bg} text-white flex items-center justify-center text-sm shrink-0 shadow-xs`;
+        if (iconEl) iconEl.className = selectedItem.icon;
+        if (nameEl) nameEl.textContent = selectedItem.name;
+        if (continueBtn) {
+          continueBtn.classList.remove('hidden');
+          continueBtn.classList.add('inline-flex');
+        }
+        if (continueLabel) continueLabel.textContent = `Open ${selectedItem.name}`;
+      } else {
+        if (iconWrapEl) iconWrapEl.className = 'w-9 h-9 rounded-xl bg-blue-100 text-[#0d5bd9] flex items-center justify-center text-sm shrink-0';
+        if (iconEl) iconEl.className = 'fa-solid fa-file-shield';
+        if (nameEl) nameEl.textContent = '-- Select a document from drop-down --';
+        if (continueBtn) {
+          continueBtn.classList.add('hidden');
+          continueBtn.classList.remove('inline-flex');
+        }
+      }
+      if (countEl) {
+        countEl.textContent = items.length === 1 ? '1 document' : `${items.length} documents`;
+      }
+    }
+
+    function renderWorkflowDocumentsDropdown(countryKey) {
+      const wrapperEl = $('wbDocumentDropdownWrapper');
+      const optionsListEl = $('wbDocumentOptionsList');
       const grid = $('wb-country-documents-grid');
       const emptyEl = $('wb-doc-tabs-empty');
       const emptyNameEl = $('wbNoDocsCountryName');
@@ -2461,53 +2581,65 @@ var $ = window.$ || (id => document.getElementById(id));
         countEl.textContent = items.length === 1 ? '1 template available' : `${items.length} templates available`;
       }
 
-      if (!grid) return;
+      syncWorkbenchDocumentDropdownUI(countryKey);
+
       if (items.length === 0) {
-        grid.innerHTML = '';
-        grid.classList.add('hidden');
+        if (wrapperEl) wrapperEl.classList.add('hidden');
+        if (optionsListEl) optionsListEl.innerHTML = '';
+        if (grid) {
+          grid.innerHTML = '';
+          grid.classList.add('hidden');
+        }
         if (emptyEl) emptyEl.classList.remove('hidden');
         return;
       }
 
       if (emptyEl) emptyEl.classList.add('hidden');
-      grid.classList.remove('hidden');
-      grid.className = items.length === 1
-        ? 'grid grid-cols-1 max-w-xl gap-4'
-        : items.length === 2
-        ? 'grid grid-cols-1 sm:grid-cols-2 gap-4'
-        : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+      if (wrapperEl) wrapperEl.classList.remove('hidden');
 
-      grid.innerHTML = items.map(item => {
-        const isCurrent = workflowSelectedDoc === item.docType;
-        const thumbHtml = item.thumbnail
-          ? `<div class="w-20 h-14 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative flex items-center justify-center">
-               <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-               <div class="hidden w-full h-full ${item.accent.bg} text-white flex items-center justify-center text-lg"><i class="${item.icon}"></i></div>
-             </div>`
-          : `<div class="w-14 h-14 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-xl shrink-0"><i class="${item.icon}"></i></div>`;
+      if (optionsListEl) {
+        optionsListEl.innerHTML = items.map(item => {
+          const isCurrent = workflowSelectedDoc === item.docType;
+          const thumbHtml = item.thumbnail
+            ? `<div class="w-16 h-11 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative flex items-center justify-center">
+                 <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                 <div class="hidden w-full h-full ${item.accent.bg} text-white flex items-center justify-center text-base"><i class="${item.icon}"></i></div>
+               </div>`
+            : `<div class="w-11 h-11 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-lg shrink-0"><i class="${item.icon}"></i></div>`;
 
-        return `
-          <button
-            type="button"
-            onclick="openCountryDocumentEditor('${countryKey.replace(/'/g, "\\'")}', '${item.docType.replace(/'/g, "\\'")}', { scrollToEditor: true })"
-            class="p-4 sm:p-5 rounded-2xl border ${isCurrent ? 'border-2 border-[#0d2658] ring-2 ring-blue-500/20' : item.accent.border} bg-gradient-to-br ${item.accent.tint} hover:shadow-md text-left transition-all cursor-pointer flex items-center gap-4 group">
-            ${thumbHtml}
-            <div class="min-w-0 flex-1 space-y-1">
-              <div class="text-xs font-medium text-slate-500 flex items-center gap-1.5">
-                <span>${item.category}</span>
-                <span aria-hidden="true">·</span>
-                <span>${item.countryName}</span>
-              </div>
-              <div class="text-sm sm:text-base font-extrabold text-[#0d2658] leading-snug">${item.name}</div>
-              <div class="text-xs text-slate-600 line-clamp-2 leading-snug">${item.description}</div>
-              <div class="pt-1.5 inline-flex items-center gap-1.5 text-xs font-bold ${item.accent.arrow} group-hover:translate-x-0.5 transition-transform">
-                <span>Open Live Preview Editor</span>
-                <i class="fa-solid fa-arrow-right text-[10px]"></i>
-              </div>
-            </div>
-          </button>
-        `;
-      }).join('');
+          return `
+            <button
+              type="button"
+              role="option"
+              data-doc-type="${item.docType}"
+              aria-selected="${isCurrent ? 'true' : 'false'}"
+              onclick="selectDocumentFromDropdown('${item.docType.replace(/'/g, "\\'")}')"
+              class="w-full px-3.5 py-3 rounded-xl text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${isCurrent ? 'bg-blue-50 border border-blue-200 text-[#0d2658]' : 'hover:bg-slate-50 border border-transparent text-slate-700'}">
+              <span class="flex items-center gap-3 min-w-0 flex-1">
+                ${thumbHtml}
+                <span class="min-w-0 flex-1">
+                  <span class="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                    <span>${item.category}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>${item.countryName}</span>
+                  </span>
+                  <span class="block text-xs sm:text-sm font-extrabold text-[#0d2658] truncate">${item.name}</span>
+                  <span class="block text-[11px] text-slate-500 truncate">${item.description}</span>
+                </span>
+              </span>
+              <span class="flex items-center gap-2 shrink-0 text-xs font-bold ${item.accent.arrow}">
+                <span class="hidden sm:inline">${isCurrent ? 'Selected' : 'Select'}</span>
+                ${isCurrent ? '<i class="fa-solid fa-check text-xs text-blue-600"></i>' : '<i class="fa-solid fa-chevron-right text-[10px]"></i>'}
+              </span>
+            </button>
+          `;
+        }).join('');
+      }
+    }
+    window.renderWorkflowDocumentsDropdown = renderWorkflowDocumentsDropdown;
+
+    function renderWorkflowDocumentsGrid(countryKey) {
+      renderWorkflowDocumentsDropdown(countryKey);
     }
     window.renderWorkflowDocumentsGrid = renderWorkflowDocumentsGrid;
 
@@ -2537,6 +2669,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
       workflowStep = nextStep;
       closeSearchableCountryDropdowns();
+      closeWorkflowDocumentDropdown();
 
       const heroSection = $('hero-section');
       const heroHomeContent = $('homepage-hero-content');
@@ -2577,6 +2710,8 @@ var $ = window.$ || (id => document.getElementById(id));
         syncWorkflowAccountsHighlight();
         if (!options.noScroll && vaSection) {
           vaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          vaSection.classList.add('ring-2', 'ring-blue-400/50', 'rounded-3xl');
+          setTimeout(() => vaSection.classList.remove('ring-2', 'ring-blue-400/50', 'rounded-3xl'), 1400);
         }
       } else if (nextStep === 'country') {
         if (heroSection) heroSection.classList.add('hidden');
@@ -2602,7 +2737,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (pIcon) pIcon.className = `${meta.icon} text-lg text-white`;
 
         syncWorkbenchCountryDropdownUI(workflowSelectedCountry);
-        renderSearchableCountryOptions('wb', '');
+        openSearchableCountryDropdown('wb', { noFocus: true });
         if (!options.noScroll && workbench) {
           workbench.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -2612,16 +2747,20 @@ var $ = window.$ || (id => document.getElementById(id));
         if (whySection) whySection.classList.add('hidden');
         if (vaSection) vaSection.classList.add('hidden');
         if (workbench) workbench.classList.remove('hidden');
-        if (countryPanel) countryPanel.classList.add('hidden');
+        if (countryPanel) countryPanel.classList.remove('hidden');
         if (docsPanel) docsPanel.classList.remove('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
         if (noDocView) noDocView.classList.add('hidden');
         document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
 
-        renderWorkflowDocumentsGrid(workflowSelectedCountry);
-        if (!options.noScroll && workbench) {
-          workbench.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        syncWorkbenchCountryDropdownUI(workflowSelectedCountry);
+        renderWorkflowDocumentsDropdown(workflowSelectedCountry);
+        if (getCountryDocumentItems(workflowSelectedCountry).length > 0) {
+          openWorkflowDocumentDropdown();
+        }
+        if (!options.noScroll && docsPanel) {
+          docsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       } else if (nextStep === 'editor') {
         if (heroSection) heroSection.classList.add('hidden');
@@ -15769,12 +15908,20 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           profilePop.classList.add('hidden');
         }
         const wbRoot = $('wbCountryDropdownRoot');
+        const wbDocRoot = $('wbDocumentDropdownRoot');
         const flowRoot = $('flowCountryDropdownRoot');
-        if (wbRoot && !wbRoot.contains(e.target)) {
+        if (skipNextCountryOutsideClose) {
+          skipNextCountryOutsideClose = false;
+        } else if (wbRoot && !wbRoot.contains(e.target)) {
           const m = $('wbCountryDropdownMenu');
           const b = $('wbCountryDropdownBtn');
           if (m) m.classList.add('hidden');
           if (b) b.setAttribute('aria-expanded', 'false');
+        }
+        if (skipNextDocOutsideClose) {
+          skipNextDocOutsideClose = false;
+        } else if (wbDocRoot && !wbDocRoot.contains(e.target)) {
+          closeWorkflowDocumentDropdown();
         }
         if (flowRoot && !flowRoot.contains(e.target)) {
           const m = $('flowCountryDropdownMenu');
@@ -15784,13 +15931,15 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         }
       });
 
-      // Escape key dismissal for modals and searchable country dropdowns
+      // Escape key dismissal for modals and dropdowns
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           const wbMenu = $('wbCountryDropdownMenu');
+          const wbDocMenu = $('wbDocumentDropdownMenu');
           const flowMenu = $('flowCountryDropdownMenu');
-          if ((wbMenu && !wbMenu.classList.contains('hidden')) || (flowMenu && !flowMenu.classList.contains('hidden'))) {
+          if ((wbMenu && !wbMenu.classList.contains('hidden')) || (wbDocMenu && !wbDocMenu.classList.contains('hidden')) || (flowMenu && !flowMenu.classList.contains('hidden'))) {
             closeSearchableCountryDropdowns();
+            closeWorkflowDocumentDropdown();
             return;
           }
           closeAccountCountryFlow();
@@ -16697,7 +16846,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       </div>
 
       <!-- ================= OUR VIRTUAL ACCOUNTS SECTION (VISIBLE ON HOMEPAGE DASHBOARD) ================= -->
-      <div id="our-virtual-accounts" class="pt-2 space-y-6">
+      <div id="our-virtual-accounts" class="scroll-mt-24 pt-2 space-y-6 transition-all">
         <div class="flex items-center gap-3.5">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white flex items-center justify-center text-xl shadow-md shadow-blue-600/25 shrink-0">
             <i class="fa-solid fa-wallet"></i>
@@ -16869,7 +17018,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
 
   <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH (HIDDEN ON HOMEPAGE) ================= -->
-  <section id="verification-workbench" class="hidden py-10 lg:py-14 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
+  <section id="verification-workbench" class="hidden scroll-mt-24 py-10 lg:py-14 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
     <div class="max-w-7xl mx-auto space-y-6">
 
       <!-- Legacy Header & Step 1 Preserved Hidden for DOM Hook Compatibility -->
@@ -17080,7 +17229,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 </span>
               </button>
 
-              <div id="wbCountryDropdownMenu" class="hidden absolute left-0 right-0 mt-2 bg-white rounded-2xl border border-blue-200 shadow-2xl z-[80] overflow-hidden">
+              <div id="wbCountryDropdownMenu" class="hidden relative mt-2 bg-white rounded-2xl border border-blue-200 shadow-xl z-[80] overflow-hidden">
                 <div class="relative border-b border-slate-100 bg-slate-50">
                   <i class="fa-solid fa-magnifying-glass text-xs text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                   <input id="wbCountrySearchInput" type="text" placeholder="Search country..." autocomplete="off" oninput="renderSearchableCountryOptions('wb', this.value)" onkeydown="handleCountrySearchKeydown(event, 'wb')" class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm font-semibold text-[#0d2658] bg-transparent focus:outline-none focus:bg-white">
@@ -17362,7 +17511,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       </div>
 
       <!-- STEP 3: COUNTRY-SPECIFIC DOCUMENT LIST PANEL (SHOWN ONLY AFTER SELECTING A COUNTRY) -->
-      <div id="wb-step-documents-panel" class="hidden max-w-5xl mx-auto bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-5">
+      <div id="wb-step-documents-panel" class="hidden scroll-mt-24 max-w-3xl mx-auto bg-white p-5 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-5">
         <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
           <div class="flex flex-wrap items-center gap-2">
             <button type="button" onclick="setWorkflowViewStep('country')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 text-[#0d2658] text-xs font-bold transition-colors cursor-pointer">
@@ -17396,7 +17545,44 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           <span id="wbDocsCountLabel" class="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl shrink-0">0 templates</span>
         </div>
 
-        <div id="wb-country-documents-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <!-- Verification Documents Drop-Down Menu List -->
+        <div id="wbDocumentDropdownWrapper" class="space-y-4">
+          <label for="wbDocumentDropdownBtn" class="block text-xs font-extrabold uppercase tracking-wider text-[#0d2658]">
+            Select Verification Document
+          </label>
+
+          <div id="wbDocumentDropdownRoot" class="relative">
+            <button type="button" id="wbDocumentDropdownBtn" onclick="toggleWorkflowDocumentDropdown()" aria-haspopup="listbox" aria-expanded="false" class="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200 bg-blue-50/40 hover:border-blue-400 focus:border-blue-600 focus:outline-none flex items-center justify-between gap-3 text-left transition-colors cursor-pointer">
+              <span class="flex items-center gap-3 min-w-0">
+                <span id="wbDocSelectedIconWrap" class="w-9 h-9 rounded-xl bg-blue-100 text-[#0d5bd9] flex items-center justify-center text-sm shrink-0">
+                  <i id="wbDocSelectedIcon" class="fa-solid fa-file-shield"></i>
+                </span>
+                <span id="wbDocSelectedName" class="text-sm font-extrabold text-[#0d2658] truncate">-- Select a document from drop-down --</span>
+              </span>
+              <span class="flex items-center gap-2.5 shrink-0">
+                <span id="wbDocCountText" class="text-[11px] font-semibold text-slate-500"></span>
+                <i class="fa-solid fa-chevron-down text-xs text-blue-600"></i>
+              </span>
+            </button>
+
+            <div id="wbDocumentDropdownMenu" class="hidden relative mt-2 bg-white rounded-2xl border border-blue-200 shadow-xl z-[80] overflow-hidden">
+              <div class="px-4 py-2.5 border-b border-slate-100 bg-slate-50 flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <span>Configured Verification Documents</span>
+                <span>Click to Open Editor</span>
+              </div>
+              <div id="wbDocumentOptionsList" role="listbox" class="max-h-96 overflow-y-auto p-1.5 space-y-1"></div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end">
+            <button type="button" id="wbDocContinueBtn" onclick="if(workflowSelectedDoc){openCountryDocumentEditor(workflowSelectedCountry, workflowSelectedDoc, { scrollToEditor: true });}" class="hidden items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0d2658] hover:bg-blue-900 text-white text-xs font-extrabold shadow-sm transition-colors cursor-pointer">
+              <span id="wbDocContinueLabel">Open Live Preview Editor</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="wb-country-documents-grid" class="hidden" aria-hidden="true"></div>
 
         <!-- Empty State if selected country has no configured documents -->
         <div id="wb-doc-tabs-empty" class="hidden p-8 rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-center space-y-3">
