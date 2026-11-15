@@ -2260,10 +2260,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const activeProvider = providerKey ? String(providerKey).toLowerCase().trim() : '';
       if (activeProvider && PROVIDER_SUPPORTED_DOCS[activeProvider]) {
         const providerAllowed = PROVIDER_SUPPORTED_DOCS[activeProvider];
-        const filtered = docs.filter(d => providerAllowed.includes(d));
-        if (filtered.length > 0) {
-          return filtered;
-        }
+        return docs.filter(d => providerAllowed.includes(d));
       }
       return docs;
     }
@@ -2882,6 +2879,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const wrapperEl = $('wbDocumentDropdownWrapper');
       const optionsListEl = $('wbDocumentOptionsList');
       const grid = $('wb-country-documents-grid');
+      const kycSummaryEl = $('wbDocsKycGuidanceSummary');
       const emptyEl = $('wb-doc-tabs-empty');
       const emptyNameEl = $('wbNoDocsCountryName');
       const flagEl = $('wbDocsCountryFlag');
@@ -2891,12 +2889,33 @@ var $ = window.$ || (id => document.getElementById(id));
       const platIconEl = $('wbDocsPlatformIcon');
       const countEl = $('wbDocsCountLabel');
 
+      if (!countryKey) {
+        if (wrapperEl) wrapperEl.classList.add('hidden');
+        if (optionsListEl) optionsListEl.innerHTML = '';
+        if (grid) {
+          grid.innerHTML = '';
+          grid.classList.add('hidden');
+        }
+        if (kycSummaryEl) {
+          kycSummaryEl.innerHTML = '';
+          kycSummaryEl.classList.add('hidden');
+        }
+        if (emptyEl) emptyEl.classList.add('hidden');
+        return;
+      }
+
       const activeProvider = workflowActiveAccount || currentVirtualAccount || 'paypal';
       const countries = getExistingWebsiteCountries();
       const countryInfo = countries.find(c => c.key === countryKey);
       const displayName = countryInfo ? countryInfo.name : (countryKey || 'Selected Country');
       const displayFlag = countryInfo ? (countryInfo.flag || '🌍') : '🌍';
       const platformMeta = platformData[activeProvider] || platformData.paypal;
+      const authorityMeta = COUNTRY_OFFICIAL_AUTHORITIES[countryKey] || {
+        authority: `${displayName} National Civil & Immigration Registry`,
+        portalName: `${displayName} Official Government Portal`,
+        portalUrl: platformMeta.url || 'https://www.paypal.com',
+        idStandard: `${displayName} Official Government Identity & Verification Standard`
+      };
 
       if (flagEl) flagEl.textContent = displayFlag;
       if (nameEl) nameEl.textContent = displayName;
@@ -2911,6 +2930,42 @@ var $ = window.$ || (id => document.getElementById(id));
       }
 
       syncWorkbenchDocumentDropdownUI(countryKey);
+
+      if (kycSummaryEl) {
+        const reqPills = (Array.isArray(platformMeta.kycReq) ? platformMeta.kycReq : []).map(req => `
+          <li class="flex items-start gap-2 text-xs text-slate-700 bg-white px-3 py-2 rounded-xl border border-slate-200/80">
+            <i class="fa-solid fa-circle-check text-emerald-600 text-[11px] mt-0.5 shrink-0"></i>
+            <span>${req}</span>
+          </li>
+        `).join('');
+        kycSummaryEl.innerHTML = `
+          <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-white to-emerald-50/50 border border-blue-100 space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-2">
+              <div class="space-y-0.5">
+                <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#0d5bd9]">
+                  ${displayFlag} ${displayName} · ${platformMeta.name} KYC Requirements
+                </div>
+                <div class="text-xs sm:text-sm font-extrabold text-[#0d2658]">
+                  Issuing Authority: ${authorityMeta.authority}
+                </div>
+                <div class="text-[11px] text-slate-600">
+                  <strong>Accepted Standard:</strong> ${authorityMeta.idStandard} · <strong>Verification Tier:</strong> ${platformMeta.kycLevel || 'Standard & Enhanced KYC'}
+                </div>
+              </div>
+              <a href="${authorityMeta.portalUrl}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-white border border-blue-200 hover:border-blue-400 text-[#0d2658] text-[11px] font-bold inline-flex items-center gap-1.5 shrink-0 transition-colors">
+                <span>${authorityMeta.portalName}</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-blue-600"></i>
+              </a>
+            </div>
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">${reqPills}</ul>
+            <div class="text-[11px] text-slate-600 bg-amber-50/80 border border-amber-200/80 rounded-xl px-3 py-2 flex items-start gap-2">
+              <i class="fa-solid fa-shield-halved text-amber-700 mt-0.5 shrink-0"></i>
+              <span><strong>Legitimate Verification Guidance:</strong> ${platformMeta.name} requires genuine, unexpired government-issued documents from ${displayName}. Unofficial or altered documents do not guarantee or qualify for KYC approval.</span>
+            </div>
+          </div>
+        `;
+        kycSummaryEl.classList.remove('hidden');
+      }
 
       if (allItems.length === 0) {
         if (wrapperEl) wrapperEl.classList.add('hidden');
@@ -2939,46 +2994,83 @@ var $ = window.$ || (id => document.getElementById(id));
       if (optionsListEl) {
         if (items.length === 0) {
           optionsListEl.innerHTML = `<div class="px-4 py-5 text-center text-xs font-semibold text-slate-500">No document category matching "${q}" for ${displayName}</div>`;
-          return;
-        }
-        optionsListEl.innerHTML = items.map(item => {
-          const isCurrent = workflowSelectedDoc === item.docType;
-          const thumbHtml = item.thumbnail
-            ? `<div class="w-16 h-11 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative flex items-center justify-center">
-                 <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
-                 <div class="hidden w-full h-full ${item.accent.bg} text-white flex items-center justify-center text-base"><i class="${item.icon}"></i></div>
-               </div>`
-            : `<div class="w-11 h-11 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-lg shrink-0"><i class="${item.icon}"></i></div>`;
+        } else {
+          optionsListEl.innerHTML = items.map(item => {
+            const isCurrent = workflowSelectedDoc === item.docType;
+            const thumbHtml = item.thumbnail
+              ? `<div class="w-16 h-11 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 relative flex items-center justify-center">
+                   <img src="${item.thumbnail}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                   <div class="hidden w-full h-full ${item.accent.bg} text-white flex items-center justify-center text-base"><i class="${item.icon}"></i></div>
+                 </div>`
+              : `<div class="w-11 h-11 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-lg shrink-0"><i class="${item.icon}"></i></div>`;
 
-          return `
-            <button
-              type="button"
-              role="option"
-              data-doc-type="${item.docType}"
-              aria-selected="${isCurrent ? 'true' : 'false'}"
-              onclick="selectDocumentFromDropdown('${item.docType.replace(/'/g, "\\'")}')"
-              class="w-full px-3.5 py-3 rounded-xl text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${isCurrent ? 'bg-blue-50 border border-blue-200 text-[#0d2658]' : 'hover:bg-slate-50 border border-transparent text-slate-700'}">
-              <span class="flex items-center gap-3 min-w-0 flex-1">
-                ${thumbHtml}
-                <span class="min-w-0 flex-1">
-                  <span class="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-slate-500">
-                    <span>${item.category}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>${item.countryName}</span>
-                    <span aria-hidden="true">·</span>
-                    <span>${platformMeta.name}</span>
+            return `
+              <button
+                type="button"
+                role="option"
+                data-doc-type="${item.docType}"
+                aria-selected="${isCurrent ? 'true' : 'false'}"
+                onclick="selectDocumentFromDropdown('${item.docType.replace(/'/g, "\\'")}')"
+                class="w-full px-3.5 py-3 rounded-xl text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${isCurrent ? 'bg-blue-50 border border-blue-200 text-[#0d2658]' : 'hover:bg-slate-50 border border-transparent text-slate-700'}">
+                <span class="flex items-center gap-3 min-w-0 flex-1">
+                  ${thumbHtml}
+                  <span class="min-w-0 flex-1">
+                    <span class="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                      <span>${item.category}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>${item.countryName}</span>
+                      <span aria-hidden="true">·</span>
+                      <span>${platformMeta.name}</span>
+                    </span>
+                    <span class="block text-xs sm:text-sm font-extrabold text-[#0d2658] truncate">${item.name}</span>
+                    <span class="block text-[11px] text-slate-500 truncate">${item.description}</span>
                   </span>
-                  <span class="block text-xs sm:text-sm font-extrabold text-[#0d2658] truncate">${item.name}</span>
-                  <span class="block text-[11px] text-slate-500 truncate">${item.description}</span>
                 </span>
-              </span>
-              <span class="flex items-center gap-2 shrink-0 text-xs font-bold ${item.accent.arrow}">
-                <span class="hidden sm:inline">${isCurrent ? 'Selected' : 'View Info'}</span>
-                ${isCurrent ? '<i class="fa-solid fa-check text-xs text-blue-600"></i>' : '<i class="fa-solid fa-chevron-right text-[10px]"></i>'}
-              </span>
-            </button>
-          `;
-        }).join('');
+                <span class="flex items-center gap-2 shrink-0 text-xs font-bold ${item.accent.arrow}">
+                  <span class="hidden sm:inline">${isCurrent ? 'Selected' : 'View Info'}</span>
+                  ${isCurrent ? '<i class="fa-solid fa-check text-xs text-blue-600"></i>' : '<i class="fa-solid fa-chevron-right text-[10px]"></i>'}
+                </span>
+              </button>
+            `;
+          }).join('');
+        }
+      }
+
+      if (grid) {
+        if (items.length === 0) {
+          grid.innerHTML = '';
+          grid.classList.add('hidden');
+        } else {
+          grid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2';
+          grid.removeAttribute('aria-hidden');
+          grid.innerHTML = items.map(item => {
+            const isCurrent = workflowSelectedDoc === item.docType;
+            return `
+              <div
+                data-doc-card="${item.docType}"
+                onclick="selectDocumentFromDropdown('${item.docType.replace(/'/g, "\\'")}')"
+                role="button"
+                tabindex="0"
+                onkeydown="if(event.key==='Enter'||event.key===' ')selectDocumentFromDropdown('${item.docType.replace(/'/g, "\\'")}')"
+                class="p-4 rounded-2xl border ${isCurrent ? 'border-2 border-[#0d5bd9] bg-blue-50/60 shadow-sm' : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50/70'} transition-all cursor-pointer flex flex-col justify-between gap-3">
+                <div class="flex items-start gap-3">
+                  <div class="w-11 h-11 rounded-xl ${item.accent.bg} text-white flex items-center justify-center text-base shrink-0 shadow-xs">
+                    <i class="${item.icon}"></i>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md mb-1">${item.category}</span>
+                    <h4 class="text-xs sm:text-sm font-extrabold text-[#0d2658] leading-snug">${item.name}</h4>
+                    <p class="text-[11px] text-slate-600 mt-1 line-clamp-2">${item.description}</p>
+                  </div>
+                </div>
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2 text-xs font-bold text-[#0d5bd9]">
+                  <span>View Official Requirements &amp; Guidance</span>
+                  <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
       }
     }
     window.renderWorkflowDocumentsDropdown = renderWorkflowDocumentsDropdown;
@@ -3224,6 +3316,9 @@ var $ = window.$ || (id => document.getElementById(id));
       const poaAccountBar = $('poa-step2-account-selector');
       const noDocView = $('wb-no-document-view');
 
+      const docsGrid = $('wb-country-documents-grid');
+      const kycSummaryEl = $('wbDocsKycGuidanceSummary');
+
       if (nextStep === 'home') {
         if (heroSection) heroSection.classList.remove('hidden');
         if (heroHomeContent) heroHomeContent.classList.remove('hidden');
@@ -3233,6 +3328,8 @@ var $ = window.$ || (id => document.getElementById(id));
         if (stepperBar) stepperBar.classList.add('hidden');
         if (countryPanel) countryPanel.classList.add('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docsGrid) { docsGrid.classList.add('hidden'); docsGrid.innerHTML = ''; }
+        if (kycSummaryEl) { kycSummaryEl.classList.add('hidden'); kycSummaryEl.innerHTML = ''; }
         if (docInfoPanel) docInfoPanel.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
@@ -3248,12 +3345,15 @@ var $ = window.$ || (id => document.getElementById(id));
         if (stepperBar) stepperBar.classList.add('hidden');
         if (countryPanel) countryPanel.classList.add('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docsGrid) { docsGrid.classList.add('hidden'); docsGrid.innerHTML = ''; }
+        if (kycSummaryEl) { kycSummaryEl.classList.add('hidden'); kycSummaryEl.innerHTML = ''; }
         if (docInfoPanel) docInfoPanel.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
         if (noDocView) noDocView.classList.add('hidden');
         document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
         syncWorkflowAccountsHighlight();
+        syncWorkbenchStepperUI();
         if (!options.noScroll && vaSection) {
           vaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
           vaSection.classList.add('ring-2', 'ring-blue-400/50', 'rounded-3xl');
@@ -3268,6 +3368,8 @@ var $ = window.$ || (id => document.getElementById(id));
         if (stepperBar) stepperBar.classList.remove('hidden');
         if (countryPanel) countryPanel.classList.remove('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docsGrid) { docsGrid.classList.add('hidden'); docsGrid.innerHTML = ''; }
+        if (kycSummaryEl) { kycSummaryEl.classList.add('hidden'); kycSummaryEl.innerHTML = ''; }
         if (docInfoPanel) docInfoPanel.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
@@ -3279,10 +3381,12 @@ var $ = window.$ || (id => document.getElementById(id));
         const pMeta = $('wbCountryPlatformMeta');
         const pIconWrap = $('wbCountryPlatformIconWrap');
         const pIcon = $('wbCountryPlatformIcon');
+        const pTip = $('platform-kyc-tip');
         if (pName) pName.textContent = meta.name;
         if (pMeta) pMeta.textContent = `${meta.currency} · ${meta.kycLevel || 'Select issuing country'}`;
         if (pIconWrap) pIconWrap.style.backgroundColor = meta.color || '#003087';
         if (pIcon) pIcon.className = `${meta.icon} text-lg text-white`;
+        if (pTip) pTip.textContent = `${meta.tip || ''} Select your supported issuing country below to view official document categories and KYC requirements for ${meta.name}.`;
 
         syncWorkbenchCountryDropdownUI(workflowSelectedCountry);
         syncWorkbenchStepperUI();
@@ -3323,6 +3427,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (stepperBar) stepperBar.classList.remove('hidden');
         if (countryPanel) countryPanel.classList.add('hidden');
         if (docsPanel) docsPanel.classList.add('hidden');
+        if (docsGrid) docsGrid.classList.add('hidden');
         if (docInfoPanel) docInfoPanel.classList.remove('hidden');
         if (editorBar) editorBar.classList.remove('hidden');
         if (poaAccountBar) {
@@ -3341,10 +3446,9 @@ var $ = window.$ || (id => document.getElementById(id));
     function selectWorkflowAccount(accountKey, opts) {
       const options = opts || {};
       const resolvedKey = (accountKey && platformData[accountKey]) ? accountKey : 'paypal';
-      const switchedAccount = Boolean(workflowActiveAccount && workflowActiveAccount !== resolvedKey);
 
       workflowActiveAccount = resolvedKey;
-      if (switchedAccount || !options.preserveCountry) {
+      if (!options.preserveCountry) {
         workflowSelectedCountry = '';
         workflowSelectedDoc = '';
         flowSelectedCountry = '';
@@ -3701,12 +3805,12 @@ var $ = window.$ || (id => document.getElementById(id));
     function switchVerificationCountry(countryKey, opts) {
       const options = typeof opts === 'boolean' ? { silent: opts } : (opts || {});
       currentCountry = countryKey;
-      const configuredDocs = getConfiguredDocsForCountry(countryKey);
+      const configuredDocs = getConfiguredDocsForCountry(countryKey, workflowActiveAccount || currentVirtualAccount);
       if (options.preferredDocType && configuredDocs.includes(options.preferredDocType)) {
         currentDocType = options.preferredDocType;
       }
 
-      if (countryKey === 'turkey') {
+      if (countryKey === 'turkey' && (!options.preferredDocType || options.preferredDocType === 'passport')) {
         currentDocType = 'passport';
         const poaAccountBar = $('poa-step2-account-selector');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
@@ -3732,7 +3836,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateTurPassPreview === 'function') updateTurPassPreview();
         if (typeof updateTurIdPreview === 'function') updateTurIdPreview();
-      } else if (countryKey === 'uae') {
+      } else if (countryKey === 'uae' && (!options.preferredDocType || options.preferredDocType === 'idcard')) {
         currentDocType = 'idcard';
         const poaAccountBar = $('poa-step2-account-selector');
         if (poaAccountBar) poaAccountBar.classList.add('hidden');
@@ -18166,7 +18270,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </div>
         </div>
 
-        <div class="flex items-center justify-between gap-2">
+        <!-- Country-Specific KYC Requirements & Official Authority Guidance Summary -->
+        <div id="wbDocsKycGuidanceSummary" class="hidden"></div>
+
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <p class="text-xs text-slate-600">
             Select a supported verification document category below to view official document requirements and verification guidance.
           </p>
