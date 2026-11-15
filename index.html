@@ -2932,39 +2932,8 @@ var $ = window.$ || (id => document.getElementById(id));
       syncWorkbenchDocumentDropdownUI(countryKey);
 
       if (kycSummaryEl) {
-        const reqPills = (Array.isArray(platformMeta.kycReq) ? platformMeta.kycReq : []).map(req => `
-          <li class="flex items-start gap-2 text-xs text-slate-700 bg-white px-3 py-2 rounded-xl border border-slate-200/80">
-            <i class="fa-solid fa-circle-check text-emerald-600 text-[11px] mt-0.5 shrink-0"></i>
-            <span>${req}</span>
-          </li>
-        `).join('');
-        kycSummaryEl.innerHTML = `
-          <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-white to-emerald-50/50 border border-blue-100 space-y-3">
-            <div class="flex flex-wrap items-start justify-between gap-2">
-              <div class="space-y-0.5">
-                <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#0d5bd9]">
-                  ${displayFlag} ${displayName} · ${platformMeta.name} KYC Requirements
-                </div>
-                <div class="text-xs sm:text-sm font-extrabold text-[#0d2658]">
-                  Issuing Authority: ${authorityMeta.authority}
-                </div>
-                <div class="text-[11px] text-slate-600">
-                  <strong>Accepted Standard:</strong> ${authorityMeta.idStandard} · <strong>Verification Tier:</strong> ${platformMeta.kycLevel || 'Standard & Enhanced KYC'}
-                </div>
-              </div>
-              <a href="${authorityMeta.portalUrl}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-white border border-blue-200 hover:border-blue-400 text-[#0d2658] text-[11px] font-bold inline-flex items-center gap-1.5 shrink-0 transition-colors">
-                <span>${authorityMeta.portalName}</span>
-                <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-blue-600"></i>
-              </a>
-            </div>
-            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">${reqPills}</ul>
-            <div class="text-[11px] text-slate-600 bg-amber-50/80 border border-amber-200/80 rounded-xl px-3 py-2 flex items-start gap-2">
-              <i class="fa-solid fa-shield-halved text-amber-700 mt-0.5 shrink-0"></i>
-              <span><strong>Legitimate Verification Guidance:</strong> ${platformMeta.name} requires genuine, unexpired government-issued documents from ${displayName}. Unofficial or altered documents do not guarantee or qualify for KYC approval.</span>
-            </div>
-          </div>
-        `;
-        kycSummaryEl.classList.remove('hidden');
+        kycSummaryEl.innerHTML = '';
+        kycSummaryEl.classList.add('hidden');
       }
 
       if (allItems.length === 0) {
@@ -3246,12 +3215,7 @@ var $ = window.$ || (id => document.getElementById(id));
       }
 
       if (dGuidanceList) {
-        dGuidanceList.innerHTML = spec.guidance.map(line => `
-          <li class="flex items-start gap-2.5 text-xs text-slate-700 leading-relaxed">
-            <i class="fa-solid fa-shield-halved text-blue-600 text-xs mt-0.5 shrink-0"></i>
-            <span>${line}</span>
-          </li>
-        `).join('');
+        dGuidanceList.innerHTML = '';
       }
 
       if (dProviderReqList) {
@@ -18298,23 +18262,13 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </div>
         </div>
 
-        <!-- Eligibility Requirements & Verification Guidance Columns -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-            <div class="flex items-center gap-2 text-sm font-extrabold text-[#0d2658]">
-              <i class="fa-solid fa-clipboard-check text-emerald-600"></i>
-              <h4>Document Eligibility Requirements</h4>
-            </div>
-            <ul id="wbInfoEligibilityList" class="space-y-2.5"></ul>
+        <!-- Document Eligibility Requirements -->
+        <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div class="flex items-center gap-2 text-sm font-extrabold text-[#0d2658]">
+            <i class="fa-solid fa-clipboard-check text-emerald-600"></i>
+            <h4>Document Eligibility Requirements</h4>
           </div>
-
-          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-            <div class="flex items-center gap-2 text-sm font-extrabold text-[#0d2658]">
-              <i class="fa-solid fa-user-shield text-blue-600"></i>
-              <h4>Legitimate KYC Verification Guidance</h4>
-            </div>
-            <ul id="wbInfoGuidanceList" class="space-y-2.5"></ul>
-          </div>
+          <ul id="wbInfoEligibilityList" class="space-y-2.5"></ul>
         </div>
 
         <!-- Provider KYC Checklist -->
