@@ -2662,6 +2662,66 @@ var $ = window.$ || (id => document.getElementById(id));
         portalName: 'Türkiye NVİ Identity & Passport Portal',
         portalUrl: 'https://randevu.nvi.gov.tr',
         idStandard: 'Türkiye Biometric Pasaport & T.C. Kimlik Kartı'
+      },
+      australia: {
+        authority: 'Australian Passport Office · Department of Foreign Affairs and Trade (DFAT)',
+        portalName: 'Australian Passport Office',
+        portalUrl: 'https://www.passports.gov.au',
+        idStandard: 'Australian Biometric e-Passport (ICAO Doc 9303 · AUS)'
+      },
+      newzealand: {
+        authority: 'Department of Internal Affairs (Te Tari Taiwhenua)',
+        portalName: 'New Zealand Passports (Te Tari Taiwhenua)',
+        portalUrl: 'https://www.passports.govt.nz',
+        idStandard: 'New Zealand Biometric e-Passport (NZL)'
+      },
+      fiji: {
+        authority: 'Department of Immigration · Ministry of Immigration',
+        portalName: 'Fiji Department of Immigration',
+        portalUrl: 'https://www.immigration.gov.fj',
+        idStandard: 'Republic of Fiji Biometric e-Passport (FJI)'
+      },
+      papuanewguinea: {
+        authority: 'PNG Immigration & Citizenship Services Authority (ICSA) & PNG Civil and Identity Registry (PNGCIR)',
+        portalName: 'PNG ICSA & Civil Registry (NID)',
+        portalUrl: 'https://www.icsa.gov.pg',
+        idStandard: 'Papua New Guinea e-Passport & National Identification (NID) Card'
+      },
+      samoa: {
+        authority: 'Immigration Division · Ministry of the Prime Minister and Cabinet',
+        portalName: 'Government of Samoa Immigration Services',
+        portalUrl: 'https://www.mygov.gov.ws',
+        idStandard: 'Independent State of Samoa Machine-Readable Passport (WSM)'
+      },
+      tonga: {
+        authority: 'Immigration Division (Ministry of Foreign Affairs) & National Identity Card Office',
+        portalName: 'Kingdom of Tonga Immigration & NID Office',
+        portalUrl: 'https://www.gov.to',
+        idStandard: 'Kingdom of Tonga Passport & National Identity Card (TON)'
+      },
+      vanuatu: {
+        authority: 'Department of Immigration & Passport Services and Civil Registry & Identity Management (CRIMD)',
+        portalName: 'Republic of Vanuatu Immigration & Civil Registry',
+        portalUrl: 'https://immigration.gov.vu',
+        idStandard: 'Republic of Vanuatu Passport & National Identity Card (VUT)'
+      },
+      solomonislands: {
+        authority: 'Immigration Division · Ministry of Commerce, Industries, Labour and Immigration',
+        portalName: 'Solomon Islands Immigration Division',
+        portalUrl: 'https://commerce.gov.sb',
+        idStandard: 'Solomon Islands Machine-Readable Passport (SLB)'
+      },
+      kiribati: {
+        authority: 'Immigration Division (Ministry of Foreign Affairs & Immigration) & Ministry of Justice',
+        portalName: 'Republic of Kiribati Immigration & Civil Registry',
+        portalUrl: 'https://www.mfa.gov.ki',
+        idStandard: 'Republic of Kiribati Passport & National Identity Card (KIR)'
+      },
+      micronesia: {
+        authority: 'Department of Justice · Division of Immigration & Labor',
+        portalName: 'FSM Department of Justice Immigration',
+        portalUrl: 'https://www.gov.fm',
+        idStandard: 'Federated States of Micronesia Biometric Passport (FSM)'
       }
     };
 
@@ -2842,6 +2902,62 @@ var $ = window.$ || (id => document.getElementById(id));
         'senegal-passport-view': {
           name: 'Senegal Passeport Biométrique',
           description: `République du Sénégal · CEDEAO / ECOWAS Biometric e-Passport Accepted by ${providerMeta.name}`
+        },
+        'australia-passport-view': {
+          name: 'Australian Passport',
+          description: `Commonwealth of Australia · DFAT Australian Passport Office e-Passport (AUS) Accepted by ${providerMeta.name}`
+        },
+        'newzealand-passport-view': {
+          name: 'New Zealand Passport',
+          description: `New Zealand / Aotearoa · Department of Internal Affairs e-Passport (NZL) Accepted by ${providerMeta.name}`
+        },
+        'fiji-passport-view': {
+          name: 'Fiji Passport',
+          description: `Republic of Fiji · Department of Immigration Biometric Passport (FJI) Accepted by ${providerMeta.name}`
+        },
+        'papuanewguinea-passport-view': {
+          name: 'Papua New Guinea Passport',
+          description: `Independent State of Papua New Guinea · ICSA e-Passport (PNG) Accepted by ${providerMeta.name}`
+        },
+        'papuanewguinea-idcard-view': {
+          name: 'Papua New Guinea National Identification (NID) Card',
+          description: `Independent State of Papua New Guinea · PNGCIR Biometric NID Card Accepted by ${providerMeta.name}`
+        },
+        'samoa-passport-view': {
+          name: 'Samoa Passport',
+          description: `Independent State of Samoa · MPMC Immigration Division Passport (WSM) Accepted by ${providerMeta.name}`
+        },
+        'tonga-passport-view': {
+          name: 'Tonga Passport',
+          description: `Kingdom of Tonga · Ministry of Foreign Affairs Passport (TON) Accepted by ${providerMeta.name}`
+        },
+        'tonga-idcard-view': {
+          name: 'Tonga National Identity Card',
+          description: `Kingdom of Tonga · National Identity Card Office Biometric Card Accepted by ${providerMeta.name}`
+        },
+        'vanuatu-passport-view': {
+          name: 'Vanuatu Passport',
+          description: `Republic of Vanuatu · Department of Immigration & Passport Services (VUT) Accepted by ${providerMeta.name}`
+        },
+        'vanuatu-idcard-view': {
+          name: 'Vanuatu National Identity Card',
+          description: `Republic of Vanuatu · CRIMD Biometric National ID Card Accepted by ${providerMeta.name}`
+        },
+        'solomonislands-passport-view': {
+          name: 'Solomon Islands Passport',
+          description: `Solomon Islands · Immigration Division Passport (SLB) Accepted by ${providerMeta.name}`
+        },
+        'kiribati-passport-view': {
+          name: 'Kiribati Passport',
+          description: `Republic of Kiribati · MFA&I Immigration Division Passport (KIR) Accepted by ${providerMeta.name}`
+        },
+        'kiribati-idcard-view': {
+          name: 'Kiribati National Identity Card',
+          description: `Republic of Kiribati · Ministry of Justice National ID Card Accepted by ${providerMeta.name}`
+        },
+        'micronesia-passport-view': {
+          name: 'Federated States of Micronesia Passport',
+          description: `Federated States of Micronesia · DOJ Division of Immigration & Labor Passport (FSM) Accepted by ${providerMeta.name}`
         }
       };
 
@@ -2948,7 +3064,21 @@ var $ = window.$ || (id => document.getElementById(id));
         'malawi:passport': () => { if (typeof updateMwiPreview === 'function') updateMwiPreview(); },
         'uae:idcard': () => { if (typeof updateUaeIdPreview === 'function') updateUaeIdPreview(); },
         'turkey:passport': () => { if (typeof updateTurPassPreview === 'function') updateTurPassPreview(); },
-        'turkey:idcard': () => { if (typeof updateTurIdPreview === 'function') updateTurIdPreview(); }
+        'turkey:idcard': () => { if (typeof updateTurIdPreview === 'function') updateTurIdPreview(); },
+        'australia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('australia', 'passport'); },
+        'newzealand:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('newzealand', 'passport'); },
+        'fiji:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('fiji', 'passport'); },
+        'papuanewguinea:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('papuanewguinea', 'passport'); },
+        'papuanewguinea:idcard': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('papuanewguinea', 'idcard'); },
+        'samoa:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('samoa', 'passport'); },
+        'tonga:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('tonga', 'passport'); },
+        'tonga:idcard': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('tonga', 'idcard'); },
+        'vanuatu:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('vanuatu', 'passport'); },
+        'vanuatu:idcard': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('vanuatu', 'idcard'); },
+        'solomonislands:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('solomonislands', 'passport'); },
+        'kiribati:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('kiribati', 'passport'); },
+        'kiribati:idcard': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('kiribati', 'idcard'); },
+        'micronesia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('micronesia', 'passport'); }
       };
       const fn = fnByCountryDoc[`${countryKey}:${docType}`];
       if (fn) fn();
@@ -2981,7 +3111,31 @@ var $ = window.$ || (id => document.getElementById(id));
         'dr congo': 'drcongo',
         drc: 'drcongo',
         'south africa': 'southafrica',
-        'united arab emirates': 'uae'
+        'united arab emirates': 'uae',
+        aus: 'australia',
+        au: 'australia',
+        'new zealand': 'newzealand',
+        nz: 'newzealand',
+        nzl: 'newzealand',
+        fji: 'fiji',
+        fj: 'fiji',
+        'papua new guinea': 'papuanewguinea',
+        png: 'papuanewguinea',
+        pg: 'papuanewguinea',
+        wsm: 'samoa',
+        ws: 'samoa',
+        ton: 'tonga',
+        to: 'tonga',
+        vut: 'vanuatu',
+        vu: 'vanuatu',
+        'solomon islands': 'solomonislands',
+        slb: 'solomonislands',
+        sb: 'solomonislands',
+        kir: 'kiribati',
+        ki: 'kiribati',
+        'federated states of micronesia': 'micronesia',
+        fsm: 'micronesia',
+        fm: 'micronesia'
       };
       return aliases[raw] || raw;
     }
@@ -4477,6 +4631,11 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateUaeIdPreview === 'function') updateUaeIdPreview();
+      } else if (typeof OCEANIA_COUNTRY_KEYS !== 'undefined' && OCEANIA_COUNTRY_KEYS.includes(countryKey)) {
+        currentDocType = (options.preferredDocType && configuredDocs.includes(options.preferredDocType))
+          ? options.preferredDocType
+          : (configuredDocs[0] || 'passport');
+        if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview(countryKey, currentDocType);
       }
 
       const countryStyles = {
@@ -4584,6 +4743,56 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-red-600 bg-gradient-to-br from-red-50 via-white to-cyan-50/50 text-red-950 text-left shadow-sm ring-2 ring-red-500/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-red-600"
+        },
+        australia: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-blue-800 bg-gradient-to-br from-blue-50 via-white to-amber-50/40 text-blue-950 text-left shadow-sm ring-2 ring-blue-700/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-blue-800"
+        },
+        newzealand: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-slate-900 bg-gradient-to-br from-slate-100 via-white to-sky-50/40 text-slate-950 text-left shadow-sm ring-2 ring-slate-700/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-100/70 hover:border-slate-400 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-slate-900"
+        },
+        fiji: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50 via-white to-cyan-50/40 text-sky-950 text-left shadow-sm ring-2 ring-sky-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-sky-600"
+        },
+        papuanewguinea: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-red-700 bg-gradient-to-br from-red-50 via-white to-amber-50/50 text-red-950 text-left shadow-sm ring-2 ring-red-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-red-700"
+        },
+        samoa: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-indigo-700 bg-gradient-to-br from-indigo-50 via-white to-red-50/40 text-indigo-950 text-left shadow-sm ring-2 ring-indigo-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-indigo-50/40 hover:border-indigo-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-indigo-700"
+        },
+        tonga: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-rose-700 bg-gradient-to-br from-rose-50 via-white to-red-50/40 text-rose-950 text-left shadow-sm ring-2 ring-rose-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-rose-50/40 hover:border-rose-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-rose-700"
+        },
+        vanuatu: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-emerald-700 bg-gradient-to-br from-emerald-50 via-white to-amber-50/40 text-emerald-950 text-left shadow-sm ring-2 ring-emerald-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-emerald-700"
+        },
+        solomonislands: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-blue-700 bg-gradient-to-br from-blue-50 via-white to-emerald-50/40 text-blue-950 text-left shadow-sm ring-2 ring-blue-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-blue-700"
+        },
+        kiribati: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50 via-white to-sky-50/50 text-amber-950 text-left shadow-sm ring-2 ring-amber-500/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-amber-600"
+        },
+        micronesia: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-cyan-700 bg-gradient-to-br from-cyan-50 via-white to-sky-50/50 text-cyan-950 text-left shadow-sm ring-2 ring-cyan-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-cyan-50/40 hover:border-cyan-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-cyan-700"
         }
       };
 
@@ -4625,7 +4834,17 @@ var $ = window.$ || (id => document.getElementById(id));
         nepal: 'Nepal',
         malawi: 'Malawi',
         uae: 'United Arab Emirates',
-        turkey: 'Turkey'
+        turkey: 'Turkey',
+        australia: 'Australia',
+        newzealand: 'New Zealand',
+        fiji: 'Fiji',
+        papuanewguinea: 'Papua New Guinea',
+        samoa: 'Samoa',
+        tonga: 'Tonga',
+        vanuatu: 'Vanuatu',
+        solomonislands: 'Solomon Islands',
+        kiribati: 'Kiribati',
+        micronesia: 'Federated States of Micronesia'
       };
       const domCountry = getExistingWebsiteCountries().find(c => c.key === countryKey);
       const displayCountryName = countryNames[countryKey] || (domCountry && domCountry.name) || countryKey.toUpperCase();
@@ -4873,6 +5092,8 @@ var $ = window.$ || (id => document.getElementById(id));
         } else if (typeof randomizeKenyaPassport === 'function') {
           randomizeKenyaPassport();
         }
+      } else if (typeof OCEANIA_COUNTRY_KEYS !== 'undefined' && OCEANIA_COUNTRY_KEYS.includes(currentCountry)) {
+        if (typeof randomizeOceaniaDoc === 'function') randomizeOceaniaDoc(currentCountry, currentDocType);
       }
     }
     window.randomizeActiveDocument = randomizeActiveDocument;
@@ -17508,6 +17729,926 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     if (typeof printUsaPassport !== "undefined") window.printUsaPassport = printUsaPassport;
     if (typeof downloadUsaPassPNG !== "undefined") window.downloadUsaPassPNG = downloadUsaPassPNG;
     if (typeof copyUsaPassSpecimenData !== "undefined") window.copyUsaPassSpecimenData = copyUsaPassSpecimenData;
+
+    // ================= OCEANIA (10 COUNTRIES: PASSPORTS & VERIFIED NATIONAL ID CARDS) CONTROLLER =================
+    const OCEANIA_DEFAULT_PORTRAITS = [
+      '/assets/aistudio/canada_passport_portrait.png',
+      '/assets/aistudio/germany_passport_portrait.png',
+      '/assets/aistudio/usa_passport_portrait_main.png',
+      '/assets/aistudio/uk_passport_color_portrait.png'
+    ];
+
+    const OCEANIA_COUNTRIES_CONFIG = {
+      australia: {
+        key: 'australia',
+        name: 'Australia',
+        officialName: 'COMMONWEALTH OF AUSTRALIA',
+        flag: '🇦🇺',
+        iso3: 'AUS',
+        passportTitle: 'Australian Passport',
+        passportHeader: 'COMMONWEALTH OF AUSTRALIA · PASSPORT',
+        passportAuthority: 'Australian Passport Office',
+        nationality: 'AUSTRALIAN',
+        accentHex: '#0f2d6b',
+        secondaryHex: '#b48327',
+        tailwindAccent: 'blue',
+        passPrefix: 'RA',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'RA4829104', surname: 'HENDERSON', givenNames: 'OLIVIA CLAIRE', sex: 'F', dob: '1993-07-18', pob: 'SYDNEY NSW', personalNo: 'AUS8492014', issue: '2023-03-14', expiry: '2033-03-13', authority: 'SYDNEY', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'RA7150382', surname: 'MITCHELL', givenNames: 'LIAM JAMES', sex: 'M', dob: '1989-11-04', pob: 'MELBOURNE VIC', personalNo: 'AUS5120498', issue: '2022-09-21', expiry: '2032-09-20', authority: 'MELBOURNE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'PA3948120', surname: 'CALLAGHAN', givenNames: 'CHLOE GRACE', sex: 'F', dob: '1996-02-27', pob: 'BRISBANE QLD', personalNo: 'AUS6938172', issue: '2024-01-11', expiry: '2034-01-10', authority: 'BRISBANE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] },
+          { passNo: 'PB6204917', surname: 'SINCLAIR', givenNames: 'ETHAN DAVID', sex: 'M', dob: '1991-05-09', pob: 'PERTH WA', personalNo: 'AUS3049815', issue: '2023-08-03', expiry: '2033-08-02', authority: 'PERTH', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] }
+        ]
+      },
+      newzealand: {
+        key: 'newzealand',
+        name: 'New Zealand',
+        officialName: 'NEW ZEALAND · AOTEAROA',
+        flag: '🇳🇿',
+        iso3: 'NZL',
+        passportTitle: 'New Zealand Passport',
+        passportHeader: 'NEW ZEALAND · URUWHENUA AOTEAROA · PASSPORT',
+        passportAuthority: 'Department of Internal Affairs',
+        nationality: 'NEW ZEALAND',
+        accentHex: '#111827',
+        secondaryHex: '#0ea5e9',
+        tailwindAccent: 'slate',
+        passPrefix: 'LA',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'LA8392041', surname: 'MCKENZIE', givenNames: 'HARPER ROSE', sex: 'F', dob: '1994-09-12', pob: 'AUCKLAND', personalNo: 'NZL7401829', issue: '2023-05-19', expiry: '2033-05-18', authority: 'WELLINGTON', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'LA5104928', surname: 'THOMPSON', givenNames: 'NOAH TAMATI', sex: 'M', dob: '1990-01-25', pob: 'WELLINGTON', personalNo: 'NZL2910485', issue: '2022-11-08', expiry: '2032-11-07', authority: 'WELLINGTON', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'LB2491803', surname: 'RATAHI', givenNames: 'MAIA AROHA', sex: 'F', dob: '1997-04-06', pob: 'CHRISTCHURCH', personalNo: 'NZL6830294', issue: '2024-02-14', expiry: '2034-02-13', authority: 'AUCKLAND', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] },
+          { passNo: 'LC9041825', surname: 'FRASER', givenNames: 'CALEB RYAN', sex: 'M', dob: '1987-12-03', pob: 'DUNEDIN', personalNo: 'NZL4812039', issue: '2021-10-27', expiry: '2031-10-26', authority: 'WELLINGTON', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] }
+        ]
+      },
+      fiji: {
+        key: 'fiji',
+        name: 'Fiji',
+        officialName: 'REPUBLIC OF FIJI',
+        flag: '🇫🇯',
+        iso3: 'FJI',
+        passportTitle: 'Fiji Passport',
+        passportHeader: 'REPUBLIC OF FIJI · PASSPORT / PASSEPORT',
+        passportAuthority: 'Department of Immigration',
+        nationality: 'FIJIAN',
+        accentHex: '#0369a1',
+        secondaryHex: '#0f766e',
+        tailwindAccent: 'sky',
+        passPrefix: 'FJ',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'FJ4092817', surname: 'VUNIBAKA', givenNames: 'MEREONI ADI', sex: 'F', dob: '1992-08-22', pob: 'SUVA', personalNo: 'FJI9102847', issue: '2023-06-12', expiry: '2033-06-11', authority: 'SUVA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] },
+          { passNo: 'FJ7381920', surname: 'PRASAD', givenNames: 'ROHAN VIKASH', sex: 'M', dob: '1990-03-14', pob: 'LAUTOKA', personalNo: 'FJI5029183', issue: '2022-04-18', expiry: '2032-04-17', authority: 'SUVA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'FJ6120495', surname: 'RATUVOU', givenNames: 'JONE TEVITA', sex: 'M', dob: '1995-10-30', pob: 'NADI', personalNo: 'FJI7291048', issue: '2024-03-04', expiry: '2034-03-03', authority: 'NADI', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { passNo: 'FJ8492013', surname: 'NARAYAN', givenNames: 'PRIYA ANJALI', sex: 'F', dob: '1996-11-17', pob: 'LABASA', personalNo: 'FJI3810492', issue: '2023-09-25', expiry: '2033-09-24', authority: 'SUVA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] }
+        ]
+      },
+      papuanewguinea: {
+        key: 'papuanewguinea',
+        name: 'Papua New Guinea',
+        officialName: 'INDEPENDENT STATE OF PAPUA NEW GUINEA',
+        flag: '🇵🇬',
+        iso3: 'PNG',
+        passportTitle: 'Papua New Guinea Passport',
+        passportHeader: 'PAPUA NEW GUINEA · PASSPORT',
+        passportAuthority: 'PNG Immigration & Citizenship Services Authority',
+        nationality: 'PAPUA NEW GUINEAN',
+        accentHex: '#991b1b',
+        secondaryHex: '#d97706',
+        tailwindAccent: 'red',
+        passPrefix: 'PG',
+        hasNationalId: true,
+        idCardTitle: 'Papua New Guinea National Identification (NID) Card',
+        idHeaderTop: 'INDEPENDENT STATE OF PAPUA NEW GUINEA',
+        idHeaderSub: 'NATIONAL IDENTIFICATION (NID) CARD · PNGCIR',
+        idAuthority: 'PNG Civil & Identity Registry',
+        idDocPrefix: 'NID',
+        passportProfiles: [
+          { passNo: 'PG6194820', surname: 'KILA', givenNames: 'KUMUL DANIEL', sex: 'M', dob: '1991-06-15', pob: 'PORT MORESBY', personalNo: 'NID-20491827', issue: '2023-02-09', expiry: '2028-02-08', authority: 'PORT MORESBY', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'PG8204195', surname: 'MOKA', givenNames: 'SERAH RUTH', sex: 'F', dob: '1995-09-28', pob: 'LAE', personalNo: 'NID-39104825', issue: '2022-07-14', expiry: '2027-07-13', authority: 'PORT MORESBY', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'PG3849102', surname: 'WARA', givenNames: 'PETER KAPI', sex: 'M', dob: '1988-12-11', pob: 'MOUNT HAGEN', personalNo: 'NID-58201944', issue: '2024-01-22', expiry: '2029-01-21', authority: 'PORT MORESBY', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { passNo: 'PG7491028', surname: 'BANI', givenNames: 'NAOMI ESTHER', sex: 'F', dob: '1997-04-03', pob: 'MADANG', personalNo: 'NID-61049283', issue: '2023-10-16', expiry: '2028-10-15', authority: 'PORT MORESBY', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ],
+        idProfiles: [
+          { docNo: 'PNG8492014', personalNo: '1004829173', surname: 'KILA', givenNames: 'KUMUL DANIEL', sex: 'M', dob: '1991-06-15', pob: 'NATIONAL CAPITAL DISTRICT', issue: '2022-05-10', expiry: '2032-05-09', authority: 'PNGCIR', region: 'NCD / PORT MORESBY', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { docNo: 'PNG5920184', personalNo: '1006391820', surname: 'MOKA', givenNames: 'SERAH RUTH', sex: 'F', dob: '1995-09-28', pob: 'MOROBE PROVINCE', issue: '2023-03-19', expiry: '2033-03-18', authority: 'PNGCIR', region: 'MOROBE / LAE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { docNo: 'PNG7319482', personalNo: '1007482019', surname: 'WARA', givenNames: 'PETER KAPI', sex: 'M', dob: '1988-12-11', pob: 'WESTERN HIGHLANDS', issue: '2021-11-04', expiry: '2031-11-03', authority: 'PNGCIR', region: 'HAGEN CENTRAL', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { docNo: 'PNG9182046', personalNo: '1009182745', surname: 'BANI', givenNames: 'NAOMI ESTHER', sex: 'F', dob: '1997-04-03', pob: 'MADANG PROVINCE', issue: '2024-02-07', expiry: '2034-02-06', authority: 'PNGCIR', region: 'MADANG URBAN', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ]
+      },
+      samoa: {
+        key: 'samoa',
+        name: 'Samoa',
+        officialName: "INDEPENDENT STATE OF SAMOA · MALO SA'OLOTO TUTO'ATASI O SAMOA",
+        flag: '🇼🇸',
+        iso3: 'WSM',
+        passportTitle: 'Samoa Passport',
+        passportHeader: 'INDEPENDENT STATE OF SAMOA · TUSI FOLAU / PASSPORT',
+        passportAuthority: 'MPMC Immigration Division',
+        nationality: 'SAMOAN',
+        accentHex: '#1e3a8a',
+        secondaryHex: '#dc2626',
+        tailwindAccent: 'indigo',
+        passPrefix: 'WS',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'WS5192048', surname: 'TAUALA', givenNames: 'SINA LEILANI', sex: 'F', dob: '1993-10-08', pob: 'APIA', personalNo: 'WSM4910283', issue: '2023-04-25', expiry: '2028-04-24', authority: 'APIA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] },
+          { passNo: 'WS7830194', surname: 'FAALOGO', givenNames: 'TAFAOGA IOANE', sex: 'M', dob: '1991-01-19', pob: 'SALELOLOGA', personalNo: 'WSM6820194', issue: '2022-08-12', expiry: '2027-08-11', authority: 'APIA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'WS6401928', surname: 'SUA', givenNames: 'LAGI MARTHA', sex: 'F', dob: '1996-05-23', pob: 'MOTOOTUA', personalNo: 'WSM7301948', issue: '2024-01-30', expiry: '2029-01-29', authority: 'APIA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'WS9204817', surname: 'MALAE', givenNames: 'VILIAME PENI', sex: 'M', dob: '1989-07-04', pob: 'VAITELE', personalNo: 'WSM2049185', issue: '2023-11-18', expiry: '2028-11-17', authority: 'APIA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] }
+        ]
+      },
+      tonga: {
+        key: 'tonga',
+        name: 'Tonga',
+        officialName: "KINGDOM OF TONGA · PULE'ANGA FAKATU'I 'O TONGA",
+        flag: '🇹🇴',
+        iso3: 'TON',
+        passportTitle: 'Tonga Passport',
+        passportHeader: 'KINGDOM OF TONGA · PASIPOOTI / PASSPORT',
+        passportAuthority: 'Ministry of Foreign Affairs · Immigration',
+        nationality: 'TONGAN',
+        accentHex: '#9f1239',
+        secondaryHex: '#b45309',
+        tailwindAccent: 'rose',
+        passPrefix: 'TO',
+        hasNationalId: true,
+        idCardTitle: 'Tonga National Identity Card',
+        idHeaderTop: "KINGDOM OF TONGA · PULE'ANGA FAKATU'I 'O TONGA",
+        idHeaderSub: 'NATIONAL IDENTITY CARD · KAATI FAKAPAPAU KO E TANGATA TONGA',
+        idAuthority: 'National Identity Card Office',
+        idDocPrefix: 'TON',
+        passportProfiles: [
+          { passNo: 'TO6482910', surname: 'TUPOU', givenNames: 'SIOSAIA MANU', sex: 'M', dob: '1992-03-17', pob: "NUKU'ALOFA", personalNo: 'TON-3920184', issue: '2023-07-06', expiry: '2028-07-05', authority: "NUKU'ALOFA", photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'TO8192045', surname: 'FAKAFANUA', givenNames: 'MELEANA LUPE', sex: 'F', dob: '1995-12-09', pob: "NEIAFU VAVA'U", personalNo: 'TON-5019284', issue: '2022-10-14', expiry: '2027-10-13', authority: "NUKU'ALOFA", photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'TO4920183', surname: 'MOALA', givenNames: 'TEVITA KOLO', sex: 'M', dob: '1990-06-28', pob: "PANGAI HA'APAI", personalNo: 'TON-7492018', issue: '2024-03-21', expiry: '2029-03-20', authority: "NUKU'ALOFA", photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { passNo: 'TO7301942', surname: 'TUIHALANGINGIE', givenNames: 'SALOTE KALISI', sex: 'F', dob: '1997-08-11', pob: "KOLONGA TONGATAPU", personalNo: 'TON-8291047', issue: '2023-01-19', expiry: '2028-01-18', authority: "NUKU'ALOFA", photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ],
+        idProfiles: [
+          { docNo: 'TON392018', personalNo: '920317-4082', surname: 'TUPOU', givenNames: 'SIOSAIA MANU', sex: 'M', dob: '1992-03-17', pob: "NUKU'ALOFA", issue: '2022-09-01', expiry: '2032-08-31', authority: 'NATIONAL ID OFFICE', region: 'TONGATAPU', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { docNo: 'TON501928', personalNo: '951209-2194', surname: 'FAKAFANUA', givenNames: 'MELEANA LUPE', sex: 'F', dob: '1995-12-09', pob: "VAVA'U", issue: '2023-05-15', expiry: '2033-05-14', authority: 'NATIONAL ID OFFICE', region: "VAVA'U", photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { docNo: 'TON749201', personalNo: '900628-5832', surname: 'MOALA', givenNames: 'TEVITA KOLO', sex: 'M', dob: '1990-06-28', pob: "HA'APAI", issue: '2021-12-10', expiry: '2031-12-09', authority: 'NATIONAL ID OFFICE', region: "HA'APAI", photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { docNo: 'TON829104', personalNo: '970811-6401', surname: 'TUIHALANGINGIE', givenNames: 'SALOTE KALISI', sex: 'F', dob: '1997-08-11', pob: 'TONGATAPU', issue: '2024-02-20', expiry: '2034-02-19', authority: 'NATIONAL ID OFFICE', region: 'TONGATAPU EAST', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ]
+      },
+      vanuatu: {
+        key: 'vanuatu',
+        name: 'Vanuatu',
+        officialName: 'REPUBLIC OF VANUATU · RIPABLIK BLONG VANUATU',
+        flag: '🇻🇺',
+        iso3: 'VUT',
+        passportTitle: 'Vanuatu Passport',
+        passportHeader: 'REPUBLIC OF VANUATU · PASSPORT / PASSEPORT',
+        passportAuthority: 'Dept. of Immigration & Passport Services',
+        nationality: 'NI-VANUATU',
+        accentHex: '#047857',
+        secondaryHex: '#ca8a04',
+        tailwindAccent: 'emerald',
+        passPrefix: 'VU',
+        hasNationalId: true,
+        idCardTitle: 'Vanuatu National Identity Card',
+        idHeaderTop: 'REPUBLIC OF VANUATU · RIPABLIK BLONG VANUATU',
+        idHeaderSub: 'NATIONAL IDENTITY CARD · KARTE D\'IDENTITÉ NATIONALE (CRIMD)',
+        idAuthority: 'Dept. of Civil Registry & Identity Management',
+        idDocPrefix: 'VUT',
+        passportProfiles: [
+          { passNo: 'VU4192837', surname: 'KALSAKAU', givenNames: 'WILLIE KENNETH', sex: 'M', dob: '1991-09-21', pob: 'PORT VILA', personalNo: 'VUT-1904827', issue: '2023-05-08', expiry: '2033-05-07', authority: 'PORT VILA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'VU7294018', surname: 'NATAK', givenNames: 'LINDA RACHEL', sex: 'F', dob: '1994-11-13', pob: 'LUGANVILLE', personalNo: 'VUT-3849102', issue: '2022-06-24', expiry: '2032-06-23', authority: 'PORT VILA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'VU5820193', surname: 'TARI', givenNames: 'ANDREW SAMSON', sex: 'M', dob: '1988-04-02', pob: 'AMBAE', personalNo: 'VUT-5920184', issue: '2024-01-17', expiry: '2034-01-16', authority: 'LUGANVILLE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { passNo: 'VU9104825', surname: 'MOLSA', givenNames: 'CATHY FLORENCE', sex: 'F', dob: '1996-07-29', pob: 'TANNA', personalNo: 'VUT-7482019', issue: '2023-10-05', expiry: '2033-10-04', authority: 'PORT VILA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ],
+        idProfiles: [
+          { docNo: 'VUT190482', personalNo: 'VU910921-4082', surname: 'KALSAKAU', givenNames: 'WILLIE KENNETH', sex: 'M', dob: '1991-09-21', pob: 'EFATE SHEFA', issue: '2022-08-14', expiry: '2032-08-13', authority: 'CRIMD PORT VILA', region: 'SHEFA PROVINCE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { docNo: 'VUT384910', personalNo: 'VU941113-7192', surname: 'NATAK', givenNames: 'LINDA RACHEL', sex: 'F', dob: '1994-11-13', pob: 'ESPIRITU SANTO', issue: '2023-04-11', expiry: '2033-04-10', authority: 'CRIMD LUGANVILLE', region: 'SANMA PROVINCE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { docNo: 'VUT592018', personalNo: 'VU880402-3048', surname: 'TARI', givenNames: 'ANDREW SAMSON', sex: 'M', dob: '1988-04-02', pob: 'PENAMA', issue: '2021-10-22', expiry: '2031-10-21', authority: 'CRIMD PORT VILA', region: 'PENAMA PROVINCE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { docNo: 'VUT748201', personalNo: 'VU960729-6201', surname: 'MOLSA', givenNames: 'CATHY FLORENCE', sex: 'F', dob: '1996-07-29', pob: 'TAFEA', issue: '2024-03-09', expiry: '2034-03-08', authority: 'CRIMD PORT VILA', region: 'TAFEA PROVINCE', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ]
+      },
+      solomonislands: {
+        key: 'solomonislands',
+        name: 'Solomon Islands',
+        officialName: 'SOLOMON ISLANDS',
+        flag: '🇸🇧',
+        iso3: 'SLB',
+        passportTitle: 'Solomon Islands Passport',
+        passportHeader: 'SOLOMON ISLANDS · PASSPORT',
+        passportAuthority: 'Immigration Division (MCILI)',
+        nationality: 'SOLOMON ISLANDER',
+        accentHex: '#1d4ed8',
+        secondaryHex: '#15803d',
+        tailwindAccent: 'blue',
+        passPrefix: 'SB',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'SB3849201', surname: 'MANE', givenNames: 'GEORGE FRANCIS', sex: 'M', dob: '1992-05-14', pob: 'HONIARA', personalNo: 'SLB4091827', issue: '2023-06-21', expiry: '2028-06-20', authority: 'HONIARA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'SB7192045', surname: 'KILU', givenNames: 'PATRICIA RUTH', sex: 'F', dob: '1995-02-09', pob: 'AUKI MALAITA', personalNo: 'SLB6204918', issue: '2022-09-12', expiry: '2027-09-11', authority: 'HONIARA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'SB5029184', surname: 'WATE', givenNames: 'SAMUEL JOHN', sex: 'M', dob: '1989-11-26', pob: 'GIZO WESTERN', personalNo: 'SLB7391042', issue: '2024-02-08', expiry: '2029-02-07', authority: 'HONIARA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { passNo: 'SB8401926', surname: 'SAU', givenNames: 'JOYCE MARGARET', sex: 'F', dob: '1997-08-03', pob: 'KIRAKIRA', personalNo: 'SLB5182940', issue: '2023-12-01', expiry: '2028-11-30', authority: 'HONIARA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ]
+      },
+      kiribati: {
+        key: 'kiribati',
+        name: 'Kiribati',
+        officialName: 'REPUBLIC OF KIRIBATI · RIBABERIKIN KIRIBATI',
+        flag: '🇰🇮',
+        iso3: 'KIR',
+        passportTitle: 'Kiribati Passport',
+        passportHeader: 'REPUBLIC OF KIRIBATI · BEBA NI MWAIE / PASSPORT',
+        passportAuthority: 'Immigration Division · MFA&I',
+        nationality: 'I-KIRIBATI',
+        accentHex: '#b45309',
+        secondaryHex: '#0284c7',
+        tailwindAccent: 'amber',
+        passPrefix: 'KI',
+        hasNationalId: true,
+        idCardTitle: 'Kiribati National Identity Card',
+        idHeaderTop: 'REPUBLIC OF KIRIBATI · RIBABERIKIN KIRIBATI',
+        idHeaderSub: 'NATIONAL IDENTITY CARD · KAATI NI KAOTA TE AOMATA',
+        idAuthority: 'Ministry of Justice · Civil Registry',
+        idDocPrefix: 'KIR',
+        passportProfiles: [
+          { passNo: 'KI4920184', surname: 'TABAI', givenNames: 'BWEBWETA JOHN', sex: 'M', dob: '1993-01-27', pob: 'TARAWA', personalNo: 'KIR-3829104', issue: '2023-03-22', expiry: '2028-03-21', authority: 'BAIRIKI TARAWA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'KI6192048', surname: 'TEANIBI', givenNames: 'MARIA TEETA', sex: 'F', dob: '1995-07-16', pob: 'BETIO', personalNo: 'KIR-5910284', issue: '2022-11-09', expiry: '2027-11-08', authority: 'BAIRIKI TARAWA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'KI8301945', surname: 'KOURA', givenNames: 'TIOBA DAVID', sex: 'M', dob: '1990-04-12', pob: 'ABEMAMA', personalNo: 'KIR-7204918', issue: '2024-01-14', expiry: '2029-01-13', authority: 'BAIRIKI TARAWA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { passNo: 'KI7482910', surname: 'NANTIMO', givenNames: 'TERESA ANNA', sex: 'F', dob: '1997-09-05', pob: 'KIRITIMATI', personalNo: 'KIR-8491023', issue: '2023-08-29', expiry: '2028-08-28', authority: 'BAIRIKI TARAWA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ],
+        idProfiles: [
+          { docNo: 'KIR382910', personalNo: 'KI930127-4091', surname: 'TABAI', givenNames: 'BWEBWETA JOHN', sex: 'M', dob: '1993-01-27', pob: 'SOUTH TARAWA', issue: '2023-02-10', expiry: '2026-02-09', authority: 'MINISTRY OF JUSTICE', region: 'TARAWA URBAN', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { docNo: 'KIR591028', personalNo: 'KI950716-2834', surname: 'TEANIBI', givenNames: 'MARIA TEETA', sex: 'F', dob: '1995-07-16', pob: 'BETIO', issue: '2024-04-18', expiry: '2027-04-17', authority: 'MINISTRY OF JUSTICE', region: 'BETIO COUNCIL', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { docNo: 'KIR720491', personalNo: 'KI900412-5910', surname: 'KOURA', givenNames: 'TIOBA DAVID', sex: 'M', dob: '1990-04-12', pob: 'ABEMAMA', issue: '2023-09-04', expiry: '2026-09-03', authority: 'MINISTRY OF JUSTICE', region: 'CENTRAL GILBERTS', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { docNo: 'KIR849102', personalNo: 'KI970905-6182', surname: 'NANTIMO', givenNames: 'TERESA ANNA', sex: 'F', dob: '1997-09-05', pob: 'KIRITIMATI', issue: '2024-06-12', expiry: '2027-06-11', authority: 'MINISTRY OF JUSTICE', region: 'LINE ISLANDS', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ]
+      },
+      micronesia: {
+        key: 'micronesia',
+        name: 'Federated States of Micronesia',
+        officialName: 'FEDERATED STATES OF MICRONESIA',
+        flag: '🇫🇲',
+        iso3: 'FSM',
+        passportTitle: 'Federated States of Micronesia Passport',
+        passportHeader: 'FEDERATED STATES OF MICRONESIA · PASSPORT',
+        passportAuthority: 'DOJ Division of Immigration & Labor',
+        nationality: 'MICRONESIAN',
+        accentHex: '#0e7490',
+        secondaryHex: '#2563eb',
+        tailwindAccent: 'cyan',
+        passPrefix: 'FM',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'FM5291048', surname: 'PRETRICK', givenNames: 'KEVIN HENRY', sex: 'M', dob: '1992-07-11', pob: 'KOLONIA POHNPEI', personalNo: 'FSM3910482', issue: '2023-05-16', expiry: '2033-05-15', authority: 'PALIKIR', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'FM7401928', surname: 'SIGRAH', givenNames: 'MARLENE ANNE', sex: 'F', dob: '1995-03-29', pob: 'WENO CHUUK', personalNo: 'FSM6104928', issue: '2022-10-03', expiry: '2032-10-02', authority: 'PALIKIR', photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
+          { passNo: 'FM6182940', surname: 'FALANG', givenNames: 'BENJAMIN JOSEPH', sex: 'M', dob: '1989-12-06', pob: 'COLONIA YAP', personalNo: 'FSM7482910', issue: '2024-02-21', expiry: '2034-02-20', authority: 'PALIKIR', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
+          { passNo: 'FM8940125', surname: 'ALIK', givenNames: 'REBECCA GRACE', sex: 'F', dob: '1996-09-14', pob: 'TOFOL KOSRAE', personalNo: 'FSM5029183', issue: '2023-11-27', expiry: '2033-11-26', authority: 'PALIKIR', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+        ]
+      }
+    };
+
+    const OCEANIA_COUNTRY_KEYS = Object.keys(OCEANIA_COUNTRIES_CONFIG);
+    window.OCEANIA_COUNTRY_KEYS = OCEANIA_COUNTRY_KEYS;
+    window.OCEANIA_COUNTRIES_CONFIG = OCEANIA_COUNTRIES_CONFIG;
+
+    const oceaniaRandomIdxMap = {};
+
+    function ocPrefix(countryKey, docType) {
+      return `oc_${countryKey}_${docType}`;
+    }
+
+    function ocFormatDate(isoStr) {
+      if (!isoStr) return '';
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      const parts = String(isoStr).split('-');
+      if (parts.length !== 3) return isoStr;
+      const y = parts[0];
+      const m = parseInt(parts[1], 10);
+      const d = parts[2];
+      if (isNaN(m) || m < 1 || m > 12) return isoStr;
+      return `${d.padStart(2, '0')} ${months[m - 1]} ${y}`;
+    }
+
+    function ocToYYMMDD(isoStr) {
+      if (!isoStr) return '000000';
+      const parts = String(isoStr).split('-');
+      if (parts.length !== 3) return '000000';
+      return parts[0].slice(-2) + parts[1].padStart(2, '0') + parts[2].padStart(2, '0');
+    }
+
+    function ocMrzCheckDigit(str) {
+      const weights = [7, 3, 1];
+      let sum = 0;
+      for (let i = 0; i < str.length; i++) {
+        const ch = str[i];
+        let v = 0;
+        if (ch === '<') v = 0;
+        else if (ch >= '0' && ch <= '9') v = ch.charCodeAt(0) - 48;
+        else if (ch >= 'A' && ch <= 'Z') v = ch.charCodeAt(0) - 55;
+        sum += v * weights[i % 3];
+      }
+      return String(sum % 10);
+    }
+
+    function ocMrzClean(str) {
+      return String(str || '').toUpperCase().replace(/[^A-Z0-9]/g, '<').replace(/<+/g, '<').replace(/^<|<$/g, '');
+    }
+
+    function buildOceaniaTd3Mrz(cfg, fields) {
+      const typeChar = ((fields.type || 'P').toUpperCase().replace(/[^A-Z]/g, '')[0]) || 'P';
+      const country = ((fields.countryCode || cfg.iso3).toUpperCase().replace(/[^A-Z]/g, '') + '<<<').slice(0, 3);
+      const sur = ocMrzClean(fields.surname || 'SPECIMEN');
+      const giv = ocMrzClean(fields.givenNames || 'SAMPLE');
+      const line1 = (`${typeChar}<${country}${sur}<<${giv}` + '<'.repeat(44)).slice(0, 44);
+
+      const passClean = (fields.docNo || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const passField = (passClean + '<'.repeat(9)).slice(0, 9);
+      const passCheck = ocMrzCheckDigit(passField);
+      const dobStr = ocToYYMMDD(fields.dob);
+      const dobCheck = ocMrzCheckDigit(dobStr);
+      const sexChar = ((fields.sex || 'M').toUpperCase() === 'F') ? 'F' : (((fields.sex || 'M').toUpperCase() === 'X') ? '<' : 'M');
+      const expStr = ocToYYMMDD(fields.expiry);
+      const expCheck = ocMrzCheckDigit(expStr);
+      const personalClean = (fields.personalNo || '').toUpperCase().replace(/[^A-Z0-9]/g, '<');
+      const personalField = (personalClean + '<'.repeat(14)).slice(0, 14);
+      const personalCheck = ocMrzCheckDigit(personalField);
+      const compCheck = ocMrzCheckDigit(passField + passCheck + dobStr + dobCheck + expStr + expCheck + personalField + personalCheck);
+      const line2 = `${passField}${passCheck}${country}${dobStr}${dobCheck}${sexChar}${expStr}${expCheck}${personalField}${personalCheck}${compCheck}`;
+      return { line1, line2 };
+    }
+
+    function buildOceaniaTd1Mrz(cfg, fields) {
+      const country = ((fields.countryCode || cfg.iso3).toUpperCase().replace(/[^A-Z]/g, '') + '<<<').slice(0, 3);
+      const docClean = (fields.docNo || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const docField = (docClean + '<'.repeat(9)).slice(0, 9);
+      const docCheck = ocMrzCheckDigit(docField);
+      const opt1 = ((fields.personalNo || '').toUpperCase().replace(/[^A-Z0-9]/g, '<') + '<'.repeat(15)).slice(0, 15);
+      const line1 = `I<${country}${docField}${docCheck}${opt1}`.slice(0, 30);
+
+      const dobStr = ocToYYMMDD(fields.dob);
+      const dobCheck = ocMrzCheckDigit(dobStr);
+      const sexChar = ((fields.sex || 'M').toUpperCase() === 'F') ? 'F' : (((fields.sex || 'M').toUpperCase() === 'X') ? '<' : 'M');
+      const expStr = ocToYYMMDD(fields.expiry);
+      const expCheck = ocMrzCheckDigit(expStr);
+      const comp = ocMrzCheckDigit(docField + docCheck + opt1 + dobStr + dobCheck + expStr + expCheck);
+      const line2 = `${dobStr}${dobCheck}${sexChar}${expStr}${expCheck}${country}${'<'.repeat(11)}${comp}`.slice(0, 30);
+
+      const sur = ocMrzClean(fields.surname || 'SPECIMEN');
+      const giv = ocMrzClean(fields.givenNames || 'SAMPLE');
+      const line3 = (`${sur}<<${giv}` + '<'.repeat(30)).slice(0, 30);
+      return { line1, line2, line3 };
+    }
+
+    function buildOceaniaPassportMarkup(cfg) {
+      const p = ocPrefix(cfg.key, 'passport');
+      const s = cfg.passportProfiles[0];
+      const hasIdSwitch = cfg.hasNationalId ? `<button type="button" onclick="switchVerificationDoc('idcard')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-id-card"></i> Switch to National ID Card</button>` : '';
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-wrap items-center justify-between gap-3 no-print">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl text-white flex items-center justify-center text-xl shadow-xs shrink-0" style="background: linear-gradient(135deg, ${cfg.accentHex}, ${cfg.secondaryHex});">${cfg.flag}</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${cfg.name} — ${cfg.passportTitle} (${cfg.iso3})</h2>
+                <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-extrabold uppercase">${cfg.iso3} · ICAO TD3 Sample</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">${cfg.passportAuthority} · Fictional KYC Verification Sample Editor</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            ${hasIdSwitch}
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','passport')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-black shadow-md border border-indigo-300/40 transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-dice text-amber-300"></i> Randomize Card</button>
+            <button type="button" onclick="resetOceaniaSample('${cfg.key}','passport')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-rotate-left"></i> Reset Sample</button>
+            <button type="button" onclick="copyOceaniaData('${cfg.key}','passport')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"><i class="fa-regular fa-copy"></i> Copy Data &amp; MRZ</button>
+            <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','passport')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Save PNG</button>
+          </div>
+        </div>
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <section class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm space-y-4 no-print">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">${cfg.flag} ${cfg.name} · ${cfg.iso3}</span>
+                <h3 class="text-base font-bold text-slate-900 mt-1">${cfg.passportTitle} Details</h3>
+                <p class="text-xs text-slate-500">Edit sample fields to dynamically update the bio-data spread &amp; ICAO Doc 9303 MRZ</p>
+              </div>
+            </div>
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','passport')" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-lg border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-amber-300 text-lg shrink-0"><i class="fa-solid fa-dice"></i></div>
+              <div class="text-left">
+                <div class="leading-none text-sm font-extrabold flex items-center gap-2"><span>Randomize Card</span><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider">INSTANT FILL</span></div>
+                <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional ${cfg.name} passport sample bio-data &amp; TD3 MRZ</div>
+              </div>
+            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Type</label><input id="${p}_type" type="text" maxlength="2" value="P" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Code</label><input id="${p}_code" type="text" maxlength="3" value="${cfg.iso3}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Passport No.</label><input id="${p}_docNo" type="text" maxlength="10" value="${s.passNo}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Surname</label><input id="${p}_surname" type="text" value="${s.surname}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Sex</label><select id="${p}_sex" onchange="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"><option value="M" ${s.sex === 'M' ? 'selected' : ''}>M</option><option value="F" ${s.sex === 'F' ? 'selected' : ''}>F</option><option value="X">X</option></select></div>
+              <div class="sm:col-span-3"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Given Names</label><input id="${p}_givenNames" type="text" value="${s.givenNames}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Nationality</label><input id="${p}_nationality" type="text" value="${cfg.nationality}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Personal No.</label><input id="${p}_personalNo" type="text" value="${s.personalNo}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Birth</label><input id="${p}_dob" type="date" value="${s.dob}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Place of Birth</label><input id="${p}_pob" type="text" value="${s.pob}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Issue</label><input id="${p}_issue" type="date" value="${s.issue}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Authority</label><input id="${p}_authority" type="text" value="${s.authority}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-3"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Expiry</label><input id="${p}_expiry" type="date" value="${s.expiry}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+            </div>
+            <div class="pt-3 border-t border-slate-100 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600">Bearer Portrait Photo</label>
+                <button type="button" onclick="resetOceaniaPhoto('${cfg.key}','passport')" class="text-[11px] font-semibold text-blue-700 hover:text-blue-900 cursor-pointer">Restore Sample Portrait</button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <input id="${p}_photoUpload" type="file" accept="image/*" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 cursor-pointer">
+                <input id="${p}_photoUrl" type="url" placeholder="Or paste image URL..." class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+              </div>
+            </div>
+            <div class="pt-2 flex flex-wrap gap-2">
+              <button type="button" onclick="window.print()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5"><i class="fa-solid fa-print"></i> Print Spread</button>
+              <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','passport')" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-image"></i> Save PNG</button>
+            </div>
+          </section>
+          <section class="lg:col-span-7 flex flex-col items-center space-y-4">
+            <article id="${cfg.key}-passport-card" class="kyc-protected-surface relative w-full max-w-[580px] mx-auto rounded-xl shadow-2xl border border-slate-300 overflow-hidden select-none text-[#16191d] bg-[#f8fafc]" style="aspect-ratio: 688 / 968; container-type: inline-size; font-family: Arial, Helvetica, sans-serif;">
+              <!-- Top Observation Page -->
+              <section class="relative h-[50%] w-full overflow-hidden border-b-2 border-slate-300/90 p-[5%]" style="background: radial-gradient(circle at 70% 35%, ${cfg.accentHex}12 0%, transparent 55%), linear-gradient(135deg, #f8fafc 0%, #eff6ff 52%, #f1f5f9 100%);">
+                <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: repeating-linear-gradient(25deg, ${cfg.accentHex}22 0 1px, transparent 1px 12px), repeating-linear-gradient(-25deg, ${cfg.secondaryHex}22 0 1px, transparent 1px 12px);"></div>
+                <div id="${p}_outPerforated" class="absolute left-[2.8%] top-[14%] bottom-[14%] flex items-center justify-center pointer-events-none" style="writing-mode: vertical-lr; transform: rotate(180deg); font-family: 'Courier New', monospace; font-weight: 900; font-size: 3.4cqw; letter-spacing: 0.14em; color: rgba(30,41,59,0.58);">${s.passNo.split('').join(' ')}</div>
+                <div class="relative z-10 h-full pl-[8%] flex flex-col justify-between">
+                  <div class="flex items-start justify-between border-b pb-[2.5%]" style="border-color: ${cfg.accentHex}30;">
+                    <div>
+                      <div class="font-black uppercase tracking-wider text-slate-700" style="font-size: 2.0cqw;">OBSERVATIONS · ENDORSEMENTS</div>
+                      <div class="font-semibold text-slate-500 mt-0.5" style="font-size: 1.55cqw;">${cfg.officialName}</div>
+                    </div>
+                    <div class="px-2 py-0.5 rounded font-black uppercase text-white" style="font-size: 1.5cqw; background:${cfg.accentHex};">SAMPLE SPECIMEN</div>
+                  </div>
+                  <div class="my-auto flex flex-col items-center justify-center text-center opacity-75">
+                    <div class="w-[18cqw] h-[18cqw] rounded-full border-2 flex items-center justify-center mb-2 shadow-inner" style="border-color:${cfg.accentHex}55; background:${cfg.accentHex}0d;">
+                      <span style="font-size: 8.5cqw;">${cfg.flag}</span>
+                    </div>
+                    <div class="font-black tracking-widest uppercase text-slate-700" style="font-size: 2.1cqw;">${cfg.passportTitle}</div>
+                    <div class="font-semibold text-slate-500 mt-0.5" style="font-size: 1.5cqw;">Issued by ${cfg.passportAuthority}</div>
+                    <div class="font-mono text-slate-400 mt-1" style="font-size: 1.4cqw;">ICAO DOC 9303 e-PASSPORT SAMPLE · PAGE 3</div>
+                  </div>
+                  <div class="flex items-center justify-between text-slate-500 border-t pt-[2%]" style="border-color:${cfg.accentHex}25; font-size: 1.45cqw;">
+                    <span>FICTIONAL VERIFICATION PREVIEW ONLY</span>
+                    <span class="font-mono font-bold">${cfg.iso3} / TD3</span>
+                  </div>
+                </div>
+              </section>
+              <!-- Bottom Bio-Data Page -->
+              <section class="relative h-[50%] w-full overflow-hidden flex flex-col justify-between" style="background: radial-gradient(circle at 82% 28%, ${cfg.secondaryHex}18 0%, transparent 45%), linear-gradient(180deg, #ffffff 0%, #f8fafc 74%, #eef2f7 100%);">
+                <div class="px-[5%] py-[2.4%] text-white flex items-center justify-between" style="background: linear-gradient(90deg, ${cfg.accentHex} 0%, ${cfg.secondaryHex} 100%);">
+                  <div class="font-black tracking-wider uppercase truncate" style="font-size: 2.05cqw;">${cfg.passportHeader}</div>
+                  <div class="font-mono font-bold tracking-widest shrink-0" style="font-size: 1.75cqw;">${cfg.iso3}</div>
+                </div>
+                <div class="relative flex-1 px-[5%] py-[2.5%] grid grid-cols-12 gap-[3%] items-start">
+                  <div class="col-span-4 flex flex-col items-center space-y-[2%]">
+                    <div class="w-full aspect-[3/3.7] rounded-md overflow-hidden border-2 bg-slate-100 shadow-xs" style="border-color:${cfg.accentHex}40;">
+                      <img id="${p}_outPhoto" src="${s.photoUrl}" alt="Bearer Sample Portrait" class="w-full h-full object-cover object-top" />
+                    </div>
+                    <div class="w-full flex items-center justify-between px-1">
+                      <span class="font-mono font-bold text-slate-500" style="font-size: 1.4cqw;">BIO CHIP</span>
+                      <span class="px-1.5 py-0.5 rounded font-black text-white" style="font-size: 1.35cqw; background:${cfg.accentHex};">e-PASS</span>
+                    </div>
+                  </div>
+                  <div class="col-span-8 space-y-[1.8%] text-slate-900">
+                    <div class="grid grid-cols-3 gap-2 border-b border-slate-200 pb-[1.5%]">
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Type / Type</div><div id="${p}_outType" class="font-black" style="font-size: 2.05cqw;">P</div></div>
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Code / Pays</div><div id="${p}_outCode" class="font-black" style="font-size: 2.05cqw;">${cfg.iso3}</div></div>
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Passport No.</div><div id="${p}_outDocNo" class="font-black font-mono" style="font-size: 2.15cqw; color:${cfg.accentHex};">${s.passNo}</div></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                      <div class="col-span-2"><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Surname / Nom</div><div id="${p}_outSurname" class="font-black uppercase truncate" style="font-size: 2.15cqw;">${s.surname}</div></div>
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Sex</div><div id="${p}_outSex" class="font-black" style="font-size: 2.05cqw;">${s.sex}</div></div>
+                    </div>
+                    <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Given Names / Prénoms</div><div id="${p}_outGivenNames" class="font-black uppercase truncate" style="font-size: 2.10cqw;">${s.givenNames}</div></div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Nationality</div><div id="${p}_outNationality" class="font-bold uppercase truncate" style="font-size: 1.85cqw;">${cfg.nationality}</div></div>
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Personal No.</div><div id="${p}_outPersonalNo" class="font-bold font-mono truncate" style="font-size: 1.80cqw;">${s.personalNo}</div></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Date of Birth</div><div id="${p}_outDob" class="font-bold" style="font-size: 1.85cqw;">${ocFormatDate(s.dob)}</div></div>
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Place of Birth</div><div id="${p}_outPob" class="font-bold uppercase truncate" style="font-size: 1.85cqw;">${s.pob}</div></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 items-end">
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Issued</div><div id="${p}_outIssue" class="font-bold" style="font-size: 1.75cqw;">${ocFormatDate(s.issue)}</div></div>
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Expiry</div><div id="${p}_outExpiry" class="font-bold" style="font-size: 1.75cqw;">${ocFormatDate(s.expiry)}</div></div>
+                      <div><div class="text-slate-500 uppercase font-bold" style="font-size: 1.25cqw;">Authority</div><div id="${p}_outAuthority" class="font-bold uppercase truncate" style="font-size: 1.70cqw;">${s.authority}</div></div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                      <div id="${p}_outSignature" class="italic font-bold text-slate-700" style="font-family: 'Brush Script MT', cursive; font-size: 2.5cqw;">${s.givenNames.split(' ')[0]} ${s.surname}</div>
+                      <div class="w-10 h-10 rounded-full overflow-hidden opacity-45 border border-slate-300 shrink-0"><img id="${p}_outGhost" src="${s.photoUrl}" alt="Ghost portrait" class="w-full h-full object-cover grayscale" /></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-[#eef3f8] border-t border-slate-300 px-[4%] py-[2.8%] font-mono font-bold text-slate-900 leading-tight tracking-wider" style="font-family: 'OCR-B', 'Courier New', monospace; font-size: 2.15cqw;">
+                  <div id="${p}_mrz1" class="whitespace-nowrap overflow-hidden"></div>
+                  <div id="${p}_mrz2" class="whitespace-nowrap overflow-hidden mt-[0.5%]"></div>
+                </div>
+              </section>
+            </article>
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Fictional sample verification preview · ${cfg.name} (${cfg.iso3}) ICAO Doc 9303 TD3 passport layout for KYC flow testing.</p>
+          </section>
+        </main>
+      `;
+    }
+
+    function buildOceaniaIdMarkup(cfg) {
+      const p = ocPrefix(cfg.key, 'idcard');
+      const s = cfg.idProfiles[0];
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-wrap items-center justify-between gap-3 no-print">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl text-white flex items-center justify-center text-xl shadow-xs shrink-0" style="background: linear-gradient(135deg, ${cfg.accentHex}, ${cfg.secondaryHex});">${cfg.flag}</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${cfg.name} — ${cfg.idCardTitle}</h2>
+                <span class="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-extrabold uppercase">${cfg.iso3} · ISO TD1 Sample</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">${cfg.idAuthority} · Front &amp; Back Fictional Sample Editor</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="switchVerificationDoc('passport')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-passport"></i> Switch to Passport</button>
+            <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+              <button type="button" id="${p}_tab_both" onclick="switchOceaniaIdSide('${cfg.key}','both')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-xs cursor-pointer">Both Sides</button>
+              <button type="button" id="${p}_tab_front" onclick="switchOceaniaIdSide('${cfg.key}','front')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 cursor-pointer">Front</button>
+              <button type="button" id="${p}_tab_back" onclick="switchOceaniaIdSide('${cfg.key}','back')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 cursor-pointer">Back</button>
+            </div>
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','idcard')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-xs font-black shadow-md cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-dice text-amber-300"></i> Randomize Card</button>
+            <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','idcard','front')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Save Front PNG</button>
+            <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','idcard','back')" class="px-3.5 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-extrabold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Save Back PNG</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4 no-print">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">${cfg.name} National ID Editor</h3>
+                <p class="text-[11px] text-slate-500">Edit sample card fields to update Front, Back &amp; TD1 MRZ live</p>
+              </div>
+              <button type="button" onclick="resetOceaniaSample('${cfg.key}','idcard')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">Reset Sample</button>
+            </div>
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','idcard')" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-black text-xs shadow-lg flex items-center justify-center gap-3 cursor-pointer"><i class="fa-solid fa-dice text-amber-300 text-base"></i><span>Randomize ${cfg.name} National ID (Instant Fill)</span></button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Card / Document No.</label><input id="${p}_docNo" type="text" value="${s.docNo}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">National ID / Personal No.</label><input id="${p}_personalNo" type="text" value="${s.personalNo}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Surname</label><input id="${p}_surname" type="text" value="${s.surname}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Given Names</label><input id="${p}_givenNames" type="text" value="${s.givenNames}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Date of Birth</label><input id="${p}_dob" type="date" value="${s.dob}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Sex</label><select id="${p}_sex" onchange="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold"><option value="M" ${s.sex === 'M' ? 'selected' : ''}>M</option><option value="F" ${s.sex === 'F' ? 'selected' : ''}>F</option></select></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Place of Birth</label><input id="${p}_pob" type="text" value="${s.pob}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Province / Island</label><input id="${p}_region" type="text" value="${s.region}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Date of Issue</label><input id="${p}_issue" type="date" value="${s.issue}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Valid Until</label><input id="${p}_expiry" type="date" value="${s.expiry}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-bold text-slate-700 mb-1">Issuing Authority</label><input id="${p}_authority" type="text" value="${s.authority}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-xs font-bold text-slate-800">Biometric Portrait Photo</div>
+                <div class="text-[10px] text-slate-500">Updates front portrait &amp; ghost preview</div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <label for="${p}_photoUpload" class="px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-[11px] font-bold cursor-pointer">Upload</label>
+                <input id="${p}_photoUpload" type="file" accept="image/*" class="hidden" />
+                <button type="button" onclick="resetOceaniaPhoto('${cfg.key}','idcard')" class="px-2 py-1.5 rounded-lg bg-white border border-slate-200 text-[11px] font-semibold cursor-pointer">Reset</button>
+              </div>
+            </div>
+          </div>
+          <div class="lg:col-span-7 space-y-6">
+            <div id="${p}_front_wrap" class="bg-slate-900/95 rounded-3xl p-4 sm:p-6 border border-slate-800 shadow-xl">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[11px] font-black uppercase tracking-widest text-sky-300">Front Side · ${cfg.idHeaderSub}</span>
+                <span class="text-[11px] font-mono text-slate-400">ISO/IEC 7810 ID-1</span>
+              </div>
+              <article id="${cfg.key}-id-front" class="kyc-protected-surface relative w-full max-w-[668px] mx-auto overflow-hidden select-none shadow-2xl flex flex-col justify-between" style="aspect-ratio: 668 / 420; container-type: inline-size; border-radius: 3.6% / 5.7%; background: radial-gradient(circle at 80% 30%, ${cfg.secondaryHex}1c 0%, transparent 55%), linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); font-family: Arial, sans-serif; color: #1e293b;">
+                <div class="px-[4.5%] py-[3%] text-white flex items-center justify-between" style="background: linear-gradient(90deg, ${cfg.accentHex}, ${cfg.secondaryHex});">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span style="font-size: 4.5cqw;">${cfg.flag}</span>
+                    <div class="min-w-0">
+                      <div class="font-black uppercase truncate" style="font-size: 2.3cqw;">${cfg.idHeaderTop}</div>
+                      <div class="font-bold opacity-90 truncate" style="font-size: 1.75cqw;">${cfg.idHeaderSub}</div>
+                    </div>
+                  </div>
+                  <span class="px-2 py-0.5 rounded bg-white/20 font-black uppercase shrink-0" style="font-size: 1.55cqw;">SAMPLE</span>
+                </div>
+                <div class="px-[4.5%] py-[3%] flex-1 grid grid-cols-12 gap-[3.5%] items-center">
+                  <div class="col-span-4 space-y-[5%]">
+                    <div class="w-full aspect-[3/3.6] rounded-lg overflow-hidden border-2 bg-white shadow-sm" style="border-color:${cfg.accentHex}45;"><img id="${p}_outPhoto" src="${s.photoUrl}" alt="Sample Portrait" class="w-full h-full object-cover object-top" /></div>
+                    <div class="flex items-center justify-between">
+                      <div class="w-[7cqw] h-[5.2cqw] rounded border border-amber-500/60 bg-gradient-to-br from-amber-200 via-yellow-100 to-amber-300 shadow-inner"></div>
+                      <span class="font-mono font-bold text-slate-600" style="font-size: 1.75cqw;">${cfg.iso3}</span>
+                    </div>
+                  </div>
+                  <div class="col-span-8 space-y-[2.2%]">
+                    <div class="grid grid-cols-2 gap-2">
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">ID / Personal No.</div><div id="${p}_outPersonalNo" class="font-mono font-black" style="font-size: 2.35cqw; color:${cfg.accentHex};">${s.personalNo}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Card No.</div><div id="${p}_outDocNo" class="font-mono font-black" style="font-size: 2.35cqw;">${s.docNo}</div></div>
+                    </div>
+                    <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Surname</div><div id="${p}_outSurname" class="font-black uppercase truncate" style="font-size: 2.65cqw;">${s.surname}</div></div>
+                    <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Given Names</div><div id="${p}_outGivenNames" class="font-black uppercase truncate" style="font-size: 2.45cqw;">${s.givenNames}</div></div>
+                    <div class="grid grid-cols-3 gap-2">
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.4cqw;">Birth Date</div><div id="${p}_outDob" class="font-bold" style="font-size: 2.05cqw;">${ocFormatDate(s.dob)}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.4cqw;">Sex</div><div id="${p}_outSex" class="font-bold" style="font-size: 2.05cqw;">${s.sex}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.4cqw;">Expires</div><div id="${p}_outExpiry" class="font-bold" style="font-size: 2.05cqw;">${ocFormatDate(s.expiry)}</div></div>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                      <div id="${p}_outSignature" class="italic font-bold text-slate-700" style="font-family: 'Brush Script MT', cursive; font-size: 2.8cqw;">${s.givenNames.split(' ')[0]} ${s.surname}</div>
+                      <div class="w-9 h-9 rounded-full overflow-hidden opacity-45 border border-slate-400"><img id="${p}_outGhost" src="${s.photoUrl}" alt="Ghost" class="w-full h-full object-cover grayscale" /></div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <div id="${p}_back_wrap" class="bg-slate-900/95 rounded-3xl p-4 sm:p-6 border border-slate-800 shadow-xl">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[11px] font-black uppercase tracking-widest text-emerald-300">Back Side · Issuing Registry &amp; ICAO TD1 MRZ</span>
+                <span class="text-[11px] font-mono text-slate-400">3-Line TD1 MRZ</span>
+              </div>
+              <article id="${cfg.key}-id-back" class="kyc-protected-surface relative w-full max-w-[668px] mx-auto overflow-hidden select-none shadow-2xl flex flex-col justify-between p-[4.5%]" style="aspect-ratio: 668 / 420; container-type: inline-size; border-radius: 3.6% / 5.7%; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); font-family: Arial, sans-serif; color: #1e293b;">
+                <div class="flex items-start justify-between gap-4 border-b border-slate-300 pb-[3%]">
+                  <div class="space-y-[2%] flex-1">
+                    <div class="font-black uppercase" style="font-size: 2.15cqw; color:${cfg.accentHex};">${cfg.idHeaderTop}</div>
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Place of Birth</div><div id="${p}_outPob" class="font-bold uppercase" style="font-size: 2.0cqw;">${s.pob}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Province / Division</div><div id="${p}_outRegion" class="font-bold uppercase" style="font-size: 2.0cqw;">${s.region}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Date of Issue</div><div id="${p}_outIssue" class="font-bold" style="font-size: 2.0cqw;">${ocFormatDate(s.issue)}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Issued By</div><div id="${p}_outAuthority" class="font-bold uppercase truncate" style="font-size: 1.9cqw;">${s.authority}</div></div>
+                    </div>
+                  </div>
+                  <div class="w-[15cqw] h-[15cqw] bg-white p-1.5 rounded-lg border border-slate-300 shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 36 36" class="w-full h-full"><rect width="36" height="36" fill="#fff"/><path d="M2 2h10v10H2zm2 2v6h6V4zm2 2h2v2H6zM24 2h10v10H24zm2 2v6h6V4zm2 2h2v2h-2zM2 24h10v10H2zm2 2v6h6v-6zm2 2h2v2H6zM15 4h6v2h-6zm2 4h4v4h-4zm-2 6h8v2h-8zm-11 4h6v2H4zm8 0h10v2H12zm14 0h8v2h-8zm-12 4h6v2h-6zm8 0h8v2h-8zm-6 4h10v2H16zm-2 4h14v2H14z" fill="#0f172a"/></svg>
+                  </div>
+                </div>
+                <div class="bg-white/90 rounded-lg border border-slate-300 px-[3.5%] py-[3%] font-mono font-bold text-slate-900 leading-tight" style="font-family: 'OCR-B', 'Courier New', monospace; font-size: 2.8cqw; letter-spacing: 0.11em;">
+                  <div id="${p}_mrz1" class="whitespace-nowrap overflow-hidden"></div>
+                  <div id="${p}_mrz2" class="whitespace-nowrap overflow-hidden mt-[1%]"></div>
+                  <div id="${p}_mrz3" class="whitespace-nowrap overflow-hidden mt-[1%]"></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function updateOceaniaPreview(countryKey, docType) {
+      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+      if (!cfg) return;
+      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+      const p = ocPrefix(countryKey, dtype);
+      const val = (suffix, fb) => { const el = $(`${p}_${suffix}`); return el ? el.value : fb; };
+      const setTxt = (suffix, txt) => { const el = $(`${p}_${suffix}`); if (el) el.textContent = txt; };
+
+      const defaults = (dtype === 'idcard' ? cfg.idProfiles[0] : cfg.passportProfiles[0]);
+      const fields = {
+        type: val('type', 'P'),
+        countryCode: val('code', cfg.iso3),
+        docNo: val('docNo', dtype === 'idcard' ? defaults.docNo : defaults.passNo),
+        surname: val('surname', defaults.surname),
+        givenNames: val('givenNames', defaults.givenNames),
+        nationality: val('nationality', cfg.nationality),
+        personalNo: val('personalNo', defaults.personalNo),
+        dob: val('dob', defaults.dob),
+        sex: val('sex', defaults.sex),
+        pob: val('pob', defaults.pob),
+        issue: val('issue', defaults.issue),
+        expiry: val('expiry', defaults.expiry),
+        authority: val('authority', defaults.authority),
+        region: val('region', defaults.region || '')
+      };
+
+      setTxt('outDocNo', fields.docNo.toUpperCase());
+      setTxt('outSurname', fields.surname.toUpperCase());
+      setTxt('outGivenNames', fields.givenNames.toUpperCase());
+      setTxt('outPersonalNo', fields.personalNo.toUpperCase());
+      setTxt('outDob', ocFormatDate(fields.dob));
+      setTxt('outSex', fields.sex.toUpperCase());
+      setTxt('outPob', fields.pob.toUpperCase());
+      setTxt('outIssue', ocFormatDate(fields.issue));
+      setTxt('outExpiry', ocFormatDate(fields.expiry));
+      setTxt('outAuthority', fields.authority.toUpperCase());
+      setTxt('outSignature', `${fields.givenNames.split(' ')[0] || 'Sample'} ${fields.surname}`);
+
+      if (dtype === 'passport') {
+        setTxt('outType', (fields.type || 'P').toUpperCase());
+        setTxt('outCode', (fields.countryCode || cfg.iso3).toUpperCase());
+        setTxt('outNationality', fields.nationality.toUpperCase());
+        setTxt('outPerforated', fields.docNo.toUpperCase().split('').join(' '));
+        const mrz = buildOceaniaTd3Mrz(cfg, fields);
+        setTxt('mrz1', mrz.line1);
+        setTxt('mrz2', mrz.line2);
+      } else {
+        setTxt('outRegion', (fields.region || '').toUpperCase());
+        const mrz = buildOceaniaTd1Mrz(cfg, fields);
+        setTxt('mrz1', mrz.line1);
+        setTxt('mrz2', mrz.line2);
+        setTxt('mrz3', mrz.line3);
+      }
+      if (typeof window.autoFitDocumentFields === 'function') {
+        const cardId = dtype === 'passport' ? `#${cfg.key}-passport-card` : `#${cfg.key}-id-front`;
+        window.autoFitDocumentFields(cardId);
+      }
+    }
+    window.updateOceaniaPreview = updateOceaniaPreview;
+
+    function applyOceaniaProfile(countryKey, docType, prof) {
+      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+      if (!cfg || !prof) return;
+      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+      const p = ocPrefix(countryKey, dtype);
+      const setVal = (suffix, v) => { const el = $(`${p}_${suffix}`); if (el && v !== undefined) el.value = v; };
+      setVal('type', 'P');
+      setVal('code', cfg.iso3);
+      setVal('docNo', dtype === 'idcard' ? prof.docNo : prof.passNo);
+      setVal('surname', prof.surname);
+      setVal('givenNames', prof.givenNames);
+      setVal('nationality', cfg.nationality);
+      setVal('personalNo', prof.personalNo);
+      setVal('dob', prof.dob);
+      setVal('sex', prof.sex);
+      setVal('pob', prof.pob);
+      setVal('issue', prof.issue);
+      setVal('expiry', prof.expiry);
+      setVal('authority', prof.authority);
+      if (prof.region !== undefined) setVal('region', prof.region);
+      if (prof.photoUrl) {
+        const photoEl = $(`${p}_outPhoto`);
+        const ghostEl = $(`${p}_outGhost`);
+        if (photoEl) photoEl.src = prof.photoUrl;
+        if (ghostEl) ghostEl.src = prof.photoUrl;
+      }
+      updateOceaniaPreview(countryKey, dtype);
+    }
+
+    function randomizeOceaniaDoc(countryKey, docType) {
+      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+      if (!cfg) return;
+      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+      const pool = dtype === 'idcard' ? cfg.idProfiles : cfg.passportProfiles;
+      const key = `${countryKey}:${dtype}`;
+      oceaniaRandomIdxMap[key] = ((oceaniaRandomIdxMap[key] || 0) + 1) % pool.length;
+      const prof = pool[oceaniaRandomIdxMap[key]];
+      applyOceaniaProfile(countryKey, dtype, prof);
+      const docLabel = dtype === 'idcard' ? cfg.idCardTitle : cfg.passportTitle;
+      if (typeof showToast === 'function') {
+        showToast(`Randomized ${cfg.name}`, `Loaded fictional sample for ${docLabel}`);
+      }
+    }
+    window.randomizeOceaniaDoc = randomizeOceaniaDoc;
+
+    function resetOceaniaSample(countryKey, docType) {
+      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+      if (!cfg) return;
+      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+      const prof = (dtype === 'idcard' ? cfg.idProfiles : cfg.passportProfiles)[0];
+      applyOceaniaProfile(countryKey, dtype, prof);
+      if (typeof showToast === 'function') {
+        showToast('Sample Restored', `Reset ${cfg.name} sample preview`);
+      }
+    }
+    window.resetOceaniaSample = resetOceaniaSample;
+
+    function resetOceaniaPhoto(countryKey, docType) {
+      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+      if (!cfg) return;
+      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+      const p = ocPrefix(countryKey, dtype);
+      const fallback = (dtype === 'idcard' ? cfg.idProfiles : cfg.passportProfiles)[0].photoUrl;
+      const photoEl = $(`${p}_outPhoto`);
+      const ghostEl = $(`${p}_outGhost`);
+      const fileEl = $(`${p}_photoUpload`);
+      const urlEl = $(`${p}_photoUrl`);
+      if (photoEl) photoEl.src = fallback;
+      if (ghostEl) ghostEl.src = fallback;
+      if (fileEl) fileEl.value = '';
+      if (urlEl) urlEl.value = '';
+    }
+    window.resetOceaniaPhoto = resetOceaniaPhoto;
+
+    function switchOceaniaIdSide(countryKey, mode) {
+      const p = ocPrefix(countryKey, 'idcard');
+      const fw = $(`${p}_front_wrap`);
+      const bw = $(`${p}_back_wrap`);
+      if (fw) fw.classList.toggle('hidden', mode === 'back');
+      if (bw) bw.classList.toggle('hidden', mode === 'front');
+      ['both', 'front', 'back'].forEach(m => {
+        const b = $(`${p}_tab_${m}`);
+        if (b) {
+          b.className = m === mode
+            ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-xs cursor-pointer'
+            : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 cursor-pointer';
+        }
+      });
+    }
+    window.switchOceaniaIdSide = switchOceaniaIdSide;
+
+    function copyOceaniaData(countryKey, docType) {
+      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+      if (!cfg) return;
+      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+      const p = ocPrefix(countryKey, dtype);
+      const getT = (s) => { const el = $(`${p}_${s}`); return el ? el.textContent : ''; };
+      const lines = [
+        `${cfg.officialName} (${cfg.iso3})`,
+        `Document: ${dtype === 'idcard' ? cfg.idCardTitle : cfg.passportTitle}`,
+        `Document No: ${getT('outDocNo')} | Personal No: ${getT('outPersonalNo')}`,
+        `Name: ${getT('outGivenNames')} ${getT('outSurname')}`,
+        `DOB: ${getT('outDob')} | Expiry: ${getT('outExpiry')}`,
+        `MRZ1: ${getT('mrz1')}`,
+        `MRZ2: ${getT('mrz2')}`
+      ];
+      if (dtype === 'idcard') lines.push(`MRZ3: ${getT('mrz3')}`);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(lines.join('\n')).then(() => {
+          if (typeof showToast === 'function') showToast('Copied!', `${cfg.name} sample bio-data & MRZ copied`);
+        });
+      }
+    }
+    window.copyOceaniaData = copyOceaniaData;
+
+    function downloadOceaniaPNG(countryKey, docType, side) {
+      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+      if (!cfg) return;
+      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+      const cardId = dtype === 'passport' ? `${cfg.key}-passport-card` : (side === 'back' ? `${cfg.key}-id-back` : `${cfg.key}-id-front`);
+      triggerWithOgadsLock(() => {
+        const card = $(cardId);
+        if (!card || typeof html2canvas !== 'function') return;
+        if (typeof showToast === 'function') showToast('Generating PNG...', `Rendering high-resolution ${cfg.name} sample document`);
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `${cfg.key}-${dtype}${side ? '-' + side : ''}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          if (typeof showToast === 'function') showToast('Ready!', `${cfg.name} PNG generated successfully`);
+        }).catch(() => {
+          if (typeof showToast === 'function') showToast('Download Error', 'Could not export document image');
+        });
+      });
+    }
+    window.downloadOceaniaPNG = downloadOceaniaPNG;
+
+    function bindOceaniaPhotoInputs(countryKey, docType) {
+      const p = ocPrefix(countryKey, docType);
+      const upEl = $(`${p}_photoUpload`);
+      if (upEl && !upEl.dataset.bound) {
+        upEl.dataset.bound = '1';
+        upEl.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = ev => {
+            const ph = $(`${p}_outPhoto`);
+            const gh = $(`${p}_outGhost`);
+            if (ph) ph.src = ev.target.result;
+            if (gh) gh.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      const urlEl = $(`${p}_photoUrl`);
+      if (urlEl && !urlEl.dataset.bound) {
+        urlEl.dataset.bound = '1';
+        urlEl.addEventListener('input', e => {
+          const v = (e.target.value || '').trim();
+          if (!v) return;
+          const ph = $(`${p}_outPhoto`);
+          const gh = $(`${p}_outGhost`);
+          if (ph) ph.src = v;
+          if (gh) gh.src = v;
+        });
+      }
+    }
+
+    function mountOceaniaDocumentViews() {
+      OCEANIA_COUNTRY_KEYS.forEach(key => {
+        const cfg = OCEANIA_COUNTRIES_CONFIG[key];
+        const passHost = $(`${key}-passport-view`);
+        if (passHost && !passHost.dataset.mounted) {
+          passHost.dataset.mounted = '1';
+          passHost.innerHTML = buildOceaniaPassportMarkup(cfg);
+          bindOceaniaPhotoInputs(key, 'passport');
+          updateOceaniaPreview(key, 'passport');
+        }
+        if (cfg.hasNationalId) {
+          const idHost = $(`${key}-idcard-view`);
+          if (idHost && !idHost.dataset.mounted) {
+            idHost.dataset.mounted = '1';
+            idHost.innerHTML = buildOceaniaIdMarkup(cfg);
+            bindOceaniaPhotoInputs(key, 'idcard');
+            updateOceaniaPreview(key, 'idcard');
+          }
+        }
+      });
+    }
+    window.mountOceaniaDocumentViews = mountOceaniaDocumentViews;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountOceaniaDocumentViews);
+    } else {
+      mountOceaniaDocumentViews();
+    }
   </script>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-900 overflow-x-hidden">
@@ -19971,6 +21112,126 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Turkey</div>
                 <div class="text-[10px] font-medium text-slate-500">Pasaport &amp; Kimlik Kartı</div>
+              </div>
+            </button>
+
+            <!-- Australia (AUS) -->
+            <button type="button" id="country-btn-australia" data-docs="passport" onclick="switchVerificationCountry('australia')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇦🇺</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Australia</div>
+                <div class="text-[10px] font-medium text-slate-500">Australian Passport (AUS)</div>
+              </div>
+            </button>
+
+            <!-- New Zealand (NZL) -->
+            <button type="button" id="country-btn-newzealand" data-docs="passport" onclick="switchVerificationCountry('newzealand')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-100/70 hover:border-slate-400 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇳🇿</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">New Zealand</div>
+                <div class="text-[10px] font-medium text-slate-500">New Zealand Passport (NZL)</div>
+              </div>
+            </button>
+
+            <!-- Fiji (FJI) -->
+            <button type="button" id="country-btn-fiji" data-docs="passport" onclick="switchVerificationCountry('fiji')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇫🇯</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Fiji</div>
+                <div class="text-[10px] font-medium text-slate-500">Fiji Passport (FJI)</div>
+              </div>
+            </button>
+
+            <!-- Papua New Guinea (PNG) -->
+            <button type="button" id="country-btn-papuanewguinea" data-docs="passport,idcard" onclick="switchVerificationCountry('papuanewguinea')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇵🇬</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Papua New Guinea</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport &amp; NID Card (PNG)</div>
+              </div>
+            </button>
+
+            <!-- Samoa (WSM) -->
+            <button type="button" id="country-btn-samoa" data-docs="passport" onclick="switchVerificationCountry('samoa')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-indigo-50/40 hover:border-indigo-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇼🇸</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Samoa</div>
+                <div class="text-[10px] font-medium text-slate-500">Samoa Passport (WSM)</div>
+              </div>
+            </button>
+
+            <!-- Tonga (TON) -->
+            <button type="button" id="country-btn-tonga" data-docs="passport,idcard" onclick="switchVerificationCountry('tonga')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-rose-50/40 hover:border-rose-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇹🇴</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Tonga</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport &amp; National ID (TON)</div>
+              </div>
+            </button>
+
+            <!-- Vanuatu (VUT) -->
+            <button type="button" id="country-btn-vanuatu" data-docs="passport,idcard" onclick="switchVerificationCountry('vanuatu')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-emerald-50/40 hover:border-emerald-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇻🇺</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Vanuatu</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport &amp; National ID (VUT)</div>
+              </div>
+            </button>
+
+            <!-- Solomon Islands (SLB) -->
+            <button type="button" id="country-btn-solomonislands" data-docs="passport" onclick="switchVerificationCountry('solomonislands')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇸🇧</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Solomon Islands</div>
+                <div class="text-[10px] font-medium text-slate-500">Solomon Islands Passport (SLB)</div>
+              </div>
+            </button>
+
+            <!-- Kiribati (KIR) -->
+            <button type="button" id="country-btn-kiribati" data-docs="passport,idcard" onclick="switchVerificationCountry('kiribati')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-amber-50/40 hover:border-amber-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇰🇮</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Kiribati</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport &amp; National ID (KIR)</div>
+              </div>
+            </button>
+
+            <!-- Federated States of Micronesia (FSM) -->
+            <button type="button" id="country-btn-micronesia" data-docs="passport" onclick="switchVerificationCountry('micronesia')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-cyan-50/40 hover:border-cyan-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇫🇲</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Federated States of Micronesia</div>
+                <div class="text-[10px] font-medium text-slate-500">FSM Passport (FSM)</div>
               </div>
             </button>
           </div>
@@ -30374,6 +31635,22 @@ COD REP DEM CONGO</div>
           </div>
         </div>
       </div>
+
+      <!-- ================= OCEANIA DOCUMENT VIEWS (HYDRATED BY OCEANIA CONTROLLER) ================= -->
+      <div id="australia-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="newzealand-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="fiji-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="papuanewguinea-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="papuanewguinea-idcard-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="samoa-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="tonga-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="tonga-idcard-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="vanuatu-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="vanuatu-idcard-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="solomonislands-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="kiribati-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="kiribati-idcard-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="micronesia-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
     </div>
   </section>
 
@@ -31618,6 +32895,24 @@ COD REP DEM CONGO</div>
         'uae-id-back',
         'turkey-id-front',
         'turkey-id-back',
+        'australia-passport-card',
+        'newzealand-passport-card',
+        'fiji-passport-card',
+        'papuanewguinea-passport-card',
+        'papuanewguinea-id-front',
+        'papuanewguinea-id-back',
+        'samoa-passport-card',
+        'tonga-passport-card',
+        'tonga-id-front',
+        'tonga-id-back',
+        'vanuatu-passport-card',
+        'vanuatu-id-front',
+        'vanuatu-id-back',
+        'solomonislands-passport-card',
+        'kiribati-passport-card',
+        'kiribati-id-front',
+        'kiribati-id-back',
+        'micronesia-passport-card',
         'turkey-passport-card',
         'proof-of-account-card',
         'poa-wise-card',
@@ -32044,6 +33339,7 @@ COD REP DEM CONGO</div>
           'updateSomSmartIdPreview', 'randomizeSomaliaIdCard', 'updateSomPreview',
           'updateSomPassPreview', 'randomizeSomaliaPassport', 'updateSomPassIdCardPreview',
           'updateSomLicPreview', 'randomizeSomaliaDriverLicense',
+          'updateOceaniaPreview', 'randomizeOceaniaDoc', 'resetOceaniaSample', 'switchOceaniaIdSide',
           'selectCountry', 'selectDocumentType', 'syncWorkbenchView'
         ];
 
