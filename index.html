@@ -1372,12 +1372,25 @@
       window.openContactModal();
     };
 
-    window.openContactModal = function() {
-      const modal = $('contactModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+    window.openContactPage = function(opts) {
+      const options = opts || {};
+      if (typeof window.closeContactModal === 'function') window.closeContactModal();
+      if (typeof window.closePrivacyModal === 'function') window.closePrivacyModal();
+      if (typeof window.closeAboutModal === 'function') window.closeAboutModal();
+      if (typeof window.closeTermsModal === 'function') window.closeTermsModal();
+      if (typeof window.closeDisclaimerModal === 'function') window.closeDisclaimerModal();
+      if (typeof window.closeCookieModal === 'function') window.closeCookieModal();
+      if (typeof window.closeFaqModal === 'function') window.closeFaqModal();
+      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+      if (typeof window.setWorkflowViewStep === 'function') {
+        window.setWorkflowViewStep('contact', { silent: true, noScroll: options.noScroll });
       }
+      if (!options.noScroll && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.openContactModal = function() {
+      window.openContactPage();
     };
     window.closeContactModal = function() {
       const modal = $('contactModal');
@@ -2056,6 +2069,76 @@ var $ = window.$ || (id => document.getElementById(id));
           'Matching Legal Name & Date of Birth',
           'Selfie / Liveness Identity Confirmation'
         ]
+      },
+      salaam: {
+        name: 'Salaam Somali Bank',
+        category: 'Regional & International Banking',
+        badge: 'Account Verification Ready',
+        color: '#0d5bd9',
+        icon: 'fa-solid fa-building-columns',
+        accType: 'Personal & Business Banking Account',
+        currency: 'USD, EUR, SOS',
+        kycLevel: 'Standard Identity & Address Verification',
+        limit: 'Regional and international account transfers',
+        tip: 'Submit a valid government-issued Passport or National Identity Card with matching account holder details.',
+        url: 'https://salaambank.com',
+        kycReq: [
+          'Valid Government-Issued Passport or National ID Card',
+          'Matching Legal Name and Identity Details',
+          'Residential Address Information'
+        ]
+      },
+      dahabshil: {
+        name: 'Dahabshil Bank',
+        category: 'Banking & Remittance Services',
+        badge: 'Account Verification Ready',
+        color: '#16a34a',
+        icon: 'fa-solid fa-building-columns',
+        accType: 'Personal & Business Banking Account',
+        currency: 'USD, EUR, GBP, SOS',
+        kycLevel: 'Standard Identity & Address Verification',
+        limit: 'Cross-border banking and remittance accounts',
+        tip: 'Provide a clear scan of your valid Passport or National Identity Card with matching beneficiary details.',
+        url: 'https://dahabshiilbank.com',
+        kycReq: [
+          'Valid Government-Issued Passport or National ID Card',
+          'Matching Legal Name and Date of Birth',
+          'Proof of Residential Address'
+        ]
+      },
+      mybank: {
+        name: 'My Bank',
+        category: 'Digital Banking Services',
+        badge: 'Account Verification Ready',
+        color: '#0d5bd9',
+        icon: 'fa-solid fa-landmark',
+        accType: 'Digital Personal & Business Account',
+        currency: 'USD, EUR, SOS',
+        kycLevel: 'Standard Identity Verification',
+        limit: 'Digital banking and multi-currency account access',
+        tip: 'Ensure your National Identity Card or Passport is valid and matches your account application.',
+        kycReq: [
+          'Valid National Identity Card or Passport',
+          'Matching Account Holder Details',
+          'Residential Address Information'
+        ]
+      },
+      premierwallet: {
+        name: 'Premier Wallet / Bank',
+        category: 'Digital Wallet & Banking',
+        badge: 'Account Verification Ready',
+        color: '#6d28d9',
+        icon: 'fa-solid fa-wallet',
+        accType: 'Digital Wallet & Banking Account',
+        currency: 'USD, EUR, SOS',
+        kycLevel: 'Standard Identity Verification',
+        limit: 'Digital wallet and bank account transfers',
+        tip: 'Submit a valid National Identity Card or Passport with matching holder details for account verification.',
+        kycReq: [
+          'Valid National Identity Card or Passport',
+          'Matching Legal Name & Identity Number',
+          'Residential Address Information'
+        ]
       }
     };
     if (typeof window !== 'undefined') window.platformData = platformData;
@@ -2121,7 +2204,11 @@ var $ = window.$ || (id => document.getElementById(id));
       binance: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'bangladesh', 'germany', 'ghana', 'rwanda', 'nepal', 'malawi', 'uae', 'turkey'],
       bybit: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'bangladesh', 'germany', 'ghana', 'rwanda', 'nepal', 'uae', 'turkey'],
       okx: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'germany', 'ghana', 'rwanda', 'nepal', 'malawi', 'uae', 'turkey'],
-      kucoin: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'bangladesh', 'germany', 'canada', 'ghana', 'rwanda', 'nepal', 'uae', 'turkey']
+      kucoin: ['kenya', 'somalia', 'ethiopia', 'nigeria', 'uk', 'uganda', 'pakistan', 'senegal', 'southafrica', 'seychelles', 'drcongo', 'bangladesh', 'germany', 'canada', 'ghana', 'rwanda', 'nepal', 'uae', 'turkey'],
+      salaam: BASELINE_WEBSITE_COUNTRY_KEYS.slice(),
+      dahabshil: BASELINE_WEBSITE_COUNTRY_KEYS.slice(),
+      mybank: BASELINE_WEBSITE_COUNTRY_KEYS.slice(),
+      premierwallet: BASELINE_WEBSITE_COUNTRY_KEYS.slice()
     };
 
     const PROVIDER_SUPPORTED_DOCS = {
@@ -2139,7 +2226,11 @@ var $ = window.$ || (id => document.getElementById(id));
       binance: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
       bybit: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
       okx: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
-      kucoin: ['passport', 'idcard', 'driverlicense', 'refugeecard']
+      kucoin: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
+      salaam: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      dahabshil: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      mybank: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
+      premierwallet: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount']
     };
 
     const COUNTRY_OFFICIAL_AUTHORITIES = {
@@ -3091,6 +3182,7 @@ var $ = window.$ || (id => document.getElementById(id));
       const aboutSection = $('about-page-section');
       const privacySection = $('privacy-page-section');
       const termsSection = $('terms-page-section');
+      const contactSection = $('contact-page-section');
       const unifiedCard = $('wb-unified-provider-card');
       const workbench = $('verification-workbench');
       const editorBar = $('active-editor-workflow-bar');
@@ -3100,11 +3192,31 @@ var $ = window.$ || (id => document.getElementById(id));
       const navHome = $('nav-link-home');
       const navAccounts = $('nav-link-accounts');
       const navAbout = $('nav-link-about');
+      const navContact = $('nav-link-contact');
       if (navHome) navHome.classList.toggle('text-[#0d5bd9]', nextStep === 'home');
       if (navAccounts) navAccounts.classList.toggle('text-[#0d5bd9]', nextStep === 'accounts' || nextStep === 'provider' || nextStep === 'editor');
       if (navAbout) navAbout.classList.toggle('text-[#0d5bd9]', nextStep === 'about');
+      if (navContact) navContact.classList.toggle('text-[#0d5bd9]', nextStep === 'contact');
 
-      if (nextStep === 'terms') {
+      if (nextStep === 'contact') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.remove('hidden');
+        if (unifiedCard) unifiedCard.classList.add('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        if (!options.noScroll && contactSection) {
+          contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'terms') {
         if (heroSection) heroSection.classList.add('hidden');
         if (heroHomeContent) heroHomeContent.classList.add('hidden');
         if (whySection) whySection.classList.add('hidden');
@@ -3112,6 +3224,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (aboutSection) aboutSection.classList.add('hidden');
         if (privacySection) privacySection.classList.add('hidden');
         if (termsSection) termsSection.classList.remove('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
@@ -3129,6 +3242,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (aboutSection) aboutSection.classList.add('hidden');
         if (privacySection) privacySection.classList.remove('hidden');
         if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
@@ -3146,6 +3260,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (aboutSection) aboutSection.classList.remove('hidden');
         if (privacySection) privacySection.classList.add('hidden');
         if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
@@ -3166,6 +3281,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (aboutSection) aboutSection.classList.add('hidden');
         if (privacySection) privacySection.classList.add('hidden');
         if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
@@ -3181,6 +3297,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (aboutSection) aboutSection.classList.add('hidden');
         if (privacySection) privacySection.classList.add('hidden');
         if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
         if (unifiedCard && !options.keepCardOpen) {
           unifiedCard.classList.add('hidden');
           workflowActiveAccount = '';
@@ -3204,6 +3321,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (aboutSection) aboutSection.classList.add('hidden');
         if (privacySection) privacySection.classList.add('hidden');
         if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.remove('hidden');
         if (workbench) workbench.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
@@ -3227,6 +3345,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (aboutSection) aboutSection.classList.add('hidden');
         if (privacySection) privacySection.classList.add('hidden');
         if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.remove('hidden');
         if (editorBar) editorBar.classList.remove('hidden');
@@ -16201,6 +16320,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     function openContactModal() {
+      if (typeof window.openContactPage === 'function') {
+        window.openContactPage();
+        return;
+      }
       const modal = $('contactModal');
       if (modal) {
         modal.classList.remove('hidden');
@@ -16213,6 +16336,122 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         modal.classList.add('hidden');
         modal.classList.remove('flex');
       }
+    }
+
+    function scrollToContactTarget(targetId, focusInputId) {
+      const el = $(targetId);
+      if (el && typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      if (focusInputId) {
+        setTimeout(() => {
+          const input = $(focusInputId);
+          if (input && typeof input.focus === 'function') input.focus();
+        }, 250);
+      }
+    }
+
+    function focusContactMessageForm() {
+      scrollToContactTarget('contact-message-form-card', 'contactFormName');
+      showToast('Support Desk Ready', 'Complete the message form below or email getkycapproved@gmail.com.');
+    }
+
+    function escapeContactHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function submitContactUsForm(event) {
+      if (event && typeof event.preventDefault === 'function') {
+        event.preventDefault();
+      }
+      const nameEl = $('contactFormName');
+      const emailEl = $('contactFormEmail');
+      const msgEl = $('contactFormMessage');
+      const feedbackEl = $('contactFormFeedback');
+
+      const name = nameEl ? nameEl.value.trim() : '';
+      const email = emailEl ? emailEl.value.trim() : '';
+      const message = msgEl ? msgEl.value.trim() : '';
+
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+
+      const resetFieldBorders = () => {
+        [nameEl, emailEl, msgEl].forEach((field) => {
+          if (!field) return;
+          field.classList.remove('border-rose-400', 'ring-2', 'ring-rose-200');
+          field.classList.add('border-blue-100');
+        });
+      };
+      resetFieldBorders();
+
+      const showError = (field, text) => {
+        if (field) {
+          field.classList.remove('border-blue-100');
+          field.classList.add('border-rose-400', 'ring-2', 'ring-rose-200');
+          if (typeof field.focus === 'function') field.focus();
+        }
+        if (feedbackEl) {
+          feedbackEl.className = 'rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs sm:text-sm text-rose-800 flex items-start gap-2.5';
+          feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-600 mt-0.5 shrink-0"></i><span>${escapeContactHtml(text)}</span>`;
+          feedbackEl.classList.remove('hidden');
+        }
+      };
+
+      if (!name) {
+        showError(nameEl, 'Please enter your name.');
+        return false;
+      }
+      if (!email || !emailValid) {
+        showError(emailEl, 'Please enter a valid email address.');
+        return false;
+      }
+      if (!message) {
+        showError(msgEl, 'Please enter your message before sending.');
+        return false;
+      }
+
+      const subject = encodeURIComponent(`GetKYCApproved Support Inquiry from ${name}`);
+      const bodyText = `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
+      const mailtoHref = `mailto:getkycapproved@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+      window.__lastPreparedContactSummary = bodyText;
+
+      if (feedbackEl) {
+        feedbackEl.className = 'rounded-2xl border border-emerald-200 bg-emerald-50/90 px-4 py-3.5 text-xs sm:text-sm text-[#0d2658] space-y-2.5';
+        feedbackEl.innerHTML = `
+          <div class="flex items-start gap-2.5">
+            <i class="fa-solid fa-circle-check text-[#16a34a] text-base mt-0.5 shrink-0"></i>
+            <div class="space-y-1">
+              <p class="font-extrabold text-[#0d2658]">Your support inquiry is ready to send.</p>
+              <p class="text-xs text-[#3b5482] leading-relaxed">
+                Open your email app below to send directly to <strong>getkycapproved@gmail.com</strong>, or copy your prepared message.
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 pl-6">
+            <a href="${mailtoHref}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#0d5bd9] hover:bg-blue-700 text-white font-bold text-xs transition-colors">
+              <i class="fa-solid fa-envelope text-[11px]"></i>
+              <span>Send via Email App</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+            <button type="button" onclick="copyToClipboard(window.__lastPreparedContactSummary || '', 'Support message copied!')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-blue-50 text-[#0d2658] border border-blue-200 font-bold text-xs transition-colors cursor-pointer">
+              <i class="fa-regular fa-copy text-[11px]"></i>
+              <span>Copy Message</span>
+            </button>
+          </div>
+        `;
+        feedbackEl.classList.remove('hidden');
+      }
+
+      if (nameEl) nameEl.value = '';
+      if (emailEl) emailEl.value = '';
+      if (msgEl) msgEl.value = '';
+      showToast('Message Prepared', 'Your support message is ready for getkycapproved@gmail.com.');
+      return true;
     }
 
     function openFaqModal() {
@@ -16949,6 +17188,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     if (typeof sharePassportImage !== "undefined") window.sharePassportImage = sharePassportImage;
     if (typeof window.openPrivacyPage === "function") window.openPrivacyPage = window.openPrivacyPage;
     if (typeof window.openTermsPage === "function") window.openTermsPage = window.openTermsPage;
+    if (typeof window.openContactPage === "function") window.openContactPage = window.openContactPage;
+    if (typeof scrollToContactTarget !== "undefined") window.scrollToContactTarget = scrollToContactTarget;
+    if (typeof focusContactMessageForm !== "undefined") window.focusContactMessageForm = focusContactMessageForm;
+    if (typeof submitContactUsForm !== "undefined") window.submitContactUsForm = submitContactUsForm;
     if (typeof openPrivacyModal !== "undefined") window.openPrivacyModal = openPrivacyModal;
     if (typeof openTermsModal !== "undefined") window.openTermsModal = openTermsModal;
     if (typeof openDisclaimerModal !== "undefined") window.openDisclaimerModal = openDisclaimerModal;
@@ -16980,7 +17223,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         <button id="nav-link-accounts" type="button" onclick="setWorkflowViewStep('accounts')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Virtual Accounts</button>
         <button id="nav-link-about" type="button" onclick="openAboutPage()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">KYC Guide</button>
         <button type="button" onclick="openFaqModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">FAQ</button>
-        <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Contact</button>
+        <button id="nav-link-contact" type="button" onclick="openContactPage()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Contact</button>
       </nav>
 
       <!-- Right Controls: Mobile Hamburger Menu Only -->
@@ -17370,6 +17613,66 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <div class="text-[11px] text-[#47608e]">Freelance USD / GBP / EUR</div>
             </div>
             <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('raenest');" class="kyc-va-cta w-full py-2 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- 8. Salaam Somali Bank -->
+          <div data-va-card="salaam" onclick="selectWorkflowAccount('salaam')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('salaam')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <span class="text-lg font-black tracking-tight text-[#0d5bd9]">Salaam</span>
+            </div>
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">Salaam Somali Bank</div>
+              <div class="text-[11px] text-[#47608e]">Virtual Account</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('salaam');" class="kyc-va-cta w-full py-2 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- 9. Dahabshil Bank -->
+          <div data-va-card="dahabshil" onclick="selectWorkflowAccount('dahabshil')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('dahabshil')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <span class="text-lg font-black tracking-tight text-[#16a34a]">Dahabshil</span>
+            </div>
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">Dahabshil Bank</div>
+              <div class="text-[11px] text-[#47608e]">Virtual Account</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('dahabshil');" class="kyc-va-cta w-full py-2 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- 10. My Bank -->
+          <div data-va-card="mybank" onclick="selectWorkflowAccount('mybank')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('mybank')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <span class="text-lg font-black tracking-tight text-[#0d2658]">My <span class="text-[#0d5bd9]">Bank</span></span>
+            </div>
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">My Bank</div>
+              <div class="text-[11px] text-[#47608e]">Virtual Account</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('mybank');" class="kyc-va-cta w-full py-2 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>Get Account</span>
+              <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <!-- 11. Premier Wallet / Bank -->
+          <div data-va-card="premierwallet" onclick="selectWorkflowAccount('premierwallet')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')selectWorkflowAccount('premierwallet')" class="kyc-va-card rounded-2xl p-5 flex flex-col items-center justify-between text-center gap-3.5 cursor-pointer">
+            <div class="h-12 flex items-center justify-center">
+              <span class="text-lg font-black tracking-tight text-[#0d2658]">Premier</span>
+            </div>
+            <div class="space-y-0.5">
+              <div class="text-base font-extrabold text-[#0d2658]">Premier Wallet / Bank</div>
+              <div class="text-[11px] text-[#47608e]">Virtual Account</div>
+            </div>
+            <button type="button" onclick="event.stopPropagation(); selectWorkflowAccount('premierwallet');" class="kyc-va-cta w-full py-2 px-4 rounded-full text-white font-bold text-xs inline-flex items-center justify-center gap-1.5 cursor-pointer">
               <span>Get Account</span>
               <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </button>
@@ -18709,6 +19012,389 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           </button>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ================= DEDICATED CONTACT US PAGE ================= -->
+  <section id="contact-page-section" class="hidden no-print relative overflow-x-hidden bg-white">
+    <!-- 1. Contact Us Hero Section -->
+    <div class="kyc-hero-surface relative overflow-hidden pt-8 sm:pt-12 lg:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
+      <!-- Subtle Dotted World Map Backdrop -->
+      <svg aria-hidden="true" class="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" viewBox="0 0 1200 520" fill="none">
+        <defs>
+          <pattern id="contactHeroWorldDots" width="12" height="12" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.4" fill="#7fb5fb" />
+          </pattern>
+          <mask id="contactHeroWorldMask">
+            <rect width="1200" height="520" fill="black" />
+            <ellipse cx="260" cy="180" rx="160" ry="95" fill="white" />
+            <ellipse cx="320" cy="310" rx="85" ry="95" fill="white" />
+            <ellipse cx="620" cy="170" rx="185" ry="90" fill="white" />
+            <ellipse cx="640" cy="300" rx="95" ry="105" fill="white" />
+            <ellipse cx="890" cy="210" rx="170" ry="110" fill="white" />
+            <ellipse cx="980" cy="370" rx="90" ry="60" fill="white" />
+          </mask>
+        </defs>
+        <rect width="1200" height="520" fill="url(#contactHeroWorldDots)" mask="url(#contactHeroWorldMask)" />
+      </svg>
+
+      <!-- Bottom Flowing Wave Divider -->
+      <svg aria-hidden="true" class="absolute bottom-0 inset-x-0 w-full h-14 sm:h-20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1440 120">
+        <defs>
+          <linearGradient id="contactHeroWaveWash" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.45" />
+            <stop offset="50%" stop-color="#ccfbf1" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.65" />
+          </linearGradient>
+        </defs>
+        <path d="M0,44 C360,104 920,-10 1440,56 L1440,120 L0,120 Z" fill="url(#contactHeroWaveWash)" />
+        <path d="M0,76 C420,28 960,108 1440,62 L1440,120 L0,120 Z" fill="#ffffff" />
+      </svg>
+
+      <div class="max-w-6xl mx-auto relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+          <!-- Left Column: Badge, Headings, Supporting Text & CTA -->
+          <div class="lg:col-span-6 space-y-4 text-center lg:text-left">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-blue-100 text-[#0d2658] text-xs sm:text-sm font-bold shadow-sm">
+              <span class="w-5 h-5 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xs">
+                <i class="fa-solid fa-envelope"></i>
+              </span>
+              <span>Contact Us</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-[3.35rem] font-extrabold text-[#0d2658] tracking-tight leading-[1.06]">
+              We&#39;re Here to Help
+            </h1>
+
+            <p class="text-sm sm:text-base text-[#3b5482] font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+              Have questions or need assistance? Our support team is ready to help you with your inquiries about GetKYCApproved and our services.
+            </p>
+
+            <div class="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <button type="button" onclick="scrollToContactTarget('contact-get-in-touch')" class="kyc-green-pill min-h-[48px] inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+                <span>Get Support</span>
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+              </button>
+              <button type="button" onclick="goToHomePage(event)" class="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/90 hover:bg-white text-[#0d2658] border border-blue-200 font-bold text-sm transition-colors shadow-sm cursor-pointer">
+                <i class="fa-solid fa-house text-xs text-[#0d5bd9]"></i>
+                <span>Back to Home</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Globe, Envelope, Security Shield & Support Headset SVG -->
+          <div class="lg:col-span-6 flex items-center justify-center relative">
+            <div class="relative w-full max-w-[440px] h-[270px] sm:h-[325px] flex items-center justify-center select-none">
+              <div class="absolute inset-6 rounded-full bg-gradient-to-tr from-[#2563eb]/25 via-[#38bdf8]/30 to-[#22c55e]/15 blur-2xl pointer-events-none"></div>
+
+              <svg viewBox="0 0 390 310" class="w-full max-w-[310px] sm:max-w-[390px] h-auto drop-shadow-[0_20px_38px_rgba(37,99,235,0.25)]" aria-label="Global customer support illustration with digital globe, message envelope, emerald security shield, and support headset">
+                <defs>
+                  <radialGradient id="contactGlobeGrad" cx="38%" cy="32%" r="68%">
+                    <stop offset="0%" stop-color="#93c5fd" />
+                    <stop offset="38%" stop-color="#2563eb" />
+                    <stop offset="82%" stop-color="#1e40af" />
+                    <stop offset="100%" stop-color="#0f2557" />
+                  </radialGradient>
+                  <linearGradient id="contactEnvelopeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#dbeafe" />
+                    <stop offset="100%" stop-color="#60a5fa" />
+                  </linearGradient>
+                  <linearGradient id="contactHeadsetGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#38bdf8" />
+                    <stop offset="100%" stop-color="#1d4ed8" />
+                  </linearGradient>
+                  <clipPath id="contactGlobeClip">
+                    <circle cx="204" cy="134" r="98" />
+                  </clipPath>
+                </defs>
+
+                <!-- Digital Connection Orbits -->
+                <ellipse cx="204" cy="136" rx="154" ry="50" transform="rotate(-14 204 136)" stroke="#bae6fd" stroke-opacity="0.85" stroke-width="1.5" fill="none" />
+                <ellipse cx="204" cy="136" rx="146" ry="44" transform="rotate(14 204 136)" stroke="#93c5fd" stroke-opacity="0.7" stroke-width="1.3" stroke-dasharray="5 5" fill="none" />
+                <circle cx="58" cy="176" r="4" fill="#38bdf8" />
+                <circle cx="342" cy="96" r="4" fill="#7dd3fc" />
+
+                <!-- Digital Globe -->
+                <circle cx="204" cy="134" r="98" fill="url(#contactGlobeGrad)" />
+                <g clip-path="url(#contactGlobeClip)" opacity="0.82">
+                  <ellipse cx="204" cy="134" rx="98" ry="32" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <ellipse cx="204" cy="134" rx="98" ry="64" stroke="#93c5fd" stroke-width="0.9" fill="none" />
+                  <ellipse cx="204" cy="134" rx="46" ry="98" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <path d="M138 90 C158 76, 188 82, 194 102 C198 118, 178 128, 182 144 C186 158, 200 166, 190 184 C182 204, 162 204, 156 184 C148 166, 156 154, 146 140 C134 126, 126 102, 138 90 Z" fill="#dbeafe" opacity="0.58" />
+                  <path d="M220 84 C244 78, 272 92, 274 114 C278 134, 260 150, 246 146 C232 140, 228 154, 238 168 C248 182, 242 204, 226 208 C212 212, 208 184, 212 164 C216 144, 206 106, 220 84 Z" fill="#dbeafe" opacity="0.58" />
+                  <circle cx="164" cy="108" r="3" fill="#ffffff" />
+                  <circle cx="246" cy="106" r="3" fill="#7dd3fc" />
+                </g>
+
+                <!-- Green Security Leaves -->
+                <path d="M74 236 C52 210, 48 176, 64 150 C80 176, 86 204, 82 236 Z" fill="#22c55e" opacity="0.92" />
+                <path d="M318 228 C338 202, 344 170, 328 148 C312 172, 306 200, 310 228 Z" fill="#16a34a" opacity="0.9" />
+
+                <!-- 3D Blue/White Envelope -->
+                <g transform="translate(86 124)">
+                  <rect x="0" y="0" width="144" height="98" rx="14" fill="url(#contactEnvelopeGrad)" stroke="#93c5fd" stroke-width="2" />
+                  <rect x="6" y="6" width="132" height="86" rx="10" fill="#ffffff" />
+                  <path d="M8 10 L72 58 L136 10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" />
+                  <line x1="12" y1="84" x2="54" y2="48" stroke="#bfdbfe" stroke-width="2.2" stroke-linecap="round" />
+                  <line x1="132" y1="84" x2="90" y2="48" stroke="#bfdbfe" stroke-width="2.2" stroke-linecap="round" />
+                </g>
+
+                <!-- Customer Support Headset (Right) -->
+                <g transform="translate(226 98)">
+                  <path d="M12 68 A46 46 0 0 1 104 68" stroke="url(#contactHeadsetGrad)" stroke-width="11" stroke-linecap="round" fill="none" />
+                  <rect x="0" y="54" width="22" height="44" rx="10" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2" />
+                  <rect x="94" y="54" width="22" height="44" rx="10" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2" />
+                  <path d="M105 94 C105 118, 86 132, 58 134" stroke="#1e40af" stroke-width="5.5" stroke-linecap="round" fill="none" />
+                  <rect x="44" y="128" width="18" height="11" rx="5.5" fill="#0f2557" />
+                </g>
+
+                <!-- Emerald Verified Security Shield -->
+                <g transform="translate(182 156)">
+                  <path d="M40 2 L6 16 V46 C6 72 20 93 40 102 C60 93 74 72 74 46 V16 L40 2 Z" fill="#ffffff" stroke="#bae6fd" stroke-width="2" />
+                  <path d="M40 9 L12 20 V46 C12 68 24 85 40 93 C56 85 68 68 68 46 V20 L40 9 Z" fill="#16a34a" />
+                  <path d="M27 48 L36 57 L54 37" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Stack -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4 sm:-mt-6 pb-12 sm:pb-16 space-y-8 sm:space-y-10 relative z-20">
+
+      <!-- 2. Get in Touch (Live Support, Email Support, Help Center) -->
+      <div id="contact-get-in-touch" class="space-y-6">
+        <div class="text-center space-y-1.5">
+          <div class="flex items-center justify-center gap-4">
+            <span class="hidden sm:block h-px w-20 bg-gradient-to-r from-transparent to-blue-200" aria-hidden="true"></span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0d2658] tracking-tight">Get in Touch</h2>
+            <span class="hidden sm:block h-px w-20 bg-gradient-to-l from-transparent to-blue-200" aria-hidden="true"></span>
+          </div>
+          <p class="text-xs sm:text-sm font-semibold text-[#47608e]">
+            Choose the best way to reach us
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+          <!-- Card 1: Live Support -->
+          <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col items-center text-center justify-between gap-4 bg-gradient-to-b from-white to-[#f6faff]">
+            <div class="space-y-3 flex flex-col items-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#e6f0ff] border border-[#cfe2ff] text-[#0d5bd9] flex items-center justify-center text-2xl shadow-xs">
+                <i class="fa-solid fa-comments"></i>
+              </div>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Live Support</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed max-w-xs">
+                Get assistance from our support team.
+              </p>
+            </div>
+            <button type="button" onclick="focusContactMessageForm()" class="kyc-va-cta min-h-[44px] w-full max-w-[200px] px-6 py-2.5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer">
+              <span>Start Chat</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </article>
+
+          <!-- Card 2: Email Support -->
+          <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col items-center text-center justify-between gap-4 bg-gradient-to-b from-white to-[#f6faff]">
+            <div class="space-y-3 flex flex-col items-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#e6f0ff] border border-[#cfe2ff] text-[#0d5bd9] flex items-center justify-center text-2xl shadow-xs">
+                <i class="fa-solid fa-envelope"></i>
+              </div>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Email Support</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed max-w-xs">
+                Send us your questions and we&#39;ll get back to you.
+              </p>
+              <span class="text-xs font-bold text-[#0d5bd9]">getkycapproved@gmail.com</span>
+            </div>
+            <a href="mailto:getkycapproved@gmail.com?subject=GetKYCApproved%20Support%20Inquiry" class="kyc-va-cta min-h-[44px] w-full max-w-[200px] px-6 py-2.5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-transform hover:-translate-y-0.5">
+              <span>Send Email</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+          </article>
+
+          <!-- Card 3: Help Center -->
+          <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col items-center text-center justify-between gap-4 bg-gradient-to-b from-white to-[#f6faff]">
+            <div class="space-y-3 flex flex-col items-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#e6f0ff] border border-[#cfe2ff] text-[#0d5bd9] flex items-center justify-center text-2xl shadow-xs">
+                <i class="fa-solid fa-book-open"></i>
+              </div>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Help Center</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed max-w-xs">
+                Find answers to common questions in our FAQ section.
+              </p>
+            </div>
+            <button type="button" onclick="openFaqModal()" class="kyc-va-cta min-h-[44px] w-full max-w-[200px] px-6 py-2.5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer">
+              <span>Visit FAQ</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </article>
+        </div>
+      </div>
+
+      <!-- 3. Send Us a Message Card (Form Left + Responsive Globe & Envelope Visual Right) -->
+      <div id="contact-message-form-card" class="kyc-about-card rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        <!-- Form Column (Left) -->
+        <div class="lg:col-span-7 p-6 sm:p-8 lg:p-9 space-y-5 bg-white">
+          <div class="flex items-start gap-3.5">
+            <div class="w-11 h-11 rounded-full bg-[#16a34a] text-white flex items-center justify-center text-lg shrink-0 shadow-sm">
+              <i class="fa-solid fa-comment-dots"></i>
+            </div>
+            <div class="space-y-1">
+              <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight">Send Us a Message</h2>
+              <p class="text-xs sm:text-sm text-[#47608e]">
+                Fill out the form below and we&#39;ll get back to you as soon as possible.
+              </p>
+            </div>
+          </div>
+
+          <form id="contactUsMessageForm" onsubmit="submitContactUsForm(event)" novalidate class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Name Field -->
+              <div class="space-y-1.5">
+                <label for="contactFormName" class="block text-xs sm:text-sm font-bold text-[#0d2658]">Name</label>
+                <div class="relative">
+                  <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748b] text-xs pointer-events-none">
+                    <i class="fa-solid fa-user"></i>
+                  </span>
+                  <input id="contactFormName" name="name" type="text" required autocomplete="name" placeholder="Your name" class="w-full min-h-[44px] pl-10 pr-3.5 py-2.5 rounded-xl border border-blue-100 bg-slate-50/70 focus:bg-white focus:border-[#0d5bd9] focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs sm:text-sm text-[#0d2658] placeholder:text-slate-400 transition-colors" />
+                </div>
+              </div>
+
+              <!-- Email Address Field -->
+              <div class="space-y-1.5">
+                <label for="contactFormEmail" class="block text-xs sm:text-sm font-bold text-[#0d2658]">Email Address</label>
+                <div class="relative">
+                  <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748b] text-xs pointer-events-none">
+                    <i class="fa-solid fa-envelope"></i>
+                  </span>
+                  <input id="contactFormEmail" name="email" type="email" required autocomplete="email" placeholder="Your email address" class="w-full min-h-[44px] pl-10 pr-3.5 py-2.5 rounded-xl border border-blue-100 bg-slate-50/70 focus:bg-white focus:border-[#0d5bd9] focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs sm:text-sm text-[#0d2658] placeholder:text-slate-400 transition-colors" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Your Message Field -->
+            <div class="space-y-1.5">
+              <label for="contactFormMessage" class="block text-xs sm:text-sm font-bold text-[#0d2658]">Your Message</label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-3.5 text-[#64748b] text-xs pointer-events-none">
+                  <i class="fa-solid fa-comment-dots"></i>
+                </span>
+                <textarea id="contactFormMessage" name="message" rows="4" required placeholder="How can we help you?" class="w-full pl-10 pr-3.5 py-3 rounded-xl border border-blue-100 bg-slate-50/70 focus:bg-white focus:border-[#0d5bd9] focus:ring-2 focus:ring-blue-100 focus:outline-none text-xs sm:text-sm text-[#0d2658] placeholder:text-slate-400 transition-colors resize-y"></textarea>
+              </div>
+            </div>
+
+            <!-- Accessible Inline Validation / Submission Feedback -->
+            <div id="contactFormFeedback" role="status" aria-live="polite" class="hidden"></div>
+
+            <button type="submit" style="background: linear-gradient(90deg, #0d5bd9 0%, #10b981 100%); box-shadow: 0 10px 24px -8px rgba(13, 91, 217, 0.45);" class="min-h-[48px] w-full rounded-full px-7 py-3 text-white font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2.5 transition-transform hover:-translate-y-0.5 cursor-pointer">
+              <i class="fa-solid fa-paper-plane text-xs"></i>
+              <span>Send Message</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </form>
+
+          <p class="text-xs text-[#47608e] pt-1">
+            You can reach GetKYCApproved through secure online support, email, and the FAQ/help resources.
+          </p>
+        </div>
+
+        <!-- Support Visual Column (Right Desktop / Below Form Mobile) -->
+        <div class="lg:col-span-5 bg-gradient-to-br from-[#eff7ff] via-[#e6f2ff] to-[#dcf5ec] border-t lg:border-t-0 lg:border-l border-blue-100 p-6 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden">
+          <svg viewBox="0 0 320 270" class="w-full max-w-[290px] h-auto drop-shadow-[0_14px_26px_rgba(37,99,235,0.2)]" aria-label="Secure communication illustration with global digital globe and open envelope">
+            <defs>
+              <radialGradient id="contactFormGlobeGrad" cx="38%" cy="32%" r="68%">
+                <stop offset="0%" stop-color="#93c5fd" />
+                <stop offset="45%" stop-color="#2563eb" />
+                <stop offset="100%" stop-color="#1e3a8a" />
+              </radialGradient>
+              <clipPath id="contactFormGlobeClip">
+                <circle cx="182" cy="96" r="72" />
+              </clipPath>
+            </defs>
+
+            <!-- Dashed Connection Orbits -->
+            <ellipse cx="182" cy="98" rx="112" ry="38" transform="rotate(-14 182 98)" stroke="#93c5fd" stroke-width="1.4" stroke-dasharray="5 5" fill="none" />
+            <ellipse cx="182" cy="98" rx="108" ry="34" transform="rotate(16 182 98)" stroke="#bae6fd" stroke-width="1.2" fill="none" />
+
+            <!-- Digital Globe -->
+            <circle cx="182" cy="96" r="72" fill="url(#contactFormGlobeGrad)" />
+            <g clip-path="url(#contactFormGlobeClip)" opacity="0.82">
+              <ellipse cx="182" cy="96" rx="72" ry="24" stroke="#bfdbfe" stroke-width="0.9" fill="none" />
+              <ellipse cx="182" cy="96" rx="34" ry="72" stroke="#bfdbfe" stroke-width="0.9" fill="none" />
+              <path d="M138 66 C154 58, 174 62, 178 78 C182 92, 168 100, 170 112 C174 124, 184 130, 174 146 C164 158, 150 156, 146 140 C140 124, 146 114, 138 102 C130 90, 128 74, 138 66 Z" fill="#dbeafe" opacity="0.55" />
+              <path d="M196 62 C214 58, 232 68, 234 86 C236 102, 224 114, 212 110 C200 106, 198 118, 204 128 C212 140, 206 154, 194 156 C186 158, 184 136, 188 120 C192 104, 184 74, 196 62 Z" fill="#dbeafe" opacity="0.55" />
+            </g>
+
+            <!-- Emerald Leaves -->
+            <path d="M68 230 C48 206, 44 178, 58 156 C74 178, 80 202, 76 230 Z" fill="#22c55e" opacity="0.92" />
+            <path d="M244 232 C264 208, 268 180, 254 158 C238 180, 232 204, 236 232 Z" fill="#16a34a" opacity="0.92" />
+
+            <!-- Open Envelope & Message Letter -->
+            <g transform="translate(76 112)">
+              <!-- Back Flap -->
+              <polygon points="8,42 84,0 160,42" fill="#93c5fd" />
+              <!-- Message Letter Sheet -->
+              <rect x="26" y="14" width="116" height="82" rx="10" fill="#ffffff" stroke="#bfdbfe" stroke-width="2" />
+              <rect x="44" y="30" width="80" height="6" rx="3" fill="#60a5fa" />
+              <rect x="44" y="44" width="64" height="5" rx="2.5" fill="#cbd5e1" />
+              <rect x="44" y="56" width="74" height="5" rx="2.5" fill="#cbd5e1" />
+              <!-- Envelope Body -->
+              <rect x="8" y="42" width="152" height="88" rx="12" fill="#2563eb" />
+              <polygon points="8,48 84,96 160,48 160,118 8,118" fill="#3b82f6" />
+              <path d="M12 124 L84 78 L156 124" fill="#60a5fa" opacity="0.9" />
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 4. Global Support Banner -->
+      <div class="kyc-about-cta-banner rounded-3xl px-6 py-7 sm:px-9 sm:py-8 relative overflow-hidden text-white">
+        <!-- Subtle World Map Texture Overlay -->
+        <svg aria-hidden="true" class="hidden md:block absolute inset-y-0 right-16 w-72 h-full opacity-20 pointer-events-none" viewBox="0 0 280 130" fill="none">
+          <defs>
+            <pattern id="contactBannerDots" width="7" height="7" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.3" fill="#93c5fd" />
+            </pattern>
+            <mask id="contactBannerMask">
+              <rect width="280" height="130" fill="black" />
+              <ellipse cx="64" cy="46" rx="44" ry="26" fill="white" />
+              <ellipse cx="82" cy="92" rx="22" ry="26" fill="white" />
+              <ellipse cx="152" cy="42" rx="44" ry="22" fill="white" />
+              <ellipse cx="154" cy="88" rx="25" ry="28" fill="white" />
+              <ellipse cx="222" cy="56" rx="44" ry="28" fill="white" />
+            </mask>
+          </defs>
+          <rect width="280" height="130" fill="url(#contactBannerDots)" mask="url(#contactBannerMask)" />
+        </svg>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-5">
+            <div class="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
+              <svg class="w-10 h-11" viewBox="0 0 64 72" fill="none" aria-hidden="true">
+                <path d="M32 4L8 14V33C8 49.5 18.2 63.4 32 68C45.8 63.4 56 49.5 56 33V14L32 4Z" fill="#ffffff" stroke="#dcfce7" stroke-width="2"/>
+                <path d="M32 9L13 17V33C13 46.5 21.1 58 32 62C42.9 58 51 46.5 51 33V17L32 9Z" fill="#16a34a"/>
+                <path d="M22.5 35.5L28.8 41.8L42 28.5" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="hidden sm:block w-px h-14 bg-white/25" aria-hidden="true"></div>
+            <div class="space-y-1">
+              <h2 class="text-xl sm:text-2xl lg:text-[1.65rem] font-extrabold tracking-tight text-white">
+                Global Support, Anytime
+              </h2>
+              <p class="text-xs sm:text-sm text-blue-100 font-medium max-w-xl">
+                Our team is here to help users around the world.
+              </p>
+            </div>
+          </div>
+
+          <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill min-h-[48px] shrink-0 inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+            <span>Get Started Now</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -29643,7 +30329,7 @@ COD REP DEM CONGO</div>
   </div>
 
   <!-- ================= CONTACT US MODAL ================= -->
-  <div id="contactModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div id="contactModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
       <div class="flex items-center justify-between pb-4 border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -29652,16 +30338,16 @@ COD REP DEM CONGO</div>
           </div>
           <div>
             <h3 class="font-bold text-slate-900 text-base">Contact Support</h3>
-            <p class="text-xs text-slate-500">Direct Support Available 24/7</p>
+            <p class="text-xs text-slate-500">Email, Online Support &amp; FAQ Resources</p>
           </div>
         </div>
-        <button onclick="closeContactModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <button onclick="closeContactModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer">
           <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
       <div class="py-4 space-y-4 text-xs text-slate-600">
-        <p>Get in touch for virtual account guidance, exchange verification consultation, or API integration:</p>
+        <p>You can reach GetKYCApproved through secure online support, email, and the FAQ/help resources:</p>
 
         <!-- Email Contact Box -->
         <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -29674,30 +30360,17 @@ COD REP DEM CONGO</div>
               </a>
             </div>
           </div>
-          <button onclick="copyToClipboard('getkycapproved@gmail.com', 'Email copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
-            <i class="fa-regular fa-copy"></i>
-          </button>
-        </div>
-
-        <!-- Phone / WhatsApp Box -->
-        <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-phone text-emerald-600 text-lg"></i>
-            <div>
-              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Phone &amp; WhatsApp</span>
-              <a href="tel:005365446" class="font-bold text-slate-900 text-xs hover:text-emerald-600">
-                005365446
-              </a>
-            </div>
-          </div>
-          <button onclick="copyToClipboard('005365446', 'Phone copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500">
+          <button onclick="copyToClipboard('getkycapproved@gmail.com', 'Email copied!')" class="p-2 rounded-lg hover:bg-slate-200 text-slate-500 cursor-pointer">
             <i class="fa-regular fa-copy"></i>
           </button>
         </div>
       </div>
 
-      <div class="pt-3 border-t border-slate-100 flex justify-end">
-        <button onclick="closeContactModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800">
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+        <button onclick="openContactPage()" class="px-4 py-2 text-xs font-bold rounded-xl bg-[#0d5bd9] text-white hover:bg-blue-700 cursor-pointer">
+          View Full Contact Page
+        </button>
+        <button onclick="closeContactModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
           Close
         </button>
       </div>
