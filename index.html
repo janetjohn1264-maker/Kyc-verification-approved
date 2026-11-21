@@ -1109,6 +1109,34 @@
     .kyc-wave-footer {
       background: #ffffff;
     }
+    .kyc-about-card {
+      background: #ffffff;
+      border: 1px solid #dce9fb;
+      box-shadow: 0 14px 32px -18px rgba(13, 38, 88, 0.16);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .kyc-about-card:hover {
+      transform: translateY(-2px);
+      border-color: #93c5fd;
+      box-shadow: 0 20px 36px -16px rgba(29, 78, 216, 0.18);
+    }
+    .kyc-value-card-blue {
+      background: linear-gradient(160deg, #ffffff 0%, #f3f8ff 60%, #eaf3ff 100%);
+      border: 1px solid #cfe0fb;
+      box-shadow: 0 10px 26px -16px rgba(13, 91, 217, 0.18);
+    }
+    .kyc-value-card-green {
+      background: linear-gradient(160deg, #ffffff 0%, #f2fbf5 60%, #e7f9ee 100%);
+      border: 1px solid #c5ebd4;
+      box-shadow: 0 10px 26px -16px rgba(22, 163, 74, 0.18);
+    }
+    .kyc-about-cta-banner {
+      background:
+        radial-gradient(circle at 82% 24%, rgba(56, 189, 248, 0.28) 0%, transparent 45%),
+        radial-gradient(circle at 14% 78%, rgba(34, 197, 94, 0.18) 0%, transparent 40%),
+        linear-gradient(115deg, #0b53d8 0%, #0d45b5 48%, #092766 100%);
+      box-shadow: 0 22px 46px -18px rgba(9, 39, 102, 0.45);
+    }
   </style>
 
   <script>
@@ -1358,12 +1386,62 @@
         modal.classList.remove('flex');
       }
     };
-    window.openAboutModal = function() {
-      const modal = $('aboutModal');
-      if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+    window.openAboutPage = function(opts) {
+      const options = opts || {};
+      if (typeof window.closeAboutModal === 'function') window.closeAboutModal();
+      if (typeof window.closePrivacyModal === 'function') window.closePrivacyModal();
+      if (typeof window.closeTermsModal === 'function') window.closeTermsModal();
+      if (typeof window.closeContactModal === 'function') window.closeContactModal();
+      if (typeof window.closeFaqModal === 'function') window.closeFaqModal();
+      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+      if (typeof window.setWorkflowViewStep === 'function') {
+        window.setWorkflowViewStep('about', { silent: true, noScroll: options.noScroll });
       }
+      if (!options.noScroll && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.openPrivacyPage = function(opts) {
+      const options = opts || {};
+      if (typeof window.closePrivacyModal === 'function') window.closePrivacyModal();
+      if (typeof window.closeAboutModal === 'function') window.closeAboutModal();
+      if (typeof window.closeTermsModal === 'function') window.closeTermsModal();
+      if (typeof window.closeCookieModal === 'function') window.closeCookieModal();
+      if (typeof window.closeContactModal === 'function') window.closeContactModal();
+      if (typeof window.closeFaqModal === 'function') window.closeFaqModal();
+      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+      if (typeof window.setWorkflowViewStep === 'function') {
+        window.setWorkflowViewStep('privacy', { silent: true, noScroll: options.noScroll });
+      }
+      if (!options.noScroll && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.openTermsPage = function(opts) {
+      const options = opts || {};
+      if (typeof window.closeTermsModal === 'function') window.closeTermsModal();
+      if (typeof window.closePrivacyModal === 'function') window.closePrivacyModal();
+      if (typeof window.closeAboutModal === 'function') window.closeAboutModal();
+      if (typeof window.closeDisclaimerModal === 'function') window.closeDisclaimerModal();
+      if (typeof window.closeCookieModal === 'function') window.closeCookieModal();
+      if (typeof window.closeContactModal === 'function') window.closeContactModal();
+      if (typeof window.closeFaqModal === 'function') window.closeFaqModal();
+      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+      if (typeof window.setWorkflowViewStep === 'function') {
+        window.setWorkflowViewStep('terms', { silent: true, noScroll: options.noScroll });
+      }
+      if (!options.noScroll && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.openTermsModal = function() {
+      window.openTermsPage();
+    };
+    window.openPrivacyModal = function() {
+      window.openPrivacyPage();
+    };
+    window.openAboutModal = function() {
+      window.openAboutPage();
     };
     window.closeAboutModal = function() {
       const modal = $('aboutModal');
@@ -3010,13 +3088,74 @@ var $ = window.$ || (id => document.getElementById(id));
       const heroHomeContent = $('homepage-hero-content');
       const whySection = $('homepage-why-section');
       const vaSection = $('our-virtual-accounts');
+      const aboutSection = $('about-page-section');
+      const privacySection = $('privacy-page-section');
+      const termsSection = $('terms-page-section');
       const unifiedCard = $('wb-unified-provider-card');
       const workbench = $('verification-workbench');
       const editorBar = $('active-editor-workflow-bar');
       const poaAccountBar = $('poa-step2-account-selector');
       const noDocView = $('wb-no-document-view');
 
-      if (nextStep === 'home') {
+      const navHome = $('nav-link-home');
+      const navAccounts = $('nav-link-accounts');
+      const navAbout = $('nav-link-about');
+      if (navHome) navHome.classList.toggle('text-[#0d5bd9]', nextStep === 'home');
+      if (navAccounts) navAccounts.classList.toggle('text-[#0d5bd9]', nextStep === 'accounts' || nextStep === 'provider' || nextStep === 'editor');
+      if (navAbout) navAbout.classList.toggle('text-[#0d5bd9]', nextStep === 'about');
+
+      if (nextStep === 'terms') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.remove('hidden');
+        if (unifiedCard) unifiedCard.classList.add('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        if (!options.noScroll && termsSection) {
+          termsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'privacy') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (privacySection) privacySection.classList.remove('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
+        if (unifiedCard) unifiedCard.classList.add('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        if (!options.noScroll && privacySection) {
+          privacySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'about') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (aboutSection) aboutSection.classList.remove('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
+        if (unifiedCard) unifiedCard.classList.add('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        if (!options.noScroll && aboutSection) {
+          aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'home') {
         workflowActiveAccount = '';
         workflowSelectedCountry = '';
         workflowSelectedDoc = '';
@@ -3024,6 +3163,9 @@ var $ = window.$ || (id => document.getElementById(id));
         if (heroHomeContent) heroHomeContent.classList.remove('hidden');
         if (whySection) whySection.classList.remove('hidden');
         if (vaSection) vaSection.classList.remove('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
@@ -3036,6 +3178,9 @@ var $ = window.$ || (id => document.getElementById(id));
         if (heroHomeContent) heroHomeContent.classList.remove('hidden');
         if (whySection) whySection.classList.remove('hidden');
         if (vaSection) vaSection.classList.remove('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
         if (unifiedCard && !options.keepCardOpen) {
           unifiedCard.classList.add('hidden');
           workflowActiveAccount = '';
@@ -3056,6 +3201,9 @@ var $ = window.$ || (id => document.getElementById(id));
         if (heroHomeContent) heroHomeContent.classList.remove('hidden');
         if (whySection) whySection.classList.remove('hidden');
         if (vaSection) vaSection.classList.remove('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.remove('hidden');
         if (workbench) workbench.classList.add('hidden');
         if (editorBar) editorBar.classList.add('hidden');
@@ -3076,6 +3224,9 @@ var $ = window.$ || (id => document.getElementById(id));
         if (heroHomeContent) heroHomeContent.classList.add('hidden');
         if (whySection) whySection.classList.add('hidden');
         if (vaSection) vaSection.classList.add('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.remove('hidden');
         if (editorBar) editorBar.classList.remove('hidden');
@@ -15963,6 +16114,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     function openAboutModal() {
+      if (typeof window.openAboutPage === 'function') {
+        window.openAboutPage();
+        return;
+      }
       const modal = $('aboutModal');
       if (modal) {
         modal.classList.remove('hidden');
@@ -15978,6 +16133,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     function openPrivacyModal() {
+      if (typeof window.openPrivacyPage === 'function') {
+        window.openPrivacyPage();
+        return;
+      }
       const modal = $('privacyModal');
       if (modal) {
         modal.classList.remove('hidden');
@@ -15993,6 +16152,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     function openTermsModal() {
+      if (typeof window.openTermsPage === 'function') {
+        window.openTermsPage();
+        return;
+      }
       const modal = $('termsModal');
       if (modal) {
         modal.classList.remove('hidden');
@@ -16652,6 +16815,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     // Explicit Window Bindings for all inline event handlers:
     if (typeof platformData !== "undefined") window.platformData = platformData;
     if (typeof scrollToSection !== "undefined") window.scrollToSection = scrollToSection;
+    if (typeof window.openAboutPage === "function") window.openAboutPage = window.openAboutPage;
     if (typeof openAboutModal !== "undefined") window.openAboutModal = openAboutModal;
     if (typeof openContactModal !== "undefined") window.openContactModal = openContactModal;
     if (typeof selectVirtualAccount !== "undefined") window.selectVirtualAccount = selectVirtualAccount;
@@ -16783,6 +16947,8 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     if (typeof closeCryptoExchangesHub !== "undefined") window.closeCryptoExchangesHub = closeCryptoExchangesHub;
     if (typeof closeImageModal !== "undefined") window.closeImageModal = closeImageModal;
     if (typeof sharePassportImage !== "undefined") window.sharePassportImage = sharePassportImage;
+    if (typeof window.openPrivacyPage === "function") window.openPrivacyPage = window.openPrivacyPage;
+    if (typeof window.openTermsPage === "function") window.openTermsPage = window.openTermsPage;
     if (typeof openPrivacyModal !== "undefined") window.openPrivacyModal = openPrivacyModal;
     if (typeof openTermsModal !== "undefined") window.openTermsModal = openTermsModal;
     if (typeof openDisclaimerModal !== "undefined") window.openDisclaimerModal = openDisclaimerModal;
@@ -16810,16 +16976,16 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
       <!-- Center Desktop Nav Links -->
       <nav aria-label="Primary Navigation" class="hidden md:flex items-center gap-7 text-sm font-semibold text-[#1e3a6e]">
-        <button type="button" onclick="goToHomePage(event)" class="text-[#0d5bd9] hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Home</button>
-        <button type="button" onclick="setWorkflowViewStep('accounts')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Virtual Accounts</button>
-        <button type="button" onclick="openAboutModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">KYC Guide</button>
+        <button id="nav-link-home" type="button" onclick="goToHomePage(event)" class="text-[#0d5bd9] hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Home</button>
+        <button id="nav-link-accounts" type="button" onclick="setWorkflowViewStep('accounts')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Virtual Accounts</button>
+        <button id="nav-link-about" type="button" onclick="openAboutPage()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">KYC Guide</button>
         <button type="button" onclick="openFaqModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">FAQ</button>
         <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Contact</button>
       </nav>
 
       <!-- Right Controls: Mobile Hamburger Menu Only -->
       <div class="flex items-center shrink-0">
-        <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu" class="md:hidden w-10 h-10 text-[#0d2658] bg-white hover:bg-blue-50 rounded-xl border border-blue-100 shadow-xs cursor-pointer transition-colors flex items-center justify-center">
+        <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu" class="md:hidden w-11 h-11 text-[#0d2658] bg-white hover:bg-blue-50 rounded-xl border border-blue-100 shadow-sm cursor-pointer transition-colors flex items-center justify-center">
           <i id="mobileMenuIcon" class="fa-solid fa-bars text-base"></i>
         </button>
       </div>
@@ -16828,19 +16994,19 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     <!-- Mobile Navigation Drawer -->
     <div id="mobileNavDrawer" class="hidden md:hidden border-t border-blue-100 bg-white/98 backdrop-blur-xl px-4 py-4 space-y-2.5 shadow-xl">
       <div class="grid grid-cols-2 gap-2">
-        <button type="button" onclick="goToHomePage(event); closeMobileMenu();" class="flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 text-[#0d2658] font-bold text-xs border border-blue-100 cursor-pointer">
+        <button type="button" onclick="goToHomePage(event); closeMobileMenu();" class="min-h-[44px] flex items-center gap-2.5 p-3 rounded-xl bg-blue-50 text-[#0d2658] font-bold text-xs border border-blue-100 cursor-pointer">
           <i class="fa-solid fa-house text-sm text-[#0d5bd9]"></i>
           <span>Home</span>
         </button>
-        <button type="button" onclick="setWorkflowViewStep('accounts'); closeMobileMenu();" class="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
+        <button type="button" onclick="setWorkflowViewStep('accounts'); closeMobileMenu();" class="min-h-[44px] flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
           <i class="fa-solid fa-wallet text-sm text-[#0d5bd9]"></i>
           <span>Virtual Accounts</span>
         </button>
-        <button type="button" onclick="openAboutModal(); closeMobileMenu();" class="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
+        <button type="button" onclick="openAboutPage(); closeMobileMenu();" class="min-h-[44px] flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
           <i class="fa-solid fa-shield-halved text-sm text-[#16a34a]"></i>
           <span>KYC Guide</span>
         </button>
-        <button type="button" onclick="openFaqModal(); closeMobileMenu();" class="flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
+        <button type="button" onclick="openFaqModal(); closeMobileMenu();" class="min-h-[44px] flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
           <i class="fa-solid fa-circle-question text-sm text-[#0d5bd9]"></i>
           <span>FAQ</span>
         </button>
@@ -17326,6 +17492,1225 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     </div>
   </section>
 
+  <!-- ================= DEDICATED ABOUT US PAGE ================= -->
+  <section id="about-page-section" class="hidden no-print relative overflow-x-hidden bg-white">
+    <!-- 1. About Hero Band -->
+    <div class="kyc-hero-surface relative overflow-hidden pt-8 sm:pt-12 lg:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
+      <!-- Subtle Dotted World Map Backdrop -->
+      <svg aria-hidden="true" class="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" viewBox="0 0 1200 520" fill="none">
+        <defs>
+          <pattern id="aboutHeroWorldDots" width="12" height="12" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.4" fill="#7fb5fb" />
+          </pattern>
+          <mask id="aboutHeroWorldMask">
+            <rect width="1200" height="520" fill="black" />
+            <ellipse cx="260" cy="180" rx="160" ry="95" fill="white" />
+            <ellipse cx="320" cy="310" rx="85" ry="95" fill="white" />
+            <ellipse cx="620" cy="170" rx="185" ry="90" fill="white" />
+            <ellipse cx="640" cy="300" rx="95" ry="105" fill="white" />
+            <ellipse cx="890" cy="210" rx="170" ry="110" fill="white" />
+            <ellipse cx="980" cy="370" rx="90" ry="60" fill="white" />
+          </mask>
+        </defs>
+        <rect width="1200" height="520" fill="url(#aboutHeroWorldDots)" mask="url(#aboutHeroWorldMask)" />
+      </svg>
+
+      <!-- Bottom Cyan-to-White Swoosh Divider -->
+      <svg aria-hidden="true" class="absolute bottom-0 inset-x-0 w-full h-14 sm:h-20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1440 120">
+        <defs>
+          <linearGradient id="aboutHeroWaveWash" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.45" />
+            <stop offset="50%" stop-color="#ccfbf1" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.65" />
+          </linearGradient>
+        </defs>
+        <path d="M0,44 C360,104 920,-10 1440,56 L1440,120 L0,120 Z" fill="url(#aboutHeroWaveWash)" />
+        <path d="M0,76 C420,28 960,108 1440,62 L1440,120 L0,120 Z" fill="#ffffff" />
+      </svg>
+
+      <div class="max-w-6xl mx-auto relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+          <!-- Left: Label, Headings, Verified Description & Primary Green CTA -->
+          <div class="lg:col-span-6 space-y-4 text-center lg:text-left">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#dcebff] border border-[#bfdbfe] text-[#0d2658] text-xs sm:text-sm font-bold shadow-sm">
+              <span class="w-5 h-5 rounded-full bg-[#0d5bd9] text-white flex items-center justify-center text-[11px]">
+                <i class="fa-solid fa-info"></i>
+              </span>
+              <span>About Us</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl lg:text-[3.15rem] font-extrabold text-[#0d2658] tracking-tight leading-[1.08]">
+              About GetKYCApproved
+            </h1>
+
+            <h2 class="text-lg sm:text-xl lg:text-[1.45rem] font-extrabold text-[#14306b] leading-snug max-w-xl mx-auto lg:mx-0">
+              Your Trusted Partner for Global Digital Finance
+            </h2>
+
+            <p class="text-sm sm:text-base text-[#3b5482] font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+              GetKYCApproved is an interactive informational fintech portal built to help international users explore supported virtual bank and crypto exchange accounts, review country-specific identity criteria, and prepare for official KYC verification.
+            </p>
+
+            <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill min-h-[48px] inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+                <span>Get Started Now</span>
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+              </button>
+              <button type="button" onclick="goToHomePage(event)" class="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/90 hover:bg-white text-[#0d2658] border border-blue-200 font-bold text-sm transition-colors shadow-sm cursor-pointer">
+                <i class="fa-solid fa-house text-xs text-[#0d5bd9]"></i>
+                <span>Back to Home</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Polished Digital Finance & KYC Verification Illustration -->
+          <div class="lg:col-span-6 flex items-center justify-center relative">
+            <div class="relative w-full max-w-[440px] h-[270px] sm:h-[330px] flex items-center justify-center select-none">
+              <div class="absolute inset-6 rounded-full bg-gradient-to-tr from-[#2563eb]/25 via-[#38bdf8]/30 to-[#22c55e]/15 blur-2xl pointer-events-none"></div>
+
+              <svg viewBox="0 0 360 320" class="w-full max-w-[300px] sm:max-w-[360px] h-auto drop-shadow-[0_20px_38px_rgba(37,99,235,0.28)]" aria-label="Global digital finance, KYC verified shield, passport, and national identity card illustration">
+                <defs>
+                  <radialGradient id="aboutGlobeFill" cx="38%" cy="34%" r="66%">
+                    <stop offset="0%" stop-color="#93c5fd" />
+                    <stop offset="32%" stop-color="#2563eb" />
+                    <stop offset="76%" stop-color="#1e40af" />
+                    <stop offset="100%" stop-color="#0f2557" />
+                  </radialGradient>
+                  <linearGradient id="aboutOrbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.95" />
+                    <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.35" />
+                    <stop offset="100%" stop-color="#93c5fd" stop-opacity="0.9" />
+                  </linearGradient>
+                  <clipPath id="aboutGlobeClip">
+                    <circle cx="180" cy="146" r="102" />
+                  </clipPath>
+                </defs>
+
+                <!-- Orbit Rings -->
+                <ellipse cx="180" cy="146" rx="154" ry="54" transform="rotate(-18 180 146)" stroke="url(#aboutOrbitGrad)" stroke-width="1.6" fill="none" />
+                <ellipse cx="180" cy="146" rx="146" ry="48" transform="rotate(16 180 146)" stroke="url(#aboutOrbitGrad)" stroke-width="1.4" stroke-dasharray="5 5" fill="none" />
+
+                <!-- Digital Globe -->
+                <circle cx="180" cy="146" r="102" fill="url(#aboutGlobeFill)" />
+                <g clip-path="url(#aboutGlobeClip)" opacity="0.82">
+                  <ellipse cx="180" cy="146" rx="102" ry="34" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <ellipse cx="180" cy="146" rx="102" ry="68" stroke="#93c5fd" stroke-width="0.9" fill="none" />
+                  <ellipse cx="180" cy="146" rx="48" ry="102" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <line x1="180" y1="44" x2="180" y2="248" stroke="#bae6fd" stroke-width="1" />
+                  <line x1="78" y1="146" x2="282" y2="146" stroke="#bae6fd" stroke-width="1" />
+                  <path d="M116 96 C132 82, 162 86, 168 106 C172 122, 154 134, 156 148 C160 162, 178 168, 170 190 C162 210, 140 214, 134 194 C130 176, 136 164, 126 150 C112 134, 104 110, 116 96 Z" fill="#dbeafe" opacity="0.58" />
+                  <path d="M196 92 C218 82, 248 96, 254 122 C258 142, 240 156, 224 152 C210 148, 204 162, 216 176 C228 190, 222 214, 204 218 C188 222, 182 194, 188 172 C194 152, 182 114, 196 92 Z" fill="#dbeafe" opacity="0.58" />
+                  <path d="M138 118 Q182 82 224 116" stroke="#fde68a" stroke-width="1.6" fill="none" />
+                  <path d="M148 166 Q188 138 232 156" stroke="#bae6fd" stroke-width="1.5" fill="none" />
+                  <circle cx="138" cy="118" r="3.5" fill="#ffffff" />
+                  <circle cx="224" cy="116" r="3.5" fill="#fde68a" />
+                  <circle cx="148" cy="166" r="3" fill="#ffffff" />
+                  <circle cx="232" cy="156" r="3" fill="#7dd3fc" />
+                </g>
+                <circle cx="180" cy="146" r="102" stroke="#bae6fd" stroke-width="1.5" stroke-opacity="0.7" fill="none" />
+
+                <!-- Passport Booklet -->
+                <g transform="translate(178 158) rotate(-4)">
+                  <rect x="0" y="0" width="78" height="106" rx="8" fill="#0d2658" stroke="#60a5fa" stroke-opacity="0.45" stroke-width="1.5" />
+                  <rect x="6" y="6" width="66" height="94" rx="5" fill="none" stroke="#f59e0b" stroke-opacity="0.45" stroke-width="1" />
+                  <text x="39" y="26" text-anchor="middle" fill="#fde68a" font-size="8.5" font-weight="800" letter-spacing="1.1">PASSPORT</text>
+                  <circle cx="39" cy="54" r="17" stroke="#fbbf24" stroke-width="1.4" fill="none" />
+                  <ellipse cx="39" cy="54" rx="8" ry="17" stroke="#fbbf24" stroke-width="1.1" fill="none" />
+                  <line x1="22" y1="54" x2="56" y2="54" stroke="#fbbf24" stroke-width="1.1" />
+                  <line x1="24" y1="45" x2="54" y2="45" stroke="#fbbf24" stroke-width="1" />
+                  <line x1="24" y1="63" x2="54" y2="63" stroke="#fbbf24" stroke-width="1" />
+                  <rect x="28" y="83" width="22" height="11" rx="2" stroke="#fbbf24" stroke-width="1.2" fill="none" />
+                  <circle cx="39" cy="88.5" r="2.2" fill="#fbbf24" />
+                </g>
+
+                <!-- National Identity Card -->
+                <g transform="translate(234 186) rotate(11)">
+                  <rect x="0" y="0" width="102" height="66" rx="8" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.6" />
+                  <rect x="0" y="0" width="102" height="18" rx="8" fill="#eff6ff" />
+                  <text x="24" y="12.5" fill="#0d2658" font-size="7" font-weight="800" letter-spacing="0.4">IDENTITY CARD</text>
+                  <circle cx="13" cy="9.5" r="4.5" fill="#0d5bd9" />
+                  <path d="M11 9.5 L12.5 11 L15.5 8" stroke="#ffffff" stroke-width="1.3" fill="none" stroke-linecap="round" />
+                  <rect x="9" y="23" width="24" height="30" rx="4" fill="#dbeafe" />
+                  <circle cx="21" cy="33" r="5" fill="#2563eb" />
+                  <path d="M12.5 49 C12.5 42.5, 29.5 42.5, 29.5 49" fill="#2563eb" />
+                  <rect x="40" y="25" width="48" height="4.5" rx="2" fill="#93c5fd" />
+                  <rect x="40" y="34" width="38" height="4" rx="2" fill="#cbd5e1" />
+                  <rect x="40" y="42" width="44" height="4" rx="2" fill="#cbd5e1" />
+                  <rect x="40" y="50" width="28" height="4" rx="2" fill="#e2e8f0" />
+                </g>
+
+                <!-- Prominent KYC Verified Shield -->
+                <g transform="translate(96 138)">
+                  <path d="M46 2 L8 18 V52 C8 82 24 106 46 116 C68 106 84 82 84 52 V18 L46 2 Z" fill="#ffffff" stroke="#bae6fd" stroke-width="2" />
+                  <path d="M46 10 L15 23 V52 C15 77 28 97 46 106 C64 97 77 77 77 52 V23 L46 10 Z" fill="#16a34a" />
+                  <path d="M32 48 L42 58 L61 36" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                  <text x="46" y="77" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="800" letter-spacing="0.2">KYC</text>
+                  <text x="46" y="90" text-anchor="middle" fill="#dcfce7" font-size="9.5" font-weight="700">Verified</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main About Page Content Body -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 pb-12 sm:pb-16 space-y-12 relative z-20">
+      <!-- 2. Mission & Vision Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        <!-- Our Mission -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-bullseye"></i>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight">Our Mission</h2>
+            <p class="text-sm text-[#47608e] font-medium leading-relaxed">
+              To make global digital financial information clear, structured, and accessible by helping users review virtual account options and country-specific official KYC requirements in one straightforward place.
+            </p>
+          </div>
+        </article>
+
+        <!-- Our Vision -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#e3f9ec] border border-[#c3f0d5] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white text-[#16a34a] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-eye"></i>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight">Our Vision</h2>
+            <p class="text-sm text-[#47608e] font-medium leading-relaxed">
+              A connected digital economy where individuals, freelancers, and remote teams worldwide can understand global virtual banking and exchange onboarding standards with confidence, clarity, and peace of mind.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <!-- 3. Our Core Values -->
+      <div class="space-y-6">
+        <div class="flex items-center justify-center gap-4">
+          <span class="hidden sm:block h-px flex-1 max-w-[180px] bg-gradient-to-r from-transparent to-blue-200" aria-hidden="true"></span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0d2658] tracking-tight text-center">Our Core Values</h2>
+          <span class="hidden sm:block h-px flex-1 max-w-[180px] bg-gradient-to-l from-transparent to-blue-200" aria-hidden="true"></span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <!-- Value 1 -->
+          <div class="kyc-value-card-blue rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-blue-100 text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-base font-extrabold text-[#0d2658]">Security First</h3>
+              <p class="text-xs sm:text-sm font-medium text-[#47608e]">Your safety is our priority</p>
+            </div>
+          </div>
+
+          <!-- Value 2 -->
+          <div class="kyc-value-card-green rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-emerald-100 text-[#16a34a] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-handshake"></i>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-base font-extrabold text-[#0d2658]">Trust &amp; Transparency</h3>
+              <p class="text-xs sm:text-sm font-medium text-[#47608e]">Clear and honest service</p>
+            </div>
+          </div>
+
+          <!-- Value 3 -->
+          <div class="kyc-value-card-blue rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-blue-100 text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-base font-extrabold text-[#0d2658]">Global Access</h3>
+              <p class="text-xs sm:text-sm font-medium text-[#47608e]">Designed for users worldwide</p>
+            </div>
+          </div>
+
+          <!-- Value 4 -->
+          <div class="kyc-value-card-green rounded-2xl p-6 text-center flex flex-col items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-white border border-emerald-100 text-[#16a34a] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-lightbulb"></i>
+            </div>
+            <div class="space-y-1">
+              <h3 class="text-base font-extrabold text-[#0d2658]">Continuous Innovation</h3>
+              <p class="text-xs sm:text-sm font-medium text-[#47608e]">Always improving the experience</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Global Presence / Trust Strip (Qualitative Verified Pillars Only) -->
+      <div class="kyc-trust-banner rounded-3xl px-6 py-7 sm:px-9 sm:py-8 relative overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+          <!-- Dotted World Map & Shield Emblem -->
+          <div class="lg:col-span-3 flex items-center justify-center relative min-h-[100px]">
+            <svg viewBox="0 0 280 130" class="w-60 h-24 text-blue-400/60" fill="currentColor" aria-hidden="true">
+              <defs>
+                <pattern id="aboutTrustWorldDots" width="7" height="7" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1.35" fill="#60a5fa" opacity="0.7" />
+                </pattern>
+                <mask id="aboutTrustWorldMask">
+                  <rect width="280" height="130" fill="black" />
+                  <ellipse cx="64" cy="46" rx="44" ry="26" fill="white" />
+                  <ellipse cx="82" cy="92" rx="22" ry="26" fill="white" />
+                  <ellipse cx="152" cy="42" rx="44" ry="22" fill="white" />
+                  <ellipse cx="154" cy="88" rx="25" ry="28" fill="white" />
+                  <ellipse cx="222" cy="56" rx="44" ry="28" fill="white" />
+                  <ellipse cx="242" cy="102" rx="22" ry="15" fill="white" />
+                </mask>
+              </defs>
+              <rect width="280" height="130" fill="url(#aboutTrustWorldDots)" mask="url(#aboutTrustWorldMask)" />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="w-14 h-14 rounded-2xl bg-white shadow-md border border-blue-100 flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved text-2xl text-[#16a34a]"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Qualitative Service & Trust Pillars -->
+          <div class="lg:col-span-9 grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-0 lg:divide-x lg:divide-blue-200/70">
+            <div class="flex flex-col items-center lg:items-start text-center lg:text-left lg:px-5 gap-1.5">
+              <div class="inline-flex items-center gap-2 text-[#0d5bd9] font-extrabold text-sm sm:text-base">
+                <i class="fa-solid fa-earth-americas text-base"></i>
+                <span>Global Access</span>
+              </div>
+              <p class="text-xs font-semibold text-[#47608e]">Multi-region coverage across supported platforms</p>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-start text-center lg:text-left lg:px-5 gap-1.5">
+              <div class="inline-flex items-center gap-2 text-[#16a34a] font-extrabold text-sm sm:text-base">
+                <i class="fa-solid fa-circle-check text-base"></i>
+                <span>Secure Verification</span>
+              </div>
+              <p class="text-xs font-semibold text-[#47608e]">Structured guidance for legitimate KYC checks</p>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-start text-center lg:text-left lg:px-5 gap-1.5">
+              <div class="inline-flex items-center gap-2 text-[#0d5bd9] font-extrabold text-sm sm:text-base">
+                <i class="fa-solid fa-headset text-base"></i>
+                <span>Reliable Support</span>
+              </div>
+              <p class="text-xs font-semibold text-[#47608e]">Clear assistance and platform specifications</p>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-start text-center lg:text-left lg:px-5 gap-1.5">
+              <div class="inline-flex items-center gap-2 text-[#0d5bd9] font-extrabold text-sm sm:text-base">
+                <i class="fa-solid fa-user-shield text-base"></i>
+                <span>Professional Service</span>
+              </div>
+              <p class="text-xs font-semibold text-[#47608e]">Clean, browser-friendly user experience</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Why People Choose Us -->
+      <div class="space-y-6">
+        <div class="text-center space-y-2 max-w-2xl mx-auto">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0d2658] tracking-tight">Why People Choose GetKYCApproved</h2>
+          <p class="text-xs sm:text-sm font-medium text-[#47608e]">
+            Built to simplify how you compare virtual account providers, review eligible official documents, and understand verification workflows.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div class="kyc-about-card rounded-2xl p-5 sm:p-6 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-base">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-[#0d2658]">Secure Verification Experience</h3>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Review legitimate identity document formats and country-specific KYC checklists inside a clean, privacy-focused interface.
+            </p>
+          </div>
+
+          <div class="kyc-about-card rounded-2xl p-5 sm:p-6 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-[#16a34a] flex items-center justify-center text-base">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-[#0d2658]">Global Accessibility</h3>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Tailored for international freelancers, digital entrepreneurs, and cross-border users across regions worldwide.
+            </p>
+          </div>
+
+          <div class="kyc-about-card rounded-2xl p-5 sm:p-6 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-[#0d5bd9] flex items-center justify-center text-base">
+              <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-[#0d2658]">Multiple Virtual Account Providers</h3>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Compare supported wallets, multi-currency receiving accounts, and exchanges including PayPal, Wise, Payoneer, Bybit, Binance, Raenest, and Paxum.
+            </p>
+          </div>
+
+          <div class="kyc-about-card rounded-2xl p-5 sm:p-6 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-sky-50 text-[#0d5bd9] flex items-center justify-center text-base">
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-[#0d2658]">Clear Country &amp; Document Selection</h3>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Pick a provider, choose your country, and immediately view only the configured official document categories supported for that region.
+            </p>
+          </div>
+
+          <div class="kyc-about-card rounded-2xl p-5 sm:p-6 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-[#16a34a] flex items-center justify-center text-base">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-[#0d2658]">Professional User Experience</h3>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Designed for effortless use across both mobile phones and desktop screens with clear navigation and instant interactive tools.
+            </p>
+          </div>
+
+          <div class="kyc-about-card rounded-2xl p-5 sm:p-6 space-y-2.5">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-base">
+              <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-[#0d2658]">Dedicated Support &amp; Guidance</h3>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Access platform verification specifications, frequently asked questions, and direct support channels whenever you need help.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Bottom Full-Width Call-To-Action Banner -->
+      <div class="kyc-about-cta-banner rounded-3xl px-6 py-7 sm:px-9 sm:py-8 relative overflow-hidden text-white">
+        <!-- Subtle City Skyline & Network Silhouette Backdrop -->
+        <svg aria-hidden="true" class="absolute inset-0 w-full h-full opacity-15 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1200 220" fill="currentColor">
+          <rect x="40" y="130" width="28" height="90" />
+          <rect x="78" y="95" width="36" height="125" />
+          <rect x="124" y="140" width="24" height="80" />
+          <rect x="210" y="110" width="42" height="110" />
+          <rect x="262" y="80" width="32" height="140" />
+          <rect x="860" y="115" width="36" height="105" />
+          <rect x="908" y="72" width="44" height="148" />
+          <rect x="962" y="102" width="30" height="118" />
+          <rect x="1030" y="125" width="40" height="95" />
+          <rect x="1082" y="88" width="34" height="132" />
+          <rect x="1126" y="135" width="28" height="85" />
+        </svg>
+
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-5">
+            <div class="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-3xl text-sky-200 shrink-0">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div class="hidden sm:block w-px h-14 bg-white/25" aria-hidden="true"></div>
+            <div class="space-y-1">
+              <h2 class="text-xl sm:text-2xl lg:text-[1.65rem] font-extrabold tracking-tight text-white">
+                Get Started With GetKYCApproved
+              </h2>
+              <p class="text-xs sm:text-sm text-blue-100 font-medium max-w-xl">
+                Explore available virtual account services and begin your verification journey.
+              </p>
+            </div>
+          </div>
+
+          <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill min-h-[48px] shrink-0 inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+            <span>Get Started Now</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEDICATED PRIVACY POLICY PAGE ================= -->
+  <section id="privacy-page-section" class="hidden no-print relative overflow-x-hidden bg-white">
+    <!-- 1. Privacy Policy Hero -->
+    <div class="kyc-hero-surface relative overflow-hidden pt-8 sm:pt-12 lg:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
+      <!-- Subtle Dotted World Map Backdrop -->
+      <svg aria-hidden="true" class="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" viewBox="0 0 1200 520" fill="none">
+        <defs>
+          <pattern id="privacyHeroWorldDots" width="12" height="12" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.4" fill="#7fb5fb" />
+          </pattern>
+          <mask id="privacyHeroWorldMask">
+            <rect width="1200" height="520" fill="black" />
+            <ellipse cx="260" cy="180" rx="160" ry="95" fill="white" />
+            <ellipse cx="320" cy="310" rx="85" ry="95" fill="white" />
+            <ellipse cx="620" cy="170" rx="185" ry="90" fill="white" />
+            <ellipse cx="640" cy="300" rx="95" ry="105" fill="white" />
+            <ellipse cx="890" cy="210" rx="170" ry="110" fill="white" />
+            <ellipse cx="980" cy="370" rx="90" ry="60" fill="white" />
+          </mask>
+        </defs>
+        <rect width="1200" height="520" fill="url(#privacyHeroWorldDots)" mask="url(#privacyHeroWorldMask)" />
+      </svg>
+
+      <!-- Bottom Flowing Wave Divider -->
+      <svg aria-hidden="true" class="absolute bottom-0 inset-x-0 w-full h-14 sm:h-20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1440 120">
+        <defs>
+          <linearGradient id="privacyHeroWaveWash" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.45" />
+            <stop offset="50%" stop-color="#ccfbf1" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.65" />
+          </linearGradient>
+        </defs>
+        <path d="M0,44 C360,104 920,-10 1440,56 L1440,120 L0,120 Z" fill="url(#privacyHeroWaveWash)" />
+        <path d="M0,76 C420,28 960,108 1440,62 L1440,120 L0,120 Z" fill="#ffffff" />
+      </svg>
+
+      <div class="max-w-6xl mx-auto relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+          <!-- Left Column: Badge, Headings, Intro & Action -->
+          <div class="lg:col-span-6 space-y-4 text-center lg:text-left">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-blue-100 text-[#0d2658] text-xs sm:text-sm font-bold shadow-sm">
+              <span class="w-5 h-5 rounded-full bg-emerald-50 text-[#16a34a] flex items-center justify-center text-xs">
+                <i class="fa-solid fa-shield-halved"></i>
+              </span>
+              <span>Privacy Policy</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-[3.35rem] font-extrabold text-[#0d2658] tracking-tight leading-[1.06]">
+              Privacy Policy
+            </h1>
+
+            <h2 class="text-xl sm:text-2xl lg:text-[1.65rem] font-extrabold text-[#14306b] leading-snug">
+              Your Privacy, Our Priority
+            </h2>
+
+            <p class="text-sm sm:text-base text-[#3b5482] font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+              At GetKYCApproved, we take your privacy and the responsible handling of user information seriously. All document preview and readiness tools operate locally inside your browser without remote identity storage.
+            </p>
+
+            <p class="text-xs font-semibold text-[#47608e]">
+              Last updated: October 2026
+            </p>
+
+            <div class="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <button type="button" onclick="var el=document.getElementById('privacy-policy-cards'); if(el) el.scrollIntoView({behavior:'smooth', block:'start'});" class="kyc-green-pill min-h-[48px] inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+                <span>Learn More</span>
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+              </button>
+              <button type="button" onclick="goToHomePage(event)" class="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/90 hover:bg-white text-[#0d2658] border border-blue-200 font-bold text-sm transition-colors shadow-sm cursor-pointer">
+                <i class="fa-solid fa-house text-xs text-[#0d5bd9]"></i>
+                <span>Back to Home</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Security Shield, Lock, Folder Protection & Global Network SVG -->
+          <div class="lg:col-span-6 flex items-center justify-center relative">
+            <div class="relative w-full max-w-[440px] h-[270px] sm:h-[330px] flex items-center justify-center select-none">
+              <div class="absolute inset-6 rounded-full bg-gradient-to-tr from-[#2563eb]/25 via-[#38bdf8]/30 to-[#22c55e]/15 blur-2xl pointer-events-none"></div>
+
+              <svg viewBox="0 0 380 310" class="w-full max-w-[310px] sm:max-w-[380px] h-auto drop-shadow-[0_20px_38px_rgba(37,99,235,0.25)]" aria-label="Privacy and data protection shield, lock, user account folder, and global digital network illustration">
+                <defs>
+                  <radialGradient id="privGlobeGrad" cx="38%" cy="34%" r="66%">
+                    <stop offset="0%" stop-color="#93c5fd" />
+                    <stop offset="36%" stop-color="#2563eb" />
+                    <stop offset="80%" stop-color="#1e40af" />
+                    <stop offset="100%" stop-color="#0f2557" />
+                  </radialGradient>
+                  <linearGradient id="privShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#38bdf8" />
+                    <stop offset="55%" stop-color="#1d6ff2" />
+                    <stop offset="100%" stop-color="#1e40af" />
+                  </linearGradient>
+                  <linearGradient id="privFolderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#3b82f6" />
+                    <stop offset="100%" stop-color="#1e3a8a" />
+                  </linearGradient>
+                  <clipPath id="privGlobeClip">
+                    <circle cx="195" cy="140" r="102" />
+                  </clipPath>
+                </defs>
+
+                <!-- Orbit Rings -->
+                <ellipse cx="195" cy="140" rx="156" ry="52" transform="rotate(-14 195 140)" stroke="#bae6fd" stroke-opacity="0.8" stroke-width="1.5" fill="none" />
+                <ellipse cx="195" cy="140" rx="148" ry="46" transform="rotate(14 195 140)" stroke="#93c5fd" stroke-opacity="0.7" stroke-width="1.3" stroke-dasharray="5 5" fill="none" />
+
+                <!-- Digital Globe -->
+                <circle cx="195" cy="140" r="102" fill="url(#privGlobeGrad)" />
+                <g clip-path="url(#privGlobeClip)" opacity="0.82">
+                  <ellipse cx="195" cy="140" rx="102" ry="34" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <ellipse cx="195" cy="140" rx="102" ry="68" stroke="#93c5fd" stroke-width="0.9" fill="none" />
+                  <ellipse cx="195" cy="140" rx="48" ry="102" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <path d="M132 92 C150 78, 178 82, 184 102 C188 118, 170 130, 172 144 C176 158, 192 166, 184 186 C176 206, 156 208, 148 188 C142 170, 148 158, 138 144 C126 128, 120 106, 132 92 Z" fill="#dbeafe" opacity="0.55" />
+                  <path d="M210 88 C232 80, 260 94, 266 118 C270 138, 252 152, 236 148 C222 144, 218 158, 228 172 C240 186, 234 210, 216 214 C200 218, 196 190, 202 168 C208 148, 196 110, 210 88 Z" fill="#dbeafe" opacity="0.55" />
+                  <path d="M150 112 Q195 78 242 112" stroke="#bae6fd" stroke-width="1.5" fill="none" />
+                  <circle cx="150" cy="112" r="3.5" fill="#ffffff" />
+                  <circle cx="242" cy="112" r="3.5" fill="#7dd3fc" />
+                </g>
+
+                <!-- Green Security Leaves Behind Illustration -->
+                <path d="M84 226 C64 202, 58 172, 74 148 C90 172, 96 198, 92 226 Z" fill="#22c55e" opacity="0.92" />
+                <path d="M98 228 C82 214, 78 192, 90 174 C102 192, 108 210, 104 228 Z" fill="#16a34a" opacity="0.92" />
+                <path d="M312 222 C332 196, 336 164, 318 142 C304 166, 298 194, 304 222 Z" fill="#22c55e" opacity="0.92" />
+
+                <!-- Prominent Security Shield with Padlock -->
+                <g transform="translate(88 104)">
+                  <path d="M62 2 L10 22 V66 C10 105 32 136 62 150 C92 136 114 105 114 66 V22 L62 2 Z" fill="#ffffff" stroke="#dbeafe" stroke-width="2" />
+                  <path d="M62 12 L20 29 V66 C20 99 39 126 62 139 C85 126 104 99 104 66 V29 L62 12 Z" fill="url(#privShieldGrad)" />
+                  <!-- Padlock Shackle & Body -->
+                  <path d="M48 64 V52 C48 43 54 37 62 37 C70 37 76 43 76 52 V64" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" fill="none" />
+                  <rect x="42" y="62" width="40" height="33" rx="7" fill="#ffffff" />
+                  <circle cx="62" cy="76" r="4.2" fill="#1d4ed8" />
+                  <rect x="60" y="79" width="4" height="8" rx="2" fill="#1d4ed8" />
+                </g>
+
+                <!-- Protected User/Account Folder Card -->
+                <g transform="translate(182 154)">
+                  <path d="M8 14 C8 8 13 4 19 4 H56 L68 18 H128 C134 18 139 23 139 29 V98 C139 104 134 109 128 109 H19 C13 109 8 104 8 98 Z" fill="#dbeafe" stroke="#93c5fd" stroke-width="1.5" />
+                  <rect x="2" y="28" width="132" height="82" rx="12" fill="url(#privFolderGrad)" stroke="#93c5fd" stroke-opacity="0.55" stroke-width="1.5" />
+                  <circle cx="48" cy="58" r="11" fill="#dbeafe" />
+                  <path d="M31 87 C31 74 65 74 65 87" fill="#dbeafe" />
+                  <rect x="76" y="54" width="38" height="5" rx="2.5" fill="#93c5fd" />
+                  <rect x="76" y="66" width="28" height="4.5" rx="2.2" fill="#60a5fa" />
+                  <!-- Green Check Badge -->
+                  <circle cx="122" cy="96" r="18" fill="#ffffff" />
+                  <circle cx="122" cy="96" r="15" fill="#16a34a" />
+                  <path d="M115 96 L120 101 L130 90" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Policy Content Container (Clean 2-Column Numbered Card Layout) -->
+    <div id="privacy-policy-cards" class="scroll-mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 pb-12 sm:pb-16 space-y-8 relative z-20">
+      <div class="rounded-3xl bg-white border border-blue-100/90 shadow-[0_22px_55px_-22px_rgba(13,38,88,0.16)] p-5 sm:p-8 lg:p-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-7">
+
+          <!-- 1. Introduction -->
+          <article class="rounded-2xl bg-[#fbfdff] p-5 sm:p-6 border border-blue-100/70 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-emerald-50 text-[#16a34a] flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="space-y-2">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">1. Introduction</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                This Privacy Policy explains how <strong>GetKYCApproved</strong> (Virtual Accounts &amp; Crypto Suite) operates with respect to user privacy. Our platform runs client-side in your browser to demonstrate verification readiness, supported virtual account criteria, and document format previews.
+              </p>
+            </div>
+          </article>
+
+          <!-- 2. Information Handling & Scope -->
+          <article class="rounded-2xl bg-[#fbfdff] p-5 sm:p-6 border border-blue-100/70 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-database"></i>
+            </div>
+            <div class="space-y-2.5">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">2. Information Handling Scope</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                GetKYCApproved operates on a zero-remote-storage model for document previews:
+              </p>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-[#3b5482]">
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span><strong>No Remote Identity Collection:</strong> We do not store, harvest, transmit, or retain personal identity details, uploaded portraits, passport photos, or credential numbers on external databases or cloud servers.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span><strong>Voluntary Support Inquiries:</strong> Direct messages sent via email or support channels are received strictly to answer your questions.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span><strong>Local UI State:</strong> Field inputs and active filters stay locally inside your browser session.</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- 3. Local In-Memory Browser Processing -->
+          <article class="rounded-2xl bg-[#fbfdff] p-5 sm:p-6 border border-blue-100/70 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-gear"></i>
+            </div>
+            <div class="space-y-2.5">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">3. Local In-Memory Processing</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                All interactive document features operate locally inside your browser sandbox:
+              </p>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-[#3b5482]">
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>Document preview generation, MRZ calculations, canvas rendering, and barcode simulations run via client-side JavaScript APIs.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>In-memory data is automatically discarded when you close or refresh your browser tab.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>Direct support correspondence is utilized solely to respond to and resolve user questions.</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- 4. Third-Party Platform Links & Sharing -->
+          <article class="rounded-2xl bg-[#fbfdff] p-5 sm:p-6 border border-blue-100/70 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-share-nodes"></i>
+            </div>
+            <div class="space-y-2.5">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">4. Third-Party Links &amp; Sharing</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                We do not sell, rent, or trade your personal information or verification data:
+              </p>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-[#3b5482]">
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>Never sold or shared with third-party advertising networks.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>Links to exchanges (Binance, Bybit, OKX, KuCoin) and virtual account providers (PayPal, Payoneer, Wise, Grey) do not pass personal identifiers, telemetry, or referral tokens from your preview session.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>External websites and third-party download prompts remain governed by their respective privacy notices.</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- 5. Data Security (Light Blue Visual Security Card) -->
+          <article class="rounded-2xl bg-gradient-to-br from-[#eff6ff] via-[#f4f8ff] to-[#e7f1ff] p-5 sm:p-6 border border-blue-200/80 flex items-start gap-4">
+            <div class="flex flex-col items-center gap-2 shrink-0">
+              <div class="w-12 h-12 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-50 text-[#16a34a] border border-emerald-200 text-xs" aria-hidden="true">
+                <i class="fa-solid fa-shield-halved"></i>
+              </span>
+            </div>
+            <div class="space-y-2">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">5. Data Security</h3>
+              <p class="text-xs sm:text-sm text-[#3b5482] leading-relaxed">
+                All document preview generation and field customizations remain isolated within your client browser sandbox, avoiding remote storage of sensitive identity inputs. Direct inquiries sent to customer support are handled with strict professional confidentiality and appropriate safeguards, while recognizing that no electronic transmission over the internet is completely risk-free.
+              </p>
+            </div>
+          </article>
+
+          <!-- 6. Your Rights & Controls -->
+          <article class="rounded-2xl bg-[#fbfdff] p-5 sm:p-6 border border-blue-100/70 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div class="space-y-2.5">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">6. Your Rights &amp; Controls</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                Based on how GetKYCApproved operates, you have the right to:
+              </p>
+              <ul class="space-y-1.5 text-xs sm:text-sm text-[#3b5482]">
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>Clear or reject browser cookies and local storage items anytime through your browser's Privacy or Security settings.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>Request review, correction, or deletion of direct email support correspondence sent to our team.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <i class="fa-solid fa-circle-check text-[#16a34a] text-sm mt-0.5 shrink-0"></i>
+                  <span>Discard active in-memory preview fields immediately by closing or refreshing your browser tab.</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- 7. Cookies & Local Browser Storage -->
+          <article class="rounded-2xl bg-[#fbfdff] p-5 sm:p-6 border border-blue-100/70 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-cookie-bite"></i>
+            </div>
+            <div class="space-y-2.5">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">7. Cookies &amp; Local Browser Storage</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                We only use essential client-side browser storage to save temporary UI state, such as your selected document tab, active platform filter, or editor display settings across reloads.
+              </p>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                No tracking or advertising cookies are placed by GetKYCApproved on your device. You can reject or clear cookies and local storage items anytime through your browser settings.
+              </p>
+            </div>
+          </article>
+
+          <!-- 8. Contact Us -->
+          <article class="rounded-2xl bg-[#fbfdff] p-5 sm:p-6 border border-blue-100/70 flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xl shrink-0">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div class="space-y-3 w-full">
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">8. Contact Us</h3>
+              <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+                If you have questions regarding this Privacy Policy, browser storage, or direct support confidentiality, please reach us using our official contact details:
+              </p>
+              <div class="flex flex-wrap items-center gap-2.5 pt-0.5">
+                <a href="mailto:getkycapproved@gmail.com" class="min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#e8f2ff] hover:bg-[#dcebff] text-[#0d2658] font-bold text-xs sm:text-sm border border-blue-200 transition-colors">
+                  <i class="fa-solid fa-envelope text-[#0d5bd9]"></i>
+                  <span>getkycapproved@gmail.com</span>
+                </a>
+                <a href="tel:005365446" class="min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 hover:bg-emerald-100 text-[#0d2658] font-bold text-xs sm:text-sm border border-emerald-200 transition-colors">
+                  <i class="fa-solid fa-phone text-[#16a34a]"></i>
+                  <span>005365446</span>
+                </a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+
+      <!-- 3. Trust Call-To-Action Banner -->
+      <div class="kyc-about-cta-banner rounded-3xl px-6 py-7 sm:px-9 sm:py-8 relative overflow-hidden text-white">
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-5">
+            <!-- Dotted World Map & Emerald Shield Visual -->
+            <div class="relative w-32 h-16 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 180 90" class="w-32 h-16 opacity-35" aria-hidden="true">
+                <defs>
+                  <pattern id="privCtaDots" width="6" height="6" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1.2" fill="#93c5fd" />
+                  </pattern>
+                  <mask id="privCtaMask">
+                    <rect width="180" height="90" fill="black" />
+                    <ellipse cx="42" cy="34" rx="28" ry="18" fill="white" />
+                    <ellipse cx="95" cy="36" rx="30" ry="20" fill="white" />
+                    <ellipse cx="142" cy="48" rx="26" ry="20" fill="white" />
+                  </mask>
+                </defs>
+                <rect width="180" height="90" fill="url(#privCtaDots)" mask="url(#privCtaMask)" />
+              </svg>
+              <div class="w-14 h-14 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center shadow-md relative z-10">
+                <svg class="w-9 h-10" viewBox="0 0 64 72" fill="none" aria-hidden="true">
+                  <path d="M32 4L8 14V33C8 49.5 18.2 63.4 32 68C45.8 63.4 56 49.5 56 33V14L32 4Z" fill="#ffffff" stroke="#dcfce7" stroke-width="2"/>
+                  <path d="M32 9L13 17V33C13 46.5 21.1 58 32 62C42.9 58 51 46.5 51 33V17L32 9Z" fill="#16a34a"/>
+                  <path d="M22.5 35.5L28.8 41.8L42 28.5" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <h2 class="text-xl sm:text-2xl lg:text-[1.65rem] font-extrabold tracking-tight text-white">
+                Your Privacy Matters
+              </h2>
+              <p class="text-xs sm:text-sm text-blue-100 font-medium max-w-xl">
+                We are committed to responsible, client-side handling of user information and transparent privacy practices across GetKYCApproved.
+              </p>
+            </div>
+          </div>
+
+          <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill min-h-[48px] shrink-0 inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+            <span>Get Started Now</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DEDICATED TERMS OF SERVICE PAGE ================= -->
+  <section id="terms-page-section" class="hidden no-print relative overflow-x-hidden bg-white">
+    <!-- 1. Terms Hero Section -->
+    <div class="kyc-hero-surface relative overflow-hidden pt-8 sm:pt-12 lg:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
+      <!-- Subtle Dotted World Map Backdrop -->
+      <svg aria-hidden="true" class="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" viewBox="0 0 1200 520" fill="none">
+        <defs>
+          <pattern id="termsHeroWorldDots" width="12" height="12" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.4" fill="#7fb5fb" />
+          </pattern>
+          <mask id="termsHeroWorldMask">
+            <rect width="1200" height="520" fill="black" />
+            <ellipse cx="260" cy="180" rx="160" ry="95" fill="white" />
+            <ellipse cx="320" cy="310" rx="85" ry="95" fill="white" />
+            <ellipse cx="620" cy="170" rx="185" ry="90" fill="white" />
+            <ellipse cx="640" cy="300" rx="95" ry="105" fill="white" />
+            <ellipse cx="890" cy="210" rx="170" ry="110" fill="white" />
+            <ellipse cx="980" cy="370" rx="90" ry="60" fill="white" />
+          </mask>
+        </defs>
+        <rect width="1200" height="520" fill="url(#termsHeroWorldDots)" mask="url(#termsHeroWorldMask)" />
+      </svg>
+
+      <!-- Bottom Flowing Wave Divider -->
+      <svg aria-hidden="true" class="absolute bottom-0 inset-x-0 w-full h-14 sm:h-20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1440 120">
+        <defs>
+          <linearGradient id="termsHeroWaveWash" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.45" />
+            <stop offset="50%" stop-color="#ccfbf1" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.65" />
+          </linearGradient>
+        </defs>
+        <path d="M0,44 C360,104 920,-10 1440,56 L1440,120 L0,120 Z" fill="url(#termsHeroWaveWash)" />
+        <path d="M0,76 C420,28 960,108 1440,62 L1440,120 L0,120 Z" fill="#ffffff" />
+      </svg>
+
+      <div class="max-w-6xl mx-auto relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center">
+          <!-- Left Column: Badge, Headings, Intro & Green CTA -->
+          <div class="lg:col-span-6 space-y-4 text-center lg:text-left">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-blue-100 text-[#0d2658] text-xs sm:text-sm font-bold shadow-sm">
+              <span class="w-5 h-5 rounded-full bg-blue-50 text-[#0d5bd9] flex items-center justify-center text-xs">
+                <i class="fa-solid fa-file-lines"></i>
+              </span>
+              <span>Terms of Service</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-[3.35rem] font-extrabold text-[#0d2658] tracking-tight leading-[1.06]">
+              Terms of Service
+            </h1>
+
+            <h2 class="text-xl sm:text-2xl lg:text-[1.6rem] font-extrabold text-[#14306b] leading-snug">
+              Your Agreement. Our Commitment.
+            </h2>
+
+            <p class="text-sm sm:text-base text-[#3b5482] font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
+              By using GetKYCApproved (Virtual Accounts &amp; Crypto Suite), you agree to the following Terms of Service and operating guidelines. Please review them carefully before using the website.
+            </p>
+
+            <div class="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill min-h-[48px] inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+                <span>Get Started Now</span>
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+              </button>
+              <button type="button" onclick="goToHomePage(event)" class="min-h-[48px] inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-white/90 hover:bg-white text-[#0d2658] border border-blue-200 font-bold text-sm transition-colors shadow-sm cursor-pointer">
+                <i class="fa-solid fa-house text-xs text-[#0d5bd9]"></i>
+                <span>Back to Home</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Document Agreement, Security Shield, Signature & Globe SVG -->
+          <div class="lg:col-span-6 flex items-center justify-center relative">
+            <div class="relative w-full max-w-[440px] h-[270px] sm:h-[330px] flex items-center justify-center select-none">
+              <div class="absolute inset-6 rounded-full bg-gradient-to-tr from-[#2563eb]/25 via-[#38bdf8]/30 to-[#22c55e]/15 blur-2xl pointer-events-none"></div>
+
+              <svg viewBox="0 0 380 310" class="w-full max-w-[310px] sm:max-w-[380px] h-auto drop-shadow-[0_20px_38px_rgba(37,99,235,0.25)]" aria-label="Terms of Service agreement document, security shield, pen signature, and global network illustration">
+                <defs>
+                  <radialGradient id="termsGlobeGrad" cx="38%" cy="34%" r="66%">
+                    <stop offset="0%" stop-color="#93c5fd" />
+                    <stop offset="36%" stop-color="#2563eb" />
+                    <stop offset="80%" stop-color="#1e40af" />
+                    <stop offset="100%" stop-color="#0f2557" />
+                  </radialGradient>
+                  <clipPath id="termsGlobeClip">
+                    <circle cx="212" cy="134" r="98" />
+                  </clipPath>
+                </defs>
+
+                <!-- Orbit Rings -->
+                <ellipse cx="212" cy="134" rx="150" ry="50" transform="rotate(-14 212 134)" stroke="#bae6fd" stroke-opacity="0.8" stroke-width="1.5" fill="none" />
+                <ellipse cx="212" cy="134" rx="142" ry="44" transform="rotate(14 212 134)" stroke="#93c5fd" stroke-opacity="0.7" stroke-width="1.3" stroke-dasharray="5 5" fill="none" />
+
+                <!-- Digital Globe -->
+                <circle cx="212" cy="134" r="98" fill="url(#termsGlobeGrad)" />
+                <g clip-path="url(#termsGlobeClip)" opacity="0.8">
+                  <ellipse cx="212" cy="134" rx="98" ry="32" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <ellipse cx="212" cy="134" rx="98" ry="64" stroke="#93c5fd" stroke-width="0.9" fill="none" />
+                  <ellipse cx="212" cy="134" rx="46" ry="98" stroke="#93c5fd" stroke-width="1" fill="none" />
+                  <path d="M150 92 C168 80, 196 84, 202 104 C206 120, 188 130, 190 144 C194 158, 208 164, 200 184 C192 204, 172 206, 166 186 C160 168, 166 156, 156 142 C144 128, 138 106, 150 92 Z" fill="#dbeafe" opacity="0.55" />
+                  <path d="M226 88 C246 80, 274 92, 278 116 C282 136, 264 150, 250 146 C236 142, 232 154, 242 168 C252 182, 246 204, 230 208 C216 212, 212 184, 216 164 C222 146, 212 110, 226 88 Z" fill="#dbeafe" opacity="0.55" />
+                  <circle cx="174" cy="108" r="3" fill="#ffffff" />
+                  <circle cx="256" cy="112" r="3" fill="#7dd3fc" />
+                </g>
+
+                <!-- Green Security Leaves -->
+                <path d="M84 234 C64 208, 58 176, 74 152 C90 176, 96 204, 92 234 Z" fill="#22c55e" opacity="0.92" />
+                <path d="M98 236 C82 220, 78 198, 90 180 C102 198, 108 218, 104 236 Z" fill="#16a34a" opacity="0.92" />
+
+                <!-- Terms of Service Document Card -->
+                <g transform="translate(88 54) rotate(-5)">
+                  <rect x="0" y="0" width="142" height="176" rx="14" fill="#ffffff" stroke="#bfdbfe" stroke-width="2" />
+                  <rect x="16" y="18" width="110" height="22" rx="6" fill="#eff6ff" />
+                  <text x="71" y="32" text-anchor="middle" fill="#0d2658" font-size="10" font-weight="800">Terms of Service</text>
+                  <rect x="20" y="54" width="102" height="6" rx="3" fill="#93c5fd" />
+                  <rect x="20" y="68" width="84" height="5" rx="2.5" fill="#cbd5e1" />
+                  <rect x="20" y="80" width="96" height="5" rx="2.5" fill="#cbd5e1" />
+                  <rect x="20" y="92" width="76" height="5" rx="2.5" fill="#cbd5e1" />
+                  <rect x="20" y="108" width="98" height="5" rx="2.5" fill="#cbd5e1" />
+                  <rect x="20" y="120" width="66" height="5" rx="2.5" fill="#e2e8f0" />
+                  <!-- Signature Stroke -->
+                  <path d="M24 148 Q38 136 52 146 T84 144" stroke="#0d5bd9" stroke-width="2.4" fill="none" stroke-linecap="round" />
+                  <line x1="20" y1="156" x2="92" y2="156" stroke="#93c5fd" stroke-width="1.4" />
+                </g>
+
+                <!-- Prominent Emerald Security Shield -->
+                <g transform="translate(178 136)">
+                  <path d="M46 2 L8 18 V52 C8 82 24 106 46 116 C68 106 84 82 84 52 V18 L46 2 Z" fill="#ffffff" stroke="#bae6fd" stroke-width="2" />
+                  <path d="M46 10 L15 23 V52 C15 77 28 97 46 106 C64 97 77 77 77 52 V23 L46 10 Z" fill="#16a34a" />
+                  <path d="M31 54 L42 65 L62 42" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                </g>
+
+                <!-- Stylized Signing Pen -->
+                <g transform="translate(274 174) rotate(28)">
+                  <rect x="0" y="0" width="14" height="72" rx="6" fill="#0d5bd9" />
+                  <rect x="2" y="8" width="10" height="44" rx="4" fill="#3b82f6" />
+                  <polygon points="0,72 14,72 7,88" fill="#dbeafe" />
+                  <polygon points="4,81 10,81 7,88" fill="#0d2658" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Terms Content Container (Preserving Existing Terms Clauses Cleanly) -->
+    <div id="terms-content-cards" class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 pb-12 sm:pb-16 space-y-6 sm:space-y-8 relative z-20">
+      <!-- Numbered Sections 1 - 6 in Responsive Two-Column Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
+
+        <!-- 1. Acceptance of Terms & Educational Purpose (Prominent Highlight Card) -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef5ff] border-blue-200/90">
+          <div class="w-16 h-16 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-handshake"></i>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white text-xs font-extrabold inline-flex items-center justify-center shrink-0">1</span>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Acceptance &amp; Educational Purpose</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              By accessing and using <strong>GetKYCApproved</strong>, you agree to comply with these Terms of Service and operating guidelines. If you do not agree, please do not use the website.
+            </p>
+            <p class="text-xs sm:text-sm text-[#3b5482] font-medium leading-relaxed">
+              Virtual Accounts &amp; Crypto Suite is designed exclusively for educational demonstration, compliance benchmarking, and visual inspection of international digital account verification standards.
+            </p>
+          </div>
+        </article>
+
+        <!-- 2. Permitted & Lawful Use -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5">
+          <div class="w-16 h-16 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white text-[#16a34a] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-laptop"></i>
+            </div>
+          </div>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white text-xs font-extrabold inline-flex items-center justify-center shrink-0">2</span>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Permitted &amp; Lawful Use</h3>
+            </div>
+            <div class="space-y-1.5 text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              <p>
+                <strong class="text-[#0d2658]">Permitted Use:</strong> Review official virtual account criteria, explore supported country document requirements, and inspect formatting previews for educational benchmarking.
+              </p>
+              <p>
+                <strong class="text-[#0d2658]">Prohibited Use:</strong> Users agree not to utilize any tools, specimens, or templates provided on this portal to commit fraud, engage in deceptive impersonation, bypass lawful anti-money laundering (AML) controls, or violate applicable domestic or international regulations.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- 3. Platform Independence & Third-Party Services -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5">
+          <div class="w-16 h-16 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-building-columns"></i>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white text-xs font-extrabold inline-flex items-center justify-center shrink-0">3</span>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Platform Independence &amp; Third-Party Services</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              We are not a bank, broker-dealer, or custodial exchange. All accounts opened with third-party providers (PayPal, Payoneer, Binance, Bybit, etc.) are governed exclusively by their respective independent terms of service and KYC validation standards.
+            </p>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              This portal is an independent educational benchmark and format previewer and is not affiliated with, authorized by, endorsed by, or connected to any government identity agency, passport issuing authority, or national registration board.
+            </p>
+          </div>
+        </article>
+
+        <!-- 4. Privacy -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5">
+          <div class="w-16 h-16 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+          </div>
+          <div class="space-y-2.5">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white text-xs font-extrabold inline-flex items-center justify-center shrink-0">4</span>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Privacy</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Your use of GetKYCApproved is also subject to our Privacy Policy, which describes how this client-side portal operates without storing personal identity details on remote servers and how direct support inquiries are handled confidentially.
+            </p>
+            <div>
+              <button type="button" onclick="openPrivacyPage()" class="min-h-[44px] inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#e8f2ff] hover:bg-[#dcebff] text-[#0d5bd9] font-bold text-xs sm:text-sm border border-blue-200 transition-colors cursor-pointer">
+                <span>View Privacy Policy</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 5. Limitation of Liability & No Financial Advice -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5">
+          <div class="w-16 h-16 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white text-xs font-extrabold inline-flex items-center justify-center shrink-0">5</span>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Limitation of Liability</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              This website and its preview tools are provided on an "as-is" basis without warranties of any kind. The operators shall not be liable for any direct, indirect, incidental, or consequential damages resulting from user access or application usage.
+            </p>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              Nothing on this website constitutes financial, taxation, investment, or legal advice. Account verification eligibility, deposit allowances, and KYC compliance approvals are determined solely by each autonomous financial institution.
+            </p>
+          </div>
+        </article>
+
+        <!-- 6. Updates & Trademark Notice -->
+        <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start gap-5">
+          <div class="w-16 h-16 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white text-xs font-extrabold inline-flex items-center justify-center shrink-0">6</span>
+              <h3 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Changes to Terms &amp; Trademarks</h3>
+            </div>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              We may update these Terms of Service and operating guidelines from time to time. Updates are reflected directly on this page, and continued use of the platform constitutes acceptance of the current posted terms.
+            </p>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed">
+              All trademarks, logos, brand names, and company designations (including PayPal, Payoneer, Raenest, Grey, Mercury, Wise, Revolut, Elevate, Binance, Bybit, OKX, and KuCoin) are the registered property of their respective owners and are used strictly descriptively.
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <!-- 3. Our Commitment Banner -->
+      <div class="kyc-trust-banner rounded-3xl px-6 py-7 sm:px-9 sm:py-8 relative overflow-hidden">
+        <!-- Subtle City Silhouette Backdrop on Right -->
+        <svg aria-hidden="true" class="hidden md:block absolute right-0 bottom-0 h-full w-64 text-blue-300/35 pointer-events-none" viewBox="0 0 260 140" fill="currentColor">
+          <rect x="30" y="75" width="18" height="65" />
+          <rect x="54" y="48" width="24" height="92" />
+          <rect x="86" y="64" width="16" height="76" />
+          <rect x="110" y="34" width="26" height="106" />
+          <rect x="144" y="56" width="20" height="84" />
+          <rect x="172" y="24" width="28" height="116" />
+          <rect x="208" y="62" width="18" height="78" />
+          <rect x="232" y="84" width="16" height="56" />
+        </svg>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+          <!-- Dotted World Map & Emerald Verified Shield -->
+          <div class="lg:col-span-4 flex items-center justify-center relative min-h-[100px]">
+            <svg viewBox="0 0 280 130" class="w-60 h-24 text-blue-400/60" fill="currentColor" aria-hidden="true">
+              <defs>
+                <pattern id="termsCommitDots" width="7" height="7" patternUnits="userSpaceOnUse">
+                  <circle cx="2" cy="2" r="1.35" fill="#60a5fa" opacity="0.7" />
+                </pattern>
+                <mask id="termsCommitMask">
+                  <rect width="280" height="130" fill="black" />
+                  <ellipse cx="64" cy="46" rx="44" ry="26" fill="white" />
+                  <ellipse cx="82" cy="92" rx="22" ry="26" fill="white" />
+                  <ellipse cx="152" cy="42" rx="44" ry="22" fill="white" />
+                  <ellipse cx="154" cy="88" rx="25" ry="28" fill="white" />
+                  <ellipse cx="222" cy="56" rx="44" ry="28" fill="white" />
+                  <ellipse cx="242" cy="102" rx="22" ry="15" fill="white" />
+                </mask>
+              </defs>
+              <rect width="280" height="130" fill="url(#termsCommitDots)" mask="url(#termsCommitMask)" />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="w-16 h-16 rounded-2xl bg-white shadow-lg border border-blue-100 flex items-center justify-center">
+                <svg class="w-10 h-11" viewBox="0 0 64 72" fill="none" aria-hidden="true">
+                  <path d="M32 4L8 14V33C8 49.5 18.2 63.4 32 68C45.8 63.4 56 49.5 56 33V14L32 4Z" fill="#ffffff" stroke="#dcfce7" stroke-width="2"/>
+                  <path d="M32 9L13 17V33C13 46.5 21.1 58 32 62C42.9 58 51 46.5 51 33V17L32 9Z" fill="#16a34a"/>
+                  <path d="M22.5 35.5L28.8 41.8L42 28.5" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8 lg:border-l lg:border-blue-200/80 lg:pl-8 text-center lg:text-left space-y-1.5">
+            <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight">Our Commitment</h2>
+            <p class="text-xs sm:text-sm text-[#47608e] font-medium leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              We are committed to maintaining a transparent, educational, and privacy-conscious platform for users exploring virtual account criteria and international KYC verification standards.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Contact Us Card (7) -->
+      <article class="kyc-about-card rounded-3xl p-6 sm:p-7 flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
+          <div class="w-16 h-16 rounded-full bg-[#e6f0ff] border border-[#cfe2ff] flex items-center justify-center shrink-0">
+            <div class="w-11 h-11 rounded-full bg-white text-[#0d5bd9] shadow-sm flex items-center justify-center text-xl">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-center sm:justify-start gap-2.5">
+              <span class="w-6 h-6 rounded-full bg-[#0d5bd9] text-white text-xs font-extrabold inline-flex items-center justify-center shrink-0">7</span>
+              <h2 class="text-lg sm:text-xl font-extrabold text-[#0d2658] tracking-tight">Contact Us</h2>
+            </div>
+            <p class="text-xs sm:text-sm text-[#47608e] leading-relaxed max-w-xl">
+              If you have questions about these Terms of Service, please contact us through our support channels.
+            </p>
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-1 text-xs font-bold text-[#0d2658]">
+              <a href="mailto:getkycapproved@gmail.com" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors">
+                <i class="fa-solid fa-envelope text-[#0d5bd9]"></i>
+                <span>getkycapproved@gmail.com</span>
+              </a>
+              <a href="tel:005365446" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+                <i class="fa-solid fa-phone text-[#16a34a]"></i>
+                <span>005365446</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onclick="openContactModal()" class="kyc-va-cta min-h-[48px] shrink-0 px-7 py-3 rounded-full text-white font-extrabold text-sm inline-flex items-center justify-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer">
+          <span>Contact Support</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </article>
+
+      <!-- 5. Final Full-Width CTA Banner -->
+      <div class="kyc-about-cta-banner rounded-3xl px-6 py-7 sm:px-9 sm:py-8 relative overflow-hidden text-white">
+        <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6 text-center lg:text-left">
+          <div class="flex flex-col sm:flex-row items-center gap-5">
+            <div class="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-3xl text-sky-200 shrink-0">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div class="hidden sm:block w-px h-14 bg-white/25" aria-hidden="true"></div>
+            <div class="space-y-1">
+              <h2 class="text-xl sm:text-2xl lg:text-[1.65rem] font-extrabold tracking-tight text-white">
+                Get Started With GetKYCApproved
+              </h2>
+              <p class="text-xs sm:text-sm text-blue-100 font-medium max-w-xl">
+                Explore available virtual account services and begin your verification journey.
+              </p>
+            </div>
+          </div>
+
+          <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill min-h-[48px] shrink-0 inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
+            <span>Get Started Now</span>
+            <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ================= VIRTUAL ACCOUNTS VERIFICATION WORKBENCH (LIVE DOCUMENT PREVIEW & EDITOR) ================= -->
   <section id="verification-workbench" class="hidden scroll-mt-24 py-10 lg:py-14 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200">
@@ -28129,7 +29514,7 @@ COD REP DEM CONGO</div>
   </div>
 
   <!-- ================= ABOUT MODAL ================= -->
-  <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200">
       <div class="flex items-center justify-between pb-4 border-b border-slate-100">
         <div class="flex items-center gap-3">
@@ -28137,8 +29522,8 @@ COD REP DEM CONGO</div>
             <i class="fa-solid fa-wallet text-lg"></i>
           </div>
           <div>
-            <h3 class="font-bold text-slate-900 text-base">About kycGetApproved</h3>
-            <p class="text-xs text-slate-500">Cross-Border Banking &amp; Exchange Compliance</p>
+            <h3 class="font-bold text-slate-900 text-base">About GetKYCApproved</h3>
+            <p class="text-xs text-slate-500">Global Virtual Accounts &amp; KYC Verification Guide</p>
           </div>
         </div>
         <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
@@ -28148,33 +29533,29 @@ COD REP DEM CONGO</div>
 
       <div class="py-4 space-y-3 text-xs text-slate-600 leading-relaxed">
         <p>
-          <strong class="text-slate-900">kycGetApproved</strong> is an interactive fintech portal demonstrating verification readiness, receiving account specifications, and KYC compliance architectures for international users, remote freelancers, and crypto traders.
+          <strong class="text-slate-900">GetKYCApproved</strong> is an interactive informational fintech portal covering virtual bank and exchange account options alongside country-specific KYC document guidance for international users and freelancers.
         </p>
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
           <div class="flex items-center gap-2 font-semibold text-slate-800">
             <i class="fa-solid fa-check text-emerald-600"></i>
-            USD, EUR &amp; GBP Virtual Accounts (PayPal, Payoneer, Raenest, Grey)
+            Virtual Accounts Overview (PayPal, Wise, Payoneer, Raenest, Paxum)
           </div>
           <div class="flex items-center gap-2 font-semibold text-slate-800">
             <i class="fa-solid fa-check text-emerald-600"></i>
-            Global Tier 2/3 Crypto Exchange Ready (Binance, Bybit, OKX, KuCoin)
+            Crypto Exchange KYC Guidance (Binance, Bybit, OKX, KuCoin)
           </div>
           <div class="flex items-center gap-2 font-semibold text-slate-800">
             <i class="fa-solid fa-check text-emerald-600"></i>
-            US Bank Routing, SEPA IBAN &amp; Swift Integration Guidelines
-          </div>
-          <div class="flex items-center gap-2 font-semibold text-slate-800">
-            <i class="fa-solid fa-check text-emerald-600"></i>
-            Real-Time Platform Requirements &amp; Instant Spec Copy
+            Country-Specific Official ID, Passport &amp; Address Document Categories
           </div>
         </div>
-        <p class="text-[11px] text-slate-400">
-          Designed for compliance analysis, cross-border invoicing workflows, and identity verification benchmarking.
-        </p>
       </div>
 
-      <div class="pt-3 border-t border-slate-100 flex justify-end">
-        <button onclick="closeAboutModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800">
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+        <button onclick="openAboutPage()" class="px-4 py-2 text-xs font-bold rounded-lg bg-[#0d5bd9] text-white hover:bg-blue-700 cursor-pointer">
+          View Full About Page
+        </button>
+        <button onclick="closeAboutModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
           Close
         </button>
       </div>
@@ -28369,7 +29750,7 @@ COD REP DEM CONGO</div>
   </div>
 
   <!-- ================= PRIVACY POLICY MODAL ================= -->
-  <div id="privacyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div id="privacyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
         <div class="flex items-center gap-3">
@@ -28438,7 +29819,10 @@ COD REP DEM CONGO</div>
         </div>
       </div>
 
-      <div class="pt-3 border-t border-slate-100 flex justify-end shrink-0">
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 shrink-0">
+        <button onclick="openPrivacyPage()" class="px-4 py-2 text-xs font-bold rounded-xl bg-[#0d5bd9] text-white hover:bg-blue-700 cursor-pointer">
+          View Full Privacy Policy Page
+        </button>
         <button onclick="closePrivacyModal()" class="px-5 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
           Close
         </button>
@@ -28447,7 +29831,7 @@ COD REP DEM CONGO</div>
   </div>
 
   <!-- ================= TERMS OF SERVICE MODAL ================= -->
-  <div id="termsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+  <div id="termsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in duration-200 max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-4 border-b border-slate-100 shrink-0">
         <div class="flex items-center gap-3">
@@ -28506,7 +29890,10 @@ COD REP DEM CONGO</div>
         </div>
       </div>
 
-      <div class="pt-3 border-t border-slate-100 flex justify-end shrink-0">
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 shrink-0">
+        <button onclick="openTermsPage()" class="px-4 py-2 text-xs font-bold rounded-xl bg-[#0d5bd9] text-white hover:bg-blue-700 cursor-pointer">
+          View Full Terms Page
+        </button>
         <button onclick="closeTermsModal()" class="px-5 py-2 text-xs font-semibold rounded-xl bg-slate-900 text-white hover:bg-slate-800 cursor-pointer">
           Close
         </button>
@@ -29044,7 +30431,7 @@ COD REP DEM CONGO</div>
               <span title="Kenya">🇰🇪</span>
               <span title="United Arab Emirates">🇦🇪</span>
             </div>
-            <button type="button" onclick="openAboutModal()" class="kyc-va-cta px-6 py-2.5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer">
+            <button type="button" onclick="openAboutPage()" class="kyc-va-cta min-h-[44px] px-6 py-2.5 rounded-full text-white font-bold text-xs sm:text-sm inline-flex items-center gap-2 transition-transform hover:-translate-y-0.5 cursor-pointer">
               <span>Learn More</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
@@ -29084,25 +30471,25 @@ COD REP DEM CONGO</div>
 
         <!-- Policy & Support Links -->
         <nav aria-label="Legal &amp; Policy Menu" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm font-bold text-[#0f295c]">
-          <button type="button" onclick="openTermsModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Terms of Service</button>
+          <button type="button" onclick="openTermsPage()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Terms of Service</button>
           <span class="text-slate-300 font-normal" aria-hidden="true">|</span>
-          <button type="button" onclick="openPrivacyModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Privacy Policy</button>
+          <button type="button" onclick="openPrivacyPage()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Privacy Policy</button>
           <span class="text-slate-300 font-normal" aria-hidden="true">|</span>
           <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Support</button>
         </nav>
 
         <!-- Social Action Icons -->
         <div class="flex items-center gap-3 shrink-0">
-          <button type="button" onclick="openContactModal()" aria-label="Facebook Support" class="w-9 h-9 rounded-full bg-[#1877F2] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <button type="button" onclick="openContactModal()" aria-label="Facebook Support" class="w-10 h-10 rounded-full bg-[#1877F2] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
             <i class="fa-brands fa-facebook-f text-sm"></i>
           </button>
-          <button type="button" onclick="openContactModal()" aria-label="WhatsApp Support" class="w-9 h-9 rounded-full bg-[#25D366] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <button type="button" onclick="openContactModal()" aria-label="WhatsApp Support" class="w-10 h-10 rounded-full bg-[#25D366] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
             <i class="fa-brands fa-whatsapp text-base"></i>
           </button>
-          <button type="button" onclick="openContactModal()" aria-label="Telegram Support" class="w-9 h-9 rounded-full bg-[#229ED9] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <button type="button" onclick="openContactModal()" aria-label="Telegram Support" class="w-10 h-10 rounded-full bg-[#229ED9] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
             <i class="fa-brands fa-telegram text-sm"></i>
           </button>
-          <button type="button" onclick="openAboutModal()" aria-label="YouTube Guide" class="w-9 h-9 rounded-full bg-[#FF0000] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
+          <button type="button" onclick="openAboutPage()" aria-label="About GetKYCApproved Guide" class="w-10 h-10 rounded-full bg-[#FF0000] hover:opacity-90 text-white flex items-center justify-center shadow-sm transition-opacity cursor-pointer">
             <i class="fa-brands fa-youtube text-sm"></i>
           </button>
         </div>
