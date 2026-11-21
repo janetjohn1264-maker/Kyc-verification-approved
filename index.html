@@ -3621,14 +3621,6 @@ var $ = window.$ || (id => document.getElementById(id));
     }
     window.selectFlowDocument = selectFlowDocument;
 
-    function toggleHeaderMenuPopover(id) {
-      const target = $(id);
-      const otherId = id === 'headerNotifPopover' ? 'headerProfilePopover' : 'headerNotifPopover';
-      const other = $(otherId);
-      if (other) other.classList.add('hidden');
-      if (target) target.classList.toggle('hidden');
-    }
-    window.toggleHeaderMenuPopover = toggleHeaderMenuPopover;
 
     // Switch Document Type: 'passport' vs 'idcard' vs 'driverlicense' vs 'refugeecard'
     function switchVerificationDoc(docType, silent) {
@@ -16523,16 +16515,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             }
           }
         });
-        const notifPop = $('headerNotifPopover');
-        const profilePop = $('headerProfilePopover');
-        const notifBtn = $('headerNotifBtn');
-        const profileBtn = $('headerProfileBtn');
-        if (notifPop && !notifPop.contains(e.target) && notifBtn && !notifBtn.contains(e.target)) {
-          notifPop.classList.add('hidden');
-        }
-        if (profilePop && !profilePop.contains(e.target) && profileBtn && !profileBtn.contains(e.target)) {
-          profilePop.classList.add('hidden');
-        }
+
         const wbRoot = $('wbCountryDropdownRoot');
         const wbDocRoot = $('wbDocumentDropdownRoot');
         const flowRoot = $('flowCountryDropdownRoot');
@@ -17243,60 +17226,8 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Support</button>
       </nav>
 
-      <!-- Right Controls: Notification Bell (2) | User Avatar Dropdown & Mobile Menu -->
-      <div class="flex items-center gap-3 shrink-0 relative">
-        <!-- Notification Bell -->
-        <div class="relative">
-          <button type="button" id="headerNotifBtn" onclick="toggleHeaderMenuPopover('headerNotifPopover')" aria-label="Notifications" class="relative w-10 h-10 rounded-full bg-white border border-blue-100 hover:border-blue-300 text-[#1e3a6e] flex items-center justify-center shadow-xs transition-colors cursor-pointer">
-            <i class="fa-regular fa-bell text-lg"></i>
-            <span class="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-red-600 text-white text-[10px] font-extrabold flex items-center justify-center ring-2 ring-white">2</span>
-          </button>
-          <div id="headerNotifPopover" class="hidden absolute right-0 mt-2 w-72 rounded-2xl bg-white border border-blue-100 shadow-xl p-3 space-y-2 z-[150]">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-              <span class="text-xs font-extrabold text-[#0f295c]">Account Updates</span>
-              <span class="text-[10px] font-bold text-emerald-700">2 Ready</span>
-            </div>
-            <button type="button" onclick="setWorkflowViewStep('accounts'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-blue-50/70 hover:bg-blue-100/70 transition-colors cursor-pointer">
-              <div class="text-xs font-bold text-[#0f295c]">KYC Verified Status Active</div>
-              <div class="text-[11px] text-slate-600 mt-0.5">Select any virtual account &amp; country to load Passport, ID, Driver's License, Proof of Address &amp; Account.</div>
-            </button>
-            <button type="button" onclick="setWorkflowViewStep('accounts'); toggleHeaderMenuPopover('headerNotifPopover');" class="w-full text-left p-2.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/70 transition-colors cursor-pointer">
-              <div class="text-xs font-bold text-emerald-900">Proof of Account PDF Ready</div>
-              <div class="text-[11px] text-slate-600 mt-0.5">Select Wise, Grey, or Revolut virtual account to continue.</div>
-            </button>
-          </div>
-        </div>
-
-        <span class="hidden sm:block w-px h-6 bg-blue-200/80"></span>
-
-        <!-- Profile Avatar Dropdown -->
-        <div class="relative">
-          <button type="button" id="headerProfileBtn" onclick="toggleHeaderMenuPopover('headerProfilePopover')" aria-label="Account Menu" class="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-white border border-blue-100 hover:border-blue-300 shadow-xs transition-colors cursor-pointer">
-            <span class="w-8 h-8 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#1d4ed8] text-white flex items-center justify-center text-sm shadow-inner">
-              <i class="fa-solid fa-user"></i>
-            </span>
-            <i class="fa-solid fa-chevron-down text-[10px] text-[#1e3a6e]"></i>
-          </button>
-          <div id="headerProfilePopover" class="hidden absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-blue-100 shadow-xl p-2 space-y-1 z-[150] text-xs font-semibold text-slate-700">
-            <button type="button" onclick="setWorkflowViewStep('accounts'); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-wallet text-blue-600 w-4"></i> Virtual Accounts
-            </button>
-            <button type="button" onclick="openWorkflowDocumentsShortcut(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-id-card text-emerald-600 w-4"></i> Documents
-            </button>
-            <button type="button" onclick="openCryptoExchangesHub(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-blue-50 text-[#0f295c] flex items-center gap-2 cursor-pointer">
-              <i class="fa-brands fa-bitcoin text-amber-500 w-4"></i> Crypto Exchanges
-            </button>
-            <div class="border-t border-slate-100 my-1"></div>
-            <button type="button" onclick="openAboutModal(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-circle-info text-slate-400 w-4"></i> About Us
-            </button>
-            <button type="button" onclick="openContactModal(); toggleHeaderMenuPopover('headerProfilePopover');" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-50 flex items-center gap-2 cursor-pointer">
-              <i class="fa-solid fa-headset text-emerald-600 w-4"></i> Contact Support
-            </button>
-          </div>
-        </div>
-
+      <!-- Right Controls: Mobile Menu -->
+      <div class="flex items-center shrink-0 relative">
         <!-- Mobile Menu Button -->
         <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu" class="md:hidden p-2 text-[#1e3a6e] hover:bg-blue-50 rounded-xl border border-blue-200 cursor-pointer transition-colors flex items-center justify-center">
           <i id="mobileMenuIcon" class="fa-solid fa-bars text-base"></i>
