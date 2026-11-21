@@ -4,6 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
+import { createSifaloPaymentService } from './src/server/sifaloPayments.ts';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,9 +15,12 @@ const PORT = Number(process.env.PORT) || 3000;
 
 async function startServer() {
   const app = express();
+  const sifaloPaymentService = createSifaloPaymentService();
 
   app.use(express.json({ limit: '15mb' }));
   app.use(express.urlencoded({ extended: true, limit: '15mb' }));
+
+  app.use('/api/payments/sifalo', sifaloPaymentService.createRouter());
 
   app.use((req, res, next) => {
     if (req.path === '/' || req.path.endsWith('.html')) {
