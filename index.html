@@ -16,7 +16,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script type="text/javascript" id="ogjs" src="https://apptrck.net/cl/js/n616e4"></script>
@@ -121,6 +121,7 @@
       #ethiopia-fayda-card { width: 100%!important; max-width: 160mm!important; margin: 0 auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; }
       #kenya-id-front, #kenya-id-back { width: 100%!important; max-width: 135mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #somalia-driverlicense-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
+      #newzealand-driverlicense-front, #newzealand-driverlicense-back, #tonga-id-front, #tonga-id-back { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-id-card { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
       #nigeria-passport-card, #uk-passport-card, #uganda-refugee-card, #pakistan-id-card, #seychelles-id-front, #seychelles-id-back, #drc-passport-card, #bangladesh-passport-card, #germany-passport-card, #canada-passport-card, #ghana-passport-card, #ethiopia-passport-card, #rwanda-id-front, #rwanda-id-back { width: 100%!important; max-width: 140mm!important; margin: 10px auto!important; border: 1px solid #94a3b8!important; box-shadow: none!important; page-break-inside: avoid; }
     }
@@ -2670,10 +2671,10 @@ var $ = window.$ || (id => document.getElementById(id));
         idStandard: 'Australian Biometric e-Passport (ICAO Doc 9303 · AUS)'
       },
       newzealand: {
-        authority: 'Department of Internal Affairs (Te Tari Taiwhenua)',
-        portalName: 'New Zealand Passports (Te Tari Taiwhenua)',
-        portalUrl: 'https://www.passports.govt.nz',
-        idStandard: 'New Zealand Biometric e-Passport (NZL)'
+        authority: 'Waka Kotahi NZ Transport Agency & Department of Internal Affairs',
+        portalName: 'Waka Kotahi NZTA & New Zealand Passports',
+        portalUrl: 'https://www.nzta.govt.nz/driver-licences/',
+        idStandard: 'New Zealand Driver Licence & Biometric e-Passport (NZL)'
       },
       fiji: {
         authority: 'Department of Immigration · Ministry of Immigration',
@@ -2835,6 +2836,12 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function extractViewThumbnail(viewEl, docType) {
       if (!viewEl) return '';
+      if (viewEl.id === 'newzealand-driverlicense-view') {
+        return '/assets/aistudio/1795281981482_8895b757.jpg';
+      }
+      if (viewEl.id === 'tonga-idcard-view') {
+        return '/assets/aistudio/1795281954260_95a93fa4.jpg';
+      }
       const imgs = Array.from(viewEl.querySelectorAll('img[src]'));
       const candidates = imgs.map(img => img.getAttribute('src') || '').filter(src => {
         if (!src || src.startsWith('data:')) return false;
@@ -2910,6 +2917,10 @@ var $ = window.$ || (id => document.getElementById(id));
         'newzealand-passport-view': {
           name: 'New Zealand Passport',
           description: `New Zealand / Aotearoa · Department of Internal Affairs e-Passport (NZL) Accepted by ${providerMeta.name}`
+        },
+        'newzealand-driverlicense-view': {
+          name: 'New Zealand Driver Licence',
+          description: `New Zealand / Aotearoa · Waka Kotahi NZ Transport Agency Driver Licence (NZL) Accepted by ${providerMeta.name}`
         },
         'fiji-passport-view': {
           name: 'Fiji Passport',
@@ -3067,6 +3078,7 @@ var $ = window.$ || (id => document.getElementById(id));
         'turkey:idcard': () => { if (typeof updateTurIdPreview === 'function') updateTurIdPreview(); },
         'australia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('australia', 'passport'); },
         'newzealand:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('newzealand', 'passport'); },
+        'newzealand:driverlicense': () => { if (typeof updateNzDlPreview === 'function') updateNzDlPreview(); },
         'fiji:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('fiji', 'passport'); },
         'papuanewguinea:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('papuanewguinea', 'passport'); },
         'papuanewguinea:idcard': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('papuanewguinea', 'idcard'); },
@@ -4051,6 +4063,9 @@ var $ = window.$ || (id => document.getElementById(id));
         if (currentDocType === 'idcard' && typeof updateTurIdPreview === 'function') updateTurIdPreview();
         else if (typeof updateTurPassPreview === 'function') updateTurPassPreview();
       }
+      if (currentCountry === 'newzealand' && currentDocType === 'driverlicense' && typeof updateNzDlPreview === 'function') {
+        updateNzDlPreview();
+      }
       const docTitles = {
         passport: 'Passport Selected',
         idcard: 'National ID Selected',
@@ -4635,7 +4650,11 @@ var $ = window.$ || (id => document.getElementById(id));
         currentDocType = (options.preferredDocType && configuredDocs.includes(options.preferredDocType))
           ? options.preferredDocType
           : (configuredDocs[0] || 'passport');
-        if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview(countryKey, currentDocType);
+        if (countryKey === 'newzealand' && currentDocType === 'driverlicense') {
+          if (typeof updateNzDlPreview === 'function') updateNzDlPreview();
+        } else if (typeof updateOceaniaPreview === 'function') {
+          updateOceaniaPreview(countryKey, currentDocType);
+        }
       }
 
       const countryStyles = {
@@ -5092,6 +5111,8 @@ var $ = window.$ || (id => document.getElementById(id));
         } else if (typeof randomizeKenyaPassport === 'function') {
           randomizeKenyaPassport();
         }
+      } else if (currentCountry === 'newzealand' && currentDocType === 'driverlicense') {
+        if (typeof randomizeNzDriverLicense === 'function') randomizeNzDriverLicense();
       } else if (typeof OCEANIA_COUNTRY_KEYS !== 'undefined' && OCEANIA_COUNTRY_KEYS.includes(currentCountry)) {
         if (typeof randomizeOceaniaDoc === 'function') randomizeOceaniaDoc(currentCountry, currentDocType);
       }
@@ -16577,6 +16598,373 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       window.print();
     }
 
+    // ================= NEW ZEALAND DRIVER LICENCE CONTROLLER =================
+    const NZ_DL_REF_FRONT_SRC = '/assets/aistudio/1795281981482_8895b757.jpg';
+    const NZ_DL_FALLBACK_PORTRAIT = '/assets/aistudio/canada_passport_portrait.png';
+    let nzDlSpecimenMainPhotoUrl = '';
+    let nzDlSpecimenGhostPhotoUrl = '';
+    let nzDlUsingSpecimenPortrait = true;
+    let nzDlRandomIndex = 0;
+
+    const NZ_DL_SPECIMEN = {
+      surname: 'CHEN',
+      firstNames: 'JIAHUI',
+      dob: '15-09-1988',
+      licence: 'AC246810',
+      version: '812',
+      donor: 'DONOR',
+      address: 'APARTMENT 4B\n25 AUCKLAND ROAD\nEPSOM',
+      batch: '0000',
+      conditions: 'Correcting lenses must be used at all times while driving.',
+      topCode: 'C/E',
+      classEndo: '1L',
+      issued: '01-05-2022',
+      expires: '01-05-2032',
+      barcodeText: 'AB123456/12345'
+    };
+
+    const NZ_DL_PRESETS = {
+      reference: { ...NZ_DL_SPECIMEN, useSpecimenPhoto: true },
+      auckland: {
+        surname: 'MCKENZIE',
+        firstNames: 'HARPER ROSE',
+        dob: '12-09-1994',
+        licence: 'DK482910',
+        version: '645',
+        donor: 'DONOR',
+        address: '18 PARNELL RISE\nPARNELL\nAUCKLAND 1052',
+        batch: '0412',
+        conditions: 'No special conditions.',
+        topCode: 'C/E',
+        classEndo: '1F',
+        issued: '19-05-2023',
+        expires: '19-05-2033',
+        barcodeText: 'DK482910/645',
+        useSpecimenPhoto: false,
+        photoUrl: '/assets/aistudio/canada_passport_portrait.png'
+      },
+      wellington: {
+        surname: 'THOMPSON',
+        firstNames: 'NOAH TAMATI',
+        dob: '25-01-1990',
+        licence: 'EW719304',
+        version: '509',
+        donor: 'DONOR',
+        address: '42 ORIENTAL PARADE\nORIENTAL BAY\nWELLINGTON 6011',
+        batch: '0198',
+        conditions: 'Correcting lenses must be used at all times while driving.',
+        topCode: 'C/E',
+        classEndo: '1F',
+        issued: '08-11-2022',
+        expires: '08-11-2032',
+        barcodeText: 'EW719304/509',
+        useSpecimenPhoto: false,
+        photoUrl: '/assets/aistudio/germany_passport_portrait.png'
+      }
+    };
+
+    const NZ_DL_RANDOM_POOL = [
+      { surname: 'PATEL', firstNames: 'AARAV VIKRAM', dob: '04-06-1992', licence: 'BG583920', version: '731', donor: 'DONOR', address: '91 RICCARTON ROAD\nRICCARTON\nCHRISTCHURCH 8011', batch: '0284', conditions: 'No special conditions.', topCode: 'C/E', classEndo: '1F', issued: '14-03-2023', expires: '14-03-2033', photoUrl: '/assets/aistudio/uk_passport_color_portrait.png' },
+      { surname: 'RATAHI', firstNames: 'MAIA AROHA', dob: '06-04-1997', licence: 'CH904127', version: '418', donor: 'DONOR', address: '7 PONSONBY TERRACE\nPONSONBY\nAUCKLAND 1011', batch: '0517', conditions: 'Correcting lenses must be used at all times while driving.', topCode: 'C/E', classEndo: '1R', issued: '22-08-2023', expires: '22-08-2033', photoUrl: '/assets/aistudio/usa_passport_portrait_main.png' },
+      { surname: 'FRASER', firstNames: 'CALEB RYAN', dob: '03-12-1987', licence: 'EJ315809', version: '924', donor: 'NONE', address: '114 GEORGE STREET\nCENTRAL DUNEDIN\nDUNEDIN 9016', batch: '0073', conditions: 'No special conditions.', topCode: 'C/E', classEndo: '1F', issued: '27-10-2021', expires: '27-10-2031', photoUrl: '/assets/aistudio/germany_passport_portrait.png' },
+      { surname: 'CHEN', firstNames: 'SOPHIE MEI', dob: '21-07-1995', licence: 'FA642015', version: '386', donor: 'DONOR', address: '12 MOUNT EDEN ROAD\nGRAFTON\nAUCKLAND 1023', batch: '0309', conditions: 'Correcting lenses must be used at all times while driving.', topCode: 'C/E', classEndo: '1L', issued: '11-01-2024', expires: '11-01-2034', photoUrl: '/assets/aistudio/canada_passport_portrait.png' }
+    ];
+
+    function renderNzDlBarcodeSvg(codeText) {
+      const str = String(codeText || 'AB123456/12345');
+      let bars = [2, 1, 1, 2, 1, 3, 2, 1];
+      for (let i = 0; i < str.length; i++) {
+        const ch = str.charCodeAt(i);
+        bars.push(1 + ((ch + i) % 2), 1 + ((ch * 3 + i) % 2), 1 + ((ch >> 1) % 3), 1 + ((ch + 2) % 2), 1);
+      }
+      bars.push(2, 3, 1, 1, 1, 2, 2);
+      let x = 2;
+      const rects = [];
+      let isBar = true;
+      for (let i = 0; i < bars.length; i++) {
+        const w = bars[i];
+        if (isBar) {
+          rects.push(`<rect x="${x}" y="0" width="${w}" height="28" fill="#18181b"/>`);
+        }
+        x += w;
+        isBar = !isBar;
+      }
+      const totalW = x + 2;
+      return `<svg viewBox="0 0 ${totalW} 28" preserveAspectRatio="none" class="w-full h-full block" shape-rendering="crispEdges" aria-hidden="true">${rects.join('')}</svg>`;
+    }
+
+    function renderNzDlBackGuillocheSvg() {
+      const cx = 358;
+      const cy = 214;
+      const paths = [];
+      const rays = 38;
+      // High-density cyan radial geometric guilloche lattice matching reference back card
+      for (let rIdx = 0; rIdx < 24; rIdx++) {
+        const radius = 15 + rIdx * 18;
+        const twist = rIdx * 0.066;
+        const pts = [];
+        for (let k = 0; k < rays; k++) {
+          const a = (k / rays) * Math.PI * 2 + twist;
+          const wobble = (rIdx % 2 === 0 ? 1 : -1) * 4.0 * Math.sin(k * 4);
+          const x = (cx + (radius + wobble) * Math.cos(a) * 1.16).toFixed(1);
+          const y = (cy + (radius - wobble) * Math.sin(a) * 0.96).toFixed(1);
+          pts.push(`${x},${y}`);
+        }
+        const op = rIdx < 7 ? '0.80' : (rIdx < 14 ? '0.56' : '0.36');
+        paths.push(`<polygon points="${pts.join(' ')}" fill="none" stroke="#00a8e8" stroke-width="0.6" stroke-opacity="${op}"/>`);
+      }
+      for (let k = 0; k < rays; k++) {
+        const a1 = (k / rays) * Math.PI * 2;
+        const a2 = ((k + 4) / rays) * Math.PI * 2;
+        const a3 = ((k - 4) / rays) * Math.PI * 2;
+        const x1 = (cx + 13 * Math.cos(a1) * 1.14).toFixed(1);
+        const y1 = (cy + 13 * Math.sin(a1) * 0.96).toFixed(1);
+        const x2 = (cx + 475 * Math.cos(a2) * 1.16).toFixed(1);
+        const y2 = (cy + 475 * Math.sin(a2) * 0.96).toFixed(1);
+        const x3 = (cx + 475 * Math.cos(a3) * 1.16).toFixed(1);
+        const y3 = (cy + 475 * Math.sin(a3) * 0.96).toFixed(1);
+        paths.push(`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#0099db" stroke-width="0.56" stroke-opacity="0.5"/>`);
+        paths.push(`<line x1="${x1}" y1="${y1}" x2="${x3}" y2="${y3}" stroke="#29b6f6" stroke-width="0.56" stroke-opacity="0.5"/>`);
+      }
+      return `
+        <svg viewBox="0 0 668 421" preserveAspectRatio="none" class="w-full h-full block" aria-hidden="true">
+          <defs>
+            <radialGradient id="nzDlBackCenterFade" cx="53.6%" cy="50.8%" r="55%">
+              <stop offset="0%" stop-color="#0284c7" stop-opacity="0.32"/>
+              <stop offset="12%" stop-color="#00a8e8" stop-opacity="0.21"/>
+              <stop offset="28%" stop-color="#38bdf8" stop-opacity="0.09"/>
+              <stop offset="65%" stop-color="#7dd3fc" stop-opacity="0.02"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="668" height="421" fill="#ffffff"/>
+          <rect width="668" height="421" fill="url(#nzDlBackCenterFade)"/>
+          <g>${paths.join('')}</g>
+          <polygon points="${
+            Array.from({ length: 12 }, (_, k) => {
+              const a = (k / 12) * Math.PI * 2;
+              return `${(cx + 11.5 * Math.cos(a) * 1.12).toFixed(1)},${(cy + 10.2 * Math.sin(a)).toFixed(1)}`;
+            }).join(' ')
+          }" fill="#ffffff" stroke="#00a8e8" stroke-width="0.8" stroke-opacity="0.62"/>
+        </svg>
+      `;
+    }
+
+    function initNzDlDefaultPhoto() {
+      const backMesh = $('nzDlBackGuillocheHost');
+      if (backMesh && !backMesh.dataset.ready) {
+        backMesh.dataset.ready = '1';
+        backMesh.innerHTML = renderNzDlBackGuillocheSvg();
+      }
+      const img = new Image();
+      img.src = NZ_DL_REF_FRONT_SRC;
+      img.onload = () => {
+        try {
+          // Extract main studio portrait from reference (x: 54..212, y: 186..381 on 720x414)
+          const mainCanvas = document.createElement('canvas');
+          mainCanvas.width = 240;
+          mainCanvas.height = 296;
+          const mCtx = mainCanvas.getContext('2d');
+          mCtx.drawImage(img, 54, 186, 158, 195, 0, 0, 240, 296);
+          nzDlSpecimenMainPhotoUrl = mainCanvas.toDataURL('image/png');
+
+          // Extract ghost portrait from reference (x: 522..608, y: 274..388 on 720x414)
+          const ghostCanvas = document.createElement('canvas');
+          ghostCanvas.width = 160;
+          ghostCanvas.height = 212;
+          const gCtx = ghostCanvas.getContext('2d');
+          gCtx.drawImage(img, 522, 274, 86, 114, 0, 0, 160, 212);
+          nzDlSpecimenGhostPhotoUrl = ghostCanvas.toDataURL('image/png');
+
+          if (nzDlUsingSpecimenPortrait) {
+            if ($('nzDlPreviewPhoto')) $('nzDlPreviewPhoto').src = nzDlSpecimenMainPhotoUrl;
+            if ($('nzDlGhostPhoto')) $('nzDlGhostPhoto').src = nzDlSpecimenGhostPhotoUrl;
+            if ($('nzDlPortraitSwirl')) $('nzDlPortraitSwirl').style.display = 'none';
+          }
+        } catch (e) {
+          // Keep fallback portrait
+        }
+      };
+    }
+
+    function resetNzDlPhoto() {
+      nzDlUsingSpecimenPortrait = true;
+      const mainSrc = nzDlSpecimenMainPhotoUrl || NZ_DL_FALLBACK_PORTRAIT;
+      const ghostSrc = nzDlSpecimenGhostPhotoUrl || NZ_DL_FALLBACK_PORTRAIT;
+      if ($('nzDlPreviewPhoto')) $('nzDlPreviewPhoto').src = mainSrc;
+      if ($('nzDlGhostPhoto')) $('nzDlGhostPhoto').src = ghostSrc;
+      if ($('nzDlPortraitSwirl')) $('nzDlPortraitSwirl').style.display = nzDlSpecimenMainPhotoUrl ? 'none' : 'block';
+      if ($('nzDlPhotoInput')) $('nzDlPhotoInput').value = '';
+      showToast('Portrait Reset', 'Restored New Zealand reference specimen portrait');
+    }
+
+    function setNzDlViewMode(mode) {
+      const frontWrap = $('nzDlFrontCardWrap');
+      const backWrap = $('nzDlBackCardWrap');
+      if (frontWrap) frontWrap.classList.toggle('hidden', mode === 'back');
+      if (backWrap) backWrap.classList.toggle('hidden', mode === 'front');
+      ['both', 'front', 'back'].forEach(m => {
+        const btn = $(`nzDlMode_${m}`);
+        if (btn) {
+          btn.className = m === mode
+            ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-xs cursor-pointer transition-colors'
+            : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-colors';
+        }
+      });
+    }
+
+    function updateNzDlPreview() {
+      const getVal = (id, fb) => {
+        const el = $(id);
+        return el && typeof el.value === 'string' && el.value.trim() !== '' ? el.value.trim() : fb;
+      };
+      const setText = (id, val) => {
+        const el = $(id);
+        if (el) el.textContent = val;
+      };
+
+      setText('nzDlOutSurname', getVal('nzDlInputSurname', NZ_DL_SPECIMEN.surname).toUpperCase());
+      setText('nzDlOutFirstNames', getVal('nzDlInputFirstNames', NZ_DL_SPECIMEN.firstNames).toUpperCase());
+      setText('nzDlOutDob', getVal('nzDlInputDob', NZ_DL_SPECIMEN.dob));
+      setText('nzDlOutLicence', getVal('nzDlInputLicence', NZ_DL_SPECIMEN.licence).toUpperCase());
+      setText('nzDlOutVersion', getVal('nzDlInputVersion', NZ_DL_SPECIMEN.version));
+      setText('nzDlOutDonor', getVal('nzDlInputDonor', NZ_DL_SPECIMEN.donor).toUpperCase());
+
+      const rawAddr = ($('nzDlInputAddress') && $('nzDlInputAddress').value.trim()) ? $('nzDlInputAddress').value.trim() : NZ_DL_SPECIMEN.address;
+      setText('nzDlOutAddress', rawAddr.toUpperCase());
+      setText('nzDlOutBatch', getVal('nzDlInputBatch', NZ_DL_SPECIMEN.batch));
+
+      // Back side live fields
+      setText('nzDlOutConditions', getVal('nzDlInputConditions', NZ_DL_SPECIMEN.conditions));
+      setText('nzDlOutTopCode', getVal('nzDlInputTopCode', NZ_DL_SPECIMEN.topCode).toUpperCase());
+      setText('nzDlOutClass', getVal('nzDlInputClass', NZ_DL_SPECIMEN.classEndo).toUpperCase());
+      setText('nzDlOutIssued', getVal('nzDlInputIssued', NZ_DL_SPECIMEN.issued));
+      setText('nzDlOutExpires', getVal('nzDlInputExpires', NZ_DL_SPECIMEN.expires));
+
+      const barcodeVal = getVal('nzDlInputBarcode', NZ_DL_SPECIMEN.barcodeText).toUpperCase();
+      setText('nzDlOutBarcodeText', barcodeVal);
+      const barcodeHost = $('nzDlBarcodeSvgHost');
+      if (barcodeHost) {
+        barcodeHost.innerHTML = renderNzDlBarcodeSvg(barcodeVal);
+      }
+
+      const backMesh = $('nzDlBackGuillocheHost');
+      if (backMesh && !backMesh.dataset.ready) {
+        backMesh.dataset.ready = '1';
+        backMesh.innerHTML = renderNzDlBackGuillocheSvg();
+      }
+    }
+
+    function applyNzDlData(data) {
+      const setVal = (id, v) => { const el = $(id); if (el && v !== undefined) el.value = v; };
+      setVal('nzDlInputSurname', data.surname);
+      setVal('nzDlInputFirstNames', data.firstNames);
+      setVal('nzDlInputDob', data.dob);
+      setVal('nzDlInputLicence', data.licence);
+      setVal('nzDlInputVersion', data.version);
+      setVal('nzDlInputDonor', data.donor);
+      setVal('nzDlInputAddress', data.address);
+      setVal('nzDlInputBatch', data.batch);
+      setVal('nzDlInputConditions', data.conditions);
+      setVal('nzDlInputTopCode', data.topCode);
+      setVal('nzDlInputClass', data.classEndo);
+      setVal('nzDlInputIssued', data.issued);
+      setVal('nzDlInputExpires', data.expires);
+      setVal('nzDlInputBarcode', data.barcodeText || `${data.licence}/${data.version}`);
+
+      if (data.useSpecimenPhoto) {
+        nzDlUsingSpecimenPortrait = true;
+        if ($('nzDlPreviewPhoto')) $('nzDlPreviewPhoto').src = nzDlSpecimenMainPhotoUrl || NZ_DL_FALLBACK_PORTRAIT;
+        if ($('nzDlGhostPhoto')) $('nzDlGhostPhoto').src = nzDlSpecimenGhostPhotoUrl || NZ_DL_FALLBACK_PORTRAIT;
+        if ($('nzDlPortraitSwirl')) $('nzDlPortraitSwirl').style.display = nzDlSpecimenMainPhotoUrl ? 'none' : 'block';
+      } else if (data.photoUrl) {
+        nzDlUsingSpecimenPortrait = false;
+        if ($('nzDlPreviewPhoto')) $('nzDlPreviewPhoto').src = data.photoUrl;
+        if ($('nzDlGhostPhoto')) $('nzDlGhostPhoto').src = data.photoUrl;
+        if ($('nzDlPortraitSwirl')) $('nzDlPortraitSwirl').style.display = 'block';
+      }
+      updateNzDlPreview();
+    }
+
+    function loadNzDlPreset(presetKey) {
+      const preset = NZ_DL_PRESETS[presetKey] || NZ_DL_PRESETS.reference;
+      applyNzDlData(preset);
+      showToast('Preset Loaded', `Loaded ${preset.firstNames} ${preset.surname} (${preset.licence})`);
+    }
+
+    function resetNzDlToSample() {
+      applyNzDlData(NZ_DL_PRESETS.reference);
+      if ($('nzDlPhotoInput')) $('nzDlPhotoInput').value = '';
+      showToast('Specimen Reset', 'Restored CHEN JIAHUI reference specimen details');
+    }
+
+    function randomizeNzDriverLicense() {
+      nzDlRandomIndex = (nzDlRandomIndex + 1) % NZ_DL_RANDOM_POOL.length;
+      const sample = NZ_DL_RANDOM_POOL[nzDlRandomIndex];
+      const prefixLetters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+      const l1 = prefixLetters[Math.floor(Math.random() * prefixLetters.length)];
+      const l2 = prefixLetters[Math.floor(Math.random() * prefixLetters.length)];
+      const digits = String(Math.floor(100000 + Math.random() * 899999));
+      const licence = `${l1}${l2}${digits}`;
+      const version = String(Math.floor(100 + Math.random() * 899));
+      applyNzDlData({
+        ...sample,
+        licence,
+        version,
+        barcodeText: `${licence}/${version}`,
+        useSpecimenPhoto: false
+      });
+      showToast('Licence Randomized!', `Generated NZ Driver Licence ${licence} (v${version})`);
+    }
+
+    async function downloadNzDlPNG(side) {
+      const targetId = side === 'back' ? 'newzealand-driverlicense-back' : 'newzealand-driverlicense-front';
+      triggerWithOgadsLock(async () => {
+        const card = $(targetId);
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', `Rendering high-resolution New Zealand Driver Licence (${side})`);
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            const licNo = $('nzDlInputLicence') ? $('nzDlInputLicence').value.trim() : 'AC246810';
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `new-zealand-driver-licence-${licNo}-${side}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', `New Zealand Driver Licence (${side}) PNG generated`);
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export canvas image');
+        }
+      });
+    }
+
+    function printNzDriverLicense() {
+      window.print();
+    }
+
+    window.updateNzDlPreview = updateNzDlPreview;
+    window.resetNzDlPhoto = resetNzDlPhoto;
+    window.setNzDlViewMode = setNzDlViewMode;
+    window.loadNzDlPreset = loadNzDlPreset;
+    window.resetNzDlToSample = resetNzDlToSample;
+    window.randomizeNzDriverLicense = randomizeNzDriverLicense;
+    window.downloadNzDlPNG = downloadNzDlPNG;
+    window.printNzDriverLicense = printNzDriverLicense;
+
 
     // Image Modal Control
     function closeImageModal() {
@@ -17345,6 +17733,27 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       }
       initSomLicDefaultPhoto();
 
+      // New Zealand Driver Licence Photo upload
+      const nzDlPhotoInput = $('nzDlPhotoInput');
+      if (nzDlPhotoInput) {
+        nzDlPhotoInput.addEventListener('change', e => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              nzDlUsingSpecimenPortrait = false;
+              if ($('nzDlPreviewPhoto')) $('nzDlPreviewPhoto').src = ev.target.result;
+              if ($('nzDlGhostPhoto')) $('nzDlGhostPhoto').src = ev.target.result;
+              if ($('nzDlPortraitSwirl')) $('nzDlPortraitSwirl').style.display = 'block';
+              showToast('Photo Updated', 'Custom portrait photo applied to New Zealand Driver Licence');
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+      initNzDlDefaultPhoto();
+      updateNzDlPreview();
+
       // Somalia Smart National ID Photo upload
       const somSmartIdPhotoInput = $('somSmartIdPhotoInput');
       if (somSmartIdPhotoInput) {
@@ -17887,10 +18296,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           { passNo: 'TO7301942', surname: 'TUIHALANGINGIE', givenNames: 'SALOTE KALISI', sex: 'F', dob: '1997-08-11', pob: "KOLONGA TONGATAPU", personalNo: 'TON-8291047', issue: '2023-01-19', expiry: '2028-01-18', authority: "NUKU'ALOFA", photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
         ],
         idProfiles: [
-          { docNo: 'TON392018', personalNo: '920317-4082', surname: 'TUPOU', givenNames: 'SIOSAIA MANU', sex: 'M', dob: '1992-03-17', pob: "NUKU'ALOFA", issue: '2022-09-01', expiry: '2032-08-31', authority: 'NATIONAL ID OFFICE', region: 'TONGATAPU', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
-          { docNo: 'TON501928', personalNo: '951209-2194', surname: 'FAKAFANUA', givenNames: 'MELEANA LUPE', sex: 'F', dob: '1995-12-09', pob: "VAVA'U", issue: '2023-05-15', expiry: '2033-05-14', authority: 'NATIONAL ID OFFICE', region: "VAVA'U", photoUrl: OCEANIA_DEFAULT_PORTRAITS[0] },
-          { docNo: 'TON749201', personalNo: '900628-5832', surname: 'MOALA', givenNames: 'TEVITA KOLO', sex: 'M', dob: '1990-06-28', pob: "HA'APAI", issue: '2021-12-10', expiry: '2031-12-09', authority: 'NATIONAL ID OFFICE', region: "HA'APAI", photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
-          { docNo: 'TON829104', personalNo: '970811-6401', surname: 'TUIHALANGINGIE', givenNames: 'SALOTE KALISI', sex: 'F', dob: '1997-08-11', pob: 'TONGATAPU', issue: '2024-02-20', expiry: '2034-02-19', authority: 'NATIONAL ID OFFICE', region: 'TONGATAPU EAST', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
+          { docNo: '125091986083971', personalNo: '125091986083971', surname: 'TUPOU', givenNames: "'EULITISI VAIAONGA", nationality: 'TONGAN', sex: 'FEMALE', dob: '1986-09-25', pob: "NUKU'ALOFA", issue: '2020-07-22', expiry: '2030-07-22', authority: 'NATIONAL ID OFFICE', region: 'TONGATAPU', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2], useSpecimenPhoto: true },
+          { docNo: '295120901482315', personalNo: '295120901482315', surname: 'FAKAFANUA', givenNames: 'MELEANA LUPE', nationality: 'TONGAN', sex: 'FEMALE', dob: '1995-12-09', pob: "VAVA'U", issue: '2023-05-15', expiry: '2033-05-14', authority: 'NATIONAL ID OFFICE', region: "VAVA'U", photoUrl: OCEANIA_DEFAULT_PORTRAITS[0], useSpecimenPhoto: false },
+          { docNo: '190062804719283', personalNo: '190062804719283', surname: 'MOALA', givenNames: 'TEVITA KOLO', nationality: 'TONGAN', sex: 'MALE', dob: '1990-06-28', pob: "HA'APAI", issue: '2021-12-10', expiry: '2031-12-09', authority: 'NATIONAL ID OFFICE', region: "HA'APAI", photoUrl: OCEANIA_DEFAULT_PORTRAITS[3], useSpecimenPhoto: false },
+          { docNo: '297081106384912', personalNo: '297081106384912', surname: 'TUIHALANGINGIE', givenNames: 'SALOTE KALISI', nationality: 'TONGAN', sex: 'FEMALE', dob: '1997-08-11', pob: 'TONGATAPU', issue: '2024-02-20', expiry: '2034-02-19', authority: 'NATIONAL ID OFFICE', region: 'TONGATAPU EAST', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2], useSpecimenPhoto: false }
         ]
       },
       vanuatu: {
@@ -18064,7 +18473,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       const passCheck = ocMrzCheckDigit(passField);
       const dobStr = ocToYYMMDD(fields.dob);
       const dobCheck = ocMrzCheckDigit(dobStr);
-      const sexChar = ((fields.sex || 'M').toUpperCase() === 'F') ? 'F' : (((fields.sex || 'M').toUpperCase() === 'X') ? '<' : 'M');
+      const sexChar = ((fields.sex || 'M').toUpperCase().startsWith('F')) ? 'F' : (((fields.sex || 'M').toUpperCase().startsWith('X')) ? '<' : 'M');
       const expStr = ocToYYMMDD(fields.expiry);
       const expCheck = ocMrzCheckDigit(expStr);
       const personalClean = (fields.personalNo || '').toUpperCase().replace(/[^A-Z0-9]/g, '<');
@@ -18085,7 +18494,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
       const dobStr = ocToYYMMDD(fields.dob);
       const dobCheck = ocMrzCheckDigit(dobStr);
-      const sexChar = ((fields.sex || 'M').toUpperCase() === 'F') ? 'F' : (((fields.sex || 'M').toUpperCase() === 'X') ? '<' : 'M');
+      const sexChar = ((fields.sex || 'M').toUpperCase().startsWith('F')) ? 'F' : (((fields.sex || 'M').toUpperCase().startsWith('X')) ? '<' : 'M');
       const expStr = ocToYYMMDD(fields.expiry);
       const expCheck = ocMrzCheckDigit(expStr);
       const comp = ocMrzCheckDigit(docField + docCheck + opt1 + dobStr + dobCheck + expStr + expCheck);
@@ -18471,7 +18880,340 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       `;
     }
 
+    const TONGA_ID_REF_SRC = '/assets/aistudio/1795281954260_95a93fa4.jpg';
+    let tongaSpecimenMainPhotoUrl = '';
+    let tongaSpecimenGhostPhotoUrl = '';
+    let tongaUsingSpecimenPortrait = true;
+
+    function ocFormatSlashDate(isoStr) {
+      if (!isoStr) return '';
+      const clean = String(isoStr).trim();
+      const parts = clean.split('-');
+      if (parts.length !== 3) return clean;
+      return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+    }
+
+    function ocFormatCompactDate(isoStr) {
+      if (!isoStr) return '';
+      const clean = String(isoStr).trim();
+      const parts = clean.split('-');
+      if (parts.length !== 3) return clean.replace(/[^0-9]/g, '').slice(0, 8);
+      return `${parts[2].padStart(2, '0')}${parts[1].padStart(2, '0')}${parts[0]}`;
+    }
+
+    function initTongaSpecimenPhoto() {
+      const img = new Image();
+      img.src = TONGA_ID_REF_SRC;
+      img.onload = () => {
+        try {
+          // Main studio portrait crop (x: 48..244, y: 98..342 on 648x431 reference)
+          const mainC = document.createElement('canvas');
+          mainC.width = 240;
+          mainC.height = 300;
+          const mCtx = mainC.getContext('2d');
+          mCtx.drawImage(img, 48, 98, 196, 244, 0, 0, 240, 300);
+          tongaSpecimenMainPhotoUrl = mainC.toDataURL('image/png');
+
+          // Secondary bottom-right ghost portrait crop (x: 545..631, y: 222..337)
+          const ghostC = document.createElement('canvas');
+          ghostC.width = 160;
+          ghostC.height = 214;
+          const gCtx = ghostC.getContext('2d');
+          gCtx.drawImage(img, 545, 222, 86, 115, 0, 0, 160, 214);
+          tongaSpecimenGhostPhotoUrl = ghostC.toDataURL('image/png');
+
+          if (tongaUsingSpecimenPortrait) {
+            const p = ocPrefix('tonga', 'idcard');
+            if ($(`${p}_outPhoto`)) $(`${p}_outPhoto`).src = tongaSpecimenMainPhotoUrl;
+            if ($(`${p}_outGhost`)) $(`${p}_outGhost`).src = tongaSpecimenGhostPhotoUrl;
+          }
+        } catch (e) {
+          // Keep fallback portrait if canvas tainted
+        }
+      };
+    }
+
+    function renderTongaCoatOfArmsWatermarkSvg() {
+      return `
+        <svg viewBox="0 0 260 290" class="w-full h-full block" fill="none" stroke="#858c64" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <!-- Outer Olive / Laurel Branches & Six-Star Corona -->
+          <g stroke-width="1.25">
+            <path d="M98 44 C 46 66, 28 124, 44 182 C 55 218, 86 244, 130 250 C 174 244, 205 218, 216 182 C 232 124, 214 66, 162 44"/>
+            <path d="M104 52 C 58 72, 42 126, 56 178 C 66 210, 92 234, 130 240 C 168 234, 194 210, 204 178 C 218 126, 202 72, 156 52"/>
+            <!-- Wreath Leaves -->
+            <path d="M52 104 C 42 98, 38 88, 46 84 C 54 88, 56 96, 52 104 Z"/>
+            <path d="M41 130 C 30 126, 26 116, 34 112 C 42 114, 44 122, 41 130 Z"/>
+            <path d="M40 158 C 28 156, 24 146, 32 142 C 40 144, 42 152, 40 158 Z"/>
+            <path d="M49 186 C 36 186, 32 176, 40 171 C 48 173, 52 180, 49 186 Z"/>
+            <path d="M68 212 C 56 215, 50 206, 57 200 C 65 200, 70 206, 68 212 Z"/>
+            <path d="M208 104 C 218 98, 222 88, 214 84 C 206 88, 204 96, 208 104 Z"/>
+            <path d="M219 130 C 230 126, 234 116, 226 112 C 218 114, 216 122, 219 130 Z"/>
+            <path d="M220 158 C 232 156, 236 146, 228 142 C 220 144, 218 152, 220 158 Z"/>
+            <path d="M211 186 C 224 186, 228 176, 220 171 C 212 173, 208 180, 211 186 Z"/>
+            <path d="M192 212 C 204 215, 210 206, 203 200 C 195 200, 190 206, 192 212 Z"/>
+          </g>
+          <!-- Crossed Tongan Flags Behind Shield -->
+          <g stroke-width="1.35">
+            <line x1="68" y1="224" x2="222" y2="54"/>
+            <line x1="192" y1="224" x2="38" y2="54"/>
+            <circle cx="224" cy="52" r="3"/>
+            <circle cx="36" cy="52" r="3"/>
+            <!-- Left Flag -->
+            <path d="M46 62 L 88 108 L 58 136 L 16 90 Z" fill="#858c64" fill-opacity="0.06"/>
+            <rect x="44" y="68" width="20" height="16" transform="rotate(47 44 68)" stroke-width="1"/>
+            <path d="M44 79 L 54 90 M54 79 L 44 90" stroke-width="1.8"/>
+            <!-- Right Flag -->
+            <path d="M214 62 L 172 108 L 202 136 L 244 90 Z" fill="#858c64" fill-opacity="0.06"/>
+            <rect x="196" y="68" width="20" height="16" transform="rotate(-47 216 68)" stroke-width="1"/>
+            <path d="M206 79 L 216 90 M216 79 L 206 90" stroke-width="1.8"/>
+          </g>
+          <!-- Top Royal Crown & 6-Star Halo -->
+          <g stroke-width="1.35" fill="#9ea47a" fill-opacity="0.16">
+            <path d="M130 14 L 130 22 M126 18 L 134 18"/>
+            <circle cx="130" cy="24" r="2.5"/>
+            <path d="M104 42 C 102 25, 158 25, 156 42 Z"/>
+            <path d="M104 42 C 110 27, 150 27, 156 42"/>
+            <path d="M116 42 C 120 26, 140 26, 144 42"/>
+            <rect x="103" y="42" width="54" height="8" rx="2"/>
+            <circle cx="112" cy="46" r="1.4"/><circle cx="121" cy="46" r="1.4"/><circle cx="130" cy="46" r="1.4"/><circle cx="139" cy="46" r="1.4"/><circle cx="148" cy="46" r="1.4"/>
+          </g>
+          <!-- Halo of 6 Stars Below Crown -->
+          <g stroke-width="1" fill="#858c64" fill-opacity="0.18">
+            <polygon points="88,65 90,69 94,69 91,72 92,76 88,73 84,76 85,72 82,69 86,69"/>
+            <polygon points="105,60 107,64 111,64 108,67 109,71 105,68 101,71 102,67 99,64 103,64"/>
+            <polygon points="122,57 124,61 128,61 125,64 126,68 122,65 118,68 119,64 116,61 120,61"/>
+            <polygon points="138,57 140,61 144,61 141,64 142,68 138,65 134,68 135,64 132,61 136,61"/>
+            <polygon points="155,60 157,64 161,64 158,67 159,71 155,68 151,71 152,67 149,64 153,64"/>
+            <polygon points="172,65 174,69 178,69 175,72 176,76 172,73 168,76 169,72 166,69 170,69"/>
+          </g>
+          <!-- Central Coat Shield -->
+          <g stroke-width="1.5">
+            <path d="M74 88 L 186 88 L 186 154 C 186 196, 152 216, 130 226 C 108 216, 74 196, 74 154 Z" fill="#f7f9fb" fill-opacity="0.45"/>
+            <line x1="130" y1="88" x2="130" y2="226"/>
+            <line x1="74" y1="150" x2="186" y2="150"/>
+            <!-- Q1: Three Six-Pointed Stars -->
+            <circle cx="94" cy="108" r="5" stroke-width="1.1"/><circle cx="110" cy="120" r="5" stroke-width="1.1"/><circle cx="96" cy="134" r="5" stroke-width="1.1"/>
+            <!-- Q2: Royal Crown Emblem -->
+            <path d="M142 128 L 174 128 L 176 116 L 166 121 L 158 110 L 150 121 L 140 116 Z" fill="#858c64" fill-opacity="0.18"/>
+            <rect x="142" y="128" width="32" height="5" rx="1"/>
+            <!-- Q3: Dove with Olive Branch -->
+            <path d="M90 178 C 96 168, 108 168, 114 176 C 110 184, 100 186, 90 178 Z" fill="#858c64" fill-opacity="0.14"/>
+            <path d="M114 176 L 122 171 M102 172 C 98 162, 106 158, 110 166"/>
+            <!-- Q4: Three Crossed Swords -->
+            <line x1="144" y1="196" x2="174" y2="162"/><line x1="174" y1="196" x2="144" y2="162"/><line x1="159" y1="202" x2="159" y2="158"/>
+            <!-- Center Cross & White Six-Point Star -->
+            <polygon points="130,132 146,150 130,168 114,150" fill="#f8fafc" fill-opacity="0.82" stroke-width="1.4"/>
+            <path d="M126 142 H134 V147 H139 V153 H134 V158 H126 V153 H121 V147 H126 Z" stroke-width="1.1"/>
+          </g>
+          <!-- Scroll Motto Ribbon -->
+          <g stroke-width="1.25">
+            <path d="M36 226 C 64 260, 196 260, 224 226 L 234 240 C 198 278, 62 278, 26 240 Z" fill="#f7f9fb" fill-opacity="0.55"/>
+            <path d="M40 232 C 68 262, 192 262, 220 232" stroke-opacity="0.55"/>
+            <text x="130" y="256" text-anchor="middle" fill="#6f7550" stroke="none" font-family="Georgia, serif" font-weight="700" font-size="8.4" letter-spacing="0.45">KO E ʻOTUA MO TONGA KO HOKU TOFIʻA</text>
+          </g>
+        </svg>
+      `;
+    }
+
+    function buildTongaReferenceIdMarkup(cfg) {
+      const p = ocPrefix(cfg.key, 'idcard');
+      const s = cfg.idProfiles[0];
+      const dobDisplay = ocFormatSlashDate(s.dob);
+      const expDisplay = ocFormatSlashDate(s.expiry);
+      const microCompact = ocFormatCompactDate(s.dob);
+      const microStr = `${microCompact.slice(4)} ${(s.surname || 'TUPOU').toUpperCase()}${(s.givenNames || 'EULITISI').split(' ')[0].toUpperCase()}${microCompact}`.replace(/\s+/g, '');
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-wrap items-center justify-between gap-3 no-print">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl text-white flex items-center justify-center text-xl shadow-xs shrink-0" style="background: linear-gradient(135deg, ${cfg.accentHex}, ${cfg.secondaryHex});">${cfg.flag}</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${cfg.name} — ${cfg.idCardTitle}</h2>
+                <span class="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-[10px] font-extrabold uppercase">TON · KAATI ID FAKAFONUA</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Pule'anga 'o Tonga · National Identity Card Prototype Editor</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="switchVerificationDoc('passport')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-passport"></i> Switch to Passport</button>
+            <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+              <button type="button" id="${p}_tab_both" onclick="switchOceaniaIdSide('${cfg.key}','both')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-xs cursor-pointer">Both Sides</button>
+              <button type="button" id="${p}_tab_front" onclick="switchOceaniaIdSide('${cfg.key}','front')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 cursor-pointer">Front</button>
+              <button type="button" id="${p}_tab_back" onclick="switchOceaniaIdSide('${cfg.key}','back')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 cursor-pointer">Back</button>
+            </div>
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','idcard')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-rose-700 via-red-700 to-amber-700 text-white text-xs font-black shadow-md cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-dice text-amber-200"></i> Randomize Card</button>
+            <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','idcard','front')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Save Front PNG</button>
+            <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','idcard','back')" class="px-3.5 py-2 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-extrabold cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Save Back PNG</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 p-5 shadow-xs space-y-4 no-print">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">Tonga National ID Editor</h3>
+                <p class="text-[11px] text-slate-500">Edit fields to update Front, Back &amp; TD1 MRZ live</p>
+              </div>
+              <button type="button" onclick="resetOceaniaSample('${cfg.key}','idcard')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">Reset Sample</button>
+            </div>
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','idcard')" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-rose-700 via-red-700 to-amber-700 text-white font-black text-xs shadow-lg flex items-center justify-center gap-3 cursor-pointer"><i class="fa-solid fa-dice text-amber-200 text-base"></i><span>Randomize Tonga National ID (Instant Fill)</span></button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Personal ID No. (Fika ID)</label><input id="${p}_personalNo" type="text" value="${s.personalNo}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Card / Document No.</label><input id="${p}_docNo" type="text" value="${s.docNo}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Surname (Hingoa fakaiku)</label><input id="${p}_surname" type="text" value="${s.surname}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Given Name(s) (Hingoa)</label><input id="${p}_givenNames" type="text" value="${s.givenNames}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Nationality (Tangata'ifonua)</label><input id="${p}_nationality" type="text" value="${s.nationality || cfg.nationality}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Sex (Tangata / Fefine)</label><select id="${p}_sex" onchange="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold"><option value="FEMALE" ${String(s.sex).toUpperCase().startsWith('F') ? 'selected' : ''}>FEMALE</option><option value="MALE" ${String(s.sex).toUpperCase().startsWith('M') ? 'selected' : ''}>MALE</option></select></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Date of Birth ('Aho fa'ele'i)</label><input id="${p}_dob" type="date" value="${s.dob}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Date of Expiry</label><input id="${p}_expiry" type="date" value="${s.expiry}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Place of Birth</label><input id="${p}_pob" type="text" value="${s.pob}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Island / Division</label><input id="${p}_region" type="text" value="${s.region}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Date of Issue</label><input id="${p}_issue" type="date" value="${s.issue}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-mono font-bold"></div>
+              <div><label class="block text-[11px] font-bold text-slate-700 mb-1">Issuing Authority</label><input id="${p}_authority" type="text" value="${s.authority}" oninput="updateOceaniaPreview('${cfg.key}','idcard')" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"></div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+              <div>
+                <div class="text-xs font-bold text-slate-800">Holder Portrait Photo</div>
+                <div class="text-[10px] text-slate-500">Updates main &amp; monochrome ghost portrait</div>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <label for="${p}_photoUpload" class="px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-[11px] font-bold cursor-pointer">Upload</label>
+                <input id="${p}_photoUpload" type="file" accept="image/*" class="hidden" />
+                <button type="button" onclick="resetOceaniaPhoto('${cfg.key}','idcard')" class="px-2 py-1.5 rounded-lg bg-white border border-slate-200 text-[11px] font-semibold cursor-pointer">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 space-y-6">
+            <!-- FRONT SIDE: KINGDOM OF TONGA NATIONAL IDENTITY CARD -->
+            <div id="${p}_front_wrap" class="w-full max-w-[668px] mx-auto">
+              <div class="flex items-center justify-between px-1 mb-1.5 no-print">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Front · Kaati ID Fakafonua / Kingdom of Tonga</span>
+                <span class="text-[11px] font-mono text-slate-400">DEMO / PROTOTYPE</span>
+              </div>
+              <article id="tonga-id-front" class="kyc-protected-surface relative w-full overflow-hidden select-none shadow-2xl" style="aspect-ratio: 668 / 421; container-type: inline-size; border-radius: 3.4% / 5.4%; border: 1px solid #cbd5e1; font-family: Arial, Helvetica, sans-serif; color: #0f172a; background: linear-gradient(172deg, #e1e8ea 0%, #eaeff1 14%, #f4f7f9 28%, #f8fafb 58%, #e8f0f3 100%);">
+                <!-- Subtle Pearlescent Corner Sheen -->
+                <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 22% 56%, rgba(236, 244, 247, 0.72) 0%, transparent 54%), radial-gradient(ellipse at 86% 78%, rgba(206, 224, 231, 0.52) 0%, transparent 52%); pointer-events: none; z-index: 1;"></div>
+
+                <!-- Top Header Labels (Bilingual Tongan / English) -->
+                <div style="position: absolute; left: 4.5%; top: 3.0%; width: 46%; text-align: center; z-index: 6;">
+                  <div style="font-size: 1.85cqw; font-weight: 500; letter-spacing: 0.03em; color: #334155; line-height: 1.1;">KAATI ID FAKAFONUA</div>
+                  <div style="font-family: 'Cormorant Garamond', 'Apple Chancery', 'Monotype Corsiva', 'URW Chancery L', Georgia, serif; font-style: italic; font-weight: 700; font-size: 4.35cqw; line-height: 0.94; color: #1e293b; margin-top: 0.15cqw; white-space: nowrap;">Pule'anga 'o Tonga</div>
+                </div>
+                <div style="position: absolute; right: 4.0%; top: 3.0%; width: 45%; text-align: center; z-index: 6;">
+                  <div style="font-size: 1.85cqw; font-weight: 500; letter-spacing: 0.03em; color: #334155; line-height: 1.1;">NATIONAL IDENTITY CARD</div>
+                  <div style="font-family: 'Cormorant Garamond', 'Apple Chancery', 'Monotype Corsiva', 'URW Chancery L', Georgia, serif; font-style: italic; font-weight: 700; font-size: 4.35cqw; line-height: 0.94; color: #1e293b; margin-top: 0.15cqw; white-space: nowrap;">Kingdom of Tonga</div>
+                </div>
+
+                <!-- Crisp Top Horizontal Divider Rule -->
+                <div style="position: absolute; left: 3.8%; right: 3.8%; top: 17.8%; height: 1.5px; background: #1e293b; opacity: 0.88; z-index: 5;"></div>
+
+                <!-- Center Coat of Arms of Tonga Monochrome Watermark -->
+                <div style="position: absolute; left: 43.0%; top: 21.8%; width: 32.8%; height: 61.5%; z-index: 2; opacity: 0.44; pointer-events: none;">
+                  ${renderTongaCoatOfArmsWatermarkSvg()}
+                </div>
+
+                <!-- Left Holder Portrait (Soft Elliptical Feather + Multiply Blend into Pearl Card Stock) -->
+                <div style="position: absolute; left: 5.2%; top: 22.4%; width: 32.0%; height: 58.6%; overflow: hidden; z-index: 5; -webkit-mask-image: radial-gradient(ellipse 56% 52% at 50% 45%, rgba(0,0,0,1) 66%, rgba(0,0,0,0) 100%); mask-image: radial-gradient(ellipse 56% 52% at 50% 45%, rgba(0,0,0,1) 66%, rgba(0,0,0,0) 100%);">
+                  <img id="${p}_outPhoto" src="${s.photoUrl}" alt="Holder Portrait" class="w-full h-full object-cover object-top block" style="mix-blend-mode: multiply; filter: brightness(1.06) contrast(1.04);" />
+                </div>
+
+                <!-- Holder Signature & Dotted Baseline -->
+                <div style="position: absolute; left: 11.4%; top: 82.4%; width: 22.2%; height: 9.2%; z-index: 7;">
+                  <div style="position: absolute; left: 0; right: 0; bottom: 22%; border-bottom: 1.5px dotted #334155;"></div>
+                  <div id="${p}_outSignatureSvg" style="position: absolute; left: 16%; bottom: 20%; width: 64%; height: 80%;">
+                    <svg viewBox="0 0 120 48" class="w-full h-full block" aria-hidden="true">
+                      <path d="M18 34 L34 10 M20 22 C28 19, 36 18, 42 19 M22 33 C28 31, 32 30, 38 31" stroke="#0f172a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                      <path d="M40 31 C44 26, 48 33, 52 29 C56 26, 59 35, 57 42 C56 35, 61 24, 68 27 C72 29, 69 34, 75 31 C80 29, 84 26, 89 30 C92 32, 95 28, 98 31" stroke="#0f172a" stroke-width="2.0" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div id="${p}_outSignature" data-no-autofit="1" class="hidden italic font-bold text-[#0f172a] whitespace-nowrap leading-none text-center" style="position: absolute; left: 0; right: 0; bottom: 24%; font-family: 'Cormorant Garamond', 'Brush Script MT', cursive; font-size: 3.4cqw;">${s.surname}</div>
+                </div>
+
+                <!-- Center Bilingual Identity Fields -->
+                <div style="position: absolute; left: 37.8%; top: 21.8%; right: 17.5%; z-index: 8; color: #0f172a;">
+                  <div style="font-size: 1.80cqw; font-weight: 700; line-height: 1.1;">Fika ID fakafo'ituitui / Personal ID No.</div>
+                  <div id="${p}_outPersonalNo" data-no-autofit="1" style="font-size: 2.52cqw; font-weight: 500; line-height: 1.15; letter-spacing: 0.015em; margin-bottom: 1.15cqw; white-space: nowrap;">${s.personalNo}</div>
+                  <span id="${p}_outDocNo" class="hidden">${s.docNo}</span>
+
+                  <div style="font-size: 1.80cqw; font-weight: 700; line-height: 1.1;">Hingoa fakaiku / Surname</div>
+                  <div id="${p}_outSurname" data-no-autofit="1" style="font-size: 2.38cqw; font-weight: 500; line-height: 1.15; text-transform: uppercase; margin-bottom: 2.15cqw; white-space: nowrap;">${s.surname}</div>
+
+                  <div style="font-size: 1.80cqw; font-weight: 700; line-height: 1.1;">Hingoa / Given name(s)</div>
+                  <div id="${p}_outGivenNames" data-no-autofit="1" style="font-size: 2.38cqw; font-weight: 500; line-height: 1.15; text-transform: uppercase; margin-bottom: 2.15cqw; white-space: nowrap;">${s.givenNames}</div>
+
+                  <div style="font-size: 1.80cqw; font-weight: 700; line-height: 1.1;">Tangata'ifonua / Nationality</div>
+                  <div id="${p}_outNationality" data-no-autofit="1" style="font-size: 2.38cqw; font-weight: 500; line-height: 1.15; text-transform: uppercase; margin-bottom: 1.80cqw; white-space: nowrap;">${s.nationality || cfg.nationality}</div>
+
+                  <div style="font-size: 1.80cqw; font-weight: 700; line-height: 1.1;">Tangata / Fefine / Sex</div>
+                  <div id="${p}_outSex" data-no-autofit="1" style="font-size: 2.38cqw; font-weight: 500; line-height: 1.15; text-transform: uppercase; margin-bottom: 1.80cqw; white-space: nowrap;">${s.sex}</div>
+
+                  <div style="font-size: 1.80cqw; font-weight: 700; line-height: 1.1;">'Aho fa'ele'i / Date of birth</div>
+                  <div id="${p}_outDob" data-no-autofit="1" style="font-size: 2.38cqw; font-weight: 500; line-height: 1.15; white-space: nowrap;">${dobDisplay}</div>
+                </div>
+
+                <!-- Right Secondary Monochrome Ghost Portrait -->
+                <div style="position: absolute; right: 2.0%; top: 51.8%; width: 14.3%; height: 26.8%; overflow: hidden; z-index: 6; -webkit-mask-image: radial-gradient(ellipse 48% 49% at 50% 48%, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%); mask-image: radial-gradient(ellipse 48% 49% at 50% 48%, rgba(0,0,0,1) 62%, rgba(0,0,0,0) 100%);">
+                  <img id="${p}_outGhost" src="${s.photoUrl}" alt="Secondary Monochrome Portrait" class="w-full h-full object-cover object-top block" style="mix-blend-mode: multiply; filter: grayscale(1) contrast(1.08) brightness(1.06); opacity: 0.92;" />
+                </div>
+
+                <!-- Curved Micro-Text Arc Wrapping Cleanly Above Date of Expiry Around Ghost Portrait -->
+                <svg viewBox="0 0 668 421" class="absolute inset-0 w-full h-full pointer-events-none select-none z-8" aria-hidden="true">
+                  <defs>
+                    <path id="${p}_microArcPath" d="M 346 403 C 424 396, 488 364, 526 328 Q 554 303, 622 325" />
+                  </defs>
+                  <text fill="#0f172a" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="11.2" letter-spacing="0.25">
+                    <textPath href="#${p}_microArcPath" startOffset="1%">
+                      <tspan font-size="6.0" font-weight="800" id="${p}_microArcPrefix">${microCompact.slice(2, 8)}</tspan><tspan id="${p}_microArcMain">${microStr.slice(4)}</tspan>
+                    </textPath>
+                  </text>
+                </svg>
+
+                <!-- Bottom-Right Expiry Label & Date -->
+                <div style="position: absolute; right: 2.0%; top: 82.0%; width: 22.8%; text-align: center; z-index: 8; color: #0f172a;">
+                  <div style="font-size: 1.76cqw; font-weight: 700; line-height: 1.15; white-space: nowrap;">'Aho 'osi hono 'aonga /</div>
+                  <div style="font-size: 1.76cqw; font-weight: 700; line-height: 1.15;">Date of expiry</div>
+                  <div id="${p}_outExpiry" data-no-autofit="1" style="font-size: 2.38cqw; font-weight: 500; line-height: 1.2; margin-top: 0.1cqw; white-space: nowrap;">${expDisplay}</div>
+                </div>
+              </article>
+            </div>
+
+            <!-- BACK SIDE: PRESERVED REGISTRY & ICAO TD1 MRZ -->
+            <div id="${p}_back_wrap" class="w-full max-w-[668px] mx-auto">
+              <div class="flex items-center justify-between px-1 mb-1.5 no-print">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Back · Issuing Registry &amp; ICAO TD1 MRZ</span>
+                <span class="text-[11px] font-mono text-slate-400">3-Line TD1 MRZ</span>
+              </div>
+              <article id="tonga-id-back" class="kyc-protected-surface relative w-full overflow-hidden select-none shadow-2xl flex flex-col justify-between p-[4.5%]" style="aspect-ratio: 668 / 421; container-type: inline-size; border-radius: 3.4% / 5.4%; border: 1px solid #cbd5e1; background: linear-gradient(135deg, #f8fafc 0%, #e8eff3 100%); font-family: Arial, sans-serif; color: #1e293b;">
+                <div class="flex items-start justify-between gap-4 border-b border-slate-300 pb-[3%]">
+                  <div class="space-y-[2%] flex-1">
+                    <div class="font-black uppercase" style="font-size: 2.15cqw; color:${cfg.accentHex};">${cfg.idHeaderTop}</div>
+                    <div class="grid grid-cols-2 gap-3 pt-1">
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Place of Birth</div><div id="${p}_outPob" class="font-bold uppercase" style="font-size: 2.0cqw;">${s.pob}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Island / Division</div><div id="${p}_outRegion" class="font-bold uppercase" style="font-size: 2.0cqw;">${s.region}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Date of Issue</div><div id="${p}_outIssue" class="font-bold" style="font-size: 2.0cqw;">${ocFormatSlashDate(s.issue)}</div></div>
+                      <div><div class="uppercase text-slate-500 font-bold" style="font-size: 1.45cqw;">Issued By</div><div id="${p}_outAuthority" class="font-bold uppercase truncate" style="font-size: 1.9cqw;">${s.authority}</div></div>
+                    </div>
+                  </div>
+                  <div class="w-[15cqw] h-[15cqw] bg-white p-1.5 rounded-lg border border-slate-300 shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 36 36" class="w-full h-full"><rect width="36" height="36" fill="#fff"/><path d="M2 2h10v10H2zm2 2v6h6V4zm2 2h2v2H6zM24 2h10v10H24zm2 2v6h6V4zm2 2h2v2h-2zM2 24h10v10H2zm2 2v6h6v-6zm2 2h2v2H6zM15 4h6v2h-6zm2 4h4v4h-4zm-2 6h8v2h-8zm-11 4h6v2H4zm8 0h10v2H12zm14 0h8v2h-8zm-12 4h6v2h-6zm8 0h8v2h-8zm-6 4h10v2H16zm-2 4h14v2H14z" fill="#0f172a"/></svg>
+                  </div>
+                </div>
+                <div class="bg-white/90 rounded-lg border border-slate-300 px-[3.5%] py-[3%] font-mono font-bold text-slate-900 leading-tight" style="font-family: 'OCR-B', 'Courier New', monospace; font-size: 2.8cqw; letter-spacing: 0.11em;">
+                  <div id="${p}_mrz1" class="whitespace-nowrap overflow-hidden"></div>
+                  <div id="${p}_mrz2" class="whitespace-nowrap overflow-hidden mt-[1%]"></div>
+                  <div id="${p}_mrz3" class="whitespace-nowrap overflow-hidden mt-[1%]"></div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     function buildOceaniaIdMarkup(cfg) {
+      if (cfg && cfg.key === 'tonga') {
+        return buildTongaReferenceIdMarkup(cfg);
+      }
       const p = ocPrefix(cfg.key, 'idcard');
       const s = cfg.idProfiles[0];
       return `
@@ -18640,13 +19382,39 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setTxt('outSurname', fields.surname.toUpperCase());
       setTxt('outGivenNames', fields.givenNames.toUpperCase());
       setTxt('outPersonalNo', fields.personalNo.toUpperCase());
-      setTxt('outDob', ocFormatDate(fields.dob));
-      setTxt('outSex', fields.sex.toUpperCase());
+      if (countryKey === 'tonga' && dtype === 'idcard') {
+        setTxt('outNationality', (fields.nationality || cfg.nationality).toUpperCase());
+        const sexUpper = String(fields.sex || 'FEMALE').toUpperCase();
+        setTxt('outSex', sexUpper.startsWith('M') ? 'MALE' : 'FEMALE');
+        setTxt('outDob', ocFormatSlashDate(fields.dob));
+        setTxt('outIssue', ocFormatSlashDate(fields.issue));
+        setTxt('outExpiry', ocFormatSlashDate(fields.expiry));
+
+        const compactDob = ocFormatCompactDate(fields.dob);
+        const firstGiven = (fields.givenNames || 'EULITISI').toUpperCase().replace(/[^A-Z0-9']/g, ' ').trim().split(/\s+/)[0] || 'EULITISI';
+        const cleanSur = (fields.surname || 'TUPOU').toUpperCase().replace(/[^A-Z0-9']/g, '');
+        const microPreEl = $(`${p}_microArcPrefix`);
+        const microMainEl = $(`${p}_microArcMain`);
+        if (microPreEl) microPreEl.textContent = compactDob.slice(2, 8);
+        if (microMainEl) microMainEl.textContent = `${cleanSur}${firstGiven.startsWith("'") ? firstGiven : "'" + firstGiven}${compactDob}`;
+
+        const sigSvg = $(`${p}_outSignatureSvg`);
+        const sigTxt = $(`${p}_outSignature`);
+        const isSpecimenSig = cleanSur === 'TUPOU' && firstGiven.includes('EULITISI');
+        if (sigSvg) sigSvg.style.display = isSpecimenSig ? 'block' : 'none';
+        if (sigTxt) {
+          sigTxt.textContent = cleanSur.charAt(0) + cleanSur.slice(1).toLowerCase();
+          sigTxt.classList.toggle('hidden', isSpecimenSig);
+        }
+      } else {
+        setTxt('outDob', ocFormatDate(fields.dob));
+        setTxt('outSex', fields.sex.toUpperCase());
+        setTxt('outIssue', ocFormatDate(fields.issue));
+        setTxt('outExpiry', ocFormatDate(fields.expiry));
+        setTxt('outSignature', `${fields.givenNames.split(' ')[0] || 'Sample'} ${fields.surname}`);
+      }
       setTxt('outPob', fields.pob.toUpperCase());
-      setTxt('outIssue', ocFormatDate(fields.issue));
-      setTxt('outExpiry', ocFormatDate(fields.expiry));
       setTxt('outAuthority', fields.authority.toUpperCase());
-      setTxt('outSignature', `${fields.givenNames.split(' ')[0] || 'Sample'} ${fields.surname}`);
 
       if (dtype === 'passport') {
         setTxt('outType', (fields.type || 'P').toUpperCase());
@@ -18686,18 +19454,26 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setVal('docNo', dtype === 'idcard' ? prof.docNo : prof.passNo);
       setVal('surname', prof.surname);
       setVal('givenNames', prof.givenNames);
-      setVal('nationality', cfg.nationality);
+      setVal('nationality', prof.nationality || cfg.nationality);
       setVal('personalNo', prof.personalNo);
       setVal('dob', prof.dob);
-      setVal('sex', prof.sex);
+      setVal('sex', (countryKey === 'tonga' && dtype === 'idcard')
+        ? (String(prof.sex || 'FEMALE').toUpperCase().startsWith('M') ? 'MALE' : 'FEMALE')
+        : prof.sex);
       setVal('pob', prof.pob);
       setVal('issue', prof.issue);
       setVal('expiry', prof.expiry);
       setVal('authority', prof.authority);
       if (prof.region !== undefined) setVal('region', prof.region);
-      if (prof.photoUrl) {
-        const photoEl = $(`${p}_outPhoto`);
-        const ghostEl = $(`${p}_outGhost`);
+      if (countryKey === 'tonga' && dtype === 'idcard') {
+        tongaUsingSpecimenPortrait = Boolean(prof.useSpecimenPhoto);
+      }
+      const photoEl = $(`${p}_outPhoto`);
+      const ghostEl = $(`${p}_outGhost`);
+      if (countryKey === 'tonga' && dtype === 'idcard' && prof.useSpecimenPhoto && tongaSpecimenMainPhotoUrl) {
+        if (photoEl) photoEl.src = tongaSpecimenMainPhotoUrl;
+        if (ghostEl) ghostEl.src = tongaSpecimenGhostPhotoUrl || tongaSpecimenMainPhotoUrl;
+      } else if (prof.photoUrl) {
         if (photoEl) photoEl.src = prof.photoUrl;
         if (ghostEl) ghostEl.src = prof.photoUrl;
       }
@@ -18742,8 +19518,14 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       const ghostEl = $(`${p}_outGhost`);
       const fileEl = $(`${p}_photoUpload`);
       const urlEl = $(`${p}_photoUrl`);
-      if (photoEl) photoEl.src = fallback;
-      if (ghostEl) ghostEl.src = fallback;
+      if (countryKey === 'tonga' && dtype === 'idcard') {
+        tongaUsingSpecimenPortrait = true;
+        if (photoEl) photoEl.src = tongaSpecimenMainPhotoUrl || fallback;
+        if (ghostEl) ghostEl.src = tongaSpecimenGhostPhotoUrl || fallback;
+      } else {
+        if (photoEl) photoEl.src = fallback;
+        if (ghostEl) ghostEl.src = fallback;
+      }
       if (fileEl) fileEl.value = '';
       if (urlEl) urlEl.value = '';
     }
@@ -18864,6 +19646,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           }
         }
       });
+      initTongaSpecimenPhoto();
     }
     window.mountOceaniaDocumentViews = mountOceaniaDocumentViews;
 
@@ -21351,14 +22134,14 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
 
             <!-- New Zealand (NZL) -->
-            <button type="button" id="country-btn-newzealand" data-docs="passport" onclick="switchVerificationCountry('newzealand')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-100/70 hover:border-slate-400 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+            <button type="button" id="country-btn-newzealand" data-docs="passport,driverlicense" onclick="switchVerificationCountry('newzealand')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-100/70 hover:border-slate-400 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
               <div class="flex items-center justify-between">
                 <span class="text-2xl drop-shadow-xs">🇳🇿</span>
                 <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
               </div>
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">New Zealand</div>
-                <div class="text-[10px] font-medium text-slate-500">New Zealand Passport (NZL)</div>
+                <div class="text-[10px] font-medium text-slate-500">Passport &amp; Driver Licence (NZL)</div>
               </div>
             </button>
 
@@ -29514,43 +30297,43 @@ COD REP DEM CONGO</div>
               <!-- Surname Amharic -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpSurnameAmharic">የአያት ስም (Surname Amharic)</label>
-                <input id="ethInpSurnameAmharic" type="text" value="መሀመድ" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800">
+                <input id="ethInpSurnameAmharic" type="text" value="መሀመድ" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800">
               </div>
 
               <!-- Surname English -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpSurname">Surname (English)</label>
-                <input id="ethInpSurname" type="text" value="MAHAMED" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+                <input id="ethInpSurname" type="text" value="MAHAMED" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
               </div>
 
               <!-- Given Name Amharic -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpGivenNameAmharic">ስም ከነአባት (Given Name Amharic)</label>
-                <input id="ethInpGivenNameAmharic" type="text" value="ማርዎ አብዱላሂ" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800">
+                <input id="ethInpGivenNameAmharic" type="text" value="ማርዎ አብዱላሂ" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800">
               </div>
 
               <!-- Given Name English -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpGivenNames">Given Name (English)</label>
-                <input id="ethInpGivenNames" type="text" value="MARWO ABDULAHI" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+                <input id="ethInpGivenNames" type="text" value="MARWO ABDULAHI" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
               </div>
 
               <!-- Passport No. -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpPassNo">ፓስፖርት ቁ. / Passport No.</label>
-                <input id="ethInpPassNo" type="text" value="EP6442640" maxlength="9" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono font-bold uppercase text-slate-800">
+                <input id="ethInpPassNo" type="text" value="EP6442640" maxlength="9" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono font-bold uppercase text-slate-800">
               </div>
 
               <!-- Date of Birth -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpDob">የትውልድ ቀን / Date of Birth</label>
-                <input id="ethInpDob" type="date" value="2005-11-03" onchange="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
+                <input id="ethInpDob" type="date" value="2005-11-03" onchange="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
               </div>
 
               <!-- Sex / ፆታ -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpSex">ፆታ / Sex</label>
-                <select id="ethInpSex" onchange="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800 bg-white">
+                <select id="ethInpSex" onchange="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold text-slate-800 bg-white">
                   <option value="F" selected>F (Female)</option>
                   <option value="M">M (Male)</option>
                 </select>
@@ -29559,37 +30342,37 @@ COD REP DEM CONGO</div>
               <!-- Nationality -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpNationality">ዜግነት / Nationality</label>
-                <input id="ethInpNationality" type="text" value="ETHIOPIAN" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+                <input id="ethInpNationality" type="text" value="ETHIOPIAN" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
               </div>
 
               <!-- Place of Birth -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpPob">የትውልድ ቦታ / Place of Birth</label>
-                <input id="ethInpPob" type="text" value="DEGAH BOUR" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+                <input id="ethInpPob" type="text" value="DEGAH BOUR" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
               </div>
 
               <!-- Personal No -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpPersonalNo">መለያ ቁ / Personal No.</label>
-                <input id="ethInpPersonalNo" type="text" value="" oninput="updateEthPreview()" placeholder="Optional" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+                <input id="ethInpPersonalNo" type="text" value="" oninput="updateEthPassPreview()" placeholder="Optional" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
               </div>
 
               <!-- Date of Issue -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpIssue">የተሰጠበት ቀን / Date of Issue</label>
-                <input id="ethInpIssue" type="date" value="2021-04-16" onchange="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
+                <input id="ethInpIssue" type="date" value="2021-04-16" onchange="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
               </div>
 
               <!-- Date of Expiry -->
               <div class="space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpExpiry">የሚያበቃበት ቀን / Date of Expiry</label>
-                <input id="ethInpExpiry" type="date" value="2026-04-15" onchange="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
+                <input id="ethInpExpiry" type="date" value="2026-04-15" onchange="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 text-slate-800">
               </div>
 
               <!-- Issuing Authority -->
               <div class="sm:col-span-2 space-y-1">
                 <label class="font-bold text-slate-600" for="ethInpAuthority">የሰጠዉ ባለስልጣን / Issuing Authority</label>
-                <input id="ethInpAuthority" type="text" value="MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS" oninput="updateEthPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
+                <input id="ethInpAuthority" type="text" value="MAIN DEPARTMENT FOR IMMIGRATION AND NATIONALITY AFFAIRS" oninput="updateEthPassPreview()" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 font-bold uppercase text-slate-800">
               </div>
             </div>
 
@@ -29597,9 +30380,9 @@ COD REP DEM CONGO</div>
             <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
               <label class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold flex items-center gap-2 cursor-pointer shadow-xs">
                 <i class="fa-solid fa-camera"></i> Change Photo
-                <input id="ethPhotoInput" type="file" accept="image/*" class="hidden">
+                <input id="ethPassPhotoInput" type="file" accept="image/*" class="hidden">
               </label>
-              <button type="button" onclick="resetEthPhoto()" class="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold flex items-center gap-1 cursor-pointer">
+              <button type="button" onclick="resetEthPassPhoto()" class="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold flex items-center gap-1 cursor-pointer">
                 <i class="fa-solid fa-user"></i> Reset Photo
               </button>
               <button type="button" onclick="copyEthSpecimenData()" class="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold flex items-center gap-1 cursor-pointer">
@@ -31862,6 +32645,403 @@ COD REP DEM CONGO</div>
       <!-- ================= OCEANIA DOCUMENT VIEWS (HYDRATED BY OCEANIA CONTROLLER) ================= -->
       <div id="australia-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
       <div id="newzealand-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+
+      <!-- ================= NEW ZEALAND DRIVER LICENCE VIEW (1:1 REFERENCE DESIGN) ================= -->
+      <div id="newzealand-driverlicense-view" class="hidden max-w-7xl mx-auto space-y-6">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form (Left Column) -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2 text-slate-900">
+                  <i class="fa-solid fa-id-badge text-emerald-700"></i>
+                  <span>New Zealand Driver Licence</span>
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">Waka Kotahi NZ Transport Agency · Front &amp; Back Specimen Prototype</p>
+              </div>
+              <span class="text-xs bg-emerald-50 text-emerald-900 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">NZL · LICENCE</span>
+            </div>
+
+            <!-- Randomize Card Button -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeNzDriverLicense()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-sky-700 hover:from-emerald-600 hover:via-teal-600 hover:to-sky-600 text-white font-black text-sm tracking-wide shadow-xl shadow-teal-700/20 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate sample New Zealand Driver Licence details</div>
+                </div>
+              </button>
+            </div>
+
+            <!-- Presets -->
+            <div class="bg-emerald-50/70 p-3 rounded-xl border border-emerald-200/80 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-950 flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles text-emerald-700"></i> Sample Presets
+                </span>
+                <button type="button" onclick="resetNzDlToSample()" class="px-2.5 py-1 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 rounded-lg text-[10px] font-bold transition flex items-center gap-1 shadow-2xs cursor-pointer">
+                  <i class="fa-solid fa-rotate-left"></i> Reset Sample
+                </button>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" onclick="loadNzDlPreset('reference')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-900 border border-emerald-300 rounded-lg text-[10px] font-bold transition truncate cursor-pointer">
+                  ★ Chen (Ref)
+                </button>
+                <button type="button" onclick="loadNzDlPreset('auckland')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Harper McKenzie
+                </button>
+                <button type="button" onclick="loadNzDlPreset('wellington')" class="px-2 py-1.5 bg-white hover:bg-emerald-100/60 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-medium transition truncate cursor-pointer">
+                  Noah Thompson
+                </button>
+              </div>
+            </div>
+
+            <form class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <!-- Photo Upload -->
+              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="nzDlPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600">Driver Portrait Photo</label>
+                  <button type="button" onclick="resetNzDlPhoto()" class="px-2 py-0.5 text-[11px] text-emerald-700 hover:text-red-600 hover:bg-red-50 rounded font-semibold cursor-pointer">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Reset Reference Photo
+                  </button>
+                </div>
+                <input type="file" id="nzDlPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white cursor-pointer">
+              </div>
+
+              <!-- Surname & First Names -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="nzDlInputSurname" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Surname</label>
+                  <input id="nzDlInputSurname" type="text" value="CHEN" oninput="updateNzDlPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs uppercase">
+                </div>
+                <div>
+                  <label for="nzDlInputFirstNames" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">First Names</label>
+                  <input id="nzDlInputFirstNames" type="text" value="JIAHUI" oninput="updateNzDlPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs uppercase">
+                </div>
+              </div>
+
+              <!-- DOB, Licence, Version -->
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label for="nzDlInputDob" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of birth</label>
+                  <input id="nzDlInputDob" type="text" value="15-09-1988" oninput="updateNzDlPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+                <div>
+                  <label for="nzDlInputLicence" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Licence</label>
+                  <input id="nzDlInputLicence" type="text" value="AC246810" oninput="updateNzDlPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                </div>
+                <div>
+                  <label for="nzDlInputVersion" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Version</label>
+                  <input id="nzDlInputVersion" type="text" value="812" oninput="updateNzDlPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Donor Status & Stock Batch -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="nzDlInputDonor" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Donor Status</label>
+                  <select id="nzDlInputDonor" onchange="updateNzDlPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs bg-white">
+                    <option value="DONOR" selected>DONOR</option>
+                    <option value="NONE">NONE</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="nzDlInputBatch" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Card Code (Bottom Right)</label>
+                  <input id="nzDlInputBatch" type="text" value="0000" oninput="updateNzDlPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs">
+                </div>
+              </div>
+
+              <!-- Address -->
+              <div>
+                <label for="nzDlInputAddress" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Address</label>
+                <textarea id="nzDlInputAddress" rows="3" oninput="updateNzDlPreview()" class="w-full px-2.5 py-1.5 border rounded font-bold text-xs uppercase leading-snug">APARTMENT 4B
+25 AUCKLAND ROAD
+EPSOM</textarea>
+              </div>
+
+              <!-- Back Entitlement & Conditions -->
+              <div class="pt-2 border-t border-slate-100 space-y-2.5">
+                <div class="text-[11px] font-black uppercase tracking-wider text-sky-900">Back Side · Driving Entitlement Information</div>
+                <div class="grid grid-cols-4 gap-2">
+                  <div>
+                    <label for="nzDlInputTopCode" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Code</label>
+                    <input id="nzDlInputTopCode" type="text" value="C/E" oninput="updateNzDlPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs uppercase">
+                  </div>
+                  <div>
+                    <label for="nzDlInputClass" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Class/Endo</label>
+                    <input id="nzDlInputClass" type="text" value="1L" oninput="updateNzDlPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs uppercase">
+                  </div>
+                  <div>
+                    <label for="nzDlInputIssued" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issued</label>
+                    <input id="nzDlInputIssued" type="text" value="01-05-2022" oninput="updateNzDlPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  </div>
+                  <div>
+                    <label for="nzDlInputExpires" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Expires</label>
+                    <input id="nzDlInputExpires" type="text" value="01-05-2032" oninput="updateNzDlPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
+                  </div>
+                </div>
+                <div>
+                  <label for="nzDlInputConditions" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Conditions</label>
+                  <input id="nzDlInputConditions" type="text" value="Correcting lenses must be used at all times while driving." oninput="updateNzDlPreview()" class="w-full px-2.5 py-1.5 border rounded font-medium text-xs">
+                </div>
+                <div>
+                  <label for="nzDlInputBarcode" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Back Barcode Number</label>
+                  <input id="nzDlInputBarcode" type="text" value="AB123456/12345" oninput="updateNzDlPreview()" class="w-full px-2.5 py-1.5 border rounded font-mono-code font-bold text-xs uppercase">
+                </div>
+              </div>
+
+              <!-- Export Actions -->
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadNzDlPNG('front')" class="py-2.5 px-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-image"></i>Save Front PNG
+                </button>
+                <button type="button" onclick="downloadNzDlPNG('back')" class="py-2.5 px-3 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-image"></i>Save Back PNG
+                </button>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="printNzDriverLicense()" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-print"></i>Print Licence
+                </button>
+                <button type="button" onclick="resetNzDlToSample()" class="py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-rotate-left text-slate-500 text-xs"></i>Reset Sample
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Preview Area (Right Column) -->
+          <section class="lg:col-span-7 space-y-5 print-area-wrapper min-w-0">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-2.5 shadow-2xs no-print">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold text-slate-800">NEW ZEALAND DRIVER LICENCE · DEMO PROTOTYPE</span>
+              </div>
+              <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
+                <button type="button" id="nzDlMode_both" onclick="setNzDlViewMode('both')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-white shadow-xs cursor-pointer transition-colors">Both Sides</button>
+                <button type="button" id="nzDlMode_front" onclick="setNzDlViewMode('front')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-colors">Front</button>
+                <button type="button" id="nzDlMode_back" onclick="setNzDlViewMode('back')" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-colors">Back</button>
+              </div>
+            </div>
+
+            <!-- FRONT SIDE -->
+            <div id="nzDlFrontCardWrap" class="w-full max-w-[668px] mx-auto">
+              <div class="flex items-center justify-between px-1 mb-1.5 no-print">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Front · Driver Identity Information</span>
+                <span class="text-[11px] font-mono text-slate-400">DEMO / PROTOTYPE</span>
+              </div>
+              <article id="newzealand-driverlicense-front" class="kyc-protected-surface relative w-full overflow-hidden select-none shadow-2xl" style="aspect-ratio: 668 / 421; container-type: inline-size; border-radius: 3.4% / 5.4%; font-family: Arial, Helvetica, sans-serif; background: linear-gradient(125deg, #f3faf7 0%, #dcefe5 20%, #bfe4ce 48%, #c9e9d6 76%, #e7f6ef 100%); color: #09090b;">
+                <!-- Mint/Teal Security Guilloche + Tilted FULL DRIVER LICENCE / RAIHANA TARAIWA TŪTURU Text Pattern -->
+                <svg viewBox="0 0 668 421" preserveAspectRatio="none" class="absolute inset-0 w-full h-full pointer-events-none select-none z-0" aria-hidden="true">
+                  <defs>
+                    <pattern id="nzDlSecurityTextPattern" width="356" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(-19 334 210)">
+                      <text x="0" y="17" fill="#ffffff" fill-opacity="0.60" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="13.2" letter-spacing="0.3">FULL DRIVER LICENCE   FULL DRIVER LICENCE</text>
+                      <text x="-42" y="39" fill="#ffffff" fill-opacity="0.60" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="13.2" letter-spacing="0.3">RAIHANA TARAIWA TŪTURU   RAIHANA TARAIWA TŪTURU</text>
+                    </pattern>
+                    <radialGradient id="nzDlMintHalo" cx="56%" cy="48%" r="55%">
+                      <stop offset="0%" stop-color="#addfc2" stop-opacity="0.72"/>
+                      <stop offset="60%" stop-color="#cae9d8" stop-opacity="0.38"/>
+                      <stop offset="100%" stop-color="#f2faf7" stop-opacity="0.1"/>
+                    </radialGradient>
+                  </defs>
+                  <rect width="668" height="421" fill="url(#nzDlMintHalo)"/>
+                  <!-- Soft diagonal wave bands -->
+                  <path d="M-40 165 Q 190 95, 420 190 T 720 130 L 720 340 Q 450 250, 220 340 T -40 290 Z" fill="#a8ddc0" fill-opacity="0.4"/>
+                  <path d="M-40 285 Q 200 220, 440 315 T 720 265 L 720 430 L -40 430 Z" fill="#c3e7d4" fill-opacity="0.36"/>
+                  <!-- Repeating tilted FULL DRIVER LICENCE / RAIHANA TARAIWA TŪTURU watermark text -->
+                  <rect width="668" height="421" fill="url(#nzDlSecurityTextPattern)"/>
+                  <!-- Subtle wavy security guilloche lines across upper & mid field -->
+                  <g fill="none" stroke="#53a87e" stroke-opacity="0.13" stroke-width="0.9">
+                    <path d="M0 95 Q 167 45 334 95 T 668 95"/>
+                    <path d="M0 107 Q 167 57 334 107 T 668 107"/>
+                    <path d="M0 119 Q 167 69 334 119 T 668 119"/>
+                    <path d="M0 245 Q 167 195 334 245 T 668 245"/>
+                    <path d="M0 257 Q 167 207 334 257 T 668 257"/>
+                  </g>
+                  <!-- Subtle oval holographic NZ security seals -->
+                  <g opacity="0.16" transform="translate(182 54) rotate(-14)">
+                    <ellipse cx="0" cy="0" rx="34" ry="20" fill="none" stroke="#ffffff" stroke-width="1.2"/>
+                    <ellipse cx="0" cy="0" rx="28" ry="15" fill="none" stroke="#ffffff" stroke-width="0.8" stroke-dasharray="2 2"/>
+                    <text x="0" y="3" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-weight="800" font-size="8.5" letter-spacing="1.2">NZWZ • NZ</text>
+                  </g>
+                  <g opacity="0.14" transform="translate(495 256) rotate(-12)">
+                    <ellipse cx="0" cy="0" rx="32" ry="18" fill="none" stroke="#ffffff" stroke-width="1.1"/>
+                    <ellipse cx="0" cy="0" rx="25" ry="13" fill="none" stroke="#ffffff" stroke-width="0.7" stroke-dasharray="2 2"/>
+                    <text x="0" y="3" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-weight="800" font-size="8" letter-spacing="1">NZTA • NZ</text>
+                  </g>
+                </svg>
+
+                <!-- Top-Left New Zealand Flag -->
+                <div style="position: absolute; left: 3.1%; top: 5.3%; width: 26.7%; height: 22.3%; z-index: 5; box-shadow: 0 0 1px rgba(15,23,42,0.2);">
+                  <svg viewBox="0 0 1200 600" class="w-full h-full block" aria-label="New Zealand Flag">
+                    <defs>
+                      <clipPath id="nzDlUnionCanton">
+                        <rect x="0" y="0" width="600" height="300"/>
+                      </clipPath>
+                      <polygon id="nzDlStar" points="0,-1 0.2245,-0.3090 0.9511,-0.3090 0.3633,0.1180 0.5878,0.8090 0,0.3820 -0.5878,0.8090 -0.3633,0.1180 -0.9511,-0.3090 -0.2245,-0.3090"/>
+                    </defs>
+                    <rect width="1200" height="600" fill="#012169"/>
+                    <g clip-path="url(#nzDlUnionCanton)">
+                      <path d="M0,0 L600,300 M600,0 L0,300" stroke="#ffffff" stroke-width="60"/>
+                      <path d="M0,0 L300,150" stroke="#C8102E" stroke-width="40" transform="translate(0,12)"/>
+                      <path d="M300,150 L600,300" stroke="#C8102E" stroke-width="40" transform="translate(0,-12)"/>
+                      <path d="M600,0 L300,150" stroke="#C8102E" stroke-width="40" transform="translate(0,-12)"/>
+                      <path d="M300,150 L0,300" stroke="#C8102E" stroke-width="40" transform="translate(0,12)"/>
+                      <path d="M300,0 V300 M0,150 H600" stroke="#ffffff" stroke-width="100"/>
+                      <path d="M300,0 V300 M0,150 H600" stroke="#C8102E" stroke-width="60"/>
+                    </g>
+                    <!-- Southern Cross 4 Stars (white outline + red interior) -->
+                    <use href="#nzDlStar" transform="translate(900,120) scale(46)" fill="#C8102E" stroke="#ffffff" stroke-width="0.22"/>
+                    <use href="#nzDlStar" transform="translate(765,245) scale(42)" fill="#C8102E" stroke="#ffffff" stroke-width="0.23"/>
+                    <use href="#nzDlStar" transform="translate(1030,220) scale(38)" fill="#C8102E" stroke="#ffffff" stroke-width="0.24"/>
+                    <use href="#nzDlStar" transform="translate(900,480) scale(52)" fill="#C8102E" stroke="#ffffff" stroke-width="0.2"/>
+                  </svg>
+                </div>
+
+                <!-- Top-Right Card Title -->
+                <div style="position: absolute; right: 4.1%; top: 5.5%; left: 39.8%; text-align: right; z-index: 6; color: #09090b;">
+                  <div style="font-size: 3.46cqw; font-weight: 800; letter-spacing: -0.015em; line-height: 1.05; white-space: nowrap;">NEW ZEALAND DRIVER LICENCE</div>
+                  <div style="font-size: 2.28cqw; font-weight: 500; letter-spacing: 0.01em; line-height: 1.18; margin-top: 0.32cqw; white-space: nowrap;">DRIVER IDENTITY INFORMATION</div>
+                </div>
+
+                <!-- Bottom-Left Main Portrait + Concentric Security Swirls -->
+                <div style="position: absolute; left: 3.7%; top: 41.5%; width: 26.4%; height: 51.9%; overflow: hidden; background: #e5e7eb; z-index: 5;">
+                  <img id="nzDlPreviewPhoto" src="/assets/aistudio/canada_passport_portrait.png" alt="Driver Portrait" class="w-full h-full object-cover object-top block">
+                  <!-- Security swirl pattern over custom/randomized photos -->
+                  <svg id="nzDlPortraitSwirl" viewBox="0 0 200 240" preserveAspectRatio="none" class="absolute inset-0 w-full h-full pointer-events-none select-none" aria-hidden="true">
+                    <g fill="none" stroke="#64748b" stroke-opacity="0.34" stroke-width="0.75">
+                      <circle cx="102" cy="118" r="16"/><circle cx="102" cy="118" r="24"/><circle cx="102" cy="118" r="32"/>
+                      <circle cx="102" cy="118" r="40"/><circle cx="102" cy="118" r="48"/><circle cx="102" cy="118" r="56"/>
+                      <circle cx="102" cy="118" r="64"/><circle cx="102" cy="118" r="72"/><circle cx="102" cy="118" r="80"/>
+                      <circle cx="102" cy="118" r="88"/><circle cx="102" cy="118" r="96"/><circle cx="102" cy="118" r="104"/>
+                    </g>
+                    <g fill="none" stroke="#ffffff" stroke-opacity="0.28" stroke-width="0.65">
+                      <circle cx="96" cy="124" r="20"/><circle cx="96" cy="124" r="36"/><circle cx="96" cy="124" r="52"/>
+                      <circle cx="96" cy="124" r="68"/><circle cx="96" cy="124" r="84"/><circle cx="96" cy="124" r="100"/>
+                    </g>
+                  </svg>
+                </div>
+
+                <!-- Center Driver Identity Fields -->
+                <div style="position: absolute; left: 33.4%; top: 19.6%; z-index: 7; color: #09090b;">
+                  <div style="font-size: 2.08cqw; font-weight: 500; line-height: 1.15; color: #111827;">Surname</div>
+                  <div id="nzDlOutSurname" style="font-size: 2.55cqw; font-weight: 800; line-height: 1.18; letter-spacing: 0.01em; text-transform: uppercase;">CHEN</div>
+                </div>
+
+                <div style="position: absolute; left: 33.4%; top: 30.6%; z-index: 7; color: #09090b;">
+                  <div style="font-size: 2.08cqw; font-weight: 500; line-height: 1.15; color: #111827;">First Names</div>
+                  <div id="nzDlOutFirstNames" style="font-size: 2.55cqw; font-weight: 800; line-height: 1.18; letter-spacing: 0.01em; text-transform: uppercase;">JIAHUI</div>
+                </div>
+
+                <!-- Date of birth / Licence / Version / Donor Status -->
+                <div style="position: absolute; left: 33.4%; top: 44.8%; right: 4.5%; z-index: 7; color: #09090b; display: grid; grid-template-columns: 15.2cqw 1fr; row-gap: 0.45cqw; align-items: baseline;">
+                  <div style="font-size: 2.08cqw; font-weight: 500; color: #111827;">Date of birth</div>
+                  <div id="nzDlOutDob" style="font-size: 2.48cqw; font-weight: 800; letter-spacing: 0.01em;">15-09-1988</div>
+
+                  <div style="font-size: 2.08cqw; font-weight: 500; color: #111827;">Licence</div>
+                  <div class="flex items-baseline whitespace-nowrap">
+                    <span id="nzDlOutLicence" style="font-size: 2.48cqw; font-weight: 800; min-width: 15.6cqw; display: inline-block; letter-spacing: 0.01em;">AC246810</span>
+                    <span style="font-size: 2.08cqw; font-weight: 500; color: #111827; margin-right: 1.4cqw;">Version</span>
+                    <span id="nzDlOutVersion" style="font-size: 2.48cqw; font-weight: 800; letter-spacing: 0.01em;">812</span>
+                  </div>
+
+                  <div style="font-size: 2.08cqw; font-weight: 500; color: #111827;">Donor Status</div>
+                  <div id="nzDlOutDonor" style="font-size: 2.48cqw; font-weight: 800; letter-spacing: 0.01em;">DONOR</div>
+                </div>
+
+                <!-- Holder Signature (Cursive Loops) -->
+                <div style="position: absolute; left: 41.2%; top: 60.4%; width: 15.8cqw; height: 7.4cqw; z-index: 7;">
+                  <svg viewBox="0 0 180 76" class="w-full h-full block" aria-label="Holder Signature">
+                    <path d="M18 46 C 12 31, 44 12, 82 14 C 118 16, 120 42, 76 54 C 42 63, 24 55, 34 39 C 44 23, 88 21, 118 28 C 148 35, 138 56, 98 62 C 74 66, 60 56, 72 44 C 86 30, 128 32, 152 40 C 166 45, 156 54, 134 55" fill="none" stroke="#09090b" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+
+                <!-- Address -->
+                <div style="position: absolute; left: 33.4%; top: 71.2%; right: 32%; z-index: 7; color: #09090b;">
+                  <div style="font-size: 2.08cqw; font-weight: 500; line-height: 1.15; color: #111827;">Address</div>
+                  <div id="nzDlOutAddress" style="font-size: 2.38cqw; font-weight: 800; line-height: 1.17; letter-spacing: 0.01em; text-transform: uppercase; white-space: pre-line; margin-top: 0.15cqw;">APARTMENT 4B
+25 AUCKLAND ROAD
+EPSOM</div>
+                </div>
+
+                <!-- Bottom-Right Batch Code & Ghost Portrait -->
+                <div id="nzDlOutBatch" style="position: absolute; left: 70.6%; bottom: 4.8%; z-index: 7; font-size: 2.32cqw; font-weight: 800; color: #09090b; letter-spacing: 0.02em;">0000</div>
+
+                <div style="position: absolute; right: 4.3%; bottom: 4.3%; width: 15.2%; height: 31.8%; overflow: hidden; z-index: 6; opacity: 0.80;">
+                  <img id="nzDlGhostPhoto" src="/assets/aistudio/canada_passport_portrait.png" alt="Ghost Portrait" class="w-full h-full object-cover object-top block" style="filter: saturate(0.75) contrast(0.92) brightness(1.05);">
+                </div>
+              </article>
+            </div>
+
+            <!-- BACK SIDE -->
+            <div id="nzDlBackCardWrap" class="w-full max-w-[668px] mx-auto">
+              <div class="flex items-center justify-between px-1 mb-1.5 no-print">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-600">Back · Driving Entitlement Information</span>
+                <span class="text-[11px] font-mono text-slate-400">CLASS / ENDO · BARCODE</span>
+              </div>
+              <article id="newzealand-driverlicense-back" class="kyc-protected-surface relative w-full overflow-hidden select-none shadow-2xl bg-white" style="aspect-ratio: 668 / 421; container-type: inline-size; border-radius: 3.4% / 5.4%; border: 1.5px solid #1e293b; font-family: Arial, Helvetica, sans-serif; color: #09090b;">
+                <!-- Full-Card Cyan Radial Guilloche Web -->
+                <div id="nzDlBackGuillocheHost" class="absolute inset-0 w-full h-full pointer-events-none select-none z-0"></div>
+
+                <!-- Top-Left Conditions -->
+                <div style="position: absolute; left: 3.6%; top: 5.2%; width: 24.4%; z-index: 6; color: #09090b;">
+                  <div style="font-size: 2.26cqw; font-weight: 700; letter-spacing: 0.01em; line-height: 1.18;">CONDITIONS</div>
+                  <div id="nzDlOutConditions" style="font-size: 2.12cqw; font-weight: 500; line-height: 1.26; margin-top: 0.45cqw; color: #111827;">Correcting lenses must be used at all times while driving.</div>
+                </div>
+
+                <!-- Top-Center-Right Code (C/E) -->
+                <div id="nzDlOutTopCode" style="position: absolute; left: 35.6%; top: 5.2%; z-index: 6; font-size: 2.26cqw; font-weight: 700; color: #09090b; line-height: 1.18;">C/E</div>
+
+                <!-- Top-Right Card Title -->
+                <div style="position: absolute; right: 3.8%; top: 5.0%; left: 41.5%; text-align: right; z-index: 6; color: #09090b;">
+                  <div style="font-size: 3.38cqw; font-weight: 800; letter-spacing: -0.015em; line-height: 1.05; white-space: nowrap;">NEW ZEALAND DRIVER LICENCE</div>
+                  <div style="font-size: 2.25cqw; font-weight: 500; letter-spacing: 0.01em; line-height: 1.18; margin-top: 0.35cqw; white-space: nowrap;">DRIVING ENTITLEMENT INFORMATION</div>
+                </div>
+
+                <!-- Driving Entitlement Table -->
+                <div style="position: absolute; left: 45.2%; right: 3.8%; top: 22.0%; z-index: 7; border: 1.2px solid #1e293b; color: #09090b;">
+                  <!-- Table Header Row -->
+                  <div class="grid" style="grid-template-columns: 38% 31% 31%; border-bottom: 1.2px solid #1e293b;">
+                    <div style="padding: 0.75cqw 1.0cqw; font-size: 2.02cqw; font-weight: 600; border-right: 1.2px solid #1e293b; white-space: nowrap;">CLASS/ENDO</div>
+                    <div style="padding: 0.75cqw 0.8cqw; font-size: 2.02cqw; font-weight: 600; text-align: center; border-right: 1.2px solid #1e293b;">ISSUED</div>
+                    <div style="padding: 0.75cqw 0.8cqw; font-size: 2.02cqw; font-weight: 600; text-align: center;">EXPIRES</div>
+                  </div>
+                  <!-- Double hairline separator matching reference -->
+                  <div style="height: 0.35cqw; border-bottom: 1.2px solid #1e293b;"></div>
+                  <!-- Table Data Row -->
+                  <div class="grid items-center" style="grid-template-columns: 38% 31% 31%;">
+                    <div class="flex items-center gap-[1.0cqw]" style="padding: 0.7cqw 0.9cqw; border-right: 1.2px solid #1e293b; min-height: 4.8cqw;">
+                      <span id="nzDlOutClass" style="font-size: 2.22cqw; font-weight: 700; line-height: 1;">1L</span>
+                      <!-- Black Car Silhouette Icon -->
+                      <svg viewBox="0 0 90 34" style="width: 9.6cqw; height: 3.6cqw; display: block; flex-shrink: 0;" aria-hidden="true">
+                        <path d="M12 22 L16 14 L27 7 L56 7 L69 14 L84 16 C87 17 88 21 86 24 L80 24 C79 20 75 18 71 18 C67 18 63 20 62 24 L31 24 C30 20 26 18 22 18 C18 18 14 20 13 24 L8 24 C6 23 8 22 12 22 Z" fill="#111827"/>
+                        <path d="M29 9.5 L41 9.5 L41 14.5 L20 14.5 Z" fill="#ffffff" opacity="0.22"/>
+                        <path d="M44 9.5 L55 9.5 L64 14.5 L44 14.5 Z" fill="#ffffff" opacity="0.22"/>
+                        <circle cx="22" cy="25" r="6" fill="#111827"/>
+                        <circle cx="22" cy="25" r="2.6" fill="#e5e7eb"/>
+                        <circle cx="71" cy="25" r="6" fill="#111827"/>
+                        <circle cx="71" cy="25" r="2.6" fill="#e5e7eb"/>
+                      </svg>
+                    </div>
+                    <div id="nzDlOutIssued" style="padding: 0.75cqw 0.6cqw; font-size: 2.08cqw; font-weight: 600; text-align: center; border-right: 1.2px solid #1e293b; white-space: nowrap;">01-05-2022</div>
+                    <div id="nzDlOutExpires" style="padding: 0.75cqw 0.6cqw; font-size: 2.08cqw; font-weight: 600; text-align: center; white-space: nowrap;">01-05-2032</div>
+                  </div>
+                </div>
+
+                <!-- Bottom-Right White Barcode Strip -->
+                <div style="position: absolute; right: 3.8%; bottom: 3.2%; width: 42.2%; background: #ffffff; padding: 1.0% 1.6% 0.5%; z-index: 8;">
+                  <div id="nzDlBarcodeSvgHost" style="width: 100%; height: 4.5cqw;"></div>
+                  <div id="nzDlOutBarcodeText" style="font-size: 1.42cqw; font-weight: 600; color: #09090b; text-align: center; letter-spacing: 0.03em; line-height: 1.15; margin-top: 0.2cqw;">AB123456/12345</div>
+                </div>
+              </article>
+            </div>
+          </section>
+        </main>
+      </div>
       <div id="fiji-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
       <div id="papuanewguinea-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
       <div id="papuanewguinea-idcard-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
@@ -33120,6 +34300,8 @@ COD REP DEM CONGO</div>
         'turkey-id-back',
         'australia-passport-card',
         'newzealand-passport-card',
+        'newzealand-driverlicense-front',
+        'newzealand-driverlicense-back',
         'fiji-passport-card',
         'papuanewguinea-passport-card',
         'papuanewguinea-id-front',
