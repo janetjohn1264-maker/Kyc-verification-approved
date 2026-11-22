@@ -3,11 +3,14 @@ import dotenv from 'dotenv';
 
 import { createSifaloPaymentService, type SifaloPaymentServiceDeps } from './sifaloPayments.js';
 
-dotenv.config();
+if (!process.env.VERCEL) {
+  dotenv.config();
+}
 
 export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
   const app = express();
   app.set('trust proxy', 1);
+  app.set('etag', false);
 
   const sifaloPaymentService = createSifaloPaymentService(deps);
 
@@ -17,6 +20,14 @@ export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
 
   app.use(express.json({ limit: '15mb', verify: captureRawBody }));
   app.use(express.urlencoded({ extended: true, limit: '15mb', verify: captureRawBody }));
+
+  // Prevent browser or CDN edge caching of dynamic payment/health status
+  app.use((_req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  });
 
   // Normalize URL prefix when Vercel rewrites /api/(.*) to /api/index.ts
   app.use((req: Request, _res: Response, next: NextFunction) => {
@@ -34,15 +45,26 @@ export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
   });
 
   app.get('/api/health', (_req: Request, res: Response) => {
+    const diagnostics = sifaloPaymentService.getDiagnostics();
+    const configured = diagnostics.SIFALO_API_USER_PRESENT && diagnostics.SIFALO_API_KEY_PRESENT;
     return res.status(200).json({
       ok: true,
       status: 'healthy',
-      configured: sifaloPaymentService.isConfigured(),
+      configured,
+      diagnostics: {
+        SIFALO_API_USER_PRESENT: diagnostics.SIFALO_API_USER_PRESENT,
+        SIFALO_API_KEY_PRESENT: diagnostics.SIFALO_API_KEY_PRESENT,
+        SIFALO_WEBHOOK_SECRET_PRESENT: diagnostics.SIFALO_WEBHOOK_SECRET_PRESENT,
+        SIFALO_ENV: diagnostics.SIFALO_ENV,
+        APP_BASE_URL_PRESENT: diagnostics.APP_BASE_URL_PRESENT,
+        VERCEL_ENV: diagnostics.VERCEL_ENV,
+      },
       service: 'kycapproved-api',
       timestamp: new Date().toISOString(),
       endpoints: {
         health: '/api/health',
         sifaloConfig: '/api/payments/sifalo/config',
+        sifaloDiagnostics: '/api/payments/sifalo/diagnostics',
         sifaloWebhook: '/api/webhooks/sifalo',
         sifaloWebhookAlias: '/api/sifalo/webhook',
         sifaloCreateCheckout: '/api/payments/sifalo/create-checkout',

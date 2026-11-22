@@ -325,6 +325,36 @@ function extractIncomingProductId(payload: Record<string, unknown>): string {
   return '';
 }
 
+function sanitizeEnvValue(rawVal: unknown): string {
+  if (typeof rawVal !== 'string') return '';
+  const cleaned = rawVal
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '')
+    .trim();
+  if (
+    !cleaned ||
+    /^\[.*\]$/.test(cleaned) ||
+    /^<.*>$/.test(cleaned) ||
+    /paste\s+my\s+(username|api\s*key)/i.test(cleaned)
+  ) {
+    return '';
+  }
+  return cleaned;
+}
+
+function getLiveProcessEnv(): Record<string, string | undefined> {
+  try {
+    const reflected = Reflect.get(globalThis.process || process, 'env');
+    if (reflected && typeof reflected === 'object') {
+      return reflected as Record<string, string | undefined>;
+    }
+  } catch {
+    // Fallback to process.env
+  }
+  return process.env || {};
+}
+
 function readRuntimeEnv(
   key:
     | 'SIFALO_API_USER'
@@ -367,10 +397,31 @@ function readRuntimeEnv(
       directVal = process.env.SIFALO_DATA_DIR;
       break;
   }
-  const dynamicEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
-    ?.env;
-  const raw = directVal || dynamicEnv?.[key] || '';
-  return String(raw).trim().replace(/^['"]|['"]$/g, '');
+
+  const cleanedDirect = sanitizeEnvValue(directVal);
+  if (cleanedDirect) {
+    return cleanedDirect;
+  }
+
+  const liveEnv = getLiveProcessEnv();
+  const cleanedDynamic = sanitizeEnvValue(liveEnv[key]);
+  if (cleanedDynamic) {
+    return cleanedDynamic;
+  }
+
+  // Fallback scan in case the Vercel Dashboard key name has accidental leading/trailing whitespace or zero-width characters
+  const targetNormalized = key.toUpperCase();
+  for (const [rawK, rawV] of Object.entries(liveEnv)) {
+    const normalizedK = rawK.replace(/[\s\u200B-\u200D\uFEFF]+/g, '').toUpperCase();
+    if (normalizedK === targetNormalized) {
+      const cleanedFallback = sanitizeEnvValue(rawV);
+      if (cleanedFallback) {
+        return cleanedFallback;
+      }
+    }
+  }
+
+  return '';
 }
 
 function resolveDefaultPersistencePath(customDir: string): string {
@@ -1141,14 +1192,46 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     }
   }
 
+  function getDiagnostics() {
+    const apiUserPresent = Boolean(getApiUser());
+    const apiKeyPresent = Boolean(getApiKey());
+    const webhookSecretPresent = Boolean(getWebhookSecret());
+    const appBaseUrlPresent = Boolean(getAppBaseUrl());
+    const liveEnv = getLiveProcessEnv();
+    const detectedSifaloEnvKeys = Object.keys(liveEnv)
+      .filter((k) => /SIFALO|APP_BASE/i.test(k))
+      .map((k) => k.trim())
+      .sort();
+
+    return {
+      SIFALO_API_USER_PRESENT: apiUserPresent,
+      SIFALO_API_KEY_PRESENT: apiKeyPresent,
+      SIFALO_WEBHOOK_SECRET_PRESENT: webhookSecretPresent,
+      SIFALO_ENV: getEnvironment(),
+      APP_BASE_URL_PRESENT: appBaseUrlPresent,
+      VERCEL: Boolean(liveEnv.VERCEL),
+      VERCEL_ENV: liveEnv.VERCEL_ENV || null,
+      detectedSifaloEnvKeys,
+    };
+  }
+
   function createRouter() {
     const router = express.Router();
 
     router.get('/config', (_req: Request, res: Response) => {
       const environment = getEnvironment();
-      const configured = Boolean(getApiUser() && getApiKey());
+      const diagnostics = getDiagnostics();
+      const configured = diagnostics.SIFALO_API_USER_PRESENT && diagnostics.SIFALO_API_KEY_PRESENT;
       return res.json({
         configured,
+        diagnostics: {
+          SIFALO_API_USER_PRESENT: diagnostics.SIFALO_API_USER_PRESENT,
+          SIFALO_API_KEY_PRESENT: diagnostics.SIFALO_API_KEY_PRESENT,
+          SIFALO_WEBHOOK_SECRET_PRESENT: diagnostics.SIFALO_WEBHOOK_SECRET_PRESENT,
+          SIFALO_ENV: diagnostics.SIFALO_ENV,
+          APP_BASE_URL_PRESENT: diagnostics.APP_BASE_URL_PRESENT,
+          VERCEL_ENV: diagnostics.VERCEL_ENV,
+        },
         provider: 'sifalo',
         environment,
         supportedMethods: [
@@ -1161,6 +1244,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           'Premier Wallet',
         ],
         pricing: AUTHORITATIVE_PRODUCT_PRICING,
+      });
+    });
+
+    router.get('/diagnostics', (_req: Request, res: Response) => {
+      const diagnostics = getDiagnostics();
+      const configured = diagnostics.SIFALO_API_USER_PRESENT && diagnostics.SIFALO_API_KEY_PRESENT;
+      return res.json({
+        configured,
+        diagnostics,
       });
     });
 
@@ -1178,8 +1270,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         const apiUser = getApiUser();
         const apiKey = getApiKey();
         if (!apiUser || !apiKey) {
+          const diagnostics = getDiagnostics();
           return res.status(503).json({
             code: 'PAYMENT_NOT_CONFIGURED',
+            configured: false,
+            diagnostics: {
+              SIFALO_API_USER_PRESENT: diagnostics.SIFALO_API_USER_PRESENT,
+              SIFALO_API_KEY_PRESENT: diagnostics.SIFALO_API_KEY_PRESENT,
+              VERCEL_ENV: diagnostics.VERCEL_ENV,
+            },
             error:
               'Sifalo Pay checkout requires SIFALO_API_USER and SIFALO_API_KEY to be configured on the server.',
           });
@@ -1482,6 +1581,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     createRouter,
     handleWebhook,
     isConfigured: () => Boolean(getApiUser() && getApiKey()),
+    getDiagnostics,
     _internal: {
       orders,
       sidToOrderId,
