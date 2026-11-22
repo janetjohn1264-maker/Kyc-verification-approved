@@ -205,10 +205,28 @@ interface UnlockTokenPayload {
   exp: number;
 }
 
+interface SignedGrantCookieEntry {
+  o: string; // orderId
+  t: string; // unlockTokenId
+  sid: string; // verified providerSid
+  p: UnlockProductKey; // productKey
+  a: number; // amountCents
+  e: number; // expiresAt
+  c: number; // createdAt
+  env: SifaloEnvironment;
+}
+
+interface SignedGrantsCookiePayload {
+  s: string; // sessionId
+  g: Partial<Record<UnlockProductKey, SignedGrantCookieEntry>>;
+}
+
 const UNLOCK_GRANT_TTL_MS = 60 * 60 * 1000;
 const ORDER_EXPIRY_TTL_MS = 60 * 60 * 1000;
 const STALE_ORDER_PRUNE_MS = 24 * 60 * 60 * 1000;
 const MAX_PROCESSED_WEBHOOK_EVENTS = 5000;
+const SIFALO_SESSION_COOKIE_NAME = 'kyc_sifalo_sid';
+const SIFALO_GRANTS_COOKIE_NAME = 'kyc_sifalo_grants';
 
 export const OFFICIAL_SIFALO_ENDPOINTS: Record<SifaloEnvironment, SifaloEndpointConfig> = {
   production: {
@@ -593,17 +611,217 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     return cleaned || null;
   }
 
+  function parseCookies(req: Request): Record<string, string> {
+    const rawHeader = req.headers.cookie;
+    const cookies: Record<string, string> = {};
+    if (typeof rawHeader !== 'string' || !rawHeader.trim()) {
+      return cookies;
+    }
+    const parts = rawHeader.split(';');
+    for (const part of parts) {
+      const idx = part.indexOf('=');
+      if (idx <= 0) continue;
+      const key = part.slice(0, idx).trim();
+      const val = part.slice(idx + 1).trim();
+      if (key) {
+        try {
+          cookies[key] = decodeURIComponent(val);
+        } catch {
+          cookies[key] = val;
+        }
+      }
+    }
+    return cookies;
+  }
+
+  function isSecureCookieRequest(req: Request): boolean {
+    const forwardedProto = String(req.headers['x-forwarded-proto'] || '')
+      .split(',')[0]
+      .trim()
+      .toLowerCase();
+    return Boolean(req.secure || forwardedProto === 'https');
+  }
+
+  function appendSetCookie(res: Response, cookieString: string) {
+    if (typeof res.append === 'function') {
+      res.append('Set-Cookie', cookieString);
+      return;
+    }
+    const existing = res.getHeader('Set-Cookie');
+    if (!existing) {
+      res.setHeader('Set-Cookie', cookieString);
+    } else if (Array.isArray(existing)) {
+      res.setHeader('Set-Cookie', [...existing, cookieString]);
+    } else {
+      res.setHeader('Set-Cookie', [String(existing), cookieString]);
+    }
+  }
+
+  function signCookiePayload(purpose: string, data: unknown): string {
+    const encoded = Buffer.from(JSON.stringify(data), 'utf8').toString('base64url');
+    const sig = crypto
+      .createHmac('sha256', getSigningSecret())
+      .update(`ck:${purpose}:${encoded}`)
+      .digest('base64url');
+    return `${encoded}.${sig}`;
+  }
+
+  function verifyCookiePayload<T>(purpose: string, rawToken: string): T | null {
+    if (!rawToken || typeof rawToken !== 'string') return null;
+    const parts = rawToken.trim().split('.');
+    if (parts.length !== 2) return null;
+    const [encoded, providedSig] = parts;
+    const expectedSig = crypto
+      .createHmac('sha256', getSigningSecret())
+      .update(`ck:${purpose}:${encoded}`)
+      .digest('base64url');
+    if (!constantTimeStringEqual(providedSig, expectedSig)) {
+      return null;
+    }
+    try {
+      return JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8')) as T;
+    } catch {
+      return null;
+    }
+  }
+
+  function getVerifiedSessionFromCookie(req: Request): string | null {
+    const cookies = parseCookies(req);
+    const raw = cookies[SIFALO_SESSION_COOKIE_NAME];
+    if (!raw) return null;
+    const parsed = verifyCookiePayload<{ sid?: unknown }>('sid', raw);
+    if (!parsed) return null;
+    return sanitizeSessionId(parsed.sid);
+  }
+
+  function setSignedSessionCookie(req: Request, res: Response, sessionId: string) {
+    const signed = signCookiePayload('sid', { sid: sessionId, iat: now() });
+    const secureFlag = isSecureCookieRequest(req) ? '; Secure' : '';
+    appendSetCookie(
+      res,
+      `${SIFALO_SESSION_COOKIE_NAME}=${encodeURIComponent(signed)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400${secureFlag}`
+    );
+  }
+
+  function getVerifiedGrantsFromCookie(
+    req: Request,
+    expectedSessionId: string | null
+  ): Partial<Record<UnlockProductKey, SignedGrantCookieEntry>> {
+    const cookies = parseCookies(req);
+    const raw = cookies[SIFALO_GRANTS_COOKIE_NAME];
+    if (!raw) return {};
+    const parsed = verifyCookiePayload<SignedGrantsCookiePayload>('grants', raw);
+    if (!parsed || typeof parsed.s !== 'string' || !parsed.g || typeof parsed.g !== 'object') {
+      return {};
+    }
+    const cookieSession = sanitizeSessionId(parsed.s);
+    if (!cookieSession) return {};
+    if (expectedSessionId && cookieSession !== expectedSessionId) {
+      return {};
+    }
+    const validGrants: Partial<Record<UnlockProductKey, SignedGrantCookieEntry>> = {};
+    const currentNow = now();
+    for (const [k, entry] of Object.entries(parsed.g)) {
+      const pk = normalizeDocTypeToProductKey(k);
+      if (!pk || !entry || typeof entry !== 'object') continue;
+      if (
+        typeof entry.o !== 'string' ||
+        typeof entry.t !== 'string' ||
+        typeof entry.sid !== 'string' ||
+        entry.p !== pk ||
+        typeof entry.e !== 'number' ||
+        entry.e <= currentNow
+      ) {
+        continue;
+      }
+      const spec = AUTHORITATIVE_PRODUCT_PRICING[pk];
+      if (entry.a !== spec.amountCents) continue;
+      validGrants[pk] = {
+        o: entry.o,
+        t: entry.t,
+        sid: entry.sid,
+        p: pk,
+        a: spec.amountCents,
+        e: entry.e,
+        c: typeof entry.c === 'number' ? entry.c : currentNow,
+        env: entry.env === 'staging' ? 'staging' : 'production',
+      };
+    }
+    return validGrants;
+  }
+
+  function setSignedGrantsCookie(
+    req: Request,
+    res: Response,
+    sessionId: string,
+    grantsMap: Partial<Record<UnlockProductKey, SignedGrantCookieEntry>>
+  ) {
+    const secureFlag = isSecureCookieRequest(req) ? '; Secure' : '';
+    const entries = Object.entries(grantsMap).filter(([, v]) => Boolean(v && v.e > now()));
+    if (entries.length === 0) {
+      appendSetCookie(
+        res,
+        `${SIFALO_GRANTS_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secureFlag}`
+      );
+      return;
+    }
+    const cleanMap: Partial<Record<UnlockProductKey, SignedGrantCookieEntry>> = {};
+    for (const [k, v] of entries) {
+      if (v) cleanMap[k as UnlockProductKey] = v;
+    }
+    const signed = signCookiePayload('grants', { s: sessionId, g: cleanMap });
+    appendSetCookie(
+      res,
+      `${SIFALO_GRANTS_COOKIE_NAME}=${encodeURIComponent(signed)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600${secureFlag}`
+    );
+  }
+
+  function buildGrantCookieEntry(order: SifaloOrderRecord): SignedGrantCookieEntry | null {
+    if (
+      order.status !== 'PAID' ||
+      order.revokedAt ||
+      !order.providerSid ||
+      !order.unlockTokenId ||
+      !order.unlockTokenExpiresAt ||
+      order.unlockTokenExpiresAt <= now()
+    ) {
+      return null;
+    }
+    return {
+      o: order.orderId,
+      t: order.unlockTokenId,
+      sid: order.providerSid,
+      p: order.productKey,
+      a: order.amountCents,
+      e: order.unlockTokenExpiresAt,
+      c: order.createdAt,
+      env: order.environment,
+    };
+  }
+
+  function resolveSessionBinding(
+    req: Request,
+    body?: Record<string, unknown> | null
+  ): {
+    cookieSessionId: string | null;
+    clientSessionId: string | null;
+    effectiveSessionId: string | null;
+  } {
+    const cookieSessionId = getVerifiedSessionFromCookie(req);
+    const fromBody = body ? sanitizeSessionId(body.sessionId) : null;
+    const fromHeader = sanitizeSessionId(req.headers['x-kyc-session-id']);
+    const fromQuery = sanitizeSessionId(req.query.sessionId);
+    const clientSessionId = fromBody || fromHeader || fromQuery || null;
+    // Signed HttpOnly cookie is authoritative when present so redirects/refreshes/new tabs cannot lose or spoof the session
+    const effectiveSessionId = cookieSessionId || clientSessionId;
+    return { cookieSessionId, clientSessionId, effectiveSessionId };
+  }
+
   function extractRequestSessionId(
     req: Request,
     body?: Record<string, unknown> | null
   ): string | null {
-    const fromBody = body ? sanitizeSessionId(body.sessionId) : null;
-    if (fromBody) return fromBody;
-    const fromHeader = sanitizeSessionId(req.headers['x-kyc-session-id']);
-    if (fromHeader) return fromHeader;
-    const fromQuery = sanitizeSessionId(req.query.sessionId);
-    if (fromQuery) return fromQuery;
-    return null;
+    return resolveSessionBinding(req, body).effectiveSessionId;
   }
 
   function signOrderStateToken(order: SifaloOrderRecord): string {
@@ -837,7 +1055,8 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
   async function verifyTransactionWithSifaloApi(
     order: SifaloOrderRecord,
-    overrideSid?: string
+    overrideSid?: string,
+    preserveGrant?: { tid: string; expiresAt: number }
   ): Promise<{
     ok: boolean;
     status: OrderStatus;
@@ -850,6 +1069,14 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         ok: false,
         status: order.status,
         error: `Payment ${order.status.toLowerCase()}. Document download is not permitted.`,
+      };
+    }
+
+    if (preserveGrant && preserveGrant.expiresAt <= now()) {
+      return {
+        ok: false,
+        status: 'EXPIRED',
+        error: 'Paid session has expired. Please start a new payment.',
       };
     }
 
@@ -1068,8 +1295,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       order.status = 'PAID';
       order.paidAt = paidAt;
       order.revokedAt = null;
-      order.unlockTokenId = crypto.randomUUID();
-      order.unlockTokenExpiresAt = paidAt + UNLOCK_GRANT_TTL_MS;
+      if (preserveGrant && preserveGrant.tid && preserveGrant.expiresAt > paidAt) {
+        order.unlockTokenId = preserveGrant.tid;
+        order.unlockTokenExpiresAt = preserveGrant.expiresAt;
+      } else {
+        order.unlockTokenId = crypto.randomUUID();
+        order.unlockTokenExpiresAt = paidAt + UNLOCK_GRANT_TTL_MS;
+      }
       orders.set(order.orderId, order);
       persistState();
       console.info(
@@ -1456,7 +1688,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         const countryKey = sanitizeShortSlug(body.countryKey, 'global');
         const providerKey = sanitizeShortSlug(body.providerKey, 'virtual-account');
-        const sessionId = extractRequestSessionId(req, body);
+        const sessionBinding = resolveSessionBinding(req, body);
+        const sessionId = sessionBinding.effectiveSessionId;
+        if (sessionId && !sessionBinding.cookieSessionId) {
+          setSignedSessionCookie(req, res, sessionId);
+        }
         const orderId = `KYC-${crypto.randomUUID()}`;
         const webhookAuthToken = computeOrderWebhookToken(orderId);
 
@@ -1572,6 +1808,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           amountCents: order.amountCents,
           currency: order.currency,
           formattedPrice: priceSpec.formattedPrice,
+          sessionId: order.sessionId || null,
           sifaloHostedMethods: priceSpec.sifaloHostedMethods,
           sifaloCardSupported: priceSpec.sifaloCardSupported,
           sifaloMethodRuleNote: priceSpec.sifaloMethodRuleNote,
@@ -1720,12 +1957,26 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           });
         }
 
+        if (grant && order.sessionId) {
+          const activeSessionId = sessionBindingEffective(req, body, order.sessionId);
+          setSignedSessionCookie(req, res, activeSessionId);
+          const cookieGrants = getVerifiedGrantsFromCookie(req, activeSessionId);
+          const grantEntry = buildGrantCookieEntry(order);
+          if (grantEntry) {
+            cookieGrants[order.productKey] = grantEntry;
+            setSignedGrantsCookie(req, res, activeSessionId, cookieGrants);
+          }
+        }
+
         return res.status(200).json({
           verified: true,
           status: 'PAID',
           orderId: order.orderId,
+          orderStateToken: signOrderStateToken(order),
           sid: order.providerSid,
           productKey: order.productKey,
+          countryKey: order.countryKey,
+          providerKey: order.providerKey,
           label: priceSpec.label,
           amount: priceSpec.amountUsdString,
           amountCents: order.amountCents,
@@ -1739,6 +1990,241 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         return res.status(500).json({ verified: false, error: 'Failed to verify Sifalo payment.' });
       }
     });
+
+    function sessionBindingEffective(
+      req: Request,
+      body: Record<string, unknown>,
+      fallbackSessionId: string
+    ): string {
+      return resolveSessionBinding(req, body).effectiveSessionId || fallbackSessionId;
+    }
+
+    async function authorizeUnlockCandidate(params: {
+      requestedProductKey: UnlockProductKey;
+      unlockToken?: string;
+      cookieGrantEntry?: SignedGrantCookieEntry;
+      requestSessionId: string | null;
+    }): Promise<
+      | {
+          authorized: true;
+          orderId: string;
+          sid: string;
+          productKey: UnlockProductKey;
+          label: string;
+          formattedPrice: string;
+          expiresAt: number;
+          unlockToken: string;
+          cookieEntry: SignedGrantCookieEntry;
+        }
+      | {
+          authorized: false;
+          httpStatus: number;
+          error: string;
+          clearGrant?: boolean;
+        }
+    > {
+      const { requestedProductKey, unlockToken, cookieGrantEntry, requestSessionId } = params;
+      const expectedSpec = AUTHORITATIVE_PRODUCT_PRICING[requestedProductKey];
+
+      let payload: UnlockTokenPayload | null = null;
+      let candidateEnv: SifaloEnvironment = getEnvironment();
+      let candidateCreatedAt = now();
+
+      if (unlockToken) {
+        payload = verifyUnlockTokenString(unlockToken);
+        if (!payload) {
+          return {
+            authorized: false,
+            httpStatus: 401,
+            error: 'Invalid or expired payment authorization token.',
+            clearGrant: true,
+          };
+        }
+      } else if (cookieGrantEntry) {
+        if (cookieGrantEntry.e <= now()) {
+          return {
+            authorized: false,
+            httpStatus: 401,
+            error: 'Payment authorization has expired.',
+            clearGrant: true,
+          };
+        }
+        payload = {
+          tid: cookieGrantEntry.t,
+          orderId: cookieGrantEntry.o,
+          productKey: cookieGrantEntry.p,
+          sessionId: requestSessionId,
+          amountCents: cookieGrantEntry.a,
+          currency: 'USD',
+          sid: cookieGrantEntry.sid,
+          exp: cookieGrantEntry.e,
+        };
+        candidateEnv = cookieGrantEntry.env;
+        candidateCreatedAt = cookieGrantEntry.c;
+      } else {
+        return {
+          authorized: false,
+          httpStatus: 401,
+          error: 'Missing payment authorization token.',
+        };
+      }
+
+      if (payload.productKey !== requestedProductKey) {
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Payment authorization is not valid for this document category.',
+        };
+      }
+
+      if (payload.sessionId && payload.sessionId !== requestSessionId) {
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Payment authorization belongs to a different user session.',
+        };
+      }
+
+      if (payload.amountCents !== undefined && payload.amountCents !== expectedSpec.amountCents) {
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Payment authorization amount does not match document requirement.',
+          clearGrant: true,
+        };
+      }
+
+      if (payload.currency !== undefined && payload.currency !== 'USD') {
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Payment authorization currency mismatch.',
+          clearGrant: true,
+        };
+      }
+
+      let order = orders.get(payload.orderId);
+
+      // Explicitly reject revoked / refunded / reversed / cancelled / failed / expired orders
+      if (
+        order &&
+        (order.revokedAt ||
+          order.status === 'REFUNDED' ||
+          order.status === 'REVERSED' ||
+          order.status === 'CANCELLED' ||
+          order.status === 'EXPIRED' ||
+          order.status === 'FAILED')
+      ) {
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Paid order verification is no longer active.',
+          clearGrant: true,
+        };
+      }
+
+      // Serverless / cold-start / cross-instance recovery:
+      // If this server instance lacks the PAID record (or still holds PENDING from checkout creation
+      // before another instance processed verify-order/webhook), re-verify directly against Sifalo's API.
+      if (!order || order.status === 'PENDING') {
+        const sidToCheck = typeof payload.sid === 'string' ? payload.sid.trim() : '';
+        if (!sidToCheck) {
+          return {
+            authorized: false,
+            httpStatus: 403,
+            error: 'Paid order record not found on server.',
+            clearGrant: true,
+          };
+        }
+
+        if (order && order.sessionId && order.sessionId !== requestSessionId) {
+          return {
+            authorized: false,
+            httpStatus: 403,
+            error: 'Payment authorization belongs to a different user session.',
+          };
+        }
+
+        const candidateOrder: SifaloOrderRecord = order ?? {
+          orderId: payload.orderId,
+          productKey: requestedProductKey,
+          countryKey: 'global',
+          providerKey: 'virtual-account',
+          sessionId: payload.sessionId ?? requestSessionId ?? null,
+          amountCents: expectedSpec.amountCents,
+          amountUsdString: expectedSpec.amountUsdString,
+          currency: 'USD',
+          environment: candidateEnv,
+          status: 'PENDING',
+          providerSid: sidToCheck,
+          providerToken: null,
+          transactionRef: null,
+          webhookAuthToken: computeOrderWebhookToken(payload.orderId),
+          createdAt: candidateCreatedAt,
+          paidAt: null,
+          revokedAt: null,
+          unlockTokenId: null,
+          unlockTokenExpiresAt: null,
+        };
+
+        const check = await verifyTransactionWithSifaloApi(candidateOrder, sidToCheck, {
+          tid: payload.tid,
+          expiresAt: payload.exp,
+        });
+        if (!check.ok || candidateOrder.status !== 'PAID') {
+          return {
+            authorized: false,
+            httpStatus: 403,
+            error: check.error || 'Paid order record could not be confirmed with Sifalo Pay.',
+            clearGrant: true,
+          };
+        }
+        order = candidateOrder;
+      }
+
+      if (
+        order.status !== 'PAID' ||
+        order.revokedAt ||
+        !order.providerSid ||
+        order.productKey !== payload.productKey ||
+        order.amountCents !== expectedSpec.amountCents ||
+        order.currency !== 'USD' ||
+        order.unlockTokenId !== payload.tid ||
+        !order.unlockTokenExpiresAt ||
+        order.unlockTokenExpiresAt <= now() ||
+        (order.sessionId && order.sessionId !== requestSessionId)
+      ) {
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Paid order verification is no longer active.',
+          clearGrant: true,
+        };
+      }
+
+      const freshGrant = issueOrderUnlockGrant(order);
+      const cookieEntry = buildGrantCookieEntry(order);
+      if (!freshGrant || !cookieEntry) {
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Paid order verification is no longer active.',
+          clearGrant: true,
+        };
+      }
+
+      return {
+        authorized: true,
+        orderId: order.orderId,
+        sid: order.providerSid,
+        productKey: order.productKey,
+        label: expectedSpec.label,
+        formattedPrice: expectedSpec.formattedPrice,
+        expiresAt: freshGrant.expiresAt,
+        unlockToken: freshGrant.unlockToken,
+        cookieEntry,
+      };
+    }
 
     router.get('/order-status', (req: Request, res: Response) => {
       loadPersistedState();
@@ -1776,85 +2262,178 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       });
     });
 
-    router.post('/authorize-unlock', (req: Request, res: Response) => {
-      loadPersistedState();
-      const body = req.body && typeof req.body === 'object' ? (req.body as Record<string, unknown>) : {};
-      const unlockToken = typeof body.unlockToken === 'string' ? body.unlockToken.trim() : '';
-      const requestedProductKey = normalizeDocTypeToProductKey(
-        body.docType ?? body.productKey ?? body.productCategory
-      );
-      const requestSessionId = extractRequestSessionId(req, body);
+    async function handleSessionStatus(req: Request, res: Response) {
+      try {
+        loadPersistedState();
+        const body =
+          req.body && typeof req.body === 'object' ? (req.body as Record<string, unknown>) : {};
+        const binding = resolveSessionBinding(req, body);
+        const sessionId =
+          binding.effectiveSessionId || `kycsess_${crypto.randomUUID().replace(/-/g, '')}`;
+        if (!binding.cookieSessionId) {
+          setSignedSessionCookie(req, res, sessionId);
+        }
 
-      if (!unlockToken || !requestedProductKey) {
-        return res.status(400).json({ authorized: false, error: 'Missing payment token or document type.' });
-      }
+        const cookieGrants = getVerifiedGrantsFromCookie(req, sessionId);
+        const rawCandidateGrants =
+          body.candidateGrants && typeof body.candidateGrants === 'object'
+            ? (body.candidateGrants as Record<string, unknown>)
+            : {};
 
-      const payload = verifyUnlockTokenString(unlockToken);
-      if (!payload) {
-        return res.status(401).json({ authorized: false, error: 'Invalid or expired payment authorization token.' });
-      }
+        const unlockedProducts: Partial<
+          Record<
+            UnlockProductKey,
+            {
+              authorized: true;
+              productKey: UnlockProductKey;
+              label: string;
+              formattedPrice: string;
+              orderId: string;
+              sid: string;
+              expiresAt: number;
+              unlockToken: string;
+            }
+          >
+        > = {};
+        const nextCookieGrants: Partial<Record<UnlockProductKey, SignedGrantCookieEntry>> = {};
 
-      if (payload.productKey !== requestedProductKey) {
-        return res.status(403).json({
-          authorized: false,
-          error: 'Payment authorization is not valid for this document category.',
+        const allProductKeys = Object.keys(AUTHORITATIVE_PRODUCT_PRICING) as UnlockProductKey[];
+        for (const productKey of allProductKeys) {
+          let candidateToken = '';
+          const rawCandidate = rawCandidateGrants[productKey];
+          if (rawCandidate && typeof rawCandidate === 'object') {
+            const tok = (rawCandidate as Record<string, unknown>).unlockToken;
+            if (typeof tok === 'string') {
+              candidateToken = tok.trim();
+            }
+          }
+
+          let cookieEntry = cookieGrants[productKey];
+
+          // Also recover from active in-memory/persisted PAID orders matching this verified session
+          if (!candidateToken && !cookieEntry) {
+            for (const ord of orders.values()) {
+              if (
+                ord.productKey === productKey &&
+                ord.sessionId === sessionId &&
+                ord.status === 'PAID' &&
+                !ord.revokedAt &&
+                ord.unlockTokenExpiresAt &&
+                ord.unlockTokenExpiresAt > now()
+              ) {
+                const entry = buildGrantCookieEntry(ord);
+                if (entry) {
+                  if (!cookieEntry || entry.e > cookieEntry.e) {
+                    cookieEntry = entry;
+                  }
+                }
+              }
+            }
+          }
+
+          if (!candidateToken && !cookieEntry) {
+            continue;
+          }
+
+          const auth = await authorizeUnlockCandidate({
+            requestedProductKey: productKey,
+            unlockToken: candidateToken || undefined,
+            cookieGrantEntry: cookieEntry,
+            requestSessionId: sessionId,
+          });
+
+          if (auth.authorized) {
+            unlockedProducts[productKey] = {
+              authorized: true,
+              productKey: auth.productKey,
+              label: auth.label,
+              formattedPrice: auth.formattedPrice,
+              orderId: auth.orderId,
+              sid: auth.sid,
+              expiresAt: auth.expiresAt,
+              unlockToken: auth.unlockToken,
+            };
+            nextCookieGrants[productKey] = auth.cookieEntry;
+          }
+        }
+
+        setSignedGrantsCookie(req, res, sessionId, nextCookieGrants);
+
+        return res.status(200).json({
+          authenticatedSession: true,
+          unlockedProducts,
         });
+      } catch (err) {
+        console.error('[Sifalo] Session status error:', err instanceof Error ? err.message : err);
+        return res.status(500).json({ authenticatedSession: false, unlockedProducts: {} });
       }
+    }
 
-      if (payload.sessionId && payload.sessionId !== requestSessionId) {
-        return res.status(403).json({
-          authorized: false,
-          error: 'Payment authorization belongs to a different user session.',
-        });
-      }
+    router.get('/session-status', handleSessionStatus);
+    router.post('/session-status', handleSessionStatus);
 
-      const expectedSpec = AUTHORITATIVE_PRODUCT_PRICING[requestedProductKey];
-      if (payload.amountCents !== undefined && payload.amountCents !== expectedSpec.amountCents) {
-        return res.status(403).json({
-          authorized: false,
-          error: 'Payment authorization amount does not match document requirement.',
-        });
-      }
-      if (payload.currency !== undefined && payload.currency !== 'USD') {
-        return res.status(403).json({
-          authorized: false,
-          error: 'Payment authorization currency mismatch.',
-        });
-      }
+    router.post('/authorize-unlock', async (req: Request, res: Response) => {
+      try {
+        loadPersistedState();
+        const body =
+          req.body && typeof req.body === 'object' ? (req.body as Record<string, unknown>) : {};
+        const unlockToken = typeof body.unlockToken === 'string' ? body.unlockToken.trim() : '';
+        const requestedProductKey = normalizeDocTypeToProductKey(
+          body.docType ?? body.productKey ?? body.productCategory
+        );
+        const binding = resolveSessionBinding(req, body);
+        const requestSessionId = binding.effectiveSessionId;
 
-      const order = orders.get(payload.orderId);
-      if (!order) {
-        return res.status(403).json({
-          authorized: false,
-          error: 'Paid order record not found on server.',
-        });
-      }
+        if (!requestedProductKey) {
+          return res.status(400).json({ authorized: false, error: 'Missing document type.' });
+        }
 
-      if (
-        order.status !== 'PAID' ||
-        order.revokedAt ||
-        !order.providerSid ||
-        order.productKey !== payload.productKey ||
-        order.amountCents !== expectedSpec.amountCents ||
-        order.currency !== 'USD' ||
-        order.unlockTokenId !== payload.tid ||
-        !order.unlockTokenExpiresAt ||
-        order.unlockTokenExpiresAt <= now() ||
-        (order.sessionId && order.sessionId !== requestSessionId)
-      ) {
-        return res.status(403).json({
-          authorized: false,
-          error: 'Paid order verification is no longer active.',
-        });
-      }
+        const cookieGrants = getVerifiedGrantsFromCookie(req, requestSessionId);
+        const cookieGrantEntry = cookieGrants[requestedProductKey];
 
-      return res.json({
-        authorized: true,
-        orderId: payload.orderId,
-        sid: order.providerSid,
-        productKey: payload.productKey,
-        expiresAt: payload.exp,
-      });
+        if (!unlockToken && !cookieGrantEntry) {
+          return res
+            .status(401)
+            .json({ authorized: false, error: 'Missing payment token or document type.' });
+        }
+
+        const result = await authorizeUnlockCandidate({
+          requestedProductKey,
+          unlockToken: unlockToken || undefined,
+          cookieGrantEntry,
+          requestSessionId,
+        });
+
+        if (!result.authorized) {
+          if (result.clearGrant && requestSessionId && cookieGrantEntry) {
+            delete cookieGrants[requestedProductKey];
+            setSignedGrantsCookie(req, res, requestSessionId, cookieGrants);
+          }
+          return res.status(result.httpStatus).json({
+            authorized: false,
+            error: result.error,
+          });
+        }
+
+        if (requestSessionId) {
+          cookieGrants[requestedProductKey] = result.cookieEntry;
+          setSignedGrantsCookie(req, res, requestSessionId, cookieGrants);
+        }
+
+        return res.json({
+          authorized: true,
+          orderId: result.orderId,
+          sid: result.sid,
+          productKey: result.productKey,
+          label: result.label,
+          formattedPrice: result.formattedPrice,
+          expiresAt: result.expiresAt,
+          unlockToken: result.unlockToken,
+        });
+      } catch (err) {
+        console.error('[Sifalo] Authorize unlock error:', err instanceof Error ? err.message : err);
+        return res.status(500).json({ authorized: false, error: 'Authorization check failed.' });
+      }
     });
 
     return router;
