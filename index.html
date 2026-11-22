@@ -1144,9 +1144,45 @@
 // Early global controllers guaranteed to be defined before body buttons render
     window.$ = window.$ || (id => document.getElementById(id));
 
-    // OGAds Content Locker Integration (ID: n616e4)
+    // OGAds Content Locker (ID: n616e4) + Server-Verified Paid Unlock Integration
     let _activeOgadsObserver = null;
     let _isOgadsExecutingCallback = false;
+    let _pendingUnlockCallback = null;
+    window.__kycPaidUnlockGrants = window.__kycPaidUnlockGrants || {};
+
+    const KYC_UNLOCK_DOC_CATALOG = {
+      passport: { productKey: 'passport', label: 'Passport', price: '$0.99' },
+      idcard: { productKey: 'nationalIdentity', label: 'National Identity Card', price: '$0.49' },
+      driverlicense: { productKey: 'driverLicense', label: 'Driver License', price: '$0.49' },
+      refugeecard: { productKey: 'proofOfAddress', label: 'Proof of Address', price: '$0.49' },
+      proofofaccount: { productKey: 'proofOfAccount', label: 'Proof of Account', price: '$0.49' }
+    };
+
+    function getActiveUnlockDocSpec() {
+      let rawType = typeof currentDocType === 'string' ? currentDocType.trim().toLowerCase() : '';
+      if (!KYC_UNLOCK_DOC_CATALOG[rawType]) {
+        const visibleViews = document.querySelectorAll('#verification-workbench [id$="-view"]:not(.hidden)');
+        for (let i = 0; i < visibleViews.length; i++) {
+          const vid = visibleViews[i].id || '';
+          if (vid.includes('proofofaccount')) { rawType = 'proofofaccount'; break; }
+          if (vid.includes('proofofaddress')) { rawType = 'refugeecard'; break; }
+          if (vid.includes('driverlicense')) { rawType = 'driverlicense'; break; }
+          if (vid.includes('passport')) { rawType = 'passport'; break; }
+          if (vid.includes('idcard') || vid.includes('-doc-view') || vid.includes('nira')) { rawType = 'idcard'; break; }
+        }
+      }
+      if (!KYC_UNLOCK_DOC_CATALOG[rawType]) {
+        rawType = 'passport';
+      }
+      const spec = KYC_UNLOCK_DOC_CATALOG[rawType];
+      return {
+        rawType,
+        productKey: spec.productKey,
+        label: spec.label,
+        price: spec.price
+      };
+    }
+    window.getActiveUnlockDocSpec = getActiveUnlockDocSpec;
 
     async function executeUnlockedDownloadCallback(downloadCallback) {
       if (typeof downloadCallback !== 'function') return;
@@ -1173,13 +1209,8 @@
       }
     }
 
-    function triggerWithOgadsLock(downloadCallback) {
+    function startOriginalOgadsLockerFlow(downloadCallback) {
       if (typeof downloadCallback !== 'function') return;
-
-      // If already executing an unlocked callback (e.g. wrapper calling inner helper), run immediately
-      if (_isOgadsExecutingCallback) {
-        return downloadCallback();
-      }
 
       if (_activeOgadsObserver) {
         try {
@@ -1233,6 +1264,288 @@
       } else {
         window.open('https://apptrck.net/cl/i/n616e4', '_blank');
       }
+    }
+
+    function openKycUnlockChoiceModal(docSpec) {
+      const modal = document.getElementById('kycUnlockChoiceModal');
+      if (!modal) {
+        if (_pendingUnlockCallback) {
+          startOriginalOgadsLockerFlow(_pendingUnlockCallback);
+        }
+        return;
+      }
+
+      const spec = docSpec || getActiveUnlockDocSpec();
+      const docBadge = document.getElementById('kycUnlockDocPriceLabel');
+      const payBtnLabel = document.getElementById('kycUnlockPayBtnLabel');
+      const payBtn = document.getElementById('kycUnlockPayBtn');
+      const offerBtn = document.getElementById('kycUnlockOfferBtn');
+      const errorBox = document.getElementById('kycUnlockChoiceError');
+
+      if (docBadge) docBadge.textContent = `${spec.label} — ${spec.price}`;
+      if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+      if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.dataset.productKey = spec.productKey;
+        payBtn.dataset.rawDocType = spec.rawType;
+      }
+      if (offerBtn) offerBtn.disabled = false;
+      if (errorBox) {
+        errorBox.textContent = '';
+        errorBox.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    window.openKycUnlockChoiceModal = openKycUnlockChoiceModal;
+
+    function closeKycUnlockChoiceModal(clearPending = true) {
+      const modal = document.getElementById('kycUnlockChoiceModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      if (clearPending) {
+        _pendingUnlockCallback = null;
+      }
+    }
+    window.closeKycUnlockChoiceModal = closeKycUnlockChoiceModal;
+
+    function chooseOgadsOfferUnlock() {
+      const cb = _pendingUnlockCallback;
+      closeKycUnlockChoiceModal(true);
+      if (typeof cb === 'function') {
+        startOriginalOgadsLockerFlow(cb);
+      }
+    }
+    window.chooseOgadsOfferUnlock = chooseOgadsOfferUnlock;
+
+    async function choosePaidCheckoutUnlock() {
+      const payBtn = document.getElementById('kycUnlockPayBtn');
+      const payBtnLabel = document.getElementById('kycUnlockPayBtnLabel');
+      const errorBox = document.getElementById('kycUnlockChoiceError');
+      const spec = getActiveUnlockDocSpec();
+
+      if (errorBox) {
+        errorBox.textContent = '';
+        errorBox.classList.add('hidden');
+      }
+      if (payBtn) payBtn.disabled = true;
+      if (payBtnLabel) payBtnLabel.textContent = 'Connecting to Sifalo Pay...';
+
+      try {
+        const res = await fetch('/api/payments/sifalo/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            docType: spec.productKey,
+            countryKey: typeof currentCountry === 'string' ? currentCountry : '',
+            providerKey:
+              (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
+              (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : '')
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data || !data.checkoutUrl) {
+          const message =
+            (data && data.error) ||
+            'Unable to start Sifalo Pay checkout right now. Please try again or complete an offer.';
+          if (errorBox) {
+            errorBox.textContent = message;
+            errorBox.classList.remove('hidden');
+          }
+          if (payBtn) payBtn.disabled = false;
+          if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+          return;
+        }
+
+        // Non-authoritative UI context only so we can return to the same editor after hosted checkout.
+        try {
+          sessionStorage.setItem(
+            'kyc_pending_checkout_ui',
+            JSON.stringify({
+              orderId: data.orderId,
+              orderStateToken: data.orderStateToken || '',
+              countryKey: typeof currentCountry === 'string' ? currentCountry : 'kenya',
+              rawDocType: spec.rawType,
+              providerKey:
+                (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
+                (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : 'paypal')
+            })
+          );
+        } catch (storageErr) {}
+
+        window.location.href = data.checkoutUrl;
+      } catch (err) {
+        console.error('Sifalo Pay checkout initialization failed:', err);
+        if (errorBox) {
+          errorBox.textContent = 'Network error starting Sifalo Pay checkout. Please complete an offer or try again.';
+          errorBox.classList.remove('hidden');
+        }
+        if (payBtn) payBtn.disabled = false;
+        if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+      }
+    }
+    window.choosePaidCheckoutUnlock = choosePaidCheckoutUnlock;
+
+    async function authorizeServerPaidUnlock(productKey) {
+      const grant = window.__kycPaidUnlockGrants && window.__kycPaidUnlockGrants[productKey];
+      if (!grant || !grant.unlockToken) return false;
+      if (grant.expiresAt && grant.expiresAt <= Date.now()) {
+        delete window.__kycPaidUnlockGrants[productKey];
+        return false;
+      }
+
+      try {
+        const res = await fetch('/api/payments/sifalo/authorize-unlock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            unlockToken: grant.unlockToken,
+            docType: productKey
+          })
+        });
+        if (!res.ok) {
+          delete window.__kycPaidUnlockGrants[productKey];
+          return false;
+        }
+        const data = await res.json().catch(() => null);
+        if (data && data.authorized === true) {
+          return true;
+        }
+        delete window.__kycPaidUnlockGrants[productKey];
+        return false;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    async function handlePaymentReturnFromCheckout() {
+      try {
+        const params = new URLSearchParams(window.location.search || '');
+        const checkoutState = params.get('sifalo_checkout');
+        const orderId = params.get('order_id') || '';
+        const sid = params.get('sid') || '';
+        const urlOrderState = params.get('order_state') || '';
+
+        if (!checkoutState) return;
+
+        // Clean URL immediately; never treat return_url or URL parameters as proof of payment
+        if (window.history && typeof window.history.replaceState === 'function') {
+          window.history.replaceState({}, document.title, window.location.pathname + (window.location.hash || ''));
+        }
+
+        let uiContext = null;
+        try {
+          const rawCtx = sessionStorage.getItem('kyc_pending_checkout_ui');
+          if (rawCtx) uiContext = JSON.parse(rawCtx);
+          sessionStorage.removeItem('kyc_pending_checkout_ui');
+        } catch (e) {}
+
+        const orderStateToken = urlOrderState || (uiContext && uiContext.orderStateToken) || '';
+
+        const restoreEditorContext = () => {
+          if (uiContext && uiContext.countryKey && typeof window.openCountryDocumentEditor === 'function') {
+            if (uiContext.providerKey && typeof workflowActiveAccount !== 'undefined') {
+              workflowActiveAccount = uiContext.providerKey;
+            }
+            window.openCountryDocumentEditor(uiContext.countryKey, uiContext.rawDocType || 'passport', {
+              silent: true,
+              scrollToEditor: true
+            });
+          }
+        };
+
+        if (checkoutState === 'return' && orderId) {
+          restoreEditorContext();
+          if (typeof showToast === 'function') {
+            showToast('Verifying Payment...', 'Checking Sifalo Pay payment confirmation with our server');
+          }
+
+          let verifyRes = null;
+          let verifyData = null;
+          for (let attempt = 0; attempt < 3; attempt++) {
+            verifyRes = await fetch('/api/payments/sifalo/verify-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId, sid, orderStateToken })
+            });
+            verifyData = await verifyRes.json().catch(() => null);
+            if (verifyRes.ok && verifyData && verifyData.verified === true) {
+              break;
+            }
+            if (verifyData && verifyData.status === 'PENDING' && attempt < 2) {
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              continue;
+            }
+            break;
+          }
+
+          if (verifyRes && verifyRes.ok && verifyData && verifyData.verified === true && verifyData.unlockToken && verifyData.productKey) {
+            window.__kycPaidUnlockGrants[verifyData.productKey] = {
+              unlockToken: verifyData.unlockToken,
+              orderId: verifyData.orderId,
+              expiresAt: verifyData.expiresAt
+            };
+            if (typeof showToast === 'function') {
+              showToast('Payment Verified!', `${verifyData.label || 'Document'} Save PNG & Download unlocked via Sifalo Pay.`);
+            }
+          } else {
+            if (verifyData && verifyData.productKey && window.__kycPaidUnlockGrants) {
+              delete window.__kycPaidUnlockGrants[verifyData.productKey];
+            }
+            const statusText = verifyData && verifyData.status ? String(verifyData.status).toUpperCase() : 'UNCONFIRMED';
+            if (typeof showToast === 'function') {
+              const title =
+                statusText === 'REFUNDED'
+                  ? 'Payment Refunded'
+                  : statusText === 'REVERSED'
+                  ? 'Payment Reversed'
+                  : statusText === 'CANCELLED'
+                  ? 'Payment Cancelled'
+                  : statusText === 'EXPIRED'
+                  ? 'Payment Expired'
+                  : statusText === 'FAILED'
+                  ? 'Payment Failed'
+                  : 'Verification Pending';
+              showToast(
+                title,
+                (verifyData && verifyData.error) || 'Payment has not been confirmed by Sifalo Pay. No unlock was granted.'
+              );
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Sifalo return verification error:', err);
+      }
+    }
+
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', handlePaymentReturnFromCheckout);
+      } else {
+        setTimeout(handlePaymentReturnFromCheckout, 0);
+      }
+    }
+
+    async function triggerWithOgadsLock(downloadCallback) {
+      if (typeof downloadCallback !== 'function') return;
+
+      // If already executing an unlocked callback (e.g. wrapper calling inner helper), run immediately
+      if (_isOgadsExecutingCallback) {
+        return downloadCallback();
+      }
+
+      const docSpec = getActiveUnlockDocSpec();
+      const hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey);
+      if (hasValidPaidUnlock) {
+        return executeUnlockedDownloadCallback(downloadCallback);
+      }
+
+      _pendingUnlockCallback = downloadCallback;
+      openKycUnlockChoiceModal(docSpec);
     }
     window.triggerWithOgadsLock = triggerWithOgadsLock;
 
@@ -33666,6 +33979,58 @@ EPSOM</div>
       <a id="fallbackDownloadLink" href="#" download="kenya-passport.png" class="py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-center text-sm font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-download mr-2"></i>Direct File Save</a>
       <button type="button" id="shareImageBtn" onclick="sharePassportImage()" class="py-3 px-4 bg-white/15 hover:bg-white/25 text-white rounded-xl text-sm font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-share-nodes mr-2"></i>Share Image</button>
       <button type="button" id="closeModalBottomBtn" onclick="closeImageModal()" class="py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-bold flex items-center justify-center cursor-pointer">Close Preview</button>
+    </div>
+  </div>
+
+  <!-- ================= DUAL UNLOCK CHOICE MODAL (OGADS OFFER OR PAID UNLOCK) ================= -->
+  <div id="kycUnlockChoiceModal" role="dialog" aria-modal="true" aria-labelledby="kycUnlockChoiceTitle" class="no-print fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-3xl bg-white border border-blue-100 shadow-2xl overflow-hidden text-[#0d2658]">
+      <div class="px-6 pt-5 pb-4 bg-gradient-to-r from-[#f0f6ff] via-white to-[#ecfdf5] border-b border-slate-100 flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0d5bd9] to-[#16a34a] text-white flex items-center justify-center shadow-sm shrink-0">
+            <i class="fa-solid fa-unlock-keyhole text-lg"></i>
+          </div>
+          <div>
+            <h2 id="kycUnlockChoiceTitle" class="text-lg font-extrabold tracking-tight text-[#0d2658]">Choose how to unlock</h2>
+            <p id="kycUnlockDocPriceLabel" class="text-xs font-bold text-[#0d5bd9] mt-0.5">Passport — $0.99</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeKycUnlockChoiceModal(true)" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer shrink-0" aria-label="Close unlock options">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <!-- Option 1: Existing OGAds Offer Flow -->
+        <div class="rounded-2xl border border-blue-200 bg-blue-50/45 p-4 space-y-2.5">
+          <button type="button" id="kycUnlockOfferBtn" onclick="chooseOgadsOfferUnlock()" class="w-full min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-[#0d5bd9] to-[#0284c7] hover:brightness-105 text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 transition cursor-pointer">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Complete an Offer</span>
+          </button>
+          <p class="text-xs font-semibold text-slate-600 text-center">Complete a short offer to unlock</p>
+        </div>
+
+        <!-- Divider -->
+        <div class="relative flex items-center justify-center py-1">
+          <div class="w-full border-t border-slate-200"></div>
+          <span class="px-3 bg-white text-[11px] font-extrabold uppercase tracking-wider text-slate-400">OR</span>
+        </div>
+
+        <!-- Option 2: Sifalo Pay Unlock -->
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50/45 p-4 space-y-2.5">
+          <div class="text-center space-y-0.5">
+            <p class="text-xs font-bold text-[#0d2658]">Prefer not to complete an offer?</p>
+            <p class="text-xs font-semibold text-emerald-700">Pay to Unlock</p>
+          </div>
+          <button type="button" id="kycUnlockPayBtn" onclick="choosePaidCheckoutUnlock()" class="w-full min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-[#16a34a] to-[#059669] hover:brightness-105 disabled:opacity-60 disabled:cursor-wait text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition cursor-pointer">
+            <i class="fa-solid fa-credit-card"></i>
+            <span id="kycUnlockPayBtnLabel">Pay $0.99 with Sifalo Pay</span>
+          </button>
+          <p class="text-[11px] font-semibold text-slate-600 text-center">Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL &amp; Premier Wallet</p>
+        </div>
+
+        <div id="kycUnlockChoiceError" role="alert" class="hidden rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-rose-700"></div>
+      </div>
     </div>
   </div>
 
