@@ -1,8 +1,15 @@
 import crypto from 'node:crypto';
+import dns from 'node:dns';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import express, { type Request, type Response } from 'express';
+
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch {
+  // Ignore if unsupported in current Node runtime
+}
 
 export type UnlockProductKey =
   | 'passport'
@@ -169,24 +176,27 @@ const ORDER_EXPIRY_TTL_MS = 60 * 60 * 1000;
 const STALE_ORDER_PRUNE_MS = 24 * 60 * 60 * 1000;
 const MAX_PROCESSED_WEBHOOK_EVENTS = 5000;
 
+function normalizeSifaloOverrideUrl(rawUrl: string | undefined, isCheckoutHost = false): string {
+  const trimmed = (rawUrl || '').trim();
+  if (!trimmed) return '';
+  return trimmed.replace(
+    /https?:\/\/staging\.sifalopay\.com/gi,
+    isCheckoutHost ? 'https://pay.sifalopay.com' : 'https://api.sifalopay.com'
+  );
+}
+
 export function resolveSifaloEndpoints(
   environment: SifaloEnvironment,
   overrides: { gatewayUrl?: string; verifyUrl?: string; checkoutBaseUrl?: string } = {}
 ): SifaloEndpointConfig {
-  const isProd = environment === 'production';
+  const gatewayOverride = normalizeSifaloOverrideUrl(overrides.gatewayUrl, false);
+  const verifyOverride = normalizeSifaloOverrideUrl(overrides.verifyUrl, false);
+  const checkoutOverride = normalizeSifaloOverrideUrl(overrides.checkoutBaseUrl, true);
   return {
     environment,
-    gatewayUrl:
-      overrides.gatewayUrl ||
-      (isProd ? 'https://api.sifalopay.com/gateway/' : 'https://staging.sifalopay.com/gateway/'),
-    verifyUrl:
-      overrides.verifyUrl ||
-      (isProd
-        ? 'https://api.sifalopay.com/gateway/verify.php'
-        : 'https://staging.sifalopay.com/gateway/verify.php'),
-    hostedCheckoutBaseUrl:
-      overrides.checkoutBaseUrl ||
-      (isProd ? 'https://pay.sifalopay.com/checkout/' : 'https://staging.sifalopay.com/checkout/'),
+    gatewayUrl: gatewayOverride || 'https://api.sifalopay.com/gateway/',
+    verifyUrl: verifyOverride || 'https://api.sifalopay.com/gateway/verify.php',
+    hostedCheckoutBaseUrl: checkoutOverride || 'https://pay.sifalopay.com/checkout/',
   };
 }
 
@@ -1232,14 +1242,33 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           channel: 'web',
         };
 
-        const sifaloRes = await fetchImpl(endpoints.gatewayUrl, {
+        const requestInit: RequestInit = {
           method: 'POST',
           headers: {
             Authorization: buildBasicAuthHeader(apiUser, apiKey),
             'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'User-Agent': 'KycApproved-SifaloPay/1.0',
           },
           body: JSON.stringify(sifaloRequestPayload),
-        });
+        };
+
+        let sifaloRes: globalThis.Response;
+        try {
+          sifaloRes = await fetchImpl(endpoints.gatewayUrl, requestInit);
+        } catch (firstFetchErr) {
+          try {
+            // Single immediate retry on transient network/DNS socket error
+            sifaloRes = await fetchImpl(endpoints.gatewayUrl, requestInit);
+          } catch (retryErr) {
+            orders.delete(orderId);
+            const reason = retryErr instanceof Error ? retryErr.message : String(firstFetchErr);
+            console.warn(`[Sifalo] Could not reach Sifalo gateway (${endpoints.gatewayUrl}): ${reason}`);
+            return res.status(502).json({
+              error: 'Could not connect to Sifalo Pay gateway. Please check your connection and try again.',
+            });
+          }
+        }
 
         const sifaloJson = (await sifaloRes.json().catch(() => null)) as Record<string, unknown> | null;
         const checkoutUrl = sifaloJson ? resolveHostedCheckoutUrl(sifaloJson, endpoints) : null;
