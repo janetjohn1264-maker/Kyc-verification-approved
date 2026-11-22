@@ -1143,6 +1143,395 @@
 // Early global controllers guaranteed to be defined before body buttons render
     window.$ = window.$ || (id => document.getElementById(id));
 
+    // Server-Verified Sifalo Pay Payment & Download Unlock Controller
+    let _isSifaloExecutingCallback = false;
+    let _pendingSifaloCallback = null;
+    window.__kycPaidUnlockGrants = window.__kycPaidUnlockGrants || {};
+
+    const KYC_SIFALO_DOC_CATALOG = {
+      passport: { productKey: 'passport', label: 'Passport', price: '$0.99' },
+      idcard: { productKey: 'nationalIdentity', label: 'National Identity Card', price: '$0.49' },
+      driverlicense: { productKey: 'driverLicense', label: 'Driver License', price: '$0.49' },
+      refugeecard: { productKey: 'proofOfAddress', label: 'Proof of Address', price: '$0.49' },
+      proofofaccount: { productKey: 'proofOfAccount', label: 'Proof of Account', price: '$0.49' }
+    };
+
+    function loadStoredSifaloGrants() {
+      try {
+        const raw = sessionStorage.getItem('kyc_sifalo_paid_grants');
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          Object.assign(window.__kycPaidUnlockGrants, parsed);
+        }
+      } catch (e) {}
+    }
+
+    function saveStoredSifaloGrants() {
+      try {
+        sessionStorage.setItem('kyc_sifalo_paid_grants', JSON.stringify(window.__kycPaidUnlockGrants || {}));
+      } catch (e) {}
+    }
+
+    loadStoredSifaloGrants();
+
+    function getActiveUnlockDocSpec() {
+      let rawType = typeof currentDocType === 'string' ? currentDocType.trim().toLowerCase() : '';
+      if (!KYC_SIFALO_DOC_CATALOG[rawType]) {
+        const visibleViews = document.querySelectorAll('#verification-workbench [id$="-view"]:not(.hidden)');
+        for (let i = 0; i < visibleViews.length; i++) {
+          const vid = visibleViews[i].id || '';
+          if (vid.includes('proofofaccount')) { rawType = 'proofofaccount'; break; }
+          if (vid.includes('proofofaddress')) { rawType = 'refugeecard'; break; }
+          if (vid.includes('driverlicense')) { rawType = 'driverlicense'; break; }
+          if (vid.includes('passport')) { rawType = 'passport'; break; }
+          if (vid.includes('idcard') || vid.includes('-doc-view') || vid.includes('nira')) { rawType = 'idcard'; break; }
+        }
+      }
+      if (!KYC_SIFALO_DOC_CATALOG[rawType]) {
+        rawType = 'passport';
+      }
+      const spec = KYC_SIFALO_DOC_CATALOG[rawType];
+      return {
+        rawType,
+        productKey: spec.productKey,
+        label: spec.label,
+        price: spec.price
+      };
+    }
+    window.getActiveUnlockDocSpec = getActiveUnlockDocSpec;
+
+    async function executePaidDownloadCallback(downloadCallback) {
+      if (typeof downloadCallback !== 'function') return;
+      _isSifaloExecutingCallback = true;
+      try {
+        const fallbackEl = document.getElementById('fallbackDownloadLink');
+        const prevFallbackHref = fallbackEl ? fallbackEl.getAttribute('href') : '';
+        await downloadCallback();
+        if (fallbackEl) {
+          const newHref = fallbackEl.getAttribute('href') || '';
+          if (newHref && newHref !== '#' && newHref !== prevFallbackHref) {
+            const autoLink = document.createElement('a');
+            autoLink.href = newHref;
+            autoLink.download = fallbackEl.getAttribute('download') || 'document.png';
+            document.body.appendChild(autoLink);
+            autoLink.click();
+            document.body.removeChild(autoLink);
+          }
+        }
+      } catch (err) {
+        console.error('Paid download callback error:', err);
+      } finally {
+        _isSifaloExecutingCallback = false;
+      }
+    }
+
+    function openSifaloPayModal(docSpec) {
+      const modal = document.getElementById('kycSifaloPayModal');
+      const spec = docSpec || getActiveUnlockDocSpec();
+      if (!modal) {
+        choosePaidCheckoutUnlock();
+        return;
+      }
+
+      const docBadge = document.getElementById('kycSifaloDocPriceLabel');
+      const payBtnLabel = document.getElementById('kycSifaloPayBtnLabel');
+      const payBtn = document.getElementById('kycSifaloPayBtn');
+      const errorBox = document.getElementById('kycSifaloPayError');
+
+      if (docBadge) docBadge.textContent = `${spec.label} — ${spec.price} USD`;
+      if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+      if (payBtn) {
+        payBtn.disabled = false;
+        payBtn.dataset.productKey = spec.productKey;
+        payBtn.dataset.rawDocType = spec.rawType;
+      }
+      if (errorBox) {
+        errorBox.textContent = '';
+        errorBox.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+    window.openSifaloPayModal = openSifaloPayModal;
+
+    function closeSifaloPayModal(clearPending = true) {
+      const modal = document.getElementById('kycSifaloPayModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+      if (clearPending) {
+        _pendingSifaloCallback = null;
+      }
+    }
+    window.closeSifaloPayModal = closeSifaloPayModal;
+
+    async function choosePaidCheckoutUnlock() {
+      const payBtn = document.getElementById('kycSifaloPayBtn');
+      const payBtnLabel = document.getElementById('kycSifaloPayBtnLabel');
+      const errorBox = document.getElementById('kycSifaloPayError');
+      const spec = getActiveUnlockDocSpec();
+
+      if (errorBox) {
+        errorBox.textContent = '';
+        errorBox.classList.add('hidden');
+      }
+      if (payBtn) payBtn.disabled = true;
+      if (payBtnLabel) payBtnLabel.textContent = 'Connecting to Sifalo Pay...';
+
+      try {
+        const res = await fetch('/api/payments/sifalo/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            docType: spec.productKey,
+            countryKey: typeof currentCountry === 'string' ? currentCountry : '',
+            providerKey:
+              (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
+              (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : '')
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data || !data.checkoutUrl) {
+          const message =
+            (data && data.error) ||
+            'Unable to start Sifalo Pay checkout right now. Please try again.';
+          if (errorBox) {
+            errorBox.textContent = message;
+            errorBox.classList.remove('hidden');
+          }
+          if (payBtn) payBtn.disabled = false;
+          if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+          return;
+        }
+
+        try {
+          const fieldSnapshot = {};
+          const inputs = document.querySelectorAll(
+            '#verification-workbench input:not([type="file"]), #verification-workbench select, #verification-workbench textarea'
+          );
+          for (let i = 0; i < inputs.length; i++) {
+            const el = inputs[i];
+            if (el && el.id) {
+              if (el.type === 'checkbox' || el.type === 'radio') {
+                fieldSnapshot[el.id] = { checked: Boolean(el.checked) };
+              } else {
+                fieldSnapshot[el.id] = { value: el.value };
+              }
+            }
+          }
+          sessionStorage.setItem(
+            'kyc_pending_checkout_ui',
+            JSON.stringify({
+              orderId: data.orderId,
+              orderStateToken: data.orderStateToken || '',
+              countryKey: typeof currentCountry === 'string' ? currentCountry : 'kenya',
+              rawDocType: spec.rawType,
+              providerKey:
+                (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
+                (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : 'paypal'),
+              fieldSnapshot
+            })
+          );
+        } catch (storageErr) {}
+
+        window.location.href = data.checkoutUrl;
+      } catch (err) {
+        console.error('Sifalo Pay checkout initialization failed:', err);
+        if (errorBox) {
+          errorBox.textContent = 'Network error starting Sifalo Pay checkout. Please try again.';
+          errorBox.classList.remove('hidden');
+        }
+        if (payBtn) payBtn.disabled = false;
+        if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+      }
+    }
+    window.choosePaidCheckoutUnlock = choosePaidCheckoutUnlock;
+
+    async function authorizeServerPaidUnlock(productKey) {
+      loadStoredSifaloGrants();
+      const grant = window.__kycPaidUnlockGrants && window.__kycPaidUnlockGrants[productKey];
+      if (!grant || !grant.unlockToken) return false;
+      if (grant.expiresAt && grant.expiresAt <= Date.now()) {
+        delete window.__kycPaidUnlockGrants[productKey];
+        saveStoredSifaloGrants();
+        return false;
+      }
+
+      try {
+        const res = await fetch('/api/payments/sifalo/authorize-unlock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            unlockToken: grant.unlockToken,
+            docType: productKey
+          })
+        });
+        if (!res.ok) {
+          delete window.__kycPaidUnlockGrants[productKey];
+          saveStoredSifaloGrants();
+          return false;
+        }
+        const data = await res.json().catch(() => null);
+        if (data && data.authorized === true) {
+          return true;
+        }
+        delete window.__kycPaidUnlockGrants[productKey];
+        saveStoredSifaloGrants();
+        return false;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    async function handlePaymentReturnFromCheckout() {
+      try {
+        const params = new URLSearchParams(window.location.search || '');
+        const checkoutState = params.get('sifalo_checkout');
+        const orderId = params.get('order_id') || '';
+        const sid = params.get('sid') || params.get('transaction_id') || '';
+        const urlOrderState = params.get('order_state') || '';
+
+        if (!checkoutState) return;
+
+        // Clean URL immediately; never treat return_url or URL parameters as proof of payment
+        if (window.history && typeof window.history.replaceState === 'function') {
+          window.history.replaceState({}, document.title, window.location.pathname + (window.location.hash || ''));
+        }
+
+        let uiContext = null;
+        try {
+          const rawCtx = sessionStorage.getItem('kyc_pending_checkout_ui');
+          if (rawCtx) uiContext = JSON.parse(rawCtx);
+          sessionStorage.removeItem('kyc_pending_checkout_ui');
+        } catch (e) {}
+
+        const orderStateToken = (uiContext && uiContext.orderStateToken) || urlOrderState || '';
+
+        const restoreEditorContext = () => {
+          if (uiContext && uiContext.countryKey && typeof window.openCountryDocumentEditor === 'function') {
+            if (uiContext.providerKey && typeof workflowActiveAccount !== 'undefined') {
+              workflowActiveAccount = uiContext.providerKey;
+            }
+            window.openCountryDocumentEditor(uiContext.countryKey, uiContext.rawDocType || 'passport', {
+              silent: true,
+              scrollToEditor: true
+            });
+            if (uiContext.fieldSnapshot && typeof uiContext.fieldSnapshot === 'object') {
+              const entries = Object.entries(uiContext.fieldSnapshot);
+              for (let i = 0; i < entries.length; i++) {
+                const [fieldId, snap] = entries[i];
+                const el = document.getElementById(fieldId);
+                if (el && snap && typeof snap === 'object') {
+                  if ('checked' in snap) {
+                    el.checked = Boolean(snap.checked);
+                  } else if ('value' in snap && typeof snap.value === 'string') {
+                    el.value = snap.value;
+                  }
+                  el.dispatchEvent(new Event('input', { bubbles: true }));
+                  el.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+              }
+            }
+          }
+        };
+
+        if (checkoutState === 'return' && orderId) {
+          restoreEditorContext();
+          if (typeof showToast === 'function') {
+            showToast('Verifying Payment...', 'Checking Sifalo Pay payment confirmation with our server');
+          }
+
+          let verifyRes = null;
+          let verifyData = null;
+          for (let attempt = 0; attempt < 3; attempt++) {
+            verifyRes = await fetch('/api/payments/sifalo/verify-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId, sid, orderStateToken })
+            });
+            verifyData = await verifyRes.json().catch(() => null);
+            if (verifyRes.ok && verifyData && verifyData.verified === true) {
+              break;
+            }
+            if (verifyData && verifyData.status === 'PENDING' && attempt < 2) {
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              continue;
+            }
+            break;
+          }
+
+          if (verifyRes && verifyRes.ok && verifyData && verifyData.verified === true && verifyData.unlockToken && verifyData.productKey) {
+            window.__kycPaidUnlockGrants[verifyData.productKey] = {
+              unlockToken: verifyData.unlockToken,
+              orderId: verifyData.orderId,
+              expiresAt: verifyData.expiresAt
+            };
+            saveStoredSifaloGrants();
+            if (typeof showToast === 'function') {
+              showToast('Payment Verified!', `${verifyData.label || 'Document'} Save PNG & Download unlocked via Sifalo Pay.`);
+            }
+          } else {
+            if (verifyData && verifyData.productKey && window.__kycPaidUnlockGrants) {
+              delete window.__kycPaidUnlockGrants[verifyData.productKey];
+              saveStoredSifaloGrants();
+            }
+            const statusText = verifyData && verifyData.status ? String(verifyData.status).toUpperCase() : 'UNCONFIRMED';
+            if (typeof showToast === 'function') {
+              const title =
+                statusText === 'REFUNDED'
+                  ? 'Payment Refunded'
+                  : statusText === 'REVERSED'
+                  ? 'Payment Reversed'
+                  : statusText === 'CANCELLED'
+                  ? 'Payment Cancelled'
+                  : statusText === 'EXPIRED'
+                  ? 'Payment Expired'
+                  : statusText === 'FAILED'
+                  ? 'Payment Failed'
+                  : 'Verification Pending';
+              showToast(
+                title,
+                (verifyData && verifyData.error) || 'Payment has not been confirmed by Sifalo Pay. Download remains locked.'
+              );
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Sifalo return verification error:', err);
+      }
+    }
+
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', handlePaymentReturnFromCheckout);
+      } else {
+        setTimeout(handlePaymentReturnFromCheckout, 0);
+      }
+    }
+
+    async function triggerWithSifaloPay(downloadCallback) {
+      if (typeof downloadCallback !== 'function') return;
+
+      if (_isSifaloExecutingCallback) {
+        return downloadCallback();
+      }
+
+      const docSpec = getActiveUnlockDocSpec();
+      const hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey);
+      if (hasValidPaidUnlock) {
+        return executePaidDownloadCallback(downloadCallback);
+      }
+
+      _pendingSifaloCallback = downloadCallback;
+      openSifaloPayModal(docSpec);
+    }
+    window.triggerWithSifaloPay = triggerWithSifaloPay;
+
+
 
     // Universal Automatic Text-Sizing Engine for all Passport & National ID Previews
     window.autoFitDocumentFields = function(rootSelectorOrEl) {
@@ -5051,21 +5440,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadDrcPassPNG() {
-      const card = $('drc-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution DR Congo passport PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'DR Congo passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('drc-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution DR Congo passport PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'DR Congo passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -5534,21 +5925,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadBgdPassPNG() {
-      const card = $('bangladesh-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Bangladesh passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'bangladesh-passport-' + (readBgdFields().passNo || 'A06821716') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Bangladesh e-Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('bangladesh-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Bangladesh passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'bangladesh-passport-' + (readBgdFields().passNo || 'A06821716') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Bangladesh e-Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -5889,21 +6282,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadDeuPassPNG() {
-      const card = $('germany-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution German passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'germany-passport-' + (readDeuFields().passNo || 'G28P5FV81') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'German Reisepass PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('germany-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution German passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'germany-passport-' + (readDeuFields().passNo || 'G28P5FV81') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'German Reisepass PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -6300,21 +6695,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadCanPassPNG() {
-      const card = $('canada-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Canadian passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'canada-passport-' + (readCanFields().passNo || 'ZE001355') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Canadian Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('canada-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Canadian passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'canada-passport-' + (readCanFields().passNo || 'ZE001355') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Canadian Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -6672,21 +7069,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadGhaPassPNG() {
-      const card = $('ghana-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Ghana passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'ghana-passport-' + (readGhaFields().passNo || 'G2866330') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Ghanaian Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('ghana-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Ghana passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'ghana-passport-' + (readGhaFields().passNo || 'G2866330') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Ghanaian Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -7002,21 +7401,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadNplPassPNG() {
-      const card = $('nepal-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Nepal passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'nepal-passport-' + (readNplFields().passNo || '12524139') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Nepal Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('nepal-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Nepal passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'nepal-passport-' + (readNplFields().passNo || '12524139') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Nepal Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -7411,20 +7812,22 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadMwiPassPNG() {
-      const card = $('malawi-passport-card');
-      if (!card || typeof html2canvas !== 'function') {
-        showToast('Export Notice', 'Preparing passport canvas for capture...');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Malawi Passport 2-page spread');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'malawi-passport-' + (readMwiFields().passNo || 'MWA058787') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Malawi Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('malawi-passport-card');
+        if (!card || typeof html2canvas !== 'function') {
+          showToast('Export Notice', 'Preparing passport canvas for capture...');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Malawi Passport 2-page spread');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = 'malawi-passport-' + (readMwiFields().passNo || 'MWA058787') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Malawi Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -7698,23 +8101,25 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadRwaCardPNG() {
-      const target = (rwaCurrentSide === 'back') ? $('rwanda-id-back') : $('rwanda-id-front');
-      if (!target) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Rwanda National ID PNG');
-      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readRwaFields();
-        const cleanId = (f.idNo || 'RWA').replace(/\s+/g, '-');
-        link.download = `rwanda-id-${cleanId}-${rwaCurrentSide}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Rwanda National ID PNG downloaded successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export ID image');
+      triggerWithSifaloPay(() => {
+        const target = (rwaCurrentSide === 'back') ? $('rwanda-id-back') : $('rwanda-id-front');
+        if (!target) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Rwanda National ID PNG');
+        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readRwaFields();
+          const cleanId = (f.idNo || 'RWA').replace(/\s+/g, '-');
+          link.download = `rwanda-id-${cleanId}-${rwaCurrentSide}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Rwanda National ID PNG downloaded successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export ID image');
+        });
       });
     }
 
@@ -8231,24 +8636,26 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadUaeCardPNG(requestedSide) {
-      const sideToExport = requestedSide || (uaeCurrentSide === 'back' ? 'back' : 'front');
-      const target = (sideToExport === 'back') ? $('uae-id-back') : $('uae-id-front');
-      if (!target) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', `Rendering high-resolution UAE Resident ID (${sideToExport.toUpperCase()}) PNG`);
-      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readUaeFields();
-        const cleanId = (f.idNo || 'UAE-EID').replace(/\s+/g, '-');
-        link.download = `uae-resident-id-${cleanId}-${sideToExport}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', `UAE Resident ID (${sideToExport.toUpperCase()}) PNG downloaded`);
-      }).catch(function () {
-        showToast('Download Error', 'Could not export UAE Resident ID image');
+      triggerWithSifaloPay(() => {
+        const sideToExport = requestedSide || (uaeCurrentSide === 'back' ? 'back' : 'front');
+        const target = (sideToExport === 'back') ? $('uae-id-back') : $('uae-id-front');
+        if (!target) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', `Rendering high-resolution UAE Resident ID (${sideToExport.toUpperCase()}) PNG`);
+        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readUaeFields();
+          const cleanId = (f.idNo || 'UAE-EID').replace(/\s+/g, '-');
+          link.download = `uae-resident-id-${cleanId}-${sideToExport}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', `UAE Resident ID (${sideToExport.toUpperCase()}) PNG downloaded`);
+        }).catch(function () {
+          showToast('Download Error', 'Could not export UAE Resident ID image');
+        });
       });
     }
 
@@ -8727,24 +9134,26 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadTurCardPNG(requestedSide) {
-      const sideToExport = requestedSide || (turCurrentSide === 'back' ? 'back' : 'front');
-      const target = (sideToExport === 'back') ? $('turkey-id-back') : $('turkey-id-front');
-      if (!target) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', `Rendering high-resolution Turkey Identity Card (${sideToExport.toUpperCase()}) PNG`);
-      html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readTurFields();
-        const cleanId = (f.idNo || 'TUR-ID').replace(/\s+/g, '-');
-        link.download = `turkey-kimlik-karti-${cleanId}-${sideToExport}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', `Turkey Identity Card (${sideToExport.toUpperCase()}) PNG downloaded`);
-      }).catch(function () {
-        showToast('Download Error', 'Could not export Turkey Identity Card image');
+      triggerWithSifaloPay(() => {
+        const sideToExport = requestedSide || (turCurrentSide === 'back' ? 'back' : 'front');
+        const target = (sideToExport === 'back') ? $('turkey-id-back') : $('turkey-id-front');
+        if (!target) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', `Rendering high-resolution Turkey Identity Card (${sideToExport.toUpperCase()}) PNG`);
+        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readTurFields();
+          const cleanId = (f.idNo || 'TUR-ID').replace(/\s+/g, '-');
+          link.download = `turkey-kimlik-karti-${cleanId}-${sideToExport}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', `Turkey Identity Card (${sideToExport.toUpperCase()}) PNG downloaded`);
+        }).catch(function () {
+          showToast('Download Error', 'Could not export Turkey Identity Card image');
+        });
       });
     }
 
@@ -9301,23 +9710,25 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadTurPassPNG() {
-      const card = $('turkey-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Turkish Passport 2-page spread PNG');
-      html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        const f = readTurPassFields();
-        const cleanNo = (f.passNo || 'U16072032').replace(/\s+/g, '');
-        link.download = `turkey-passport-${cleanNo}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Turkish Passport PNG downloaded successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export Turkish Passport PNG');
+      triggerWithSifaloPay(() => {
+        const card = $('turkey-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Turkish Passport 2-page spread PNG');
+        html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          const f = readTurPassFields();
+          const cleanNo = (f.passNo || 'U16072032').replace(/\s+/g, '');
+          link.download = `turkey-passport-${cleanNo}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Turkish Passport PNG downloaded successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export Turkish Passport PNG');
+        });
       });
     }
 
@@ -9746,21 +10157,23 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     function downloadEthPassPNG() {
-      const card = $('ethiopia-passport-card');
-      if (!card) return;
-      if (typeof html2canvas !== 'function') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Ethiopian passport spread PNG');
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.download = 'ethiopia-passport-' + (readEthFields().passNo || 'EP6442640') + '.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        showToast('Ready!', 'Ethiopian Passport PNG generated successfully');
-      }).catch(function () {
-        showToast('Download Error', 'Could not export passport image');
+      triggerWithSifaloPay(() => {
+        const card = $('ethiopia-passport-card');
+        if (!card) return;
+        if (typeof html2canvas !== 'function') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Ethiopian passport spread PNG');
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const link = document.createElement('a');
+          link.download = 'ethiopia-passport-' + (readEthFields().passNo || 'EP6442640') + '.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          showToast('Ready!', 'Ethiopian Passport PNG generated successfully');
+        }).catch(function () {
+          showToast('Download Error', 'Could not export passport image');
+        });
       });
     }
 
@@ -10420,36 +10833,38 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadProofOfAccountPNG() {
-      const provider = window.currentPoaProvider || 'wise';
-      const cardId = provider === 'wise' ? 'poa-wise-card' : provider === 'revolut' ? 'poa-revolut-card' : 'proof-of-account-card';
-      const card = $(cardId);
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', `Rendering high-resolution ${provider.toUpperCase()} Proof of Account PNG`);
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#ffffff'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `proof-of-account-${provider}.png`;
+      triggerWithSifaloPay(async () => {
+        const provider = window.currentPoaProvider || 'wise';
+        const cardId = provider === 'wise' ? 'poa-wise-card' : provider === 'revolut' ? 'poa-revolut-card' : 'proof-of-account-card';
+        const card = $(cardId);
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', `Rendering high-resolution ${provider.toUpperCase()} Proof of Account PNG`);
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `proof-of-account-${provider}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', `${provider.toUpperCase()} Proof of Account PNG generated successfully`);
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export letter image');
         }
-        showToast('Ready!', `${provider.toUpperCase()} Proof of Account PNG generated successfully`);
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export letter image');
-      }
+      });
     }
 
     function printProofOfAccount() {
@@ -10606,34 +11021,36 @@ var $ = window.$ || (id => document.getElementById(id));
     window.randomizeProofOfAddress = randomizeProofOfAddress;
 
     async function downloadProofOfAddressPNG() {
-      const card = $('proof-of-address-bill-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Electricity Bill Proof of Address PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#ffffff'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'proof-of-address-electricity-bill.png';
+      triggerWithSifaloPay(async () => {
+        const card = $('proof-of-address-bill-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Electricity Bill Proof of Address PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'proof-of-address-electricity-bill.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Proof of Address Electricity Bill PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export Electricity Bill image');
         }
-        showToast('Ready!', 'Proof of Address Electricity Bill PNG generated successfully');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export Electricity Bill image');
-      }
+      });
     }
     window.downloadProofOfAddressPNG = downloadProofOfAddressPNG;
 
@@ -11099,48 +11516,50 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadUgandaPNG(specificCardId) {
-      let target = null;
-      let bgColor = '#ffffff';
-      if (specificCardId && $(specificCardId)) {
-        target = $(specificCardId);
-      } else if (currentUgaViewMode === 'front' && $('uganda-refugee-card')) {
-        target = $('uganda-refugee-card');
-      } else if (currentUgaViewMode === 'back' && $('uganda-id-back-card')) {
-        target = $('uganda-id-back-card');
-      } else if ($('uga-showcase-canvas-inner') && !$('uga-live-card-wrapper').classList.contains('hidden')) {
-        target = $('uga-showcase-canvas-inner');
-        bgColor = currentUgaViewMode === 'showcase' ? '#a48f6c' : '#ffffff';
-      } else {
-        target = $('uganda-refugee-card');
-      }
+      triggerWithSifaloPay(async () => {
+        let target = null;
+        let bgColor = '#ffffff';
+        if (specificCardId && $(specificCardId)) {
+          target = $(specificCardId);
+        } else if (currentUgaViewMode === 'front' && $('uganda-refugee-card')) {
+          target = $('uganda-refugee-card');
+        } else if (currentUgaViewMode === 'back' && $('uganda-id-back-card')) {
+          target = $('uganda-id-back-card');
+        } else if ($('uga-showcase-canvas-inner') && !$('uga-live-card-wrapper').classList.contains('hidden')) {
+          target = $('uga-showcase-canvas-inner');
+          bgColor = currentUgaViewMode === 'showcase' ? '#a48f6c' : '#ffffff';
+        } else {
+          target = $('uganda-refugee-card');
+        }
 
-      if (!target || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Republic of Uganda National ID Card PNG');
-      try {
-        const canvas = await html2canvas(target, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: bgColor
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'uganda-national-id-card.png';
+        if (!target || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Republic of Uganda National ID Card PNG');
+        try {
+          const canvas = await html2canvas(target, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: bgColor
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'uganda-national-id-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Uganda National ID Card PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export card image');
         }
-        showToast('Ready!', 'Uganda National ID Card PNG generated successfully');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export card image');
-      }
+      });
     }
 
     function printUgandaCard() {
@@ -11643,47 +12062,49 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadPakCardPNG(targetCardId) {
-      let targetEl = null;
-      if (targetCardId) {
-        targetEl = $(targetCardId);
-      } else if (pakCurrentViewMode === 'showcase') {
-        targetEl = $('pak-showcase-canvas-inner');
-      } else if (pakCurrentViewMode === 'front') {
-        targetEl = $('pak-single-front-card');
-      } else if (pakCurrentViewMode === 'back') {
-        targetEl = $('pak-single-back-card');
-      } else {
-        targetEl = $('pak-view-dual-inner');
-      }
-
-      if (!targetEl) targetEl = $('pak-showcase-canvas-inner') || $('pakistan-id-card');
-      if (!targetEl) return;
-
-      try {
-        showToast('Processing...', 'Generating high-resolution Pakistan CNIC PNG...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: targetEl.id === 'pak-showcase-canvas-inner' ? '#a48f6c' : '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `pakistan-cnic-${pakCurrentViewMode}-specimen.png`;
+      triggerWithSifaloPay(async () => {
+        let targetEl = null;
+        if (targetCardId) {
+          targetEl = $(targetCardId);
+        } else if (pakCurrentViewMode === 'showcase') {
+          targetEl = $('pak-showcase-canvas-inner');
+        } else if (pakCurrentViewMode === 'front') {
+          targetEl = $('pak-single-front-card');
+        } else if (pakCurrentViewMode === 'back') {
+          targetEl = $('pak-single-back-card');
+        } else {
+          targetEl = $('pak-view-dual-inner');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+
+        if (!targetEl) targetEl = $('pak-showcase-canvas-inner') || $('pakistan-id-card');
+        if (!targetEl) return;
+
+        try {
+          showToast('Processing...', 'Generating high-resolution Pakistan CNIC PNG...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: targetEl.id === 'pak-showcase-canvas-inner' ? '#a48f6c' : '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `pakistan-cnic-${pakCurrentViewMode}-specimen.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Pakistan CNIC mockup PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Notice', 'Direct download completed');
         }
-        showToast('Ready!', 'Pakistan CNIC mockup PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Notice', 'Direct download completed');
-      }
+      });
     }
 
     function copyPakSpecimenData() {
@@ -12055,43 +12476,45 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadSenegalPassPNG() {
-      let targetEl = null;
-      if (senCurrentViewMode === 'datapage') {
-        targetEl = $('senegal-datapage-card');
-      } else if (senCurrentViewMode === 'page1') {
-        targetEl = $('senegal-page1-card');
-      } else {
-        targetEl = $('senegal-passport-spread');
-      }
-
-      if (!targetEl) targetEl = $('senegal-passport-spread');
-      if (!targetEl) return;
-
-      try {
-        showToast('En cours...', 'Génération du PNG haute résolution...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `senegal-passeport-${senCurrentViewMode}.png`;
+      triggerWithSifaloPay(async () => {
+        let targetEl = null;
+        if (senCurrentViewMode === 'datapage') {
+          targetEl = $('senegal-datapage-card');
+        } else if (senCurrentViewMode === 'page1') {
+          targetEl = $('senegal-page1-card');
+        } else {
+          targetEl = $('senegal-passport-spread');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+
+        if (!targetEl) targetEl = $('senegal-passport-spread');
+        if (!targetEl) return;
+
+        try {
+          showToast('En cours...', 'Génération du PNG haute résolution...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `senegal-passeport-${senCurrentViewMode}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Prêt !', 'Passeport sénégalais téléchargé avec succès');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Info', 'Téléchargement direct terminé');
         }
-        showToast('Prêt !', 'Passeport sénégalais téléchargé avec succès');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Info', 'Téléchargement direct terminé');
-      }
+      });
     }
 
     function copySenegalSpecimenData() {
@@ -12311,32 +12734,34 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadZafCardPNG() {
-      const targetEl = $('senegal-id-card');
-      if (!targetEl) return;
-      try {
-        showToast('Rendering...', 'Generating high-resolution PNG of Senegal CEDEAO Identity Card...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'senegal-cedeao-identity-card-specimen.png';
+      triggerWithSifaloPay(async () => {
+        const targetEl = $('senegal-id-card');
+        if (!targetEl) return;
+        try {
+          showToast('Rendering...', 'Generating high-resolution PNG of Senegal CEDEAO Identity Card...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'senegal-cedeao-identity-card-specimen.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Senegal CEDEAO Identity Card PNG generated');
+        } catch (err) {
+          console.error('html2canvas error:', err);
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Senegal CEDEAO Identity Card PNG generated');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-      }
+      });
     }
 
     function copyZafSpecimenData() {
@@ -12834,32 +13259,34 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadSaPassPNG() {
-      const targetEl = $('sa-passport-card');
-      if (!targetEl) return;
-      try {
-        showToast('Rendering...', 'Generating high-resolution PNG of South Africa Passport...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'south-africa-passport-specimen.png';
+      triggerWithSifaloPay(async () => {
+        const targetEl = $('sa-passport-card');
+        if (!targetEl) return;
+        try {
+          showToast('Rendering...', 'Generating high-resolution PNG of South Africa Passport...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'south-africa-passport-specimen.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'South Africa Passport PNG generated');
+        } catch (err) {
+          console.error('html2canvas error:', err);
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'South Africa Passport PNG generated');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-      }
+      });
     }
 
     function copySaPassSpecimenData() {
@@ -13131,32 +13558,34 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadUsaPassPNG() {
-      const targetEl = $('usa-passport-card');
-      if (!targetEl) return;
-      try {
-        showToast('Rendering...', 'Generating high-resolution PNG of United States Passport...');
-        const canvas = await html2canvas(targetEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'united-states-passport-specimen.png';
+      triggerWithSifaloPay(async () => {
+        const targetEl = $('usa-passport-card');
+        if (!targetEl) return;
+        try {
+          showToast('Rendering...', 'Generating high-resolution PNG of United States Passport...');
+          const canvas = await html2canvas(targetEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'united-states-passport-specimen.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'United States Passport PNG generated');
+        } catch (err) {
+          console.error('html2canvas error:', err);
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'United States Passport PNG generated');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-      }
+      });
     }
 
     function copyUsaPassSpecimenData() {
@@ -13445,39 +13874,41 @@ var $ = window.$ || (id => document.getElementById(id));
     }
 
     async function downloadSycCardPNG() {
-      const cardEl = $('seychelles-id-front');
-      if (!cardEl) return;
-      try {
-        showToast('Processing...', 'Generating high-resolution Seychelles National ID PNG...');
-        const canvas = await html2canvas(cardEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#f7f9fb',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'seychelles-national-identity-card.png';
+      triggerWithSifaloPay(async () => {
+        const cardEl = $('seychelles-id-front');
+        if (!cardEl) return;
+        try {
+          showToast('Processing...', 'Generating high-resolution Seychelles National ID PNG...');
+          const canvas = await html2canvas(cardEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#f7f9fb',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'seychelles-national-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Seychelles National ID PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          const a = document.createElement('a');
+          a.href = officialSycSpecimenSrc;
+          a.download = 'seychelles-national-identity-card-official-specimen.jpg';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Downloaded Specimen', 'Downloaded official Seychelles National ID specimen');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Seychelles National ID PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        const a = document.createElement('a');
-        a.href = officialSycSpecimenSrc;
-        a.download = 'seychelles-national-identity-card-official-specimen.jpg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Downloaded Specimen', 'Downloaded official Seychelles National ID specimen');
-      }
+      });
     }
 
     function copySycSpecimenData() {
@@ -13759,81 +14190,87 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
 
     // High-Resolution PNG Exports for Front, Back, and Both Sides
     async function downloadKidFrontPNG() {
-      const card = $('kenya-id-front');
-      if (!card) return;
-      showToast('Rendering...', 'Generating Front Side Kenya Maisha ID PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f7faf7' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'kenya-maisha-id-front.png';
+      triggerWithSifaloPay(async () => {
+        const card = $('kenya-id-front');
+        if (!card) return;
+        showToast('Rendering...', 'Generating Front Side Kenya Maisha ID PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f7faf7' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'kenya-maisha-id-front.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Front Side Kenya Maisha ID PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate front card image');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Front Side Kenya Maisha ID PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate front card image');
-      }
+      });
     }
 
     async function downloadKidBackPNG() {
-      const card = $('kenya-id-back');
-      if (!card) return;
-      showToast('Rendering...', 'Generating Back Side Kenya Maisha ID PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f8faf8' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'kenya-maisha-id-back.png';
+      triggerWithSifaloPay(async () => {
+        const card = $('kenya-id-back');
+        if (!card) return;
+        showToast('Rendering...', 'Generating Back Side Kenya Maisha ID PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#f8faf8' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'kenya-maisha-id-back.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Back Side Kenya Maisha ID PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate back card image');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Back Side Kenya Maisha ID PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate back card image');
-      }
+      });
     }
 
     async function downloadKidBothPNG() {
-      const card = $('kidBothCardsContainer');
-      if (!card) return;
-      // Ensure both wraps are visible before capture
-      const frontWrap = $('kidFrontCardWrap');
-      const backWrap = $('kidBackCardWrap');
-      if (frontWrap) frontWrap.classList.remove('hidden');
-      if (backWrap) backWrap.classList.remove('hidden');
+      triggerWithSifaloPay(async () => {
+        const card = $('kidBothCardsContainer');
+        if (!card) return;
+        // Ensure both wraps are visible before capture
+        const frontWrap = $('kidFrontCardWrap');
+        const backWrap = $('kidBackCardWrap');
+        if (frontWrap) frontWrap.classList.remove('hidden');
+        if (backWrap) backWrap.classList.remove('hidden');
 
-      showToast('Rendering...', 'Generating Complete Kenya Maisha ID (Both Sides) PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'kenya-maisha-id-complete-set.png';
+        showToast('Rendering...', 'Generating Complete Kenya Maisha ID (Both Sides) PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'kenya-maisha-id-complete-set.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Kenya Maisha ID Set (Front & Back) generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate ID set image');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Kenya Maisha ID Set (Front & Back) generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate ID set image');
-      }
+      });
     }
 
     function downloadKidPNG() {
@@ -13985,31 +14422,33 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     }
 
     async function downloadEthPNG() {
-      const card = $('ethiopia-fayda-card');
-      if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Ethiopian Fayda ID Card PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#faf7ee'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'ethiopian-digital-id-fayda.png';
+      triggerWithSifaloPay(async () => {
+        const card = $('ethiopia-fayda-card');
+        if (!card) return;
+        showToast('Rendering...', 'Generating high-resolution Ethiopian Fayda ID Card PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#faf7ee'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'ethiopian-digital-id-fayda.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Ethiopian Fayda Digital ID generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate Fayda ID PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Ethiopian Fayda Digital ID generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate Fayda ID PNG');
-      }
+      });
     }
 
     function printEthCard() {
@@ -14205,39 +14644,41 @@ MRZ Line 3: ${$('sycPreviewMrz3')?.textContent || 'AGBONDE<<AFOLABI<MICHAEL<<<<<
     }
 
     async function downloadNgaCardPNG() {
-      const cardEl = $('nigeria-id-card');
-      if (!cardEl) return;
-      try {
-        showToast('Processing...', 'Generating high-resolution Nigeria National ID PNG...');
-        const canvas = await html2canvas(cardEl, {
-          scale: 3,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#f6faf6',
-          logging: false
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'nigeria-national-identity-card.png';
+      triggerWithSifaloPay(async () => {
+        const cardEl = $('nigeria-id-card');
+        if (!cardEl) return;
+        try {
+          showToast('Processing...', 'Generating high-resolution Nigeria National ID PNG...');
+          const canvas = await html2canvas(cardEl, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#f6faf6',
+            logging: false
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'nigeria-national-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Nigeria National ID PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          const a = document.createElement('a');
+          a.href = officialNgaSpecimenSrc;
+          a.download = 'nigeria-national-identity-card-official-specimen.png';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Specimen Downloaded', 'Official Nigeria National Identity Card downloaded');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Nigeria National ID PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        const a = document.createElement('a');
-        a.href = officialNgaSpecimenSrc;
-        a.download = 'nigeria-national-identity-card-official-specimen.png';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Specimen Downloaded', 'Official Nigeria National Identity Card downloaded');
-      }
+      });
     }
 
     function printNgaCard() {
@@ -14702,46 +15143,48 @@ Issuing Authority: National Identity Management Commission (NIMC)`;
     }
 
     async function downloadNgaPassportPNG() {
-      if (currentNgaPassViewMode === 'specimen') {
-        const a = document.createElement('a');
-        a.href = officialNgaPassportSrc;
-        a.download = 'nigeria-standard-passport-official-specimen.jpg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('Passport Downloaded', 'Official Nigerian Passport specimen downloaded');
-        return;
-      }
+      triggerWithSifaloPay(async () => {
+        if (currentNgaPassViewMode === 'specimen') {
+          const a = document.createElement('a');
+          a.href = officialNgaPassportSrc;
+          a.download = 'nigeria-standard-passport-official-specimen.jpg';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          showToast('Passport Downloaded', 'Official Nigerian Passport specimen downloaded');
+          return;
+        }
 
-      const card = $('nigeria-passport-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Rendering...', 'Generating high-resolution Nigerian e-Passport PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#fbfbf4'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        const passNo = $('ngaPassInputNumber') ? $('ngaPassInputNumber').value.replace(/\s+/g, '') : 'B50621098';
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `nigeria-passport-${passNo}.png`;
+        const card = $('nigeria-passport-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Rendering...', 'Generating high-resolution Nigerian e-Passport PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#fbfbf4'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          const passNo = $('ngaPassInputNumber') ? $('ngaPassInputNumber').value.replace(/\s+/g, '') : 'B50621098';
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `nigeria-passport-${passNo}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Nigerian Passport image generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate Nigerian passport PNG');
         }
-        showToast('Ready!', 'Nigerian Passport image generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate Nigerian passport PNG');
-      }
+      });
     }
 
     function printNgaPassport() {
@@ -15094,35 +15537,37 @@ ${$('ngaPassMrzLine2')?.textContent || 'B506210986NGA9412309M330725064841848001<
     }
 
     async function downloadUkPassPNG() {
-      const card = $('uk-passport-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Rendering...', 'Generating high-resolution UK Passport 2-page spread PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: null
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        const passNo = $('ukPassInputNumber') ? $('ukPassInputNumber').value.replace(/\s+/g, '') : '120834476';
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `uk-passport-${passNo}.png`;
+      triggerWithSifaloPay(async () => {
+        const card = $('uk-passport-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Rendering...', 'Generating high-resolution UK Passport 2-page spread PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: null
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          const passNo = $('ukPassInputNumber') ? $('ukPassInputNumber').value.replace(/\s+/g, '') : '120834476';
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `uk-passport-${passNo}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'United Kingdom Passport image generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate UK passport PNG');
         }
-        showToast('Ready!', 'United Kingdom Passport image generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate UK passport PNG');
-      }
+      });
     }
 
     function printUkPass() {
@@ -15312,34 +15757,36 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomSmartIdPNG() {
-      const card = $('somali-smart-id-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Somali National Identity Card');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f2fadc'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `somali-national-id-${$('somSmartIdInputNo') ? $('somSmartIdInputNo').value : '26405034834834'}.png`;
+      triggerWithSifaloPay(async () => {
+        const card = $('somali-smart-id-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Somali National Identity Card');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f2fadc'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `somali-national-id-${$('somSmartIdInputNo') ? $('somSmartIdInputNo').value : '26405034834834'}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali National ID Card PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export card canvas image');
         }
-        showToast('Ready!', 'Somali National ID Card PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export card canvas image');
-      }
+      });
     }
 
     function printSomSmartIdCard() {
@@ -15426,27 +15873,29 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
     // Somalia NIRA PNG Download
     async function downloadSomPNG() {
-      const card = $('somalia-card');
-      if (!card) return;
-      showToast('Rendering...', 'Generating Somalia NIRA Certificate PNG');
-      try {
-        const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-national-id-nira.png';
+      triggerWithSifaloPay(async () => {
+        const card = $('somalia-card');
+        if (!card) return;
+        showToast('Rendering...', 'Generating Somalia NIRA Certificate PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'somali-national-id-nira.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali NIRA Certificate PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate Somalia Document PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Somali NIRA Certificate PNG generated successfully');
-      } catch (err) {
-        console.error(err);
-        showToast('Error', 'Failed to generate Somalia Document PNG');
-      }
+      });
     }
 
     // ================= SOMALIA BIOMETRIC PASSPORT CONTROLLER =================
@@ -15827,31 +16276,33 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomPassPNG() {
-      const card = $('somPassContainer') || $('somalia-passport-spread');
-      if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Somali Passport & Identity Card PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f8fafc'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-passport-and-identity-card.png';
+      triggerWithSifaloPay(async () => {
+        const card = $('somPassContainer') || $('somalia-passport-spread');
+        if (!card) return;
+        showToast('Rendering...', 'Generating high-resolution Somali Passport & Identity Card PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f8fafc'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'somali-passport-and-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali Passport & Identity Card image generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate passport PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Somali Passport & Identity Card image generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate passport PNG');
-      }
+      });
     }
 
     function printSomaliaPassport() {
@@ -15957,31 +16408,33 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomPassIdCardPNG() {
-      const card = $('somalia-passport-id-card');
-      if (!card) return;
-      showToast('Rendering...', 'Generating high-resolution Somali Passport Identity Card PNG');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f0f9fd'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = 'somali-passport-identity-card.png';
+      triggerWithSifaloPay(async () => {
+        const card = $('somalia-passport-id-card');
+        if (!card) return;
+        showToast('Rendering...', 'Generating high-resolution Somali Passport Identity Card PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f0f9fd'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'somali-passport-identity-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Identity Card PNG generated successfully');
+        } catch (err) {
+          console.error('html2canvas error:', err);
+          showToast('Error', 'Failed to generate Identity Card PNG');
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
-        }
-        showToast('Ready!', 'Identity Card PNG generated successfully');
-      } catch (err) {
-        console.error('html2canvas error:', err);
-        showToast('Error', 'Failed to generate Identity Card PNG');
-      }
+      });
     }
 
     function printSomPassIdCard() {
@@ -16104,34 +16557,36 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadSomLicPNG() {
-      const card = $('somalia-driverlicense-card');
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', 'Rendering high-resolution Somali Driver License specimen');
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#f0f9ff'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `somali-driver-license-${$('somLicInputNo') ? $('somLicInputNo').value : '54935'}.png`;
+      triggerWithSifaloPay(async () => {
+        const card = $('somalia-driverlicense-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', 'Rendering high-resolution Somali Driver License specimen');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#f0f9ff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `somali-driver-license-${$('somLicInputNo') ? $('somLicInputNo').value : '54935'}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Somali Driver License PNG generated');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export canvas image');
         }
-        showToast('Ready!', 'Somali Driver License PNG generated');
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export canvas image');
-      }
+      });
     }
 
     function printSomaliDriverLicense() {
@@ -16458,36 +16913,38 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     async function downloadNzDlPNG(side) {
-      const targetId = side === 'back' ? 'newzealand-driverlicense-back' : 'newzealand-driverlicense-front';
-      const card = $(targetId);
-      if (!card || typeof html2canvas === 'undefined') {
-        showToast('Export Error', 'Rendering engine unavailable');
-        return;
-      }
-      showToast('Generating PNG...', `Rendering high-resolution New Zealand Driver Licence (${side})`);
-      try {
-        const canvas = await html2canvas(card, {
-          scale: 3,
-          useCORS: true,
-          backgroundColor: '#ffffff'
-        });
-        const imgData = canvas.toDataURL('image/png');
-        if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-        if ($('fallbackDownloadLink')) {
-          const licNo = $('nzDlInputLicence') ? $('nzDlInputLicence').value.trim() : 'AC246810';
-          $('fallbackDownloadLink').href = imgData;
-          $('fallbackDownloadLink').download = `new-zealand-driver-licence-${licNo}-${side}.png`;
+      triggerWithSifaloPay(async () => {
+        const targetId = side === 'back' ? 'newzealand-driverlicense-back' : 'newzealand-driverlicense-front';
+        const card = $(targetId);
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
         }
-        const modal = $('imageModal');
-        if (modal) {
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        showToast('Generating PNG...', `Rendering high-resolution New Zealand Driver Licence (${side})`);
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            const licNo = $('nzDlInputLicence') ? $('nzDlInputLicence').value.trim() : 'AC246810';
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `new-zealand-driver-licence-${licNo}-${side}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', `New Zealand Driver Licence (${side}) PNG generated`);
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export canvas image');
         }
-        showToast('Ready!', `New Zealand Driver Licence (${side}) PNG generated`);
-      } catch (err) {
-        console.error(err);
-        showToast('Download Error', 'Could not export canvas image');
-      }
+      });
     }
 
     function printNzDriverLicense() {
@@ -17071,32 +17528,53 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       // Download Kenya Passport PNG (html2canvas)
       const downloadBtn = $('downloadBtn');
       if (downloadBtn) {
-        downloadBtn.addEventListener('click', async () => {
-          const card = $('passport-card');
-          if (!card) return;
-          showToast('Rendering...', 'Generating high-resolution Kenya Passport PNG');
-          try {
-            const canvas = await html2canvas(card, {
-              scale: 3,
-              useCORS: true,
-              backgroundColor: '#ffffff'
-            });
-            const imgData = canvas.toDataURL('image/png');
-            if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
-            if ($('fallbackDownloadLink')) {
-              $('fallbackDownloadLink').href = imgData;
-              $('fallbackDownloadLink').download = 'republic-of-kenya-passport.png';
+        downloadBtn.addEventListener('click', () => {
+          triggerWithSifaloPay(async () => {
+            const card = $('passport-card');
+            if (!card) return;
+            showToast('Rendering...', 'Generating high-resolution Kenya Passport PNG');
+            try {
+              const canvas = await html2canvas(card, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+              });
+              const imgData = canvas.toDataURL('image/png');
+              if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+              if ($('fallbackDownloadLink')) {
+                $('fallbackDownloadLink').href = imgData;
+                $('fallbackDownloadLink').download = 'republic-of-kenya-passport.png';
+              }
+              const modal = $('imageModal');
+              if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+              }
+              showToast('Ready!', 'Kenya Passport image generated successfully');
+            } catch (err) {
+              console.error('html2canvas error:', err);
+              showToast('Error', 'Failed to generate passport PNG');
             }
-            const modal = $('imageModal');
-            if (modal) {
-              modal.classList.remove('hidden');
-              modal.classList.add('flex');
-            }
-            showToast('Ready!', 'Kenya Passport image generated successfully');
-          } catch (err) {
-            console.error('html2canvas error:', err);
-            showToast('Error', 'Failed to generate passport PNG');
-          }
+          });
+        });
+      }
+
+      const fallbackDownloadLink = $('fallbackDownloadLink');
+      if (fallbackDownloadLink) {
+        fallbackDownloadLink.addEventListener('click', (e) => {
+          if (_isSifaloExecutingCallback) return;
+          e.preventDefault();
+          const targetHref = fallbackDownloadLink.getAttribute('href') || '';
+          const targetName = fallbackDownloadLink.getAttribute('download') || 'document.png';
+          if (!targetHref || targetHref === '#') return;
+          triggerWithSifaloPay(() => {
+            const a = document.createElement('a');
+            a.href = targetHref;
+            a.download = targetName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          });
         });
       }
 
@@ -19090,21 +19568,23 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     window.copyOceaniaData = copyOceaniaData;
 
     function downloadOceaniaPNG(countryKey, docType, side) {
-      const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
-      if (!cfg) return;
-      const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
-      const cardId = dtype === 'passport' ? `${cfg.key}-passport-card` : (side === 'back' ? `${cfg.key}-id-back` : `${cfg.key}-id-front`);
-      const card = $(cardId);
-      if (!card || typeof html2canvas !== 'function') return;
-      if (typeof showToast === 'function') showToast('Generating PNG...', `Rendering high-resolution ${cfg.name} sample document`);
-      html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `${cfg.key}-${dtype}${side ? '-' + side : ''}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        if (typeof showToast === 'function') showToast('Ready!', `${cfg.name} PNG generated successfully`);
-      }).catch(() => {
-        if (typeof showToast === 'function') showToast('Download Error', 'Could not export document image');
+      triggerWithSifaloPay(() => {
+        const cfg = OCEANIA_COUNTRIES_CONFIG[countryKey];
+        if (!cfg) return;
+        const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
+        const cardId = dtype === 'passport' ? `${cfg.key}-passport-card` : (side === 'back' ? `${cfg.key}-id-back` : `${cfg.key}-id-front`);
+        const card = $(cardId);
+        if (!card || typeof html2canvas !== 'function') return;
+        if (typeof showToast === 'function') showToast('Generating PNG...', `Rendering high-resolution ${cfg.name} sample document`);
+        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = `${cfg.key}-${dtype}${side ? '-' + side : ''}.png`;
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          if (typeof showToast === 'function') showToast('Ready!', `${cfg.name} PNG generated successfully`);
+        }).catch(() => {
+          if (typeof showToast === 'function') showToast('Download Error', 'Could not export document image');
+        });
       });
     }
     window.downloadOceaniaPNG = downloadOceaniaPNG;
@@ -33483,6 +33963,42 @@ EPSOM</div>
       <a id="fallbackDownloadLink" href="#" download="kenya-passport.png" class="py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-center text-sm font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-download mr-2"></i>Direct File Save</a>
       <button type="button" id="shareImageBtn" onclick="sharePassportImage()" class="py-3 px-4 bg-white/15 hover:bg-white/25 text-white rounded-xl text-sm font-bold flex items-center justify-center cursor-pointer"><i class="fa-solid fa-share-nodes mr-2"></i>Share Image</button>
       <button type="button" id="closeModalBottomBtn" onclick="closeImageModal()" class="py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-bold flex items-center justify-center cursor-pointer">Close Preview</button>
+    </div>
+  </div>
+
+  <!-- ================= SIFALO PAY CHECKOUT MODAL ================= -->
+  <div id="kycSifaloPayModal" role="dialog" aria-modal="true" aria-labelledby="kycSifaloPayTitle" class="no-print fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-3xl bg-white border border-emerald-100 shadow-2xl overflow-hidden text-[#0d2658]">
+      <div class="px-6 pt-5 pb-4 bg-gradient-to-r from-[#ecfdf5] via-white to-[#f0f6ff] border-b border-slate-100 flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#16a34a] to-[#059669] text-white flex items-center justify-center shadow-sm shrink-0">
+            <i class="fa-solid fa-credit-card text-lg"></i>
+          </div>
+          <div>
+            <h2 id="kycSifaloPayTitle" class="text-lg font-extrabold tracking-tight text-[#0d2658]">Unlock Document Download</h2>
+            <p id="kycSifaloDocPriceLabel" class="text-xs font-bold text-emerald-700 mt-0.5">Passport — $0.99 USD</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeSifaloPayModal(true)" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer shrink-0" aria-label="Close payment modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50/45 p-4 space-y-3">
+          <div class="text-center space-y-1">
+            <p class="text-xs font-bold text-[#0d2658]">Instant High-Resolution PNG Export</p>
+            <p class="text-xs font-medium text-slate-600">Complete your secure Sifalo Pay payment to unlock Save PNG &amp; Download for this document.</p>
+          </div>
+          <button type="button" id="kycSifaloPayBtn" onclick="choosePaidCheckoutUnlock()" class="w-full min-h-[48px] px-5 py-3 rounded-xl bg-gradient-to-r from-[#16a34a] to-[#059669] hover:brightness-105 disabled:opacity-60 disabled:cursor-wait text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition cursor-pointer">
+            <i class="fa-solid fa-lock-open"></i>
+            <span id="kycSifaloPayBtnLabel">Pay $0.99 with Sifalo Pay</span>
+          </button>
+          <p class="text-[11px] font-semibold text-slate-600 text-center">Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL &amp; Premier Wallet</p>
+        </div>
+
+        <div id="kycSifaloPayError" role="alert" class="hidden rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-rose-700"></div>
+      </div>
     </div>
   </div>
 

@@ -2,6 +2,11 @@ import express, { type Request, type Response } from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+import { createApiApp } from './src/server/app.ts';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -9,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const PORT = Number(process.env.PORT) || 3000;
 
 async function startServer() {
-  const app = express();
+  const app = createApiApp();
 
   app.use((req, res, next) => {
     if (req.path === '/' || req.path.endsWith('.html')) {
