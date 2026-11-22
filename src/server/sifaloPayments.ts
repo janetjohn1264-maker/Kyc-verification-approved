@@ -176,12 +176,23 @@ const ORDER_EXPIRY_TTL_MS = 60 * 60 * 1000;
 const STALE_ORDER_PRUNE_MS = 24 * 60 * 60 * 1000;
 const MAX_PROCESSED_WEBHOOK_EVENTS = 5000;
 
-function normalizeSifaloOverrideUrl(rawUrl: string | undefined, isCheckoutHost = false): string {
+function normalizeSifaloOverrideUrl(
+  rawUrl: string | undefined,
+  environment: SifaloEnvironment,
+  isCheckoutHost = false
+): string {
   const trimmed = (rawUrl || '').trim();
   if (!trimmed) return '';
+  const isProd = environment === 'production';
+  if (isCheckoutHost) {
+    return trimmed.replace(
+      /https?:\/\/(?:pay|staging)\.sifalopay\.com/gi,
+      isProd ? 'https://pay.sifalo.com' : 'https://pay.sifalo.net'
+    );
+  }
   return trimmed.replace(
     /https?:\/\/staging\.sifalopay\.com/gi,
-    isCheckoutHost ? 'https://pay.sifalopay.com' : 'https://api.sifalopay.com'
+    isProd ? 'https://api.sifalopay.com' : 'https://spay-api.sifalo.net'
   );
 }
 
@@ -189,14 +200,23 @@ export function resolveSifaloEndpoints(
   environment: SifaloEnvironment,
   overrides: { gatewayUrl?: string; verifyUrl?: string; checkoutBaseUrl?: string } = {}
 ): SifaloEndpointConfig {
-  const gatewayOverride = normalizeSifaloOverrideUrl(overrides.gatewayUrl, false);
-  const verifyOverride = normalizeSifaloOverrideUrl(overrides.verifyUrl, false);
-  const checkoutOverride = normalizeSifaloOverrideUrl(overrides.checkoutBaseUrl, true);
+  const isProd = environment === 'production';
+  const gatewayOverride = normalizeSifaloOverrideUrl(overrides.gatewayUrl, environment, false);
+  const verifyOverride = normalizeSifaloOverrideUrl(overrides.verifyUrl, environment, false);
+  const checkoutOverride = normalizeSifaloOverrideUrl(overrides.checkoutBaseUrl, environment, true);
   return {
     environment,
-    gatewayUrl: gatewayOverride || 'https://api.sifalopay.com/gateway/',
-    verifyUrl: verifyOverride || 'https://api.sifalopay.com/gateway/verify.php',
-    hostedCheckoutBaseUrl: checkoutOverride || 'https://pay.sifalopay.com/checkout/',
+    gatewayUrl:
+      gatewayOverride ||
+      (isProd ? 'https://api.sifalopay.com/gateway/' : 'https://spay-api.sifalo.net/gateway/'),
+    verifyUrl:
+      verifyOverride ||
+      (isProd
+        ? 'https://api.sifalopay.com/gateway/verify.php'
+        : 'https://spay-api.sifalo.net/gateway/verify.php'),
+    hostedCheckoutBaseUrl:
+      checkoutOverride ||
+      (isProd ? 'https://pay.sifalo.com/checkout/' : 'https://pay.sifalo.net/checkout/'),
   };
 }
 
@@ -728,16 +748,19 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     sifaloData: Record<string, unknown>,
     endpoints: SifaloEndpointConfig
   ): string | null {
-    const directUrl = [sifaloData.checkout_url, sifaloData.payment_url, sifaloData.url]
-      .find((u) => typeof u === 'string' && /^https?:\/\//i.test(u)) as string | undefined;
-    if (directUrl) return directUrl;
-
     const key = typeof sifaloData.key === 'string' ? sifaloData.key.trim() : '';
     const token = typeof sifaloData.token === 'string' ? sifaloData.token.trim() : '';
     if (key && token) {
       const base = endpoints.hostedCheckoutBaseUrl.replace(/\/+$/, '');
       return `${base}/?key=${encodeURIComponent(key)}&token=${encodeURIComponent(token)}`;
     }
+
+    const directUrl = [sifaloData.checkout_url, sifaloData.payment_url, sifaloData.url]
+      .find((u) => typeof u === 'string' && /^https?:\/\//i.test(u)) as string | undefined;
+    if (directUrl) {
+      return normalizeSifaloOverrideUrl(directUrl, endpoints.environment, true);
+    }
+
     return null;
   }
 
