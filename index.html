@@ -1338,7 +1338,15 @@
           );
         } catch (storageErr) {}
 
-        window.location.href = data.checkoutUrl;
+        let finalCheckoutUrl = String(data.checkoutUrl);
+        try {
+          const parsedCheckout = new URL(finalCheckoutUrl);
+          parsedCheckout.protocol = 'https:';
+          parsedCheckout.hostname = data.environment === 'staging' ? 'pay.sifalo.net' : 'pay.sifalo.com';
+          finalCheckoutUrl = parsedCheckout.toString();
+        } catch (urlErr) {}
+
+        window.location.href = finalCheckoutUrl;
       } catch (err) {
         console.error('Sifalo Pay checkout initialization failed:', err);
         if (errorBox) {

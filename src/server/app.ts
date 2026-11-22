@@ -58,6 +58,8 @@ export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
         SIFALO_ENV: diagnostics.SIFALO_ENV,
         APP_BASE_URL_PRESENT: diagnostics.APP_BASE_URL_PRESENT,
         VERCEL_ENV: diagnostics.VERCEL_ENV,
+        checkoutHostname: diagnostics.checkoutHostname,
+        gatewayHostname: diagnostics.gatewayHostname,
       },
       service: 'kycapproved-api',
       timestamp: new Date().toISOString(),

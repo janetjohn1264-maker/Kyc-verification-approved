@@ -176,48 +176,27 @@ const ORDER_EXPIRY_TTL_MS = 60 * 60 * 1000;
 const STALE_ORDER_PRUNE_MS = 24 * 60 * 60 * 1000;
 const MAX_PROCESSED_WEBHOOK_EVENTS = 5000;
 
-function normalizeSifaloOverrideUrl(
-  rawUrl: string | undefined,
-  environment: SifaloEnvironment,
-  isCheckoutHost = false
-): string {
-  const trimmed = (rawUrl || '').trim();
-  if (!trimmed) return '';
-  const isProd = environment === 'production';
-  if (isCheckoutHost) {
-    return trimmed.replace(
-      /https?:\/\/(?:pay|staging)\.sifalopay\.com/gi,
-      isProd ? 'https://pay.sifalo.com' : 'https://pay.sifalo.net'
-    );
-  }
-  return trimmed.replace(
-    /https?:\/\/staging\.sifalopay\.com/gi,
-    isProd ? 'https://api.sifalopay.com' : 'https://spay-api.sifalo.net'
-  );
-}
+export const OFFICIAL_SIFALO_ENDPOINTS: Record<SifaloEnvironment, SifaloEndpointConfig> = {
+  production: {
+    environment: 'production',
+    gatewayUrl: 'https://api.sifalopay.com/gateway/',
+    verifyUrl: 'https://api.sifalopay.com/gateway/verify.php',
+    hostedCheckoutBaseUrl: 'https://pay.sifalo.com/checkout/',
+  },
+  staging: {
+    environment: 'staging',
+    gatewayUrl: 'https://spay-api.sifalo.net/gateway/',
+    verifyUrl: 'https://spay-api.sifalo.net/gateway/verify.php',
+    hostedCheckoutBaseUrl: 'https://pay.sifalo.net/checkout/',
+  },
+};
 
 export function resolveSifaloEndpoints(
   environment: SifaloEnvironment,
-  overrides: { gatewayUrl?: string; verifyUrl?: string; checkoutBaseUrl?: string } = {}
+  _overrides: { gatewayUrl?: string; verifyUrl?: string; checkoutBaseUrl?: string } = {}
 ): SifaloEndpointConfig {
-  const isProd = environment === 'production';
-  const gatewayOverride = normalizeSifaloOverrideUrl(overrides.gatewayUrl, environment, false);
-  const verifyOverride = normalizeSifaloOverrideUrl(overrides.verifyUrl, environment, false);
-  const checkoutOverride = normalizeSifaloOverrideUrl(overrides.checkoutBaseUrl, environment, true);
-  return {
-    environment,
-    gatewayUrl:
-      gatewayOverride ||
-      (isProd ? 'https://api.sifalopay.com/gateway/' : 'https://spay-api.sifalo.net/gateway/'),
-    verifyUrl:
-      verifyOverride ||
-      (isProd
-        ? 'https://api.sifalopay.com/gateway/verify.php'
-        : 'https://spay-api.sifalo.net/gateway/verify.php'),
-    hostedCheckoutBaseUrl:
-      checkoutOverride ||
-      (isProd ? 'https://pay.sifalo.com/checkout/' : 'https://pay.sifalo.net/checkout/'),
-  };
+  const envKey: SifaloEnvironment = environment === 'staging' ? 'staging' : 'production';
+  return { ...OFFICIAL_SIFALO_ENDPOINTS[envKey] };
 }
 
 function sanitizeShortSlug(val: unknown, fallback = 'default'): string {
@@ -748,17 +727,26 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     sifaloData: Record<string, unknown>,
     endpoints: SifaloEndpointConfig
   ): string | null {
-    const key = typeof sifaloData.key === 'string' ? sifaloData.key.trim() : '';
-    const token = typeof sifaloData.token === 'string' ? sifaloData.token.trim() : '';
-    if (key && token) {
-      const base = endpoints.hostedCheckoutBaseUrl.replace(/\/+$/, '');
-      return `${base}/?key=${encodeURIComponent(key)}&token=${encodeURIComponent(token)}`;
+    const officialBase = endpoints.hostedCheckoutBaseUrl.replace(/\/+$/, '');
+    let key = typeof sifaloData.key === 'string' ? sifaloData.key.trim() : '';
+    let token = typeof sifaloData.token === 'string' ? sifaloData.token.trim() : '';
+
+    if (!key || !token) {
+      const directUrl = [sifaloData.checkout_url, sifaloData.payment_url, sifaloData.url]
+        .find((u) => typeof u === 'string' && /^https?:\/\//i.test(u)) as string | undefined;
+      if (directUrl) {
+        try {
+          const parsedDirect = new URL(directUrl);
+          key = key || (parsedDirect.searchParams.get('key') || '').trim();
+          token = token || (parsedDirect.searchParams.get('token') || '').trim();
+        } catch {
+          return null;
+        }
+      }
     }
 
-    const directUrl = [sifaloData.checkout_url, sifaloData.payment_url, sifaloData.url]
-      .find((u) => typeof u === 'string' && /^https?:\/\//i.test(u)) as string | undefined;
-    if (directUrl) {
-      return normalizeSifaloOverrideUrl(directUrl, endpoints.environment, true);
+    if (key && token) {
+      return `${officialBase}/?key=${encodeURIComponent(key)}&token=${encodeURIComponent(token)}`;
     }
 
     return null;
@@ -1220,6 +1208,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     const apiKeyPresent = Boolean(getApiKey());
     const webhookSecretPresent = Boolean(getWebhookSecret());
     const appBaseUrlPresent = Boolean(getAppBaseUrl());
+    const environment = getEnvironment();
+    const endpoints = resolveSifaloEndpoints(environment);
+    const checkoutHostname = new URL(endpoints.hostedCheckoutBaseUrl).hostname;
+    const gatewayHostname = new URL(endpoints.gatewayUrl).hostname;
     const liveEnv = getLiveProcessEnv();
     const detectedSifaloEnvKeys = Object.keys(liveEnv)
       .filter((k) => /SIFALO|APP_BASE/i.test(k))
@@ -1230,10 +1222,14 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       SIFALO_API_USER_PRESENT: apiUserPresent,
       SIFALO_API_KEY_PRESENT: apiKeyPresent,
       SIFALO_WEBHOOK_SECRET_PRESENT: webhookSecretPresent,
-      SIFALO_ENV: getEnvironment(),
+      SIFALO_ENV: environment,
       APP_BASE_URL_PRESENT: appBaseUrlPresent,
       VERCEL: Boolean(liveEnv.VERCEL),
       VERCEL_ENV: liveEnv.VERCEL_ENV || null,
+      checkoutHostname,
+      gatewayHostname,
+      hostedCheckoutBaseUrl: endpoints.hostedCheckoutBaseUrl,
+      gatewayUrl: endpoints.gatewayUrl,
       detectedSifaloEnvKeys,
     };
   }
@@ -1254,9 +1250,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           SIFALO_ENV: diagnostics.SIFALO_ENV,
           APP_BASE_URL_PRESENT: diagnostics.APP_BASE_URL_PRESENT,
           VERCEL_ENV: diagnostics.VERCEL_ENV,
+          checkoutHostname: diagnostics.checkoutHostname,
+          gatewayHostname: diagnostics.gatewayHostname,
         },
         provider: 'sifalo',
         environment,
+        checkoutHostname: diagnostics.checkoutHostname,
+        gatewayHostname: diagnostics.gatewayHostname,
         supportedMethods: [
           'Visa',
           'Mastercard',
@@ -1421,14 +1421,17 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         const orderStateToken = signOrderStateToken(order);
 
+        const checkoutHostname = new URL(checkoutUrl).hostname;
+
         console.info(
-          `[Sifalo] Checkout created: orderId=${orderId} product=${productKey} amount=$${priceSpec.amountUsdString} env=${environment}`
+          `[Sifalo] Checkout created: orderId=${orderId} product=${productKey} amount=$${priceSpec.amountUsdString} env=${environment} checkoutHost=${checkoutHostname}`
         );
 
         return res.status(200).json({
           orderId: order.orderId,
           orderStateToken,
           checkoutUrl,
+          checkoutHostname,
           environment,
           productKey: order.productKey,
           amount: priceSpec.amountUsdString,
