@@ -35,7 +35,15 @@ export interface ProductPriceSpec {
   amountUsdString: string;
   formattedPrice: string;
   currency: 'USD';
+  sifaloHostedMethods: Array<'card' | 'mobile_money'>;
+  sifaloCardSupported: boolean;
+  sifaloMethodRuleNote: string;
 }
+
+// Sifalo Pay's hosted checkout script (https://pay.sifalo.com/checkout/js/checkout.js -> checkTabs)
+// enforces: `if (currency == "USD" && convertToCents(amountToPay) > 51)` to enable Card (Stripe/MPGS).
+// For USD amounts <= $0.51 (51 cents), Sifalo hides Card/MPGS tabs and displays Mobile Money only.
+export const SIFALO_CARD_MIN_AMOUNT_CENTS = 52;
 
 // Authoritative server-side pricing table. Never trust prices sent by the browser.
 export const AUTHORITATIVE_PRODUCT_PRICING: Record<UnlockProductKey, ProductPriceSpec> = {
@@ -46,38 +54,58 @@ export const AUTHORITATIVE_PRODUCT_PRICING: Record<UnlockProductKey, ProductPric
     amountUsdString: '0.99',
     formattedPrice: '$0.99',
     currency: 'USD',
+    sifaloHostedMethods: ['card', 'mobile_money'],
+    sifaloCardSupported: true,
+    sifaloMethodRuleNote:
+      'Amount is $0.99 (99 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
   },
   nationalIdentity: {
     productKey: 'nationalIdentity',
     label: 'National Identity Card',
-    amountCents: 49,
-    amountUsdString: '0.49',
-    formattedPrice: '$0.49',
+    amountCents: 52,
+    amountUsdString: '0.52',
+    formattedPrice: '$0.52',
     currency: 'USD',
+    sifaloHostedMethods: ['card', 'mobile_money'],
+    sifaloCardSupported: true,
+    sifaloMethodRuleNote:
+      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
   },
   driverLicense: {
     productKey: 'driverLicense',
     label: 'Driver License',
-    amountCents: 49,
-    amountUsdString: '0.49',
-    formattedPrice: '$0.49',
+    amountCents: 52,
+    amountUsdString: '0.52',
+    formattedPrice: '$0.52',
     currency: 'USD',
+    sifaloHostedMethods: ['card', 'mobile_money'],
+    sifaloCardSupported: true,
+    sifaloMethodRuleNote:
+      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
   },
   proofOfAddress: {
     productKey: 'proofOfAddress',
     label: 'Proof of Address',
-    amountCents: 49,
-    amountUsdString: '0.49',
-    formattedPrice: '$0.49',
+    amountCents: 52,
+    amountUsdString: '0.52',
+    formattedPrice: '$0.52',
     currency: 'USD',
+    sifaloHostedMethods: ['card', 'mobile_money'],
+    sifaloCardSupported: true,
+    sifaloMethodRuleNote:
+      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
   },
   proofOfAccount: {
     productKey: 'proofOfAccount',
     label: 'Proof of Account',
-    amountCents: 49,
-    amountUsdString: '0.49',
-    formattedPrice: '$0.49',
+    amountCents: 52,
+    amountUsdString: '0.52',
+    formattedPrice: '$0.52',
     currency: 'USD',
+    sifaloHostedMethods: ['card', 'mobile_money'],
+    sifaloCardSupported: true,
+    sifaloMethodRuleNote:
+      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
   },
 };
 
@@ -112,6 +140,7 @@ export interface SifaloOrderRecord {
   productKey: UnlockProductKey;
   countryKey: string;
   providerKey: string;
+  sessionId?: string | null;
   amountCents: number;
   amountUsdString: string;
   currency: 'USD';
@@ -156,6 +185,7 @@ interface SignedOrderPayload {
   productKey: UnlockProductKey;
   countryKey: string;
   providerKey: string;
+  sessionId?: string | null;
   amountCents: number;
   amountUsdString: string;
   currency: 'USD';
@@ -168,6 +198,10 @@ interface UnlockTokenPayload {
   tid: string;
   orderId: string;
   productKey: UnlockProductKey;
+  sessionId?: string | null;
+  amountCents?: number;
+  currency?: 'USD';
+  sid?: string | null;
   exp: number;
 }
 
@@ -553,12 +587,32 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       .digest('hex');
   }
 
+  function sanitizeSessionId(rawVal: unknown): string | null {
+    if (typeof rawVal !== 'string') return null;
+    const cleaned = rawVal.trim().replace(/[^a-zA-Z0-9._-]/g, '').slice(0, 96);
+    return cleaned || null;
+  }
+
+  function extractRequestSessionId(
+    req: Request,
+    body?: Record<string, unknown> | null
+  ): string | null {
+    const fromBody = body ? sanitizeSessionId(body.sessionId) : null;
+    if (fromBody) return fromBody;
+    const fromHeader = sanitizeSessionId(req.headers['x-kyc-session-id']);
+    if (fromHeader) return fromHeader;
+    const fromQuery = sanitizeSessionId(req.query.sessionId);
+    if (fromQuery) return fromQuery;
+    return null;
+  }
+
   function signOrderStateToken(order: SifaloOrderRecord): string {
     const payload: SignedOrderPayload = {
       orderId: order.orderId,
       productKey: order.productKey,
       countryKey: order.countryKey,
       providerKey: order.providerKey,
+      sessionId: order.sessionId || null,
       amountCents: order.amountCents,
       amountUsdString: order.amountUsdString,
       currency: order.currency,
@@ -576,7 +630,9 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
   function recoverOrderFromStateToken(token: string, expectedOrderId?: string): SifaloOrderRecord | null {
     if (!token || typeof token !== 'string') return null;
-    const parts = token.split('.');
+    // Strip any ?sid=... or &sid=... that Sifalo's redirect may have concatenated onto the end of order_state
+    const cleanToken = token.split(/[?&]/)[0].trim();
+    const parts = cleanToken.split('.');
     if (parts.length !== 2) return null;
     const [encoded, providedSig] = parts;
     const expectedSig = crypto
@@ -597,7 +653,8 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       ) {
         return null;
       }
-      if (expectedOrderId && parsed.orderId !== expectedOrderId) {
+      const cleanExpectedOrderId = expectedOrderId ? expectedOrderId.split(/[?&]/)[0].trim() : '';
+      if (cleanExpectedOrderId && parsed.orderId !== cleanExpectedOrderId) {
         return null;
       }
       const existing = orders.get(parsed.orderId);
@@ -605,6 +662,9 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         if (!existing.providerSid && parsed.providerSid) {
           existing.providerSid = parsed.providerSid;
           sidToOrderId.set(parsed.providerSid, existing.orderId);
+        }
+        if (!existing.sessionId && parsed.sessionId) {
+          existing.sessionId = sanitizeSessionId(parsed.sessionId);
         }
         return existing;
       }
@@ -614,6 +674,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         productKey: parsed.productKey,
         countryKey: sanitizeShortSlug(parsed.countryKey, 'global'),
         providerKey: sanitizeShortSlug(parsed.providerKey, 'virtual-account'),
+        sessionId: sanitizeSessionId(parsed.sessionId),
         amountCents: priceSpec.amountCents,
         amountUsdString: priceSpec.amountUsdString,
         currency: 'USD',
@@ -715,6 +776,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       tid: order.unlockTokenId,
       orderId: order.orderId,
       productKey: order.productKey,
+      sessionId: order.sessionId || null,
+      amountCents: order.amountCents,
+      currency: order.currency,
+      sid: order.providerSid || order.transactionRef || null,
       exp: order.unlockTokenExpiresAt,
     });
     return {
@@ -798,21 +863,47 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       checkoutBaseUrl: getCustomCheckoutBaseUrl(),
     });
 
-    const sidToVerify = (overrideSid || order.providerSid || '').trim();
+    const sidToVerify = (overrideSid || order.providerSid || '').split(/[?&]/)[0].trim();
     const verifyBody: Record<string, string> = sidToVerify
       ? { sid: sidToVerify, order_id: order.orderId }
       : { order_id: order.orderId };
 
-    let res: globalThis.Response;
-    try {
-      res = await fetchImpl(endpoints.verifyUrl, {
+    const callVerifyEndpoint = async (payload: Record<string, string>) => {
+      const response = await fetchImpl(endpoints.verifyUrl, {
         method: 'POST',
         headers: {
           Authorization: buildBasicAuthHeader(apiUser, apiKey),
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(verifyBody),
+        body: JSON.stringify(payload),
       });
+      const json = (await response.json().catch(() => null)) as Record<string, unknown> | null;
+      return { response, json };
+    };
+
+    let res: globalThis.Response;
+    let data: Record<string, unknown> | null = null;
+    try {
+      const firstAttempt = await callVerifyEndpoint(verifyBody);
+      res = firstAttempt.response;
+      data = firstAttempt.json;
+
+      // Hosted checkout (`gateway: "checkout"`) transactions in Sifalo's verify.php can return
+      // "order_id not found" when both sid and order_id are passed; fallback to querying by sid alone.
+      if (
+        sidToVerify &&
+        res.ok &&
+        data &&
+        !isSifaloSuccessPayload(data) &&
+        typeof data.response === 'string' &&
+        data.response.toLowerCase().includes('order_id not found')
+      ) {
+        const secondAttempt = await callVerifyEndpoint({ sid: sidToVerify });
+        if (secondAttempt.response.ok && secondAttempt.json) {
+          res = secondAttempt.response;
+          data = secondAttempt.json;
+        }
+      }
     } catch {
       return {
         ok: false,
@@ -822,13 +913,30 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       };
     }
 
-    const data = (await res.json().catch(() => null)) as Record<string, unknown> | null;
     if (!res.ok || !data) {
       return {
         ok: false,
         status: order.status,
         isPending: order.status === 'PENDING',
         error: 'Invalid verification response from Sifalo Pay.',
+      };
+    }
+
+    const rawProviderResponseText =
+      typeof data.response === 'string' ? data.response.trim().toLowerCase() : '';
+    const isUnpaidCheckoutNotYetRecorded =
+      !isSifaloSuccessPayload(data) &&
+      !sidToVerify &&
+      rawProviderResponseText.includes('order_id not found');
+
+    if (isUnpaidCheckoutNotYetRecorded) {
+      return {
+        ok: false,
+        status: order.status,
+        isPending: order.status === 'PENDING',
+        error:
+          'Payment has not been completed or confirmed by Sifalo Pay. Save PNG & Download remain locked.',
+        data,
       };
     }
 
@@ -847,8 +955,8 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         isPending: nonSuccess === 'PENDING',
         error:
           nonSuccess === 'PENDING'
-            ? 'Payment is still awaiting confirmation from Sifalo Pay.'
-            : `Payment ${nonSuccess.toLowerCase()}.`,
+            ? 'Payment is still awaiting confirmation from Sifalo Pay. Save PNG & Download remain locked.'
+            : `Payment ${nonSuccess.toLowerCase()}. Save PNG & Download remain locked.`,
         data,
       };
     }
@@ -885,15 +993,16 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       }
     }
 
+    // Require explicit USD currency in verified Sifalo payload
     const returnedCurrency =
       typeof data.currency === 'string' && data.currency.trim()
         ? data.currency.trim().toUpperCase()
-        : order.currency;
+        : '';
     if (returnedCurrency !== order.currency) {
       return {
         ok: false,
         status: order.status,
-        error: 'Verified Sifalo payment currency mismatch.',
+        error: 'Verified Sifalo payment currency mismatch (USD required).',
       };
     }
 
@@ -913,7 +1022,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         ? data.transaction_id.trim()
         : sidToVerify;
 
-    if (order.providerSid && verifiedSid && order.providerSid !== verifiedSid) {
+    if (!verifiedSid) {
+      return {
+        ok: false,
+        status: order.status,
+        error: 'Verified Sifalo payment response is missing a valid transaction SID.',
+      };
+    }
+
+    if (order.providerSid && order.providerSid !== verifiedSid) {
       return {
         ok: false,
         status: order.status,
@@ -921,20 +1038,18 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       };
     }
 
-    if (verifiedSid) {
-      const existingOwner = consumedTransactions.get(verifiedSid);
-      if (existingOwner && existingOwner !== order.orderId) {
-        return {
-          ok: false,
-          status: order.status,
-          error: 'This Sifalo checkout session belongs to another order.',
-        };
-      }
-      consumedTransactions.set(verifiedSid, order.orderId);
-      sidToOrderId.set(verifiedSid, order.orderId);
-      order.providerSid = verifiedSid;
-      order.transactionRef = verifiedSid;
+    const existingOwner = consumedTransactions.get(verifiedSid);
+    if (existingOwner && existingOwner !== order.orderId) {
+      return {
+        ok: false,
+        status: order.status,
+        error: 'This Sifalo checkout transaction has already been used for another order.',
+      };
     }
+    consumedTransactions.set(verifiedSid, order.orderId);
+    sidToOrderId.set(verifiedSid, order.orderId);
+    order.providerSid = verifiedSid;
+    order.transactionRef = verifiedSid;
 
     // Bind & atomically transition PENDING -> PAID
     if (order.status !== 'PAID') {
@@ -947,7 +1062,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       orders.set(order.orderId, order);
       persistState();
       console.info(
-        `[Sifalo] Order verified PAID: orderId=${order.orderId} product=${order.productKey} amount=$${order.amountUsdString}`
+        `[Sifalo] Order verified PAID: orderId=${order.orderId} sid=${verifiedSid} product=${order.productKey} amount=$${order.amountUsdString}`
       );
     }
 
@@ -1325,6 +1440,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         const countryKey = sanitizeShortSlug(body.countryKey, 'global');
         const providerKey = sanitizeShortSlug(body.providerKey, 'virtual-account');
+        const sessionId = extractRequestSessionId(req, body);
         const orderId = `KYC-${crypto.randomUUID()}`;
         const webhookAuthToken = computeOrderWebhookToken(orderId);
 
@@ -1333,6 +1449,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           productKey,
           countryKey,
           providerKey,
+          sessionId,
           amountCents: priceSpec.amountCents,
           amountUsdString: priceSpec.amountUsdString,
           currency: priceSpec.currency,
@@ -1424,7 +1541,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         const checkoutHostname = new URL(checkoutUrl).hostname;
 
         console.info(
-          `[Sifalo] Checkout created: orderId=${orderId} product=${productKey} amount=$${priceSpec.amountUsdString} env=${environment} checkoutHost=${checkoutHostname}`
+          `[Sifalo] Checkout created: orderId=${orderId} product=${productKey} amount=$${priceSpec.amountUsdString} env=${environment} checkoutHost=${checkoutHostname} methods=${priceSpec.sifaloHostedMethods.join('+')}`
         );
 
         return res.status(200).json({
@@ -1434,9 +1551,21 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           checkoutHostname,
           environment,
           productKey: order.productKey,
+          label: priceSpec.label,
           amount: priceSpec.amountUsdString,
           amountCents: order.amountCents,
+          currency: order.currency,
           formattedPrice: priceSpec.formattedPrice,
+          sifaloHostedMethods: priceSpec.sifaloHostedMethods,
+          sifaloCardSupported: priceSpec.sifaloCardSupported,
+          sifaloMethodRuleNote: priceSpec.sifaloMethodRuleNote,
+          checkoutRequestSpec: {
+            order_id: sifaloRequestPayload.order_id,
+            amount: sifaloRequestPayload.amount,
+            currency: sifaloRequestPayload.currency,
+            gateway: sifaloRequestPayload.gateway,
+            channel: sifaloRequestPayload.channel,
+          },
         });
       } catch (err) {
         console.error('[Sifalo] Create checkout unexpected error:', err instanceof Error ? err.message : err);
@@ -1450,10 +1579,16 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       try {
         loadPersistedState();
         const body = req.body && typeof req.body === 'object' ? (req.body as Record<string, unknown>) : {};
-        const orderId = typeof body.orderId === 'string' ? body.orderId.trim() : '';
-        const sid = typeof body.sid === 'string' ? body.sid.trim() : '';
-        const orderStateToken =
-          typeof body.orderStateToken === 'string' ? body.orderStateToken.trim() : '';
+        const orderId = (typeof body.orderId === 'string' ? body.orderId : '').split(/[?&]/)[0].trim();
+        const sid = (typeof body.sid === 'string' ? body.sid : '').split(/[?&]/)[0].trim();
+        const orderStateToken = (typeof body.orderStateToken === 'string' ? body.orderStateToken : '')
+          .split(/[?&]/)[0]
+          .trim();
+        const requestSessionId = extractRequestSessionId(req, body);
+        const returnStatus =
+          typeof body.returnStatus === 'string' ? body.returnStatus.trim().toLowerCase() : '';
+        const returnMessage =
+          typeof body.returnMessage === 'string' ? body.returnMessage.trim().slice(0, 240) : '';
 
         if (!orderId) {
           return res.status(400).json({ verified: false, error: 'Missing orderId.' });
@@ -1462,6 +1597,21 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         const order = orders.get(orderId) || recoverOrderFromStateToken(orderStateToken, orderId);
         if (!order) {
           return res.status(404).json({ verified: false, error: 'Payment order not found.' });
+        }
+
+        const priceSpec = AUTHORITATIVE_PRODUCT_PRICING[order.productKey];
+
+        // Enforce user/session binding when order was created with a session ID
+        if (order.sessionId && order.sessionId !== requestSessionId) {
+          return res.status(403).json({
+            verified: false,
+            status: order.status,
+            orderId: order.orderId,
+            productKey: order.productKey,
+            label: priceSpec.label,
+            formattedPrice: priceSpec.formattedPrice,
+            error: 'Payment order belongs to a different user session.',
+          });
         }
 
         // Handle explicit expiration for pending orders older than 1 hour
@@ -1483,21 +1633,62 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             status: order.status,
             productKey: order.productKey,
             orderId: order.orderId,
-            error: `Payment ${order.status.toLowerCase()}. Please start a new payment.`,
+            label: priceSpec.label,
+            formattedPrice: priceSpec.formattedPrice,
+            error: `Payment ${order.status.toLowerCase()}. Save PNG & Download remain locked. Please start a new payment.`,
           });
         }
 
-        // If webhook did not mark it PAID yet, confirm server-to-server with Sifalo Verify API
+        // Always confirm server-to-server with Sifalo Verify API if not already verified PAID
         if (order.status === 'PENDING') {
           const check = await verifyTransactionWithSifaloApi(order, sid || undefined);
           if (!check.ok) {
-            const httpCode = check.isPending ? 202 : 402;
+            let effectiveStatus: OrderStatus = check.status;
+            let effectiveError =
+              check.error || 'Payment not confirmed by Sifalo Pay yet. Save PNG & Download remain locked.';
+
+            if (effectiveStatus === 'PENDING') {
+              if (returnStatus === 'cancelled' || returnStatus === 'canceled') {
+                effectiveStatus = 'CANCELLED';
+                order.status = 'CANCELLED';
+                orders.set(order.orderId, order);
+                persistState();
+                effectiveError =
+                  'Payment was cancelled before confirmation. Save PNG & Download remain locked.';
+              } else if (returnStatus === 'failed' || returnStatus === 'error') {
+                effectiveStatus = 'FAILED';
+                order.status = 'FAILED';
+                orders.set(order.orderId, order);
+                persistState();
+                effectiveError = returnMessage
+                  ? `Payment failed (${returnMessage}). Save PNG & Download remain locked.`
+                  : 'Payment failed on Sifalo checkout. Save PNG & Download remain locked.';
+              }
+            }
+
+            const httpCode = check.isPending && effectiveStatus === 'PENDING' ? 202 : 402;
             return res.status(httpCode).json({
               verified: false,
-              status: check.status,
-              error: check.error || 'Payment not confirmed yet.',
+              status: effectiveStatus,
+              orderId: order.orderId,
+              productKey: order.productKey,
+              label: priceSpec.label,
+              formattedPrice: priceSpec.formattedPrice,
+              error: effectiveError,
             });
           }
+        }
+
+        if (order.status !== 'PAID' || !order.providerSid) {
+          return res.status(402).json({
+            verified: false,
+            status: order.status,
+            orderId: order.orderId,
+            productKey: order.productKey,
+            label: priceSpec.label,
+            formattedPrice: priceSpec.formattedPrice,
+            error: 'Payment has not been verified with a valid Sifalo transaction ID.',
+          });
         }
 
         const grant = issueOrderUnlockGrant(order);
@@ -1505,19 +1696,24 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           return res.status(403).json({
             verified: false,
             status: 'EXPIRED',
+            orderId: order.orderId,
+            productKey: order.productKey,
+            label: priceSpec.label,
+            formattedPrice: priceSpec.formattedPrice,
             error: 'Paid session has expired. Please start a new payment.',
           });
         }
 
-        const priceSpec = AUTHORITATIVE_PRODUCT_PRICING[order.productKey];
         return res.status(200).json({
           verified: true,
           status: 'PAID',
           orderId: order.orderId,
+          sid: order.providerSid,
           productKey: order.productKey,
           label: priceSpec.label,
           amount: priceSpec.amountUsdString,
           amountCents: order.amountCents,
+          currency: order.currency,
           formattedPrice: priceSpec.formattedPrice,
           unlockToken: grant.unlockToken,
           expiresAt: grant.expiresAt,
@@ -1530,14 +1726,23 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
     router.get('/order-status', (req: Request, res: Response) => {
       loadPersistedState();
-      const orderId = typeof req.query.orderId === 'string' ? req.query.orderId.trim() : '';
-      const orderStateToken =
-        typeof req.query.orderStateToken === 'string' ? req.query.orderStateToken.trim() : '';
+      const orderId = (typeof req.query.orderId === 'string' ? req.query.orderId : '')
+        .split(/[?&]/)[0]
+        .trim();
+      const orderStateToken = (
+        typeof req.query.orderStateToken === 'string' ? req.query.orderStateToken : ''
+      )
+        .split(/[?&]/)[0]
+        .trim();
+      const requestSessionId = extractRequestSessionId(req, null);
       const order = orderId
         ? orders.get(orderId) || recoverOrderFromStateToken(orderStateToken, orderId)
         : null;
       if (!order) {
         return res.status(404).json({ error: 'Order not found.' });
+      }
+      if (order.sessionId && requestSessionId && order.sessionId !== requestSessionId) {
+        return res.status(403).json({ error: 'Order belongs to a different user session.' });
       }
       if (order.status === 'PENDING' && now() - order.createdAt > ORDER_EXPIRY_TTL_MS) {
         order.status = 'EXPIRED';
@@ -1551,7 +1756,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         productKey: order.productKey,
         label: priceSpec.label,
         formattedPrice: priceSpec.formattedPrice,
-        verified: order.status === 'PAID',
+        verified: order.status === 'PAID' && Boolean(order.providerSid),
       });
     });
 
@@ -1562,6 +1767,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       const requestedProductKey = normalizeDocTypeToProductKey(
         body.docType ?? body.productKey ?? body.productCategory
       );
+      const requestSessionId = extractRequestSessionId(req, body);
 
       if (!unlockToken || !requestedProductKey) {
         return res.status(400).json({ authorized: false, error: 'Missing payment token or document type.' });
@@ -1579,22 +1785,57 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         });
       }
 
+      if (payload.sessionId && payload.sessionId !== requestSessionId) {
+        return res.status(403).json({
+          authorized: false,
+          error: 'Payment authorization belongs to a different user session.',
+        });
+      }
+
+      const expectedSpec = AUTHORITATIVE_PRODUCT_PRICING[requestedProductKey];
+      if (payload.amountCents !== undefined && payload.amountCents !== expectedSpec.amountCents) {
+        return res.status(403).json({
+          authorized: false,
+          error: 'Payment authorization amount does not match document requirement.',
+        });
+      }
+      if (payload.currency !== undefined && payload.currency !== 'USD') {
+        return res.status(403).json({
+          authorized: false,
+          error: 'Payment authorization currency mismatch.',
+        });
+      }
+
       const order = orders.get(payload.orderId);
-      if (order) {
-        if (
-          order.status !== 'PAID' ||
-          order.productKey !== payload.productKey ||
-          order.unlockTokenId !== payload.tid ||
-          !order.unlockTokenExpiresAt ||
-          order.unlockTokenExpiresAt <= now()
-        ) {
-          return res.status(403).json({ authorized: false, error: 'Paid order verification is no longer active.' });
-        }
+      if (!order) {
+        return res.status(403).json({
+          authorized: false,
+          error: 'Paid order record not found on server.',
+        });
+      }
+
+      if (
+        order.status !== 'PAID' ||
+        order.revokedAt ||
+        !order.providerSid ||
+        order.productKey !== payload.productKey ||
+        order.amountCents !== expectedSpec.amountCents ||
+        order.currency !== 'USD' ||
+        order.unlockTokenId !== payload.tid ||
+        !order.unlockTokenExpiresAt ||
+        order.unlockTokenExpiresAt <= now() ||
+        (order.sessionId && order.sessionId !== requestSessionId)
+      ) {
+        return res.status(403).json({
+          authorized: false,
+          error: 'Paid order verification is no longer active.',
+        });
       }
 
       return res.json({
         authorized: true,
         orderId: payload.orderId,
+        sid: order.providerSid,
         productKey: payload.productKey,
         expiresAt: payload.exp,
       });

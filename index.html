@@ -1147,14 +1147,61 @@
     let _isSifaloExecutingCallback = false;
     let _pendingSifaloCallback = null;
     window.__kycPaidUnlockGrants = window.__kycPaidUnlockGrants || {};
+    window.__kycLastUnconfirmedOrder = null;
 
     const KYC_SIFALO_DOC_CATALOG = {
-      passport: { productKey: 'passport', label: 'Passport', price: '$0.99' },
-      idcard: { productKey: 'nationalIdentity', label: 'National Identity Card', price: '$0.49' },
-      driverlicense: { productKey: 'driverLicense', label: 'Driver License', price: '$0.49' },
-      refugeecard: { productKey: 'proofOfAddress', label: 'Proof of Address', price: '$0.49' },
-      proofofaccount: { productKey: 'proofOfAccount', label: 'Proof of Account', price: '$0.49' }
+      passport: {
+        productKey: 'passport',
+        label: 'Passport',
+        price: '$0.99',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
+      idcard: {
+        productKey: 'nationalIdentity',
+        label: 'National Identity Card',
+        price: '$0.52',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
+      driverlicense: {
+        productKey: 'driverLicense',
+        label: 'Driver License',
+        price: '$0.52',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
+      refugeecard: {
+        productKey: 'proofOfAddress',
+        label: 'Proof of Address',
+        price: '$0.52',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
+      proofofaccount: {
+        productKey: 'proofOfAccount',
+        label: 'Proof of Account',
+        price: '$0.52',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      }
     };
+
+    function getOrCreateSifaloSessionId() {
+      if (window.__kycSifaloSessionId) return window.__kycSifaloSessionId;
+      try {
+        const existing = sessionStorage.getItem('kyc_sifalo_session_id');
+        if (existing && /^[a-zA-Z0-9._-]{12,96}$/.test(existing)) {
+          window.__kycSifaloSessionId = existing;
+          return existing;
+        }
+      } catch (e) {}
+      const generated =
+        'kycsess_' +
+        (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID().replace(/[^a-zA-Z0-9_-]/g, '')
+          : Math.random().toString(36).slice(2) + Date.now().toString(36));
+      window.__kycSifaloSessionId = generated;
+      try {
+        sessionStorage.setItem('kyc_sifalo_session_id', generated);
+      } catch (e) {}
+      return generated;
+    }
 
     function loadStoredSifaloGrants() {
       try {
@@ -1173,7 +1220,32 @@
       } catch (e) {}
     }
 
+    function clearSifaloGrantForProduct(productKey) {
+      if (!productKey) return;
+      if (window.__kycPaidUnlockGrants && window.__kycPaidUnlockGrants[productKey]) {
+        delete window.__kycPaidUnlockGrants[productKey];
+      }
+      saveStoredSifaloGrants();
+    }
+
     loadStoredSifaloGrants();
+
+    function getDocSpecByProductKey(productKey) {
+      const entries = Object.entries(KYC_SIFALO_DOC_CATALOG);
+      for (let i = 0; i < entries.length; i++) {
+        const [rawType, spec] = entries[i];
+        if (spec.productKey === productKey) {
+          return {
+            rawType,
+            productKey: spec.productKey,
+            label: spec.label,
+            price: spec.price,
+            methodsText: spec.methodsText
+          };
+        }
+      }
+      return null;
+    }
 
     function getActiveUnlockDocSpec() {
       let rawType = typeof currentDocType === 'string' ? currentDocType.trim().toLowerCase() : '';
@@ -1196,7 +1268,8 @@
         rawType,
         productKey: spec.productKey,
         label: spec.label,
-        price: spec.price
+        price: spec.price,
+        methodsText: spec.methodsText
       };
     }
     window.getActiveUnlockDocSpec = getActiveUnlockDocSpec;
@@ -1226,7 +1299,7 @@
       }
     }
 
-    function openSifaloPayModal(docSpec) {
+    function openSifaloPayModal(docSpec, statusNotice) {
       const modal = document.getElementById('kycSifaloPayModal');
       const spec = docSpec || getActiveUnlockDocSpec();
       if (!modal) {
@@ -1237,18 +1310,40 @@
       const docBadge = document.getElementById('kycSifaloDocPriceLabel');
       const payBtnLabel = document.getElementById('kycSifaloPayBtnLabel');
       const payBtn = document.getElementById('kycSifaloPayBtn');
+      const methodsLabel = document.getElementById('kycSifaloSupportedMethodsLabel');
       const errorBox = document.getElementById('kycSifaloPayError');
+      const recheckBtn = document.getElementById('kycSifaloRecheckBtn');
 
       if (docBadge) docBadge.textContent = `${spec.label} — ${spec.price} USD`;
-      if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+      if (payBtnLabel) {
+        payBtnLabel.textContent = statusNotice
+          ? `Retry Payment (${spec.price}) with Sifalo Pay`
+          : `Pay ${spec.price} with Sifalo Pay`;
+      }
       if (payBtn) {
         payBtn.disabled = false;
         payBtn.dataset.productKey = spec.productKey;
         payBtn.dataset.rawDocType = spec.rawType;
       }
+      if (methodsLabel && spec.methodsText) {
+        methodsLabel.textContent = spec.methodsText;
+      }
       if (errorBox) {
-        errorBox.textContent = '';
-        errorBox.classList.add('hidden');
+        if (statusNotice && statusNotice.message) {
+          errorBox.textContent = statusNotice.message;
+          errorBox.classList.remove('hidden');
+        } else {
+          errorBox.textContent = '';
+          errorBox.classList.add('hidden');
+        }
+      }
+      if (recheckBtn) {
+        if (statusNotice && statusNotice.canRecheck && window.__kycLastUnconfirmedOrder) {
+          recheckBtn.classList.remove('hidden');
+          recheckBtn.disabled = false;
+        } else {
+          recheckBtn.classList.add('hidden');
+        }
       }
 
       modal.classList.remove('hidden');
@@ -1272,11 +1367,19 @@
       const payBtn = document.getElementById('kycSifaloPayBtn');
       const payBtnLabel = document.getElementById('kycSifaloPayBtnLabel');
       const errorBox = document.getElementById('kycSifaloPayError');
+      const recheckBtn = document.getElementById('kycSifaloRecheckBtn');
       const spec = getActiveUnlockDocSpec();
+      const sessionId = getOrCreateSifaloSessionId();
+
+      // Clear any previous grant for this product when starting a new checkout
+      clearSifaloGrantForProduct(spec.productKey);
 
       if (errorBox) {
         errorBox.textContent = '';
         errorBox.classList.add('hidden');
+      }
+      if (recheckBtn) {
+        recheckBtn.classList.add('hidden');
       }
       if (payBtn) payBtn.disabled = true;
       if (payBtnLabel) payBtnLabel.textContent = 'Connecting to Sifalo Pay...';
@@ -1284,9 +1387,13 @@
       try {
         const res = await fetch('/api/payments/sifalo/create-checkout', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Kyc-Session-Id': sessionId
+          },
           body: JSON.stringify({
             docType: spec.productKey,
+            sessionId,
             countryKey: typeof currentCountry === 'string' ? currentCountry : '',
             providerKey:
               (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
@@ -1328,6 +1435,8 @@
             JSON.stringify({
               orderId: data.orderId,
               orderStateToken: data.orderStateToken || '',
+              sessionId,
+              productKey: spec.productKey,
               countryKey: typeof currentCountry === 'string' ? currentCountry : 'kenya',
               rawDocType: spec.rawType,
               providerKey:
@@ -1364,48 +1473,138 @@
       const grant = window.__kycPaidUnlockGrants && window.__kycPaidUnlockGrants[productKey];
       if (!grant || !grant.unlockToken) return false;
       if (grant.expiresAt && grant.expiresAt <= Date.now()) {
-        delete window.__kycPaidUnlockGrants[productKey];
-        saveStoredSifaloGrants();
+        clearSifaloGrantForProduct(productKey);
         return false;
       }
 
+      const sessionId = getOrCreateSifaloSessionId();
       try {
         const res = await fetch('/api/payments/sifalo/authorize-unlock', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Kyc-Session-Id': sessionId
+          },
           body: JSON.stringify({
             unlockToken: grant.unlockToken,
-            docType: productKey
+            docType: productKey,
+            sessionId
           })
         });
         if (!res.ok) {
-          delete window.__kycPaidUnlockGrants[productKey];
-          saveStoredSifaloGrants();
+          clearSifaloGrantForProduct(productKey);
           return false;
         }
         const data = await res.json().catch(() => null);
-        if (data && data.authorized === true) {
+        if (data && data.authorized === true && data.productKey === productKey) {
           return true;
         }
-        delete window.__kycPaidUnlockGrants[productKey];
-        saveStoredSifaloGrants();
+        clearSifaloGrantForProduct(productKey);
         return false;
       } catch (err) {
         return false;
       }
     }
 
+    function parseSifaloReturnSearch(rawSearch) {
+      const searchStr = typeof rawSearch === 'string' ? rawSearch.trim() : '';
+      if (!searchStr) return new URLSearchParams('');
+      const withoutLeadingQ = searchStr.startsWith('?') ? searchStr.slice(1) : searchStr;
+      // Sifalo's redirect may append `?sid=...` with a literal `?` to a return_url that already has query params
+      const normalizedQuery = withoutLeadingQ.replace(/\?/g, '&');
+      return new URLSearchParams(normalizedQuery);
+    }
+
+    async function recheckLastSifaloOrderStatus() {
+      const pending = window.__kycLastUnconfirmedOrder;
+      if (!pending || !pending.orderId) return;
+      const recheckBtn = document.getElementById('kycSifaloRecheckBtn');
+      const errorBox = document.getElementById('kycSifaloPayError');
+      const sessionId = getOrCreateSifaloSessionId();
+      if (recheckBtn) {
+        recheckBtn.disabled = true;
+        recheckBtn.textContent = 'Checking Sifalo Pay confirmation...';
+      }
+      try {
+        const verifyRes = await fetch('/api/payments/sifalo/verify-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Kyc-Session-Id': sessionId
+          },
+          body: JSON.stringify({
+            orderId: pending.orderId,
+            sid: pending.sid || '',
+            orderStateToken: pending.orderStateToken || '',
+            sessionId
+          })
+        });
+        const verifyData = await verifyRes.json().catch(() => null);
+        if (
+          verifyRes.ok &&
+          verifyData &&
+          verifyData.verified === true &&
+          verifyData.status === 'PAID' &&
+          verifyData.unlockToken &&
+          verifyData.productKey
+        ) {
+          window.__kycPaidUnlockGrants[verifyData.productKey] = {
+            unlockToken: verifyData.unlockToken,
+            orderId: verifyData.orderId,
+            sid: verifyData.sid || '',
+            sessionId,
+            expiresAt: verifyData.expiresAt
+          };
+          saveStoredSifaloGrants();
+          window.__kycLastUnconfirmedOrder = null;
+          closeSifaloPayModal(false);
+          if (typeof showToast === 'function') {
+            showToast(
+              'Payment Verified!',
+              `${verifyData.label || 'Document'} Save PNG & Download unlocked via Sifalo Pay.`
+            );
+          }
+          if (typeof _pendingSifaloCallback === 'function') {
+            const cb = _pendingSifaloCallback;
+            _pendingSifaloCallback = null;
+            await executePaidDownloadCallback(cb);
+          }
+          return;
+        }
+        clearSifaloGrantForProduct(pending.productKey);
+        if (errorBox) {
+          errorBox.textContent =
+            (verifyData && verifyData.error) ||
+            'Payment has still not been confirmed by Sifalo Pay. Save PNG & Download remain locked.';
+          errorBox.classList.remove('hidden');
+        }
+      } catch (e) {
+        if (errorBox) {
+          errorBox.textContent = 'Could not verify payment status right now. Save PNG & Download remain locked.';
+          errorBox.classList.remove('hidden');
+        }
+      } finally {
+        if (recheckBtn) {
+          recheckBtn.disabled = false;
+          recheckBtn.textContent = 'Re-check Payment Status';
+        }
+      }
+    }
+    window.recheckLastSifaloOrderStatus = recheckLastSifaloOrderStatus;
+
     async function handlePaymentReturnFromCheckout() {
       try {
-        const params = new URLSearchParams(window.location.search || '');
+        const params = parseSifaloReturnSearch(window.location.search || '');
         const checkoutState = params.get('sifalo_checkout');
-        const orderId = params.get('order_id') || '';
-        const sid = params.get('sid') || params.get('transaction_id') || '';
-        const urlOrderState = params.get('order_state') || '';
+        const orderId = (params.get('order_id') || '').split(/[?&]/)[0].trim();
+        const sid = (params.get('sid') || params.get('transaction_id') || '').split(/[?&]/)[0].trim();
+        const urlOrderState = (params.get('order_state') || '').split(/[?&]/)[0].trim();
+        const returnStatus = (params.get('status') || '').trim().toLowerCase();
+        const returnMessage = (params.get('message') || '').trim();
 
         if (!checkoutState) return;
 
-        // Clean URL immediately; never treat return_url or URL parameters as proof of payment
+        // Clean URL immediately; NEVER treat return_url or URL parameters as proof of payment
         if (window.history && typeof window.history.replaceState === 'function') {
           window.history.replaceState({}, document.title, window.location.pathname + (window.location.hash || ''));
         }
@@ -1417,7 +1616,12 @@
           sessionStorage.removeItem('kyc_pending_checkout_ui');
         } catch (e) {}
 
+        const sessionId = (uiContext && uiContext.sessionId) || getOrCreateSifaloSessionId();
         const orderStateToken = (uiContext && uiContext.orderStateToken) || urlOrderState || '';
+        if (uiContext && uiContext.productKey) {
+          // Ensure product starts strictly locked until server verification succeeds
+          clearSifaloGrantForProduct(uiContext.productKey);
+        }
 
         const restoreEditorContext = () => {
           if (uiContext && uiContext.countryKey && typeof window.openCountryDocumentEditor === 'function') {
@@ -1455,56 +1659,97 @@
 
           let verifyRes = null;
           let verifyData = null;
-          for (let attempt = 0; attempt < 3; attempt++) {
+          const maxAttempts = returnStatus === 'failed' || returnStatus === 'cancelled' ? 1 : 3;
+          for (let attempt = 0; attempt < maxAttempts; attempt++) {
             verifyRes = await fetch('/api/payments/sifalo/verify-order', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ orderId, sid, orderStateToken })
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Kyc-Session-Id': sessionId
+              },
+              body: JSON.stringify({
+                orderId,
+                sid,
+                orderStateToken,
+                sessionId,
+                returnStatus,
+                returnMessage
+              })
             });
             verifyData = await verifyRes.json().catch(() => null);
-            if (verifyRes.ok && verifyData && verifyData.verified === true) {
+            if (verifyRes.ok && verifyData && verifyData.verified === true && verifyData.status === 'PAID') {
               break;
             }
-            if (verifyData && verifyData.status === 'PENDING' && attempt < 2) {
+            if (verifyData && verifyData.status === 'PENDING' && attempt < maxAttempts - 1) {
               await new Promise((resolve) => setTimeout(resolve, 1500));
               continue;
             }
             break;
           }
 
-          if (verifyRes && verifyRes.ok && verifyData && verifyData.verified === true && verifyData.unlockToken && verifyData.productKey) {
+          if (
+            verifyRes &&
+            verifyRes.ok &&
+            verifyData &&
+            verifyData.verified === true &&
+            verifyData.status === 'PAID' &&
+            verifyData.unlockToken &&
+            verifyData.productKey &&
+            verifyData.sid
+          ) {
             window.__kycPaidUnlockGrants[verifyData.productKey] = {
               unlockToken: verifyData.unlockToken,
               orderId: verifyData.orderId,
+              sid: verifyData.sid,
+              sessionId,
               expiresAt: verifyData.expiresAt
             };
             saveStoredSifaloGrants();
+            window.__kycLastUnconfirmedOrder = null;
+            closeSifaloPayModal(false);
             if (typeof showToast === 'function') {
               showToast('Payment Verified!', `${verifyData.label || 'Document'} Save PNG & Download unlocked via Sifalo Pay.`);
             }
           } else {
-            if (verifyData && verifyData.productKey && window.__kycPaidUnlockGrants) {
-              delete window.__kycPaidUnlockGrants[verifyData.productKey];
-              saveStoredSifaloGrants();
-            }
+            const targetProductKey =
+              (verifyData && verifyData.productKey) ||
+              (uiContext && uiContext.productKey) ||
+              getActiveUnlockDocSpec().productKey;
+            clearSifaloGrantForProduct(targetProductKey);
+
             const statusText = verifyData && verifyData.status ? String(verifyData.status).toUpperCase() : 'UNCONFIRMED';
+            const title =
+              statusText === 'REFUNDED'
+                ? 'Payment Refunded'
+                : statusText === 'REVERSED'
+                ? 'Payment Reversed'
+                : statusText === 'CANCELLED'
+                ? 'Payment Cancelled'
+                : statusText === 'EXPIRED'
+                ? 'Payment Expired'
+                : statusText === 'FAILED'
+                ? 'Payment Failed'
+                : 'Payment Not Confirmed';
+            const errorMsg =
+              (verifyData && verifyData.error) ||
+              'Payment has not been confirmed by Sifalo Pay. Save PNG & Download remain locked.';
+
+            window.__kycLastUnconfirmedOrder = {
+              orderId,
+              sid,
+              orderStateToken,
+              productKey: targetProductKey
+            };
+
+            const docSpec = getDocSpecByProductKey(targetProductKey) || getActiveUnlockDocSpec();
+            openSifaloPayModal(docSpec, {
+              title,
+              message: `${title}: ${errorMsg}`,
+              canRecheck: statusText === 'PENDING' || statusText === 'UNCONFIRMED'
+            });
+
             if (typeof showToast === 'function') {
-              const title =
-                statusText === 'REFUNDED'
-                  ? 'Payment Refunded'
-                  : statusText === 'REVERSED'
-                  ? 'Payment Reversed'
-                  : statusText === 'CANCELLED'
-                  ? 'Payment Cancelled'
-                  : statusText === 'EXPIRED'
-                  ? 'Payment Expired'
-                  : statusText === 'FAILED'
-                  ? 'Payment Failed'
-                  : 'Verification Pending';
-              showToast(
-                title,
-                (verifyData && verifyData.error) || 'Payment has not been confirmed by Sifalo Pay. Download remains locked.'
-              );
+              showToast(title, errorMsg);
             }
           }
         }
@@ -34002,7 +34247,11 @@ EPSOM</div>
             <i class="fa-solid fa-lock-open"></i>
             <span id="kycSifaloPayBtnLabel">Pay $0.99 with Sifalo Pay</span>
           </button>
-          <p class="text-[11px] font-semibold text-slate-600 text-center">Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL &amp; Premier Wallet</p>
+          <button type="button" id="kycSifaloRecheckBtn" onclick="recheckLastSifaloOrderStatus()" class="hidden w-full min-h-[40px] px-4 py-2 rounded-xl border border-emerald-600/30 bg-white hover:bg-emerald-50 disabled:opacity-60 text-[#0d2658] font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Re-check Payment Status</span>
+          </button>
+          <p id="kycSifaloSupportedMethodsLabel" class="text-[11px] font-semibold text-slate-600 text-center">Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL &amp; Premier Wallet</p>
         </div>
 
         <div id="kycSifaloPayError" role="alert" class="hidden rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-semibold text-rose-700"></div>
