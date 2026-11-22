@@ -50,62 +50,62 @@ export const AUTHORITATIVE_PRODUCT_PRICING: Record<UnlockProductKey, ProductPric
   passport: {
     productKey: 'passport',
     label: 'Passport',
-    amountCents: 99,
-    amountUsdString: '0.99',
-    formattedPrice: '$0.99',
+    amountCents: 111,
+    amountUsdString: '1.11',
+    formattedPrice: '$1.11',
     currency: 'USD',
     sifaloHostedMethods: ['card', 'mobile_money'],
     sifaloCardSupported: true,
     sifaloMethodRuleNote:
-      'Amount is $0.99 (99 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
+      'Amount is $1.11 (111 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
   },
   nationalIdentity: {
     productKey: 'nationalIdentity',
     label: 'National Identity Card',
-    amountCents: 52,
-    amountUsdString: '0.52',
-    formattedPrice: '$0.52',
+    amountCents: 50,
+    amountUsdString: '0.50',
+    formattedPrice: '$0.50',
     currency: 'USD',
-    sifaloHostedMethods: ['card', 'mobile_money'],
-    sifaloCardSupported: true,
+    sifaloHostedMethods: ['mobile_money'],
+    sifaloCardSupported: false,
     sifaloMethodRuleNote:
-      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
+      'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
   },
   driverLicense: {
     productKey: 'driverLicense',
     label: 'Driver License',
-    amountCents: 52,
-    amountUsdString: '0.52',
-    formattedPrice: '$0.52',
+    amountCents: 50,
+    amountUsdString: '0.50',
+    formattedPrice: '$0.50',
     currency: 'USD',
-    sifaloHostedMethods: ['card', 'mobile_money'],
-    sifaloCardSupported: true,
+    sifaloHostedMethods: ['mobile_money'],
+    sifaloCardSupported: false,
     sifaloMethodRuleNote:
-      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
+      'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
   },
   proofOfAddress: {
     productKey: 'proofOfAddress',
     label: 'Proof of Address',
-    amountCents: 52,
-    amountUsdString: '0.52',
-    formattedPrice: '$0.52',
+    amountCents: 50,
+    amountUsdString: '0.50',
+    formattedPrice: '$0.50',
     currency: 'USD',
-    sifaloHostedMethods: ['card', 'mobile_money'],
-    sifaloCardSupported: true,
+    sifaloHostedMethods: ['mobile_money'],
+    sifaloCardSupported: false,
     sifaloMethodRuleNote:
-      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
+      'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
   },
   proofOfAccount: {
     productKey: 'proofOfAccount',
     label: 'Proof of Account',
-    amountCents: 52,
-    amountUsdString: '0.52',
-    formattedPrice: '$0.52',
+    amountCents: 50,
+    amountUsdString: '0.50',
+    formattedPrice: '$0.50',
     currency: 'USD',
-    sifaloHostedMethods: ['card', 'mobile_money'],
-    sifaloCardSupported: true,
+    sifaloHostedMethods: ['mobile_money'],
+    sifaloCardSupported: false,
     sifaloMethodRuleNote:
-      'Amount is $0.52 (52 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
+      'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
   },
 };
 
@@ -657,8 +657,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       if (cleanExpectedOrderId && parsed.orderId !== cleanExpectedOrderId) {
         return null;
       }
+      const priceSpec = AUTHORITATIVE_PRODUCT_PRICING[parsed.productKey];
+      if (parsed.amountCents !== priceSpec.amountCents) {
+        return null;
+      }
       const existing = orders.get(parsed.orderId);
       if (existing) {
+        if (existing.amountCents !== priceSpec.amountCents) {
+          return null;
+        }
         if (!existing.providerSid && parsed.providerSid) {
           existing.providerSid = parsed.providerSid;
           sidToOrderId.set(parsed.providerSid, existing.orderId);
@@ -668,7 +675,6 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         }
         return existing;
       }
-      const priceSpec = AUTHORITATIVE_PRODUCT_PRICING[parsed.productKey];
       const recovered: SifaloOrderRecord = {
         orderId: parsed.orderId,
         productKey: parsed.productKey,
@@ -1006,8 +1012,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       };
     }
 
+    const expectedPriceSpec = AUTHORITATIVE_PRODUCT_PRICING[order.productKey];
     const paidCents = parseAmountToCents(data.amount);
-    if (paidCents !== order.amountCents) {
+    if (
+      !expectedPriceSpec ||
+      paidCents !== expectedPriceSpec.amountCents ||
+      paidCents !== order.amountCents
+    ) {
       return {
         ok: false,
         status: order.status,
@@ -1280,8 +1291,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         return res.status(400).json({ error: 'Webhook currency mismatch.' });
       }
 
+      const expectedPriceSpec = AUTHORITATIVE_PRODUCT_PRICING[order.productKey];
       const incomingCents = parseAmountToCents(body.amount);
-      if (incomingCents !== order.amountCents) {
+      if (
+        !expectedPriceSpec ||
+        incomingCents !== expectedPriceSpec.amountCents ||
+        incomingCents !== order.amountCents
+      ) {
         console.warn(`[Sifalo] Webhook rejected (amount mismatch): orderId=${orderId}`);
         return res.status(400).json({ error: 'Webhook amount does not match server order price.' });
       }
