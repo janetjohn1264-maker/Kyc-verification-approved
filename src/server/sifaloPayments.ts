@@ -549,11 +549,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       ? path.resolve(deps.persistenceFilePath)
       : resolveDefaultPersistencePath(getPersistentDataDir());
 
+  let lastLoadedMtimeMs = -1;
+
   function loadPersistedState() {
     if (!resolvedPersistencePath) return;
     try {
-      if (!fs.existsSync(resolvedPersistencePath)) return;
+      const stat = fs.statSync(resolvedPersistencePath);
+      if (stat.mtimeMs === lastLoadedMtimeMs) return;
       const raw = fs.readFileSync(resolvedPersistencePath, 'utf8');
+      lastLoadedMtimeMs = stat.mtimeMs;
       if (!raw.trim()) return;
       const parsed = JSON.parse(raw) as {
         orders?: SifaloOrderRecord[];
@@ -585,6 +589,9 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         }
       }
     } catch (err) {
+      if (err && typeof err === 'object' && 'code' in err && (err as { code?: string }).code === 'ENOENT') {
+        return;
+      }
       console.warn('[Sifalo] Could not load persisted state:', err instanceof Error ? err.message : err);
     }
   }
@@ -602,6 +609,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       const tmpFile = `${resolvedPersistencePath}.tmp`;
       fs.writeFileSync(tmpFile, JSON.stringify(payload), 'utf8');
       fs.renameSync(tmpFile, resolvedPersistencePath);
+      try {
+        lastLoadedMtimeMs = fs.statSync(resolvedPersistencePath).mtimeMs;
+      } catch {
+        // ignore stat errors
+      }
     } catch (err) {
       console.warn('[Sifalo] Could not write persisted state:', err instanceof Error ? err.message : err);
     }

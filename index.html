@@ -1146,6 +1146,11 @@
     // Server-Verified Sifalo Pay Payment & Download Unlock Controller
     let _isSifaloExecutingCallback = false;
     let _pendingSifaloCallback = null;
+    let _isSifaloCheckoutInFlight = false;
+    let _isSifaloAuthorizingInFlight = false;
+    let _kycSessionStatusResolved = false;
+    let _kycSessionStatusPromise = null;
+    window.__kycSifaloCheckoutInFlight = false;
     // Untrusted client token references ONLY (never treated as proof of payment)
     window.__kycPaidUnlockGrants = window.__kycPaidUnlockGrants || {};
     // Runtime-only map populated strictly from server-verified API responses on this page load
@@ -1358,16 +1363,22 @@
     function captureWorkbenchFieldSnapshot() {
       const fieldSnapshot = {};
       try {
-        const inputs = document.querySelectorAll(
-          '#verification-workbench input:not([type="file"]), #verification-workbench select, #verification-workbench textarea'
-        );
-        for (let i = 0; i < inputs.length; i++) {
-          const el = inputs[i];
-          if (el && el.id) {
-            if (el.type === 'checkbox' || el.type === 'radio') {
-              fieldSnapshot[el.id] = { checked: Boolean(el.checked) };
-            } else {
-              fieldSnapshot[el.id] = { value: el.value };
+        const wb = document.getElementById('verification-workbench');
+        if (!wb) return fieldSnapshot;
+        const visibleViews = wb.querySelectorAll('[id$="-view"]:not(.hidden)');
+        const roots = visibleViews.length > 0 ? Array.from(visibleViews) : [wb];
+        for (let r = 0; r < roots.length; r++) {
+          const inputs = roots[r].querySelectorAll(
+            'input:not([type="file"]), select, textarea'
+          );
+          for (let i = 0; i < inputs.length; i++) {
+            const el = inputs[i];
+            if (el && el.id) {
+              if (el.type === 'checkbox' || el.type === 'radio') {
+                fieldSnapshot[el.id] = { checked: Boolean(el.checked) };
+              } else {
+                fieldSnapshot[el.id] = { value: el.value };
+              }
             }
           }
         }
@@ -1393,7 +1404,7 @@
       }
     }
 
-    function saveActiveEditorUiState() {
+    function saveActiveEditorUiState(precomputedSnapshot) {
       try {
         if (typeof workflowStep !== 'undefined' && workflowStep !== 'editor') return;
         const countryKey = (typeof workflowSelectedCountry === 'string' && workflowSelectedCountry) ||
@@ -1403,6 +1414,7 @@
         const providerKey = (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
           (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : 'paypal');
         if (!countryKey) return;
+        const fieldSnapshot = precomputedSnapshot || captureWorkbenchFieldSnapshot();
         sessionStorage.setItem(
           KYC_ACTIVE_EDITOR_UI_KEY,
           JSON.stringify({
@@ -1410,7 +1422,7 @@
             providerKey,
             countryKey,
             rawDocType,
-            fieldSnapshot: captureWorkbenchFieldSnapshot(),
+            fieldSnapshot,
             updatedAt: Date.now()
           })
         );
@@ -1529,18 +1541,101 @@
     }
     window.closeSifaloPayModal = closeSifaloPayModal;
 
-    async function choosePaidCheckoutUnlock() {
+    function getClickedTriggerButton() {
+      try {
+        const evt = typeof window !== 'undefined' ? window.event : null;
+        const target = evt && (evt.currentTarget || evt.target);
+        if (target && typeof target.closest === 'function') {
+          const btn = target.closest('button, a');
+          if (btn) return btn;
+        }
+        const active = document.activeElement;
+        if (active && (active.tagName === 'BUTTON' || active.tagName === 'A')) {
+          return active;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function setOpeningPaymentButtonState(btn, isLoading) {
+      if (!btn) return;
+      try {
+        if (isLoading) {
+          if (!btn.dataset.kycOrigHtml) {
+            btn.dataset.kycOrigHtml = btn.innerHTML;
+          }
+          if (btn.tagName === 'BUTTON') {
+            btn.disabled = true;
+          } else {
+            btn.setAttribute('aria-disabled', 'true');
+            btn.style.pointerEvents = 'none';
+          }
+          btn.setAttribute('aria-busy', 'true');
+          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Opening secure payment...</span>';
+        } else {
+          if (btn.dataset.kycOrigHtml) {
+            btn.innerHTML = btn.dataset.kycOrigHtml;
+            delete btn.dataset.kycOrigHtml;
+          }
+          if (btn.tagName === 'BUTTON') {
+            btn.disabled = false;
+          } else {
+            btn.removeAttribute('aria-disabled');
+            btn.style.pointerEvents = '';
+          }
+          btn.removeAttribute('aria-busy');
+        }
+      } catch (e) {}
+    }
+
+    function showOpeningPaymentStatusIndicator(isLoading, docSpec) {
+      try {
+        if (isLoading && typeof showToast === 'function') {
+          const priceNote = docSpec && docSpec.price ? ` (${docSpec.price})` : '';
+          showToast('Opening secure payment...', `Connecting to Sifalo Pay checkout${priceNote}`);
+        }
+      } catch (e) {}
+    }
+
+    async function startSifaloCheckoutImmediately(docSpec, triggerBtn) {
+      if (_isSifaloCheckoutInFlight) return;
+      _isSifaloCheckoutInFlight = true;
+      window.__kycSifaloCheckoutInFlight = true;
+      _pendingSifaloCallback = null;
+
+      const spec = docSpec || getActiveUnlockDocSpec();
+      const sessionId = getOrCreateSifaloSessionId();
+      const countryKey = typeof currentCountry === 'string' ? currentCountry : '';
+      const providerKey =
+        (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
+        (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : '');
+
       const payBtn = document.getElementById('kycSifaloPayBtn');
       const payBtnLabel = document.getElementById('kycSifaloPayBtnLabel');
       const errorBox = document.getElementById('kycSifaloPayError');
       const recheckBtn = document.getElementById('kycSifaloRecheckBtn');
-      const spec = getActiveUnlockDocSpec();
-      const sessionId = getOrCreateSifaloSessionId();
 
-      // Clear any previous unverified/stale grant for this product when starting a new checkout
-      clearSifaloGrantForProduct(spec.productKey);
-      syncActiveProductUnlockUI();
+      // Fire /create-checkout IMMEDIATELY before any DOM or storage serialization work
+      const checkoutFetchPromise = fetch('/api/payments/sifalo/create-checkout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Kyc-Session-Id': sessionId
+        },
+        body: JSON.stringify({
+          docType: spec.productKey,
+          sessionId,
+          countryKey,
+          providerKey
+        })
+      });
 
+      // Immediately show non-blocking loading indicator while the network request is already in flight
+      setOpeningPaymentButtonState(triggerBtn, true);
+      showOpeningPaymentStatusIndicator(true, spec);
+      if (payBtn) payBtn.disabled = true;
+      if (payBtnLabel) payBtnLabel.textContent = 'Opening secure payment...';
       if (errorBox) {
         errorBox.textContent = '';
         errorBox.classList.add('hidden');
@@ -1548,38 +1643,18 @@
       if (recheckBtn) {
         recheckBtn.classList.add('hidden');
       }
-      if (payBtn) payBtn.disabled = true;
-      if (payBtnLabel) payBtnLabel.textContent = 'Connecting to Sifalo Pay...';
 
       try {
-        const res = await fetch('/api/payments/sifalo/create-checkout', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Kyc-Session-Id': sessionId
-          },
-          body: JSON.stringify({
-            docType: spec.productKey,
-            sessionId,
-            countryKey: typeof currentCountry === 'string' ? currentCountry : '',
-            providerKey:
-              (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
-              (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : '')
-          })
-        });
-
+        const res = await checkoutFetchPromise;
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data || !data.checkoutUrl) {
           const message =
             (data && data.error) ||
             'Unable to start Sifalo Pay checkout right now. Please try again.';
-          if (errorBox) {
-            errorBox.textContent = message;
-            errorBox.classList.remove('hidden');
-          }
-          if (payBtn) payBtn.disabled = false;
-          if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+          _isSifaloCheckoutInFlight = false;
+          window.__kycSifaloCheckoutInFlight = false;
+          setOpeningPaymentButtonState(triggerBtn, false);
+          openSifaloPayModal(spec, { message });
           return;
         }
 
@@ -1587,21 +1662,20 @@
         window.__kycSifaloSessionId = effectiveSessionId;
         writeSessionOnlyStorage(KYC_SIFALO_SESSION_KEY, effectiveSessionId);
 
+        const activeSnapshot = captureWorkbenchFieldSnapshot();
         const checkoutUiPayload = {
           orderId: data.orderId,
           orderStateToken: data.orderStateToken || '',
           sessionId: effectiveSessionId,
           productKey: spec.productKey,
-          countryKey: typeof currentCountry === 'string' ? currentCountry : 'kenya',
+          countryKey: countryKey || 'kenya',
           rawDocType: spec.rawType,
-          providerKey:
-            (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
-            (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : 'paypal'),
-          fieldSnapshot: captureWorkbenchFieldSnapshot(),
+          providerKey: providerKey || 'paypal',
+          fieldSnapshot: activeSnapshot,
           savedAt: Date.now()
         };
         writeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY, JSON.stringify(checkoutUiPayload));
-        saveActiveEditorUiState();
+        saveActiveEditorUiState(activeSnapshot);
 
         let finalCheckoutUrl = String(data.checkoutUrl);
         try {
@@ -1614,13 +1688,22 @@
         window.location.href = finalCheckoutUrl;
       } catch (err) {
         console.error('Sifalo Pay checkout initialization failed:', err);
-        if (errorBox) {
-          errorBox.textContent = 'Network error starting Sifalo Pay checkout. Please try again.';
-          errorBox.classList.remove('hidden');
-        }
-        if (payBtn) payBtn.disabled = false;
-        if (payBtnLabel) payBtnLabel.textContent = `Pay ${spec.price} with Sifalo Pay`;
+        _isSifaloCheckoutInFlight = false;
+        window.__kycSifaloCheckoutInFlight = false;
+        setOpeningPaymentButtonState(triggerBtn, false);
+        openSifaloPayModal(spec, {
+          message: 'Network error starting Sifalo Pay checkout. Please try again.'
+        });
       }
+    }
+
+    async function choosePaidCheckoutUnlock() {
+      if (_isSifaloCheckoutInFlight) return;
+      const spec = getActiveUnlockDocSpec();
+      clearSifaloGrantForProduct(spec.productKey);
+      syncActiveProductUnlockUI();
+      const payBtn = document.getElementById('kycSifaloPayBtn');
+      return startSifaloCheckoutImmediately(spec, payBtn);
     }
     window.choosePaidCheckoutUnlock = choosePaidCheckoutUnlock;
 
@@ -1802,6 +1885,8 @@
       } catch (err) {
         // Keep everything locked on network failure; explicit Save PNG click will still query server
         syncActiveProductUnlockUI();
+      } finally {
+        _kycSessionStatusResolved = true;
       }
     }
 
@@ -2076,23 +2161,27 @@
       _kycLifecycleInitialized = true;
       _pendingSifaloCallback = null;
       _isSifaloExecutingCallback = false;
+      _isSifaloCheckoutInFlight = false;
+      _isSifaloAuthorizingInFlight = false;
+      window.__kycSifaloCheckoutInFlight = false;
 
-      // Restore saved editor view immediately if returning/refreshing, then re-sync after doc init timers
       const returnInfo = await handlePaymentReturnFromCheckout();
       if (!returnInfo.handled) {
         restoreSavedEditorUiOnRefresh();
-      }
-
-      // Yield briefly for secondary country init scripts (~50ms) and re-ensure saved editor stays active
-      await new Promise((resolve) => setTimeout(resolve, 75));
-      if (!returnInfo.handled && sessionStorage.getItem(KYC_ACTIVE_EDITOR_UI_KEY)) {
-        if (typeof workflowStep !== 'undefined' && workflowStep !== 'editor') {
-          restoreSavedEditorUiOnRefresh();
+        // Start server session-status validation immediately without waiting for secondary DOM timers
+        _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad({ justVerifiedData: null });
+        await new Promise((resolve) => setTimeout(resolve, 75));
+        if (sessionStorage.getItem(KYC_ACTIVE_EDITOR_UI_KEY)) {
+          if (typeof workflowStep !== 'undefined' && workflowStep !== 'editor') {
+            restoreSavedEditorUiOnRefresh();
+          }
         }
+        await _kycSessionStatusPromise;
+      } else {
+        _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad({ justVerifiedData: returnInfo.verifiedData });
+        await _kycSessionStatusPromise;
       }
 
-      // Always validate existing server authorizations without triggering any download
-      await restoreAuthorizedSessionOnLoad({ justVerifiedData: returnInfo.verifiedData });
       syncActiveProductUnlockUI();
     }
 
@@ -2109,12 +2198,18 @@
       window.addEventListener('pageshow', (event) => {
         _pendingSifaloCallback = null;
         _isSifaloExecutingCallback = false;
+        _isSifaloCheckoutInFlight = false;
+        _isSifaloAuthorizingInFlight = false;
+        window.__kycSifaloCheckoutInFlight = false;
         if (event && event.persisted) {
-          restoreAuthorizedSessionOnLoad();
+          _kycSessionStatusResolved = false;
+          _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad();
         }
       });
       window.addEventListener('beforeunload', () => {
-        saveActiveEditorUiState();
+        if (!_isSifaloCheckoutInFlight) {
+          saveActiveEditorUiState();
+        }
       });
     }
 
@@ -2125,15 +2220,37 @@
         return downloadCallback();
       }
 
-      const docSpec = getActiveUnlockDocSpec();
-      const hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey);
-      syncActiveProductUnlockUI();
-      if (hasValidPaidUnlock) {
-        return executePaidDownloadCallback(downloadCallback);
+      if (_isSifaloCheckoutInFlight || _isSifaloAuthorizingInFlight) {
+        return;
       }
 
-      _pendingSifaloCallback = null;
-      openSifaloPayModal(docSpec);
+      const clickedBtn = getClickedTriggerButton();
+      const docSpec = getActiveUnlockDocSpec();
+
+      // If page-load session validation is still in flight on a fresh load/refresh, await it once before deciding
+      if (!isProductUnlockedInUi(docSpec.productKey) && !_kycSessionStatusResolved && _kycSessionStatusPromise) {
+        try {
+          await _kycSessionStatusPromise;
+        } catch (e) {}
+      }
+
+      // Only hit /authorize-unlock synchronously before checkout if the product is unlocked in UI
+      if (isProductUnlockedInUi(docSpec.productKey)) {
+        _isSifaloAuthorizingInFlight = true;
+        let hasValidPaidUnlock = false;
+        try {
+          hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey);
+        } finally {
+          _isSifaloAuthorizingInFlight = false;
+        }
+        syncActiveProductUnlockUI();
+        if (hasValidPaidUnlock) {
+          return executePaidDownloadCallback(downloadCallback);
+        }
+      }
+
+      // Locked / unverified / expired: immediately launch /api/payments/sifalo/create-checkout without modal or PNG delays
+      return startSifaloCheckoutImmediately(docSpec, clickedBtn);
     }
     window.triggerWithSifaloPay = triggerWithSifaloPay;
 
@@ -35367,9 +35484,11 @@ EPSOM</div>
 
         let rafId = null;
         const scheduleFit = () => {
+          if (window.__kycSifaloCheckoutInFlight) return;
           if (rafId) cancelAnimationFrame(rafId);
           rafId = requestAnimationFrame(() => {
             rafId = null;
+            if (window.__kycSifaloCheckoutInFlight) return;
             runFit();
           });
         };
