@@ -315,9 +315,60 @@ function extractIncomingProductId(payload: Record<string, unknown>): string {
   return '';
 }
 
+function readRuntimeEnv(
+  key:
+    | 'SIFALO_API_USER'
+    | 'SIFALO_API_KEY'
+    | 'SIFALO_WEBHOOK_SECRET'
+    | 'SIFALO_ENV'
+    | 'APP_BASE_URL'
+    | 'SIFALO_API_BASE_URL'
+    | 'SIFALO_VERIFY_URL'
+    | 'SIFALO_CHECKOUT_URL'
+    | 'SIFALO_DATA_DIR'
+): string {
+  let directVal: string | undefined;
+  switch (key) {
+    case 'SIFALO_API_USER':
+      directVal = process.env.SIFALO_API_USER;
+      break;
+    case 'SIFALO_API_KEY':
+      directVal = process.env.SIFALO_API_KEY;
+      break;
+    case 'SIFALO_WEBHOOK_SECRET':
+      directVal = process.env.SIFALO_WEBHOOK_SECRET;
+      break;
+    case 'SIFALO_ENV':
+      directVal = process.env.SIFALO_ENV;
+      break;
+    case 'APP_BASE_URL':
+      directVal = process.env.APP_BASE_URL;
+      break;
+    case 'SIFALO_API_BASE_URL':
+      directVal = process.env.SIFALO_API_BASE_URL;
+      break;
+    case 'SIFALO_VERIFY_URL':
+      directVal = process.env.SIFALO_VERIFY_URL;
+      break;
+    case 'SIFALO_CHECKOUT_URL':
+      directVal = process.env.SIFALO_CHECKOUT_URL;
+      break;
+    case 'SIFALO_DATA_DIR':
+      directVal = process.env.SIFALO_DATA_DIR;
+      break;
+  }
+  const dynamicEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const raw = directVal || dynamicEnv?.[key] || '';
+  return String(raw).trim().replace(/^['"]|['"]$/g, '');
+}
+
 function resolveDefaultPersistencePath(customDir: string): string {
   if (customDir) {
     return path.resolve(customDir, 'sifalo-payments.json');
+  }
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), 'kycapproved-sifalo-payments.json');
   }
   const projectDataDir = path.resolve(process.cwd(), '.data');
   try {
@@ -335,22 +386,21 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
   const getEnvironment =
     deps.getEnvironment ??
     (() => {
-      const raw = String(process.env.SIFALO_ENV || 'production').trim().toLowerCase();
+      const raw = (readRuntimeEnv('SIFALO_ENV') || 'production').toLowerCase();
       return raw === 'staging' || raw === 'test' || raw === 'sandbox' ? 'staging' : 'production';
     });
-  const getApiUser = deps.getApiUser ?? (() => String(process.env.SIFALO_API_USER || '').trim());
-  const getApiKey = deps.getApiKey ?? (() => String(process.env.SIFALO_API_KEY || '').trim());
-  const getWebhookSecret =
-    deps.getWebhookSecret ?? (() => String(process.env.SIFALO_WEBHOOK_SECRET || '').trim());
-  const getAppBaseUrl = deps.getAppBaseUrl ?? (() => String(process.env.APP_BASE_URL || '').trim());
+  const getApiUser = deps.getApiUser ?? (() => readRuntimeEnv('SIFALO_API_USER'));
+  const getApiKey = deps.getApiKey ?? (() => readRuntimeEnv('SIFALO_API_KEY'));
+  const getWebhookSecret = deps.getWebhookSecret ?? (() => readRuntimeEnv('SIFALO_WEBHOOK_SECRET'));
+  const getAppBaseUrl = deps.getAppBaseUrl ?? (() => readRuntimeEnv('APP_BASE_URL'));
   const getCustomGatewayUrl =
-    deps.getCustomGatewayUrl ?? (() => String(process.env.SIFALO_API_BASE_URL || '').trim());
+    deps.getCustomGatewayUrl ?? (() => readRuntimeEnv('SIFALO_API_BASE_URL'));
   const getCustomVerifyUrl =
-    deps.getCustomVerifyUrl ?? (() => String(process.env.SIFALO_VERIFY_URL || '').trim());
+    deps.getCustomVerifyUrl ?? (() => readRuntimeEnv('SIFALO_VERIFY_URL'));
   const getCustomCheckoutBaseUrl =
-    deps.getCustomCheckoutBaseUrl ?? (() => String(process.env.SIFALO_CHECKOUT_URL || '').trim());
+    deps.getCustomCheckoutBaseUrl ?? (() => readRuntimeEnv('SIFALO_CHECKOUT_URL'));
   const getPersistentDataDir =
-    deps.getPersistentDataDir ?? (() => String(process.env.SIFALO_DATA_DIR || '').trim());
+    deps.getPersistentDataDir ?? (() => readRuntimeEnv('SIFALO_DATA_DIR'));
 
   // Derive deterministic server-side signing secret from configured Sifalo credentials so stateless Vercel requests verify seamlessly
   const fallbackProcessSecret = crypto.randomBytes(32);
@@ -1402,6 +1452,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
   return {
     createRouter,
     handleWebhook,
+    isConfigured: () => Boolean(getApiUser() && getApiKey()),
     _internal: {
       orders,
       sidToOrderId,

@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
-import { createApiApp } from './src/server/app.ts';
+import { createApiApp } from './src/server/app.js';
 
 dotenv.config();
 
