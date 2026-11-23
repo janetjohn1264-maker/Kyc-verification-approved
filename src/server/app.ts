@@ -2,17 +2,25 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import dotenv from 'dotenv';
 
 import { createSifaloPaymentService, type SifaloPaymentServiceDeps } from './sifaloPayments.js';
+import { KycAdminService } from './adminService.js';
 
 if (!process.env.VERCEL) {
   dotenv.config();
 }
 
-export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
+export interface ApiAppDeps extends SifaloPaymentServiceDeps {
+  adminPersistencePath?: string;
+}
+
+export function createApiApp(deps: ApiAppDeps = {}) {
   const app = express();
   app.set('trust proxy', 1);
   app.set('etag', false);
 
   const sifaloPaymentService = createSifaloPaymentService(deps);
+  const kycAdminService = new KycAdminService(sifaloPaymentService, deps.adminPersistencePath);
+  app.locals.sifaloPaymentService = sifaloPaymentService;
+  app.locals.kycAdminService = kycAdminService;
 
   const captureRawBody = (req: Request, _res: Response, buf: Buffer) => {
     (req as Request & { rawBody?: Buffer }).rawBody = buf;
@@ -35,6 +43,8 @@ export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
       !req.url.startsWith('/api/') &&
       req.url !== '/api' &&
       (req.url.startsWith('/health') ||
+        req.url.startsWith('/catalog') ||
+        req.url.startsWith('/admin') ||
         req.url.startsWith('/webhooks/sifalo') ||
         req.url.startsWith('/sifalo/webhook') ||
         req.url.startsWith('/payments/sifalo'))
@@ -65,6 +75,8 @@ export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
       timestamp: new Date().toISOString(),
       endpoints: {
         health: '/api/health',
+        catalog: '/api/catalog',
+        adminAuthStatus: '/api/admin/auth/status',
         sifaloConfig: '/api/payments/sifalo/config',
         sifaloDiagnostics: '/api/payments/sifalo/diagnostics',
         sifaloWebhook: '/api/webhooks/sifalo',
@@ -79,6 +91,8 @@ export function createApiApp(deps: SifaloPaymentServiceDeps = {}) {
   app.post('/api/webhooks/sifalo', sifaloPaymentService.handleWebhook);
   app.post('/api/sifalo/webhook', sifaloPaymentService.handleWebhook);
   app.use('/api/payments/sifalo', sifaloPaymentService.createRouter());
+  app.use('/api/catalog', kycAdminService.createPublicCatalogRouter());
+  app.use('/api/admin', kycAdminService.createAdminRouter());
 
   return app;
 }

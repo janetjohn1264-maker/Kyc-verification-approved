@@ -3012,25 +3012,45 @@
       _isSifaloAuthorizingInFlight = true;
       setSavePngButtonState(clickedBtn, 'checking', 'Checking authorization...');
 
+      let hasValidAdminTestAuth = false;
       let hasValidPaidUnlock = false;
       try {
-        // If initial page-load session verification is still in flight, wait up to 1500ms
-        if (!_kycSessionStatusResolved && _kycSessionStatusPromise) {
+        // Server-verified Admin Test Mode check (never trusts frontend variables; requires active server-side admin session + testModeEnabled + single-use token consumption)
+        if (typeof window.__kycRequestServerAdminTestAuthorization === 'function') {
           try {
-            await Promise.race([
-              _kycSessionStatusPromise,
-              new Promise((r) => setTimeout(r, 1500))
-            ]);
-          } catch (e) {}
+            hasValidAdminTestAuth = await window.__kycRequestServerAdminTestAuthorization({
+              docSpec,
+              clickedBtn,
+              actionDescriptor,
+            });
+          } catch (e) {
+            hasValidAdminTestAuth = false;
+          }
         }
 
-        // Always verify with the server whether this exact product & session has a valid single-use payment authorization (and consume it atomically)
-        hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey, true);
+        if (!hasValidAdminTestAuth) {
+          // If initial page-load session verification is still in flight, wait up to 1500ms
+          if (!_kycSessionStatusResolved && _kycSessionStatusPromise) {
+            try {
+              await Promise.race([
+                _kycSessionStatusPromise,
+                new Promise((r) => setTimeout(r, 1500))
+              ]);
+            } catch (e) {}
+          }
+
+          // Always verify with the server whether this exact product & session has a valid single-use payment authorization (and consume it atomically)
+          hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey, true);
+        }
       } finally {
         _isSifaloAuthorizingInFlight = false;
       }
 
       syncActiveProductUnlockUI();
+
+      if (hasValidAdminTestAuth) {
+        return executePaidDownloadCallback(downloadCallback, clickedBtn, null);
+      }
 
       if (hasValidPaidUnlock) {
         return executePaidDownloadCallback(downloadCallback, clickedBtn, docSpec.productKey);
@@ -4333,9 +4353,11 @@ var $ = window.$ || (id => document.getElementById(id));
       if (!countryKey || !docType) return null;
       if (docType === 'passport') return $(`${countryKey}-passport-view`);
       if (docType === 'idcard') return $(`${countryKey}-idcard-view`) || $(`${countryKey}-doc-view`);
-      if (docType === 'driverlicense') return $(`${countryKey}-driverlicense-view`);
+      if (docType === 'driverlicense') {
+        return $(`${countryKey}-driverlicense-view`) || $('somalia-driverlicense-view');
+      }
       if (docType === 'refugeecard') {
-        return $(`${countryKey}-proofofaddress-view`) || (countryKey === 'bangladesh' ? $('proofofaddress-doc-view') : null);
+        return $(`${countryKey}-proofofaddress-view`) || $('proofofaddress-doc-view');
       }
       if (docType === 'proofofaccount') {
         const custom = $(`${countryKey}-proofofaccount-view`);
@@ -4343,7 +4365,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (Array.isArray(window.poaConfiguredCountryKeys) && window.poaConfiguredCountryKeys.includes(countryKey)) {
           return $('proofofaccount-doc-view');
         }
-        return null;
+        return $('proofofaccount-doc-view');
       }
       return $(`${countryKey}-${docType}-view`);
     }
@@ -6469,7 +6491,10 @@ var $ = window.$ || (id => document.getElementById(id));
         return;
       }
 
-      if (currentDocType === 'proofofaccount') {
+      const exactResolvedView = resolveCountryViewElement(currentCountry, currentDocType);
+      if (exactResolvedView) {
+        exactResolvedView.classList.remove('hidden');
+      } else if (currentDocType === 'proofofaccount') {
         const customPoaView = $(`${currentCountry}-proofofaccount-view`);
         if (customPoaView) customPoaView.classList.remove('hidden');
         else if (poaDocView) poaDocView.classList.remove('hidden');
@@ -6477,83 +6502,12 @@ var $ = window.$ || (id => document.getElementById(id));
         const customAddrView = $(`${currentCountry}-proofofaddress-view`);
         if (customAddrView) customAddrView.classList.remove('hidden');
         else if (poaddrDocView) poaddrDocView.classList.remove('hidden');
-      } else if (currentCountry === 'turkey') {
-        if (currentDocType === 'idcard' && turkeyDocView) {
-          turkeyDocView.classList.remove('hidden');
-        } else if (turkeyPassView) {
-          turkeyPassView.classList.remove('hidden');
-        }
-      } else if (currentCountry === 'uae') {
-        if (uaeDocView) uaeDocView.classList.remove('hidden');
-      } else if (currentCountry === 'malawi' || currentCountry === 'mali') {
-        if (mwiPassView) mwiPassView.classList.remove('hidden');
-      } else if (currentCountry === 'nepal') {
-        if (nplPassView) nplPassView.classList.remove('hidden');
-      } else if (currentCountry === 'rwanda') {
-        if (rwandaDocView) rwandaDocView.classList.remove('hidden');
-      } else if (currentCountry === 'ghana') {
-        if (ghaPassView) ghaPassView.classList.remove('hidden');
-      } else if (currentCountry === 'canada') {
-        if (canPassView) canPassView.classList.remove('hidden');
-      } else if (currentCountry === 'germany') {
-        if (deuPassView) deuPassView.classList.remove('hidden');
-      } else if (currentCountry === 'bangladesh') {
-        if (bgdPassView) bgdPassView.classList.remove('hidden');
-      } else if (currentCountry === 'drcongo') {
-        if (drcPassView) drcPassView.classList.remove('hidden');
-      } else if (currentCountry === 'usa') {
-        if (usaPassView) usaPassView.classList.remove('hidden');
-      } else if (currentCountry === 'southafrica') {
-        if (saPassView) saPassView.classList.remove('hidden');
-      } else if (currentCountry === 'senegal') {
-        if (currentDocType === 'idcard' && senegalIdView) {
-          senegalIdView.classList.remove('hidden');
-        } else if (senegalPassView) {
-          senegalPassView.classList.remove('hidden');
-        }
-      } else if (currentCountry === 'seychelles') {
-        if (seychellesDocView) seychellesDocView.classList.remove('hidden');
-      } else if (currentCountry === 'pakistan') {
-        if (pakistanDocView) pakistanDocView.classList.remove('hidden');
-      } else if (currentCountry === 'uganda') {
-        if (ugandaDocView) ugandaDocView.classList.remove('hidden');
-      } else if (currentCountry === 'uk') {
-        if (ukPassView) ukPassView.classList.remove('hidden');
       } else if (currentDocType === 'driverlicense') {
         const customDlView = $(`${currentCountry}-driverlicense-view`);
         if (customDlView) customDlView.classList.remove('hidden');
         else if (somaliaDlView) somaliaDlView.classList.remove('hidden');
-      } else if (currentCountry === 'nigeria') {
-        if (currentDocType === 'passport' && nigeriaPassView) {
-          nigeriaPassView.classList.remove('hidden');
-        } else if (nigeriaDocView) {
-          nigeriaDocView.classList.remove('hidden');
-        }
-      } else if (currentCountry === 'ethiopia') {
-        if (currentDocType === 'idcard' && ethiopiaDocView) {
-          ethiopiaDocView.classList.remove('hidden');
-        } else if (ethPassView) {
-          ethPassView.classList.remove('hidden');
-        }
-      } else if (currentCountry === 'somalia') {
-        if (currentDocType === 'idcard' && somaliaIdView) {
-          somaliaIdView.classList.remove('hidden');
-        } else if (somaliaPassView) {
-          somaliaPassView.classList.remove('hidden');
-        }
-      } else if (currentCountry === 'kenya') {
-        if (currentDocType === 'idcard' && kenyaIdView) {
-          kenyaIdView.classList.remove('hidden');
-        } else if (kenyaPassView) {
-          kenyaPassView.classList.remove('hidden');
-        }
-      } else {
-        const dynamicView = resolveCountryViewElement(currentCountry, currentDocType);
-        if (dynamicView) {
-          dynamicView.classList.remove('hidden');
-        } else if (noDocView) {
-          noDocView.classList.remove('hidden');
-        }
+      } else if (noDocView) {
+        noDocView.classList.remove('hidden');
       }
       syncActiveWorkflowBar();
     }
@@ -21132,7 +21086,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
 
     function mountOceaniaDocumentViews() {
-      OCEANIA_COUNTRY_KEYS.forEach(key => {
+      Object.keys(OCEANIA_COUNTRIES_CONFIG).forEach(key => {
+        if (!OCEANIA_COUNTRY_KEYS.includes(key)) {
+          OCEANIA_COUNTRY_KEYS.push(key);
+        }
         const cfg = OCEANIA_COUNTRIES_CONFIG[key];
         const passHost = $(`${key}-passport-view`);
         if (passHost && !passHost.dataset.mounted) {
@@ -21154,6 +21111,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       initTongaSpecimenPhoto();
     }
     window.mountOceaniaDocumentViews = mountOceaniaDocumentViews;
+    window.buildOceaniaPassportMarkup = buildOceaniaPassportMarkup;
+    window.buildOceaniaIdMarkup = buildOceaniaIdMarkup;
+    window.bindOceaniaPhotoInputs = bindOceaniaPhotoInputs;
+    window.OCEANIA_DEFAULT_PORTRAITS = OCEANIA_DEFAULT_PORTRAITS;
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', mountOceaniaDocumentViews);
@@ -35678,6 +35639,11 @@ EPSOM</div>
           <button type="button" onclick="openPrivacyPage()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Privacy Policy</button>
           <span class="text-slate-300 font-normal" aria-hidden="true">|</span>
           <button type="button" onclick="openContactModal()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer">Support</button>
+          <span class="text-slate-300 font-normal" aria-hidden="true">|</span>
+          <button type="button" id="footer-admin-portal-btn" onclick="window.openKycAdminDashboard && window.openKycAdminDashboard()" class="hover:text-[#0d5bd9] transition-colors cursor-pointer inline-flex items-center gap-1.5 text-slate-600">
+            <i class="fa-solid fa-shield-halved text-xs text-blue-700"></i>
+            <span>Admin</span>
+          </button>
         </nav>
 
         <!-- Social Action Icons -->
@@ -36275,6 +36241,2348 @@ EPSOM</div>
         document.addEventListener('DOMContentLoaded', initKycContentProtection);
       } else {
         initKycContentProtection();
+      }
+    })();
+  </script>
+
+  <!-- ================= SERVER-VERIFIED ADMIN TEST MODE FLOATING INDICATOR BAR ================= -->
+  <div id="kyc-admin-test-mode-bar" class="hidden no-print fixed top-0 inset-x-0 z-[260] bg-slate-950/95 text-white border-b-2 border-emerald-500 shadow-2xl backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-black uppercase tracking-wider">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          ADMIN TEST MODE
+        </span>
+        <span class="text-xs sm:text-sm font-semibold text-slate-200">
+          Server-Verified Payment Bypass Active &mdash; Save PNG &amp; Download Unlocked for Admin Testing
+        </span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <select id="kyc-admin-bar-country-select" aria-label="Admin Test Country" class="bg-slate-900 border border-slate-700 text-white text-xs font-bold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-400"></select>
+        <select id="kyc-admin-bar-doc-select" aria-label="Admin Test Document" class="bg-slate-900 border border-slate-700 text-white text-xs font-bold rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-400"></select>
+        <button type="button" id="kyc-admin-bar-open-dashboard-btn" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-gauge-high"></i>
+          <span>Admin Dashboard</span>
+        </button>
+        <button type="button" id="kyc-admin-bar-disable-test-btn" class="px-3 py-1.5 rounded-lg bg-amber-600/90 hover:bg-amber-500 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-power-off"></i>
+          <span>Exit Test Mode</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= KYCAPPROVED SECURE ADMIN DASHBOARD OVERLAY ================= -->
+  <div id="kyc-admin-dashboard-overlay" class="hidden no-print fixed inset-0 z-[270] bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+    <div class="min-h-screen flex flex-col bg-slate-100 text-slate-900">
+      <!-- Top Bar -->
+      <header class="bg-slate-950 text-white border-b border-slate-800 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4 sticky top-0 z-30">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center text-white font-black shadow-sm">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-black text-sm sm:text-base tracking-tight text-white">KycApproved Admin</span>
+              <span id="kyc-admin-header-role-badge" class="hidden px-2.5 py-0.5 rounded-md bg-blue-500/20 border border-blue-400/50 text-blue-200 text-[11px] font-black uppercase tracking-wider">
+                Role: Super Admin
+              </span>
+              <span id="kyc-admin-header-test-badge" class="hidden px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
+                ADMIN TEST MODE ON
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-400">Server-Enforced Role-Based Access Control (RBAC) &amp; Specimen Management</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span id="kyc-admin-header-user" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 font-semibold"></span>
+          <button type="button" id="kyc-admin-close-overlay-btn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Website</span>
+          </button>
+          <button type="button" id="kyc-admin-header-logout-btn" class="hidden px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-colors cursor-pointer items-center gap-1.5">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- LOGIN / INITIAL SETUP VIEW -->
+      <div id="kyc-admin-login-view" class="flex-1 flex items-center justify-center p-4 sm:p-6">
+        <div class="max-w-md w-full bg-white rounded-2xl border border-slate-200/90 shadow-xl p-6 sm:p-8">
+          <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-600/20 text-blue-700 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h2 id="kyc-admin-auth-title" class="text-xl font-black text-slate-900 tracking-tight">Protected Admin Login</h2>
+          <p id="kyc-admin-auth-subtitle" class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+            Authenticate with your server-side KycApproved administrator credentials to manage countries, document availability, and Admin Test Mode.
+          </p>
+
+          <div id="kyc-admin-auth-error" class="hidden mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
+
+          <form id="kyc-admin-auth-form" class="mt-5 space-y-4">
+            <div>
+              <label for="kyc-admin-username-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Admin Username</label>
+              <input id="kyc-admin-username-input" type="text" autocomplete="username" value="admin" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20">
+            </div>
+            <div>
+              <label for="kyc-admin-password-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Admin Password</label>
+              <input id="kyc-admin-password-input" type="password" autocomplete="current-password" placeholder="Enter server-verified admin password" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20">
+            </div>
+            <button type="submit" id="kyc-admin-auth-submit-btn" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-700 to-emerald-600 hover:from-blue-800 hover:to-emerald-700 text-white font-black text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
+              <i class="fa-solid fa-shield-check"></i>
+              <span id="kyc-admin-auth-submit-label">Sign In to Admin Dashboard</span>
+            </button>
+          </form>
+
+          <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+            <span><i class="fa-solid fa-server mr-1 text-emerald-600"></i>Server-Side RBAC &amp; Session</span>
+            <span>Expiring Bearer &amp; HttpOnly Token</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUTHENTICATED DASHBOARD WORKSPACE -->
+      <div id="kyc-admin-main-view" class="hidden flex-1 flex flex-col lg:flex-row max-w-[1440px] w-full mx-auto">
+        <!-- Sidebar Navigation -->
+        <aside class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 p-3 sm:p-4 shrink-0">
+          <div class="text-[11px] font-black uppercase tracking-wider text-slate-400 px-3 py-1.5">Navigation</div>
+          <nav class="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0" aria-label="Admin Dashboard Sections">
+            <button type="button" id="kyc-admin-nav-overview" data-admin-nav="overview" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap bg-blue-50 text-blue-700">
+              <i class="fa-solid fa-chart-pie w-4 text-center"></i>
+              <span>Overview</span>
+            </button>
+            <button type="button" id="kyc-admin-nav-countries" data-admin-nav="countries" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
+              <i class="fa-solid fa-earth-africa w-4 text-center"></i>
+              <span>Countries</span>
+            </button>
+            <button type="button" id="kyc-admin-nav-documents" data-admin-nav="documents" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
+              <i class="fa-solid fa-passport w-4 text-center"></i>
+              <span>Document Types</span>
+            </button>
+            <button type="button" id="kyc-admin-nav-matrix" data-admin-nav="matrix" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
+              <i class="fa-solid fa-list-check w-4 text-center"></i>
+              <span>Country + Documents</span>
+            </button>
+            <button type="button" id="kyc-admin-nav-testmode" data-admin-nav="testmode" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
+              <i class="fa-solid fa-flask-vial w-4 text-center"></i>
+              <span>Admin Test Mode</span>
+            </button>
+            <button type="button" id="kyc-admin-nav-users" data-admin-nav="users" class="kyc-admin-nav-btn hidden px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
+              <i class="fa-solid fa-users-gear w-4 text-center"></i>
+              <span>Admin Users &amp; Roles</span>
+            </button>
+            <button type="button" id="kyc-admin-nav-audit" data-admin-nav="audit" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
+              <i class="fa-solid fa-clipboard-list w-4 text-center"></i>
+              <span>Audit Log</span>
+            </button>
+          </nav>
+
+          <!-- Sidebar Role & Permissions Card -->
+          <div class="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Active Role</span>
+              <span id="kyc-admin-sidebar-role-label" class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-black uppercase">Super Admin</span>
+            </div>
+            <div id="kyc-admin-sidebar-perm-count" class="text-[11px] text-slate-600 font-medium">22 server-enforced permissions</div>
+          </div>
+
+          <!-- Sidebar Test Mode Quick Card -->
+          <div id="kyc-admin-sidebar-test-card" class="mt-3 p-3.5 rounded-xl bg-slate-900 text-white border border-slate-800">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-black uppercase tracking-wider text-emerald-400">Admin Test Mode</span>
+              <span id="kyc-admin-sidebar-test-pill" class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-slate-800 text-slate-400">OFF</span>
+            </div>
+            <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
+              Test Save PNG &amp; Download without Sifalo checkout (verified server-side).
+            </p>
+            <button type="button" id="kyc-admin-sidebar-test-toggle-btn" class="mt-2.5 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors cursor-pointer">
+              Enable Admin Test Mode
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Section Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 overflow-x-hidden">
+          <!-- Status Toast Banner inside Admin -->
+          <div id="kyc-admin-feedback-banner" class="hidden p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-between gap-3"></div>
+
+          <!-- SECTION: OVERVIEW -->
+          <section id="kyc-admin-section-overview" class="space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">System Overview</h1>
+                <p class="text-xs sm:text-sm text-slate-600">Live inventory of KycApproved countries, document types, payment unlock lifecycle, and role-scoped admin activity.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="kyc-admin-overview-matrix-btn" onclick="window.__kycAdminSwitchSection('matrix')" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                  <i class="fa-solid fa-sliders"></i>
+                  <span>Configure Country Documents</span>
+                </button>
+                <button type="button" id="kyc-admin-overview-testmode-btn" onclick="window.__kycAdminSwitchSection('testmode')" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                  <i class="fa-solid fa-flask"></i>
+                  <span>Launch Test Preview</span>
+                </button>
+                <button type="button" id="kyc-admin-overview-users-btn" onclick="window.__kycAdminSwitchSection('users')" class="hidden px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer items-center gap-1.5">
+                  <i class="fa-solid fa-users-gear"></i>
+                  <span>Manage Admin Users</span>
+                </button>
+              </div>
+            </div>
+
+            <div id="kyc-admin-overview-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Sifalo Unlock Lifecycle Audit Summary -->
+              <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">Public Sifalo Unlock Lifecycle Audit</h3>
+                  <span class="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-bold">Protected</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Real-time server-side state of public visitor Save PNG authorizations (CREATED &rarr; PAYMENT_VERIFIED &rarr; AUTHORIZED &rarr; CONSUMED).</p>
+                <div id="kyc-admin-unlock-lifecycle-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
+              </div>
+
+              <!-- Recent Admin Audit Events -->
+              <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">Recent Admin Activity</h3>
+                  <button type="button" id="kyc-admin-overview-view-audit-btn" onclick="window.__kycAdminSwitchSection('audit')" class="text-xs font-bold text-blue-600 hover:underline cursor-pointer">View Full Audit Log &rarr;</button>
+                </div>
+                <div id="kyc-admin-overview-recent-audit" class="space-y-2 max-h-60 overflow-y-auto"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION: COUNTRIES -->
+          <section id="kyc-admin-section-countries" class="hidden space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Countries Management</h2>
+                <p class="text-xs sm:text-sm text-slate-600">Add new countries, edit metadata, enable or disable countries, and manage supported verification documents.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="kyc-admin-countries-readonly-badge" class="hidden px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+                  <i class="fa-solid fa-eye mr-1"></i>Read-Only View for Role
+                </span>
+                <button type="button" id="kyc-admin-open-add-country-btn" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer inline-flex items-center gap-2">
+                  <i class="fa-solid fa-plus"></i>
+                  <span>Add New Country</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 flex flex-wrap items-center gap-3">
+              <div class="flex-1 min-w-[220px]">
+                <input id="kyc-admin-country-search" type="text" placeholder="Search countries by name, key, ISO3, or subtitle..." class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600">
+              </div>
+              <select id="kyc-admin-country-status-filter" aria-label="Filter countries by status" class="rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+                <option value="all">All Statuses</option>
+                <option value="enabled">Enabled Only</option>
+                <option value="disabled">Disabled Only</option>
+              </select>
+              <select id="kyc-admin-country-doc-filter" aria-label="Filter countries by document type" class="rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+                <option value="">All Document Types</option>
+                <option value="passport">Passport</option>
+                <option value="idcard">National Identity Card</option>
+                <option value="driverlicense">Driver License</option>
+                <option value="refugeecard">Proof of Address</option>
+                <option value="proofofaccount">Proof of Account</option>
+              </select>
+            </div>
+
+            <!-- Countries List Table -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                      <th class="py-3 px-4">Country</th>
+                      <th class="py-3 px-4">ISO3 / Key</th>
+                      <th class="py-3 px-4">Status</th>
+                      <th class="py-3 px-4">Enabled Documents</th>
+                      <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kyc-admin-countries-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION: DOCUMENT TYPES -->
+          <section id="kyc-admin-section-documents" class="hidden space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Document Types Management</h2>
+                <p class="text-xs sm:text-sm text-slate-600">View supported KycApproved document types, enable or disable document categories globally, and update display metadata.</p>
+              </div>
+              <span id="kyc-admin-documents-readonly-badge" class="hidden px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+                <i class="fa-solid fa-eye mr-1"></i>Read-Only View for Role
+              </span>
+            </div>
+            <div id="kyc-admin-documents-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </section>
+
+          <!-- SECTION: COUNTRY + DOCUMENT MANAGEMENT -->
+          <section id="kyc-admin-section-matrix" class="hidden space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Country + Document Assignment</h2>
+                <p class="text-xs sm:text-sm text-slate-600">Select a country and check or uncheck which document types are enabled for it without editing source code.</p>
+              </div>
+              <span id="kyc-admin-matrix-readonly-badge" class="hidden px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
+                <i class="fa-solid fa-lock mr-1"></i>Read-Only Matrix (Requires country_documents.manage)
+              </span>
+            </div>
+
+            <!-- Single Country Checkbox Editor Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-5">
+              <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                  <label for="kyc-admin-matrix-country-select" class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-600">Country:</label>
+                  <select id="kyc-admin-matrix-country-select" class="rounded-xl border-2 border-slate-300 px-3.5 py-2 text-sm font-black text-slate-900 focus:outline-none focus:border-blue-600"></select>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" id="kyc-admin-matrix-preview-btn" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>Open Country in Live Preview</span>
+                  </button>
+                </div>
+              </div>
+
+              <div id="kyc-admin-matrix-checkbox-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+
+              <div class="pt-2 flex flex-wrap items-center justify-between gap-3">
+                <span class="text-xs text-slate-500">Changes immediately update the public KycApproved country &amp; document selector.</span>
+                <button type="button" id="kyc-admin-matrix-save-btn" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-sm transition-colors cursor-pointer inline-flex items-center gap-2">
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Save Country Document Availability</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Full Matrix Table -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+                <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">All Countries &times; Document Matrix</h3>
+                <span class="text-xs text-slate-500">Click any checkbox to toggle immediately</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                      <th class="py-3 px-4">Country</th>
+                      <th class="py-3 px-3 text-center">Passport</th>
+                      <th class="py-3 px-3 text-center">National ID Card</th>
+                      <th class="py-3 px-3 text-center">Driver License</th>
+                      <th class="py-3 px-3 text-center">Proof of Address</th>
+                      <th class="py-3 px-3 text-center">Proof of Account</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kyc-admin-full-matrix-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION: ADMIN PREVIEW / TEST MODE -->
+          <section id="kyc-admin-section-testmode" class="hidden space-y-6">
+            <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-lg">
+              <div class="flex flex-wrap items-start justify-between gap-4">
+                <div class="max-w-2xl space-y-2">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black uppercase tracking-wider">
+                    <i class="fa-solid fa-shield-check"></i>
+                    Server-Verified Admin Preview &amp; Test Mode
+                  </span>
+                  <h2 class="text-xl sm:text-2xl font-black tracking-tight">Test Documents, Save PNG &amp; Download Without Payment</h2>
+                  <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    When enabled for authorized roles (<strong>Super Admin</strong> &amp; <strong>Test Admin</strong>), the server issues single-action test authorizations for your authenticated session so you can inspect live document previews, test form fields, and verify PNG generation without creating Sifalo payments. Public visitors always remain protected by Sifalo checkout.
+                  </p>
+                </div>
+                <div class="flex flex-col items-end gap-2">
+                  <span id="kyc-admin-testmode-status-badge" class="px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-300">
+                    Test Mode: Disabled
+                  </span>
+                  <button type="button" id="kyc-admin-testmode-main-toggle-btn" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer">
+                    Enable Admin Test Mode
+                  </button>
+                </div>
+              </div>
+
+              <div id="kyc-admin-testmode-no-perm-banner" class="hidden mt-5 p-4 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-200 text-xs sm:text-sm font-semibold">
+                <i class="fa-solid fa-lock mr-2"></i>Your current role does not include <code>png_test.use</code> or <code>download_test.use</code> permissions. Only Super Admin and Test Admin accounts can authorize payment-free test downloads.
+              </div>
+
+              <div id="kyc-admin-testmode-controls-grid" class="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label for="kyc-admin-test-country-select" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">1. Select Country</label>
+                  <select id="kyc-admin-test-country-select" class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-emerald-400"></select>
+                </div>
+                <div>
+                  <label for="kyc-admin-test-doc-select" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">2. Select Document Type</label>
+                  <select id="kyc-admin-test-doc-select" class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-emerald-400"></select>
+                </div>
+                <div class="flex items-end">
+                  <button type="button" id="kyc-admin-launch-live-editor-btn" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-up-right-from-square"></i>
+                    <span>Open Live Preview &amp; Test Save PNG</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION: ADMIN USERS & ROLE PERMISSIONS (SUPER ADMIN ONLY) -->
+          <section id="kyc-admin-section-users" class="hidden space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Admin Users &amp; Role-Based Permissions</h2>
+                <p class="text-xs sm:text-sm text-slate-600">Manage administrator accounts, assign roles (Super Admin, Content Admin, Test Admin, Viewer), customize granular permissions, and disable or reset accounts.</p>
+              </div>
+              <button type="button" id="kyc-admin-open-create-user-btn" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer inline-flex items-center gap-2">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Create Admin User</span>
+              </button>
+            </div>
+
+            <!-- Role Reference Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-800 text-xs font-black uppercase">Super Admin</span>
+                  <span class="text-[11px] font-mono text-slate-400">22 perms</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-2 leading-relaxed">Full control over countries, documents, Admin Test Mode, audit logs, payment settings, and admin user accounts/roles.</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-800 text-xs font-black uppercase">Content Admin</span>
+                  <span class="text-[11px] font-mono text-slate-400">13 perms</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-2 leading-relaxed">Add/edit/enable/disable countries, documents, and country-document availability. Cannot use Test Mode or manage users.</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-xs font-black uppercase">Test Admin</span>
+                  <span class="text-[11px] font-mono text-slate-400">5 perms</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-2 leading-relaxed">View catalog and use Admin Test Mode to test Save PNG &amp; Download without Sifalo payment. Cannot edit catalog or users.</p>
+              </div>
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 text-xs font-black uppercase">Viewer</span>
+                  <span class="text-[11px] font-mono text-slate-400">4 perms</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-2 leading-relaxed">Read-only access to dashboard overview, country list, document list, and content audit log. Cannot edit or use Test Mode.</p>
+              </div>
+            </div>
+
+            <!-- Admin Users Table -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                      <th class="py-3 px-4">Admin User</th>
+                      <th class="py-3 px-4">Assigned Role</th>
+                      <th class="py-3 px-4">Status</th>
+                      <th class="py-3 px-4">Effective Permissions</th>
+                      <th class="py-3 px-4">Created / Last Login</th>
+                      <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kyc-admin-users-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION: AUDIT LOG -->
+          <section id="kyc-admin-section-audit" class="hidden space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Admin Audit Log</h2>
+                <p class="text-xs sm:text-sm text-slate-600">Tamper-resistant server-side log of admin logins, role &amp; permission changes, unauthorized access attempts, country/document updates, and Admin Test Mode actions.</p>
+              </div>
+              <button type="button" id="kyc-admin-refresh-audit-btn" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate"></i>
+                <span>Refresh Log</span>
+              </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 flex flex-wrap items-center gap-3">
+              <div class="flex-1 min-w-[200px]">
+                <input id="kyc-admin-audit-search" type="text" placeholder="Search audit events by summary, target key, or actor..." class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600">
+              </div>
+              <select id="kyc-admin-audit-type-filter" aria-label="Filter audit events by type" class="rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+                <option value="">All Event Types</option>
+                <option value="ADMIN_LOGIN_SUCCESS">ADMIN_LOGIN_SUCCESS</option>
+                <option value="ADMIN_LOGIN_FAILED">ADMIN_LOGIN_FAILED</option>
+                <option value="ADMIN_LOGOUT">ADMIN_LOGOUT</option>
+                <option value="ADMIN_USER_CREATED">ADMIN_USER_CREATED</option>
+                <option value="ADMIN_USER_UPDATED">ADMIN_USER_UPDATED</option>
+                <option value="ADMIN_USER_ENABLED">ADMIN_USER_ENABLED</option>
+                <option value="ADMIN_USER_DISABLED">ADMIN_USER_DISABLED</option>
+                <option value="ADMIN_PASSWORD_RESET">ADMIN_PASSWORD_RESET</option>
+                <option value="ADMIN_ROLE_CHANGED">ADMIN_ROLE_CHANGED</option>
+                <option value="ADMIN_PERMISSIONS_CHANGED">ADMIN_PERMISSIONS_CHANGED</option>
+                <option value="UNAUTHORIZED_ACCESS_ATTEMPT">UNAUTHORIZED_ACCESS_ATTEMPT</option>
+                <option value="COUNTRY_ADDED">COUNTRY_ADDED</option>
+                <option value="COUNTRY_UPDATED">COUNTRY_UPDATED</option>
+                <option value="COUNTRY_ENABLED">COUNTRY_ENABLED</option>
+                <option value="COUNTRY_DISABLED">COUNTRY_DISABLED</option>
+                <option value="COUNTRY_REMOVED">COUNTRY_REMOVED</option>
+                <option value="DOCUMENT_UPDATED">DOCUMENT_UPDATED</option>
+                <option value="DOCUMENT_ENABLED">DOCUMENT_ENABLED</option>
+                <option value="DOCUMENT_DISABLED">DOCUMENT_DISABLED</option>
+                <option value="COUNTRY_DOCUMENTS_UPDATED">COUNTRY_DOCUMENTS_UPDATED</option>
+                <option value="ADMIN_TEST_MODE_ENABLED">ADMIN_TEST_MODE_ENABLED</option>
+                <option value="ADMIN_TEST_MODE_DISABLED">ADMIN_TEST_MODE_DISABLED</option>
+                <option value="ADMIN_TEST_SAVE_PNG">ADMIN_TEST_SAVE_PNG</option>
+                <option value="ADMIN_TEST_DOWNLOAD">ADMIN_TEST_DOWNLOAD</option>
+              </select>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-black uppercase tracking-wider text-slate-500">
+                      <th class="py-3 px-4">Timestamp</th>
+                      <th class="py-3 px-4">Event Type</th>
+                      <th class="py-3 px-4">Actor</th>
+                      <th class="py-3 px-4">Target</th>
+                      <th class="py-3 px-4">Summary</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kyc-admin-audit-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT COUNTRY MODAL -->
+  <div id="kyc-admin-country-modal" class="hidden no-print fixed inset-0 z-[280] bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-lg w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 id="kyc-admin-country-modal-title" class="text-lg font-black text-slate-900">Add New Country</h3>
+        <button type="button" id="kyc-admin-country-modal-close" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="kyc-admin-country-form" class="space-y-3.5">
+        <input type="hidden" id="kyc-admin-country-form-mode" value="add">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="kyc-admin-country-name" class="block text-xs font-bold text-slate-700 uppercase mb-1">Country Name *</label>
+            <input id="kyc-admin-country-name" type="text" required placeholder="e.g. Brazil" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold">
+          </div>
+          <div>
+            <label for="kyc-admin-country-key" class="block text-xs font-bold text-slate-700 uppercase mb-1">Country Key *</label>
+            <input id="kyc-admin-country-key" type="text" required placeholder="e.g. brazil" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="kyc-admin-country-flag" class="block text-xs font-bold text-slate-700 uppercase mb-1">Flag Emoji</label>
+            <input id="kyc-admin-country-flag" type="text" placeholder="🇧🇷" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+          </div>
+          <div>
+            <label for="kyc-admin-country-iso3" class="block text-xs font-bold text-slate-700 uppercase mb-1">ISO3 Code</label>
+            <input id="kyc-admin-country-iso3" type="text" maxlength="3" placeholder="BRA" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono uppercase">
+          </div>
+        </div>
+        <div>
+          <label for="kyc-admin-country-subtitle" class="block text-xs font-bold text-slate-700 uppercase mb-1">Card Subtitle</label>
+          <input id="kyc-admin-country-subtitle" type="text" placeholder="Passport &amp; National ID Card" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label for="kyc-admin-country-authority" class="block text-xs font-bold text-slate-700 uppercase mb-1">Official Issuing Authority</label>
+          <input id="kyc-admin-country-authority" type="text" placeholder="Federal Police / National Identity Authority" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <span class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Enabled Documents for Country</span>
+          <div id="kyc-admin-country-modal-docs" class="grid grid-cols-2 gap-2"></div>
+        </div>
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" id="kyc-admin-country-modal-cancel" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black cursor-pointer">Save Country</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT DOCUMENT METADATA MODAL -->
+  <div id="kyc-admin-doc-modal" class="hidden no-print fixed inset-0 z-[280] bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-black text-slate-900">Edit Document Metadata</h3>
+        <button type="button" id="kyc-admin-doc-modal-close" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="kyc-admin-doc-form" class="space-y-3.5">
+        <input type="hidden" id="kyc-admin-doc-form-type" value="">
+        <div>
+          <label for="kyc-admin-doc-name" class="block text-xs font-bold text-slate-700 uppercase mb-1">Display Name *</label>
+          <input id="kyc-admin-doc-name" type="text" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold">
+        </div>
+        <div>
+          <label for="kyc-admin-doc-category" class="block text-xs font-bold text-slate-700 uppercase mb-1">Category Label</label>
+          <input id="kyc-admin-doc-category" type="text" required class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label for="kyc-admin-doc-desc" class="block text-xs font-bold text-slate-700 uppercase mb-1">Description</label>
+          <textarea id="kyc-admin-doc-desc" rows="3" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"></textarea>
+        </div>
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" id="kyc-admin-doc-modal-cancel" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black cursor-pointer">Save Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CREATE / EDIT ADMIN USER & ROLE PERMISSIONS MODAL -->
+  <div id="kyc-admin-user-modal" class="hidden no-print fixed inset-0 z-[285] bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <h3 id="kyc-admin-user-modal-title" class="text-lg font-black text-slate-900">Create Admin User</h3>
+        <button type="button" id="kyc-admin-user-modal-close" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="kyc-admin-user-form" class="space-y-4">
+        <input type="hidden" id="kyc-admin-user-form-mode" value="create">
+        <input type="hidden" id="kyc-admin-user-form-id" value="">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="kyc-admin-user-username" class="block text-xs font-bold text-slate-700 uppercase mb-1">Username *</label>
+            <input id="kyc-admin-user-username" type="text" required placeholder="e.g. content_manager" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-mono">
+          </div>
+          <div>
+            <label for="kyc-admin-user-displayname" class="block text-xs font-bold text-slate-700 uppercase mb-1">Display Name *</label>
+            <input id="kyc-admin-user-displayname" type="text" required placeholder="e.g. Content Manager" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold">
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="kyc-admin-user-role" class="block text-xs font-bold text-slate-700 uppercase mb-1">Assigned Role *</label>
+            <select id="kyc-admin-user-role" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-900">
+              <option value="super_admin">Super Admin (Full Control)</option>
+              <option value="content_admin">Content Admin (Countries &amp; Docs)</option>
+              <option value="test_admin">Test Admin (Preview &amp; Test Mode)</option>
+              <option value="viewer">Viewer (Read-Only)</option>
+            </select>
+          </div>
+          <div id="kyc-admin-user-password-wrap">
+            <label for="kyc-admin-user-password" class="block text-xs font-bold text-slate-700 uppercase mb-1">Initial Password * (min 8 chars)</label>
+            <input id="kyc-admin-user-password" type="password" autocomplete="new-password" placeholder="Minimum 8 characters" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold">
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3">
+          <div class="flex items-center justify-between mb-2">
+            <label class="flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+              <input type="checkbox" id="kyc-admin-user-use-custom-perms" class="accent-blue-600 rounded">
+              <span>Customize Individual Permissions (Override Role Defaults)</span>
+            </label>
+            <button type="button" id="kyc-admin-user-reset-role-perms-btn" class="text-[11px] font-bold text-blue-600 hover:underline cursor-pointer">Reset to Role Defaults</button>
+          </div>
+          <div id="kyc-admin-user-perms-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-52 overflow-y-auto p-2.5 rounded-xl bg-slate-50 border border-slate-200"></div>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" id="kyc-admin-user-modal-cancel" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">Cancel</button>
+          <button type="submit" id="kyc-admin-user-submit-btn" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black cursor-pointer">Save Admin User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- RESET ADMIN USER PASSWORD MODAL -->
+  <div id="kyc-admin-reset-pw-modal" class="hidden no-print fixed inset-0 z-[285] bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 id="kyc-admin-reset-pw-title" class="text-lg font-black text-slate-900">Reset Admin Password</h3>
+        <button type="button" id="kyc-admin-reset-pw-close" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="kyc-admin-reset-pw-form" class="space-y-3.5">
+        <input type="hidden" id="kyc-admin-reset-pw-userid" value="">
+        <p class="text-xs text-slate-600">Enter a new password (minimum 8 characters). This will immediately hash the new password with scrypt on the server and revoke existing active sessions for this user.</p>
+        <div>
+          <label for="kyc-admin-reset-pw-input" class="block text-xs font-bold text-slate-700 uppercase mb-1">New Password *</label>
+          <input id="kyc-admin-reset-pw-input" type="password" required minlength="8" autocomplete="new-password" placeholder="Enter new password (min 8 chars)" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold">
+        </div>
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" id="kyc-admin-reset-pw-cancel" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-black cursor-pointer">Reset Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div id="kyc-admin-confirm-modal" class="hidden no-print fixed inset-0 z-[290] bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 max-w-md w-full p-6 shadow-2xl space-y-4">
+      <h3 id="kyc-admin-confirm-title" class="text-lg font-black text-slate-900">Confirm Action</h3>
+      <p id="kyc-admin-confirm-message" class="text-xs sm:text-sm text-slate-600 leading-relaxed"></p>
+      <div class="pt-2 flex items-center justify-end gap-2">
+        <button type="button" id="kyc-admin-confirm-cancel" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">Cancel</button>
+        <button type="button" id="kyc-admin-confirm-ok" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black cursor-pointer">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Strictly in-memory admin session state — NEVER stored in localStorage, sessionStorage, or window globals
+      let _adminMemoryToken = null;
+      let _adminSessionInfo = null;
+      let _adminTestModeEnabled = false;
+      let _adminCountries = [];
+      let _adminDocuments = [];
+      let _adminUsers = [];
+      let _adminOverview = null;
+      let _activeSection = 'overview';
+      let _selectedMatrixCountry = 'somalia';
+      let _confirmCallback = null;
+
+      const ROLE_DEFAULT_PERMS = {
+        super_admin: [
+          'dashboard.view',
+          'countries.view', 'countries.create', 'countries.update', 'countries.enable', 'countries.disable',
+          'documents.view', 'documents.create', 'documents.update', 'documents.enable', 'documents.disable',
+          'country_documents.manage',
+          'png_test.use', 'download_test.use',
+          'audit.view',
+          'admins.view', 'admins.create', 'admins.update', 'admins.disable', 'roles.manage',
+          'payments.settings.view', 'payments.settings.manage'
+        ],
+        content_admin: [
+          'dashboard.view',
+          'countries.view', 'countries.create', 'countries.update', 'countries.enable', 'countries.disable',
+          'documents.view', 'documents.create', 'documents.update', 'documents.enable', 'documents.disable',
+          'country_documents.manage',
+          'audit.view'
+        ],
+        test_admin: [
+          'dashboard.view',
+          'countries.view',
+          'documents.view',
+          'png_test.use',
+          'download_test.use'
+        ],
+        viewer: [
+          'dashboard.view',
+          'countries.view',
+          'documents.view',
+          'audit.view'
+        ]
+      };
+
+      const ALL_PERMISSIONS_LIST = ROLE_DEFAULT_PERMS.super_admin;
+
+      const ROLE_BADGE_STYLES = {
+        super_admin: 'bg-purple-100 text-purple-800 border-purple-200',
+        content_admin: 'bg-blue-100 text-blue-800 border-blue-200',
+        test_admin: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+        viewer: 'bg-slate-100 text-slate-700 border-slate-200'
+      };
+
+      const DOC_LABELS = {
+        passport: 'Passport',
+        idcard: 'National Identity Card',
+        driverlicense: 'Driver License',
+        refugeecard: 'Proof of Address',
+        proofofaccount: 'Proof of Account'
+      };
+
+      const DOC_TYPE_TO_PRODUCT_KEY = {
+        passport: 'passport',
+        idcard: 'nationalIdentity',
+        driverlicense: 'driverLicense',
+        refugeecard: 'proofOfAddress',
+        proofofaccount: 'proofOfAccount'
+      };
+
+      function el(id) {
+        return document.getElementById(id);
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function hasPerm(perm) {
+        if (!_adminSessionInfo || !Array.isArray(_adminSessionInfo.permissions)) return false;
+        return _adminSessionInfo.permissions.includes(perm);
+      }
+
+      function canUseTestMode() {
+        return hasPerm('png_test.use') || hasPerm('download_test.use');
+      }
+
+      async function adminApiFetch(path, options) {
+        const opts = options || {};
+        const headers = Object.assign(
+          {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Kyc-Admin-Request': '1'
+          },
+          opts.headers || {}
+        );
+        if (_adminMemoryToken) {
+          headers['Authorization'] = 'Bearer ' + _adminMemoryToken;
+        }
+        const res = await fetch(path, {
+          method: opts.method || 'GET',
+          headers,
+          credentials: 'same-origin',
+          cache: 'no-store',
+          body: opts.body ? JSON.stringify(opts.body) : undefined
+        });
+        const data = await res.json().catch(() => ({ ok: false, error: 'Invalid server response' }));
+        return { status: res.status, ok: res.ok && data.ok !== false, data };
+      }
+
+      // Server-verified Admin Test Mode single-action authorizer invoked by triggerWithSifaloPay
+      window.__kycRequestServerAdminTestAuthorization = async function(context) {
+        if (!_adminMemoryToken || !_adminTestModeEnabled || !_adminSessionInfo || !canUseTestMode()) {
+          return false;
+        }
+        const docSpec = (context && context.docSpec) || {};
+        const clickedBtn = context && context.clickedBtn;
+        const btnText = clickedBtn ? String(clickedBtn.textContent || '').toLowerCase() : '';
+        const action = btnText.includes('download') && !btnText.includes('save png') ? 'download' : 'save_png';
+        const countryKey = (typeof currentCountry === 'string' && currentCountry) ? currentCountry : 'kenya';
+        const docType = (typeof currentDocType === 'string' && currentDocType) ? currentDocType : 'passport';
+        const productKey = docSpec.productKey || DOC_TYPE_TO_PRODUCT_KEY[docType] || 'passport';
+
+        // Step 1: Request single-use server-side Admin Test authorization
+        const authRes = await adminApiFetch('/api/admin/test-mode/authorize-action', {
+          method: 'POST',
+          body: {
+            countryKey,
+            docType,
+            productKey,
+            action
+          }
+        });
+
+        if (!authRes.ok || !authRes.data || !authRes.data.authorized || !authRes.data.adminTestToken) {
+          return false;
+        }
+
+        // Step 2: Atomically verify & consume the single-use adminTestToken on the server
+        const consumeRes = await adminApiFetch('/api/admin/test-mode/consume-token', {
+          method: 'POST',
+          body: {
+            adminTestToken: authRes.data.adminTestToken,
+            countryKey,
+            productKey,
+            action
+          }
+        });
+
+        if (!consumeRes.ok || !consumeRes.data || !consumeRes.data.consumed) {
+          return false;
+        }
+
+        if (typeof showToast === 'function') {
+          showToast(
+            'Admin Test Mode Authorized',
+            `Server verified Admin Test ${action === 'download' ? 'Download' : 'Save PNG'} for ${countryKey.toUpperCase()} (${DOC_LABELS[docType] || docType})`
+          );
+        }
+        return true;
+      };
+
+      // Dynamically ensure any added country or newly enabled Passport/ID card view exists in the live workbench
+      function ensureDynamicCountryViewsMounted(country) {
+        if (!country || !country.key) return;
+        const key = country.key;
+        const enabledDocs = Array.isArray(country.enabledDocs) ? country.enabledDocs : [];
+        const workbench = document.getElementById('verification-workbench');
+        const portraits = window.OCEANIA_DEFAULT_PORTRAITS || [
+          '/assets/aistudio/1793954903894_cb01dc06.jpg',
+          '/assets/aistudio/1793954988317_80f3f77d.jpg',
+          '/assets/aistudio/1793954903894_cb01dc06.jpg',
+          '/assets/aistudio/1793954988317_80f3f77d.jpg'
+        ];
+
+        const needsDynamicPassport = enabledDocs.includes('passport') && !document.getElementById(`${key}-passport-view`);
+        const needsDynamicId = enabledDocs.includes('idcard') && !document.getElementById(`${key}-idcard-view`) && !document.getElementById(`${key}-doc-view`);
+
+        if ((needsDynamicPassport || needsDynamicId) && window.OCEANIA_COUNTRIES_CONFIG) {
+          const iso3 = (country.iso3 || key.slice(0, 3)).toUpperCase();
+          if (!window.OCEANIA_COUNTRIES_CONFIG[key]) {
+            window.OCEANIA_COUNTRIES_CONFIG[key] = {
+              key,
+              name: country.name || key,
+              officialName: (country.name || key).toUpperCase(),
+              flag: country.flag || '🌍',
+              iso3,
+              passportTitle: `${country.name || key} Passport`,
+              passportHeader: `${(country.name || key).toUpperCase()} · PASSPORT`,
+              passportAuthority: country.authority || `${country.name || key} Immigration Authority`,
+              nationality: (country.name || key).toUpperCase(),
+              accentHex: '#0f2d6b',
+              secondaryHex: '#0ea5e9',
+              tailwindAccent: 'blue',
+              passPrefix: iso3.slice(0, 2),
+              hasNationalId: true,
+              idCardTitle: `${country.name || key} National Identity Card`,
+              idHeaderTop: (country.name || key).toUpperCase(),
+              idHeaderSub: `NATIONAL IDENTITY CARD · ${iso3}`,
+              idAuthority: country.authority || `${country.name || key} Civil Registry`,
+              idDocPrefix: iso3,
+              passportProfiles: [
+                { passNo: `${iso3.slice(0, 2)}4829104`, surname: 'ALEXANDER', givenNames: 'MARCUS ELI', sex: 'M', dob: '1992-06-14', pob: (country.name || key).toUpperCase(), personalNo: `${iso3}8492014`, issue: '2023-03-14', expiry: '2033-03-13', authority: iso3, photoUrl: portraits[0] },
+                { passNo: `${iso3.slice(0, 2)}7150382`, surname: 'LAURENT', givenNames: 'SOFIA CLAIRE', sex: 'F', dob: '1995-11-04', pob: (country.name || key).toUpperCase(), personalNo: `${iso3}5120498`, issue: '2023-09-21', expiry: '2033-09-20', authority: iso3, photoUrl: portraits[1] }
+              ],
+              idProfiles: [
+                { docNo: `${iso3}8492014`, personalNo: '1004829173', surname: 'ALEXANDER', givenNames: 'MARCUS ELI', sex: 'M', dob: '1992-06-14', pob: (country.name || key).toUpperCase(), issue: '2023-05-10', expiry: '2033-05-09', authority: iso3, region: (country.name || key).toUpperCase(), photoUrl: portraits[0] },
+                { docNo: `${iso3}5920184`, personalNo: '1006391820', surname: 'LAURENT', givenNames: 'SOFIA CLAIRE', sex: 'F', dob: '1995-11-04', pob: (country.name || key).toUpperCase(), issue: '2023-03-19', expiry: '2033-03-18', authority: iso3, region: (country.name || key).toUpperCase(), photoUrl: portraits[1] }
+              ]
+            };
+          } else {
+            window.OCEANIA_COUNTRIES_CONFIG[key].hasNationalId = true;
+            if (!window.OCEANIA_COUNTRIES_CONFIG[key].idProfiles) {
+              window.OCEANIA_COUNTRIES_CONFIG[key].idCardTitle = `${country.name || key} National Identity Card`;
+              window.OCEANIA_COUNTRIES_CONFIG[key].idHeaderTop = (country.name || key).toUpperCase();
+              window.OCEANIA_COUNTRIES_CONFIG[key].idHeaderSub = `NATIONAL IDENTITY CARD · ${iso3}`;
+              window.OCEANIA_COUNTRIES_CONFIG[key].idAuthority = country.authority || `${country.name || key} Civil Registry`;
+              window.OCEANIA_COUNTRIES_CONFIG[key].idDocPrefix = iso3;
+              window.OCEANIA_COUNTRIES_CONFIG[key].idProfiles = [
+                { docNo: `${iso3}8492014`, personalNo: '1004829173', surname: 'ALEXANDER', givenNames: 'MARCUS ELI', sex: 'M', dob: '1992-06-14', pob: (country.name || key).toUpperCase(), issue: '2023-05-10', expiry: '2033-05-09', authority: iso3, region: (country.name || key).toUpperCase(), photoUrl: portraits[0] }
+              ];
+            }
+          }
+
+          if (workbench) {
+            if (needsDynamicPassport && !document.getElementById(`${key}-passport-view`)) {
+              const div = document.createElement('div');
+              div.id = `${key}-passport-view`;
+              div.className = 'hidden max-w-7xl mx-auto space-y-6';
+              workbench.appendChild(div);
+            }
+            if (needsDynamicId && !document.getElementById(`${key}-idcard-view`)) {
+              const div = document.createElement('div');
+              div.id = `${key}-idcard-view`;
+              div.className = 'hidden max-w-7xl mx-auto space-y-6';
+              workbench.appendChild(div);
+            }
+          }
+
+          if (typeof window.mountOceaniaDocumentViews === 'function') {
+            window.mountOceaniaDocumentViews();
+          }
+        }
+
+        if (enabledDocs.includes('proofofaccount')) {
+          if (Array.isArray(window.poaConfiguredCountryKeys) && !window.poaConfiguredCountryKeys.includes(key)) {
+            window.poaConfiguredCountryKeys.push(key);
+          }
+          if (typeof poaCountryMap === 'object' && poaCountryMap && !poaCountryMap[key]) {
+            poaCountryMap[key] = {
+              name: country.name || key,
+              fullName: country.name || key,
+              city: 'Capital District',
+              address: `14 Central Boulevard, ${(country.name || key)}`,
+              bank: 'Clear Junction Global',
+              dotColor: 'bg-blue-600',
+              badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/40'
+            };
+          }
+        }
+      }
+
+      // Synchronize public website country & document catalog from /api/catalog
+      async function syncPublicCatalogFromServer() {
+        try {
+          const res = await fetch('/api/catalog', { cache: 'no-store' });
+          if (!res.ok) return;
+          const data = await res.json();
+          if (!data || !data.ok) return;
+
+          const registry = document.getElementById('existing-country-registry');
+          if (!registry) return;
+
+          const enabledSet = new Set((data.countries || []).map(c => c.key));
+
+          (data.countries || []).forEach(c => {
+            if (typeof COUNTRY_OFFICIAL_AUTHORITIES === 'object' && COUNTRY_OFFICIAL_AUTHORITIES) {
+              COUNTRY_OFFICIAL_AUTHORITIES[c.key] = {
+                authority: c.authority || `${c.name} Immigration & Identity Authority`,
+                portalName: c.portalName || `${c.name} Official Portal`,
+                portalUrl: c.portalUrl || 'https://www.icao.int',
+                idStandard: c.idStandard || `${c.name} Verification Specimen`
+              };
+            }
+
+            ensureDynamicCountryViewsMounted(c);
+
+            let btn = document.getElementById(`country-btn-${c.key}`);
+            if (!btn) {
+              btn = document.createElement('button');
+              btn.type = 'button';
+              btn.id = `country-btn-${c.key}`;
+              btn.setAttribute('onclick', `switchVerificationCountry('${c.key}')`);
+              btn.className = 'country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-blue-50/40 hover:border-blue-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer';
+              btn.innerHTML = `
+                <div class="flex items-center justify-between">
+                  <span class="text-2xl drop-shadow-xs">${escapeHtml(c.flag || '🌍')}</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+                </div>
+                <div class="mt-2.5">
+                  <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">${escapeHtml(c.name)}</div>
+                  <div class="text-[10px] font-medium text-slate-500">${escapeHtml(c.subtitle || '')}</div>
+                </div>
+              `;
+              registry.appendChild(btn);
+            } else {
+              const flagEl = btn.querySelector('.text-2xl');
+              const nameEl = btn.querySelector('.text-xs.sm\\:text-sm, .font-black');
+              const subEl = btn.querySelector('.text-\\[10px\\]');
+              if (flagEl) flagEl.textContent = c.flag || '🌍';
+              if (nameEl) nameEl.textContent = c.name;
+              if (subEl) subEl.textContent = c.subtitle || '';
+            }
+            btn.setAttribute('data-docs', (c.enabledDocs || []).join(','));
+            btn.setAttribute('data-providers', 'all');
+            btn.classList.add('country-pill-btn');
+            btn.removeAttribute('data-admin-disabled');
+          });
+
+          (data.allCountryStates || []).forEach(st => {
+            if (!st.enabled && !enabledSet.has(st.key)) {
+              const btn = document.getElementById(`country-btn-${st.key}`);
+              if (btn) {
+                btn.classList.remove('country-pill-btn');
+                btn.setAttribute('data-admin-disabled', '1');
+              }
+            }
+          });
+
+          const knownKeys = new Set((data.allCountryStates || []).map(s => s.key));
+          registry.querySelectorAll('[id^="country-btn-"]').forEach(btn => {
+            const key = btn.id.replace('country-btn-', '').trim();
+            if (key && !knownKeys.has(key)) {
+              btn.remove();
+            }
+          });
+
+          if (typeof currentCountry === 'string' && currentCountry) {
+            if (typeof syncWorkbenchCountryDropdownUI === 'function') {
+              syncWorkbenchCountryDropdownUI(currentCountry);
+            }
+            if (typeof syncWorkbenchDocTabsForCountry === 'function') {
+              syncWorkbenchDocTabsForCountry(currentCountry);
+            }
+            if (typeof renderActiveDocumentView === 'function') {
+              renderActiveDocumentView();
+            }
+          }
+        } catch (e) {}
+      }
+
+      function showAdminFeedback(message, isError) {
+        const banner = el('kyc-admin-feedback-banner');
+        if (!banner) return;
+        banner.className = isError
+          ? 'p-3.5 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs sm:text-sm font-semibold flex items-center justify-between gap-3'
+          : 'p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs sm:text-sm font-semibold flex items-center justify-between gap-3';
+        banner.innerHTML = `
+          <span><i class="fa-solid ${isError ? 'fa-circle-exclamation' : 'fa-circle-check'} mr-2"></i>${escapeHtml(message)}</span>
+          <button type="button" onclick="this.parentElement.classList.add('hidden')" class="text-xs font-bold underline cursor-pointer">Dismiss</button>
+        `;
+        banner.classList.remove('hidden');
+      }
+
+      function applyRoleAndPermissionsToDashboardUI() {
+        const roleLabel = (_adminSessionInfo && _adminSessionInfo.roleLabel) || 'Admin';
+        const permsCount = (_adminSessionInfo && Array.isArray(_adminSessionInfo.permissions))
+          ? _adminSessionInfo.permissions.length
+          : 0;
+
+        const headerRoleBadge = el('kyc-admin-header-role-badge');
+        if (headerRoleBadge) {
+          headerRoleBadge.textContent = `Role: ${roleLabel}`;
+          headerRoleBadge.classList.remove('hidden');
+        }
+
+        const sidebarRoleLabel = el('kyc-admin-sidebar-role-label');
+        if (sidebarRoleLabel) {
+          sidebarRoleLabel.textContent = roleLabel;
+        }
+        const sidebarPermCount = el('kyc-admin-sidebar-perm-count');
+        if (sidebarPermCount) {
+          sidebarPermCount.textContent = `${permsCount} server-enforced permissions`;
+        }
+
+        // Sidebar navigation tabs visibility
+        el('kyc-admin-nav-users')?.classList.toggle('hidden', !hasPerm('admins.view'));
+        el('kyc-admin-nav-audit')?.classList.toggle('hidden', !hasPerm('audit.view'));
+        el('kyc-admin-overview-view-audit-btn')?.classList.toggle('hidden', !hasPerm('audit.view'));
+
+        const overviewUsersBtn = el('kyc-admin-overview-users-btn');
+        if (overviewUsersBtn) {
+          overviewUsersBtn.classList.toggle('hidden', !hasPerm('admins.view'));
+          overviewUsersBtn.classList.toggle('inline-flex', hasPerm('admins.view'));
+        }
+
+        const overviewTestBtn = el('kyc-admin-overview-testmode-btn');
+        if (overviewTestBtn) {
+          overviewTestBtn.classList.toggle('hidden', !canUseTestMode());
+        }
+        const overviewMatrixBtn = el('kyc-admin-overview-matrix-btn');
+        if (overviewMatrixBtn) {
+          overviewMatrixBtn.classList.toggle('hidden', !hasPerm('country_documents.manage'));
+        }
+
+        // Sidebar Test Mode card & nav
+        el('kyc-admin-sidebar-test-card')?.classList.toggle('hidden', !canUseTestMode());
+        el('kyc-admin-nav-testmode')?.classList.toggle('hidden', !canUseTestMode());
+
+        // Countries section controls
+        const canEditCountries = hasPerm('countries.create') || hasPerm('countries.update') || hasPerm('countries.enable') || hasPerm('countries.disable');
+        el('kyc-admin-open-add-country-btn')?.classList.toggle('hidden', !hasPerm('countries.create'));
+        el('kyc-admin-countries-readonly-badge')?.classList.toggle('hidden', canEditCountries);
+
+        // Documents section controls
+        const canEditDocs = hasPerm('documents.update') || hasPerm('documents.enable') || hasPerm('documents.disable');
+        el('kyc-admin-documents-readonly-badge')?.classList.toggle('hidden', canEditDocs);
+
+        // Country + Documents Matrix controls
+        const canManageMatrix = hasPerm('country_documents.manage');
+        el('kyc-admin-matrix-readonly-badge')?.classList.toggle('hidden', canManageMatrix);
+        el('kyc-admin-matrix-save-btn')?.classList.toggle('hidden', !canManageMatrix);
+        el('kyc-admin-matrix-preview-btn')?.classList.toggle('hidden', !canUseTestMode());
+
+        // Test Mode section banner & controls
+        el('kyc-admin-testmode-no-perm-banner')?.classList.toggle('hidden', canUseTestMode());
+        el('kyc-admin-testmode-controls-grid')?.classList.toggle('hidden', !canUseTestMode());
+        el('kyc-admin-testmode-main-toggle-btn')?.classList.toggle('hidden', !canUseTestMode());
+
+        // Admin Users section Create button
+        el('kyc-admin-open-create-user-btn')?.classList.toggle('hidden', !hasPerm('admins.create'));
+      }
+
+      function syncAdminTestModeUI() {
+        const floatingBar = el('kyc-admin-test-mode-bar');
+        const headerBadge = el('kyc-admin-header-test-badge');
+        const sidebarPill = el('kyc-admin-sidebar-test-pill');
+        const sidebarBtn = el('kyc-admin-sidebar-test-toggle-btn');
+        const mainBadge = el('kyc-admin-testmode-status-badge');
+        const mainBtn = el('kyc-admin-testmode-main-toggle-btn');
+
+        const isActive = Boolean(_adminMemoryToken && _adminSessionInfo && _adminTestModeEnabled && canUseTestMode());
+
+        if (floatingBar) {
+          floatingBar.classList.toggle('hidden', !isActive);
+        }
+        if (headerBadge) {
+          headerBadge.classList.toggle('hidden', !isActive);
+        }
+        if (sidebarPill) {
+          sidebarPill.textContent = isActive ? 'ON' : 'OFF';
+          sidebarPill.className = isActive
+            ? 'px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+            : 'px-2 py-0.5 rounded text-[10px] font-black uppercase bg-slate-800 text-slate-400';
+        }
+        if (sidebarBtn) {
+          sidebarBtn.textContent = isActive ? 'Disable Admin Test Mode' : 'Enable Admin Test Mode';
+          sidebarBtn.className = isActive
+            ? 'mt-2.5 w-full py-2 px-3 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors cursor-pointer'
+            : 'mt-2.5 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors cursor-pointer';
+        }
+        if (mainBadge) {
+          mainBadge.textContent = isActive ? 'Test Mode: ACTIVE (Server-Verified)' : 'Test Mode: Disabled';
+          mainBadge.className = isActive
+            ? 'px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+            : 'px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-300';
+        }
+        if (mainBtn) {
+          mainBtn.textContent = isActive ? 'Disable Admin Test Mode' : 'Enable Admin Test Mode';
+          mainBtn.className = isActive
+            ? 'px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer'
+            : 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer';
+        }
+
+        populateTestModeSelects();
+      }
+
+      function populateTestModeSelects() {
+        const enabledCountries = _adminCountries.filter(c => c.enabled);
+        const countrySelectIds = ['kyc-admin-test-country-select', 'kyc-admin-bar-country-select'];
+        const activeCountry = (typeof currentCountry === 'string' && currentCountry) || (enabledCountries[0] && enabledCountries[0].key) || 'kenya';
+
+        countrySelectIds.forEach(id => {
+          const sel = el(id);
+          if (!sel) return;
+          const prev = sel.value || activeCountry;
+          sel.innerHTML = enabledCountries
+            .map(c => `<option value="${escapeHtml(c.key)}">${escapeHtml(c.flag)} ${escapeHtml(c.name)} (${escapeHtml(c.iso3)})</option>`)
+            .join('');
+          if (enabledCountries.some(c => c.key === prev)) {
+            sel.value = prev;
+          }
+        });
+
+        updateTestDocOptionsForCountry('kyc-admin-test-country-select', 'kyc-admin-test-doc-select');
+        updateTestDocOptionsForCountry('kyc-admin-bar-country-select', 'kyc-admin-bar-doc-select');
+      }
+
+      function updateTestDocOptionsForCountry(countrySelectId, docSelectId) {
+        const cSel = el(countrySelectId);
+        const dSel = el(docSelectId);
+        if (!cSel || !dSel) return;
+        const country = _adminCountries.find(c => c.key === cSel.value) || _adminCountries[0];
+        const docs = (country && Array.isArray(country.enabledDocs) && country.enabledDocs.length > 0)
+          ? country.enabledDocs
+          : ['passport'];
+        const prevDoc = dSel.value;
+        dSel.innerHTML = docs
+          .map(d => `<option value="${escapeHtml(d)}">${escapeHtml(DOC_LABELS[d] || d)}</option>`)
+          .join('');
+        if (docs.includes(prevDoc)) {
+          dSel.value = prevDoc;
+        }
+      }
+
+      async function loadAllAdminData() {
+        const [ovRes, cRes, dRes] = await Promise.all([
+          adminApiFetch('/api/admin/overview'),
+          adminApiFetch('/api/admin/countries'),
+          adminApiFetch('/api/admin/documents')
+        ]);
+
+        if (ovRes.status === 401 || ovRes.status === 403) {
+          handleUnauthenticatedState();
+          return;
+        }
+
+        if (ovRes.ok && ovRes.data) {
+          _adminOverview = ovRes.data;
+          if (ovRes.data.session) {
+            _adminSessionInfo = ovRes.data.session;
+            _adminTestModeEnabled = Boolean(ovRes.data.session.testModeEnabled);
+          }
+        }
+        if (cRes.ok && Array.isArray(cRes.data.countries)) {
+          _adminCountries = cRes.data.countries;
+        }
+        if (dRes.ok && Array.isArray(dRes.data.documents)) {
+          _adminDocuments = dRes.data.documents;
+        }
+
+        applyRoleAndPermissionsToDashboardUI();
+        renderOverviewSection();
+        renderCountriesSection();
+        renderDocumentsSection();
+        renderMatrixSection();
+        syncAdminTestModeUI();
+        if (hasPerm('admins.view')) {
+          await loadAndRenderAdminUsers();
+        }
+        if (_activeSection === 'audit' && hasPerm('audit.view')) {
+          await loadAndRenderAuditLogs();
+        }
+      }
+
+      function renderOverviewSection() {
+        if (!_adminOverview) return;
+        const s = _adminOverview.stats || {};
+        const cardsEl = el('kyc-admin-overview-cards');
+        if (cardsEl) {
+          cardsEl.innerHTML = `
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+              <div class="text-xs font-bold text-slate-500 uppercase">Active Countries</div>
+              <div class="mt-1 text-2xl font-black text-slate-900">${Number(s.enabledCountries || 0)} <span class="text-xs font-semibold text-slate-400">/ ${Number(s.totalCountries || 0)}</span></div>
+              <div class="mt-1 text-[11px] text-emerald-700 font-semibold">${Number(s.disabledCountries || 0)} disabled &middot; ${Number(s.customCountries || 0)} custom</div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+              <div class="text-xs font-bold text-slate-500 uppercase">Document Types</div>
+              <div class="mt-1 text-2xl font-black text-slate-900">${Number(s.enabledDocuments || 0)} <span class="text-xs font-semibold text-slate-400">/ ${Number(s.totalDocuments || 0)}</span></div>
+              <div class="mt-1 text-[11px] text-blue-700 font-semibold">Passport, National ID, DL, POA</div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+              <div class="text-xs font-bold text-slate-500 uppercase">Country-Doc Mappings</div>
+              <div class="mt-1 text-2xl font-black text-slate-900">${Number(s.totalActiveCountryDocMappings || 0)}</div>
+              <div class="mt-1 text-[11px] text-slate-500 font-semibold">Live enabled specimens</div>
+            </div>
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs">
+              <div class="text-xs font-bold text-slate-500 uppercase">Role &amp; Test Mode</div>
+              <div class="mt-1 text-lg font-black ${_adminTestModeEnabled ? 'text-emerald-600' : 'text-slate-800'}">${escapeHtml((_adminSessionInfo && _adminSessionInfo.roleLabel) || 'Admin')}</div>
+              <div class="mt-1 text-[11px] text-slate-500 font-semibold">Test Mode: ${_adminTestModeEnabled ? 'ENABLED' : 'OFF'} &middot; ${Number(s.activeAdminUsers || 1)} admins</div>
+            </div>
+          `;
+        }
+
+        const lifecycleEl = el('kyc-admin-unlock-lifecycle-grid');
+        if (lifecycleEl && _adminOverview.unlockLifecycleSummary) {
+          const counts = _adminOverview.unlockLifecycleSummary.statusCounts || {};
+          const items = [
+            { label: 'CREATED', val: counts.CREATED || 0, cls: 'bg-slate-50 text-slate-800 border-slate-200' },
+            { label: 'PAYMENT_VERIFIED', val: counts.PAYMENT_VERIFIED || 0, cls: 'bg-blue-50 text-blue-800 border-blue-200' },
+            { label: 'AUTHORIZED', val: counts.AUTHORIZED || 0, cls: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+            { label: 'CONSUMED', val: counts.CONSUMED || 0, cls: 'bg-teal-50 text-teal-900 border-teal-200' },
+            { label: 'EXPIRED', val: counts.EXPIRED || 0, cls: 'bg-amber-50 text-amber-800 border-amber-200' },
+            { label: 'FAILED / REVOKED', val: (counts.FAILED || 0) + (counts.REVOKED || 0), cls: 'bg-rose-50 text-rose-800 border-rose-200' }
+          ];
+          lifecycleEl.innerHTML = items
+            .map(i => `
+              <div class="p-3 rounded-xl border ${i.cls}">
+                <div class="text-[10px] font-black uppercase tracking-wider">${escapeHtml(i.label)}</div>
+                <div class="text-lg font-black mt-0.5">${Number(i.val)}</div>
+              </div>
+            `)
+            .join('');
+        }
+
+        const recentAuditEl = el('kyc-admin-overview-recent-audit');
+        if (recentAuditEl) {
+          const logs = _adminOverview.recentAuditLogs || [];
+          if (logs.length === 0) {
+            recentAuditEl.innerHTML = '<div class="text-xs text-slate-400 py-4 text-center">No recent audit events visible for your role.</div>';
+          } else {
+            recentAuditEl.innerHTML = logs
+              .map(l => `
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start justify-between gap-2">
+                  <div>
+                    <span class="inline-block px-2 py-0.5 rounded bg-slate-200 text-slate-800 font-mono text-[10px] font-bold">${escapeHtml(l.eventType)}</span>
+                    <p class="text-xs text-slate-700 font-medium mt-1">${escapeHtml(l.summary)}</p>
+                  </div>
+                  <span class="text-[10px] text-slate-400 whitespace-nowrap">${escapeHtml(new Date(l.timestamp).toLocaleTimeString())}</span>
+                </div>
+              `)
+              .join('');
+          }
+        }
+      }
+
+      function renderCountriesSection() {
+        const tbody = el('kyc-admin-countries-tbody');
+        if (!tbody) return;
+        const search = (el('kyc-admin-country-search')?.value || '').trim().toLowerCase();
+        const statusFilter = el('kyc-admin-country-status-filter')?.value || 'all';
+        const docFilter = el('kyc-admin-country-doc-filter')?.value || '';
+
+        const filtered = _adminCountries.filter(c => {
+          if (search) {
+            const hay = `${c.name} ${c.key} ${c.iso3} ${c.subtitle}`.toLowerCase();
+            if (!hay.includes(search)) return false;
+          }
+          if (statusFilter === 'enabled' && !c.enabled) return false;
+          if (statusFilter === 'disabled' && c.enabled) return false;
+          if (docFilter && !(c.enabledDocs || []).includes(docFilter)) return false;
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">No countries match your current search/filter criteria.</td></tr>';
+          return;
+        }
+
+        const canManageMatrix = hasPerm('country_documents.manage');
+        const canUpdateCountry = hasPerm('countries.update');
+        const canEnableCountry = hasPerm('countries.enable');
+        const canDisableCountry = hasPerm('countries.disable');
+
+        tbody.innerHTML = filtered
+          .map(c => {
+            const docBadges = (c.enabledDocs || [])
+              .map(d => `<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold">${escapeHtml(DOC_LABELS[d] || d)}</span>`)
+              .join(' ');
+            const canToggleThis = c.enabled ? canDisableCountry : canEnableCountry;
+            const actionsHtml = [];
+            if (canManageMatrix) {
+              actionsHtml.push(`
+                <button type="button" onclick="window.__kycAdminOpenCountryInMatrix('${escapeHtml(c.key)}')" class="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer" title="Manage Country Documents">
+                  <i class="fa-solid fa-list-check"></i> Docs
+                </button>
+              `);
+            }
+            if (canUpdateCountry) {
+              actionsHtml.push(`
+                <button type="button" onclick="window.__kycAdminOpenEditCountryModal('${escapeHtml(c.key)}')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer" title="Edit Country">
+                  <i class="fa-solid fa-pen"></i> Edit
+                </button>
+              `);
+            }
+            if (canToggleThis) {
+              actionsHtml.push(`
+                <button type="button" onclick="window.__kycAdminToggleCountry('${escapeHtml(c.key)}', ${!c.enabled})" class="px-2.5 py-1.5 rounded-lg ${c.enabled ? 'bg-amber-50 hover:bg-amber-100 text-amber-800' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} text-xs font-bold cursor-pointer">
+                  ${c.enabled ? 'Disable' : 'Enable'}
+                </button>
+              `);
+            }
+            if (!c.isBuiltIn && canUpdateCountry && canDisableCountry) {
+              actionsHtml.push(`
+                <button type="button" onclick="window.__kycAdminConfirmRemoveCountry('${escapeHtml(c.key)}')" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold cursor-pointer" title="Remove Custom Country">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              `);
+            }
+
+            return `
+              <tr class="hover:bg-slate-50/80 transition-colors">
+                <td class="py-3 px-4">
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">${escapeHtml(c.flag || '🌍')}</span>
+                    <div>
+                      <div class="font-black text-slate-900">${escapeHtml(c.name)}</div>
+                      <div class="text-[11px] text-slate-500">${escapeHtml(c.subtitle || '')}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3 px-4 font-mono text-xs text-slate-600">
+                  <span class="font-bold text-slate-900">${escapeHtml(c.iso3)}</span> &middot; ${escapeHtml(c.key)}
+                  ${c.isBuiltIn ? '<span class="ml-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-sans font-bold">Core</span>' : '<span class="ml-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-[10px] font-sans font-bold">Custom</span>'}
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${c.enabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${c.enabled ? 'bg-emerald-600' : 'bg-slate-400'}"></span>
+                    ${c.enabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="flex flex-wrap gap-1">${docBadges || '<span class="text-xs text-slate-400">None</span>'}</div>
+                </td>
+                <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                  ${actionsHtml.length > 0 ? actionsHtml.join(' ') : '<span class="text-xs text-slate-400 font-semibold">Read-Only</span>'}
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+      }
+
+      function renderDocumentsSection() {
+        const grid = el('kyc-admin-documents-grid');
+        if (!grid) return;
+        const canUpdateDoc = hasPerm('documents.update');
+        const canEnableDoc = hasPerm('documents.enable');
+        const canDisableDoc = hasPerm('documents.disable');
+
+        grid.innerHTML = _adminDocuments
+          .map(d => {
+            const canToggleThis = d.enabled ? canDisableDoc : canEnableDoc;
+            return `
+              <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col justify-between gap-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center text-lg">
+                      <i class="${escapeHtml(d.icon || 'fa-solid fa-file-shield')}"></i>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h3 class="font-black text-slate-900 text-base">${escapeHtml(d.name)}</h3>
+                        <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono text-xs font-bold">$${escapeHtml(d.priceUsd)}</span>
+                      </div>
+                      <div class="text-xs font-semibold text-blue-700">${escapeHtml(d.categoryLabel)}</div>
+                    </div>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-md text-xs font-bold ${d.enabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
+                    ${d.enabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+                <p class="text-xs text-slate-600 leading-relaxed">${escapeHtml(d.description)}</p>
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold text-slate-500">Assigned to ${Number(d.assignedCountryCount || 0)} countries</span>
+                  <div class="flex items-center gap-2">
+                    ${canUpdateDoc ? `
+                      <button type="button" onclick="window.__kycAdminOpenEditDocModal('${escapeHtml(d.docType)}')" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer">
+                        <i class="fa-solid fa-pen mr-1"></i>Edit Metadata
+                      </button>
+                    ` : ''}
+                    ${canToggleThis ? `
+                      <button type="button" onclick="window.__kycAdminToggleDocument('${escapeHtml(d.docType)}', ${!d.enabled})" class="px-3 py-1.5 rounded-lg ${d.enabled ? 'bg-amber-50 hover:bg-amber-100 text-amber-800' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} text-xs font-bold cursor-pointer">
+                        ${d.enabled ? 'Disable Globally' : 'Enable Globally'}
+                      </button>
+                    ` : ''}
+                    ${(!canUpdateDoc && !canToggleThis) ? '<span class="text-xs text-slate-400 font-semibold">Read-Only</span>' : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          })
+          .join('');
+      }
+
+      function renderMatrixSection() {
+        const selectEl = el('kyc-admin-matrix-country-select');
+        const checkboxListEl = el('kyc-admin-matrix-checkbox-list');
+        const fullMatrixTbody = el('kyc-admin-full-matrix-tbody');
+        if (!selectEl || !checkboxListEl) return;
+
+        if (!_adminCountries.some(c => c.key === _selectedMatrixCountry) && _adminCountries[0]) {
+          _selectedMatrixCountry = _adminCountries[0].key;
+        }
+
+        selectEl.innerHTML = _adminCountries
+          .map(c => `<option value="${escapeHtml(c.key)}">${escapeHtml(c.flag)} ${escapeHtml(c.name)} (${escapeHtml(c.iso3)})</option>`)
+          .join('');
+        selectEl.value = _selectedMatrixCountry;
+
+        const currentCountryObj = _adminCountries.find(c => c.key === _selectedMatrixCountry);
+        const enabledDocs = (currentCountryObj && Array.isArray(currentCountryObj.enabledDocs))
+          ? currentCountryObj.enabledDocs
+          : [];
+
+        const canManageMatrix = hasPerm('country_documents.manage');
+        const allDocKeys = ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'];
+        checkboxListEl.innerHTML = allDocKeys
+          .map(docKey => {
+            const checked = enabledDocs.includes(docKey);
+            return `
+              <label class="flex items-center gap-3 p-3.5 rounded-xl border-2 ${checked ? 'border-blue-600 bg-blue-50/40' : 'border-slate-200 bg-white'} ${canManageMatrix ? 'cursor-pointer' : 'opacity-75 cursor-not-allowed'} transition-colors">
+                <input type="checkbox" data-matrix-single-doc="${escapeHtml(docKey)}" ${checked ? 'checked' : ''} ${canManageMatrix ? '' : 'disabled'} class="w-4 h-4 accent-blue-600 rounded">
+                <div>
+                  <div class="text-xs sm:text-sm font-black text-slate-900">${escapeHtml(DOC_LABELS[docKey])}</div>
+                  <div class="text-[11px] text-slate-500 font-mono">${escapeHtml(docKey)}</div>
+                </div>
+              </label>
+            `;
+          })
+          .join('');
+
+        if (fullMatrixTbody) {
+          fullMatrixTbody.innerHTML = _adminCountries
+            .map(c => {
+              const cDocs = Array.isArray(c.enabledDocs) ? c.enabledDocs : [];
+              const cells = allDocKeys
+                .map(docKey => {
+                  const isChecked = cDocs.includes(docKey);
+                  return `
+                    <td class="py-2.5 px-3 text-center">
+                      <input type="checkbox" aria-label="${escapeHtml(c.name)} ${escapeHtml(DOC_LABELS[docKey])}" ${isChecked ? 'checked' : ''} ${canManageMatrix ? `onchange="window.__kycAdminQuickMatrixToggle('${escapeHtml(c.key)}', '${escapeHtml(docKey)}', this.checked)"` : 'disabled'} class="w-4 h-4 accent-blue-600 rounded ${canManageMatrix ? 'cursor-pointer' : 'cursor-not-allowed'}">
+                    </td>
+                  `;
+                })
+                .join('');
+              return `
+                <tr class="hover:bg-slate-50/80">
+                  <td class="py-2.5 px-4 font-bold text-slate-900 whitespace-nowrap">
+                    <span class="mr-1.5">${escapeHtml(c.flag)}</span>${escapeHtml(c.name)}
+                    ${!c.enabled ? '<span class="ml-1.5 px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px]">Disabled</span>' : ''}
+                  </td>
+                  ${cells}
+                </tr>
+              `;
+            })
+            .join('');
+        }
+      }
+
+      async function loadAndRenderAdminUsers() {
+        const tbody = el('kyc-admin-users-tbody');
+        if (!tbody || !hasPerm('admins.view')) return;
+        const res = await adminApiFetch('/api/admin/users');
+        if (!res.ok || !res.data || !Array.isArray(res.data.users)) {
+          tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-rose-600 text-xs">Could not load admin users.</td></tr>';
+          return;
+        }
+        _adminUsers = res.data.users;
+        if (_adminUsers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">No admin accounts found.</td></tr>';
+          return;
+        }
+
+        const canUpdateAdmins = hasPerm('admins.update') || hasPerm('roles.manage');
+        const canDisableAdmins = hasPerm('admins.disable');
+
+        tbody.innerHTML = _adminUsers
+          .map(u => {
+            const roleCls = ROLE_BADGE_STYLES[u.role] || ROLE_BADGE_STYLES.viewer;
+            const isSelf = _adminSessionInfo && _adminSessionInfo.userId === u.id;
+            const lastLoginStr = u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : 'Never';
+            const createdStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-';
+            return `
+              <tr class="hover:bg-slate-50/80">
+                <td class="py-3 px-4">
+                  <div class="font-black text-slate-900 flex items-center gap-1.5">
+                    <span>${escapeHtml(u.displayName)}</span>
+                    ${isSelf ? '<span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 text-[10px] font-bold">You</span>' : ''}
+                  </div>
+                  <div class="font-mono text-xs text-slate-500">@${escapeHtml(u.username)}</div>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-md border text-xs font-black uppercase ${roleCls}">
+                    ${escapeHtml(u.roleLabel || u.role)}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold ${u.enabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}">
+                    <span class="w-1.5 h-1.5 rounded-full ${u.enabled ? 'bg-emerald-600' : 'bg-rose-500'}"></span>
+                    ${u.enabled ? 'Active' : 'Disabled'}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <span class="font-bold text-slate-800">${Array.isArray(u.effectivePermissions) ? u.effectivePermissions.length : 0}</span>
+                  <span class="text-xs text-slate-500">permissions</span>
+                  ${Array.isArray(u.customPermissions) ? '<span class="ml-1 px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-bold">Custom</span>' : ''}
+                </td>
+                <td class="py-3 px-4 text-xs text-slate-500">
+                  <div>Created: ${escapeHtml(createdStr)}</div>
+                  <div>Last Login: ${escapeHtml(lastLoginStr)}</div>
+                </td>
+                <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+                  ${canUpdateAdmins ? `
+                    <button type="button" onclick="window.__kycAdminOpenEditUserModal('${escapeHtml(u.id)}')" class="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer" title="Change Role or Permissions">
+                      <i class="fa-solid fa-user-shield"></i> Role &amp; Perms
+                    </button>
+                    <button type="button" onclick="window.__kycAdminOpenResetPwModal('${escapeHtml(u.id)}')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer" title="Reset Password">
+                      <i class="fa-solid fa-key"></i> Password
+                    </button>
+                  ` : ''}
+                  ${canDisableAdmins ? `
+                    <button type="button" onclick="window.__kycAdminToggleUserStatus('${escapeHtml(u.id)}', ${!u.enabled})" class="px-2.5 py-1.5 rounded-lg ${u.enabled ? 'bg-rose-50 hover:bg-rose-100 text-rose-700' : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} text-xs font-bold cursor-pointer">
+                      ${u.enabled ? 'Disable' : 'Enable'}
+                    </button>
+                  ` : ''}
+                </td>
+              </tr>
+            `;
+          })
+          .join('');
+      }
+
+      async function loadAndRenderAuditLogs() {
+        const tbody = el('kyc-admin-audit-tbody');
+        if (!tbody || !hasPerm('audit.view')) return;
+        const search = (el('kyc-admin-audit-search')?.value || '').trim();
+        const eventType = el('kyc-admin-audit-type-filter')?.value || '';
+        const qs = new URLSearchParams();
+        if (search) qs.set('search', search);
+        if (eventType) qs.set('eventType', eventType);
+
+        const res = await adminApiFetch('/api/admin/audit-logs?' + qs.toString());
+        if (!res.ok || !res.data || !Array.isArray(res.data.auditLogs)) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-6 text-center text-rose-600 text-xs">Failed to load audit log.</td></tr>';
+          return;
+        }
+
+        const logs = res.data.auditLogs;
+        if (logs.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">No matching audit log events.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = logs
+          .map(l => `
+            <tr class="hover:bg-slate-50/80">
+              <td class="py-2.5 px-4 font-mono text-xs text-slate-500 whitespace-nowrap">${escapeHtml(new Date(l.timestamp).toLocaleString())}</td>
+              <td class="py-2.5 px-4"><span class="px-2 py-0.5 rounded ${l.eventType === 'UNAUTHORIZED_ACCESS_ATTEMPT' ? 'bg-rose-100 border-rose-200 text-rose-800' : 'bg-slate-100 border-slate-200 text-slate-800'} border font-mono text-[11px] font-bold">${escapeHtml(l.eventType)}</span></td>
+              <td class="py-2.5 px-4 font-bold text-slate-800">${escapeHtml(l.actor)}</td>
+              <td class="py-2.5 px-4 font-mono text-xs text-blue-700">${escapeHtml(l.targetKey || '-')}</td>
+              <td class="py-2.5 px-4 text-slate-700">${escapeHtml(l.summary)}</td>
+            </tr>
+          `)
+          .join('');
+      }
+
+      function handleAuthenticatedState(session, token) {
+        if (token) {
+          _adminMemoryToken = token;
+        }
+        _adminSessionInfo = session;
+        _adminTestModeEnabled = Boolean(session && session.testModeEnabled);
+
+        el('kyc-admin-login-view')?.classList.add('hidden');
+        el('kyc-admin-main-view')?.classList.remove('hidden');
+        const userBadge = el('kyc-admin-header-user');
+        if (userBadge && session) {
+          userBadge.textContent = `${session.displayName || session.username} (${session.roleLabel || session.role})`;
+          userBadge.classList.remove('hidden');
+        }
+        const logoutBtn = el('kyc-admin-header-logout-btn');
+        if (logoutBtn) {
+          logoutBtn.classList.remove('hidden');
+          logoutBtn.classList.add('inline-flex');
+        }
+        applyRoleAndPermissionsToDashboardUI();
+        syncAdminTestModeUI();
+        loadAllAdminData();
+      }
+
+      function handleUnauthenticatedState(needsSetup) {
+        _adminMemoryToken = null;
+        _adminSessionInfo = null;
+        _adminTestModeEnabled = false;
+        syncAdminTestModeUI();
+
+        el('kyc-admin-main-view')?.classList.add('hidden');
+        el('kyc-admin-login-view')?.classList.remove('hidden');
+        el('kyc-admin-header-user')?.classList.add('hidden');
+        el('kyc-admin-header-role-badge')?.classList.add('hidden');
+        const logoutBtn = el('kyc-admin-header-logout-btn');
+        if (logoutBtn) {
+          logoutBtn.classList.add('hidden');
+          logoutBtn.classList.remove('inline-flex');
+        }
+
+        const titleEl = el('kyc-admin-auth-title');
+        const subEl = el('kyc-admin-auth-subtitle');
+        const btnLabelEl = el('kyc-admin-auth-submit-label');
+        const formEl = el('kyc-admin-auth-form');
+        if (formEl) {
+          formEl.dataset.mode = needsSetup ? 'setup' : 'login';
+        }
+        if (needsSetup) {
+          if (titleEl) titleEl.textContent = 'Initial Super Admin Security Setup';
+          if (subEl) subEl.textContent = 'Create your server-side Super Admin password (minimum 8 characters). This password is hashed with scrypt on the server and locks initial setup permanently.';
+          if (btnLabelEl) btnLabelEl.textContent = 'Claim & Lock Super Admin Account';
+        } else {
+          if (titleEl) titleEl.textContent = 'Protected Admin Login';
+          if (subEl) subEl.textContent = 'Authenticate with your server-side KycApproved administrator credentials to access your role-assigned dashboard sections.';
+          if (btnLabelEl) btnLabelEl.textContent = 'Sign In to Admin Dashboard';
+        }
+      }
+
+      window.__kycAdminSwitchSection = function(sectionKey) {
+        _activeSection = sectionKey;
+        const sections = ['overview', 'countries', 'documents', 'matrix', 'testmode', 'users', 'audit'];
+        sections.forEach(s => {
+          const secEl = el(`kyc-admin-section-${s}`);
+          if (secEl) secEl.classList.toggle('hidden', s !== sectionKey);
+        });
+        document.querySelectorAll('.kyc-admin-nav-btn').forEach(btn => {
+          const isCurrent = btn.getAttribute('data-admin-nav') === sectionKey;
+          const isHidden = btn.classList.contains('hidden');
+          btn.className = (isHidden ? 'hidden ' : '') + (isCurrent
+            ? 'kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap bg-blue-50 text-blue-700'
+            : 'kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100');
+        });
+        if (sectionKey === 'audit' && hasPerm('audit.view')) {
+          loadAndRenderAuditLogs();
+        }
+        if (sectionKey === 'users' && hasPerm('admins.view')) {
+          loadAndRenderAdminUsers();
+        }
+      };
+
+      window.openKycAdminDashboard = async function() {
+        const overlay = el('kyc-admin-dashboard-overlay');
+        if (overlay) overlay.classList.remove('hidden');
+        const statusRes = await adminApiFetch('/api/admin/auth/status');
+        if (statusRes.ok && statusRes.data && statusRes.data.authenticated && statusRes.data.session) {
+          handleAuthenticatedState(statusRes.data.session, _adminMemoryToken);
+        } else {
+          handleUnauthenticatedState(Boolean(statusRes.data && statusRes.data.needsInitialSetup));
+        }
+      };
+
+      window.__kycAdminOpenCountryInMatrix = function(countryKey) {
+        _selectedMatrixCountry = countryKey;
+        window.__kycAdminSwitchSection('matrix');
+        renderMatrixSection();
+      };
+
+      window.__kycAdminToggleCountry = async function(countryKey, enabled) {
+        const res = await adminApiFetch(`/api/admin/countries/${encodeURIComponent(countryKey)}/toggle`, {
+          method: 'PATCH',
+          body: { enabled: Boolean(enabled) }
+        });
+        if (!res.ok) {
+          showAdminFeedback(res.data?.error || 'Could not update country status.', true);
+          return;
+        }
+        showAdminFeedback(`Country '${countryKey}' is now ${enabled ? 'enabled' : 'disabled'}.`, false);
+        await syncPublicCatalogFromServer();
+        await loadAllAdminData();
+      };
+
+      window.__kycAdminConfirmRemoveCountry = function(countryKey) {
+        const c = _adminCountries.find(x => x.key === countryKey);
+        if (!c) return;
+        const modal = el('kyc-admin-confirm-modal');
+        el('kyc-admin-confirm-title').textContent = `Remove ${c.name}?`;
+        el('kyc-admin-confirm-message').textContent = `Are you sure you want to permanently remove '${c.name}' (${c.key}) from the KycApproved country catalog?`;
+        _confirmCallback = async () => {
+          const res = await adminApiFetch(`/api/admin/countries/${encodeURIComponent(countryKey)}`, {
+            method: 'DELETE'
+          });
+          if (!res.ok) {
+            showAdminFeedback(res.data?.error || 'Could not remove country.', true);
+            return;
+          }
+          showAdminFeedback(`Removed country '${c.name}'.`, false);
+          await syncPublicCatalogFromServer();
+          await loadAllAdminData();
+        };
+        modal.classList.remove('hidden');
+      };
+
+      window.__kycAdminOpenEditCountryModal = function(countryKey) {
+        const c = _adminCountries.find(x => x.key === countryKey);
+        if (!c) return;
+        el('kyc-admin-country-modal-title').textContent = `Edit Country: ${c.name}`;
+        el('kyc-admin-country-form-mode').value = 'edit';
+        el('kyc-admin-country-name').value = c.name || '';
+        const keyInput = el('kyc-admin-country-key');
+        keyInput.value = c.key;
+        keyInput.readOnly = true;
+        keyInput.classList.add('bg-slate-100');
+        el('kyc-admin-country-flag').value = c.flag || '';
+        el('kyc-admin-country-iso3').value = c.iso3 || '';
+        el('kyc-admin-country-subtitle').value = c.subtitle || '';
+        el('kyc-admin-country-authority').value = c.authority || '';
+
+        const docsContainer = el('kyc-admin-country-modal-docs');
+        const allDocKeys = ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'];
+        docsContainer.innerHTML = allDocKeys
+          .map(d => `
+            <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 text-xs font-bold cursor-pointer">
+              <input type="checkbox" data-country-modal-doc="${escapeHtml(d)}" ${(c.enabledDocs || []).includes(d) ? 'checked' : ''} class="accent-blue-600">
+              <span>${escapeHtml(DOC_LABELS[d])}</span>
+            </label>
+          `)
+          .join('');
+        el('kyc-admin-country-modal').classList.remove('hidden');
+      };
+
+      window.__kycAdminOpenEditDocModal = function(docType) {
+        const d = _adminDocuments.find(x => x.docType === docType);
+        if (!d) return;
+        el('kyc-admin-doc-form-type').value = d.docType;
+        el('kyc-admin-doc-name').value = d.name || '';
+        el('kyc-admin-doc-category').value = d.categoryLabel || '';
+        el('kyc-admin-doc-desc').value = d.description || '';
+        el('kyc-admin-doc-modal').classList.remove('hidden');
+      };
+
+      window.__kycAdminToggleDocument = async function(docType, enabled) {
+        const res = await adminApiFetch(`/api/admin/documents/${encodeURIComponent(docType)}/toggle`, {
+          method: 'PATCH',
+          body: { enabled: Boolean(enabled) }
+        });
+        if (!res.ok) {
+          showAdminFeedback(res.data?.error || 'Could not toggle document type.', true);
+          return;
+        }
+        showAdminFeedback(`Document type '${DOC_LABELS[docType] || docType}' is now ${enabled ? 'enabled' : 'disabled'}.`, false);
+        await syncPublicCatalogFromServer();
+        await loadAllAdminData();
+      };
+
+      window.__kycAdminQuickMatrixToggle = async function(countryKey, docKey, checked) {
+        const c = _adminCountries.find(x => x.key === countryKey);
+        if (!c) return;
+        const set = new Set(c.enabledDocs || []);
+        if (checked) set.add(docKey);
+        else set.delete(docKey);
+        const enabledDocs = Array.from(set);
+
+        const res = await adminApiFetch(`/api/admin/countries/${encodeURIComponent(countryKey)}/documents`, {
+          method: 'PUT',
+          body: { enabledDocs }
+        });
+        if (!res.ok) {
+          showAdminFeedback(res.data?.error || 'Failed to update country documents.', true);
+          return;
+        }
+        showAdminFeedback(`Updated documents for ${c.name}.`, false);
+        await syncPublicCatalogFromServer();
+        await loadAllAdminData();
+      };
+
+      function renderUserPermissionsCheckboxes(role, selectedPerms, customEnabled) {
+        const grid = el('kyc-admin-user-perms-grid');
+        if (!grid) return;
+        const activePerms = Array.isArray(selectedPerms) ? selectedPerms : (ROLE_DEFAULT_PERMS[role] || []);
+        grid.innerHTML = ALL_PERMISSIONS_LIST
+          .map(p => {
+            const isChecked = activePerms.includes(p);
+            return `
+              <label class="flex items-center gap-2 p-1.5 rounded-lg bg-white border border-slate-200 text-[11px] font-mono ${customEnabled ? 'cursor-pointer' : 'opacity-70'}">
+                <input type="checkbox" data-admin-user-perm="${escapeHtml(p)}" ${isChecked ? 'checked' : ''} ${customEnabled ? '' : 'disabled'} class="accent-blue-600 rounded">
+                <span class="truncate">${escapeHtml(p)}</span>
+              </label>
+            `;
+          })
+          .join('');
+      }
+
+      window.__kycAdminOpenEditUserModal = function(userId) {
+        const u = _adminUsers.find(x => x.id === userId);
+        if (!u) return;
+        el('kyc-admin-user-modal-title').textContent = `Edit Admin User: @${u.username}`;
+        el('kyc-admin-user-form-mode').value = 'edit';
+        el('kyc-admin-user-form-id').value = u.id;
+        const uInput = el('kyc-admin-user-username');
+        uInput.value = u.username;
+        uInput.readOnly = true;
+        uInput.classList.add('bg-slate-100');
+        el('kyc-admin-user-displayname').value = u.displayName || u.username;
+        el('kyc-admin-user-role').value = u.role || 'viewer';
+        el('kyc-admin-user-password-wrap')?.classList.add('hidden');
+        const pwInput = el('kyc-admin-user-password');
+        if (pwInput) {
+          pwInput.required = false;
+          pwInput.value = '';
+        }
+
+        const hasCustom = Array.isArray(u.customPermissions);
+        const customToggle = el('kyc-admin-user-use-custom-perms');
+        if (customToggle) customToggle.checked = hasCustom;
+        renderUserPermissionsCheckboxes(u.role, u.effectivePermissions, hasCustom);
+        el('kyc-admin-user-modal')?.classList.remove('hidden');
+      };
+
+      window.__kycAdminOpenResetPwModal = function(userId) {
+        const u = _adminUsers.find(x => x.id === userId);
+        if (!u) return;
+        el('kyc-admin-reset-pw-title').textContent = `Reset Password: @${u.username}`;
+        el('kyc-admin-reset-pw-userid').value = u.id;
+        el('kyc-admin-reset-pw-input').value = '';
+        el('kyc-admin-reset-pw-modal')?.classList.remove('hidden');
+      };
+
+      window.__kycAdminToggleUserStatus = function(userId, enabled) {
+        const u = _adminUsers.find(x => x.id === userId);
+        if (!u) return;
+        const modal = el('kyc-admin-confirm-modal');
+        el('kyc-admin-confirm-title').textContent = `${enabled ? 'Enable' : 'Disable'} @${u.username}?`;
+        el('kyc-admin-confirm-message').textContent = enabled
+          ? `Re-enable administrator account '@${u.username}' (${u.roleLabel})?`
+          : `Disable administrator account '@${u.username}'? Any active sessions for this user will be terminated immediately.`;
+        _confirmCallback = async () => {
+          const res = await adminApiFetch(`/api/admin/users/${encodeURIComponent(userId)}/status`, {
+            method: 'PATCH',
+            body: { enabled: Boolean(enabled) }
+          });
+          if (!res.ok) {
+            showAdminFeedback(res.data?.error || 'Could not change admin user status.', true);
+            return;
+          }
+          showAdminFeedback(`Admin user '@${u.username}' is now ${enabled ? 'enabled' : 'disabled'}.`, false);
+          await loadAllAdminData();
+        };
+        modal?.classList.remove('hidden');
+      };
+
+      async function toggleServerAdminTestMode(forceState) {
+        const nextState = typeof forceState === 'boolean' ? forceState : !_adminTestModeEnabled;
+        const res = await adminApiFetch('/api/admin/test-mode/toggle', {
+          method: 'POST',
+          body: { enabled: nextState }
+        });
+        if (!res.ok) {
+          showAdminFeedback(res.data?.error || 'Failed to toggle Admin Test Mode.', true);
+          return false;
+        }
+        _adminTestModeEnabled = Boolean(res.data.testModeEnabled);
+        syncAdminTestModeUI();
+        renderOverviewSection();
+        showAdminFeedback(
+          _adminTestModeEnabled
+            ? 'Admin Test Mode ENABLED on server. You can now test Save PNG and Download without Sifalo payment.'
+            : 'Admin Test Mode DISABLED. Standard Sifalo payment protection is active.',
+          false
+        );
+        return true;
+      }
+
+      async function openCountryAndDocInLiveEditor(countryKey, docType) {
+        if (!_adminTestModeEnabled) {
+          const ok = await toggleServerAdminTestMode(true);
+          if (!ok) return;
+        }
+        await syncPublicCatalogFromServer();
+        el('kyc-admin-dashboard-overlay')?.classList.add('hidden');
+        syncAdminTestModeUI();
+
+        const barCountry = el('kyc-admin-bar-country-select');
+        const barDoc = el('kyc-admin-bar-doc-select');
+        if (barCountry) barCountry.value = countryKey;
+        updateTestDocOptionsForCountry('kyc-admin-bar-country-select', 'kyc-admin-bar-doc-select');
+        if (barDoc) barDoc.value = docType;
+
+        if (typeof switchVerificationCountry === 'function') {
+          switchVerificationCountry(countryKey, { preferredDocType: docType, silent: true });
+        }
+        if (typeof switchVerificationDoc === 'function') {
+          switchVerificationDoc(docType, true);
+        }
+
+        const wb = document.getElementById('verification-workbench');
+        if (wb) {
+          wb.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        if (typeof showToast === 'function') {
+          showToast(
+            'ADMIN TEST MODE ACTIVE',
+            `Viewing ${countryKey.toUpperCase()} (${DOC_LABELS[docType] || docType}) — Save PNG & Download unlocked for admin testing`
+          );
+        }
+      }
+
+      function initKycAdminDashboardEvents() {
+        document.querySelectorAll('.kyc-admin-nav-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const sec = btn.getAttribute('data-admin-nav');
+            if (sec) window.__kycAdminSwitchSection(sec);
+          });
+        });
+
+        el('kyc-admin-close-overlay-btn')?.addEventListener('click', () => {
+          el('kyc-admin-dashboard-overlay')?.classList.add('hidden');
+        });
+
+        el('kyc-admin-auth-form')?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const errEl = el('kyc-admin-auth-error');
+          if (errEl) errEl.classList.add('hidden');
+          const username = (el('kyc-admin-username-input')?.value || 'admin').trim();
+          const password = (el('kyc-admin-password-input')?.value || '').trim();
+          const mode = e.currentTarget.dataset.mode === 'setup' ? 'setup' : 'login';
+          const endpoint = mode === 'setup' ? '/api/admin/auth/setup' : '/api/admin/auth/login';
+
+          const res = await adminApiFetch(endpoint, {
+            method: 'POST',
+            body: { username, password }
+          });
+
+          if (!res.ok || !res.data || !res.data.authenticated) {
+            if (errEl) {
+              errEl.textContent = (res.data && res.data.error) || 'Authentication failed.';
+              errEl.classList.remove('hidden');
+            }
+            return;
+          }
+
+          el('kyc-admin-password-input').value = '';
+          handleAuthenticatedState(res.data.session, res.data.adminToken);
+        });
+
+        el('kyc-admin-header-logout-btn')?.addEventListener('click', async () => {
+          await adminApiFetch('/api/admin/auth/logout', { method: 'POST' });
+          handleUnauthenticatedState(false);
+        });
+
+        el('kyc-admin-sidebar-test-toggle-btn')?.addEventListener('click', () => {
+          toggleServerAdminTestMode();
+        });
+
+        el('kyc-admin-testmode-main-toggle-btn')?.addEventListener('click', () => {
+          toggleServerAdminTestMode();
+        });
+
+        el('kyc-admin-country-search')?.addEventListener('input', renderCountriesSection);
+        el('kyc-admin-country-status-filter')?.addEventListener('change', renderCountriesSection);
+        el('kyc-admin-country-doc-filter')?.addEventListener('change', renderCountriesSection);
+
+        el('kyc-admin-open-add-country-btn')?.addEventListener('click', () => {
+          el('kyc-admin-country-modal-title').textContent = 'Add New Country';
+          el('kyc-admin-country-form-mode').value = 'add';
+          el('kyc-admin-country-name').value = '';
+          const keyInput = el('kyc-admin-country-key');
+          keyInput.value = '';
+          keyInput.readOnly = false;
+          keyInput.classList.remove('bg-slate-100');
+          el('kyc-admin-country-flag').value = '🌍';
+          el('kyc-admin-country-iso3').value = '';
+          el('kyc-admin-country-subtitle').value = '';
+          el('kyc-admin-country-authority').value = '';
+
+          const docsContainer = el('kyc-admin-country-modal-docs');
+          const allDocKeys = ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'];
+          docsContainer.innerHTML = allDocKeys
+            .map(d => `
+              <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 text-xs font-bold cursor-pointer">
+                <input type="checkbox" data-country-modal-doc="${escapeHtml(d)}" ${(d === 'passport' || d === 'idcard') ? 'checked' : ''} class="accent-blue-600">
+                <span>${escapeHtml(DOC_LABELS[d])}</span>
+              </label>
+            `)
+            .join('');
+          el('kyc-admin-country-modal').classList.remove('hidden');
+        });
+
+        const closeCountryModal = () => el('kyc-admin-country-modal')?.classList.add('hidden');
+        el('kyc-admin-country-modal-close')?.addEventListener('click', closeCountryModal);
+        el('kyc-admin-country-modal-cancel')?.addEventListener('click', closeCountryModal);
+
+        el('kyc-admin-country-form')?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const mode = el('kyc-admin-country-form-mode').value;
+          const name = el('kyc-admin-country-name').value.trim();
+          const key = el('kyc-admin-country-key').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+          const flag = el('kyc-admin-country-flag').value.trim() || '🌍';
+          const iso3 = el('kyc-admin-country-iso3').value.trim().toUpperCase();
+          const subtitle = el('kyc-admin-country-subtitle').value.trim();
+          const authority = el('kyc-admin-country-authority').value.trim();
+          const enabledDocs = [];
+          document.querySelectorAll('[data-country-modal-doc]').forEach(cb => {
+            if (cb.checked) enabledDocs.push(cb.getAttribute('data-country-modal-doc'));
+          });
+
+          const path = mode === 'edit'
+            ? `/api/admin/countries/${encodeURIComponent(key)}`
+            : '/api/admin/countries';
+          const method = mode === 'edit' ? 'PUT' : 'POST';
+
+          const res = await adminApiFetch(path, {
+            method,
+            body: { name, key, flag, iso3, subtitle, authority, enabledDocs }
+          });
+
+          if (!res.ok) {
+            showAdminFeedback(res.data?.error || 'Could not save country.', true);
+            return;
+          }
+
+          closeCountryModal();
+          showAdminFeedback(`Saved country '${name}'.`, false);
+          await syncPublicCatalogFromServer();
+          await loadAllAdminData();
+        });
+
+        const closeDocModal = () => el('kyc-admin-doc-modal')?.classList.add('hidden');
+        el('kyc-admin-doc-modal-close')?.addEventListener('click', closeDocModal);
+        el('kyc-admin-doc-modal-cancel')?.addEventListener('click', closeDocModal);
+
+        el('kyc-admin-doc-form')?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const docType = el('kyc-admin-doc-form-type').value;
+          const name = el('kyc-admin-doc-name').value.trim();
+          const categoryLabel = el('kyc-admin-doc-category').value.trim();
+          const description = el('kyc-admin-doc-desc').value.trim();
+
+          const res = await adminApiFetch(`/api/admin/documents/${encodeURIComponent(docType)}`, {
+            method: 'PUT',
+            body: { name, categoryLabel, description }
+          });
+
+          if (!res.ok) {
+            showAdminFeedback(res.data?.error || 'Could not update document metadata.', true);
+            return;
+          }
+
+          closeDocModal();
+          showAdminFeedback(`Updated metadata for '${name}'.`, false);
+          await syncPublicCatalogFromServer();
+          await loadAllAdminData();
+        });
+
+        // Admin Users Modal Events
+        el('kyc-admin-open-create-user-btn')?.addEventListener('click', () => {
+          el('kyc-admin-user-modal-title').textContent = 'Create Admin User';
+          el('kyc-admin-user-form-mode').value = 'create';
+          el('kyc-admin-user-form-id').value = '';
+          const uInput = el('kyc-admin-user-username');
+          uInput.value = '';
+          uInput.readOnly = false;
+          uInput.classList.remove('bg-slate-100');
+          el('kyc-admin-user-displayname').value = '';
+          el('kyc-admin-user-role').value = 'content_admin';
+          el('kyc-admin-user-password-wrap')?.classList.remove('hidden');
+          const pwInput = el('kyc-admin-user-password');
+          if (pwInput) {
+            pwInput.required = true;
+            pwInput.value = '';
+          }
+          const customToggle = el('kyc-admin-user-use-custom-perms');
+          if (customToggle) customToggle.checked = false;
+          renderUserPermissionsCheckboxes('content_admin', ROLE_DEFAULT_PERMS.content_admin, false);
+          el('kyc-admin-user-modal')?.classList.remove('hidden');
+        });
+
+        el('kyc-admin-user-role')?.addEventListener('change', (e) => {
+          const role = e.target.value;
+          const customToggle = el('kyc-admin-user-use-custom-perms');
+          const isCustom = Boolean(customToggle && customToggle.checked);
+          renderUserPermissionsCheckboxes(role, ROLE_DEFAULT_PERMS[role] || [], isCustom);
+        });
+
+        el('kyc-admin-user-use-custom-perms')?.addEventListener('change', (e) => {
+          const isCustom = Boolean(e.target.checked);
+          const role = el('kyc-admin-user-role')?.value || 'viewer';
+          const currentChecked = [];
+          document.querySelectorAll('[data-admin-user-perm]').forEach(cb => {
+            if (cb.checked) currentChecked.push(cb.getAttribute('data-admin-user-perm'));
+          });
+          renderUserPermissionsCheckboxes(role, isCustom ? currentChecked : (ROLE_DEFAULT_PERMS[role] || []), isCustom);
+        });
+
+        el('kyc-admin-user-reset-role-perms-btn')?.addEventListener('click', () => {
+          const role = el('kyc-admin-user-role')?.value || 'viewer';
+          const customToggle = el('kyc-admin-user-use-custom-perms');
+          if (customToggle) customToggle.checked = false;
+          renderUserPermissionsCheckboxes(role, ROLE_DEFAULT_PERMS[role] || [], false);
+        });
+
+        const closeUserModal = () => el('kyc-admin-user-modal')?.classList.add('hidden');
+        el('kyc-admin-user-modal-close')?.addEventListener('click', closeUserModal);
+        el('kyc-admin-user-modal-cancel')?.addEventListener('click', closeUserModal);
+
+        el('kyc-admin-user-form')?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const mode = el('kyc-admin-user-form-mode').value;
+          const userId = el('kyc-admin-user-form-id').value;
+          const username = el('kyc-admin-user-username').value.trim();
+          const displayName = el('kyc-admin-user-displayname').value.trim();
+          const role = el('kyc-admin-user-role').value;
+          const password = el('kyc-admin-user-password').value;
+          const useCustom = Boolean(el('kyc-admin-user-use-custom-perms')?.checked);
+          let customPermissions = null;
+          if (useCustom) {
+            customPermissions = [];
+            document.querySelectorAll('[data-admin-user-perm]').forEach(cb => {
+              if (cb.checked) customPermissions.push(cb.getAttribute('data-admin-user-perm'));
+            });
+          }
+
+          const path = mode === 'edit'
+            ? `/api/admin/users/${encodeURIComponent(userId)}`
+            : '/api/admin/users';
+          const method = mode === 'edit' ? 'PUT' : 'POST';
+          const body = mode === 'edit'
+            ? { displayName, role, customPermissions }
+            : { username, displayName, role, password, customPermissions };
+
+          const res = await adminApiFetch(path, { method, body });
+          if (!res.ok) {
+            showAdminFeedback(res.data?.error || 'Could not save admin user.', true);
+            return;
+          }
+          closeUserModal();
+          showAdminFeedback(mode === 'edit' ? `Updated admin user '@${username}'.` : `Created admin user '@${username}'.`, false);
+          await loadAllAdminData();
+        });
+
+        const closeResetPwModal = () => el('kyc-admin-reset-pw-modal')?.classList.add('hidden');
+        el('kyc-admin-reset-pw-close')?.addEventListener('click', closeResetPwModal);
+        el('kyc-admin-reset-pw-cancel')?.addEventListener('click', closeResetPwModal);
+
+        el('kyc-admin-reset-pw-form')?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const userId = el('kyc-admin-reset-pw-userid').value;
+          const newPassword = el('kyc-admin-reset-pw-input').value;
+          const res = await adminApiFetch(`/api/admin/users/${encodeURIComponent(userId)}/reset-password`, {
+            method: 'POST',
+            body: { newPassword }
+          });
+          if (!res.ok) {
+            showAdminFeedback(res.data?.error || 'Could not reset password.', true);
+            return;
+          }
+          closeResetPwModal();
+          showAdminFeedback('Password reset successfully and active sessions revoked.', false);
+          await loadAllAdminData();
+        });
+
+        el('kyc-admin-matrix-country-select')?.addEventListener('change', (e) => {
+          _selectedMatrixCountry = e.target.value;
+          renderMatrixSection();
+        });
+
+        el('kyc-admin-matrix-save-btn')?.addEventListener('click', async () => {
+          const enabledDocs = [];
+          document.querySelectorAll('[data-matrix-single-doc]').forEach(cb => {
+            if (cb.checked) enabledDocs.push(cb.getAttribute('data-matrix-single-doc'));
+          });
+          const res = await adminApiFetch(`/api/admin/countries/${encodeURIComponent(_selectedMatrixCountry)}/documents`, {
+            method: 'PUT',
+            body: { enabledDocs }
+          });
+          if (!res.ok) {
+            showAdminFeedback(res.data?.error || 'Could not save country document availability.', true);
+            return;
+          }
+          showAdminFeedback(`Saved enabled documents for '${_selectedMatrixCountry}'.`, false);
+          await syncPublicCatalogFromServer();
+          await loadAllAdminData();
+        });
+
+        el('kyc-admin-matrix-preview-btn')?.addEventListener('click', () => {
+          const c = _adminCountries.find(x => x.key === _selectedMatrixCountry);
+          const firstDoc = (c && c.enabledDocs && c.enabledDocs[0]) || 'passport';
+          openCountryAndDocInLiveEditor(_selectedMatrixCountry, firstDoc);
+        });
+
+        el('kyc-admin-test-country-select')?.addEventListener('change', () => {
+          updateTestDocOptionsForCountry('kyc-admin-test-country-select', 'kyc-admin-test-doc-select');
+        });
+
+        el('kyc-admin-launch-live-editor-btn')?.addEventListener('click', () => {
+          const cKey = el('kyc-admin-test-country-select')?.value || 'kenya';
+          const dKey = el('kyc-admin-test-doc-select')?.value || 'passport';
+          openCountryAndDocInLiveEditor(cKey, dKey);
+        });
+
+        el('kyc-admin-bar-country-select')?.addEventListener('change', (e) => {
+          const cKey = e.target.value;
+          updateTestDocOptionsForCountry('kyc-admin-bar-country-select', 'kyc-admin-bar-doc-select');
+          const dKey = el('kyc-admin-bar-doc-select')?.value || 'passport';
+          if (typeof switchVerificationCountry === 'function') {
+            switchVerificationCountry(cKey, { preferredDocType: dKey });
+          }
+        });
+
+        el('kyc-admin-bar-doc-select')?.addEventListener('change', (e) => {
+          const dKey = e.target.value;
+          if (typeof switchVerificationDoc === 'function') {
+            switchVerificationDoc(dKey);
+          }
+        });
+
+        el('kyc-admin-bar-open-dashboard-btn')?.addEventListener('click', () => {
+          window.openKycAdminDashboard();
+        });
+
+        el('kyc-admin-bar-disable-test-btn')?.addEventListener('click', async () => {
+          await toggleServerAdminTestMode(false);
+        });
+
+        el('kyc-admin-refresh-audit-btn')?.addEventListener('click', loadAndRenderAuditLogs);
+        el('kyc-admin-audit-search')?.addEventListener('input', loadAndRenderAuditLogs);
+        el('kyc-admin-audit-type-filter')?.addEventListener('change', loadAndRenderAuditLogs);
+
+        el('kyc-admin-confirm-cancel')?.addEventListener('click', () => {
+          _confirmCallback = null;
+          el('kyc-admin-confirm-modal')?.classList.add('hidden');
+        });
+        el('kyc-admin-confirm-ok')?.addEventListener('click', async () => {
+          const fn = _confirmCallback;
+          _confirmCallback = null;
+          el('kyc-admin-confirm-modal')?.classList.add('hidden');
+          if (typeof fn === 'function') await fn();
+        });
+
+        // Sync public catalog from server on load
+        syncPublicCatalogFromServer();
+
+        // Open admin login overlay automatically only if URL hash is #admin
+        if (window.location.hash === '#admin') {
+          window.openKycAdminDashboard();
+        }
+        window.addEventListener('hashchange', () => {
+          if (window.location.hash === '#admin') {
+            window.openKycAdminDashboard();
+          }
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initKycAdminDashboardEvents);
+      } else {
+        initKycAdminDashboardEvents();
       }
     })();
   </script>
