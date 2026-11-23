@@ -1160,6 +1160,8 @@
     const KYC_SIFALO_SESSION_KEY = 'kyc_sifalo_session_id';
     const KYC_SIFALO_GRANTS_KEY = 'kyc_sifalo_paid_grants';
     const KYC_PENDING_CHECKOUT_KEY = 'kyc_pending_checkout_ui';
+    const KYC_PENDING_SAVE_PNG_KEY = 'pendingSavePngAfterPayment';
+    const KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY = 'kyc_sifalo_consumed_auto_orders_v1';
     const KYC_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v1';
 
     // Purge any legacy cross-browser-session localStorage payment flags so a new browser session never auto-unlocks
@@ -1168,6 +1170,8 @@
         localStorage.removeItem(KYC_SIFALO_GRANTS_KEY);
         localStorage.removeItem(KYC_SIFALO_SESSION_KEY);
         localStorage.removeItem(KYC_PENDING_CHECKOUT_KEY);
+        localStorage.removeItem(KYC_PENDING_SAVE_PNG_KEY);
+        localStorage.removeItem(KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY);
         localStorage.removeItem(KYC_ACTIVE_EDITOR_UI_KEY);
       } catch (e) {}
     })();
@@ -1920,8 +1924,157 @@
     }
     window.closeSifaloPayModal = closeSifaloPayModal;
 
+    const KYC_WHITELISTED_SAVE_PNG_FUNCTIONS = new Set([
+      'downloadDrcPassPNG',
+      'downloadBgdPassPNG',
+      'downloadDeuPassPNG',
+      'downloadCanPassPNG',
+      'downloadGhaPassPNG',
+      'downloadNplPassPNG',
+      'downloadMwiPassPNG',
+      'downloadRwaCardPNG',
+      'downloadUaeCardPNG',
+      'downloadTurCardPNG',
+      'downloadTurPassPNG',
+      'downloadEthPassPNG',
+      'downloadProofOfAccountPNG',
+      'downloadProofOfAddressPNG',
+      'downloadUgandaPNG',
+      'downloadPakCardPNG',
+      'downloadSenegalPassPNG',
+      'downloadZafCardPNG',
+      'downloadSaPassPNG',
+      'downloadUsaPassPNG',
+      'downloadSycCardPNG',
+      'downloadKidFrontPNG',
+      'downloadKidBackPNG',
+      'downloadKidBothPNG',
+      'downloadEthPNG',
+      'downloadNgaCardPNG',
+      'downloadNgaPassportPNG',
+      'downloadUkPassPNG',
+      'downloadSomSmartIdPNG',
+      'downloadSomPNG',
+      'downloadSomPassPNG',
+      'downloadSomPassIdCardPNG',
+      'downloadSomLicPNG',
+      'downloadNzDlPNG',
+      'downloadOceaniaPNG'
+    ]);
+
+    function parseOnclickSavePngDescriptor(onclickAttr) {
+      if (typeof onclickAttr !== 'string' || !onclickAttr.trim()) return null;
+      const trimmed = onclickAttr.trim();
+      const match = trimmed.match(/^([a-zA-Z0-9_]+)\s*\(([^)]*)\)\s*;?$/);
+      if (!match) return null;
+      const fnName = match[1];
+      if (!KYC_WHITELISTED_SAVE_PNG_FUNCTIONS.has(fnName)) return null;
+      const rawArgs = match[2].trim();
+      const args = [];
+      if (rawArgs) {
+        const argRegex = /'([^']*)'|"([^"]*)"/g;
+        let argMatch;
+        while ((argMatch = argRegex.exec(rawArgs)) !== null) {
+          args.push(argMatch[1] !== undefined ? argMatch[1] : argMatch[2]);
+        }
+      }
+      return {
+        type: 'function',
+        fnName,
+        args,
+        onclickRaw: trimmed
+      };
+    }
+
+    function resolveSavePngActionDescriptor(triggerBtn) {
+      try {
+        if (triggerBtn) {
+          if (triggerBtn.id === 'downloadBtn') {
+            return { type: 'buttonId', buttonId: 'downloadBtn', fnName: '', args: [], onclickRaw: '' };
+          }
+          if (typeof triggerBtn.getAttribute === 'function') {
+            const parsed = parseOnclickSavePngDescriptor(triggerBtn.getAttribute('onclick') || '');
+            if (parsed) return parsed;
+          }
+        }
+        const wb = document.getElementById('verification-workbench');
+        if (wb && !wb.classList.contains('hidden')) {
+          const visibleViews = wb.querySelectorAll('[id$="-view"]:not(.hidden)');
+          for (let i = 0; i < visibleViews.length; i++) {
+            const view = visibleViews[i];
+            if (!view || !view.id || view.id === 'wb-no-document-view') continue;
+            const kenyaBtn = view.querySelector('#downloadBtn');
+            if (kenyaBtn) {
+              return { type: 'buttonId', buttonId: 'downloadBtn', fnName: '', args: [], onclickRaw: '' };
+            }
+            const dlBtn = view.querySelector('button[onclick^="download"]');
+            if (dlBtn) {
+              const parsed = parseOnclickSavePngDescriptor(dlBtn.getAttribute('onclick') || '');
+              if (parsed) return parsed;
+            }
+          }
+        }
+        if (window.__kycLastSavePngActionDescriptor) {
+          return window.__kycLastSavePngActionDescriptor;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function isOrderAutoDownloadConsumed(orderId) {
+      if (!orderId) return true;
+      try {
+        if (window.__kycConsumedAutoDownloadOrders && window.__kycConsumedAutoDownloadOrders[orderId]) {
+          return true;
+        }
+        const raw = readSessionOnlyStorage(KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY);
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        return Boolean(parsed && typeof parsed === 'object' && parsed[orderId]);
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function markOrderAutoDownloadConsumed(orderId) {
+      if (!orderId) return;
+      try {
+        window.__kycConsumedAutoDownloadOrders = window.__kycConsumedAutoDownloadOrders || {};
+        window.__kycConsumedAutoDownloadOrders[orderId] = true;
+        let map = {};
+        const raw = readSessionOnlyStorage(KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY);
+        if (raw) {
+          try {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') map = parsed;
+          } catch (e) {}
+        }
+        map[orderId] = Date.now();
+        writeSessionOnlyStorage(KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY, JSON.stringify(map));
+      } catch (e) {}
+    }
+
+    function readPendingSavePngAfterPayment() {
+      try {
+        const raw = readSessionOnlyStorage(KYC_PENDING_SAVE_PNG_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearPendingSavePngAfterPayment() {
+      removeSessionOnlyStorage(KYC_PENDING_SAVE_PNG_KEY);
+    }
+
     function getClickedTriggerButton() {
       try {
+        if (window.__kycPostPaymentActiveTriggerBtn) {
+          return window.__kycPostPaymentActiveTriggerBtn;
+        }
         const evt = typeof window !== 'undefined' ? window.event : null;
         const target = evt && (evt.currentTarget || evt.target);
         if (target && typeof target.closest === 'function') {
@@ -1949,15 +2102,21 @@
       } catch (e) {}
     }
 
-    async function startSifaloCheckoutImmediately(docSpec, triggerBtn) {
+    async function startSifaloCheckoutImmediately(docSpec, triggerBtn, actionDescriptor) {
       if (_isSifaloCheckoutInFlight) return;
       _isSifaloCheckoutInFlight = true;
       window.__kycSifaloCheckoutInFlight = true;
       _pendingSifaloCallback = null;
 
-      const spec = docSpec || getActiveUnlockDocSpec();
+      const spec = docSpec || getActiveUnlockDocSpec(triggerBtn);
+      const resolvedActionDescriptor = actionDescriptor || resolveSavePngActionDescriptor(triggerBtn);
+      if (resolvedActionDescriptor) {
+        window.__kycLastSavePngActionDescriptor = resolvedActionDescriptor;
+      }
       const sessionId = getOrCreateSifaloSessionId();
-      const countryKey = typeof currentCountry === 'string' ? currentCountry : '';
+      const countryKey =
+        (typeof workflowSelectedCountry === 'string' && workflowSelectedCountry) ||
+        (typeof currentCountry === 'string' ? currentCountry : '');
       const providerKey =
         (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
         (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : '');
@@ -1965,6 +2124,7 @@
       // Clear any previous pending checkout reference or stale grant so every attempt creates a brand-new Sifalo order
       window.__kycLastUnconfirmedOrder = null;
       removeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY);
+      clearPendingSavePngAfterPayment();
       clearSifaloGrantForProduct(spec.productKey);
 
       const payBtn = document.getElementById('kycSifaloPayBtn');
@@ -2022,6 +2182,11 @@
         writeSessionOnlyStorage(KYC_SIFALO_SESSION_KEY, effectiveSessionId);
 
         const activeSnapshot = captureWorkbenchFieldSnapshot();
+        const sideState = {
+          rwaCurrentSide: typeof rwaCurrentSide === 'string' ? rwaCurrentSide : 'front',
+          uaeCurrentSide: typeof uaeCurrentSide === 'string' ? uaeCurrentSide : 'both',
+          turCurrentSide: typeof turCurrentSide === 'string' ? turCurrentSide : 'both'
+        };
         const checkoutUiPayload = {
           orderId: data.orderId,
           orderStateToken: data.orderStateToken || '',
@@ -2031,9 +2196,30 @@
           rawDocType: spec.rawType,
           providerKey: providerKey || 'paypal',
           fieldSnapshot: activeSnapshot,
+          sideState,
+          actionDescriptor: resolvedActionDescriptor,
           savedAt: Date.now()
         };
         writeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY, JSON.stringify(checkoutUiPayload));
+
+        // Store one-time pendingSavePngAfterPayment state to resume automatically ONLY after server-side payment verification
+        const pendingSavePngPayload = {
+          action: 'save_png',
+          status: 'awaiting_payment_verification',
+          consumed: false,
+          orderId: data.orderId,
+          orderStateToken: data.orderStateToken || '',
+          sessionId: effectiveSessionId,
+          productKey: spec.productKey,
+          rawDocType: spec.rawType,
+          countryKey: countryKey || 'kenya',
+          providerKey: providerKey || 'paypal',
+          actionDescriptor: resolvedActionDescriptor,
+          sideState,
+          fieldSnapshot: activeSnapshot,
+          createdAt: Date.now()
+        };
+        writeSessionOnlyStorage(KYC_PENDING_SAVE_PNG_KEY, JSON.stringify(pendingSavePngPayload));
         saveActiveEditorUiState(activeSnapshot);
 
         // Redirect directly to the exact fresh checkout URL constructed by the server without re-encoding or mutating key/token
@@ -2056,7 +2242,7 @@
       clearSifaloGrantForProduct(spec.productKey);
       syncActiveProductUnlockUI();
       const payBtn = document.getElementById('kycSifaloPayBtn');
-      return startSifaloCheckoutImmediately(spec, payBtn);
+      return startSifaloCheckoutImmediately(spec, payBtn, window.__kycLastSavePngActionDescriptor);
     }
     window.choosePaidCheckoutUnlock = choosePaidCheckoutUnlock;
 
@@ -2254,6 +2440,188 @@
       return new URLSearchParams(normalizedQuery);
     }
 
+    function findRestoredSavePngTriggerButton(actionDescriptor) {
+      try {
+        const wb = document.getElementById('verification-workbench');
+        const root = wb || document;
+        if (actionDescriptor && actionDescriptor.type === 'buttonId' && actionDescriptor.buttonId) {
+          const byId = document.getElementById(actionDescriptor.buttonId);
+          if (byId) return byId;
+        }
+        if (actionDescriptor && actionDescriptor.onclickRaw) {
+          const visibleViews = root.querySelectorAll('[id$="-view"]:not(.hidden)');
+          for (let i = 0; i < visibleViews.length; i++) {
+            const btns = visibleViews[i].querySelectorAll('button[onclick^="download"]');
+            for (let j = 0; j < btns.length; j++) {
+              if ((btns[j].getAttribute('onclick') || '').trim() === actionDescriptor.onclickRaw) {
+                return btns[j];
+              }
+            }
+          }
+        }
+        const visibleViews = root.querySelectorAll('[id$="-view"]:not(.hidden)');
+        for (let i = 0; i < visibleViews.length; i++) {
+          const view = visibleViews[i];
+          if (!view || view.id === 'wb-no-document-view') continue;
+          const btn = view.querySelector('#downloadBtn, button[onclick^="download"]');
+          if (btn) return btn;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    async function consumeAndRunPendingSavePngAfterPayment(verifyData, pendingSavePng) {
+      if (!verifyData || verifyData.verified !== true || verifyData.status !== 'PAID') {
+        return false;
+      }
+      if (!pendingSavePng || pendingSavePng.consumed === true) {
+        return false;
+      }
+      const orderId = String(verifyData.orderId || '').trim();
+      const productKey = String(verifyData.productKey || '').trim();
+      if (!orderId || !productKey) {
+        return false;
+      }
+      // Enforce strict order & product match between the pending Save PNG action and the server-verified order
+      if (pendingSavePng.orderId && pendingSavePng.orderId !== orderId) {
+        return false;
+      }
+      if (pendingSavePng.productKey && pendingSavePng.productKey !== productKey) {
+        return false;
+      }
+      if (verifyData.autoDownloadEligible === false || isOrderAutoDownloadConsumed(orderId)) {
+        clearPendingSavePngAfterPayment();
+        return false;
+      }
+
+      // Immediately consume and clear pendingSavePngAfterPayment so any later refresh cannot re-trigger it
+      clearPendingSavePngAfterPayment();
+      removeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY);
+      markOrderAutoDownloadConsumed(orderId);
+
+      // Verify one-time post-payment auto-download authorization with the server (/api/payments/sifalo/authorize-unlock)
+      const sessionId =
+        (verifyData.sessionId && typeof verifyData.sessionId === 'string')
+          ? verifyData.sessionId
+          : getOrCreateSifaloSessionId();
+      try {
+        const authRes = await fetch('/api/payments/sifalo/authorize-unlock', {
+          method: 'POST',
+          credentials: 'same-origin',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, no-cache',
+            'X-Kyc-Session-Id': sessionId
+          },
+          body: JSON.stringify({
+            unlockToken: verifyData.unlockToken || '',
+            docType: productKey,
+            productKey,
+            orderId,
+            sessionId,
+            consumePostPaymentAutoDownload: true
+          })
+        });
+        const authData = await authRes.json().catch(() => null);
+        if (
+          !authRes.ok ||
+          !authData ||
+          authData.authorized !== true ||
+          authData.productKey !== productKey ||
+          authData.autoDownloadAuthorized !== true
+        ) {
+          return false;
+        }
+        recordServerVerifiedUnlock(authData, sessionId);
+        syncActiveProductUnlockUI();
+      } catch (err) {
+        return false;
+      }
+
+      // Restore side/tab state if applicable before rendering
+      try {
+        if (pendingSavePng.sideState && typeof pendingSavePng.sideState === 'object') {
+          if (pendingSavePng.sideState.rwaCurrentSide && typeof switchRwaSide === 'function') {
+            switchRwaSide(pendingSavePng.sideState.rwaCurrentSide);
+          }
+          if (pendingSavePng.sideState.uaeCurrentSide && typeof switchUaeSide === 'function') {
+            switchUaeSide(pendingSavePng.sideState.uaeCurrentSide);
+          }
+          if (pendingSavePng.sideState.turCurrentSide && typeof switchTurSide === 'function') {
+            switchTurSide(pendingSavePng.sideState.turCurrentSide);
+          }
+        }
+      } catch (e) {}
+
+      // Wait for restored document editor DOM, fonts, and preview elements to settle
+      await waitForNextFramePair();
+
+      let descriptor = pendingSavePng.actionDescriptor;
+      const targetBtn = findRestoredSavePngTriggerButton(descriptor);
+      if (!descriptor && targetBtn) {
+        descriptor = resolveSavePngActionDescriptor(targetBtn);
+      }
+
+      if (typeof showToast === 'function') {
+        showToast(
+          'Payment Verified — Generating PNG...',
+          `Automatically exporting your ${verifyData.label || 'document'} PNG`
+        );
+      }
+
+      window.__kycPostPaymentActiveTriggerBtn = targetBtn || null;
+      try {
+        if (descriptor && descriptor.type === 'buttonId' && descriptor.buttonId === 'downloadBtn') {
+          const dlBtn = document.getElementById('downloadBtn');
+          if (dlBtn && typeof dlBtn.click === 'function') {
+            dlBtn.click();
+            // Wait for the triggered async execution to finish
+            await new Promise((r) => setTimeout(r, 50));
+            while (_isSifaloAuthorizingInFlight || _isSifaloExecutingCallback) {
+              await new Promise((r) => setTimeout(r, 40));
+            }
+            return true;
+          }
+        }
+
+        if (
+          descriptor &&
+          descriptor.type === 'function' &&
+          KYC_WHITELISTED_SAVE_PNG_FUNCTIONS.has(descriptor.fnName) &&
+          typeof window[descriptor.fnName] === 'function'
+        ) {
+          const fnArgs = Array.isArray(descriptor.args) ? descriptor.args : [];
+          await window[descriptor.fnName](...fnArgs);
+          await new Promise((r) => setTimeout(r, 50));
+          while (_isSifaloAuthorizingInFlight || _isSifaloExecutingCallback) {
+            await new Promise((r) => setTimeout(r, 40));
+          }
+          return true;
+        }
+
+        if (targetBtn && typeof targetBtn.click === 'function') {
+          targetBtn.click();
+          await new Promise((r) => setTimeout(r, 50));
+          while (_isSifaloAuthorizingInFlight || _isSifaloExecutingCallback) {
+            await new Promise((r) => setTimeout(r, 40));
+          }
+          return true;
+        }
+      } catch (err) {
+        console.error('Automatic post-payment Save PNG failed:', err);
+        if (typeof showToast === 'function') {
+          showToast(
+            'Export Error',
+            'Could not complete automatic PNG download. Please click Save PNG to retry.'
+          );
+        }
+      } finally {
+        window.__kycPostPaymentActiveTriggerBtn = null;
+      }
+      return false;
+    }
+
     async function recheckLastSifaloOrderStatus() {
       const pending = window.__kycLastUnconfirmedOrder;
       if (!pending || !pending.orderId) return;
@@ -2291,13 +2659,16 @@
           recordServerVerifiedUnlock(verifyData, sessionId);
           window.__kycLastUnconfirmedOrder = null;
           _pendingSifaloCallback = null;
+          const pendingSavePng = readPendingSavePngAfterPayment();
           removeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY);
           closeSifaloPayModal(true);
           syncActiveProductUnlockUI();
-          if (typeof showToast === 'function') {
+          if (pendingSavePng && !pendingSavePng.consumed) {
+            await consumeAndRunPendingSavePngAfterPayment(verifyData, pendingSavePng);
+          } else if (typeof showToast === 'function') {
             showToast(
               'Payment Verified!',
-              `${verifyData.label || 'Document'} unlocked. Click Save PNG or Download when ready.`
+              `${verifyData.label || 'Document'} unlocked.`
             );
           }
           return;
@@ -2335,10 +2706,9 @@
         const returnMessage = (params.get('message') || '').trim();
 
         if (!checkoutState && !urlOrderId) {
-          return { handled: false, verifiedData: null };
+          return { handled: false, verifiedData: null, pendingSavePng: null };
         }
 
-        // Ensure nothing can ever auto-download on return
         _pendingSifaloCallback = null;
         _isSifaloExecutingCallback = false;
 
@@ -2353,20 +2723,31 @@
           if (rawCtx) uiContext = JSON.parse(rawCtx);
         } catch (e) {}
 
-        const orderId = urlOrderId || (uiContext && uiContext.orderId) || '';
-        const sessionId = (uiContext && uiContext.sessionId) || getOrCreateSifaloSessionId();
+        const pendingSavePng = readPendingSavePngAfterPayment();
+        const effectiveUiContext = uiContext || pendingSavePng;
+
+        const orderId =
+          urlOrderId ||
+          (effectiveUiContext && effectiveUiContext.orderId) ||
+          '';
+        const sessionId =
+          (effectiveUiContext && effectiveUiContext.sessionId) ||
+          getOrCreateSifaloSessionId();
         if (sessionId) {
           window.__kycSifaloSessionId = sessionId;
           writeSessionOnlyStorage(KYC_SIFALO_SESSION_KEY, sessionId);
         }
-        const orderStateToken = (uiContext && uiContext.orderStateToken) || urlOrderState || '';
-        if (uiContext && uiContext.productKey) {
+        const orderStateToken =
+          (effectiveUiContext && effectiveUiContext.orderStateToken) ||
+          urlOrderState ||
+          '';
+        if (effectiveUiContext && effectiveUiContext.productKey) {
           // Ensure product starts strictly locked until server verification succeeds
-          clearSifaloGrantForProduct(uiContext.productKey);
+          clearSifaloGrantForProduct(effectiveUiContext.productKey);
         }
 
         if (orderId) {
-          restoreEditorContextFromData(uiContext, true);
+          restoreEditorContextFromData(effectiveUiContext, true);
           if (typeof showToast === 'function') {
             showToast('Verifying Payment...', 'Checking Sifalo Pay payment confirmation with our server');
           }
@@ -2378,8 +2759,10 @@
             verifyRes = await fetch('/api/payments/sifalo/verify-order', {
               method: 'POST',
               credentials: 'same-origin',
+              cache: 'no-store',
               headers: {
                 'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache',
                 'X-Kyc-Session-Id': sessionId
               },
               body: JSON.stringify({
@@ -2412,7 +2795,7 @@
             verifyData.productKey &&
             verifyData.sid
           ) {
-            const hasActiveEditor = Boolean(uiContext && uiContext.countryKey);
+            const hasActiveEditor = Boolean(effectiveUiContext && effectiveUiContext.countryKey);
             if (!hasActiveEditor && verifyData.countryKey && verifyData.countryKey !== 'global') {
               const fallbackSpec = getDocSpecByProductKey(verifyData.productKey);
               restoreEditorContextFromData({
@@ -2434,17 +2817,15 @@
             saveActiveEditorUiState();
             closeSifaloPayModal(true);
             syncActiveProductUnlockUI();
-            if (typeof showToast === 'function') {
-              showToast(
-                'Payment Verified!',
-                `${verifyData.label || 'Document'} unlocked. Click Save PNG or Download whenever you are ready.`
-              );
-            }
-            return { handled: true, verifiedData: verifyData };
+            return {
+              handled: true,
+              verifiedData: verifyData,
+              pendingSavePng: pendingSavePng && !pendingSavePng.consumed ? pendingSavePng : null
+            };
           } else {
             const targetProductKey =
               (verifyData && verifyData.productKey) ||
-              (uiContext && uiContext.productKey) ||
+              (effectiveUiContext && effectiveUiContext.productKey) ||
               getActiveUnlockDocSpec().productKey;
             clearSifaloGrantForProduct(targetProductKey);
             syncActiveProductUnlockUI();
@@ -2452,6 +2833,7 @@
             const statusText = verifyData && verifyData.status ? String(verifyData.status).toUpperCase() : 'UNCONFIRMED';
             if (statusText !== 'PENDING') {
               removeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY);
+              clearPendingSavePngAfterPayment();
             }
             const title =
               statusText === 'REFUNDED'
@@ -2486,13 +2868,13 @@
             if (typeof showToast === 'function') {
               showToast(title, errorMsg);
             }
-            return { handled: true, verifiedData: null };
+            return { handled: true, verifiedData: null, pendingSavePng: null };
           }
         }
-        return { handled: Boolean(checkoutState), verifiedData: null };
+        return { handled: Boolean(checkoutState), verifiedData: null, pendingSavePng: null };
       } catch (err) {
         console.error('Sifalo return verification error:', err);
-        return { handled: false, verifiedData: null };
+        return { handled: false, verifiedData: null, pendingSavePng: null };
       }
     }
 
@@ -2532,12 +2914,20 @@
           }
         }
         await _kycSessionStatusPromise;
+        syncActiveProductUnlockUI();
       } else {
         _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad({ justVerifiedData: returnInfo.verifiedData });
         await _kycSessionStatusPromise;
-      }
+        syncActiveProductUnlockUI();
 
-      syncActiveProductUnlockUI();
+        // Only after server-side payment verification succeeded on this return, automatically continue the one-time pending Save PNG action
+        if (returnInfo.verifiedData && returnInfo.pendingSavePng) {
+          await consumeAndRunPendingSavePngAfterPayment(
+            returnInfo.verifiedData,
+            returnInfo.pendingSavePng
+          );
+        }
+      }
     }
 
     if (typeof document !== 'undefined') {
@@ -2579,6 +2969,10 @@
 
       const clickedBtn = getClickedTriggerButton();
       const docSpec = getActiveUnlockDocSpec(clickedBtn);
+      const actionDescriptor = resolveSavePngActionDescriptor(clickedBtn);
+      if (actionDescriptor) {
+        window.__kycLastSavePngActionDescriptor = actionDescriptor;
+      }
 
       _isSifaloAuthorizingInFlight = true;
       setSavePngButtonState(clickedBtn, 'checking', 'Checking authorization...');
@@ -2608,7 +3002,7 @@
       }
 
       // Not authorized: immediately start a fresh Sifalo checkout session without generating any PNG
-      return startSifaloCheckoutImmediately(docSpec, clickedBtn);
+      return startSifaloCheckoutImmediately(docSpec, clickedBtn, actionDescriptor);
     }
     window.triggerWithSifaloPay = triggerWithSifaloPay;
 

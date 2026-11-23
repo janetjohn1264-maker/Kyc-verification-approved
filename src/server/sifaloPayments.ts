@@ -541,6 +541,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
   const sidToOrderId = new Map<string, string>();
   const consumedTransactions = new Map<string, string>(); // txRef -> orderId
   const processedWebhookEvents = new Set<string>();
+  const autoDownloadConsumedOrders = new Set<string>();
 
   const resolvedPersistencePath =
     deps.persistenceFilePath === null
@@ -563,6 +564,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         orders?: SifaloOrderRecord[];
         consumedTransactions?: Array<[string, string]>;
         processedWebhookEvents?: string[];
+        autoDownloadConsumedOrders?: string[];
       };
       if (Array.isArray(parsed.orders)) {
         for (const ord of parsed.orders) {
@@ -588,6 +590,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           }
         }
       }
+      if (Array.isArray(parsed.autoDownloadConsumedOrders)) {
+        for (const ordId of parsed.autoDownloadConsumedOrders) {
+          if (typeof ordId === 'string') {
+            autoDownloadConsumedOrders.add(ordId);
+          }
+        }
+      }
     } catch (err) {
       if (err && typeof err === 'object' && 'code' in err && (err as { code?: string }).code === 'ENOENT') {
         return;
@@ -605,6 +614,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         orders: Array.from(orders.values()),
         consumedTransactions: Array.from(consumedTransactions.entries()),
         processedWebhookEvents: Array.from(processedWebhookEvents.values()).slice(-MAX_PROCESSED_WEBHOOK_EVENTS),
+        autoDownloadConsumedOrders: Array.from(autoDownloadConsumedOrders.values()).slice(-MAX_PROCESSED_WEBHOOK_EVENTS),
       };
       const tmpFile = `${resolvedPersistencePath}.tmp`;
       fs.writeFileSync(tmpFile, JSON.stringify(payload), 'utf8');
@@ -2017,6 +2027,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
     router.post('/verify-order', async (req: Request, res: Response) => {
       try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         if (isUntrustedCrossOriginPost(req)) {
           return res.status(403).json({ verified: false, error: 'Cross-origin verification request rejected.' });
         }
@@ -2198,6 +2212,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           formattedPrice: priceSpec.formattedPrice,
           unlockToken: grant.unlockToken,
           expiresAt: grant.expiresAt,
+          autoDownloadEligible: !autoDownloadConsumedOrders.has(order.orderId),
         });
       } catch (err) {
         console.error('[Sifalo] Verify order error:', err instanceof Error ? err.message : err);
@@ -2778,8 +2793,26 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           setSignedGrantsCookie(req, res, requestSessionId, cookieGrants);
         }
 
+        const consumePostPaymentAutoDownload = body.consumePostPaymentAutoDownload === true;
+        let autoDownloadAuthorized = false;
+        if (consumePostPaymentAutoDownload) {
+          const expectedOrderId =
+            typeof body.orderId === 'string' && body.orderId.trim()
+              ? body.orderId.trim()
+              : result.orderId;
+          if (
+            expectedOrderId === result.orderId &&
+            !autoDownloadConsumedOrders.has(result.orderId)
+          ) {
+            autoDownloadConsumedOrders.add(result.orderId);
+            persistState();
+            autoDownloadAuthorized = true;
+          }
+        }
+
         return res.json({
           authorized: true,
+          autoDownloadAuthorized,
           orderId: result.orderId,
           sid: result.sid,
           productKey: result.productKey,
