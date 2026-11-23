@@ -2573,6 +2573,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
     async function handleSessionStatus(req: Request, res: Response) {
       try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         if (req.method === 'POST' && isUntrustedCrossOriginPost(req)) {
           return res.status(403).json({ authenticatedSession: false, unlockedProducts: {} });
         }
@@ -2681,6 +2685,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
     router.post('/authorize-unlock', async (req: Request, res: Response) => {
       try {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+
         if (isUntrustedCrossOriginPost(req)) {
           return res.status(403).json({ authorized: false, error: 'Cross-origin unlock request rejected.' });
         }
@@ -2703,7 +2711,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           cookieGrants[requestedProductKey] ||
           findLatestActiveOrderGrantEntry(requestSessionId, requestedProductKey);
 
-        if (!unlockToken && !cookieGrantEntry && requestSessionId) {
+        if (!cookieGrantEntry && requestSessionId) {
           cookieGrantEntry = await tryConfirmPendingOrderForProduct(
             req,
             res,
@@ -2732,6 +2740,23 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             cookieGrantEntry,
             requestSessionId,
           });
+        }
+
+        // If an expired grant failed, check if a newer pending order for this session & product was just paid at Sifalo
+        if (!result.authorized && requestSessionId) {
+          const confirmedPendingEntry = await tryConfirmPendingOrderForProduct(
+            req,
+            res,
+            requestSessionId,
+            requestedProductKey
+          );
+          if (confirmedPendingEntry) {
+            result = await authorizeUnlockCandidate({
+              requestedProductKey,
+              cookieGrantEntry: confirmedPendingEntry,
+              requestSessionId,
+            });
+          }
         }
 
         if (!result.authorized) {

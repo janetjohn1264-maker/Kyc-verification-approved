@@ -1285,19 +1285,36 @@
       return null;
     }
 
-    function getActiveUnlockDocSpec() {
+    function classifyUnlockDocViewId(vid) {
+      if (!vid || vid === 'wb-no-document-view') return '';
+      if (vid.includes('proofofaccount')) return 'proofofaccount';
+      if (vid.includes('proofofaddress')) return 'refugeecard';
+      if (vid.includes('driverlicense')) return 'driverlicense';
+      if (vid.includes('passport')) return 'passport';
+      if (vid.includes('idcard') || vid.includes('-doc-view') || vid.includes('nira')) return 'idcard';
+      return '';
+    }
+
+    function getActiveUnlockDocSpec(triggerBtn) {
       let rawType = '';
+      try {
+        if (triggerBtn && typeof triggerBtn.closest === 'function') {
+          const enclosingView = triggerBtn.closest('[id$="-view"]');
+          if (enclosingView && enclosingView.id) {
+            rawType = classifyUnlockDocViewId(enclosingView.id);
+          }
+        }
+      } catch (e) {}
+
       const wb = document.getElementById('verification-workbench');
-      if (wb && !wb.classList.contains('hidden')) {
+      if (!rawType && wb && !wb.classList.contains('hidden')) {
         const visibleViews = wb.querySelectorAll('[id$="-view"]:not(.hidden)');
         for (let i = 0; i < visibleViews.length; i++) {
-          const vid = visibleViews[i].id || '';
-          if (!vid || vid === 'wb-no-document-view') continue;
-          if (vid.includes('proofofaccount')) { rawType = 'proofofaccount'; break; }
-          if (vid.includes('proofofaddress')) { rawType = 'refugeecard'; break; }
-          if (vid.includes('driverlicense')) { rawType = 'driverlicense'; break; }
-          if (vid.includes('passport')) { rawType = 'passport'; break; }
-          if (vid.includes('idcard') || vid.includes('-doc-view') || vid.includes('nira')) { rawType = 'idcard'; break; }
+          const matched = classifyUnlockDocViewId(visibleViews[i].id || '');
+          if (matched) {
+            rawType = matched;
+            break;
+          }
         }
       }
       if (!KYC_SIFALO_DOC_CATALOG[rawType]) {
@@ -1464,16 +1481,378 @@
       return true;
     }
 
-    async function executePaidDownloadCallback(downloadCallback) {
+    function dataUrlToBlobUrl(dataUrl) {
+      if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+        return dataUrl;
+      }
+      try {
+        const commaIdx = dataUrl.indexOf(',');
+        if (commaIdx === -1) return dataUrl;
+        const meta = dataUrl.slice(0, commaIdx);
+        const base64 = dataUrl.slice(commaIdx + 1);
+        if (!meta.includes(';base64') || base64.length < 32) {
+          return dataUrl;
+        }
+        if (
+          typeof atob !== 'function' ||
+          typeof Blob !== 'function' ||
+          typeof URL === 'undefined' ||
+          typeof URL.createObjectURL !== 'function'
+        ) {
+          return dataUrl;
+        }
+        const mimeMatch = meta.match(/^data:([^;]+)/);
+        const mimeType = (mimeMatch && mimeMatch[1]) || 'image/png';
+        const binary = atob(base64);
+        const len = binary.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: mimeType });
+        return URL.createObjectURL(blob);
+      } catch (e) {
+        return dataUrl;
+      }
+    }
+    window.dataUrlToBlobUrl = dataUrlToBlobUrl;
+
+    function triggerReliablePngDownload(hrefOrDataUrl, filename) {
+      if (!hrefOrDataUrl || hrefOrDataUrl === '#') return false;
+      try {
+        window.__kycDirectPngTriggeredInTurn = true;
+        const safeName =
+          (typeof filename === 'string' && filename.trim()) ? filename.trim() : 'document.png';
+        const downloadUrl =
+          typeof hrefOrDataUrl === 'string' && hrefOrDataUrl.startsWith('data:image/')
+            ? dataUrlToBlobUrl(hrefOrDataUrl)
+            : String(hrefOrDataUrl);
+        const createdBlobUrl =
+          typeof downloadUrl === 'string' &&
+          downloadUrl.startsWith('blob:') &&
+          downloadUrl !== hrefOrDataUrl;
+
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = safeName;
+        a.rel = 'noopener';
+        a.style.display = 'none';
+        if (document.body) {
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } else {
+          a.click();
+        }
+
+        if (createdBlobUrl && typeof URL !== 'undefined' && typeof URL.revokeObjectURL === 'function') {
+          setTimeout(() => {
+            try {
+              URL.revokeObjectURL(downloadUrl);
+            } catch (e) {}
+          }, 60000);
+        }
+        return true;
+      } catch (err) {
+        console.error('PNG download trigger failed:', err);
+        return false;
+      }
+    }
+    window.triggerReliablePngDownload = triggerReliablePngDownload;
+
+    async function waitForNextFramePair() {
+      await new Promise((resolve) => {
+        let settled = false;
+        const done = () => {
+          if (!settled) {
+            settled = true;
+            resolve();
+          }
+        };
+        const timer = setTimeout(done, 50);
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              clearTimeout(timer);
+              done();
+            });
+          });
+        }
+      });
+    }
+
+    async function prepareElementForHtml2Canvas(targetEl) {
+      const restoredNodes = [];
+      if (!targetEl || typeof targetEl !== 'object') {
+        return () => {};
+      }
+      try {
+        // 1. Clear any content-protection blur or overlay shield before capturing
+        if (document.body && document.body.classList) {
+          document.body.classList.remove('kyc-tab-blurred');
+        }
+        const shield = document.getElementById('kycProtectionShield');
+        if (shield && shield.classList) {
+          shield.classList.remove('active');
+        }
+
+        // 2. If target card or an ancestor card-wrapper inside the active document view is hidden (e.g. Front vs Back tab), unhide during capture
+        let curr = targetEl;
+        const wb = document.getElementById('verification-workbench');
+        while (curr && curr !== document.body && curr !== document.documentElement && curr !== wb) {
+          if (curr.classList && curr.classList.contains('hidden')) {
+            curr.classList.remove('hidden');
+            restoredNodes.push({ type: 'class', node: curr });
+          } else if (curr.style && curr.style.display === 'none') {
+            const prevDisplay = curr.style.display;
+            curr.style.display = '';
+            restoredNodes.push({ type: 'display', node: curr, prevDisplay });
+          }
+          if (curr.id && curr.id.endsWith('-view')) {
+            break;
+          }
+          curr = curr.parentElement;
+        }
+
+        // 3. Ensure procedural background canvases are painted if present
+        if (typeof targetEl.querySelector === 'function') {
+          const somCanvas =
+            (targetEl.id === 'somalia-passport-card' || targetEl.querySelector('#som-pass-base-canvas'))
+              ? document.getElementById('som-pass-base-canvas')
+              : null;
+          if (somCanvas && typeof initSomPassBaseCanvas === 'function') {
+            try { initSomPassBaseCanvas(); } catch (e) {}
+          }
+          const saCanvas =
+            (targetEl.id === 'sa-passport-card' || targetEl.querySelector('#sa-pass-base-canvas'))
+              ? document.getElementById('sa-pass-base-canvas')
+              : null;
+          if (saCanvas && typeof initSaPassBaseCanvas === 'function') {
+            try { initSaPassBaseCanvas(); } catch (e) {}
+          }
+        }
+
+        // 4. Wait for web fonts to finish loading
+        if (document.fonts && document.fonts.ready) {
+          try {
+            await Promise.race([
+              document.fonts.ready,
+              new Promise((r) => setTimeout(r, 2500))
+            ]);
+          } catch (e) {}
+        }
+
+        // 5. Wait for all <img> elements inside targetEl to finish loading and decoding
+        if (typeof targetEl.querySelectorAll === 'function') {
+          const imgs = Array.from(targetEl.querySelectorAll('img'));
+          if (imgs.length > 0) {
+            await Promise.race([
+              Promise.all(
+                imgs.map((img) => {
+                  return new Promise((resolve) => {
+                    if (!img) return resolve();
+                    const srcAttr = img.getAttribute('src');
+                    if (!srcAttr) return resolve();
+                    const finalizeDecode = () => {
+                      if (typeof img.decode === 'function') {
+                        img.decode().catch(() => {}).finally(resolve);
+                      } else {
+                        resolve();
+                      }
+                    };
+                    if (img.complete) {
+                      if (img.naturalWidth > 0) {
+                        finalizeDecode();
+                      } else {
+                        resolve();
+                      }
+                      return;
+                    }
+                    const onDone = () => {
+                      img.removeEventListener('load', onLoad);
+                      img.removeEventListener('error', onErr);
+                      finalizeDecode();
+                    };
+                    const onLoad = () => onDone();
+                    const onErr = () => {
+                      img.removeEventListener('load', onLoad);
+                      img.removeEventListener('error', onErr);
+                      resolve();
+                    };
+                    img.addEventListener('load', onLoad, { once: true });
+                    img.addEventListener('error', onErr, { once: true });
+                  });
+                })
+              ),
+              new Promise((r) => setTimeout(r, 3000))
+            ]);
+          }
+        }
+
+        // 6. Run one synchronous auto-fit pass while auto-fit observer is paused, then wait for layout paint
+        if (typeof window.autoFitDocumentFields === 'function') {
+          try {
+            window.autoFitDocumentFields(targetEl);
+          } catch (e) {}
+        }
+
+        await waitForNextFramePair();
+      } catch (e) {}
+
+      return function restorePreparedElement() {
+        for (let i = restoredNodes.length - 1; i >= 0; i--) {
+          const item = restoredNodes[i];
+          try {
+            if (item.type === 'class' && item.node && item.node.classList) {
+              item.node.classList.add('hidden');
+            } else if (item.type === 'display' && item.node && item.node.style) {
+              item.node.style.display = item.prevDisplay;
+            }
+          } catch (e) {}
+        }
+      };
+    }
+
+    function trackHtml2CanvasPromise(promise) {
+      if (!promise || typeof promise.then !== 'function') return promise;
+      window.__kycLastHtml2CanvasChainPromise = promise;
+      const origThen = promise.then;
+      const origCatch = promise.catch;
+      if (typeof origThen === 'function' && !promise._kycChainTracked) {
+        promise._kycChainTracked = true;
+        promise.then = function (onFulfilled, onRejected) {
+          const chained = origThen.call(this, onFulfilled, onRejected);
+          return trackHtml2CanvasPromise(chained);
+        };
+        if (typeof origCatch === 'function') {
+          promise.catch = function (onRejected) {
+            const chained = origCatch.call(this, onRejected);
+            return trackHtml2CanvasPromise(chained);
+          };
+        }
+      }
+      return promise;
+    }
+
+    function installSynchronizedHtml2CanvasWrapper() {
+      const currentFn = window.html2canvas;
+      if (typeof currentFn !== 'function' || currentFn._kycSyncWrapped) {
+        return;
+      }
+      const origHtml2Canvas = currentFn;
+      const wrappedHtml2Canvas = function (targetEl, options) {
+        const execPromise = (async () => {
+          const restore = await prepareElementForHtml2Canvas(targetEl);
+          try {
+            const safeOpts = Object.assign({ useCORS: true, logging: false }, options || {});
+            return await origHtml2Canvas(targetEl, safeOpts);
+          } finally {
+            restore();
+          }
+        })();
+        return trackHtml2CanvasPromise(execPromise);
+      };
+      wrappedHtml2Canvas._kycSyncWrapped = true;
+      wrappedHtml2Canvas._origHtml2Canvas = origHtml2Canvas;
+      window.html2canvas = wrappedHtml2Canvas;
+      try {
+        html2canvas = wrappedHtml2Canvas;
+      } catch (e) {}
+    }
+    installSynchronizedHtml2CanvasWrapper();
+
+    function setSavePngButtonState(btn, mode, customText) {
+      if (!btn) return;
+      try {
+        if (mode && mode !== 'idle') {
+          if (!btn.dataset.kycOrigHtml) {
+            btn.dataset.kycOrigHtml = btn.innerHTML;
+          }
+          if (btn.tagName === 'BUTTON') {
+            btn.disabled = true;
+          } else {
+            btn.setAttribute('aria-disabled', 'true');
+            btn.style.pointerEvents = 'none';
+          }
+          btn.setAttribute('aria-busy', 'true');
+          btn.dataset.kycBusyMode = mode;
+          const label =
+            customText ||
+            (mode === 'checking'
+              ? 'Checking authorization...'
+              : mode === 'rendering'
+                ? 'Generating PNG...'
+                : 'Opening secure payment...');
+          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>${label}</span>`;
+        } else {
+          if (btn.dataset.kycOrigHtml) {
+            btn.innerHTML = btn.dataset.kycOrigHtml;
+            delete btn.dataset.kycOrigHtml;
+          }
+          if (btn.tagName === 'BUTTON') {
+            btn.disabled = false;
+          } else {
+            btn.removeAttribute('aria-disabled');
+            btn.style.pointerEvents = '';
+          }
+          btn.removeAttribute('aria-busy');
+          delete btn.dataset.kycBusyMode;
+          syncActiveProductUnlockUI();
+        }
+      } catch (e) {}
+    }
+
+    async function executePaidDownloadCallback(downloadCallback, triggerBtn) {
       if (typeof downloadCallback !== 'function') return;
       _isSifaloExecutingCallback = true;
+      window.__kycSifaloRenderingInFlight = true;
+      window.__kycLastHtml2CanvasChainPromise = null;
+      window.__kycDirectPngTriggeredInTurn = false;
+      installSynchronizedHtml2CanvasWrapper();
+      setSavePngButtonState(triggerBtn, 'rendering', 'Generating PNG...');
+
+      const fallbackLink = document.getElementById('fallbackDownloadLink');
+      const prevFallbackHref = fallbackLink ? (fallbackLink.getAttribute('href') || '') : '';
+      if (fallbackLink) {
+        fallbackLink.dataset.kycRenderedTurn = '';
+      }
+
       try {
-        // Run ONLY the explicit user-initiated export/preview callback; never inject hidden auto-downloads
-        await downloadCallback();
+        const result = downloadCallback();
+        if (result && typeof result.then === 'function') {
+          await result;
+        }
+        if (window.__kycLastHtml2CanvasChainPromise) {
+          await window.__kycLastHtml2CanvasChainPromise;
+        }
+
+        // If the handler populated #fallbackDownloadLink (preview modal flow) without triggering a direct download yet,
+        // convert its data: URL to a Blob URL and trigger the file download immediately for this explicit Save PNG click.
+        if (fallbackLink && !window.__kycDirectPngTriggeredInTurn) {
+          const nextHref = fallbackLink.getAttribute('href') || '';
+          const nextDownloadName = fallbackLink.getAttribute('download') || 'document.png';
+          if (
+            nextHref &&
+            nextHref !== '#' &&
+            (nextHref !== prevFallbackHref || nextHref.startsWith('data:image/') || nextHref.startsWith('blob:'))
+          ) {
+            const blobHref = nextHref.startsWith('data:image/') ? dataUrlToBlobUrl(nextHref) : nextHref;
+            if (blobHref && blobHref !== nextHref) {
+              fallbackLink.setAttribute('href', blobHref);
+            }
+            triggerReliablePngDownload(blobHref, nextDownloadName);
+          }
+        }
       } catch (err) {
         console.error('Paid download callback error:', err);
+        if (typeof showToast === 'function') {
+          showToast('Export Failed', 'Could not generate PNG. Please click Save PNG to try again.');
+        }
       } finally {
+        window.__kycLastHtml2CanvasChainPromise = null;
+        window.__kycSifaloRenderingInFlight = false;
         _isSifaloExecutingCallback = false;
+        setSavePngButtonState(triggerBtn, 'idle');
       }
     }
 
@@ -1558,34 +1937,7 @@
     }
 
     function setOpeningPaymentButtonState(btn, isLoading) {
-      if (!btn) return;
-      try {
-        if (isLoading) {
-          if (!btn.dataset.kycOrigHtml) {
-            btn.dataset.kycOrigHtml = btn.innerHTML;
-          }
-          if (btn.tagName === 'BUTTON') {
-            btn.disabled = true;
-          } else {
-            btn.setAttribute('aria-disabled', 'true');
-            btn.style.pointerEvents = 'none';
-          }
-          btn.setAttribute('aria-busy', 'true');
-          btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Opening secure payment...</span>';
-        } else {
-          if (btn.dataset.kycOrigHtml) {
-            btn.innerHTML = btn.dataset.kycOrigHtml;
-            delete btn.dataset.kycOrigHtml;
-          }
-          if (btn.tagName === 'BUTTON') {
-            btn.disabled = false;
-          } else {
-            btn.removeAttribute('aria-disabled');
-            btn.style.pointerEvents = '';
-          }
-          btn.removeAttribute('aria-busy');
-        }
-      } catch (e) {}
+      setSavePngButtonState(btn, isLoading ? 'checkout' : 'idle', 'Opening secure payment...');
     }
 
     function showOpeningPaymentStatusIndicator(isLoading, docSpec) {
@@ -1748,12 +2100,14 @@
       const activeGrant = window.__kycPaidUnlockGrants && window.__kycPaidUnlockGrants[productKey];
       const sessionId = getOrCreateSifaloSessionId();
       try {
-        // Always ask server (server validates HttpOnly signed session/grant cookies, server orders, and candidate unlockToken)
+        // Always ask server (server validates HttpOnly signed session/grant cookies, server orders, pending orders, and candidate unlockToken)
         const res = await fetch('/api/payments/sifalo/authorize-unlock', {
           method: 'POST',
           credentials: 'same-origin',
+          cache: 'no-store',
           headers: {
             'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, no-cache',
             'X-Kyc-Session-Id': sessionId
           },
           body: JSON.stringify({
@@ -2202,6 +2556,7 @@
         _isSifaloCheckoutInFlight = false;
         _isSifaloAuthorizingInFlight = false;
         window.__kycSifaloCheckoutInFlight = false;
+        window.__kycSifaloRenderingInFlight = false;
         if (event && event.persisted) {
           _kycSessionStatusResolved = false;
           _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad();
@@ -2217,40 +2572,42 @@
     async function triggerWithSifaloPay(downloadCallback) {
       if (typeof downloadCallback !== 'function') return;
 
-      if (_isSifaloExecutingCallback) {
-        return downloadCallback();
-      }
-
-      if (_isSifaloCheckoutInFlight || _isSifaloAuthorizingInFlight) {
+      // Single active operation lock: prevent double-clicks from launching duplicate renders or checkouts
+      if (_isSifaloExecutingCallback || _isSifaloCheckoutInFlight || _isSifaloAuthorizingInFlight) {
         return;
       }
 
       const clickedBtn = getClickedTriggerButton();
-      const docSpec = getActiveUnlockDocSpec();
+      const docSpec = getActiveUnlockDocSpec(clickedBtn);
 
-      // If page-load session validation is still in flight on a fresh load/refresh, await it once before deciding
-      if (!isProductUnlockedInUi(docSpec.productKey) && !_kycSessionStatusResolved && _kycSessionStatusPromise) {
-        try {
-          await _kycSessionStatusPromise;
-        } catch (e) {}
+      _isSifaloAuthorizingInFlight = true;
+      setSavePngButtonState(clickedBtn, 'checking', 'Checking authorization...');
+
+      let hasValidPaidUnlock = false;
+      try {
+        // If initial page-load session verification is still in flight, wait up to 1500ms
+        if (!_kycSessionStatusResolved && _kycSessionStatusPromise) {
+          try {
+            await Promise.race([
+              _kycSessionStatusPromise,
+              new Promise((r) => setTimeout(r, 1500))
+            ]);
+          } catch (e) {}
+        }
+
+        // Always verify with the server whether this exact product & session has a valid payment authorization
+        hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey);
+      } finally {
+        _isSifaloAuthorizingInFlight = false;
       }
 
-      // Only hit /authorize-unlock synchronously before checkout if the product is unlocked in UI
-      if (isProductUnlockedInUi(docSpec.productKey)) {
-        _isSifaloAuthorizingInFlight = true;
-        let hasValidPaidUnlock = false;
-        try {
-          hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey);
-        } finally {
-          _isSifaloAuthorizingInFlight = false;
-        }
-        syncActiveProductUnlockUI();
-        if (hasValidPaidUnlock) {
-          return executePaidDownloadCallback(downloadCallback);
-        }
+      syncActiveProductUnlockUI();
+
+      if (hasValidPaidUnlock) {
+        return executePaidDownloadCallback(downloadCallback, clickedBtn);
       }
 
-      // Locked / unverified / expired: immediately launch /api/payments/sifalo/create-checkout without modal or PNG delays
+      // Not authorized: immediately start a fresh Sifalo checkout session without generating any PNG
       return startSifaloCheckoutImmediately(docSpec, clickedBtn);
     }
     window.triggerWithSifaloPay = triggerWithSifaloPay;
@@ -6178,11 +6535,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution DR Congo passport PNG');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fdf3ec', logging: false }).then(function (canvas) {
+          const filename = 'drc-passport-' + (readDrcFields().passNo || 'specimen') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'DR Congo passport PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -6663,11 +7018,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Bangladesh passport spread PNG');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'bangladesh-passport-' + (readBgdFields().passNo || 'A06821716') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const filename = 'bangladesh-passport-' + (readBgdFields().passNo || 'A06821716') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Bangladesh e-Passport PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -7020,11 +7373,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution German passport spread PNG');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'germany-passport-' + (readDeuFields().passNo || 'G28P5FV81') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const filename = 'germany-passport-' + (readDeuFields().passNo || 'G28P5FV81') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'German Reisepass PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -7433,11 +7784,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Canadian passport spread PNG');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'canada-passport-' + (readCanFields().passNo || 'ZE001355') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const filename = 'canada-passport-' + (readCanFields().passNo || 'ZE001355') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Canadian Passport PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -7807,11 +8156,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Ghana passport spread PNG');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'ghana-passport-' + (readGhaFields().passNo || 'G2866330') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const filename = 'ghana-passport-' + (readGhaFields().passNo || 'G2866330') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Ghanaian Passport PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -8139,11 +8486,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Nepal passport spread PNG');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'nepal-passport-' + (readNplFields().passNo || '12524139') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const filename = 'nepal-passport-' + (readNplFields().passNo || '12524139') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Nepal Passport PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -8549,11 +8894,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Malawi Passport 2-page spread');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
-          const link = document.createElement('a');
-          link.download = 'malawi-passport-' + (readMwiFields().passNo || 'MWA058787') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+          const filename = 'malawi-passport-' + (readMwiFields().passNo || 'MWA058787') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Malawi Passport PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -8839,13 +9182,11 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Rwanda National ID PNG');
-        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
+        return html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
           const f = readRwaFields();
           const cleanId = (f.idNo || 'RWA').replace(/\s+/g, '-');
-          link.download = `rwanda-id-${cleanId}-${rwaCurrentSide}.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+          const filename = `rwanda-id-${cleanId}-${rwaCurrentSide}.png`;
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Rwanda National ID PNG downloaded successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export ID image');
@@ -9375,13 +9716,11 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', `Rendering high-resolution UAE Resident ID (${sideToExport.toUpperCase()}) PNG`);
-        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
+        return html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
           const f = readUaeFields();
           const cleanId = (f.idNo || 'UAE-EID').replace(/\s+/g, '-');
-          link.download = `uae-resident-id-${cleanId}-${sideToExport}.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+          const filename = `uae-resident-id-${cleanId}-${sideToExport}.png`;
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', `UAE Resident ID (${sideToExport.toUpperCase()}) PNG downloaded`);
         }).catch(function () {
           showToast('Download Error', 'Could not export UAE Resident ID image');
@@ -9873,13 +10212,11 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', `Rendering high-resolution Turkey Identity Card (${sideToExport.toUpperCase()}) PNG`);
-        html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
+        return html2canvas(target, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
           const f = readTurFields();
           const cleanId = (f.idNo || 'TUR-ID').replace(/\s+/g, '-');
-          link.download = `turkey-kimlik-karti-${cleanId}-${sideToExport}.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+          const filename = `turkey-kimlik-karti-${cleanId}-${sideToExport}.png`;
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', `Turkey Identity Card (${sideToExport.toUpperCase()}) PNG downloaded`);
         }).catch(function () {
           showToast('Download Error', 'Could not export Turkey Identity Card image');
@@ -10448,13 +10785,11 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Turkish Passport 2-page spread PNG');
-        html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
+        return html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
           const f = readTurPassFields();
           const cleanNo = (f.passNo || 'U16072032').replace(/\s+/g, '');
-          link.download = `turkey-passport-${cleanNo}.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+          const filename = `turkey-passport-${cleanNo}.png`;
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Turkish Passport PNG downloaded successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export Turkish Passport PNG');
@@ -10895,11 +11230,9 @@ var $ = window.$ || (id => document.getElementById(id));
           return;
         }
         showToast('Generating PNG...', 'Rendering high-resolution Ethiopian passport spread PNG');
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
-          const link = document.createElement('a');
-          link.download = 'ethiopia-passport-' + (readEthFields().passNo || 'EP6442640') + '.png';
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false }).then(function (canvas) {
+          const filename = 'ethiopia-passport-' + (readEthFields().passNo || 'EP6442640') + '.png';
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           showToast('Ready!', 'Ethiopian Passport PNG generated successfully');
         }).catch(function () {
           showToast('Download Error', 'Could not export passport image');
@@ -18303,12 +18636,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           const targetName = fallbackDownloadLink.getAttribute('download') || 'document.png';
           if (!targetHref || targetHref === '#') return;
           triggerWithSifaloPay(() => {
-            const a = document.createElement('a');
-            a.href = targetHref;
-            a.download = targetName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            triggerReliablePngDownload(targetHref, targetName);
           });
         });
       }
@@ -20316,11 +20644,9 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         const card = $(cardId);
         if (!card || typeof html2canvas !== 'function') return;
         if (typeof showToast === 'function') showToast('Generating PNG...', `Rendering high-resolution ${cfg.name} sample document`);
-        html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
-          const link = document.createElement('a');
-          link.download = `${cfg.key}-${dtype}${side ? '-' + side : ''}.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
+        return html2canvas(card, { scale: 2, useCORS: true, backgroundColor: null }).then(canvas => {
+          const filename = `${cfg.key}-${dtype}${side ? '-' + side : ''}.png`;
+          triggerReliablePngDownload(canvas.toDataURL('image/png'), filename);
           if (typeof showToast === 'function') showToast('Ready!', `${cfg.name} PNG generated successfully`);
         }).catch(() => {
           if (typeof showToast === 'function') showToast('Download Error', 'Could not export document image');
@@ -35485,11 +35811,11 @@ EPSOM</div>
 
         let rafId = null;
         const scheduleFit = () => {
-          if (window.__kycSifaloCheckoutInFlight) return;
+          if (window.__kycSifaloCheckoutInFlight || window.__kycSifaloRenderingInFlight) return;
           if (rafId) cancelAnimationFrame(rafId);
           rafId = requestAnimationFrame(() => {
             rafId = null;
-            if (window.__kycSifaloCheckoutInFlight) return;
+            if (window.__kycSifaloCheckoutInFlight || window.__kycSifaloRenderingInFlight) return;
             runFit();
           });
         };
