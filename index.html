@@ -1610,17 +1610,24 @@
         (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
         (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : '');
 
+      // Clear any previous pending checkout reference or stale grant so every attempt creates a brand-new Sifalo order
+      window.__kycLastUnconfirmedOrder = null;
+      removeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY);
+      clearSifaloGrantForProduct(spec.productKey);
+
       const payBtn = document.getElementById('kycSifaloPayBtn');
       const payBtnLabel = document.getElementById('kycSifaloPayBtnLabel');
       const errorBox = document.getElementById('kycSifaloPayError');
       const recheckBtn = document.getElementById('kycSifaloRecheckBtn');
 
-      // Fire /create-checkout IMMEDIATELY before any DOM or storage serialization work
+      // Fire /create-checkout IMMEDIATELY with cache: 'no-store' to guarantee a fresh Sifalo payment session
       const checkoutFetchPromise = fetch('/api/payments/sifalo/create-checkout', {
         method: 'POST',
         credentials: 'same-origin',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache',
           'X-Kyc-Session-Id': sessionId
         },
         body: JSON.stringify({
@@ -1677,14 +1684,8 @@
         writeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY, JSON.stringify(checkoutUiPayload));
         saveActiveEditorUiState(activeSnapshot);
 
-        let finalCheckoutUrl = String(data.checkoutUrl);
-        try {
-          const parsedCheckout = new URL(finalCheckoutUrl);
-          parsedCheckout.protocol = 'https:';
-          parsedCheckout.hostname = data.environment === 'staging' ? 'pay.sifalo.net' : 'pay.sifalo.com';
-          finalCheckoutUrl = parsedCheckout.toString();
-        } catch (urlErr) {}
-
+        // Redirect directly to the exact fresh checkout URL constructed by the server without re-encoding or mutating key/token
+        const finalCheckoutUrl = String(data.checkoutUrl).trim();
         window.location.href = finalCheckoutUrl;
       } catch (err) {
         console.error('Sifalo Pay checkout initialization failed:', err);

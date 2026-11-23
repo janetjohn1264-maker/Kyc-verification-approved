@@ -1129,6 +1129,42 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     };
   }
 
+  function formatSifaloCheckoutQueryValue(rawVal: string): string {
+    let cleaned = rawVal.trim();
+    if (!cleaned) return '';
+    // If a value was accidentally double-encoded (e.g. %253D), unwrap %25XX -> %XX down to single encoding
+    while (/%25[0-9A-Fa-f]{2}/.test(cleaned)) {
+      try {
+        const decodedOnce = decodeURIComponent(cleaned);
+        if (decodedOnce === cleaned) break;
+        cleaned = decodedOnce;
+      } catch {
+        break;
+      }
+    }
+    // Sifalo Pay returns key and token already URL-encoded (e.g. containing %3D, %2B, %2F).
+    // Do NOT run encodeURIComponent again on an already percent-encoded value or '%' will become '%25' (%253D).
+    if (/%[0-9A-Fa-f]{2}/.test(cleaned)) {
+      return cleaned;
+    }
+    // If Sifalo returned a raw unencoded value (no %XX sequences), encode it once.
+    return encodeURIComponent(cleaned);
+  }
+
+  function extractRawQueryParamFromUrl(rawUrl: string, paramName: string): string {
+    const qIdx = rawUrl.indexOf('?');
+    if (qIdx === -1) return '';
+    const hashIdx = rawUrl.indexOf('#', qIdx);
+    const query = hashIdx === -1 ? rawUrl.slice(qIdx + 1) : rawUrl.slice(qIdx + 1, hashIdx);
+    const prefix = `${paramName}=`;
+    for (const part of query.split('&')) {
+      if (part.startsWith(prefix)) {
+        return part.slice(prefix.length).trim();
+      }
+    }
+    return '';
+  }
+
   function resolveHostedCheckoutUrl(
     sifaloData: Record<string, unknown>,
     endpoints: SifaloEndpointConfig
@@ -1142,9 +1178,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         .find((u) => typeof u === 'string' && /^https?:\/\//i.test(u)) as string | undefined;
       if (directUrl) {
         try {
+          const rawKey = extractRawQueryParamFromUrl(directUrl, 'key');
+          const rawToken = extractRawQueryParamFromUrl(directUrl, 'token');
           const parsedDirect = new URL(directUrl);
-          key = key || (parsedDirect.searchParams.get('key') || '').trim();
-          token = token || (parsedDirect.searchParams.get('token') || '').trim();
+          key = key || rawKey || (parsedDirect.searchParams.get('key') || '').trim();
+          token = token || rawToken || (parsedDirect.searchParams.get('token') || '').trim();
         } catch {
           return null;
         }
@@ -1152,7 +1190,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     }
 
     if (key && token) {
-      return `${officialBase}/?key=${encodeURIComponent(key)}&token=${encodeURIComponent(token)}`;
+      const formattedKey = formatSifaloCheckoutQueryValue(key);
+      const formattedToken = formatSifaloCheckoutQueryValue(token);
+      if (!formattedKey || !formattedToken) return null;
+      return `${officialBase}/?key=${formattedKey}&token=${formattedToken}`;
     }
 
     return null;
@@ -1814,7 +1855,23 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         if (!sessionBinding.cookieSessionId || sessionBinding.cookieSessionId !== sessionId) {
           setSignedSessionCookie(req, res, sessionId);
         }
-        const orderId = `KYC-${crypto.randomUUID()}`;
+
+        // Invalidate any previous unconfirmed PENDING orders for this session and product so every click starts a fresh Sifalo checkout session
+        for (const existingOrd of orders.values()) {
+          if (
+            existingOrd.sessionId === sessionId &&
+            existingOrd.productKey === productKey &&
+            existingOrd.status === 'PENDING'
+          ) {
+            existingOrd.status = 'CANCELLED';
+            orders.set(existingOrd.orderId, existingOrd);
+          }
+        }
+
+        let orderId = `KYC-${crypto.randomUUID()}`;
+        while (orders.has(orderId)) {
+          orderId = `KYC-${crypto.randomUUID()}`;
+        }
         const webhookAuthToken = computeOrderWebhookToken(orderId);
 
         const order: SifaloOrderRecord = {
@@ -1856,10 +1913,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         const requestInit: RequestInit = {
           method: 'POST',
+          cache: 'no-store',
           headers: {
             Authorization: buildBasicAuthHeader(apiUser, apiKey),
             'Content-Type': 'application/json',
             Accept: 'application/json',
+            'Cache-Control': 'no-store, no-cache',
             'User-Agent': 'KycApproved-SifaloPay/1.0',
           },
           body: JSON.stringify(sifaloRequestPayload),
@@ -1883,7 +1942,14 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         }
 
         const sifaloJson = (await sifaloRes.json().catch(() => null)) as Record<string, unknown> | null;
+        const keyReturned = Boolean(
+          sifaloJson && typeof sifaloJson.key === 'string' && sifaloJson.key.trim().length > 0
+        );
+        const tokenReturned = Boolean(
+          sifaloJson && typeof sifaloJson.token === 'string' && sifaloJson.token.trim().length > 0
+        );
         const checkoutUrl = sifaloJson ? resolveHostedCheckoutUrl(sifaloJson, endpoints) : null;
+        const configuredCheckoutHostname = new URL(endpoints.hostedCheckoutBaseUrl).hostname;
 
         if (!sifaloRes.ok || !sifaloJson || !checkoutUrl) {
           orders.delete(orderId);
@@ -1892,20 +1958,18 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             (sifaloJson && typeof sifaloJson.message === 'string' && sifaloJson.message) ||
             'Unable to create Sifalo Pay hosted checkout session.';
           console.warn(
-            `[Sifalo] Checkout creation failed: orderId=${orderId} env=${environment} status=${sifaloRes.status}`
+            `[Sifalo] Checkout creation failed: orderId=${orderId} product=${productKey} amount=$${priceSpec.amountUsdString} checkoutHost=${configuredCheckoutHostname} keyReturned=${keyReturned} tokenReturned=${tokenReturned} status=${sifaloRes.status}`
           );
           return res.status(502).json({ error: providerMessage });
         }
 
         const sid = typeof sifaloJson.sid === 'string' ? sifaloJson.sid.trim() : null;
-        const token = typeof sifaloJson.token === 'string' ? sifaloJson.token.trim() : null;
         if (sid) {
           order.providerSid = sid;
           sidToOrderId.set(sid, orderId);
         }
-        if (token) {
-          order.providerToken = token;
-        }
+        // Never persist or reuse Sifalo checkout key/token
+        order.providerToken = null;
         orders.set(orderId, order);
         persistState();
 
@@ -1915,9 +1979,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         const checkoutHostname = new URL(checkoutUrl).hostname;
 
         console.info(
-          `[Sifalo] Checkout created: orderId=${orderId} product=${productKey} amount=$${priceSpec.amountUsdString} env=${environment} checkoutHost=${checkoutHostname} methods=${priceSpec.sifaloHostedMethods.join('+')}`
+          `[Sifalo] Checkout created: orderId=${orderId} product=${productKey} amount=$${priceSpec.amountUsdString} checkoutHost=${checkoutHostname} keyReturned=${keyReturned} tokenReturned=${tokenReturned}`
         );
 
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
         return res.status(200).json({
           orderId: order.orderId,
           orderStateToken,
