@@ -1806,7 +1806,7 @@
       } catch (e) {}
     }
 
-    async function executePaidDownloadCallback(downloadCallback, triggerBtn) {
+    async function executePaidDownloadCallback(downloadCallback, triggerBtn, productKeyToClear) {
       if (typeof downloadCallback !== 'function') return;
       _isSifaloExecutingCallback = true;
       window.__kycSifaloRenderingInFlight = true;
@@ -1856,6 +1856,9 @@
         window.__kycLastHtml2CanvasChainPromise = null;
         window.__kycSifaloRenderingInFlight = false;
         _isSifaloExecutingCallback = false;
+        if (productKeyToClear) {
+          clearSifaloGrantForProduct(productKeyToClear);
+        }
         setSavePngButtonState(triggerBtn, 'idle');
       }
     }
@@ -2277,16 +2280,26 @@
       }
     }
 
-    async function authorizeServerPaidUnlock(productKey) {
+    async function authorizeServerPaidUnlock(productKey, consumeUnlock = true) {
       const grant = window.__kycPaidUnlockGrants && window.__kycPaidUnlockGrants[productKey];
       if (grant && grant.expiresAt && grant.expiresAt <= Date.now()) {
         clearSifaloGrantForProduct(productKey);
       }
 
       const activeGrant = window.__kycPaidUnlockGrants && window.__kycPaidUnlockGrants[productKey];
+      const candidateToken =
+        activeGrant && typeof activeGrant.unlockToken === 'string'
+          ? activeGrant.unlockToken.trim()
+          : '';
+      // Never rely on cookies or stale browser state if there is no active, unconsumed server-issued unlockToken
+      if (!candidateToken) {
+        clearSifaloGrantForProduct(productKey);
+        syncActiveProductUnlockUI();
+        return false;
+      }
+
       const sessionId = getOrCreateSifaloSessionId();
       try {
-        // Always ask server (server validates HttpOnly signed session/grant cookies, server orders, pending orders, and candidate unlockToken)
         const res = await fetch('/api/payments/sifalo/authorize-unlock', {
           method: 'POST',
           credentials: 'same-origin',
@@ -2297,10 +2310,12 @@
             'X-Kyc-Session-Id': sessionId
           },
           body: JSON.stringify({
-            unlockToken: (activeGrant && activeGrant.unlockToken) || '',
+            unlockToken: candidateToken,
+            orderId: (activeGrant && activeGrant.orderId) || '',
             docType: productKey,
             productKey,
-            sessionId
+            sessionId,
+            consumeUnlock: consumeUnlock !== false
           })
         });
         if (!res.ok) {
@@ -2310,7 +2325,12 @@
         }
         const data = await res.json().catch(() => null);
         if (data && data.authorized === true && data.productKey === productKey) {
-          recordServerVerifiedUnlock(data, sessionId);
+          if (consumeUnlock !== false || data.consumed === true) {
+            // Single-use authorization has been consumed on the server; clear it immediately so any next click requires payment
+            clearSifaloGrantForProduct(productKey);
+          } else {
+            recordServerVerifiedUnlock(data, sessionId);
+          }
           syncActiveProductUnlockUI();
           return true;
         }
@@ -2318,6 +2338,8 @@
         syncActiveProductUnlockUI();
         return false;
       } catch (err) {
+        clearSifaloGrantForProduct(productKey);
+        syncActiveProductUnlockUI();
         return false;
       }
     }
@@ -2520,7 +2542,8 @@
             productKey,
             orderId,
             sessionId,
-            consumePostPaymentAutoDownload: true
+            consumePostPaymentAutoDownload: true,
+            consumeUnlock: false
           })
         });
         const authData = await authRes.json().catch(() => null);
@@ -2531,11 +2554,15 @@
           authData.productKey !== productKey ||
           authData.autoDownloadAuthorized !== true
         ) {
+          clearSifaloGrantForProduct(productKey);
+          syncActiveProductUnlockUI();
           return false;
         }
         recordServerVerifiedUnlock(authData, sessionId);
         syncActiveProductUnlockUI();
       } catch (err) {
+        clearSifaloGrantForProduct(productKey);
+        syncActiveProductUnlockUI();
         return false;
       }
 
@@ -2618,6 +2645,8 @@
         }
       } finally {
         window.__kycPostPaymentActiveTriggerBtn = null;
+        clearSifaloGrantForProduct(productKey);
+        syncActiveProductUnlockUI();
       }
       return false;
     }
@@ -2904,8 +2933,10 @@
 
       const returnInfo = await handlePaymentReturnFromCheckout();
       if (!returnInfo.handled) {
+        // Fresh page load or browser refresh: never carry over a previous unlocked state
+        window.__kycVerifiedUnlockState = {};
+        window.__kycPaidUnlockGrants = {};
         restoreSavedEditorUiOnRefresh();
-        // Start server session-status validation immediately without waiting for secondary DOM timers
         _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad({ justVerifiedData: null });
         await new Promise((resolve) => setTimeout(resolve, 75));
         if (sessionStorage.getItem(KYC_ACTIVE_EDITOR_UI_KEY)) {
@@ -2948,8 +2979,12 @@
         window.__kycSifaloCheckoutInFlight = false;
         window.__kycSifaloRenderingInFlight = false;
         if (event && event.persisted) {
+          // Clear any cached bfcache unlock state so returning via browser Back/Forward never shows a stale unlocked button
+          window.__kycVerifiedUnlockState = {};
+          window.__kycPaidUnlockGrants = {};
           _kycSessionStatusResolved = false;
-          _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad();
+          _kycSessionStatusPromise = restoreAuthorizedSessionOnLoad({ justVerifiedData: null });
+          syncActiveProductUnlockUI();
         }
       });
       window.addEventListener('beforeunload', () => {
@@ -2989,8 +3024,8 @@
           } catch (e) {}
         }
 
-        // Always verify with the server whether this exact product & session has a valid payment authorization
-        hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey);
+        // Always verify with the server whether this exact product & session has a valid single-use payment authorization (and consume it atomically)
+        hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey, true);
       } finally {
         _isSifaloAuthorizingInFlight = false;
       }
@@ -2998,7 +3033,7 @@
       syncActiveProductUnlockUI();
 
       if (hasValidPaidUnlock) {
-        return executePaidDownloadCallback(downloadCallback, clickedBtn);
+        return executePaidDownloadCallback(downloadCallback, clickedBtn, docSpec.productKey);
       }
 
       // Not authorized: immediately start a fresh Sifalo checkout session without generating any PNG

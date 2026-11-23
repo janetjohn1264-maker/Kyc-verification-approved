@@ -155,6 +155,7 @@ export interface SifaloOrderRecord {
   revokedAt?: number | null;
   unlockTokenId: string | null;
   unlockTokenExpiresAt: number | null;
+  unlockConsumedAt?: number | null;
 }
 
 export interface SifaloEndpointConfig {
@@ -232,7 +233,8 @@ interface SignedPendingCheckoutCookiePayload {
   c: number; // createdAt
 }
 
-const UNLOCK_GRANT_TTL_MS = 60 * 60 * 1000;
+// Short-lived single-use unlock token TTL (5 minutes max before consumption)
+const UNLOCK_GRANT_TTL_MS = 5 * 60 * 1000;
 const ORDER_EXPIRY_TTL_MS = 60 * 60 * 1000;
 const STALE_ORDER_PRUNE_MS = 24 * 60 * 60 * 1000;
 const MAX_PROCESSED_WEBHOOK_EVENTS = 5000;
@@ -907,6 +909,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     if (
       order.status !== 'PAID' ||
       order.revokedAt ||
+      order.unlockConsumedAt ||
       !order.providerSid ||
       !order.unlockTokenId ||
       !order.unlockTokenExpiresAt ||
@@ -1040,6 +1043,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         revokedAt: null,
         unlockTokenId: null,
         unlockTokenExpiresAt: null,
+        unlockConsumedAt: null,
       };
       orders.set(recovered.orderId, recovered);
       if (recovered.providerSid) {
@@ -1117,7 +1121,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
   }
 
   function issueOrderUnlockGrant(order: SifaloOrderRecord) {
-    if (order.status !== 'PAID' || !order.unlockTokenId || !order.unlockTokenExpiresAt) {
+    if (
+      order.status !== 'PAID' ||
+      order.revokedAt ||
+      order.unlockConsumedAt ||
+      !order.unlockTokenId ||
+      !order.unlockTokenExpiresAt
+    ) {
       return null;
     }
     if (order.unlockTokenExpiresAt <= now()) {
@@ -1237,6 +1247,14 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         ok: false,
         status: order.status,
         error: `Payment ${order.status.toLowerCase()}. Document download is not permitted.`,
+      };
+    }
+
+    if (order.unlockConsumedAt) {
+      return {
+        ok: false,
+        status: 'EXPIRED',
+        error: 'This payment authorization has already been consumed. Please start a new payment.',
       };
     }
 
@@ -1904,6 +1922,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           revokedAt: null,
           unlockTokenId: null,
           unlockTokenExpiresAt: null,
+          unlockConsumedAt: null,
         };
         orders.set(orderId, order);
 
@@ -2162,6 +2181,19 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           });
         }
 
+        if (order.unlockConsumedAt) {
+          clearSignedPendingCheckoutCookie(req, res);
+          return res.status(403).json({
+            verified: false,
+            status: 'EXPIRED',
+            orderId: order.orderId,
+            productKey: order.productKey,
+            label: priceSpec.label,
+            formattedPrice: priceSpec.formattedPrice,
+            error: 'This payment authorization has already been used. Please start a new payment.',
+          });
+        }
+
         const grant = issueOrderUnlockGrant(order);
         if (!grant) {
           clearSignedPendingCheckoutCookie(req, res);
@@ -2188,12 +2220,8 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           persistState();
         }
         setSignedSessionCookie(req, res, activeSessionId);
-        const cookieGrants = getVerifiedGrantsFromCookie(req, activeSessionId);
-        const grantEntry = buildGrantCookieEntry(order);
-        if (grantEntry) {
-          cookieGrants[order.productKey] = grantEntry;
-          setSignedGrantsCookie(req, res, activeSessionId, cookieGrants);
-        }
+        // Clear any legacy grants cookie so browser cookies never act as persistent proof of payment
+        setSignedGrantsCookie(req, res, activeSessionId, {});
 
         return res.status(200).json({
           verified: true,
@@ -2334,10 +2362,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
       let order = orders.get(payload.orderId);
 
-      // Explicitly reject revoked / refunded / reversed / cancelled / failed / expired orders
+      // Explicitly reject consumed, revoked, refunded, reversed, cancelled, failed, or expired orders
       if (
         order &&
-        (order.revokedAt ||
+        (order.unlockConsumedAt ||
+          order.revokedAt ||
           order.status === 'REFUNDED' ||
           order.status === 'REVERSED' ||
           order.status === 'CANCELLED' ||
@@ -2347,7 +2376,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         return {
           authorized: false,
           httpStatus: 403,
-          error: 'Paid order verification is no longer active.',
+          error: 'Payment authorization has already been consumed or is no longer active.',
           clearGrant: true,
         };
       }
@@ -2394,6 +2423,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           revokedAt: null,
           unlockTokenId: null,
           unlockTokenExpiresAt: null,
+          unlockConsumedAt: null,
         };
 
         const check = await verifyTransactionWithSifaloApi(candidateOrder, sidToCheck, {
@@ -2414,6 +2444,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       if (
         order.status !== 'PAID' ||
         order.revokedAt ||
+        order.unlockConsumedAt ||
         !order.providerSid ||
         order.productKey !== payload.productKey ||
         order.amountCents !== expectedSpec.amountCents ||
@@ -2574,6 +2605,8 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           ord.sessionId === sessionId &&
           ord.status === 'PAID' &&
           !ord.revokedAt &&
+          !ord.unlockConsumedAt &&
+          !autoDownloadConsumedOrders.has(ord.orderId) &&
           ord.unlockTokenExpiresAt &&
           ord.unlockTokenExpiresAt > now()
         ) {
@@ -2605,7 +2638,6 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           setSignedSessionCookie(req, res, sessionId);
         }
 
-        const cookieGrants = getVerifiedGrantsFromCookie(req, sessionId);
         const rawCandidateGrants =
           body.candidateGrants && typeof body.candidateGrants === 'object'
             ? (body.candidateGrants as Record<string, unknown>)
@@ -2626,8 +2658,9 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             }
           >
         > = {};
-        const nextCookieGrants: Partial<Record<UnlockProductKey, SignedGrantCookieEntry>> = {};
 
+        // Never auto-unlock from cookies or old session history on page refresh;
+        // only validate explicitly provided, unconsumed, non-expired candidate unlock tokens.
         const allProductKeys = Object.keys(AUTHORITATIVE_PRODUCT_PRICING) as UnlockProductKey[];
         for (const productKey of allProductKeys) {
           let candidateToken = '';
@@ -2639,33 +2672,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             }
           }
 
-          let cookieEntry =
-            cookieGrants[productKey] || findLatestActiveOrderGrantEntry(sessionId, productKey);
-
-          // If user paid at Sifalo and returned without query params, check pending checkout against Sifalo Verify API
-          if (!cookieEntry) {
-            cookieEntry = await tryConfirmPendingOrderForProduct(req, res, sessionId, productKey);
-          }
-
-          if (!candidateToken && !cookieEntry) {
+          if (!candidateToken) {
             continue;
           }
 
-          let auth = await authorizeUnlockCandidate({
+          const auth = await authorizeUnlockCandidate({
             requestedProductKey: productKey,
-            unlockToken: candidateToken || undefined,
-            cookieGrantEntry: cookieEntry,
+            unlockToken: candidateToken,
             requestSessionId: sessionId,
           });
-
-          // If client passed an outdated candidateToken while valid server cookie/order exists, validate cookieEntry directly
-          if (!auth.authorized && candidateToken && cookieEntry) {
-            auth = await authorizeUnlockCandidate({
-              requestedProductKey: productKey,
-              cookieGrantEntry: cookieEntry,
-              requestSessionId: sessionId,
-            });
-          }
 
           if (auth.authorized) {
             unlockedProducts[productKey] = {
@@ -2678,11 +2693,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
               expiresAt: auth.expiresAt,
               unlockToken: auth.unlockToken,
             };
-            nextCookieGrants[productKey] = auth.cookieEntry;
           }
         }
 
-        setSignedGrantsCookie(req, res, sessionId, nextCookieGrants);
+        // Clear any legacy grants cookie so browser refresh never inherits a persistent unlock
+        setSignedGrantsCookie(req, res, sessionId, {});
 
         return res.status(200).json({
           authenticatedSession: true,
@@ -2721,63 +2736,22 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           return res.status(400).json({ authorized: false, error: 'Missing document type.' });
         }
 
-        const cookieGrants = getVerifiedGrantsFromCookie(req, requestSessionId);
-        let cookieGrantEntry =
-          cookieGrants[requestedProductKey] ||
-          findLatestActiveOrderGrantEntry(requestSessionId, requestedProductKey);
-
-        if (!cookieGrantEntry && requestSessionId) {
-          cookieGrantEntry = await tryConfirmPendingOrderForProduct(
-            req,
-            res,
-            requestSessionId,
-            requestedProductKey
-          );
-        }
-
-        if (!unlockToken && !cookieGrantEntry) {
+        // Require an explicit, server-signed unlockToken (never fall back to persistent cookies or old session history)
+        if (!unlockToken) {
           return res
             .status(401)
             .json({ authorized: false, error: 'Missing payment token or document type.' });
         }
 
-        let result = await authorizeUnlockCandidate({
+        const result = await authorizeUnlockCandidate({
           requestedProductKey,
-          unlockToken: unlockToken || undefined,
-          cookieGrantEntry,
+          unlockToken,
           requestSessionId,
         });
 
-        // If a stale unlockToken failed while a valid HttpOnly cookie/server order exists for this product & session, authorize via cookieGrantEntry
-        if (!result.authorized && unlockToken && cookieGrantEntry) {
-          result = await authorizeUnlockCandidate({
-            requestedProductKey,
-            cookieGrantEntry,
-            requestSessionId,
-          });
-        }
-
-        // If an expired grant failed, check if a newer pending order for this session & product was just paid at Sifalo
-        if (!result.authorized && requestSessionId) {
-          const confirmedPendingEntry = await tryConfirmPendingOrderForProduct(
-            req,
-            res,
-            requestSessionId,
-            requestedProductKey
-          );
-          if (confirmedPendingEntry) {
-            result = await authorizeUnlockCandidate({
-              requestedProductKey,
-              cookieGrantEntry: confirmedPendingEntry,
-              requestSessionId,
-            });
-          }
-        }
-
         if (!result.authorized) {
-          if (result.clearGrant && requestSessionId && cookieGrants[requestedProductKey]) {
-            delete cookieGrants[requestedProductKey];
-            setSignedGrantsCookie(req, res, requestSessionId, cookieGrants);
+          if (requestSessionId) {
+            setSignedGrantsCookie(req, res, requestSessionId, {});
           }
           return res.status(result.httpStatus).json({
             authorized: false,
@@ -2785,41 +2759,61 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           });
         }
 
-        if (requestSessionId) {
-          if (!binding.cookieSessionId || binding.cookieSessionId !== requestSessionId) {
-            setSignedSessionCookie(req, res, requestSessionId);
-          }
-          cookieGrants[requestedProductKey] = result.cookieEntry;
-          setSignedGrantsCookie(req, res, requestSessionId, cookieGrants);
+        const expectedOrderId =
+          typeof body.orderId === 'string' && body.orderId.trim()
+            ? body.orderId.trim()
+            : result.orderId;
+        if (expectedOrderId !== result.orderId) {
+          return res.status(403).json({
+            authorized: false,
+            error: 'Order ID mismatch for payment authorization.',
+          });
+        }
+
+        if (requestSessionId && (!binding.cookieSessionId || binding.cookieSessionId !== requestSessionId)) {
+          setSignedSessionCookie(req, res, requestSessionId);
         }
 
         const consumePostPaymentAutoDownload = body.consumePostPaymentAutoDownload === true;
+        // Single-use consumption: consume and invalidate the unlock authorization immediately unless consumeUnlock === false
+        const shouldConsumeUnlock = body.consumeUnlock !== false && !consumePostPaymentAutoDownload;
         let autoDownloadAuthorized = false;
+
         if (consumePostPaymentAutoDownload) {
-          const expectedOrderId =
-            typeof body.orderId === 'string' && body.orderId.trim()
-              ? body.orderId.trim()
-              : result.orderId;
-          if (
-            expectedOrderId === result.orderId &&
-            !autoDownloadConsumedOrders.has(result.orderId)
-          ) {
+          if (!autoDownloadConsumedOrders.has(result.orderId)) {
             autoDownloadConsumedOrders.add(result.orderId);
-            persistState();
             autoDownloadAuthorized = true;
           }
         }
 
+        const authorizedOrder = orders.get(result.orderId);
+        if (shouldConsumeUnlock) {
+          autoDownloadConsumedOrders.add(result.orderId);
+          if (authorizedOrder) {
+            authorizedOrder.unlockConsumedAt = now();
+            authorizedOrder.unlockTokenId = null;
+            authorizedOrder.unlockTokenExpiresAt = null;
+            orders.set(authorizedOrder.orderId, authorizedOrder);
+          }
+          if (requestSessionId) {
+            setSignedGrantsCookie(req, res, requestSessionId, {});
+          }
+          persistState();
+        } else if (consumePostPaymentAutoDownload) {
+          persistState();
+        }
+
         return res.json({
           authorized: true,
+          consumed: shouldConsumeUnlock,
           autoDownloadAuthorized,
           orderId: result.orderId,
           sid: result.sid,
           productKey: result.productKey,
           label: result.label,
           formattedPrice: result.formattedPrice,
-          expiresAt: result.expiresAt,
-          unlockToken: result.unlockToken,
+          expiresAt: shouldConsumeUnlock ? 0 : result.expiresAt,
+          unlockToken: shouldConsumeUnlock ? '' : result.unlockToken,
         });
       } catch (err) {
         console.error('[Sifalo] Authorize unlock error:', err instanceof Error ? err.message : err);
