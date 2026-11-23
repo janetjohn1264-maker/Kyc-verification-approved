@@ -3124,9 +3124,17 @@
       history.replaceState(null, document.title, window.location.pathname + window.location.search);
     }
 
-    window.openWelcomeModal = function() {
+    // In-memory only flag for current page load (never persisted to localStorage, sessionStorage, or cookies)
+    let kycMissingCountryPopupShownInCurrentLoad = false;
+
+    window.openWelcomeModal = function(opts) {
+      const options = opts || {};
+      if (options.auto && kycMissingCountryPopupShownInCurrentLoad) {
+        return;
+      }
       const modal = $('welcomeModal');
       if (modal) {
+        kycMissingCountryPopupShownInCurrentLoad = true;
         modal.classList.remove('hidden');
         modal.classList.add('flex');
       }
@@ -3137,13 +3145,14 @@
         modal.classList.add('hidden');
         modal.classList.remove('flex');
       }
-      try {
-        sessionStorage.setItem('kyc_welcome_v2_shown', 'true');
-      } catch (e) {}
     };
     window.handleWelcomeContact = function() {
       window.closeWelcomeModal();
-      window.openContactModal();
+      if (typeof window.openContactPage === 'function') {
+        window.openContactPage();
+      } else if (typeof window.openContactModal === 'function') {
+        window.openContactModal();
+      }
     };
 
     window.openContactPage = function(opts) {
@@ -18915,11 +18924,17 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       });
 
       filterHeroPlatforms('all');
-      const isReturningFromSifalo = typeof window.location.search === 'string' && window.location.search.indexOf('sifalo_checkout=') !== -1;
+      const isReturningFromSifalo =
+        typeof window.location.search === 'string' &&
+        (window.location.search.indexOf('sifalo_checkout=') !== -1 ||
+          window.location.search.indexOf('sifalo_return=') !== -1);
       let hasSavedEditorUi = false;
       try { hasSavedEditorUi = Boolean(sessionStorage.getItem('kyc_active_editor_ui_v1')); } catch (e) {}
       if (!workflowActiveAccount && !isReturningFromSifalo && !hasSavedEditorUi) {
         selectVirtualAccount('paypal', { silent: true });
+      }
+      if (!isReturningFromSifalo && typeof window.openWelcomeModal === 'function') {
+        window.openWelcomeModal({ auto: true });
       }
 
       // Bind all Kenya passport input fields to live preview & MRZ
@@ -34706,83 +34721,64 @@ EPSOM</div>
     </div>
   </div>
 
-  <!-- ================= WELCOME TO KYC APPROVED MODAL ================= -->
-  <div id="welcomeModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-[200] hidden items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in-95 duration-200 flex flex-col gap-4">
-      
-      <!-- Modal Header -->
-      <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
+  <!-- ================= MISSING COUNTRY OR DOCUMENT INFORMATIONAL POPUP ================= -->
+  <div id="welcomeModal" class="fixed inset-0 bg-slate-950/65 backdrop-blur-sm z-[200] hidden items-center justify-center p-4 sm:p-6 transition-opacity duration-200" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle" aria-describedby="welcomeModalDescription">
+    <div class="bg-white/95 backdrop-blur-md rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-[0_24px_60px_-15px_rgba(15,23,42,0.35)] border border-slate-200/90 relative animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200 flex flex-col gap-5 overflow-hidden">
+      <!-- Subtle top accent bar -->
+      <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#0d5bd9] via-indigo-500 to-emerald-500"></div>
+
+      <!-- Close Button (×) -->
+      <button type="button" onclick="closeWelcomeModal()" aria-label="Close popup" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100/80 hover:bg-slate-200/90 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer text-lg font-semibold leading-none">
+        &times;
+      </button>
+
+      <!-- Header with Globe Visual & Branding -->
+      <div class="flex flex-col items-start gap-3.5 pr-8 pt-1">
         <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 shrink-0">
-            <i class="fa-solid fa-globe text-xl text-amber-300"></i>
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#0d5bd9] to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/25 ring-4 ring-blue-50 shrink-0">
+            <i class="fa-solid fa-earth-americas text-xl text-white"></i>
           </div>
-          <div>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-0.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Educational &amp; Informational Resource
+          <div class="flex flex-col">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-[#0d5bd9] border border-blue-200/80 w-fit">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#0d5bd9]"></span>
+              KycApproved Global Coverage
             </span>
-            <h3 id="welcomeModalTitle" class="font-black text-slate-900 text-lg sm:text-xl tracking-tight leading-snug">
-              Welcome to KYCApproved 🌍
-            </h3>
           </div>
         </div>
-        <button type="button" onclick="closeWelcomeModal()" aria-label="Close welcome popup" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors shrink-0 cursor-pointer">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
 
-      <!-- Welcome Message Body -->
-      <div class="space-y-3.5 text-xs sm:text-sm text-slate-600 leading-relaxed">
-        <p class="font-medium text-slate-800">
-          This website is created for educational and informational purposes, especially for people working in digital marketing, online services, and related fields.
-        </p>
-
-        <p class="text-slate-700">
-          Our goal is to provide useful information and examples from different countries and document types.
-        </p>
-
-        <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-50/70 via-slate-50 to-emerald-50/40 border border-blue-100 text-slate-700 space-y-2">
-          <div class="space-y-1 font-bold text-slate-900 text-xs sm:text-sm">
-            <p>🌎 Is your country missing?</p>
-            <p>📄 Is a document or service missing?</p>
-          </div>
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed pt-0.5">
-            Please let us know so we can review it and consider adding it to the website.
+        <div class="space-y-1">
+          <h3 id="welcomeModalTitle" class="font-extrabold text-slate-900 text-lg sm:text-xl tracking-tight leading-snug">
+            🌍 Missing Your Country or Document?
+          </h3>
+          <p class="text-xs sm:text-sm font-semibold text-[#0d5bd9]">
+            Can’t find the country or document you need?
           </p>
         </div>
+      </div>
 
-        <p class="text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2 pt-0.5">
-          <span>📧 Contact us:</span>
-          <a href="mailto:getkycapproved@gmail.com" class="text-blue-600 hover:text-blue-700 underline underline-offset-2">getkycapproved@gmail.com</a>
+      <!-- Message Body -->
+      <div id="welcomeModalDescription" class="space-y-3 text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50/80 p-4 rounded-2xl border border-slate-200/70">
+        <p class="font-medium text-slate-800">
+          KycApproved is continuously expanding to support more countries and document types.
         </p>
-
-        <p class="text-xs sm:text-sm font-bold text-emerald-800 pt-0.5">
-          Thank you for visiting KYCApproved.
+        <p class="text-slate-600">
+          If your desired country or document is not currently available, please contact us and tell us what you need. We’ll review your request and work to add it soon.
+        </p>
+        <p class="text-slate-700 font-semibold pt-0.5">
+          Your request helps us make KycApproved better for everyone.
         </p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-        <div class="flex items-center gap-2 flex-1">
-          <!-- Button 1: Contact Us -->
-          <button type="button" onclick="handleWelcomeContact()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer">
-            <i class="fa-solid fa-headset text-xs"></i>
-            <span>Contact Us</span>
-          </button>
-          
-          <!-- Button 2: Email Us -->
-          <a href="mailto:getkycapproved@gmail.com?subject=Country%20or%20Document%20Request%20-%20KYCApproved&body=Hello%20KYCApproved%20Team%2C%0A%0AI%20am%20looking%20for%20the%20following%20country%2C%20document%2C%20or%20service%3A%0A-%20Country%3A%20%0A-%20Document%20%2F%20Service%3A%20%0A%0AThank%20you!" onclick="closeWelcomeModal()" class="flex-1 py-2.5 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-xs transition-colors text-center cursor-pointer">
-            <i class="fa-solid fa-envelope text-xs"></i>
-            <span>Email Us</span>
-          </a>
-        </div>
-
-        <!-- Button 3: Continue to Website -->
-        <button type="button" onclick="closeWelcomeModal()" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-colors text-center cursor-pointer">
-          Continue to Website
+      <div class="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+        <button type="button" onclick="handleWelcomeContact()" class="flex-1 py-2.5 px-4 rounded-xl bg-[#0d5bd9] hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 transition-all cursor-pointer">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+          <span>Contact Us</span>
+        </button>
+        <button type="button" onclick="closeWelcomeModal()" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200/90 text-slate-700 font-semibold text-xs sm:text-sm transition-colors text-center cursor-pointer">
+          Maybe Later
         </button>
       </div>
-
     </div>
   </div>
 
