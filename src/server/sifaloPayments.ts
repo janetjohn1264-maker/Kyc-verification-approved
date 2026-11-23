@@ -135,8 +135,73 @@ export function normalizeDocTypeToProductKey(rawDocType: unknown): UnlockProduct
   }
 }
 
+export type UnlockLifecycleStatus =
+  | 'CREATED'
+  | 'PAYMENT_VERIFIED'
+  | 'AUTHORIZED'
+  | 'CONSUMED'
+  | 'EXPIRED'
+  | 'FAILED'
+  | 'REVOKED';
+
+export type UnlockAuditEventType =
+  | 'UNLOCK_CREATED'
+  | 'PAYMENT_VERIFICATION_STARTED'
+  | 'PAYMENT_VERIFIED'
+  | 'PAYMENT_VERIFICATION_FAILED'
+  | 'UNLOCK_AUTHORIZED'
+  | 'UNLOCK_CONSUMED'
+  | 'UNLOCK_EXPIRED'
+  | 'UNLOCK_REVOKED'
+  | 'UNLOCK_REPLAY_BLOCKED'
+  | 'PRODUCT_MISMATCH_BLOCKED'
+  | 'INVALID_UNLOCK_BLOCKED';
+
+export interface UnlockLifecycleAuditEvent {
+  eventId: string;
+  eventType: UnlockAuditEventType;
+  timestamp: number;
+  isoTimestamp: string;
+  authorizationId: string | null;
+  orderId: string | null;
+  productKey: UnlockProductKey | null;
+  requestedProductKey?: UnlockProductKey | null;
+  lifecycleStatus: UnlockLifecycleStatus | null;
+  sessionFingerprint: string | null;
+  tokenFingerprint: string | null;
+  reason?: string | null;
+}
+
+export interface UnlockAuthorizationAuditRecord {
+  authorizationId: string;
+  orderId: string;
+  productKey: UnlockProductKey;
+  amountCents: number;
+  currency: 'USD';
+  paymentVerificationResult: 'UNVERIFIED' | 'PENDING' | 'VERIFIED_PAID' | 'FAILED' | 'REVOKED';
+  providerSidFingerprint: string | null;
+  authorizationStatus: UnlockLifecycleStatus;
+  createdAt: number;
+  paymentVerifiedAt: number | null;
+  authorizedAt: number | null;
+  expiresAt: number | null;
+  consumedAt: number | null;
+  revokedAt: number | null;
+  failedAt: number | null;
+  expiredAt: number | null;
+  sessionFingerprint: string | null;
+  tokenFingerprint: string | null;
+  failureOrRevocationReason: string | null;
+  events: Array<{
+    eventType: UnlockAuditEventType;
+    timestamp: number;
+    reason?: string | null;
+  }>;
+}
+
 export interface SifaloOrderRecord {
   orderId: string;
+  authorizationId?: string | null;
   productKey: UnlockProductKey;
   countryKey: string;
   providerKey: string;
@@ -146,12 +211,14 @@ export interface SifaloOrderRecord {
   currency: 'USD';
   environment: SifaloEnvironment;
   status: OrderStatus;
+  lifecycleStatus?: UnlockLifecycleStatus;
   providerSid: string | null;
   providerToken: string | null;
   transactionRef: string | null;
   webhookAuthToken: string;
   createdAt: number;
   paidAt: number | null;
+  authorizedAt?: number | null;
   revokedAt?: number | null;
   unlockTokenId: string | null;
   unlockTokenExpiresAt: number | null;
@@ -238,6 +305,8 @@ const UNLOCK_GRANT_TTL_MS = 5 * 60 * 1000;
 const ORDER_EXPIRY_TTL_MS = 60 * 60 * 1000;
 const STALE_ORDER_PRUNE_MS = 24 * 60 * 60 * 1000;
 const MAX_PROCESSED_WEBHOOK_EVENTS = 5000;
+const MAX_AUDIT_RECORDS = 1000;
+const MAX_AUDIT_EVENTS = 2500;
 const SIFALO_SESSION_COOKIE_NAME = 'kyc_sifalo_sid';
 const SIFALO_GRANTS_COOKIE_NAME = 'kyc_sifalo_grants';
 const SIFALO_PENDING_COOKIE_NAME = 'kyc_sifalo_pending';
@@ -544,6 +613,327 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
   const consumedTransactions = new Map<string, string>(); // txRef -> orderId
   const processedWebhookEvents = new Set<string>();
   const autoDownloadConsumedOrders = new Set<string>();
+  const unlockAuditRecords = new Map<string, UnlockAuthorizationAuditRecord>(); // orderId -> auditRecord
+  const unlockAuditEvents: UnlockLifecycleAuditEvent[] = [];
+
+  function computeOneWayFingerprint(prefix: string, rawSecretOrValue: string | null | undefined): string | null {
+    if (!rawSecretOrValue || typeof rawSecretOrValue !== 'string' || !rawSecretOrValue.trim()) {
+      return null;
+    }
+    const digest = crypto
+      .createHmac('sha256', getSigningSecret())
+      .update(`fp:${prefix}:${rawSecretOrValue.trim()}`)
+      .digest('hex')
+      .slice(0, 16);
+    return `${prefix}_${digest}`;
+  }
+
+  function decodeTokenPayloadUnverified(rawToken: string | undefined): Partial<UnlockTokenPayload> | null {
+    if (!rawToken || typeof rawToken !== 'string') return null;
+    const parts = rawToken.trim().split('.');
+    if (parts.length !== 2) return null;
+    try {
+      const parsed = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+      if (parsed && typeof parsed === 'object') {
+        return parsed as Partial<UnlockTokenPayload>;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  function ensureAuditRecordForOrder(order: SifaloOrderRecord): UnlockAuthorizationAuditRecord {
+    const existing = unlockAuditRecords.get(order.orderId);
+    if (existing) {
+      if (!order.authorizationId) {
+        order.authorizationId = existing.authorizationId;
+      }
+      return existing;
+    }
+    const authId = order.authorizationId || `AUTH-${order.orderId.replace(/^KYC-/, '')}`;
+    order.authorizationId = authId;
+    const initialStatus: UnlockLifecycleStatus = order.lifecycleStatus || 'CREATED';
+    order.lifecycleStatus = initialStatus;
+    const record: UnlockAuthorizationAuditRecord = {
+      authorizationId: authId,
+      orderId: order.orderId,
+      productKey: order.productKey,
+      amountCents: order.amountCents,
+      currency: order.currency,
+      paymentVerificationResult: order.status === 'PAID' ? 'VERIFIED_PAID' : 'UNVERIFIED',
+      providerSidFingerprint: computeOneWayFingerprint('sid', order.providerSid),
+      authorizationStatus: initialStatus,
+      createdAt: order.createdAt,
+      paymentVerifiedAt: order.paidAt || null,
+      authorizedAt: order.authorizedAt || null,
+      expiresAt: order.unlockTokenExpiresAt || null,
+      consumedAt: order.unlockConsumedAt || null,
+      revokedAt: order.revokedAt || null,
+      failedAt: null,
+      expiredAt: null,
+      sessionFingerprint: computeOneWayFingerprint('sess', order.sessionId),
+      tokenFingerprint: computeOneWayFingerprint('tid', order.unlockTokenId),
+      failureOrRevocationReason: null,
+      events: [],
+    };
+    unlockAuditRecords.set(order.orderId, record);
+    return record;
+  }
+
+  function recordUnlockAuditEvent(params: {
+    eventType: UnlockAuditEventType;
+    order?: SifaloOrderRecord | null;
+    orderId?: string | null;
+    authorizationId?: string | null;
+    productKey?: UnlockProductKey | null;
+    requestedProductKey?: UnlockProductKey | null;
+    nextStatus?: UnlockLifecycleStatus | null;
+    paymentVerificationResult?: UnlockAuthorizationAuditRecord['paymentVerificationResult'];
+    sessionId?: string | null;
+    rawTokenOrTid?: string | null;
+    reason?: string | null;
+  }): UnlockLifecycleAuditEvent {
+    const ts = now();
+    const ord = params.order || (params.orderId ? orders.get(params.orderId) || null : null);
+    const auditRecord = ord ? ensureAuditRecordForOrder(ord) : null;
+
+    if (auditRecord && ord) {
+      if (params.nextStatus) {
+        // Enforce terminal state immutability: once CONSUMED, REVOKED, or EXPIRED, never revert to AUTHORIZED
+        const current = auditRecord.authorizationStatus;
+        const isTerminal = current === 'CONSUMED' || current === 'REVOKED';
+        if (!isTerminal || params.nextStatus === 'REVOKED') {
+          auditRecord.authorizationStatus = params.nextStatus;
+          ord.lifecycleStatus = params.nextStatus;
+        }
+      }
+      if (params.paymentVerificationResult) {
+        auditRecord.paymentVerificationResult = params.paymentVerificationResult;
+      }
+      if (ord.providerSid) {
+        auditRecord.providerSidFingerprint = computeOneWayFingerprint('sid', ord.providerSid);
+      }
+      if (ord.sessionId || params.sessionId) {
+        auditRecord.sessionFingerprint = computeOneWayFingerprint('sess', ord.sessionId || params.sessionId);
+      }
+      if (ord.unlockTokenId || params.rawTokenOrTid) {
+        auditRecord.tokenFingerprint = computeOneWayFingerprint('tid', ord.unlockTokenId || params.rawTokenOrTid);
+      }
+      if (ord.paidAt) auditRecord.paymentVerifiedAt = ord.paidAt;
+      if (ord.authorizedAt) auditRecord.authorizedAt = ord.authorizedAt;
+      if (ord.unlockTokenExpiresAt) auditRecord.expiresAt = ord.unlockTokenExpiresAt;
+      if (ord.unlockConsumedAt) auditRecord.consumedAt = ord.unlockConsumedAt;
+      if (ord.revokedAt) auditRecord.revokedAt = ord.revokedAt;
+
+      if (params.eventType === 'PAYMENT_VERIFICATION_FAILED' && params.nextStatus === 'FAILED') {
+        auditRecord.failedAt = ts;
+      }
+      if (params.eventType === 'UNLOCK_EXPIRED') {
+        auditRecord.expiredAt = ts;
+      }
+      if (params.eventType === 'UNLOCK_CONSUMED') {
+        auditRecord.consumedAt = ord.unlockConsumedAt || ts;
+      }
+      if (params.eventType === 'UNLOCK_REVOKED') {
+        auditRecord.revokedAt = ord.revokedAt || ts;
+      }
+      if (params.reason) {
+        auditRecord.failureOrRevocationReason = params.reason;
+      }
+      auditRecord.events.push({
+        eventType: params.eventType,
+        timestamp: ts,
+        reason: params.reason || null,
+      });
+      if (auditRecord.events.length > 60) {
+        auditRecord.events.splice(0, auditRecord.events.length - 60);
+      }
+      unlockAuditRecords.set(ord.orderId, auditRecord);
+    }
+
+    const sessionFp =
+      (auditRecord && auditRecord.sessionFingerprint) ||
+      computeOneWayFingerprint('sess', params.sessionId || (ord ? ord.sessionId : null));
+    const tokenFp =
+      computeOneWayFingerprint('tok', params.rawTokenOrTid) ||
+      (auditRecord ? auditRecord.tokenFingerprint : null);
+
+    const eventEntry: UnlockLifecycleAuditEvent = {
+      eventId: `EVT-${ts}-${crypto.randomBytes(3).toString('hex')}`,
+      eventType: params.eventType,
+      timestamp: ts,
+      isoTimestamp: new Date(ts).toISOString(),
+      authorizationId: (auditRecord && auditRecord.authorizationId) || params.authorizationId || null,
+      orderId: (ord && ord.orderId) || params.orderId || null,
+      productKey: (ord && ord.productKey) || params.productKey || null,
+      requestedProductKey: params.requestedProductKey || (ord && ord.productKey) || params.productKey || null,
+      lifecycleStatus: (auditRecord && auditRecord.authorizationStatus) || params.nextStatus || null,
+      sessionFingerprint: sessionFp,
+      tokenFingerprint: tokenFp,
+      reason: params.reason || null,
+    };
+
+    unlockAuditEvents.push(eventEntry);
+    if (unlockAuditEvents.length > MAX_AUDIT_EVENTS) {
+      unlockAuditEvents.splice(0, unlockAuditEvents.length - MAX_AUDIT_EVENTS);
+    }
+
+    console.info(
+      `[SifaloAudit] event=${eventEntry.eventType} status=${eventEntry.lifecycleStatus || 'NONE'} authId=${eventEntry.authorizationId || 'none'} orderId=${eventEntry.orderId || 'none'} product=${eventEntry.productKey || 'none'}${eventEntry.requestedProductKey && eventEntry.requestedProductKey !== eventEntry.productKey ? ` requestedProduct=${eventEntry.requestedProductKey}` : ''} sessFp=${eventEntry.sessionFingerprint || 'none'} tokFp=${eventEntry.tokenFingerprint || 'none'}${eventEntry.reason ? ` reason="${eventEntry.reason}"` : ''}`
+    );
+
+    return eventEntry;
+  }
+
+  function inspectAuthorizationLifecycle(orderIdOrAuthId: string): {
+    found: boolean;
+    currentlyValid: boolean;
+    status: UnlockLifecycleStatus | 'NOT_FOUND';
+    reason: string;
+    record: UnlockAuthorizationAuditRecord | null;
+  } {
+    const cleanId = typeof orderIdOrAuthId === 'string' ? orderIdOrAuthId.trim() : '';
+    let ord = orders.get(cleanId) || null;
+    if (!ord) {
+      for (const candidate of orders.values()) {
+        if (candidate.authorizationId === cleanId) {
+          ord = candidate;
+          break;
+        }
+      }
+    }
+    const record = ord ? ensureAuditRecordForOrder(ord) : unlockAuditRecords.get(cleanId) || null;
+    if (!ord && !record) {
+      return {
+        found: false,
+        currentlyValid: false,
+        status: 'NOT_FOUND',
+        reason: 'Authorization record not found.',
+        record: null,
+      };
+    }
+
+    const currentTs = now();
+    if (ord) {
+      if (ord.revokedAt || ord.status === 'REFUNDED' || ord.status === 'REVERSED') {
+        if (record && record.authorizationStatus !== 'REVOKED') {
+          record.authorizationStatus = 'REVOKED';
+          ord.lifecycleStatus = 'REVOKED';
+        }
+        return {
+          found: true,
+          currentlyValid: false,
+          status: 'REVOKED',
+          reason: record?.failureOrRevocationReason || 'Authorization was revoked due to refund or reversal.',
+          record,
+        };
+      }
+      if (ord.unlockConsumedAt) {
+        if (record && record.authorizationStatus !== 'CONSUMED') {
+          record.authorizationStatus = 'CONSUMED';
+          ord.lifecycleStatus = 'CONSUMED';
+        }
+        return {
+          found: true,
+          currentlyValid: false,
+          status: 'CONSUMED',
+          reason: 'Authorization has already been consumed for a Save PNG operation.',
+          record,
+        };
+      }
+      if (ord.status === 'FAILED' || ord.status === 'CANCELLED') {
+        if (record && record.authorizationStatus !== 'FAILED') {
+          record.authorizationStatus = 'FAILED';
+          ord.lifecycleStatus = 'FAILED';
+        }
+        return {
+          found: true,
+          currentlyValid: false,
+          status: 'FAILED',
+          reason: record?.failureOrRevocationReason || `Order status is ${ord.status}.`,
+          record,
+        };
+      }
+      if (
+        ord.status === 'EXPIRED' ||
+        (ord.status === 'PENDING' && currentTs - ord.createdAt > ORDER_EXPIRY_TTL_MS) ||
+        (ord.status === 'PAID' && (!ord.unlockTokenExpiresAt || ord.unlockTokenExpiresAt <= currentTs))
+      ) {
+        if (record && record.authorizationStatus !== 'EXPIRED') {
+          recordUnlockAuditEvent({
+            eventType: 'UNLOCK_EXPIRED',
+            order: ord,
+            nextStatus: 'EXPIRED',
+            reason:
+              ord.status === 'PAID'
+                ? 'Short-lived unlock authorization TTL expired before consumption.'
+                : 'Unpaid checkout order expired.',
+          });
+        }
+        return {
+          found: true,
+          currentlyValid: false,
+          status: 'EXPIRED',
+          reason: record?.failureOrRevocationReason || 'Authorization has expired.',
+          record,
+        };
+      }
+      if (
+        ord.status === 'PAID' &&
+        ord.providerSid &&
+        ord.unlockTokenId &&
+        ord.unlockTokenExpiresAt &&
+        ord.unlockTokenExpiresAt > currentTs
+      ) {
+        return {
+          found: true,
+          currentlyValid: true,
+          status: 'AUTHORIZED',
+          reason: 'Authorization is currently valid, unconsumed, and within its short-lived TTL.',
+          record,
+        };
+      }
+    }
+
+    return {
+      found: true,
+      currentlyValid: false,
+      status: record ? record.authorizationStatus : 'CREATED',
+      reason: record?.failureOrRevocationReason || 'Payment has not been verified yet.',
+      record,
+    };
+  }
+
+  function getUnlockAuditSummary() {
+    const countsByStatus: Record<UnlockLifecycleStatus, number> = {
+      CREATED: 0,
+      PAYMENT_VERIFIED: 0,
+      AUTHORIZED: 0,
+      CONSUMED: 0,
+      EXPIRED: 0,
+      FAILED: 0,
+      REVOKED: 0,
+    };
+    for (const ord of orders.values()) {
+      const info = inspectAuthorizationLifecycle(ord.orderId);
+      if (info.status !== 'NOT_FOUND') {
+        countsByStatus[info.status] = (countsByStatus[info.status] || 0) + 1;
+      }
+    }
+    const countsByEventType: Partial<Record<UnlockAuditEventType, number>> = {};
+    for (const ev of unlockAuditEvents) {
+      countsByEventType[ev.eventType] = (countsByEventType[ev.eventType] || 0) + 1;
+    }
+    return {
+      unlockGrantTtlMs: UNLOCK_GRANT_TTL_MS,
+      singleUseEnforced: true,
+      totalTrackedAuthorizations: unlockAuditRecords.size,
+      totalAuditEvents: unlockAuditEvents.length,
+      countsByStatus,
+      countsByEventType,
+    };
+  }
 
   const resolvedPersistencePath =
     deps.persistenceFilePath === null
@@ -567,6 +957,8 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         consumedTransactions?: Array<[string, string]>;
         processedWebhookEvents?: string[];
         autoDownloadConsumedOrders?: string[];
+        unlockAuditRecords?: UnlockAuthorizationAuditRecord[];
+        unlockAuditEvents?: UnlockLifecycleAuditEvent[];
       };
       if (Array.isArray(parsed.orders)) {
         for (const ord of parsed.orders) {
@@ -599,6 +991,21 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           }
         }
       }
+      if (Array.isArray(parsed.unlockAuditRecords)) {
+        for (const rec of parsed.unlockAuditRecords) {
+          if (rec && typeof rec.orderId === 'string') {
+            unlockAuditRecords.set(rec.orderId, rec);
+          }
+        }
+      }
+      if (Array.isArray(parsed.unlockAuditEvents)) {
+        unlockAuditEvents.length = 0;
+        for (const ev of parsed.unlockAuditEvents.slice(-MAX_AUDIT_EVENTS)) {
+          if (ev && typeof ev.eventType === 'string') {
+            unlockAuditEvents.push(ev);
+          }
+        }
+      }
     } catch (err) {
       if (err && typeof err === 'object' && 'code' in err && (err as { code?: string }).code === 'ENOENT') {
         return;
@@ -617,6 +1024,8 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         consumedTransactions: Array.from(consumedTransactions.entries()),
         processedWebhookEvents: Array.from(processedWebhookEvents.values()).slice(-MAX_PROCESSED_WEBHOOK_EVENTS),
         autoDownloadConsumedOrders: Array.from(autoDownloadConsumedOrders.values()).slice(-MAX_PROCESSED_WEBHOOK_EVENTS),
+        unlockAuditRecords: Array.from(unlockAuditRecords.values()).slice(-MAX_AUDIT_RECORDS),
+        unlockAuditEvents: unlockAuditEvents.slice(-MAX_AUDIT_EVENTS),
       };
       const tmpFile = `${resolvedPersistencePath}.tmp`;
       fs.writeFileSync(tmpFile, JSON.stringify(payload), 'utf8');
@@ -1219,11 +1628,19 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     return null;
   }
 
-  function invalidateOrderUnlock(order: SifaloOrderRecord, nextStatus: OrderStatus) {
+  function invalidateOrderUnlock(order: SifaloOrderRecord, nextStatus: OrderStatus, reason?: string) {
     order.status = nextStatus;
     order.revokedAt = now();
+    order.lifecycleStatus = 'REVOKED';
     order.unlockTokenId = null;
     order.unlockTokenExpiresAt = null;
+    recordUnlockAuditEvent({
+      eventType: 'UNLOCK_REVOKED',
+      order,
+      nextStatus: 'REVOKED',
+      paymentVerificationResult: 'REVOKED',
+      reason: reason || `Order invalidated with status ${nextStatus}.`,
+    });
     orders.set(order.orderId, order);
     persistState();
     console.info(
@@ -1243,6 +1660,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     data?: Record<string, unknown>;
   }> {
     if (order.status === 'REFUNDED' || order.status === 'REVERSED') {
+      recordUnlockAuditEvent({
+        eventType: 'UNLOCK_REVOKED',
+        order,
+        nextStatus: 'REVOKED',
+        paymentVerificationResult: 'REVOKED',
+        reason: `Payment is ${order.status.toLowerCase()}.`,
+      });
       return {
         ok: false,
         status: order.status,
@@ -1251,6 +1675,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     }
 
     if (order.unlockConsumedAt) {
+      recordUnlockAuditEvent({
+        eventType: 'UNLOCK_REPLAY_BLOCKED',
+        order,
+        nextStatus: 'CONSUMED',
+        reason: 'Attempted to re-verify or reuse an already consumed payment authorization.',
+      });
       return {
         ok: false,
         status: 'EXPIRED',
@@ -1259,6 +1689,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     }
 
     if (preserveGrant && preserveGrant.expiresAt <= now()) {
+      recordUnlockAuditEvent({
+        eventType: 'UNLOCK_EXPIRED',
+        order,
+        nextStatus: 'EXPIRED',
+        reason: 'Unlock token TTL expired before verification completed.',
+      });
       return {
         ok: false,
         status: 'EXPIRED',
@@ -1275,6 +1711,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         error: 'Sifalo Pay server credentials (SIFALO_API_USER / SIFALO_API_KEY) are not configured.',
       };
     }
+
+    recordUnlockAuditEvent({
+      eventType: 'PAYMENT_VERIFICATION_STARTED',
+      order,
+      paymentVerificationResult: order.status === 'PAID' ? 'VERIFIED_PAID' : 'PENDING',
+      reason: 'Verifying transaction with Sifalo Pay verify.php API.',
+    });
 
     const endpoints = resolveSifaloEndpoints(order.environment, {
       gatewayUrl: getCustomGatewayUrl(),
@@ -1324,6 +1767,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         }
       }
     } catch {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        reason: 'Could not reach Sifalo Pay verification gateway.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1333,6 +1781,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     }
 
     if (!res.ok || !data) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        reason: 'Invalid verification response from Sifalo Pay.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1349,6 +1802,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       rawProviderResponseText.includes('order_id not found');
 
     if (isUnpaidCheckoutNotYetRecorded) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        paymentVerificationResult: 'PENDING',
+        reason: 'Payment has not been completed or recorded at Sifalo Pay yet.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1362,11 +1821,31 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     const nonSuccess = classifyNonSuccessStatus(data);
     if (nonSuccess && !isSifaloSuccessPayload(data)) {
       if (nonSuccess === 'REFUNDED' || nonSuccess === 'REVERSED') {
-        invalidateOrderUnlock(order, nonSuccess);
+        invalidateOrderUnlock(order, nonSuccess, `Sifalo reported ${nonSuccess}.`);
       } else if (nonSuccess !== 'PENDING' && order.status === 'PENDING') {
         order.status = nonSuccess;
+        const mappedLifecycle: UnlockLifecycleStatus =
+          nonSuccess === 'EXPIRED' ? 'EXPIRED' : 'FAILED';
+        order.lifecycleStatus = mappedLifecycle;
+        recordUnlockAuditEvent({
+          eventType: nonSuccess === 'EXPIRED' ? 'UNLOCK_EXPIRED' : 'PAYMENT_VERIFICATION_FAILED',
+          order,
+          nextStatus: mappedLifecycle,
+          paymentVerificationResult: 'FAILED',
+          reason: `Sifalo reported payment ${nonSuccess.toLowerCase()}.`,
+        });
         orders.set(order.orderId, order);
         persistState();
+      } else {
+        recordUnlockAuditEvent({
+          eventType: 'PAYMENT_VERIFICATION_FAILED',
+          order,
+          paymentVerificationResult: nonSuccess === 'PENDING' ? 'PENDING' : 'FAILED',
+          reason:
+            nonSuccess === 'PENDING'
+              ? 'Payment is still awaiting confirmation from Sifalo Pay.'
+              : `Payment ${nonSuccess.toLowerCase()}.`,
+        });
       }
       return {
         ok: false,
@@ -1381,6 +1860,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     }
 
     if (!isSifaloSuccessPayload(data)) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        paymentVerificationResult: order.status === 'PENDING' ? 'PENDING' : 'FAILED',
+        reason: 'Sifalo Pay did not confirm payment success (status=success, code=601 required).',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1393,6 +1878,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     // Strict order binding check
     const returnedOrderId = typeof data.order_id === 'string' ? data.order_id.trim() : '';
     if (returnedOrderId && returnedOrderId !== order.orderId) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        paymentVerificationResult: 'FAILED',
+        reason: 'Verified Sifalo transaction belongs to a different order ID.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1404,6 +1895,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     if (returnedProductRaw) {
       const normalizedProduct = normalizeDocTypeToProductKey(returnedProductRaw);
       if (normalizedProduct !== order.productKey) {
+        recordUnlockAuditEvent({
+          eventType: 'PRODUCT_MISMATCH_BLOCKED',
+          order,
+          requestedProductKey: normalizedProduct || undefined,
+          paymentVerificationResult: 'FAILED',
+          reason: 'Verified Sifalo product type does not match order document.',
+        });
         return {
           ok: false,
           status: order.status,
@@ -1418,6 +1916,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         ? data.currency.trim().toUpperCase()
         : '';
     if (returnedCurrency !== order.currency) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        paymentVerificationResult: 'FAILED',
+        reason: 'Verified Sifalo payment currency mismatch (USD required).',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1432,6 +1936,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       paidCents !== expectedPriceSpec.amountCents ||
       paidCents !== order.amountCents
     ) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        paymentVerificationResult: 'FAILED',
+        reason: 'Verified Sifalo payment amount does not match product price.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1447,6 +1957,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         : sidToVerify;
 
     if (!verifiedSid) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        paymentVerificationResult: 'FAILED',
+        reason: 'Verified Sifalo payment response is missing a valid transaction SID.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1455,6 +1971,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     }
 
     if (order.providerSid && order.providerSid !== verifiedSid) {
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFICATION_FAILED',
+        order,
+        paymentVerificationResult: 'FAILED',
+        reason: 'Verified Sifalo transaction SID does not match order SID.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1464,6 +1986,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
     const existingOwner = consumedTransactions.get(verifiedSid);
     if (existingOwner && existingOwner !== order.orderId) {
+      recordUnlockAuditEvent({
+        eventType: 'UNLOCK_REPLAY_BLOCKED',
+        order,
+        paymentVerificationResult: 'FAILED',
+        reason: 'This Sifalo checkout transaction SID has already been used for another order.',
+      });
       return {
         ok: false,
         status: order.status,
@@ -1475,11 +2003,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     order.providerSid = verifiedSid;
     order.transactionRef = verifiedSid;
 
-    // Bind & atomically transition PENDING -> PAID
+    // Bind & atomically transition CREATED -> PAYMENT_VERIFIED -> AUTHORIZED
     if (order.status !== 'PAID') {
       const paidAt = now();
       order.status = 'PAID';
       order.paidAt = paidAt;
+      order.authorizedAt = paidAt;
       order.revokedAt = null;
       if (preserveGrant && preserveGrant.tid && preserveGrant.expiresAt > paidAt) {
         order.unlockTokenId = preserveGrant.tid;
@@ -1488,6 +2017,22 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         order.unlockTokenId = crypto.randomUUID();
         order.unlockTokenExpiresAt = paidAt + UNLOCK_GRANT_TTL_MS;
       }
+      recordUnlockAuditEvent({
+        eventType: 'PAYMENT_VERIFIED',
+        order,
+        nextStatus: 'PAYMENT_VERIFIED',
+        paymentVerificationResult: 'VERIFIED_PAID',
+        rawTokenOrTid: order.unlockTokenId,
+        reason: `Sifalo payment verified ($${order.amountUsdString} USD).`,
+      });
+      recordUnlockAuditEvent({
+        eventType: 'UNLOCK_AUTHORIZED',
+        order,
+        nextStatus: 'AUTHORIZED',
+        paymentVerificationResult: 'VERIFIED_PAID',
+        rawTokenOrTid: order.unlockTokenId,
+        reason: `Short-lived single-use unlock authorization issued (TTL ${Math.round(UNLOCK_GRANT_TTL_MS / 1000)}s).`,
+      });
       orders.set(order.orderId, order);
       persistState();
       console.info(
@@ -1780,6 +2325,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       hostedCheckoutBaseUrl: endpoints.hostedCheckoutBaseUrl,
       gatewayUrl: endpoints.gatewayUrl,
       detectedSifaloEnvKeys,
+      unlockLifecycleSummary: getUnlockAuditSummary(),
     };
   }
 
@@ -1902,8 +2448,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         }
         const webhookAuthToken = computeOrderWebhookToken(orderId);
 
+        const authorizationId = `AUTH-${orderId.replace(/^KYC-/, '')}`;
         const order: SifaloOrderRecord = {
           orderId,
+          authorizationId,
           productKey,
           countryKey,
           providerKey,
@@ -1913,18 +2461,28 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           currency: priceSpec.currency,
           environment,
           status: 'PENDING',
+          lifecycleStatus: 'CREATED',
           providerSid: null,
           providerToken: null,
           transactionRef: null,
           webhookAuthToken,
           createdAt: now(),
           paidAt: null,
+          authorizedAt: null,
           revokedAt: null,
           unlockTokenId: null,
           unlockTokenExpiresAt: null,
           unlockConsumedAt: null,
         };
         orders.set(orderId, order);
+        recordUnlockAuditEvent({
+          eventType: 'UNLOCK_CREATED',
+          order,
+          nextStatus: 'CREATED',
+          paymentVerificationResult: 'UNVERIFIED',
+          sessionId,
+          reason: `Created Sifalo checkout order for ${priceSpec.label} ($${priceSpec.amountUsdString} USD).`,
+        });
 
         const prelimStateToken = signOrderStateToken(order);
         const returnUrl = `${baseUrl}/?sifalo_checkout=return&order_id=${encodeURIComponent(orderId)}&order_state=${encodeURIComponent(prelimStateToken)}`;
@@ -2102,6 +2660,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         // Handle explicit expiration for pending orders older than 1 hour
         if (order.status === 'PENDING' && now() - order.createdAt > ORDER_EXPIRY_TTL_MS) {
           order.status = 'EXPIRED';
+          order.lifecycleStatus = 'EXPIRED';
+          recordUnlockAuditEvent({
+            eventType: 'UNLOCK_EXPIRED',
+            order,
+            nextStatus: 'EXPIRED',
+            paymentVerificationResult: 'FAILED',
+            sessionId: requestSessionId,
+            reason: 'Pending checkout order expired after 60 minutes without payment.',
+          });
           orders.set(order.orderId, order);
           persistState();
         }
@@ -2137,6 +2704,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
               if (returnStatus === 'cancelled' || returnStatus === 'canceled') {
                 effectiveStatus = 'CANCELLED';
                 order.status = 'CANCELLED';
+                order.lifecycleStatus = 'FAILED';
+                recordUnlockAuditEvent({
+                  eventType: 'PAYMENT_VERIFICATION_FAILED',
+                  order,
+                  nextStatus: 'FAILED',
+                  paymentVerificationResult: 'FAILED',
+                  sessionId: requestSessionId,
+                  reason: 'Payment was cancelled by user before Sifalo confirmation.',
+                });
                 orders.set(order.orderId, order);
                 persistState();
                 clearSignedPendingCheckoutCookie(req, res);
@@ -2145,6 +2721,17 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
               } else if (returnStatus === 'failed' || returnStatus === 'error') {
                 effectiveStatus = 'FAILED';
                 order.status = 'FAILED';
+                order.lifecycleStatus = 'FAILED';
+                recordUnlockAuditEvent({
+                  eventType: 'PAYMENT_VERIFICATION_FAILED',
+                  order,
+                  nextStatus: 'FAILED',
+                  paymentVerificationResult: 'FAILED',
+                  sessionId: requestSessionId,
+                  reason: returnMessage
+                    ? `Payment failed on Sifalo checkout (${returnMessage}).`
+                    : 'Payment failed on Sifalo checkout.',
+                });
                 orders.set(order.orderId, order);
                 persistState();
                 clearSignedPendingCheckoutCookie(req, res);
@@ -2170,6 +2757,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         }
 
         if (order.status !== 'PAID' || !order.providerSid) {
+          recordUnlockAuditEvent({
+            eventType: 'PAYMENT_VERIFICATION_FAILED',
+            order,
+            sessionId: requestSessionId,
+            reason: 'Order is not PAID or missing verified Sifalo transaction SID.',
+          });
           return res.status(402).json({
             verified: false,
             status: order.status,
@@ -2183,6 +2776,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         if (order.unlockConsumedAt) {
           clearSignedPendingCheckoutCookie(req, res);
+          recordUnlockAuditEvent({
+            eventType: 'UNLOCK_REPLAY_BLOCKED',
+            order,
+            nextStatus: 'CONSUMED',
+            sessionId: requestSessionId,
+            reason: 'Blocked verify-order replay on an already consumed payment authorization.',
+          });
           return res.status(403).json({
             verified: false,
             status: 'EXPIRED',
@@ -2197,6 +2797,13 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         const grant = issueOrderUnlockGrant(order);
         if (!grant) {
           clearSignedPendingCheckoutCookie(req, res);
+          recordUnlockAuditEvent({
+            eventType: 'UNLOCK_EXPIRED',
+            order,
+            nextStatus: 'EXPIRED',
+            sessionId: requestSessionId,
+            reason: 'Short-lived unlock authorization expired before it could be issued.',
+          });
           return res.status(403).json({
             verified: false,
             status: 'EXPIRED',
@@ -2290,6 +2897,41 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       if (unlockToken) {
         payload = verifyUnlockTokenString(unlockToken);
         if (!payload) {
+          // Inspect unverified payload purely to distinguish expired valid tokens from forged/corrupted tokens in server audit
+          const unverified = decodeTokenPayloadUnverified(unlockToken);
+          const candidateOrd =
+            unverified && typeof unverified.orderId === 'string'
+              ? orders.get(unverified.orderId) || null
+              : null;
+          if (
+            candidateOrd &&
+            unverified &&
+            typeof unverified.exp === 'number' &&
+            unverified.exp <= now() &&
+            !candidateOrd.unlockConsumedAt
+          ) {
+            recordUnlockAuditEvent({
+              eventType: 'UNLOCK_EXPIRED',
+              order: candidateOrd,
+              requestedProductKey,
+              nextStatus: 'EXPIRED',
+              sessionId: requestSessionId,
+              rawTokenOrTid: unlockToken,
+              reason: 'Unlock token expired beyond its short-lived 5-minute TTL.',
+            });
+            persistState();
+          } else {
+            recordUnlockAuditEvent({
+              eventType: 'INVALID_UNLOCK_BLOCKED',
+              order: candidateOrd,
+              orderId:
+                (unverified && typeof unverified.orderId === 'string' && unverified.orderId) || null,
+              requestedProductKey,
+              sessionId: requestSessionId,
+              rawTokenOrTid: unlockToken,
+              reason: 'Forged, malformed, or expired unlock token signature rejected.',
+            });
+          }
           return {
             authorized: false,
             httpStatus: 401,
@@ -2319,6 +2961,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         candidateEnv = cookieGrantEntry.env;
         candidateCreatedAt = cookieGrantEntry.c;
       } else {
+        recordUnlockAuditEvent({
+          eventType: 'INVALID_UNLOCK_BLOCKED',
+          requestedProductKey,
+          sessionId: requestSessionId,
+          reason: 'Missing payment authorization token.',
+        });
         return {
           authorized: false,
           httpStatus: 401,
@@ -2326,7 +2974,19 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         };
       }
 
+      let order = orders.get(payload.orderId);
+
       if (payload.productKey !== requestedProductKey) {
+        recordUnlockAuditEvent({
+          eventType: 'PRODUCT_MISMATCH_BLOCKED',
+          order,
+          orderId: payload.orderId,
+          productKey: payload.productKey,
+          requestedProductKey,
+          sessionId: requestSessionId,
+          rawTokenOrTid: payload.tid,
+          reason: `Authorization for product "${payload.productKey}" cannot unlock requested product "${requestedProductKey}".`,
+        });
         return {
           authorized: false,
           httpStatus: 403,
@@ -2335,6 +2995,16 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       }
 
       if (payload.sessionId && payload.sessionId !== requestSessionId) {
+        recordUnlockAuditEvent({
+          eventType: 'INVALID_UNLOCK_BLOCKED',
+          order,
+          orderId: payload.orderId,
+          productKey: payload.productKey,
+          requestedProductKey,
+          sessionId: requestSessionId,
+          rawTokenOrTid: payload.tid,
+          reason: 'Payment authorization belongs to a different user session.',
+        });
         return {
           authorized: false,
           httpStatus: 403,
@@ -2343,6 +3013,16 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       }
 
       if (payload.amountCents !== undefined && payload.amountCents !== expectedSpec.amountCents) {
+        recordUnlockAuditEvent({
+          eventType: 'INVALID_UNLOCK_BLOCKED',
+          order,
+          orderId: payload.orderId,
+          productKey: payload.productKey,
+          requestedProductKey,
+          sessionId: requestSessionId,
+          rawTokenOrTid: payload.tid,
+          reason: 'Payment authorization amount does not match document requirement.',
+        });
         return {
           authorized: false,
           httpStatus: 403,
@@ -2352,6 +3032,16 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       }
 
       if (payload.currency !== undefined && payload.currency !== 'USD') {
+        recordUnlockAuditEvent({
+          eventType: 'INVALID_UNLOCK_BLOCKED',
+          order,
+          orderId: payload.orderId,
+          productKey: payload.productKey,
+          requestedProductKey,
+          sessionId: requestSessionId,
+          rawTokenOrTid: payload.tid,
+          reason: 'Payment authorization currency mismatch.',
+        });
         return {
           authorized: false,
           httpStatus: 403,
@@ -2360,25 +3050,60 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         };
       }
 
-      let order = orders.get(payload.orderId);
-
       // Explicitly reject consumed, revoked, refunded, reversed, cancelled, failed, or expired orders
-      if (
-        order &&
-        (order.unlockConsumedAt ||
-          order.revokedAt ||
-          order.status === 'REFUNDED' ||
-          order.status === 'REVERSED' ||
-          order.status === 'CANCELLED' ||
-          order.status === 'EXPIRED' ||
-          order.status === 'FAILED')
-      ) {
-        return {
-          authorized: false,
-          httpStatus: 403,
-          error: 'Payment authorization has already been consumed or is no longer active.',
-          clearGrant: true,
-        };
+      if (order) {
+        if (order.unlockConsumedAt) {
+          recordUnlockAuditEvent({
+            eventType: 'UNLOCK_REPLAY_BLOCKED',
+            order,
+            requestedProductKey,
+            nextStatus: 'CONSUMED',
+            sessionId: requestSessionId,
+            rawTokenOrTid: payload.tid,
+            reason: 'Blocked attempt to reuse an already CONSUMED single-use authorization.',
+          });
+          persistState();
+          return {
+            authorized: false,
+            httpStatus: 403,
+            error: 'Payment authorization has already been consumed or is no longer active.',
+            clearGrant: true,
+          };
+        }
+        if (order.revokedAt || order.status === 'REFUNDED' || order.status === 'REVERSED') {
+          recordUnlockAuditEvent({
+            eventType: 'UNLOCK_REVOKED',
+            order,
+            requestedProductKey,
+            nextStatus: 'REVOKED',
+            sessionId: requestSessionId,
+            rawTokenOrTid: payload.tid,
+            reason: 'Blocked attempt to use a REVOKED authorization.',
+          });
+          return {
+            authorized: false,
+            httpStatus: 403,
+            error: 'Payment authorization has already been consumed or is no longer active.',
+            clearGrant: true,
+          };
+        }
+        if (order.status === 'CANCELLED' || order.status === 'EXPIRED' || order.status === 'FAILED') {
+          recordUnlockAuditEvent({
+            eventType: order.status === 'EXPIRED' ? 'UNLOCK_EXPIRED' : 'INVALID_UNLOCK_BLOCKED',
+            order,
+            requestedProductKey,
+            nextStatus: order.status === 'EXPIRED' ? 'EXPIRED' : 'FAILED',
+            sessionId: requestSessionId,
+            rawTokenOrTid: payload.tid,
+            reason: `Order status is ${order.status}.`,
+          });
+          return {
+            authorized: false,
+            httpStatus: 403,
+            error: 'Payment authorization has already been consumed or is no longer active.',
+            clearGrant: true,
+          };
+        }
       }
 
       // Serverless / cold-start / cross-instance recovery:
@@ -2387,6 +3112,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       if (!order || order.status === 'PENDING') {
         const sidToCheck = typeof payload.sid === 'string' ? payload.sid.trim() : '';
         if (!sidToCheck) {
+          recordUnlockAuditEvent({
+            eventType: 'INVALID_UNLOCK_BLOCKED',
+            order,
+            orderId: payload.orderId,
+            requestedProductKey,
+            sessionId: requestSessionId,
+            rawTokenOrTid: payload.tid,
+            reason: 'Paid order record not found on server and no provider SID present.',
+          });
           return {
             authorized: false,
             httpStatus: 403,
@@ -2396,6 +3130,14 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         }
 
         if (order && order.sessionId && order.sessionId !== requestSessionId) {
+          recordUnlockAuditEvent({
+            eventType: 'INVALID_UNLOCK_BLOCKED',
+            order,
+            requestedProductKey,
+            sessionId: requestSessionId,
+            rawTokenOrTid: payload.tid,
+            reason: 'Payment authorization belongs to a different user session.',
+          });
           return {
             authorized: false,
             httpStatus: 403,
@@ -2405,6 +3147,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         const candidateOrder: SifaloOrderRecord = order ?? {
           orderId: payload.orderId,
+          authorizationId: `AUTH-${payload.orderId.replace(/^KYC-/, '')}`,
           productKey: requestedProductKey,
           countryKey: 'global',
           providerKey: 'virtual-account',
@@ -2414,12 +3157,14 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           currency: 'USD',
           environment: candidateEnv,
           status: 'PENDING',
+          lifecycleStatus: 'CREATED',
           providerSid: sidToCheck,
           providerToken: null,
           transactionRef: null,
           webhookAuthToken: computeOrderWebhookToken(payload.orderId),
           createdAt: candidateCreatedAt,
           paidAt: null,
+          authorizedAt: null,
           revokedAt: null,
           unlockTokenId: null,
           unlockTokenExpiresAt: null,
@@ -2441,6 +3186,45 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         order = candidateOrder;
       }
 
+      if (order.productKey !== requestedProductKey) {
+        recordUnlockAuditEvent({
+          eventType: 'PRODUCT_MISMATCH_BLOCKED',
+          order,
+          requestedProductKey,
+          sessionId: requestSessionId,
+          rawTokenOrTid: payload.tid,
+          reason: `Order product "${order.productKey}" does not match requested product "${requestedProductKey}".`,
+        });
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Payment authorization is not valid for this document category.',
+          clearGrant: true,
+        };
+      }
+
+      if (
+        !order.unlockTokenExpiresAt ||
+        order.unlockTokenExpiresAt <= now()
+      ) {
+        recordUnlockAuditEvent({
+          eventType: 'UNLOCK_EXPIRED',
+          order,
+          requestedProductKey,
+          nextStatus: 'EXPIRED',
+          sessionId: requestSessionId,
+          rawTokenOrTid: payload.tid,
+          reason: 'Order unlock token TTL has expired.',
+        });
+        persistState();
+        return {
+          authorized: false,
+          httpStatus: 403,
+          error: 'Paid order verification is no longer active.',
+          clearGrant: true,
+        };
+      }
+
       if (
         order.status !== 'PAID' ||
         order.revokedAt ||
@@ -2450,10 +3234,16 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         order.amountCents !== expectedSpec.amountCents ||
         order.currency !== 'USD' ||
         order.unlockTokenId !== payload.tid ||
-        !order.unlockTokenExpiresAt ||
-        order.unlockTokenExpiresAt <= now() ||
         (order.sessionId && order.sessionId !== requestSessionId)
       ) {
+        recordUnlockAuditEvent({
+          eventType: order.unlockConsumedAt ? 'UNLOCK_REPLAY_BLOCKED' : 'INVALID_UNLOCK_BLOCKED',
+          order,
+          requestedProductKey,
+          sessionId: requestSessionId,
+          rawTokenOrTid: payload.tid,
+          reason: 'Order authorization state or token ID mismatch.',
+        });
         return {
           authorized: false,
           httpStatus: 403,
@@ -2738,6 +3528,12 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         // Require an explicit, server-signed unlockToken (never fall back to persistent cookies or old session history)
         if (!unlockToken) {
+          recordUnlockAuditEvent({
+            eventType: 'INVALID_UNLOCK_BLOCKED',
+            requestedProductKey,
+            sessionId: requestSessionId,
+            reason: 'Save PNG attempted without a payment authorization token.',
+          });
           return res
             .status(401)
             .json({ authorized: false, error: 'Missing payment token or document type.' });
@@ -2764,6 +3560,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             ? body.orderId.trim()
             : result.orderId;
         if (expectedOrderId !== result.orderId) {
+          recordUnlockAuditEvent({
+            eventType: 'INVALID_UNLOCK_BLOCKED',
+            orderId: result.orderId,
+            productKey: result.productKey,
+            requestedProductKey,
+            sessionId: requestSessionId,
+            rawTokenOrTid: unlockToken,
+            reason: `Order ID mismatch (expected ${expectedOrderId}, token bound to ${result.orderId}).`,
+          });
           return res.status(403).json({
             authorized: false,
             error: 'Order ID mismatch for payment authorization.',
@@ -2783,16 +3588,37 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           if (!autoDownloadConsumedOrders.has(result.orderId)) {
             autoDownloadConsumedOrders.add(result.orderId);
             autoDownloadAuthorized = true;
+          } else {
+            recordUnlockAuditEvent({
+              eventType: 'UNLOCK_REPLAY_BLOCKED',
+              orderId: result.orderId,
+              productKey: result.productKey,
+              requestedProductKey,
+              sessionId: requestSessionId,
+              rawTokenOrTid: unlockToken,
+              reason: 'Blocked duplicate post-payment automatic download attempt for the same order.',
+            });
           }
         }
 
         const authorizedOrder = orders.get(result.orderId);
         if (shouldConsumeUnlock) {
+          const consumedTokenTid = authorizedOrder?.unlockTokenId || unlockToken;
           autoDownloadConsumedOrders.add(result.orderId);
           if (authorizedOrder) {
             authorizedOrder.unlockConsumedAt = now();
+            authorizedOrder.lifecycleStatus = 'CONSUMED';
             authorizedOrder.unlockTokenId = null;
             authorizedOrder.unlockTokenExpiresAt = null;
+            recordUnlockAuditEvent({
+              eventType: 'UNLOCK_CONSUMED',
+              order: authorizedOrder,
+              requestedProductKey,
+              nextStatus: 'CONSUMED',
+              sessionId: requestSessionId,
+              rawTokenOrTid: consumedTokenTid,
+              reason: 'Single-use Save PNG authorization consumed and invalidated.',
+            });
             orders.set(authorizedOrder.orderId, authorizedOrder);
           }
           if (requestSessionId) {
@@ -2829,11 +3655,17 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     handleWebhook,
     isConfigured: () => Boolean(getApiUser() && getApiKey()),
     getDiagnostics,
+    inspectAuthorizationLifecycle,
+    getUnlockAuditSummary,
     _internal: {
       orders,
       sidToOrderId,
       consumedTransactions,
       processedWebhookEvents,
+      unlockAuditRecords,
+      unlockAuditEvents,
+      inspectAuthorizationLifecycle,
+      getUnlockAuditSummary,
       verifyUnlockTokenString,
       computeOrderWebhookToken,
       signOrderStateToken,
