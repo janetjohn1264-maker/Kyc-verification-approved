@@ -343,10 +343,24 @@
       50% { transform: translate(-6px, 8px); }
     }
     .animate-float-diag {
-      animation: floatDiagonal 4.5s ease-in-out infinite;
+      animation: floatDiagonal 5.2s ease-in-out infinite;
     }
     .animate-float-diag-alt {
-      animation: floatDiagonalAlt 5.5s ease-in-out infinite;
+      animation: floatDiagonalAlt 5.8s ease-in-out infinite;
+    }
+    @keyframes floatOrbitLowerLeft {
+      0%, 100% { transform: translate(0px, 0px); }
+      50% { transform: translate(4px, -6px); }
+    }
+    @keyframes floatOrbitLowerRight {
+      0%, 100% { transform: translate(0px, 0px); }
+      50% { transform: translate(-4px, -7px); }
+    }
+    .animate-float-lower-left {
+      animation: floatOrbitLowerLeft 6.2s ease-in-out infinite;
+    }
+    .animate-float-lower-right {
+      animation: floatOrbitLowerRight 5.6s ease-in-out infinite;
     }
 
     /* Clean Light-Mode Glass Cards with Brand Contrast */
@@ -21355,39 +21369,70 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               </svg>
 
               <!-- Floating Provider & Virtual Banking Badges Around Globe -->
-              <!-- Top Left: PayPal Emblem -->
-              <div class="animate-float-slow absolute top-2 left-4 sm:left-8 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white shadow-lg border border-blue-100 flex items-center justify-center">
-                <svg viewBox="0 0 64 64" class="w-8 h-8" aria-hidden="true">
-                  <path d="M24 12h17c8.5 0 13.5 4.2 12.2 12.4-1.2 8-7.4 12.6-16 12.6h-5.8l-2.6 15H17L24 12Z" fill="#003087"/>
-                  <path d="M29.5 22h15c7.2 0 11.4 3.6 10.3 10.6-1 6.8-6.3 10.8-13.5 10.8h-5l-2.2 12.6H23.5L29.5 22Z" fill="#0079C1" opacity="0.92"/>
+              <!-- Upper-Left: PayPal -->
+              <div title="PayPal" class="animate-float-slow absolute top-1 left-2 sm:top-2 sm:left-6 w-[52px] h-[52px] sm:w-16 sm:h-16 rounded-full bg-white shadow-[0_10px_24px_-4px_rgba(37,99,235,0.24),0_4px_10px_-2px_rgba(15,23,42,0.08)] ring-2 ring-white/90 border border-blue-100/90 flex flex-col items-center justify-center p-1">
+                <svg viewBox="0 0 64 44" class="w-6 h-4 sm:w-8 sm:h-5" aria-hidden="true">
+                  <path d="M23 4h14.5c7.2 0 11.4 3.5 10.3 10.4-1 6.7-6.2 10.6-13.5 10.6h-4.8L27.3 37H17.5L23 4Z" fill="#003087"/>
+                  <path d="M28 11.5h12.8c6.1 0 9.6 3 8.7 8.9-.9 5.7-5.3 9.1-11.4 9.1h-4.2L32 40h-8.8L28 11.5Z" fill="#0079C1" opacity="0.94"/>
                 </svg>
+                <span class="text-[8px] sm:text-[10px] font-black italic tracking-tight leading-none text-[#003087] mt-0.5">Pay<span class="text-[#0079C1]">Pal</span></span>
               </div>
 
-              <!-- Top Right: Wise Emblem -->
-              <div class="animate-float-reverse absolute top-2 right-4 sm:right-8 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white shadow-lg border border-emerald-100 flex items-center justify-center">
-                <svg viewBox="0 0 40 40" class="w-8 h-8" aria-hidden="true">
-                  <path d="M12 8h22l-5 8h6l-16 16 4-11H11l5-6-4-7Z" fill="#16a34a"/>
+              <!-- Upper-Right: Wise -->
+              <div title="Wise" class="animate-float-reverse absolute top-1 right-2 sm:top-2 sm:right-6 w-[52px] h-[52px] sm:w-16 sm:h-16 rounded-full bg-white shadow-[0_10px_24px_-4px_rgba(37,99,235,0.24),0_4px_10px_-2px_rgba(15,23,42,0.08)] ring-2 ring-white/90 border border-emerald-100/90 flex flex-col items-center justify-center p-1">
+                <svg viewBox="0 0 40 28" class="w-5 h-3.5 sm:w-7 sm:h-4.5" aria-hidden="true">
+                  <path d="M11 3h21l-4.5 7h5.5L18 25l3.8-10H10l4.5-5.5L11 3Z" fill="#16a34a"/>
                 </svg>
+                <span class="text-[9px] sm:text-[11px] font-black tracking-tight leading-none text-[#14532d] mt-0.5">wise</span>
               </div>
 
-              <!-- Left Mid: Digital Bank Emblem -->
-              <div class="animate-float-diag absolute top-1/2 -translate-y-4 left-0 sm:left-2 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white shadow-lg border border-blue-100 flex items-center justify-center text-[#0d5bd9]">
-                <i class="fa-solid fa-landmark text-base sm:text-lg"></i>
+              <!-- Left-Middle: Dahabshiil Bank International -->
+              <div title="Dahabshiil Bank International" class="animate-float-diag absolute top-[38%] left-0 sm:-left-1 w-[52px] h-[52px] sm:w-16 sm:h-16 rounded-full bg-white shadow-[0_10px_24px_-4px_rgba(37,99,235,0.24),0_4px_10px_-2px_rgba(15,23,42,0.08)] ring-2 ring-white/90 border border-emerald-100/90 flex flex-col items-center justify-center p-1">
+                <svg viewBox="0 0 64 26" class="w-8 h-3.5 sm:w-11 sm:h-4.5" aria-hidden="true">
+                  <path d="M8 22 C18 7, 38 5, 54 19 C41 11, 22 12, 8 22 Z" fill="#16a34a"/>
+                  <path d="M24 12 C34 4, 48 6, 56 18 C47 10, 35 9, 24 12 Z" fill="#15803d"/>
+                </svg>
+                <span class="text-[7px] sm:text-[9px] font-extrabold tracking-tight leading-none text-[#15803d] mt-0.5">Dahabshiil</span>
               </div>
 
-              <!-- Right Mid: Payoneer Ring Emblem -->
-              <div class="animate-float-diag-alt absolute top-1/3 right-0 sm:right-1 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white shadow-lg border border-purple-100 flex items-center justify-center">
-                <svg viewBox="0 0 64 64" class="w-8 h-8" aria-hidden="true">
+              <!-- Right-Middle: Payoneer -->
+              <div title="Payoneer" class="animate-float-diag-alt absolute top-[38%] right-0 sm:-right-1 w-[52px] h-[52px] sm:w-16 sm:h-16 rounded-full bg-white shadow-[0_10px_24px_-4px_rgba(37,99,235,0.24),0_4px_10px_-2px_rgba(15,23,42,0.08)] ring-2 ring-white/90 border border-purple-100/90 flex flex-col items-center justify-center p-1">
+                <svg viewBox="0 0 64 42" class="w-6 h-4 sm:w-8 sm:h-5" aria-hidden="true">
                   <defs>
                     <linearGradient id="heroPayoOrb" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stop-color="#f97316"/>
-                      <stop offset="30%" stop-color="#ec4899"/>
-                      <stop offset="60%" stop-color="#6366f1"/>
+                      <stop offset="28%" stop-color="#ec4899"/>
+                      <stop offset="58%" stop-color="#6366f1"/>
+                      <stop offset="82%" stop-color="#06b6d4"/>
                       <stop offset="100%" stop-color="#22c55e"/>
                     </linearGradient>
                   </defs>
-                  <circle cx="32" cy="32" r="19" fill="none" stroke="url(#heroPayoOrb)" stroke-width="6.5"/>
+                  <circle cx="32" cy="21" r="14" fill="none" stroke="url(#heroPayoOrb)" stroke-width="5.5"/>
                 </svg>
+                <span class="text-[7.5px] sm:text-[9.5px] font-extrabold tracking-tight leading-none text-[#0f172a] mt-0.5">Payoneer</span>
+              </div>
+
+              <!-- Lower-Left: Binance -->
+              <div title="Binance" class="animate-float-lower-left absolute bottom-2 left-2 sm:bottom-3 sm:left-6 w-[52px] h-[52px] sm:w-16 sm:h-16 rounded-full bg-white shadow-[0_10px_24px_-4px_rgba(37,99,235,0.24),0_4px_10px_-2px_rgba(15,23,42,0.08)] ring-2 ring-white/90 border border-amber-100/90 flex flex-col items-center justify-center p-1">
+                <svg viewBox="0 0 64 46" class="w-6 h-4 sm:w-8 sm:h-5.5" aria-hidden="true">
+                  <g fill="#F0B90B">
+                    <polygon points="32,4 40,12 32,20 24,12"/>
+                    <polygon points="17,19 22.5,24.5 17,30 11.5,24.5"/>
+                    <polygon points="47,19 52.5,24.5 47,30 41.5,24.5"/>
+                    <polygon points="32,27 40,35 32,43 24,35"/>
+                    <polygon points="32,18.5 36.5,23 32,27.5 27.5,23"/>
+                  </g>
+                </svg>
+                <span class="text-[7px] sm:text-[8.5px] font-black tracking-wide leading-none text-[#d97706] mt-0.5">BINANCE</span>
+              </div>
+
+              <!-- Lower-Right: Salaam Bank -->
+              <div title="Salaam Bank" class="animate-float-lower-right absolute bottom-2 right-2 sm:bottom-3 sm:right-6 w-[52px] h-[52px] sm:w-16 sm:h-16 rounded-full bg-white shadow-[0_10px_24px_-4px_rgba(37,99,235,0.24),0_4px_10px_-2px_rgba(15,23,42,0.08)] ring-2 ring-white/90 border border-blue-100/90 flex flex-col items-center justify-center p-1">
+                <svg viewBox="0 0 64 34" class="w-7 h-3.5 sm:w-9 sm:h-4.5" aria-hidden="true">
+                  <path d="M10 18 C18 6, 30 6, 38 15 C44 21, 51 20, 56 13 C50 25, 39 27, 31 18 C24 11, 16 12, 10 18 Z" fill="#16a34a"/>
+                  <path d="M8 24 C17 13, 29 14, 37 22 C43 28, 51 26, 57 18 C51 30, 39 33, 30 24 C23 17, 15 18, 8 24 Z" fill="#0d5bd9"/>
+                </svg>
+                <span class="text-[7.5px] sm:text-[9px] font-black tracking-wide leading-none text-[#0d47a1] mt-0.5">SALAAM</span>
               </div>
             </div>
           </div>
@@ -36288,34 +36333,33 @@ EPSOM</div>
   </div>
 
   <!-- ================= KYCAPPROVED SECURE ADMIN DASHBOARD OVERLAY ================= -->
-  <div id="kyc-admin-dashboard-overlay" class="hidden no-print fixed inset-0 z-[270] bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
-    <div class="min-h-screen flex flex-col bg-slate-100 text-slate-900">
+  <div id="kyc-admin-dashboard-overlay" class="hidden no-print fixed inset-0 z-[270] bg-slate-950/80 backdrop-blur-sm overflow-y-auto overflow-x-hidden">
+    <div class="min-h-screen flex flex-col bg-slate-100 text-slate-900 overflow-x-hidden">
       <!-- Top Bar -->
-      <header class="bg-slate-950 text-white border-b border-slate-800 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4 sticky top-0 z-30">
-        <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center text-white font-black shadow-sm">
+      <header class="bg-slate-950 text-white border-b border-slate-800 px-3.5 sm:px-6 py-3 sm:py-3.5 flex flex-wrap items-center justify-between gap-3 sticky top-0 z-30">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center text-white font-black shadow-sm shrink-0">
             <i class="fa-solid fa-shield-halved"></i>
           </div>
-          <div>
-            <div class="flex flex-wrap items-center gap-2">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span class="font-black text-sm sm:text-base tracking-tight text-white">KycApproved Admin</span>
               <span id="kyc-admin-header-role-badge" class="hidden px-2.5 py-0.5 rounded-md bg-blue-500/20 border border-blue-400/50 text-blue-200 text-[11px] font-black uppercase tracking-wider">
                 Role: Super Admin
               </span>
               <span id="kyc-admin-header-test-badge" class="hidden px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[10px] font-black uppercase tracking-wider">
-                ADMIN TEST MODE ON
+                ADMIN TEST MODE: ON
               </span>
             </div>
-            <p class="text-[11px] text-slate-400">Server-Enforced Role-Based Access Control (RBAC) &amp; Specimen Management</p>
+            <p class="text-[11px] text-slate-400 leading-snug">Server-Enforced Role-Based Access Control (RBAC) &amp; Specimen Management</p>
           </div>
         </div>
-        <div class="flex items-center gap-2.5">
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
           <span id="kyc-admin-header-user" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 font-semibold"></span>
-          <button type="button" id="kyc-admin-close-overlay-btn" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
-            <i class="fa-solid fa-arrow-left"></i>
-            <span>Back to Website</span>
-          </button>
-          <button type="button" id="kyc-admin-header-logout-btn" class="hidden px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-colors cursor-pointer items-center gap-1.5">
+          <a href="/" id="kyc-admin-close-overlay-btn" class="min-h-[40px] px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 no-underline">
+            <span>← Back to Home</span>
+          </a>
+          <button type="button" id="kyc-admin-header-logout-btn" class="hidden min-h-[40px] px-3.5 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-colors cursor-pointer items-center justify-center gap-1.5">
             <i class="fa-solid fa-right-from-bracket"></i>
             <span>Logout</span>
           </button>
@@ -36324,101 +36368,119 @@ EPSOM</div>
 
       <!-- LOGIN / INITIAL SETUP VIEW -->
       <div id="kyc-admin-login-view" class="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div class="max-w-md w-full bg-white rounded-2xl border border-slate-200/90 shadow-xl p-6 sm:p-8">
-          <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-600/20 text-blue-700 flex items-center justify-center text-xl mb-4">
-            <i class="fa-solid fa-lock"></i>
+        <div class="max-w-md w-full space-y-4">
+          <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xl p-6 sm:p-8">
+            <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-600/20 text-blue-700 flex items-center justify-center text-xl mb-4">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 id="kyc-admin-auth-title" class="text-xl font-black text-slate-900 tracking-tight">Protected Admin Login</h2>
+            <p id="kyc-admin-auth-subtitle" class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+              Authenticate with your server-side KycApproved administrator credentials to manage countries, document availability, and Admin Test Mode.
+            </p>
+
+            <div id="kyc-admin-auth-error" class="hidden mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
+            <div id="kyc-admin-auth-logged-out-notice" class="hidden mt-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+              <i class="fa-solid fa-circle-check text-emerald-600"></i>
+              <span>You have been securely logged out of the Admin Dashboard.</span>
+            </div>
+
+            <form id="kyc-admin-auth-form" class="mt-5 space-y-4">
+              <div>
+                <label for="kyc-admin-username-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Admin Username</label>
+                <input id="kyc-admin-username-input" type="text" autocomplete="username" value="admin" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20">
+              </div>
+              <div>
+                <label for="kyc-admin-password-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Admin Password</label>
+                <input id="kyc-admin-password-input" type="password" autocomplete="current-password" placeholder="Enter server-verified admin password" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20">
+              </div>
+              <button type="submit" id="kyc-admin-auth-submit-btn" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-700 to-emerald-600 hover:from-blue-800 hover:to-emerald-700 text-white font-black text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-shield-check"></i>
+                <span id="kyc-admin-auth-submit-label">Sign In to Admin Dashboard</span>
+              </button>
+            </form>
+
+            <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span><i class="fa-solid fa-server mr-1 text-emerald-600"></i>Server-Side RBAC &amp; Session</span>
+              <span>Expiring Bearer &amp; HttpOnly Token</span>
+            </div>
           </div>
-          <h2 id="kyc-admin-auth-title" class="text-xl font-black text-slate-900 tracking-tight">Protected Admin Login</h2>
-          <p id="kyc-admin-auth-subtitle" class="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-            Authenticate with your server-side KycApproved administrator credentials to manage countries, document availability, and Admin Test Mode.
-          </p>
 
-          <div id="kyc-admin-auth-error" class="hidden mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold"></div>
-
-          <form id="kyc-admin-auth-form" class="mt-5 space-y-4">
-            <div>
-              <label for="kyc-admin-username-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Admin Username</label>
-              <input id="kyc-admin-username-input" type="text" autocomplete="username" value="admin" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20">
-            </div>
-            <div>
-              <label for="kyc-admin-password-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Admin Password</label>
-              <input id="kyc-admin-password-input" type="password" autocomplete="current-password" placeholder="Enter server-verified admin password" required class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-semibold text-slate-900 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20">
-            </div>
-            <button type="submit" id="kyc-admin-auth-submit-btn" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-700 to-emerald-600 hover:from-blue-800 hover:to-emerald-700 text-white font-black text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
-              <i class="fa-solid fa-shield-check"></i>
-              <span id="kyc-admin-auth-submit-label">Sign In to Admin Dashboard</span>
-            </button>
-          </form>
-
-          <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-            <span><i class="fa-solid fa-server mr-1 text-emerald-600"></i>Server-Side RBAC &amp; Session</span>
-            <span>Expiring Bearer &amp; HttpOnly Token</span>
+          <div class="flex justify-center">
+            <a href="/" id="kyc-admin-login-back-home-btn" class="w-full py-3 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 shadow-sm text-slate-700 hover:text-blue-700 font-bold text-sm transition-all cursor-pointer flex items-center justify-center gap-2 no-underline">
+              <span>← Back to Home</span>
+            </a>
           </div>
         </div>
       </div>
 
       <!-- AUTHENTICATED DASHBOARD WORKSPACE -->
-      <div id="kyc-admin-main-view" class="hidden flex-1 flex flex-col lg:flex-row max-w-[1440px] w-full mx-auto">
-        <!-- Sidebar Navigation -->
-        <aside class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 p-3 sm:p-4 shrink-0">
-          <div class="text-[11px] font-black uppercase tracking-wider text-slate-400 px-3 py-1.5">Navigation</div>
-          <nav class="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-1 lg:pb-0" aria-label="Admin Dashboard Sections">
-            <button type="button" id="kyc-admin-nav-overview" data-admin-nav="overview" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap bg-blue-50 text-blue-700">
-              <i class="fa-solid fa-chart-pie w-4 text-center"></i>
-              <span>Overview</span>
+      <div id="kyc-admin-main-view" class="hidden flex-1 flex flex-col lg:flex-row max-w-[1440px] w-full mx-auto overflow-x-hidden">
+        <!-- Sidebar / Responsive Top Navigation -->
+        <aside class="w-full lg:w-72 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 p-3.5 sm:p-4 shrink-0">
+          <div class="text-[11px] font-black uppercase tracking-wider text-slate-500 px-1 py-1.5">Navigation</div>
+          <nav class="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-col gap-2 lg:gap-1.5" aria-label="Admin Dashboard Sections">
+            <button type="button" id="kyc-admin-nav-overview" data-admin-nav="overview" class="kyc-admin-nav-btn min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-blue-50 text-blue-700 border-blue-200 shadow-2xs">
+              <i class="fa-solid fa-chart-pie w-4 text-center shrink-0"></i>
+              <span class="leading-snug">Overview</span>
             </button>
-            <button type="button" id="kyc-admin-nav-countries" data-admin-nav="countries" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
-              <i class="fa-solid fa-earth-africa w-4 text-center"></i>
-              <span>Countries</span>
+            <button type="button" id="kyc-admin-nav-countries" data-admin-nav="countries" class="kyc-admin-nav-btn min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-slate-50/70 lg:bg-transparent text-slate-700 border-slate-200/80 lg:border-transparent hover:bg-slate-100">
+              <i class="fa-solid fa-earth-africa w-4 text-center shrink-0"></i>
+              <span class="leading-snug">Countries</span>
             </button>
-            <button type="button" id="kyc-admin-nav-documents" data-admin-nav="documents" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
-              <i class="fa-solid fa-passport w-4 text-center"></i>
-              <span>Document Types</span>
+            <button type="button" id="kyc-admin-nav-documents" data-admin-nav="documents" class="kyc-admin-nav-btn min-[360px]:col-span-2 sm:col-span-1 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-slate-50/70 lg:bg-transparent text-slate-700 border-slate-200/80 lg:border-transparent hover:bg-slate-100">
+              <i class="fa-solid fa-passport w-4 text-center shrink-0"></i>
+              <span class="leading-snug">Document Types</span>
             </button>
-            <button type="button" id="kyc-admin-nav-matrix" data-admin-nav="matrix" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
-              <i class="fa-solid fa-list-check w-4 text-center"></i>
-              <span>Country + Documents</span>
+            <button type="button" id="kyc-admin-nav-matrix" data-admin-nav="matrix" class="kyc-admin-nav-btn min-[360px]:col-span-2 sm:col-span-1 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-slate-50/70 lg:bg-transparent text-slate-700 border-slate-200/80 lg:border-transparent hover:bg-slate-100">
+              <i class="fa-solid fa-list-check w-4 text-center shrink-0"></i>
+              <span class="leading-snug">Country + Documents</span>
             </button>
-            <button type="button" id="kyc-admin-nav-testmode" data-admin-nav="testmode" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
-              <i class="fa-solid fa-flask-vial w-4 text-center"></i>
-              <span>Admin Test Mode</span>
+            <button type="button" id="kyc-admin-nav-testmode" data-admin-nav="testmode" class="kyc-admin-nav-btn min-[360px]:col-span-2 sm:col-span-1 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-slate-50/70 lg:bg-transparent text-slate-700 border-slate-200/80 lg:border-transparent hover:bg-slate-100">
+              <i class="fa-solid fa-flask-vial w-4 text-center shrink-0"></i>
+              <span class="leading-snug">Admin Test Mode</span>
             </button>
-            <button type="button" id="kyc-admin-nav-users" data-admin-nav="users" class="kyc-admin-nav-btn hidden px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
-              <i class="fa-solid fa-users-gear w-4 text-center"></i>
-              <span>Admin Users &amp; Roles</span>
+            <button type="button" id="kyc-admin-nav-users" data-admin-nav="users" class="kyc-admin-nav-btn hidden min-[360px]:col-span-2 sm:col-span-1 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-slate-50/70 lg:bg-transparent text-slate-700 border-slate-200/80 lg:border-transparent hover:bg-slate-100">
+              <i class="fa-solid fa-users-gear w-4 text-center shrink-0"></i>
+              <span class="leading-snug">Admin Users &amp; Roles</span>
             </button>
-            <button type="button" id="kyc-admin-nav-audit" data-admin-nav="audit" class="kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100">
-              <i class="fa-solid fa-clipboard-list w-4 text-center"></i>
-              <span>Audit Log</span>
+            <button type="button" id="kyc-admin-nav-audit" data-admin-nav="audit" class="kyc-admin-nav-btn min-[360px]:col-span-2 sm:col-span-1 min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-slate-50/70 lg:bg-transparent text-slate-700 border-slate-200/80 lg:border-transparent hover:bg-slate-100">
+              <i class="fa-solid fa-clipboard-list w-4 text-center shrink-0"></i>
+              <span class="leading-snug">Audit Log</span>
             </button>
           </nav>
 
-          <!-- Sidebar Role & Permissions Card -->
-          <div class="mt-4 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Active Role</span>
-              <span id="kyc-admin-sidebar-role-label" class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 text-[10px] font-black uppercase">Super Admin</span>
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
+            <!-- Sidebar Role & Permissions Card -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-2 flex flex-col justify-center">
+              <div class="text-[11px] font-black uppercase tracking-wider text-slate-500">ACTIVE ROLE</div>
+              <div>
+                <span id="kyc-admin-sidebar-role-label" class="inline-flex items-center px-3 py-1 rounded-lg bg-blue-100 text-blue-800 border border-blue-200 text-xs sm:text-sm font-black uppercase tracking-wide">SUPER ADMIN</span>
+              </div>
+              <div id="kyc-admin-sidebar-perm-count" class="text-xs sm:text-sm text-slate-700 font-semibold leading-snug">22 server-enforced permissions</div>
             </div>
-            <div id="kyc-admin-sidebar-perm-count" class="text-[11px] text-slate-600 font-medium">22 server-enforced permissions</div>
-          </div>
 
-          <!-- Sidebar Test Mode Quick Card -->
-          <div id="kyc-admin-sidebar-test-card" class="mt-3 p-3.5 rounded-xl bg-slate-900 text-white border border-slate-800">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-[11px] font-black uppercase tracking-wider text-emerald-400">Admin Test Mode</span>
-              <span id="kyc-admin-sidebar-test-pill" class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-slate-800 text-slate-400">OFF</span>
+            <!-- Sidebar Test Mode Quick Card -->
+            <div id="kyc-admin-sidebar-test-card" class="p-4 rounded-2xl bg-slate-900 text-white border border-slate-800 shadow-sm space-y-3">
+              <div>
+                <div class="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-400">ADMIN TEST MODE</div>
+                <p class="text-xs sm:text-sm text-slate-200 mt-1.5 leading-relaxed">
+                  Test Save PNG &amp; Download without Sifalo checkout (verified server-side).
+                </p>
+              </div>
+              <div id="kyc-admin-sidebar-test-pill" role="status" aria-live="polite" class="w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 text-center">
+                <i class="fa-solid fa-circle-stop text-slate-400"></i>
+                <span>ADMIN TEST MODE: OFF</span>
+              </div>
+              <button type="button" id="kyc-admin-sidebar-test-toggle-btn" class="w-full min-h-[46px] py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-power-off"></i>
+                <span>Enable Admin Test Mode</span>
+              </button>
             </div>
-            <p class="text-[11px] text-slate-300 mt-1 leading-relaxed">
-              Test Save PNG &amp; Download without Sifalo checkout (verified server-side).
-            </p>
-            <button type="button" id="kyc-admin-sidebar-test-toggle-btn" class="mt-2.5 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors cursor-pointer">
-              Enable Admin Test Mode
-            </button>
           </div>
         </aside>
 
         <!-- Main Section Content -->
-        <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 overflow-x-hidden">
+        <main class="flex-1 p-3.5 sm:p-6 lg:p-8 space-y-6 overflow-x-hidden min-w-0">
           <!-- Status Toast Banner inside Admin -->
           <div id="kyc-admin-feedback-banner" class="hidden p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-between gap-3"></div>
 
@@ -36429,16 +36491,16 @@ EPSOM</div>
                 <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">System Overview</h1>
                 <p class="text-xs sm:text-sm text-slate-600">Live inventory of KycApproved countries, document types, payment unlock lifecycle, and role-scoped admin activity.</p>
               </div>
-              <div class="flex flex-wrap items-center gap-2">
-                <button type="button" id="kyc-admin-overview-matrix-btn" onclick="window.__kycAdminSwitchSection('matrix')" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <button type="button" id="kyc-admin-overview-matrix-btn" onclick="window.__kycAdminSwitchSection('matrix')" class="w-full sm:w-auto min-h-[42px] px-3.5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5">
                   <i class="fa-solid fa-sliders"></i>
                   <span>Configure Country Documents</span>
                 </button>
-                <button type="button" id="kyc-admin-overview-testmode-btn" onclick="window.__kycAdminSwitchSection('testmode')" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                <button type="button" id="kyc-admin-overview-testmode-btn" onclick="window.__kycAdminSwitchSection('testmode')" class="w-full sm:w-auto min-h-[42px] px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5">
                   <i class="fa-solid fa-flask"></i>
                   <span>Launch Test Preview</span>
                 </button>
-                <button type="button" id="kyc-admin-overview-users-btn" onclick="window.__kycAdminSwitchSection('users')" class="hidden px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer items-center gap-1.5">
+                <button type="button" id="kyc-admin-overview-users-btn" onclick="window.__kycAdminSwitchSection('users')" class="hidden w-full sm:w-auto min-h-[42px] px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer items-center justify-center gap-1.5">
                   <i class="fa-solid fa-users-gear"></i>
                   <span>Manage Admin Users</span>
                 </button>
@@ -36449,18 +36511,18 @@ EPSOM</div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Sifalo Unlock Lifecycle Audit Summary -->
-              <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-                <div class="flex items-center justify-between mb-3">
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">Public Sifalo Unlock Lifecycle Audit</h3>
                   <span class="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-bold">Protected</span>
                 </div>
-                <p class="text-xs text-slate-500 mb-4">Real-time server-side state of public visitor Save PNG authorizations (CREATED &rarr; PAYMENT_VERIFIED &rarr; AUTHORIZED &rarr; CONSUMED).</p>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Real-time server-side state of public visitor Save PNG authorizations (CREATED &rarr; PAYMENT_VERIFIED &rarr; AUTHORIZED &rarr; CONSUMED).</p>
                 <div id="kyc-admin-unlock-lifecycle-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
               </div>
 
               <!-- Recent Admin Audit Events -->
-              <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
-                <div class="flex items-center justify-between mb-3">
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 shadow-xs">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">Recent Admin Activity</h3>
                   <button type="button" id="kyc-admin-overview-view-audit-btn" onclick="window.__kycAdminSwitchSection('audit')" class="text-xs font-bold text-blue-600 hover:underline cursor-pointer">View Full Audit Log &rarr;</button>
                 </div>
@@ -36476,11 +36538,11 @@ EPSOM</div>
                 <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Countries Management</h2>
                 <p class="text-xs sm:text-sm text-slate-600">Add new countries, edit metadata, enable or disable countries, and manage supported verification documents.</p>
               </div>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                 <span id="kyc-admin-countries-readonly-badge" class="hidden px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">
                   <i class="fa-solid fa-eye mr-1"></i>Read-Only View for Role
                 </span>
-                <button type="button" id="kyc-admin-open-add-country-btn" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer inline-flex items-center gap-2">
+                <button type="button" id="kyc-admin-open-add-country-btn" class="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer inline-flex items-center justify-center gap-2">
                   <i class="fa-solid fa-plus"></i>
                   <span>Add New Country</span>
                 </button>
@@ -36489,15 +36551,15 @@ EPSOM</div>
 
             <!-- Filter Bar -->
             <div class="bg-white rounded-2xl border border-slate-200 p-4 flex flex-wrap items-center gap-3">
-              <div class="flex-1 min-w-[220px]">
-                <input id="kyc-admin-country-search" type="text" placeholder="Search countries by name, key, ISO3, or subtitle..." class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600">
+              <div class="w-full sm:flex-1 sm:min-w-[220px]">
+                <input id="kyc-admin-country-search" type="text" placeholder="Search countries by name, key, ISO3, or subtitle..." class="w-full min-h-[42px] rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600">
               </div>
-              <select id="kyc-admin-country-status-filter" aria-label="Filter countries by status" class="rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+              <select id="kyc-admin-country-status-filter" aria-label="Filter countries by status" class="w-full sm:w-auto min-h-[42px] rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
                 <option value="all">All Statuses</option>
                 <option value="enabled">Enabled Only</option>
                 <option value="disabled">Disabled Only</option>
               </select>
-              <select id="kyc-admin-country-doc-filter" aria-label="Filter countries by document type" class="rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+              <select id="kyc-admin-country-doc-filter" aria-label="Filter countries by document type" class="w-full sm:w-auto min-h-[42px] rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
                 <option value="">All Document Types</option>
                 <option value="passport">Passport</option>
                 <option value="idcard">National Identity Card</option>
@@ -36553,14 +36615,14 @@ EPSOM</div>
             </div>
 
             <!-- Single Country Checkbox Editor Card -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-xs space-y-5">
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-5">
               <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
+                <div class="w-full sm:w-auto flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                   <label for="kyc-admin-matrix-country-select" class="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-600">Country:</label>
-                  <select id="kyc-admin-matrix-country-select" class="rounded-xl border-2 border-slate-300 px-3.5 py-2 text-sm font-black text-slate-900 focus:outline-none focus:border-blue-600"></select>
+                  <select id="kyc-admin-matrix-country-select" class="w-full sm:w-auto min-h-[44px] rounded-xl border-2 border-slate-300 px-3.5 py-2 text-sm font-black text-slate-900 focus:outline-none focus:border-blue-600"></select>
                 </div>
-                <div class="flex items-center gap-2">
-                  <button type="button" id="kyc-admin-matrix-preview-btn" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                  <button type="button" id="kyc-admin-matrix-preview-btn" class="w-full sm:w-auto min-h-[44px] px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-eye"></i>
                     <span>Open Country in Live Preview</span>
                   </button>
@@ -36571,7 +36633,7 @@ EPSOM</div>
 
               <div class="pt-2 flex flex-wrap items-center justify-between gap-3">
                 <span class="text-xs text-slate-500">Changes immediately update the public KycApproved country &amp; document selector.</span>
-                <button type="button" id="kyc-admin-matrix-save-btn" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-sm transition-colors cursor-pointer inline-flex items-center gap-2">
+                <button type="button" id="kyc-admin-matrix-save-btn" class="w-full sm:w-auto min-h-[46px] px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-sm transition-colors cursor-pointer inline-flex items-center justify-center gap-2">
                   <i class="fa-solid fa-floppy-disk"></i>
                   <span>Save Country Document Availability</span>
                 </button>
@@ -36580,7 +36642,7 @@ EPSOM</div>
 
             <!-- Full Matrix Table -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-              <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+              <div class="px-4 sm:px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-wider">All Countries &times; Document Matrix</h3>
                 <span class="text-xs text-slate-500">Click any checkbox to toggle immediately</span>
               </div>
@@ -36604,9 +36666,9 @@ EPSOM</div>
 
           <!-- SECTION: ADMIN PREVIEW / TEST MODE -->
           <section id="kyc-admin-section-testmode" class="hidden space-y-6">
-            <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 border border-slate-800 shadow-lg">
-              <div class="flex flex-wrap items-start justify-between gap-4">
-                <div class="max-w-2xl space-y-2">
+            <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 text-white rounded-2xl p-5 sm:p-8 border border-slate-800 shadow-lg">
+              <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
+                <div class="max-w-2xl space-y-2.5">
                   <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black uppercase tracking-wider">
                     <i class="fa-solid fa-shield-check"></i>
                     Server-Verified Admin Preview &amp; Test Mode
@@ -36616,12 +36678,15 @@ EPSOM</div>
                     When enabled for authorized roles (<strong>Super Admin</strong> &amp; <strong>Test Admin</strong>), the server issues single-action test authorizations for your authenticated session so you can inspect live document previews, test form fields, and verify PNG generation without creating Sifalo payments. Public visitors always remain protected by Sifalo checkout.
                   </p>
                 </div>
-                <div class="flex flex-col items-end gap-2">
-                  <span id="kyc-admin-testmode-status-badge" class="px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-300">
-                    Test Mode: Disabled
-                  </span>
-                  <button type="button" id="kyc-admin-testmode-main-toggle-btn" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer">
-                    Enable Admin Test Mode
+                <div class="w-full lg:w-72 shrink-0 flex flex-col gap-3 p-4 rounded-2xl bg-slate-950/70 border border-slate-800">
+                  <div class="text-[11px] font-black uppercase tracking-wider text-emerald-400">Admin Test Mode Status</div>
+                  <div id="kyc-admin-testmode-status-badge" role="status" aria-live="polite" class="w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 text-center">
+                    <i class="fa-solid fa-circle-stop text-slate-400"></i>
+                    <span>ADMIN TEST MODE: OFF</span>
+                  </div>
+                  <button type="button" id="kyc-admin-testmode-main-toggle-btn" class="w-full min-h-[46px] px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-power-off"></i>
+                    <span>Enable Admin Test Mode</span>
                   </button>
                 </div>
               </div>
@@ -36630,18 +36695,18 @@ EPSOM</div>
                 <i class="fa-solid fa-lock mr-2"></i>Your current role does not include <code>png_test.use</code> or <code>download_test.use</code> permissions. Only Super Admin and Test Admin accounts can authorize payment-free test downloads.
               </div>
 
-              <div id="kyc-admin-testmode-controls-grid" class="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label for="kyc-admin-test-country-select" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">1. Select Country</label>
-                  <select id="kyc-admin-test-country-select" class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-emerald-400"></select>
+              <div id="kyc-admin-testmode-controls-grid" class="mt-6 pt-6 border-t border-slate-800 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="w-full">
+                  <label for="kyc-admin-test-country-select" class="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">1. Select Country</label>
+                  <select id="kyc-admin-test-country-select" class="w-full min-h-[48px] rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-3 text-sm font-bold text-white focus:outline-none focus:border-emerald-400"></select>
                 </div>
-                <div>
-                  <label for="kyc-admin-test-doc-select" class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">2. Select Document Type</label>
-                  <select id="kyc-admin-test-doc-select" class="w-full rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-2.5 text-sm font-bold text-white focus:outline-none focus:border-emerald-400"></select>
+                <div class="w-full">
+                  <label for="kyc-admin-test-doc-select" class="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">2. Select Document Type</label>
+                  <select id="kyc-admin-test-doc-select" class="w-full min-h-[48px] rounded-xl bg-slate-950 border border-slate-700 px-3.5 py-3 text-sm font-bold text-white focus:outline-none focus:border-emerald-400"></select>
                 </div>
-                <div class="flex items-end">
-                  <button type="button" id="kyc-admin-launch-live-editor-btn" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-up-right-from-square"></i>
+                <div class="w-full flex items-end">
+                  <button type="button" id="kyc-admin-launch-live-editor-btn" class="w-full min-h-[48px] py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2 text-center">
+                    <i class="fa-solid fa-up-right-from-square shrink-0"></i>
                     <span>Open Live Preview &amp; Test Save PNG</span>
                   </button>
                 </div>
@@ -36656,7 +36721,7 @@ EPSOM</div>
                 <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Admin Users &amp; Role-Based Permissions</h2>
                 <p class="text-xs sm:text-sm text-slate-600">Manage administrator accounts, assign roles (Super Admin, Content Admin, Test Admin, Viewer), customize granular permissions, and disable or reset accounts.</p>
               </div>
-              <button type="button" id="kyc-admin-open-create-user-btn" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer inline-flex items-center gap-2">
+              <button type="button" id="kyc-admin-open-create-user-btn" class="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer inline-flex items-center justify-center gap-2">
                 <i class="fa-solid fa-user-plus"></i>
                 <span>Create Admin User</span>
               </button>
@@ -36721,17 +36786,17 @@ EPSOM</div>
                 <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Admin Audit Log</h2>
                 <p class="text-xs sm:text-sm text-slate-600">Tamper-resistant server-side log of admin logins, role &amp; permission changes, unauthorized access attempts, country/document updates, and Admin Test Mode actions.</p>
               </div>
-              <button type="button" id="kyc-admin-refresh-audit-btn" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5">
+              <button type="button" id="kyc-admin-refresh-audit-btn" class="w-full sm:w-auto min-h-[42px] px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-rotate"></i>
                 <span>Refresh Log</span>
               </button>
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200 p-4 flex flex-wrap items-center gap-3">
-              <div class="flex-1 min-w-[200px]">
-                <input id="kyc-admin-audit-search" type="text" placeholder="Search audit events by summary, target key, or actor..." class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600">
+              <div class="w-full sm:flex-1 sm:min-w-[200px]">
+                <input id="kyc-admin-audit-search" type="text" placeholder="Search audit events by summary, target key, or actor..." class="w-full min-h-[42px] rounded-xl border border-slate-300 px-3.5 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:border-blue-600">
               </div>
-              <select id="kyc-admin-audit-type-filter" aria-label="Filter audit events by type" class="rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
+              <select id="kyc-admin-audit-type-filter" aria-label="Filter audit events by type" class="w-full sm:w-auto max-w-full min-h-[42px] rounded-xl border border-slate-300 px-3 py-2 text-xs sm:text-sm font-semibold text-slate-700">
                 <option value="">All Event Types</option>
                 <option value="ADMIN_LOGIN_SUCCESS">ADMIN_LOGIN_SUCCESS</option>
                 <option value="ADMIN_LOGIN_FAILED">ADMIN_LOGIN_FAILED</option>
@@ -37415,28 +37480,36 @@ EPSOM</div>
           headerBadge.classList.toggle('hidden', !isActive);
         }
         if (sidebarPill) {
-          sidebarPill.textContent = isActive ? 'ON' : 'OFF';
+          sidebarPill.innerHTML = isActive
+            ? '<i class="fa-solid fa-circle-check text-emerald-400"></i><span>ADMIN TEST MODE: ON</span>'
+            : '<i class="fa-solid fa-circle-stop text-slate-400"></i><span>ADMIN TEST MODE: OFF</span>';
           sidebarPill.className = isActive
-            ? 'px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-            : 'px-2 py-0.5 rounded text-[10px] font-black uppercase bg-slate-800 text-slate-400';
+            ? 'w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-200 border border-emerald-400/50 flex items-center justify-center gap-2 text-center'
+            : 'w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 text-center';
         }
         if (sidebarBtn) {
-          sidebarBtn.textContent = isActive ? 'Disable Admin Test Mode' : 'Enable Admin Test Mode';
+          sidebarBtn.innerHTML = isActive
+            ? '<i class="fa-solid fa-power-off"></i><span>Disable Admin Test Mode</span>'
+            : '<i class="fa-solid fa-power-off"></i><span>Enable Admin Test Mode</span>';
           sidebarBtn.className = isActive
-            ? 'mt-2.5 w-full py-2 px-3 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors cursor-pointer'
-            : 'mt-2.5 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors cursor-pointer';
+            ? 'w-full min-h-[46px] py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2'
+            : 'w-full min-h-[46px] py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2';
         }
         if (mainBadge) {
-          mainBadge.textContent = isActive ? 'Test Mode: ACTIVE (Server-Verified)' : 'Test Mode: Disabled';
+          mainBadge.innerHTML = isActive
+            ? '<i class="fa-solid fa-circle-check text-emerald-400"></i><span>ADMIN TEST MODE: ON</span>'
+            : '<i class="fa-solid fa-circle-stop text-slate-400"></i><span>ADMIN TEST MODE: OFF</span>';
           mainBadge.className = isActive
-            ? 'px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
-            : 'px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider bg-slate-800 text-slate-300';
+            ? 'w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-200 border border-emerald-400/50 flex items-center justify-center gap-2 text-center'
+            : 'w-full py-2.5 px-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center gap-2 text-center';
         }
         if (mainBtn) {
-          mainBtn.textContent = isActive ? 'Disable Admin Test Mode' : 'Enable Admin Test Mode';
+          mainBtn.innerHTML = isActive
+            ? '<i class="fa-solid fa-power-off"></i><span>Disable Admin Test Mode</span>'
+            : '<i class="fa-solid fa-power-off"></i><span>Enable Admin Test Mode</span>';
           mainBtn.className = isActive
-            ? 'px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer'
-            : 'px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer';
+            ? 'w-full min-h-[46px] px-4 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2'
+            : 'w-full min-h-[46px] px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black shadow-md transition-colors cursor-pointer flex items-center justify-center gap-2';
         }
 
         populateTestModeSelects();
@@ -37992,11 +38065,15 @@ EPSOM</div>
           if (secEl) secEl.classList.toggle('hidden', s !== sectionKey);
         });
         document.querySelectorAll('.kyc-admin-nav-btn').forEach(btn => {
-          const isCurrent = btn.getAttribute('data-admin-nav') === sectionKey;
+          const btnSec = btn.getAttribute('data-admin-nav');
+          const isCurrent = btnSec === sectionKey;
           const isHidden = btn.classList.contains('hidden');
-          btn.className = (isHidden ? 'hidden ' : '') + (isCurrent
-            ? 'kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap bg-blue-50 text-blue-700'
-            : 'kyc-admin-nav-btn px-3 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer whitespace-nowrap text-slate-700 hover:bg-slate-100');
+          const spanCols = (btnSec === 'documents' || btnSec === 'matrix' || btnSec === 'testmode' || btnSec === 'users' || btnSec === 'audit')
+            ? 'min-[360px]:col-span-2 sm:col-span-1 '
+            : '';
+          btn.className = (isHidden ? 'hidden ' : '') + spanCols + (isCurrent
+            ? 'kyc-admin-nav-btn min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-blue-50 text-blue-700 border-blue-200 shadow-2xs'
+            : 'kyc-admin-nav-btn min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-left flex items-center gap-2.5 transition-colors cursor-pointer border bg-slate-50/70 lg:bg-transparent text-slate-700 border-slate-200/80 lg:border-transparent hover:bg-slate-100');
         });
         if (sectionKey === 'audit' && hasPerm('audit.view')) {
           loadAndRenderAuditLogs();
@@ -38270,14 +38347,28 @@ EPSOM</div>
           });
         });
 
-        el('kyc-admin-close-overlay-btn')?.addEventListener('click', () => {
+        function returnToPublicHomepageFromAdmin(e) {
+          if (e && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+          }
           el('kyc-admin-dashboard-overlay')?.classList.add('hidden');
-        });
+          el('kyc-admin-auth-logged-out-notice')?.classList.add('hidden');
+          if (window.location.hash === '#admin') {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+          if (typeof window.goToHomePage === 'function') {
+            window.goToHomePage();
+          }
+        }
+
+        el('kyc-admin-close-overlay-btn')?.addEventListener('click', returnToPublicHomepageFromAdmin);
+        el('kyc-admin-login-back-home-btn')?.addEventListener('click', returnToPublicHomepageFromAdmin);
 
         el('kyc-admin-auth-form')?.addEventListener('submit', async (e) => {
           e.preventDefault();
           const errEl = el('kyc-admin-auth-error');
           if (errEl) errEl.classList.add('hidden');
+          el('kyc-admin-auth-logged-out-notice')?.classList.add('hidden');
           const username = (el('kyc-admin-username-input')?.value || 'admin').trim();
           const password = (el('kyc-admin-password-input')?.value || '').trim();
           const mode = e.currentTarget.dataset.mode === 'setup' ? 'setup' : 'login';
@@ -38302,7 +38393,11 @@ EPSOM</div>
 
         el('kyc-admin-header-logout-btn')?.addEventListener('click', async () => {
           await adminApiFetch('/api/admin/auth/logout', { method: 'POST' });
+          const pwdInput = el('kyc-admin-password-input');
+          if (pwdInput) pwdInput.value = '';
+          el('kyc-admin-auth-error')?.classList.add('hidden');
           handleUnauthenticatedState(false);
+          el('kyc-admin-auth-logged-out-notice')?.classList.remove('hidden');
         });
 
         el('kyc-admin-sidebar-test-toggle-btn')?.addEventListener('click', () => {
