@@ -38618,20 +38618,6 @@ EPSOM</div>
 
   <!-- ================= SERVER-AUTHORITATIVE PREVIEW-PROTECTION SYSTEM ================= -->
   <style id="kyc-preview-protection-styles">
-    .kyc-preview-only-watermark {
-      position: absolute !important;
-      inset: 0 !important;
-      z-index: 38 !important;
-      pointer-events: none !important;
-      user-select: none !important;
-      -webkit-user-select: none !important;
-      overflow: hidden !important;
-      border-radius: inherit;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='155' viewBox='0 0 250 155'%3E%3Cg transform='rotate(-23 125 77)'%3E%3Crect x='22' y='52' width='206' height='36' rx='7' fill='rgba(15,23,42,0.05)' stroke='rgba(15,23,42,0.16)' stroke-width='1.2' stroke-dasharray='4 3'/%3E%3Ctext x='125' y='75' text-anchor='middle' fill='rgba(15,23,42,0.20)' font-family='Inter,system-ui,sans-serif' font-size='15' font-weight='900' letter-spacing='3.5'%3EPREVIEW ONLY%3C/text%3E%3C/g%3E%3C/svg%3E") !important;
-      background-repeat: repeat !important;
-      background-position: center center !important;
-    }
-
     .kyc-preview-protected-bottom-mask {
       position: absolute !important;
       left: 0 !important;
@@ -38642,11 +38628,11 @@ EPSOM</div>
       user-select: none !important;
       -webkit-user-select: none !important;
       display: flex !important;
-      flex-direction: column !important;
+      flex-direction: row !important;
       align-items: center !important;
       justify-content: center !important;
-      gap: 3px !important;
-      padding: 6px 12px !important;
+      gap: 8px !important;
+      padding: 6px 14px !important;
       text-align: center !important;
       background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.99) 45%, #091326 100%) !important;
       border-top: 2px solid rgba(56, 189, 248, 0.72) !important;
@@ -38670,46 +38656,26 @@ EPSOM</div>
       pointer-events: none;
     }
 
-    .kyc-preview-mask-badge {
+    .kyc-preview-mask-subtext {
       position: relative;
       z-index: 2;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 2px 10px;
-      border-radius: 9999px;
-      background: rgba(56, 189, 248, 0.16);
-      border: 1px solid rgba(56, 189, 248, 0.48);
+      justify-content: center;
+      gap: 7px;
       color: #f8fafc;
       font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      line-height: 1.25;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-    }
-
-    .kyc-preview-mask-subtext {
-      position: relative;
-      z-index: 2;
-      color: #e2e8f0;
-      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.01em;
-      line-height: 1.25;
-      max-width: 94%;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+      line-height: 1.3;
+      max-width: 96%;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
     }
 
     @media (max-width: 640px) {
-      .kyc-preview-mask-badge {
-        font-size: 9.5px;
-        padding: 1.5px 8px;
-      }
       .kyc-preview-mask-subtext {
-        font-size: 9.5px;
+        font-size: 10px;
       }
     }
   </style>
@@ -38988,16 +38954,6 @@ EPSOM</div>
               ctx.lineTo(w, cutY);
               ctx.stroke();
 
-              // Diagonal watermark across the bitmap itself
-              ctx.save();
-              ctx.translate(w / 2, cutY / 2);
-              ctx.rotate((-22 * Math.PI) / 180);
-              ctx.fillStyle = 'rgba(15, 23, 42, 0.14)';
-              ctx.font = `900 ${Math.max(18, Math.round(w * 0.038))}px Inter, Arial, sans-serif`;
-              ctx.textAlign = 'center';
-              ctx.fillText('PREVIEW ONLY', 0, 0);
-              ctx.restore();
-
               const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
               _redactedPlateCache.set(cacheKey, dataUrl);
               resolve(dataUrl);
@@ -39053,7 +39009,7 @@ EPSOM</div>
 
       function buildRedactedMrzLine(originalText) {
         const cleanLen = Math.max(30, Math.min(44, String(originalText || '').trim().length || 44));
-        const pattern = 'PREVIEW<ONLY<<COMPLETE<PAYMENT<TO<UNLOCK<<<<';
+        const pattern = 'COMPLETE<THE<PAYMENT<TO<GET<FULL<DOCUMENT<<<';
         if (cleanLen <= pattern.length) {
           return pattern.slice(0, cleanLen);
         }
@@ -39074,7 +39030,7 @@ EPSOM</div>
         for (let i = 0; i < mrzNodes.length; i++) {
           const node = mrzNodes[i];
           const currentTxt = String(node.textContent || '');
-          if (!currentTxt.includes('PREVIEW<ONLY') && !currentTxt.includes('PREVIEW ONLY')) {
+          if (!currentTxt.includes('COMPLETE<THE<PAYMENT')) {
             if (currentTxt.trim().length > 0) {
               _originalMrzTextMap.set(node, currentTxt);
             }
@@ -39131,29 +39087,21 @@ EPSOM</div>
           }
         }
 
-        // 5. Render professional "PREVIEW ONLY" diagonal watermark overlay
-        let wmEl = cardEl.querySelector(':scope > [data-kyc-preview-watermark="1"]');
-        if (!wmEl) {
-          wmEl = document.createElement('div');
-          wmEl.setAttribute('data-kyc-preview-watermark', '1');
-          wmEl.setAttribute('aria-hidden', 'true');
-          wmEl.className = 'kyc-preview-only-watermark';
-          cardEl.appendChild(wmEl);
+        // 5. Ensure no repeated watermark overlay exists over the document preview
+        const existingWatermarks = cardEl.querySelectorAll('[data-kyc-preview-watermark="1"], .kyc-preview-only-watermark');
+        for (let i = 0; i < existingWatermarks.length; i++) {
+          if (existingWatermarks[i].parentNode) {
+            existingWatermarks[i].parentNode.removeChild(existingWatermarks[i]);
+          }
         }
 
-        // 6. Render attractive bottom protected area mask overlay
+        // 6. Render attractive bottom protected area mask overlay with the exact message
         let maskEl = cardEl.querySelector(':scope > [data-kyc-preview-mask="1"]');
         if (!maskEl) {
           maskEl = document.createElement('div');
           maskEl.setAttribute('data-kyc-preview-mask', '1');
           maskEl.className = 'kyc-preview-protected-bottom-mask';
-          maskEl.innerHTML = `
-            <div class="kyc-preview-mask-badge">
-              <i class="fa-solid fa-lock text-sky-400"></i>
-              <span>Preview Only</span>
-            </div>
-            <div class="kyc-preview-mask-subtext">Complete the payment to unlock the full document.</div>
-          `;
+          maskEl.innerHTML = `<div class="kyc-preview-mask-subtext"><i class="fa-solid fa-lock text-sky-400"></i><span>Complete the payment to get full document.</span></div>`;
           cardEl.appendChild(maskEl);
         }
         if (maskEl.style.height !== area.height) {

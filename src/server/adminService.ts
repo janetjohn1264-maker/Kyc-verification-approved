@@ -1664,9 +1664,9 @@ export class KycAdminService {
       }
       return res.status(200).json({
         ok: true,
-        watermarkText: 'PREVIEW ONLY',
-        maskTitle: 'Preview Only',
-        maskMessage: 'Complete the payment to unlock the full document.',
+        watermarkText: '',
+        maskTitle: '',
+        maskMessage: 'Complete the payment to get full document.',
         documentProtectedAreas,
         templateProtectedAreas: { ...TEMPLATE_PREVIEW_PROTECTION_CONFIG },
       });
@@ -1720,20 +1720,15 @@ export class KycAdminService {
       <stop offset="50%" stop-color="#1e293b"/>
       <stop offset="100%" stop-color="#0f172a"/>
     </linearGradient>
-    <pattern id="diagWatermark" width="240" height="160" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
-      <text x="15" y="90" fill="rgba(15, 23, 42, 0.14)" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800" letter-spacing="4">PREVIEW ONLY</text>
-    </pattern>
   </defs>
   <rect width="800" height="500" fill="url(#bgGrad)"/>
   <rect x="24" y="24" width="752" height="${Math.round((visibleHeight / 100) * 500) - 36}" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
   <text x="52" y="74" fill="#0f172a" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">KYCAPPROVED PROTECTED PREVIEW SPECIMEN</text>
   <text x="52" y="108" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600">Document Type: ${evaluation.docType.toUpperCase()} · Template: ${evaluation.templateId}</text>
   <text x="52" y="140" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="13">Top document section is visible for live verification. Lower ${pct}% verification zone is withheld on server.</text>
-  <rect width="800" height="500" fill="url(#diagWatermark)"/>
   <rect x="0" y="${Math.round((visibleHeight / 100) * 500)}" width="800" height="${Math.round((pct / 100) * 500)}" fill="url(#maskGrad)"/>
   <line x1="0" y1="${Math.round((visibleHeight / 100) * 500)}" x2="800" y2="${Math.round((visibleHeight / 100) * 500)}" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.65"/>
-  <text x="400" y="${Math.round((visibleHeight / 100) * 500) + Math.round(((pct / 100) * 500) / 2) - 8}" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800" letter-spacing="1.5">PREVIEW ONLY</text>
-  <text x="400" y="${Math.round((visibleHeight / 100) * 500) + Math.round(((pct / 100) * 500) / 2) + 16}" text-anchor="middle" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500">Complete the payment to unlock the full document.</text>
+  <text x="400" y="${Math.round((visibleHeight / 100) * 500) + Math.round(((pct / 100) * 500) / 2) + 5}" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700">Complete the payment to get full document.</text>
 </svg>`;
         res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
         return res.status(200).send(svg);
