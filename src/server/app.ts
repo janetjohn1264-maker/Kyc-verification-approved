@@ -44,6 +44,7 @@ export function createApiApp(deps: ApiAppDeps = {}) {
       req.url !== '/api' &&
       (req.url.startsWith('/health') ||
         req.url.startsWith('/catalog') ||
+        req.url.startsWith('/preview-protection') ||
         req.url.startsWith('/admin') ||
         req.url.startsWith('/webhooks/sifalo') ||
         req.url.startsWith('/sifalo/webhook') ||
@@ -76,6 +77,8 @@ export function createApiApp(deps: ApiAppDeps = {}) {
       endpoints: {
         health: '/api/health',
         catalog: '/api/catalog',
+        previewProtectionConfig: '/api/preview-protection/config',
+        previewProtectionVerify: '/api/preview-protection/verify-access',
         adminAuthStatus: '/api/admin/auth/status',
         sifaloConfig: '/api/payments/sifalo/config',
         sifaloDiagnostics: '/api/payments/sifalo/diagnostics',
@@ -92,6 +95,7 @@ export function createApiApp(deps: ApiAppDeps = {}) {
   app.post('/api/sifalo/webhook', sifaloPaymentService.handleWebhook);
   app.use('/api/payments/sifalo', sifaloPaymentService.createRouter());
   app.use('/api/catalog', kycAdminService.createPublicCatalogRouter());
+  app.use('/api/preview-protection', kycAdminService.createPreviewProtectionRouter());
   app.use('/api/admin', kycAdminService.createAdminRouter());
 
   return app;

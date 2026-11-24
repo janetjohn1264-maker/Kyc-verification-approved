@@ -219,6 +219,14 @@ export interface AdminCountryConfig {
   updatedAt: string;
 }
 
+export interface PreviewProtectedAreaConfig {
+  enabled: boolean;
+  position: 'bottom';
+  height: string;
+  heightPercent: number;
+  label?: string;
+}
+
 export interface AdminDocumentTypeConfig {
   docType: DocTypeKey;
   productKey: UnlockProductKey;
@@ -228,6 +236,7 @@ export interface AdminDocumentTypeConfig {
   description: string;
   icon: string;
   enabled: boolean;
+  previewProtectedArea: PreviewProtectedAreaConfig;
   updatedAt: string;
 }
 
@@ -321,6 +330,138 @@ const DOC_TYPE_TO_PRODUCT_KEY: Record<DocTypeKey, UnlockProductKey> = {
   proofofaccount: 'proofOfAccount',
 };
 
+export const DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA: Record<DocTypeKey, PreviewProtectedAreaConfig> = {
+  passport: {
+    enabled: true,
+    position: 'bottom',
+    height: '16%',
+    heightPercent: 16,
+    label: 'Lower Machine-Readable Zone (MRZ) & Security Strip',
+  },
+  idcard: {
+    enabled: true,
+    position: 'bottom',
+    height: '19%',
+    heightPercent: 19,
+    label: 'Lower Verification Bar & Machine-Readable Strip',
+  },
+  driverlicense: {
+    enabled: true,
+    position: 'bottom',
+    height: '19%',
+    heightPercent: 19,
+    label: 'Lower License Verification & Endorsement Strip',
+  },
+  refugeecard: {
+    enabled: true,
+    position: 'bottom',
+    height: '17%',
+    heightPercent: 17,
+    label: 'Lower Billing Verification & Payment Stub',
+  },
+  proofofaccount: {
+    enabled: true,
+    position: 'bottom',
+    height: '17%',
+    heightPercent: 17,
+    label: 'Lower Account Certification & Bank Stamp Strip',
+  },
+};
+
+/**
+ * Authoritative template-specific protected area definitions for every document card surface.
+ * Each template defines its exact lower protected area so the top/main preview remains clear
+ * and readable while the bottom MRZ / barcode / verification strip is genuinely withheld until
+ * server-side payment authorization or server-verified Admin Test Mode.
+ */
+export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtectedAreaConfig> = {
+  // 2-Page Spread Passports (Bio-data fields end at ~82.6%; MRZ is at 87%–95%)
+  'passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'somalia-passport-spread': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'nigeria-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'uk-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'senegal-passport-spread': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'sa-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'usa-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'drc-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'bangladesh-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'germany-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'canada-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'ghana-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'ethiopia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'nepal-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'malawi-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'turkey-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'australia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'newzealand-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'fiji-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'papuanewguinea-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'samoa-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'tonga-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'vanuatu-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'solomonislands-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'kiribati-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'micronesia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+
+  // Single-Page Passport Data Cards
+  'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
+  'somalia-passport-id-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
+
+  // National Identity Card — Front Side
+  'kenya-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'somali-smart-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'somalia-card': { enabled: true, position: 'bottom', height: '20%', heightPercent: 20 },
+  'ethiopia-fayda-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'nigeria-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'uganda-refugee-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'pak-showcase-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'pakistan-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'pak-single-front-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'seychelles-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'senegal-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'rwanda-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'uae-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'turkey-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'fiji-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'papuanewguinea-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'samoa-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'tonga-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'vanuatu-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'solomonislands-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'kiribati-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+
+  // National Identity Card — Back Side (TD1 3-line MRZ / Barcode zone at 68%–95%)
+  'kenya-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'uganda-id-back-card': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'pak-showcase-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'pakistan-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'pak-single-back-card': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'seychelles-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'rwanda-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'uae-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'turkey-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'fiji-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'papuanewguinea-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'samoa-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'tonga-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'vanuatu-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'solomonislands-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+  'kiribati-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+
+  // Driver License Cards
+  'somalia-driverlicense-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'newzealand-driverlicense-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+  'newzealand-driverlicense-back': { enabled: true, position: 'bottom', height: '25%', heightPercent: 25 },
+
+  // Proof of Address & Proof of Account
+  'proof-of-address-bill-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+  'poa-wise-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+  'proof-of-account-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+  'poa-revolut-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+  'poaPdfContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+  'poaLetterContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+};
+
 function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
   return [
     {
@@ -332,6 +473,7 @@ function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
       description: 'Official machine-readable biometric passport data page & full spread specimen.',
       icon: 'fa-solid fa-passport',
       enabled: true,
+      previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport },
       updatedAt: nowIso,
     },
     {
@@ -343,6 +485,7 @@ function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
       description: 'Polycarbonate dual-sided national identity card with MRZ & biometric chip.',
       icon: 'fa-solid fa-id-card',
       enabled: true,
+      previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.idcard },
       updatedAt: nowIso,
     },
     {
@@ -354,6 +497,7 @@ function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
       description: 'Official photocard driver licence specimen for identity & vehicle verification.',
       icon: 'fa-solid fa-id-badge',
       enabled: true,
+      previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.driverlicense },
       updatedAt: nowIso,
     },
     {
@@ -365,6 +509,7 @@ function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
       description: 'Utility electricity bill & residential proof of address verification document.',
       icon: 'fa-solid fa-bolt',
       enabled: true,
+      previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.refugeecard },
       updatedAt: nowIso,
     },
     {
@@ -376,6 +521,7 @@ function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
       description: 'Official financial institution account confirmation & proof of address statement.',
       icon: 'fa-solid fa-file-invoice-dollar',
       enabled: true,
+      previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.proofofaccount },
       updatedAt: nowIso,
     },
   ];
@@ -922,13 +1068,22 @@ export class KycAdminService {
         const raw = fs.readFileSync(this.persistencePath, 'utf8');
         const parsed = JSON.parse(raw) as Partial<PersistedAdminState>;
         if (parsed && Array.isArray(parsed.countries) && Array.isArray(parsed.documents)) {
+          const normalizedDocs = (parsed.documents.length > 0 ? parsed.documents : defaultState.documents).map((doc) => ({
+            ...doc,
+            previewProtectedArea:
+              doc.previewProtectedArea &&
+              typeof doc.previewProtectedArea.height === 'string' &&
+              typeof doc.previewProtectedArea.heightPercent === 'number'
+                ? doc.previewProtectedArea
+                : { ...(DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA[doc.docType] || DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport) },
+          }));
           return {
             claimedPasswordSalt: typeof parsed.claimedPasswordSalt === 'string' ? parsed.claimedPasswordSalt : null,
             claimedPasswordHash: typeof parsed.claimedPasswordHash === 'string' ? parsed.claimedPasswordHash : null,
             claimedUsername: typeof parsed.claimedUsername === 'string' ? parsed.claimedUsername : null,
             adminUsers: Array.isArray(parsed.adminUsers) ? parsed.adminUsers : [],
             countries: parsed.countries.length > 0 ? parsed.countries : defaultState.countries,
-            documents: parsed.documents.length > 0 ? parsed.documents : defaultState.documents,
+            documents: normalizedDocs,
             auditLogs: Array.isArray(parsed.auditLogs) ? parsed.auditLogs.slice(0, MAX_AUDIT_LOGS) : [],
           };
         }
@@ -1298,7 +1453,14 @@ export class KycAdminService {
     return {
       countries: enabledCountries,
       allCountryStates,
-      documents: this.state.documents.map((d) => ({ ...d })),
+      documents: this.state.documents.map((d) => ({
+        ...d,
+        previewProtectedArea:
+          d.previewProtectedArea ||
+          DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA[d.docType] ||
+          DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport,
+      })),
+      templatePreviewProtection: { ...TEMPLATE_PREVIEW_PROTECTION_CONFIG },
       updatedAt: new Date().toISOString(),
     };
   }
@@ -1343,6 +1505,260 @@ export class KycAdminService {
         ok: true,
         ...this.getPublicCatalog(),
       });
+    });
+
+    return router;
+  }
+
+  private resolvePreviewProtectedAreaForRequest(
+    docTypeRaw: string,
+    templateIdRaw: string
+  ): {
+    docType: DocTypeKey;
+    productKey: UnlockProductKey;
+    templateId: string;
+    previewProtectedArea: PreviewProtectedAreaConfig;
+  } {
+    const cleanedDocType = docTypeRaw.toLowerCase().trim() as DocTypeKey;
+    const docType: DocTypeKey = VALID_DOC_TYPES.includes(cleanedDocType) ? cleanedDocType : 'passport';
+    const productKey = DOC_TYPE_TO_PRODUCT_KEY[docType];
+    const templateId = sanitizeText(templateIdRaw, 80);
+
+    if (templateId && TEMPLATE_PREVIEW_PROTECTION_CONFIG[templateId]) {
+      return {
+        docType,
+        productKey,
+        templateId,
+        previewProtectedArea: { ...TEMPLATE_PREVIEW_PROTECTION_CONFIG[templateId] },
+      };
+    }
+
+    const docRecord = this.state.documents.find((d) => d.docType === docType);
+    const fallbackArea =
+      (docRecord && docRecord.previewProtectedArea) ||
+      DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA[docType] ||
+      DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport;
+
+    return {
+      docType,
+      productKey,
+      templateId: templateId || docType,
+      previewProtectedArea: { ...fallbackArea },
+    };
+  }
+
+  private evaluateServerPreviewAuthorization(
+    req: Request,
+    params: {
+      docType?: string;
+      productKey?: string;
+      templateId?: string;
+      unlockToken?: string;
+    }
+  ): {
+    fullDocumentAuthorized: boolean;
+    previewMode: 'FULL_UNRESTRICTED' | 'PROTECTED_PREVIEW_ONLY';
+    authorizationSource: 'sifalo_verified_payment' | 'admin_test_mode' | 'none';
+    orderId: string | null;
+    productKey: UnlockProductKey;
+    docType: DocTypeKey;
+    templateId: string;
+    expiresAt: number;
+    previewProtectedArea: PreviewProtectedAreaConfig;
+  } {
+    const resolvedSpec = this.resolvePreviewProtectedAreaForRequest(
+      params.docType || '',
+      params.templateId || ''
+    );
+    const requestedProductRaw = sanitizeText(params.productKey, 40) as UnlockProductKey;
+    const expectedProductKey: UnlockProductKey =
+      requestedProductRaw && Object.values(DOC_TYPE_TO_PRODUCT_KEY).includes(requestedProductRaw)
+        ? requestedProductRaw
+        : resolvedSpec.productKey;
+
+    // 1. Check authoritative server-verified Sifalo payment unlockToken (non-consuming check)
+    const rawUnlockToken = sanitizeText(params.unlockToken, 600);
+    if (rawUnlockToken) {
+      const verifiedPayload = this.sifaloService._internal.verifyUnlockTokenString(rawUnlockToken);
+      if (verifiedPayload && verifiedPayload.productKey === expectedProductKey) {
+        const lifecycle = this.sifaloService.inspectAuthorizationLifecycle(verifiedPayload.orderId);
+        const ord = this.sifaloService._internal.orders.get(verifiedPayload.orderId);
+        if (
+          lifecycle.currentlyValid &&
+          lifecycle.status === 'AUTHORIZED' &&
+          ord &&
+          ord.status === 'PAID' &&
+          !ord.revokedAt &&
+          !ord.unlockConsumedAt &&
+          ord.unlockTokenId === verifiedPayload.tid &&
+          ord.unlockTokenExpiresAt &&
+          ord.unlockTokenExpiresAt > Date.now()
+        ) {
+          return {
+            fullDocumentAuthorized: true,
+            previewMode: 'FULL_UNRESTRICTED',
+            authorizationSource: 'sifalo_verified_payment',
+            orderId: ord.orderId,
+            productKey: expectedProductKey,
+            docType: resolvedSpec.docType,
+            templateId: resolvedSpec.templateId,
+            expiresAt: ord.unlockTokenExpiresAt,
+            previewProtectedArea: resolvedSpec.previewProtectedArea,
+          };
+        }
+      }
+    }
+
+    // 2. Check authoritative server-side Admin Test Mode session & permission
+    const adminResolved = this.resolveAdminContext(req);
+    if (
+      adminResolved.status === 'ok' &&
+      adminResolved.context &&
+      adminResolved.context.session.testModeEnabled === true &&
+      (adminResolved.context.permissions.has('png_test.use') ||
+        adminResolved.context.permissions.has('download_test.use'))
+    ) {
+      return {
+        fullDocumentAuthorized: true,
+        previewMode: 'FULL_UNRESTRICTED',
+        authorizationSource: 'admin_test_mode',
+        orderId: null,
+        productKey: expectedProductKey,
+        docType: resolvedSpec.docType,
+        templateId: resolvedSpec.templateId,
+        expiresAt: adminResolved.context.session.expiresAtMs,
+        previewProtectedArea: resolvedSpec.previewProtectedArea,
+      };
+    }
+
+    return {
+      fullDocumentAuthorized: false,
+      previewMode: 'PROTECTED_PREVIEW_ONLY',
+      authorizationSource: 'none',
+      orderId: null,
+      productKey: expectedProductKey,
+      docType: resolvedSpec.docType,
+      templateId: resolvedSpec.templateId,
+      expiresAt: 0,
+      previewProtectedArea: resolvedSpec.previewProtectedArea,
+    };
+  }
+
+  public createPreviewProtectionRouter(): express.Router {
+    const router = express.Router();
+
+    router.use((_req: Request, res: Response, next: NextFunction) => {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      next();
+    });
+
+    router.get('/config', (_req: Request, res: Response) => {
+      const documentProtectedAreas: Record<string, PreviewProtectedAreaConfig> = {};
+      for (const doc of this.state.documents) {
+        documentProtectedAreas[doc.docType] =
+          doc.previewProtectedArea ||
+          DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA[doc.docType] ||
+          DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport;
+      }
+      return res.status(200).json({
+        ok: true,
+        watermarkText: 'PREVIEW ONLY',
+        maskTitle: 'Preview Only',
+        maskMessage: 'Complete the payment to unlock the full document.',
+        documentProtectedAreas,
+        templateProtectedAreas: { ...TEMPLATE_PREVIEW_PROTECTION_CONFIG },
+      });
+    });
+
+    router.post('/verify-access', (req: Request, res: Response) => {
+      const body =
+        req.body && typeof req.body === 'object' ? (req.body as Record<string, unknown>) : {};
+      const evaluation = this.evaluateServerPreviewAuthorization(req, {
+        docType: typeof body.docType === 'string' ? body.docType : '',
+        productKey: typeof body.productKey === 'string' ? body.productKey : '',
+        templateId: typeof body.templateId === 'string' ? body.templateId : '',
+        unlockToken: typeof body.unlockToken === 'string' ? body.unlockToken : '',
+      });
+
+      return res.status(200).json({
+        ok: true,
+        ...evaluation,
+      });
+    });
+
+    router.get('/specimen', (req: Request, res: Response) => {
+      const assetRaw = sanitizeText(req.query.asset, 140);
+      const docTypeRaw = sanitizeText(req.query.docType, 40);
+      const productKeyRaw = sanitizeText(req.query.productKey, 40);
+      const templateIdRaw = sanitizeText(req.query.templateId, 80);
+      const unlockTokenRaw = sanitizeText(req.query.unlockToken, 600);
+
+      const evaluation = this.evaluateServerPreviewAuthorization(req, {
+        docType: docTypeRaw,
+        productKey: productKeyRaw,
+        templateId: templateIdRaw,
+        unlockToken: unlockTokenRaw,
+      });
+
+      res.setHeader('X-Kyc-Preview-Mode', evaluation.previewMode);
+      res.setHeader('X-Kyc-Authorization-Source', evaluation.authorizationSource);
+
+      if (!evaluation.fullDocumentAuthorized) {
+        const pct = evaluation.previewProtectedArea.heightPercent || 18;
+        const visibleHeight = Math.max(50, 100 - pct);
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="maskGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <pattern id="diagWatermark" width="240" height="160" patternUnits="userSpaceOnUse" patternTransform="rotate(-24)">
+      <text x="15" y="90" fill="rgba(15, 23, 42, 0.14)" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800" letter-spacing="4">PREVIEW ONLY</text>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#bgGrad)"/>
+  <rect x="24" y="24" width="752" height="${Math.round((visibleHeight / 100) * 500) - 36}" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="52" y="74" fill="#0f172a" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">KYCAPPROVED PROTECTED PREVIEW SPECIMEN</text>
+  <text x="52" y="108" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600">Document Type: ${evaluation.docType.toUpperCase()} · Template: ${evaluation.templateId}</text>
+  <text x="52" y="140" fill="#64748b" font-family="Inter, Arial, sans-serif" font-size="13">Top document section is visible for live verification. Lower ${pct}% verification zone is withheld on server.</text>
+  <rect width="800" height="500" fill="url(#diagWatermark)"/>
+  <rect x="0" y="${Math.round((visibleHeight / 100) * 500)}" width="800" height="${Math.round((pct / 100) * 500)}" fill="url(#maskGrad)"/>
+  <line x1="0" y1="${Math.round((visibleHeight / 100) * 500)}" x2="800" y2="${Math.round((visibleHeight / 100) * 500)}" stroke="#38bdf8" stroke-width="2" stroke-opacity="0.65"/>
+  <text x="400" y="${Math.round((visibleHeight / 100) * 500) + Math.round(((pct / 100) * 500) / 2) - 8}" text-anchor="middle" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800" letter-spacing="1.5">PREVIEW ONLY</text>
+  <text x="400" y="${Math.round((visibleHeight / 100) * 500) + Math.round(((pct / 100) * 500) / 2) + 16}" text-anchor="middle" fill="#cbd5e1" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="500">Complete the payment to unlock the full document.</text>
+</svg>`;
+        res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+        return res.status(200).send(svg);
+      }
+
+      if (!assetRaw) {
+        return res.status(200).json({
+          ok: true,
+          fullDocumentAuthorized: true,
+          previewMode: 'FULL_UNRESTRICTED',
+          authorizationSource: evaluation.authorizationSource,
+        });
+      }
+
+      const safeRelative = assetRaw.replace(/^\/+/, '').replace(/\.\./g, '');
+      if (!/\.(png|jpe?g|webp|svg)$/i.test(safeRelative)) {
+        return res.status(400).json({ ok: false, error: 'Unsupported specimen asset format.' });
+      }
+      const publicDir = path.resolve(process.cwd(), 'public');
+      const resolvedFile = path.resolve(publicDir, safeRelative);
+      if (!resolvedFile.startsWith(publicDir + path.sep) || !fs.existsSync(resolvedFile)) {
+        return res.status(404).json({ ok: false, error: 'Requested specimen asset not found.' });
+      }
+
+      return res.sendFile(resolvedFile);
     });
 
     return router;

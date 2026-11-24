@@ -1377,6 +1377,9 @@
             }
           }
         }
+        if (typeof window.__kycSyncPreviewProtectionState === 'function') {
+          window.__kycSyncPreviewProtectionState();
+        }
       } catch (e) {}
     }
     window.syncActiveProductUnlockUI = syncActiveProductUnlockUI;
@@ -1598,6 +1601,11 @@
         const shield = document.getElementById('kycProtectionShield');
         if (shield && shield.classList) {
           shield.classList.remove('active');
+        }
+        if (typeof window.__kycEnsureUnrestrictedCardForAuthorizedCapture === 'function') {
+          try {
+            await window.__kycEnsureUnrestrictedCardForAuthorizedCapture(targetEl);
+          } catch (e) {}
         }
 
         // 2. If target card or an ancestor card-wrapper inside the active document view is hidden (e.g. Front vs Back tab), unhide during capture
@@ -4629,7 +4637,14 @@ var $ = window.$ || (id => document.getElementById(id));
         'micronesia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('micronesia', 'passport'); }
       };
       const fn = fnByCountryDoc[`${countryKey}:${docType}`];
-      if (fn) fn();
+      if (fn) {
+        fn();
+      } else if (typeof updateOceaniaPreview === 'function') {
+        try { updateOceaniaPreview(countryKey, docType); } catch (e) {}
+      }
+      if (typeof window.__kycSchedulePreviewProtectionPass === 'function') {
+        window.__kycSchedulePreviewProtectionPass();
+      }
     }
     window.refreshActiveDocumentPreview = refreshActiveDocumentPreview;
 
@@ -37425,7 +37440,21 @@ EPSOM</div>
         }
 
         populateTestModeSelects();
+        if (typeof window.__kycSyncPreviewProtectionState === 'function') {
+          window.__kycSyncPreviewProtectionState();
+        }
       }
+
+      window.__kycGetServerAdminPreviewHeaders = function() {
+        const headers = { 'X-Kyc-Admin-Request': '1' };
+        if (_adminMemoryToken && _adminTestModeEnabled && _adminSessionInfo && canUseTestMode()) {
+          headers['Authorization'] = `Bearer ${_adminMemoryToken}`;
+        }
+        return headers;
+      };
+      window.__kycIsAdminTestModeVerifiedActive = function() {
+        return Boolean(_adminMemoryToken && _adminSessionInfo && _adminTestModeEnabled && canUseTestMode());
+      };
 
       function populateTestModeSelects() {
         const enabledCountries = _adminCountries.filter(c => c.enabled);
@@ -38583,6 +38612,874 @@ EPSOM</div>
         document.addEventListener('DOMContentLoaded', initKycAdminDashboardEvents);
       } else {
         initKycAdminDashboardEvents();
+      }
+    })();
+  </script>
+
+  <!-- ================= SERVER-AUTHORITATIVE PREVIEW-PROTECTION SYSTEM ================= -->
+  <style id="kyc-preview-protection-styles">
+    .kyc-preview-only-watermark {
+      position: absolute !important;
+      inset: 0 !important;
+      z-index: 38 !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      overflow: hidden !important;
+      border-radius: inherit;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='155' viewBox='0 0 250 155'%3E%3Cg transform='rotate(-23 125 77)'%3E%3Crect x='22' y='52' width='206' height='36' rx='7' fill='rgba(15,23,42,0.05)' stroke='rgba(15,23,42,0.16)' stroke-width='1.2' stroke-dasharray='4 3'/%3E%3Ctext x='125' y='75' text-anchor='middle' fill='rgba(15,23,42,0.20)' font-family='Inter,system-ui,sans-serif' font-size='15' font-weight='900' letter-spacing='3.5'%3EPREVIEW ONLY%3C/text%3E%3C/g%3E%3C/svg%3E") !important;
+      background-repeat: repeat !important;
+      background-position: center center !important;
+    }
+
+    .kyc-preview-protected-bottom-mask {
+      position: absolute !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      z-index: 42 !important;
+      pointer-events: none !important;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 3px !important;
+      padding: 6px 12px !important;
+      text-align: center !important;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.99) 45%, #091326 100%) !important;
+      border-top: 2px solid rgba(56, 189, 248, 0.72) !important;
+      box-shadow: 0 -8px 22px rgba(9, 19, 38, 0.45) !important;
+      border-bottom-left-radius: inherit;
+      border-bottom-right-radius: inherit;
+      overflow: hidden !important;
+    }
+
+    .kyc-preview-protected-bottom-mask::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        -45deg,
+        rgba(56, 189, 248, 0.06) 0px,
+        rgba(56, 189, 248, 0.06) 10px,
+        transparent 10px,
+        transparent 20px
+      );
+      pointer-events: none;
+    }
+
+    .kyc-preview-mask-badge {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.16);
+      border: 1px solid rgba(56, 189, 248, 0.48);
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1.25;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    .kyc-preview-mask-subtext {
+      position: relative;
+      z-index: 2;
+      color: #e2e8f0;
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      line-height: 1.25;
+      max-width: 94%;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    }
+
+    @media (max-width: 640px) {
+      .kyc-preview-mask-badge {
+        font-size: 9.5px;
+        padding: 1.5px 8px;
+      }
+      .kyc-preview-mask-subtext {
+        font-size: 9.5px;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      // Private closure maps: never exposed on window or stored in DOM attributes
+      const _originalMrzTextMap = new WeakMap();
+      const _originalPlateSrcMap = new WeakMap();
+      const _redactedPlateCache = new Map();
+      const _plateCroppingInFlight = new WeakSet();
+      const _cardProtectedStateMap = new WeakMap();
+
+      // Authoritative template-specific protected area definitions (synced with /api/preview-protection/config)
+      const _templateProtectedAreas = {
+        'passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'somalia-passport-spread': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'nigeria-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'uk-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'senegal-passport-spread': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'sa-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'usa-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'drc-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'bangladesh-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'germany-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'canada-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'ghana-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'ethiopia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'nepal-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'malawi-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'turkey-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'australia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'newzealand-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'fiji-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'papuanewguinea-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'samoa-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'tonga-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'vanuatu-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'solomonislands-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'kiribati-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'micronesia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+
+        'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
+        'somalia-passport-id-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
+
+        'kenya-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'somali-smart-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'somalia-card': { enabled: true, position: 'bottom', height: '20%', heightPercent: 20 },
+        'ethiopia-fayda-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'nigeria-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'uganda-refugee-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'pak-showcase-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'pakistan-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'pak-single-front-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'seychelles-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'senegal-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'rwanda-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'uae-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'turkey-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'fiji-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'papuanewguinea-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'samoa-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'tonga-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'vanuatu-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'solomonislands-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'kiribati-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+
+        'kenya-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'uganda-id-back-card': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'pak-showcase-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'pakistan-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'pak-single-back-card': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'seychelles-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'rwanda-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'uae-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'turkey-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'fiji-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'papuanewguinea-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'samoa-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'tonga-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'vanuatu-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'solomonislands-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+        'kiribati-id-back': { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 },
+
+        'somalia-driverlicense-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'newzealand-driverlicense-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        'newzealand-driverlicense-back': { enabled: true, position: 'bottom', height: '25%', heightPercent: 25 },
+
+        'proof-of-address-bill-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        'poa-wise-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        'proof-of-account-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        'poa-revolut-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        'poaPdfContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        'poaLetterContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 }
+      };
+
+      const _docTypeDefaultAreas = {
+        passport: { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        idcard: { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        driverlicense: { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        refugeecard: { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        proofofaccount: { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 }
+      };
+
+      const _serverVerifiedAccessByProduct = {
+        passport: { authorized: false, expiresAt: 0, source: 'none', token: '' },
+        nationalIdentity: { authorized: false, expiresAt: 0, source: 'none', token: '' },
+        driverLicense: { authorized: false, expiresAt: 0, source: 'none', token: '' },
+        proofOfAddress: { authorized: false, expiresAt: 0, source: 'none', token: '' },
+        proofOfAccount: { authorized: false, expiresAt: 0, source: 'none', token: '' }
+      };
+
+      let _isApplyingProtectionPass = false;
+      let _protectionPassScheduled = false;
+      let _verifyInFlightPromise = null;
+
+      function resolveCardProductKey(cardEl) {
+        const id = (cardEl && cardEl.id) ? String(cardEl.id) : '';
+        const lower = id.toLowerCase();
+        if (lower.includes('driverlicense')) return 'driverLicense';
+        if (lower.includes('proof-of-address')) return 'proofOfAddress';
+        if (lower.includes('proof-of-account') || lower.startsWith('poa')) return 'proofOfAccount';
+        if (lower.includes('passport') || lower === 'senegal-datapage-card' || lower === 'senegal-page1-card') {
+          return 'passport';
+        }
+        if (lower.includes('-id-') || lower.includes('fayda') || lower.includes('refugee-card') || lower === 'somalia-card' || lower.includes('pak-')) {
+          return 'nationalIdentity';
+        }
+        if (typeof getActiveUnlockDocSpec === 'function') {
+          return getActiveUnlockDocSpec().productKey || 'passport';
+        }
+        return 'passport';
+      }
+
+      function resolveProtectedAreaForCard(cardEl) {
+        const id = (cardEl && cardEl.id) ? String(cardEl.id) : '';
+        if (id && _templateProtectedAreas[id]) {
+          return _templateProtectedAreas[id];
+        }
+        const lower = id.toLowerCase();
+        if (lower.endsWith('-id-back')) {
+          return { enabled: true, position: 'bottom', height: '32%', heightPercent: 32 };
+        }
+        if (lower.endsWith('-id-front')) {
+          return { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 };
+        }
+        if (lower.endsWith('-passport-card')) {
+          return { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 };
+        }
+        const productKey = resolveCardProductKey(cardEl);
+        if (productKey === 'nationalIdentity') return _docTypeDefaultAreas.idcard;
+        if (productKey === 'driverLicense') return _docTypeDefaultAreas.driverlicense;
+        if (productKey === 'proofOfAddress') return _docTypeDefaultAreas.refugeecard;
+        if (productKey === 'proofOfAccount') return _docTypeDefaultAreas.proofofaccount;
+        return _docTypeDefaultAreas.passport;
+      }
+
+      /**
+       * Authoritative check whether a card is currently unlocked for full unrestricted display.
+       * Strictly requires:
+       *  1. An active server-verified Save PNG/Download execution turn (_isSifaloExecutingCallback / __kycSifaloRenderingInFlight), OR
+       *  2. A valid, unconsumed, non-expired server-verified Sifalo unlockToken confirmed by the server, OR
+       *  3. An active server-verified Admin Test Mode session with png_test.use / download_test.use.
+       * Never trusts localStorage, sessionStorage, URL parameters, or simple frontend flags.
+       */
+      function isCardAuthorizedForFullPreview(cardEl) {
+        if (typeof _isSifaloExecutingCallback !== 'undefined' && _isSifaloExecutingCallback) {
+          return true;
+        }
+        if (window.__kycSifaloRenderingInFlight === true) {
+          return true;
+        }
+        if (typeof window.__kycIsAdminTestModeVerifiedActive === 'function' && window.__kycIsAdminTestModeVerifiedActive()) {
+          return true;
+        }
+        const productKey = resolveCardProductKey(cardEl);
+        if (typeof isProductUnlockedInUi === 'function' && isProductUnlockedInUi(productKey)) {
+          const grant = window.__kycVerifiedUnlockState && window.__kycVerifiedUnlockState[productKey];
+          if (
+            grant &&
+            grant.unlocked === true &&
+            typeof grant.unlockToken === 'string' &&
+            grant.unlockToken.length > 16 &&
+            typeof grant.expiresAt === 'number' &&
+            grant.expiresAt > Date.now()
+          ) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function isPortraitOrEmblemImage(img) {
+        if (!img) return true;
+        const id = String(img.id || '').toLowerCase();
+        const alt = String(img.alt || '').toLowerCase();
+        const cls = String(img.className || '').toLowerCase();
+        const src = String(_originalPlateSrcMap.get(img) || img.getAttribute('src') || '').toLowerCase();
+
+        if (
+          id.includes('photo') ||
+          id.includes('portrait') ||
+          id.includes('ghost') ||
+          id.includes('avatar') ||
+          id.includes('sign') ||
+          id.includes('flag') ||
+          id.includes('coat') ||
+          id.includes('emblem') ||
+          id.includes('logo') ||
+          id.includes('chip') ||
+          alt.includes('portrait') ||
+          alt.includes('applicant') ||
+          alt.includes('holder') ||
+          alt.includes('ghost') ||
+          alt.includes('signature') ||
+          alt.includes('logo')
+        ) {
+          return true;
+        }
+        if (src.includes('1793954903894') || src.includes('1793954988317') || src.includes('getkycapproved_trimmed')) {
+          return true;
+        }
+        // Only treat full-card background images (absolute inset-0 / w-full h-full) as base plates
+        const isFullBleed =
+          (cls.includes('inset-0') || (cls.includes('w-full') && cls.includes('h-full'))) &&
+          !cls.includes('rounded-full');
+        return !isFullBleed;
+      }
+
+      function getCardPlateImages(cardEl) {
+        if (!cardEl || typeof cardEl.querySelectorAll !== 'function') return [];
+        const imgs = Array.from(cardEl.querySelectorAll('img'));
+        return imgs.filter((img) => !isPortraitOrEmblemImage(img));
+      }
+
+      function buildRedactedPlateDataUrl(img, heightPercent) {
+        return new Promise((resolve) => {
+          const origSrc = _originalPlateSrcMap.get(img) || img.getAttribute('src') || '';
+          if (!origSrc || origSrc.startsWith('data:image/')) {
+            return resolve(null);
+          }
+          const cacheKey = `${origSrc}::${heightPercent}`;
+          if (_redactedPlateCache.has(cacheKey)) {
+            return resolve(_redactedPlateCache.get(cacheKey));
+          }
+
+          const loader = new Image();
+          loader.crossOrigin = 'anonymous';
+          loader.onload = function() {
+            try {
+              const w = loader.naturalWidth || 900;
+              const h = loader.naturalHeight || 600;
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return resolve(null);
+
+              const cutY = Math.round(h * ((100 - heightPercent) / 100));
+              // Draw ONLY the top visible portion of the base plate onto the canvas
+              ctx.drawImage(loader, 0, 0, w, cutY, 0, 0, w, cutY);
+
+              // Physically overwrite the protected bottom region in the bitmap
+              const maskH = h - cutY;
+              const grad = ctx.createLinearGradient(0, cutY, 0, h);
+              grad.addColorStop(0, '#0f172a');
+              grad.addColorStop(0.5, '#172554');
+              grad.addColorStop(1, '#091326');
+              ctx.fillStyle = grad;
+              ctx.fillRect(0, cutY, w, maskH);
+
+              ctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+              ctx.lineWidth = Math.max(2, Math.round(h * 0.004));
+              ctx.beginPath();
+              ctx.moveTo(0, cutY);
+              ctx.lineTo(w, cutY);
+              ctx.stroke();
+
+              // Diagonal watermark across the bitmap itself
+              ctx.save();
+              ctx.translate(w / 2, cutY / 2);
+              ctx.rotate((-22 * Math.PI) / 180);
+              ctx.fillStyle = 'rgba(15, 23, 42, 0.14)';
+              ctx.font = `900 ${Math.max(18, Math.round(w * 0.038))}px Inter, Arial, sans-serif`;
+              ctx.textAlign = 'center';
+              ctx.fillText('PREVIEW ONLY', 0, 0);
+              ctx.restore();
+
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+              _redactedPlateCache.set(cacheKey, dataUrl);
+              resolve(dataUrl);
+            } catch (e) {
+              resolve(null);
+            }
+          };
+          loader.onerror = function() {
+            resolve(null);
+          };
+          loader.src = origSrc;
+        });
+      }
+
+      function findProtectedMrzAndBottomTextNodes(cardEl) {
+        if (!cardEl || typeof cardEl.querySelectorAll !== 'function') return [];
+        const selector = [
+          '[id*="mrz"]',
+          '[id*="Mrz"]',
+          '[id*="MRZ"]',
+          '[class*="-mrz"]',
+          '[class*="mrz-"]',
+          '[data-sen^="mrz"]',
+          '[id*="Barcode"]',
+          '[id*="barcode"]',
+          '#poaFooterRef',
+          '#poaWiseFooterRef',
+          '#poaRevFooterRef'
+        ].join(', ');
+        const matched = Array.from(cardEl.querySelectorAll(selector));
+        const leafNodes = [];
+        const seen = new Set();
+
+        for (let i = 0; i < matched.length; i++) {
+          const el = matched[i];
+          if (!el || seen.has(el)) continue;
+          const childLines = el.querySelectorAll('div, span, p');
+          if (childLines.length > 0) {
+            for (let j = 0; j < childLines.length; j++) {
+              const child = childLines[j];
+              if (child && child.children.length === 0 && !seen.has(child)) {
+                seen.add(child);
+                leafNodes.push(child);
+              }
+            }
+          } else {
+            seen.add(el);
+            leafNodes.push(el);
+          }
+        }
+        return leafNodes;
+      }
+
+      function buildRedactedMrzLine(originalText) {
+        const cleanLen = Math.max(30, Math.min(44, String(originalText || '').trim().length || 44));
+        const pattern = 'PREVIEW<ONLY<<COMPLETE<PAYMENT<TO<UNLOCK<<<<';
+        if (cleanLen <= pattern.length) {
+          return pattern.slice(0, cleanLen);
+        }
+        return (pattern + '<<<<<<<<<<<<<<<<<<<<').slice(0, cleanLen);
+      }
+
+      function redactCardDomAndPlates(cardEl, area) {
+        if (!cardEl || !area || !area.enabled) return;
+
+        // 1. Ensure card has position: relative or absolute so overlays anchor accurately
+        const computedPos = window.getComputedStyle ? window.getComputedStyle(cardEl).position : '';
+        if (computedPos === 'static') {
+          cardEl.style.position = 'relative';
+        }
+
+        // 2. Genuine DOM text redaction for MRZ and lower verification nodes
+        const mrzNodes = findProtectedMrzAndBottomTextNodes(cardEl);
+        for (let i = 0; i < mrzNodes.length; i++) {
+          const node = mrzNodes[i];
+          const currentTxt = String(node.textContent || '');
+          if (!currentTxt.includes('PREVIEW<ONLY') && !currentTxt.includes('PREVIEW ONLY')) {
+            if (currentTxt.trim().length > 0) {
+              _originalMrzTextMap.set(node, currentTxt);
+            }
+            node.textContent = buildRedactedMrzLine(currentTxt);
+          }
+        }
+
+        // 3. Genuine bitmap cropping for full-card background plate images
+        const plateImgs = getCardPlateImages(cardEl);
+        for (let i = 0; i < plateImgs.length; i++) {
+          const img = plateImgs[i];
+          const currentSrc = img.getAttribute('src') || '';
+          if (currentSrc && !currentSrc.startsWith('data:image/')) {
+            _originalPlateSrcMap.set(img, currentSrc);
+          }
+          if (img.hasAttribute('srcset')) {
+            img.removeAttribute('srcset');
+          }
+          const origSrc = _originalPlateSrcMap.get(img);
+          if (origSrc && !_plateCroppingInFlight.has(img)) {
+            const cacheKey = `${origSrc}::${area.heightPercent}`;
+            const cachedDataUrl = _redactedPlateCache.get(cacheKey);
+            if (cachedDataUrl) {
+              if (img.getAttribute('src') !== cachedDataUrl) {
+                img.setAttribute('src', cachedDataUrl);
+              }
+            } else {
+              _plateCroppingInFlight.add(img);
+              buildRedactedPlateDataUrl(img, area.heightPercent)
+                .then((redactedUrl) => {
+                  _plateCroppingInFlight.delete(img);
+                  if (redactedUrl && !isCardAuthorizedForFullPreview(cardEl)) {
+                    img.setAttribute('src', redactedUrl);
+                  }
+                })
+                .catch(() => {
+                  _plateCroppingInFlight.delete(img);
+                });
+            }
+          }
+        }
+
+        // 4. Redact procedural canvases in unpaid mode
+        const proceduralCanvases = cardEl.querySelectorAll('#som-pass-base-canvas, #sa-pass-base-canvas');
+        for (let i = 0; i < proceduralCanvases.length; i++) {
+          const c = proceduralCanvases[i];
+          if (c && c.getContext) {
+            const ctx = c.getContext('2d');
+            if (ctx && c.width > 0 && c.height > 0) {
+              const cutY = Math.round(c.height * ((100 - area.heightPercent) / 100));
+              ctx.fillStyle = '#0f172a';
+              ctx.fillRect(0, cutY, c.width, c.height - cutY);
+            }
+          }
+        }
+
+        // 5. Render professional "PREVIEW ONLY" diagonal watermark overlay
+        let wmEl = cardEl.querySelector(':scope > [data-kyc-preview-watermark="1"]');
+        if (!wmEl) {
+          wmEl = document.createElement('div');
+          wmEl.setAttribute('data-kyc-preview-watermark', '1');
+          wmEl.setAttribute('aria-hidden', 'true');
+          wmEl.className = 'kyc-preview-only-watermark';
+          cardEl.appendChild(wmEl);
+        }
+
+        // 6. Render attractive bottom protected area mask overlay
+        let maskEl = cardEl.querySelector(':scope > [data-kyc-preview-mask="1"]');
+        if (!maskEl) {
+          maskEl = document.createElement('div');
+          maskEl.setAttribute('data-kyc-preview-mask', '1');
+          maskEl.className = 'kyc-preview-protected-bottom-mask';
+          maskEl.innerHTML = `
+            <div class="kyc-preview-mask-badge">
+              <i class="fa-solid fa-lock text-sky-400"></i>
+              <span>Preview Only</span>
+            </div>
+            <div class="kyc-preview-mask-subtext">Complete the payment to unlock the full document.</div>
+          `;
+          cardEl.appendChild(maskEl);
+        }
+        if (maskEl.style.height !== area.height) {
+          maskEl.style.height = area.height;
+        }
+
+        cardEl.setAttribute('data-kyc-preview-mode', 'PROTECTED_PREVIEW_ONLY');
+        _cardProtectedStateMap.set(cardEl, 'PROTECTED');
+      }
+
+      async function restoreCardFullUnrestrictedState(cardEl) {
+        if (!cardEl) return;
+        const wasProtected = _cardProtectedStateMap.get(cardEl) === 'PROTECTED' ||
+          cardEl.getAttribute('data-kyc-preview-mode') === 'PROTECTED_PREVIEW_ONLY';
+
+        // 1. Remove watermark and bottom restriction overlay
+        const watermarks = cardEl.querySelectorAll('[data-kyc-preview-watermark="1"]');
+        for (let i = 0; i < watermarks.length; i++) {
+          if (watermarks[i].parentNode) watermarks[i].parentNode.removeChild(watermarks[i]);
+        }
+        const masks = cardEl.querySelectorAll('[data-kyc-preview-mask="1"]');
+        for (let i = 0; i < masks.length; i++) {
+          if (masks[i].parentNode) masks[i].parentNode.removeChild(masks[i]);
+        }
+
+        // 2. Restore original uncropped base plate images from private closure WeakMap
+        const plateImgs = getCardPlateImages(cardEl);
+        const decodePromises = [];
+        for (let i = 0; i < plateImgs.length; i++) {
+          const img = plateImgs[i];
+          const origSrc = _originalPlateSrcMap.get(img);
+          if (origSrc && img.getAttribute('src') !== origSrc) {
+            img.setAttribute('src', origSrc);
+            decodePromises.push(
+              new Promise((resolve) => {
+                if (img.complete && img.naturalWidth > 0) {
+                  if (typeof img.decode === 'function') {
+                    img.decode().catch(() => {}).finally(resolve);
+                  } else {
+                    resolve();
+                  }
+                  return;
+                }
+                const done = () => {
+                  img.removeEventListener('load', done);
+                  img.removeEventListener('error', done);
+                  resolve();
+                };
+                img.addEventListener('load', done, { once: true });
+                img.addEventListener('error', done, { once: true });
+              })
+            );
+          }
+        }
+
+        // 3. Restore original MRZ and lower verification text from private closure WeakMap
+        const mrzNodes = findProtectedMrzAndBottomTextNodes(cardEl);
+        for (let i = 0; i < mrzNodes.length; i++) {
+          const node = mrzNodes[i];
+          const savedTxt = _originalMrzTextMap.get(node);
+          if (savedTxt) {
+            node.textContent = savedTxt;
+          }
+        }
+
+        // 4. Repaint procedural background canvases in full
+        if (cardEl.id === 'somalia-passport-spread' || cardEl.querySelector('#som-pass-base-canvas')) {
+          if (typeof initSomPassBaseCanvas === 'function') {
+            try { initSomPassBaseCanvas(); } catch (e) {}
+          }
+        }
+        if (cardEl.id === 'sa-passport-card' || cardEl.querySelector('#sa-pass-base-canvas')) {
+          if (typeof initSaPassBaseCanvas === 'function') {
+            try { initSaPassBaseCanvas(); } catch (e) {}
+          }
+        }
+
+        cardEl.setAttribute('data-kyc-preview-mode', 'FULL_UNRESTRICTED');
+        _cardProtectedStateMap.set(cardEl, 'UNRESTRICTED');
+
+        // 5. Re-run the active document generator so any live form edits are freshly computed
+        if (wasProtected && !_isApplyingProtectionPass && typeof refreshActiveDocumentPreview === 'function') {
+          const cKey = (typeof currentCountry === 'string' && currentCountry) ? currentCountry : 'kenya';
+          const dKey = (typeof currentDocType === 'string' && currentDocType) ? currentDocType : 'passport';
+          try {
+            _isApplyingProtectionPass = true;
+            refreshActiveDocumentPreview(cKey, dKey);
+          } catch (e) {} finally {
+            _isApplyingProtectionPass = false;
+          }
+        }
+
+        if (decodePromises.length > 0) {
+          await Promise.race([
+            Promise.all(decodePromises),
+            new Promise((r) => setTimeout(r, 2000))
+          ]);
+        }
+      }
+
+      function applyPreviewProtectionAcrossAllCards() {
+        if (_isApplyingProtectionPass) return;
+        _isApplyingProtectionPass = true;
+        try {
+          const cardIds = Object.keys(_templateProtectedAreas);
+          // Also include any dynamically mounted Oceania passport/id cards
+          const dynamicCards = document.querySelectorAll(
+            '#verification-workbench [id$="-passport-card"], #verification-workbench [id$="-id-front"], #verification-workbench [id$="-id-back"]'
+          );
+          const allCards = new Set();
+          for (let i = 0; i < cardIds.length; i++) {
+            const el = document.getElementById(cardIds[i]);
+            if (el) allCards.add(el);
+          }
+          for (let i = 0; i < dynamicCards.length; i++) {
+            allCards.add(dynamicCards[i]);
+          }
+
+          allCards.forEach((cardEl) => {
+            const area = resolveProtectedAreaForCard(cardEl);
+            if (!area || !area.enabled) return;
+            if (isCardAuthorizedForFullPreview(cardEl)) {
+              restoreCardFullUnrestrictedState(cardEl);
+            } else {
+              redactCardDomAndPlates(cardEl, area);
+            }
+          });
+        } catch (e) {} finally {
+          _isApplyingProtectionPass = false;
+        }
+      }
+
+      function schedulePreviewProtectionPass() {
+        if (_protectionPassScheduled) return;
+        _protectionPassScheduled = true;
+        const run = () => {
+          _protectionPassScheduled = false;
+          applyPreviewProtectionAcrossAllCards();
+        };
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(run);
+        } else {
+          setTimeout(run, 16);
+        }
+      }
+
+      async function syncPreviewProtectionWithServer() {
+        applyPreviewProtectionAcrossAllCards();
+        if (_verifyInFlightPromise) return _verifyInFlightPromise;
+
+        _verifyInFlightPromise = (async () => {
+          try {
+            const spec = typeof getActiveUnlockDocSpec === 'function'
+              ? getActiveUnlockDocSpec()
+              : { rawType: 'passport', productKey: 'passport' };
+            const grant = window.__kycVerifiedUnlockState && window.__kycVerifiedUnlockState[spec.productKey];
+            const unlockToken = (grant && grant.unlocked && typeof grant.unlockToken === 'string')
+              ? grant.unlockToken
+              : '';
+            const headers = Object.assign(
+              { 'Content-Type': 'application/json' },
+              typeof window.__kycGetServerAdminPreviewHeaders === 'function'
+                ? window.__kycGetServerAdminPreviewHeaders()
+                : {}
+            );
+
+            const res = await fetch('/api/preview-protection/verify-access', {
+              method: 'POST',
+              headers,
+              credentials: 'same-origin',
+              cache: 'no-store',
+              body: JSON.stringify({
+                docType: spec.rawType,
+                productKey: spec.productKey,
+                unlockToken
+              })
+            });
+            if (res.ok) {
+              const data = await res.json().catch(() => null);
+              if (data && data.ok) {
+                _serverVerifiedAccessByProduct[spec.productKey] = {
+                  authorized: Boolean(data.fullDocumentAuthorized),
+                  expiresAt: Number(data.expiresAt) || 0,
+                  source: data.authorizationSource || 'none',
+                  token: unlockToken
+                };
+                if (!data.fullDocumentAuthorized && data.authorizationSource === 'none' && unlockToken) {
+                  // Server rejected or expired the token — clear local unlock state immediately
+                  if (typeof clearLocalProductUnlockState === 'function') {
+                    clearLocalProductUnlockState(spec.productKey);
+                  }
+                }
+              }
+            }
+          } catch (e) {} finally {
+            _verifyInFlightPromise = null;
+            applyPreviewProtectionAcrossAllCards();
+          }
+        })();
+
+        return _verifyInFlightPromise;
+      }
+
+      async function loadPreviewProtectionConfigFromServer() {
+        try {
+          const res = await fetch('/api/preview-protection/config', { cache: 'no-store' });
+          if (!res.ok) return;
+          const data = await res.json().catch(() => null);
+          if (!data || !data.ok) return;
+          if (data.templateProtectedAreas && typeof data.templateProtectedAreas === 'object') {
+            Object.assign(_templateProtectedAreas, data.templateProtectedAreas);
+          }
+          if (data.documentProtectedAreas && typeof data.documentProtectedAreas === 'object') {
+            Object.assign(_docTypeDefaultAreas, data.documentProtectedAreas);
+          }
+          applyPreviewProtectionAcrossAllCards();
+        } catch (e) {}
+      }
+
+      // Hook invoked by prepareElementForHtml2Canvas right before html2canvas captures an authorized export
+      window.__kycEnsureUnrestrictedCardForAuthorizedCapture = async function(targetEl) {
+        if (!targetEl) return;
+        if (isCardAuthorizedForFullPreview(targetEl)) {
+          await restoreCardFullUnrestrictedState(targetEl);
+          // Also restore any nested card surfaces inside targetEl
+          if (typeof targetEl.querySelectorAll === 'function') {
+            const nested = targetEl.querySelectorAll('[data-kyc-preview-mode]');
+            for (let i = 0; i < nested.length; i++) {
+              await restoreCardFullUnrestrictedState(nested[i]);
+            }
+          }
+        }
+      };
+
+      // Gate full-resolution specimen modal viewers when unpaid so visitors cannot bypass preview protection
+      function installSpecimenViewerGates() {
+        const buildProtectedSpecimenUrl = (assetPath, docType, templateId) => {
+          const spec = typeof getActiveUnlockDocSpec === 'function'
+            ? getActiveUnlockDocSpec()
+            : { rawType: docType || 'passport', productKey: 'passport' };
+          const grant = window.__kycVerifiedUnlockState && window.__kycVerifiedUnlockState[spec.productKey];
+          const unlockToken = (grant && grant.unlocked && typeof grant.unlockToken === 'string')
+            ? grant.unlockToken
+            : '';
+          return `/api/preview-protection/specimen?asset=${encodeURIComponent(assetPath || '')}&docType=${encodeURIComponent(docType || spec.rawType)}&templateId=${encodeURIComponent(templateId || '')}&unlockToken=${encodeURIComponent(unlockToken)}`;
+        };
+
+        const wrapViewer = (fnName, docType, templateId, defaultAsset) => {
+          const origFn = window[fnName];
+          if (typeof origFn !== 'function' || origFn._kycPreviewGated) return;
+          const gated = function(argUrl) {
+            const cardEl = document.getElementById(templateId);
+            if (!isCardAuthorizedForFullPreview(cardEl)) {
+              const modal = document.getElementById('imageModal');
+              const modalImg = document.getElementById('modalPreviewImg');
+              const fallbackLink = document.getElementById('fallbackDownloadLink');
+              if (modalImg) {
+                modalImg.src = buildProtectedSpecimenUrl(argUrl || defaultAsset, docType, templateId);
+              }
+              if (fallbackLink) {
+                fallbackLink.href = '#';
+                fallbackLink.classList.add('hidden');
+              }
+              if (modal) {
+                modal.classList.remove('hidden');
+              }
+              return;
+            }
+            return origFn.apply(this, arguments);
+          };
+          gated._kycPreviewGated = true;
+          window[fnName] = gated;
+        };
+
+        wrapViewer('viewUgandaFullRes', 'idcard', 'uganda-refugee-card', '/uganda-id-front.png');
+        wrapViewer('viewSycFullRes', 'idcard', 'seychelles-id-front', '/seychelles-id-specimen.png');
+        wrapViewer('viewNgaFullRes', 'idcard', 'nigeria-id-card', '/nigeria-nimc-specimen.png');
+        wrapViewer('viewNgaPassportFullRes', 'passport', 'nigeria-passport-card', '/nigeria-passport-specimen.png');
+      }
+
+      // MutationObserver & Expiry Watcher: if someone deletes the watermark or mask in DevTools while unpaid,
+      // or if a short-lived payment token expires, immediately re-apply redaction and preview protection.
+      function startPreviewProtectionObservers() {
+        const wb = document.getElementById('verification-workbench');
+        if (wb && typeof MutationObserver === 'function') {
+          const observer = new MutationObserver((mutations) => {
+            if (_isApplyingProtectionPass) return;
+            for (let i = 0; i < mutations.length; i++) {
+              const m = mutations[i];
+              if (m.type === 'childList' || m.type === 'characterData' || m.type === 'attributes') {
+                schedulePreviewProtectionPass();
+                break;
+              }
+            }
+          });
+          observer.observe(wb, {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true,
+            attributeFilter: ['class', 'style']
+          });
+        }
+
+        // Periodic expiry check so expired payment tokens automatically revert to Protected Preview Only
+        setInterval(() => {
+          applyPreviewProtectionAcrossAllCards();
+        }, 2500);
+      }
+
+      window.__kycSyncPreviewProtectionState = syncPreviewProtectionWithServer;
+      window.__kycSchedulePreviewProtectionPass = schedulePreviewProtectionPass;
+      window.__kycApplyPreviewProtectionNow = applyPreviewProtectionAcrossAllCards;
+
+      function initKycPreviewProtectionSystem() {
+        installSpecimenViewerGates();
+        applyPreviewProtectionAcrossAllCards();
+        loadPreviewProtectionConfigFromServer();
+        syncPreviewProtectionWithServer();
+        startPreviewProtectionObservers();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initKycPreviewProtectionSystem);
+      } else {
+        initKycPreviewProtectionSystem();
       }
     })();
   </script>
