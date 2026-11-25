@@ -168,20 +168,6 @@ export const NepalPassportCard: React.FC<{
 
   const isCustomPhoto = Boolean(data.photoUrl && data.photoUrl !== defaultNepalPassportData.photoUrl);
 
-  const isExactSpecimen =
-    !isCustomPhoto &&
-    data.passportNo.toUpperCase() === defaultNepalPassportData.passportNo &&
-    data.surname.toUpperCase() === defaultNepalPassportData.surname &&
-    data.givenNames.toUpperCase() === defaultNepalPassportData.givenNames &&
-    data.nationality.toUpperCase() === defaultNepalPassportData.nationality &&
-    data.dateOfBirth.toUpperCase() === defaultNepalPassportData.dateOfBirth &&
-    data.citizenshipNo.toUpperCase() === defaultNepalPassportData.citizenshipNo &&
-    data.sex === defaultNepalPassportData.sex &&
-    data.placeOfBirth.toUpperCase() === defaultNepalPassportData.placeOfBirth &&
-    data.dateOfIssue.toUpperCase() === defaultNepalPassportData.dateOfIssue &&
-    data.issuingAuthority.toUpperCase() === defaultNepalPassportData.issuingAuthority &&
-    data.dateOfExpiry.toUpperCase() === defaultNepalPassportData.dateOfExpiry;
-
   const fitCqw = (text: string, baseCqw: number, maxChars: number, minCqw = baseCqw * 0.56) => {
     const len = (text || "").trim().length;
     if (len <= maxChars) return `${baseCqw}cqw`;
@@ -391,16 +377,6 @@ export const NepalPassportCard: React.FC<{
           {mrz.line2}
         </div>
       </div>
-
-      {/* Exact 1:1 Reference Specimen Overlay when unmodified */}
-      {isExactSpecimen && (
-        <img
-          src="/assets/aistudio/nepal_passport_reference.png"
-          alt="Nepal Passport Exact Reference Specimen"
-          draggable={false}
-          className="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-30"
-        />
-      )}
     </div>
   );
 };

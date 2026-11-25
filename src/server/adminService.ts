@@ -404,6 +404,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
   'micronesia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
   'trinidadandtobago-passport-card': { enabled: true, position: 'bottom', height: '11.5%', heightPercent: 11.5 },
   'indonesia-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
+  'pakistan-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
 
   // Single-Page Passport Data Cards
   'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
@@ -618,13 +619,13 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       key: 'pakistan',
       name: 'Pakistan',
       flag: '🇵🇰',
-      subtitle: 'National Identity Card (SNIC)',
+      subtitle: 'Passport & National Identity Card (SNIC)',
       iso3: 'PAK',
       authority: 'National Database & Registration Authority (NADRA) & DGI&P',
-      portalName: 'NADRA Official Identity Portal',
+      portalName: 'NADRA & DGI&P Official Identity Portal',
       portalUrl: 'https://www.nadra.gov.pk',
-      idStandard: 'NADRA Smart National Identity Card (SNIC / CNIC) with ICAO Chip',
-      enabledDocs: ['idcard', 'proofofaccount'],
+      idStandard: 'Islamic Republic of Pakistan Machine-Readable Passport & NADRA Smart National Identity Card (SNIC / CNIC)',
+      enabledDocs: ['passport', 'idcard', 'proofofaccount'],
     },
     {
       key: 'senegal',
@@ -1018,7 +1019,18 @@ export class KycAdminService {
                 ? doc.previewProtectedArea
                 : { ...(DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA[doc.docType] || DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport) },
           }));
-          const filteredPersistedCountries = parsed.countries.filter((c) => !REMOVED_COUNTRY_KEYS.has(c.key));
+          const filteredPersistedCountries = parsed.countries
+            .filter((c) => !REMOVED_COUNTRY_KEYS.has(c.key))
+            .map((c): AdminCountryConfig => {
+              if (c.key === 'pakistan' && Array.isArray(c.enabledDocs) && !c.enabledDocs.includes('passport')) {
+                return {
+                  ...c,
+                  subtitle: 'Passport & National Identity Card (SNIC)',
+                  enabledDocs: ['passport', ...c.enabledDocs],
+                };
+              }
+              return c;
+            });
           const existingCountryKeys = new Set(filteredPersistedCountries.map((c) => c.key));
           const mergedCountries =
             filteredPersistedCountries.length > 0
