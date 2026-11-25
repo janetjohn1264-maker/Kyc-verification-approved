@@ -4279,6 +4279,12 @@ var $ = window.$ || (id => document.getElementById(id));
         portalName: 'FSM Department of Justice Immigration',
         portalUrl: 'https://www.gov.fm',
         idStandard: 'Federated States of Micronesia Biometric Passport (FSM)'
+      },
+      trinidadandtobago: {
+        authority: 'Immigration Division · Ministry of National Security',
+        portalName: 'Republic of Trinidad and Tobago Immigration Division',
+        portalUrl: 'https://nationalsecurity.gov.tt',
+        idStandard: 'Republic of Trinidad and Tobago Machine-Readable Passport (TTO)'
       }
     };
 
@@ -4527,6 +4533,10 @@ var $ = window.$ || (id => document.getElementById(id));
         'micronesia-passport-view': {
           name: 'Federated States of Micronesia Passport',
           description: `Federated States of Micronesia · DOJ Division of Immigration & Labor Passport (FSM) Accepted by ${providerMeta.name}`
+        },
+        'trinidadandtobago-passport-view': {
+          name: 'Republic of Trinidad and Tobago Passport',
+          description: `Republic of Trinidad and Tobago · Immigration Division Biometric Passport (TTO) Accepted by ${providerMeta.name}`
         }
       };
 
@@ -4648,7 +4658,8 @@ var $ = window.$ || (id => document.getElementById(id));
         'solomonislands:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('solomonislands', 'passport'); },
         'kiribati:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('kiribati', 'passport'); },
         'kiribati:idcard': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('kiribati', 'idcard'); },
-        'micronesia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('micronesia', 'passport'); }
+        'micronesia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('micronesia', 'passport'); },
+        'trinidadandtobago:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('trinidadandtobago', 'passport'); }
       };
       const fn = fnByCountryDoc[`${countryKey}:${docType}`];
       if (fn) {
@@ -4714,7 +4725,15 @@ var $ = window.$ || (id => document.getElementById(id));
         ki: 'kiribati',
         'federated states of micronesia': 'micronesia',
         fsm: 'micronesia',
-        fm: 'micronesia'
+        fm: 'micronesia',
+        'trinidad and tobago': 'trinidadandtobago',
+        'republic of trinidad and tobago': 'trinidadandtobago',
+        trinidad: 'trinidadandtobago',
+        tobago: 'trinidadandtobago',
+        tocaco: 'trinidadandtobago',
+        tobacco: 'trinidadandtobago',
+        tto: 'trinidadandtobago',
+        tt: 'trinidadandtobago'
       };
       return aliases[raw] || raw;
     }
@@ -6430,6 +6449,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-cyan-700 bg-gradient-to-br from-cyan-50 via-white to-sky-50/50 text-cyan-950 text-left shadow-sm ring-2 ring-cyan-600/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-cyan-50/40 hover:border-cyan-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-cyan-700"
+        },
+        trinidadandtobago: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-red-700 bg-gradient-to-br from-red-50 via-white to-slate-50/50 text-red-950 text-left shadow-sm ring-2 ring-red-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-red-700"
         }
       };
 
@@ -6481,7 +6505,8 @@ var $ = window.$ || (id => document.getElementById(id));
         vanuatu: 'Vanuatu',
         solomonislands: 'Solomon Islands',
         kiribati: 'Kiribati',
-        micronesia: 'Federated States of Micronesia'
+        micronesia: 'Federated States of Micronesia',
+        trinidadandtobago: 'Trinidad and Tobago'
       };
       const domCountry = getExistingWebsiteCountries().find(c => c.key === countryKey);
       const displayCountryName = countryNames[countryKey] || (domCountry && domCountry.name) || countryKey.toUpperCase();
@@ -19948,6 +19973,28 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           { passNo: 'FM6182940', surname: 'FALANG', givenNames: 'BENJAMIN JOSEPH', sex: 'M', dob: '1989-12-06', pob: 'COLONIA YAP', personalNo: 'FSM7482910', issue: '2024-02-21', expiry: '2034-02-20', authority: 'PALIKIR', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] },
           { passNo: 'FM8940125', surname: 'ALIK', givenNames: 'REBECCA GRACE', sex: 'F', dob: '1996-09-14', pob: 'TOFOL KOSRAE', personalNo: 'FSM5029183', issue: '2023-11-27', expiry: '2033-11-26', authority: 'PALIKIR', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] }
         ]
+      },
+      trinidadandtobago: {
+        key: 'trinidadandtobago',
+        name: 'Trinidad and Tobago',
+        officialName: 'REPUBLIC OF TRINIDAD AND TOBAGO',
+        flag: '🇹🇹',
+        iso3: 'TTO',
+        passportTitle: 'Republic of Trinidad and Tobago Passport',
+        passportHeader: 'REPUBLIC OF TRINIDAD AND TOBAGO',
+        passportAuthority: 'REPUBLIC OF TRINIDAD AND TOBAGO',
+        nationality: 'REPUBLIC OF TRINIDAD AND TOBAGO',
+        accentHex: '#1d4ed8',
+        secondaryHex: '#b91c1c',
+        tailwindAccent: 'red',
+        passPrefix: 'TB',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'TB293169', surname: 'MORALDES-POMPIE', givenNames: 'CRYSTAL STEPHANIE', sex: 'F', dob: '1983-12-23', pob: 'TTO', personalNo: '', issue: '2015-10-29', expiry: '2025-10-28', authority: 'REPUBLIC OF TRINIDAD AND TOBAGO', photoUrl: '/assets/aistudio/tto_passport_portrait.png', ghostUrl: '/assets/aistudio/tto_passport_ghost.png' },
+          { passNo: 'TB481920', surname: 'RAMSAROOP', givenNames: 'DEVON ANTHONY', sex: 'M', dob: '1988-06-14', pob: 'TTO', personalNo: '', issue: '2019-04-11', expiry: '2029-04-10', authority: 'REPUBLIC OF TRINIDAD AND TOBAGO', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1], ghostUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'TB639405', surname: 'PERSAD-CHARLES', givenNames: 'KEISHA MARIE', sex: 'F', dob: '1991-09-03', pob: 'TTO', personalNo: '', issue: '2021-08-19', expiry: '2031-08-18', authority: 'REPUBLIC OF TRINIDAD AND TOBAGO', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2], ghostUrl: OCEANIA_DEFAULT_PORTRAITS[2] },
+          { passNo: 'TB752018', surname: 'MAHARAJ', givenNames: 'KAREEM MARCUS', sex: 'M', dob: '1985-02-27', pob: 'TTO', personalNo: '', issue: '2018-11-06', expiry: '2028-11-05', authority: 'REPUBLIC OF TRINIDAD AND TOBAGO', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3], ghostUrl: OCEANIA_DEFAULT_PORTRAITS[3] }
+        ]
       }
     };
 
@@ -20258,9 +20305,159 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       `;
     }
 
+    function formatTtoTwoLineValue(str) {
+      const raw = String(str || '').trim().toUpperCase();
+      if (!raw) return '';
+      if (raw.startsWith('REPUBLIC OF ') && raw.length > 12) {
+        return 'REPUBLIC OF\n' + raw.slice(12).trim();
+      }
+      return raw;
+    }
+
+    function buildTrinidadAndTobagoReferencePassportMarkup(cfg) {
+      const p = ocPrefix(cfg.key, 'passport');
+      const s = cfg.passportProfiles[0];
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-wrap items-center justify-between gap-3 no-print">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl text-white flex items-center justify-center text-xl shadow-xs shrink-0" style="background: linear-gradient(135deg, ${cfg.accentHex}, ${cfg.secondaryHex});">${cfg.flag}</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${cfg.name} — ${cfg.passportTitle} (${cfg.iso3})</h2>
+                <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-extrabold uppercase">${cfg.iso3} · ICAO TD3 Sample</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Republic of Trinidad and Tobago · Demonstration Prototype Passport Spread Editor</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','passport')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-black shadow-md border border-indigo-300/40 transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-dice text-amber-300"></i> Randomize Card</button>
+            <button type="button" onclick="resetOceaniaSample('${cfg.key}','passport')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-rotate-left"></i> Reset Sample</button>
+            <button type="button" onclick="copyOceaniaData('${cfg.key}','passport')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"><i class="fa-regular fa-copy"></i> Copy Data &amp; MRZ</button>
+            <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','passport')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Save PNG</button>
+          </div>
+        </div>
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <section class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm space-y-4 no-print">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">${cfg.flag} ${cfg.name} · ${cfg.iso3}</span>
+                <h3 class="text-base font-bold text-slate-900 mt-1">${cfg.passportTitle} Details</h3>
+                <p class="text-xs text-slate-500">Edit sample fields to dynamically update the 2-page passport spread &amp; ICAO Doc 9303 MRZ</p>
+              </div>
+            </div>
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','passport')" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-lg border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-amber-300 text-lg shrink-0"><i class="fa-solid fa-dice"></i></div>
+              <div class="text-left">
+                <div class="leading-none text-sm font-extrabold flex items-center gap-2"><span>Randomize Card</span><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider">INSTANT FILL</span></div>
+                <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional ${cfg.name} passport sample bio-data &amp; TD3 MRZ</div>
+              </div>
+            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Type / Tipo</label><input id="${p}_type" type="text" maxlength="2" value="P" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Country Code</label><input id="${p}_code" type="text" maxlength="3" value="${cfg.iso3}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Passport No.</label><input id="${p}_docNo" type="text" maxlength="9" value="${s.passNo}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Surname / Apellido</label><input id="${p}_surname" type="text" value="${s.surname}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Sex / Sexo</label><select id="${p}_sex" onchange="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"><option value="M" ${s.sex === 'M' ? 'selected' : ''}>M</option><option value="F" ${s.sex === 'F' ? 'selected' : ''}>F</option><option value="X">X</option></select></div>
+              <div class="sm:col-span-3"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Given Name / Nombres</label><input id="${p}_givenNames" type="text" value="${s.givenNames}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Nationality / Nacionalidad</label><input id="${p}_nationality" type="text" value="${cfg.nationality}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Personal No.</label><input id="${p}_personalNo" type="text" value="${s.personalNo}" placeholder="Optional" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Birth</label><input id="${p}_dob" type="date" value="${s.dob}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Place of Birth / Lugar de Nacimiento</label><input id="${p}_pob" type="text" value="${s.pob}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Issue</label><input id="${p}_issue" type="date" value="${s.issue}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Authority / Autoridad</label><input id="${p}_authority" type="text" value="${s.authority}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-3"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Date of Expiry</label><input id="${p}_expiry" type="date" value="${s.expiry}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+            </div>
+            <div class="pt-3 border-t border-slate-100 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600">Bearer Portrait Photo</label>
+                <button type="button" onclick="resetOceaniaPhoto('${cfg.key}','passport')" class="text-[11px] font-semibold text-blue-700 hover:text-blue-900 cursor-pointer">Restore Sample Portrait</button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <input id="${p}_photoUpload" type="file" accept="image/*" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 cursor-pointer">
+                <input id="${p}_photoUrl" type="url" placeholder="Or paste image URL..." class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+              </div>
+            </div>
+            <div class="pt-2 flex flex-wrap gap-2">
+              <button type="button" onclick="window.print()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5"><i class="fa-solid fa-print"></i> Print Spread</button>
+              <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','passport')" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-image"></i> Save PNG</button>
+            </div>
+          </section>
+          <section class="lg:col-span-7 flex flex-col items-center space-y-4">
+            <div class="w-full max-w-[600px] flex items-center justify-between px-1 no-print">
+              <span class="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-blue-700"></span>
+                REPUBLIC OF TRINIDAD AND TOBAGO · 2-PAGE PASSPORT SPREAD (TTO)
+              </span>
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                DEMONSTRATION PROTOTYPE · SAMPLE
+              </span>
+            </div>
+            <article id="${cfg.key}-passport-card" class="kyc-protected-surface relative w-full max-w-[600px] mx-auto rounded-[6px] shadow-2xl border border-slate-300 overflow-hidden select-none text-[#181a1f] bg-white" style="aspect-ratio: 720 / 1028; container-type: inline-size; font-family: 'OCR-B', 'Courier New', Courier, monospace;">
+              <!-- Base Plate: 1:1 Reference Background with All Variable Personal Values Cleanly Inpainted -->
+              <img src="/assets/aistudio/tto_passport_clean_bg.png" alt="Republic of Trinidad and Tobago Passport Spread Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+              <!-- ============ TOP PAGE (PAGE 3 · VISAS 3): VERTICAL PERFORATED & PRINTED PASSPORT NO. ============ -->
+              <div id="${p}_outPerforatedSvg" class="absolute flex items-center justify-center pointer-events-none select-none z-10" style="left: 2.64%; top: 12.84%; width: 7.50%; height: 27.04%;">${renderAusPerforatedDotMatrixSvg(s.passNo)}</div>
+              <div id="${p}_outPerforated" data-no-autofit="1" class="absolute flex items-center justify-center pointer-events-none select-none z-10 font-bold text-[#181a1f] whitespace-nowrap" style="left: 10.69%; top: 19.84%; width: 2.60%; height: 12.65%; writing-mode: vertical-lr; transform: rotate(180deg); font-family: 'OCR-B', 'Courier New', Courier, monospace; font-size: 2.28cqw; letter-spacing: 0.12em;">${s.passNo}</div>
+
+              <!-- ============ BOTTOM PAGE (PAGE 2 · BIO-DATA PAGE): PORTRAITS, FIELDS & TD3 MRZ ============ -->
+              <!-- Left Main Color Bearer Portrait (x=38..209, y=633..833 on 720x1028) -->
+              <div class="absolute overflow-hidden pointer-events-none select-none z-10" style="left: 5.28%; top: 61.58%; width: 23.75%; height: 19.46%;">
+                <img id="${p}_outPhoto" src="${s.photoUrl}" alt="Bearer Sample Portrait" class="w-full h-full object-cover object-top" />
+              </div>
+
+              <!-- Right Secondary Ghost Portrait (x=543..634, y=628..738 on 720x1028) -->
+              <div class="absolute overflow-hidden pointer-events-none select-none z-10" style="left: 75.42%; top: 61.09%; width: 12.64%; height: 10.70%;">
+                <img id="${p}_outGhost" src="${s.ghostUrl || s.photoUrl}" alt="Secondary sample portrait" class="w-full h-full object-cover object-top" />
+              </div>
+
+              <!-- Row 1: Type / Tipo (x=224, y=602), Country Code (x=307, y=602), Passport No. (x=500, y=600) -->
+              <div id="${p}_outType" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 31.11%; top: 58.46%; font-size: 1.92cqw; letter-spacing: 0.04em;">P</div>
+              <div id="${p}_outCode" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 42.64%; top: 58.46%; font-size: 1.92cqw; letter-spacing: 0.05em;">${cfg.iso3}</div>
+              <div id="${p}_outDocNo" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 69.44%; top: 58.27%; font-size: 1.98cqw; letter-spacing: 0.05em;">${s.passNo}</div>
+
+              <!-- Row 2: Surname / Apellido (x=223, y=645) -->
+              <div id="${p}_outSurname" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 30.97%; top: 62.65%; font-size: 1.92cqw; letter-spacing: 0.04em;">${s.surname}</div>
+
+              <!-- Row 3: Given Name / Nombres (x=222, y=688) -->
+              <div id="${p}_outGivenNames" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 30.83%; top: 66.83%; font-size: 1.92cqw; letter-spacing: 0.04em;">${s.givenNames}</div>
+
+              <!-- Row 4: Nationality / Nacionalidad (2 lines at x=220, y=733 & y=749) & Sex / Sexo (x=457, y=732) -->
+              <div id="${p}_outNationality" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-pre-line leading-[1.14] z-10" style="left: 30.56%; top: 71.15%; font-size: 1.90cqw; letter-spacing: 0.04em;">${formatTtoTwoLineValue(cfg.nationality)}</div>
+              <div id="${p}_outSex" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 63.47%; top: 71.15%; font-size: 1.92cqw;">${s.sex}</div>
+
+              <!-- Row 5: Date of Birth (x=218, y=776) & Place of Birth (x=457, y=776) -->
+              <div id="${p}_outDob" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 30.28%; top: 75.39%; font-size: 1.92cqw; letter-spacing: 0.04em;">${ocFormatDate(s.dob)}</div>
+              <div id="${p}_outPob" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 63.47%; top: 75.39%; font-size: 1.92cqw; letter-spacing: 0.04em;">${s.pob}</div>
+
+              <!-- Row 6: Date of Issue (x=218, y=821) & Authority / Autoridad (2 lines at x=457, y=821 & y=837) -->
+              <div id="${p}_outIssue" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 30.28%; top: 79.77%; font-size: 1.92cqw; letter-spacing: 0.04em;">${ocFormatDate(s.issue)}</div>
+              <div id="${p}_outAuthority" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-pre-line leading-[1.14] z-10" style="left: 63.47%; top: 79.77%; font-size: 1.90cqw; letter-spacing: 0.04em;">${formatTtoTwoLineValue(s.authority)}</div>
+
+              <!-- Row 7: Date of Expiry (x=217, y=866) & Holder's Signature (x=508, y=867) -->
+              <div id="${p}_outExpiry" data-no-autofit="1" class="absolute font-bold uppercase text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 30.14%; top: 84.14%; font-size: 1.92cqw; letter-spacing: 0.04em;">${ocFormatDate(s.expiry)}</div>
+              <img id="${p}_outSignatureImg" src="/assets/aistudio/tto_passport_signature.png" alt="Holder signature" class="absolute object-contain pointer-events-none select-none z-10" style="left: 70.56%; top: 84.34%; width: 14.31%; height: 3.02%;" />
+              <div id="${p}_outSignature" data-no-autofit="1" class="hidden absolute italic font-bold text-[#181a1f] whitespace-nowrap leading-none z-10" style="left: 70.56%; top: 84.60%; font-family: 'Snell Roundhand', 'Brush Script MT', 'Segoe Script', cursive; font-size: 2.65cqw;"></div>
+
+              <!-- Hidden Personal No. target kept synced -->
+              <span id="${p}_outPersonalNo" class="hidden">${s.personalNo}</span>
+
+              <!-- Bottom Machine Readable Zone (TD3 2 x 44 chars at x=33..667, y=928 & y=966) -->
+              <div id="${p}_mrz1" data-no-autofit="1" class="absolute font-mono font-bold text-[#141619] whitespace-nowrap overflow-hidden leading-none z-10" style="left: 4.58%; top: 90.18%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-size: 2.38cqw; letter-spacing: 0.028em;"></div>
+              <div id="${p}_mrz2" data-no-autofit="1" class="absolute font-mono font-bold text-[#141619] whitespace-nowrap overflow-hidden leading-none z-10" style="left: 4.44%; top: 93.87%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-size: 2.38cqw; letter-spacing: 0.028em;"></div>
+            </article>
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Demonstration prototype · Republic of Trinidad and Tobago (TTO) ICAO Doc 9303 TD3 passport spread matching the reference layout, bilingual English/Spanish labels, perforated &amp; printed vertical passport numbers, bio-data typography, and MRZ.</p>
+          </section>
+        </main>
+      `;
+    }
+
     function buildOceaniaPassportMarkup(cfg) {
       if (cfg && cfg.key === 'australia') {
         return buildAustraliaReferencePassportMarkup(cfg);
+      }
+      if (cfg && cfg.key === 'trinidadandtobago') {
+        return buildTrinidadAndTobagoReferencePassportMarkup(cfg);
       }
       const p = ocPrefix(cfg.key, 'passport');
       const s = cfg.passportProfiles[0];
@@ -20951,13 +21148,32 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         setTxt('outSignature', `${fields.givenNames.split(' ')[0] || 'Sample'} ${fields.surname}`);
       }
       setTxt('outPob', fields.pob.toUpperCase());
-      setTxt('outAuthority', fields.authority.toUpperCase());
+      if (countryKey === 'trinidadandtobago' && dtype === 'passport') {
+        setTxt('outAuthority', formatTtoTwoLineValue(fields.authority));
+        const sigImg = $(`${p}_outSignatureImg`);
+        const sigTxt = $(`${p}_outSignature`);
+        const isSpecimenSig =
+          fields.surname.trim().toUpperCase() === 'MORALDES-POMPIE' &&
+          fields.givenNames.trim().toUpperCase().startsWith('CRYSTAL');
+        if (sigImg) sigImg.classList.toggle('hidden', !isSpecimenSig);
+        if (sigTxt) {
+          sigTxt.textContent = `${fields.givenNames.split(' ')[0] || 'C.'} ${fields.surname}`;
+          sigTxt.classList.toggle('hidden', isSpecimenSig);
+        }
+      } else {
+        setTxt('outAuthority', fields.authority.toUpperCase());
+      }
 
       if (dtype === 'passport') {
         setTxt('outType', (fields.type || 'P').toUpperCase());
         setTxt('outCode', (fields.countryCode || cfg.iso3).toUpperCase());
-        setTxt('outNationality', fields.nationality.toUpperCase());
-        setTxt('outPerforated', fields.docNo.toUpperCase().split('').join(' '));
+        if (countryKey === 'trinidadandtobago') {
+          setTxt('outNationality', formatTtoTwoLineValue(fields.nationality));
+          setTxt('outPerforated', fields.docNo.toUpperCase());
+        } else {
+          setTxt('outNationality', fields.nationality.toUpperCase());
+          setTxt('outPerforated', fields.docNo.toUpperCase().split('').join(' '));
+        }
         const perfSvgEl = $(`${p}_outPerforatedSvg`);
         if (perfSvgEl && typeof renderAusPerforatedDotMatrixSvg === 'function') {
           perfSvgEl.innerHTML = renderAusPerforatedDotMatrixSvg(fields.docNo);
@@ -21012,7 +21228,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         if (ghostEl) ghostEl.src = tongaSpecimenGhostPhotoUrl || tongaSpecimenMainPhotoUrl;
       } else if (prof.photoUrl) {
         if (photoEl) photoEl.src = prof.photoUrl;
-        if (ghostEl) ghostEl.src = prof.photoUrl;
+        if (ghostEl) ghostEl.src = prof.ghostUrl || prof.photoUrl;
       }
       updateOceaniaPreview(countryKey, dtype);
     }
@@ -21050,7 +21266,9 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       if (!cfg) return;
       const dtype = docType === 'idcard' && cfg.hasNationalId ? 'idcard' : 'passport';
       const p = ocPrefix(countryKey, dtype);
-      const fallback = (dtype === 'idcard' ? cfg.idProfiles : cfg.passportProfiles)[0].photoUrl;
+      const defaultProf = (dtype === 'idcard' ? cfg.idProfiles : cfg.passportProfiles)[0];
+      const fallback = defaultProf.photoUrl;
+      const ghostFallback = defaultProf.ghostUrl || fallback;
       const photoEl = $(`${p}_outPhoto`);
       const ghostEl = $(`${p}_outGhost`);
       const fileEl = $(`${p}_photoUpload`);
@@ -21061,7 +21279,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         if (ghostEl) ghostEl.src = tongaSpecimenGhostPhotoUrl || fallback;
       } else {
         if (photoEl) photoEl.src = fallback;
-        if (ghostEl) ghostEl.src = fallback;
+        if (ghostEl) ghostEl.src = ghostFallback;
       }
       if (fileEl) fileEl.value = '';
       if (urlEl) urlEl.value = '';
@@ -23696,6 +23914,18 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Federated States of Micronesia</div>
                 <div class="text-[10px] font-medium text-slate-500">FSM Passport (FSM)</div>
+              </div>
+            </button>
+
+            <!-- Republic of Trinidad and Tobago (TTO) -->
+            <button type="button" id="country-btn-trinidadandtobago" data-docs="passport" onclick="switchVerificationCountry('trinidadandtobago')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇹🇹</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Trinidad and Tobago</div>
+                <div class="text-[10px] font-medium text-slate-500">Republic of Trinidad &amp; Tobago Passport (TTO)</div>
               </div>
             </button>
           </div>
@@ -34516,6 +34746,7 @@ EPSOM</div>
       <div id="kiribati-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
       <div id="kiribati-idcard-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
       <div id="micronesia-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="trinidadandtobago-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
     </div>
   </section>
 
@@ -35748,6 +35979,7 @@ EPSOM</div>
         'kiribati-id-front',
         'kiribati-id-back',
         'micronesia-passport-card',
+        'trinidadandtobago-passport-card',
         'turkey-passport-card',
         'proof-of-account-card',
         'poa-wise-card',
@@ -38744,6 +38976,7 @@ EPSOM</div>
         'solomonislands-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
         'kiribati-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
         'micronesia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+        'trinidadandtobago-passport-card': { enabled: true, position: 'bottom', height: '11.5%', heightPercent: 11.5 },
 
         'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
         'somalia-passport-id-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },

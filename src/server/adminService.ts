@@ -402,6 +402,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
   'solomonislands-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
   'kiribati-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
   'micronesia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
+  'trinidadandtobago-passport-card': { enabled: true, position: 'bottom', height: '11.5%', heightPercent: 11.5 },
 
   // Single-Page Passport Data Cards
   'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
@@ -912,6 +913,18 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       idStandard: 'Federated States of Micronesia Biometric Passport (FSM)',
       enabledDocs: ['passport'],
     },
+    {
+      key: 'trinidadandtobago',
+      name: 'Trinidad and Tobago',
+      flag: '🇹🇹',
+      subtitle: 'Republic of Trinidad and Tobago Passport (TTO)',
+      iso3: 'TTO',
+      authority: 'Immigration Division · Ministry of National Security',
+      portalName: 'Republic of Trinidad and Tobago Immigration Division',
+      portalUrl: 'https://nationalsecurity.gov.tt',
+      idStandard: 'Republic of Trinidad and Tobago Machine-Readable Passport (TTO)',
+      enabledDocs: ['passport'],
+    },
   ];
 
   return raw.map((item) => ({
@@ -1077,12 +1090,20 @@ export class KycAdminService {
                 ? doc.previewProtectedArea
                 : { ...(DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA[doc.docType] || DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport) },
           }));
+          const existingCountryKeys = new Set(parsed.countries.map((c) => c.key));
+          const mergedCountries =
+            parsed.countries.length > 0
+              ? [
+                  ...parsed.countries,
+                  ...defaultState.countries.filter((c) => !existingCountryKeys.has(c.key)),
+                ]
+              : defaultState.countries;
           return {
             claimedPasswordSalt: typeof parsed.claimedPasswordSalt === 'string' ? parsed.claimedPasswordSalt : null,
             claimedPasswordHash: typeof parsed.claimedPasswordHash === 'string' ? parsed.claimedPasswordHash : null,
             claimedUsername: typeof parsed.claimedUsername === 'string' ? parsed.claimedUsername : null,
             adminUsers: Array.isArray(parsed.adminUsers) ? parsed.adminUsers : [],
-            countries: parsed.countries.length > 0 ? parsed.countries : defaultState.countries,
+            countries: mergedCountries,
             documents: normalizedDocs,
             auditLogs: Array.isArray(parsed.auditLogs) ? parsed.auditLogs.slice(0, MAX_AUDIT_LOGS) : [],
           };
