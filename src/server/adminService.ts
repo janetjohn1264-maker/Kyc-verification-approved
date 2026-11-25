@@ -819,102 +819,6 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       enabledDocs: ['passport', 'driverlicense'],
     },
     {
-      key: 'fiji',
-      name: 'Fiji',
-      flag: '🇫🇯',
-      subtitle: 'Fiji Passport (FJI)',
-      iso3: 'FJI',
-      authority: 'Department of Immigration · Ministry of Immigration',
-      portalName: 'Fiji Department of Immigration',
-      portalUrl: 'https://www.immigration.gov.fj',
-      idStandard: 'Republic of Fiji Biometric e-Passport (FJI)',
-      enabledDocs: ['passport'],
-    },
-    {
-      key: 'papuanewguinea',
-      name: 'Papua New Guinea',
-      flag: '🇵🇬',
-      subtitle: 'Passport & NID Card (PNG)',
-      iso3: 'PNG',
-      authority: 'PNG Immigration & Citizenship Services Authority (ICSA) & PNG Civil and Identity Registry (PNGCIR)',
-      portalName: 'PNG ICSA & Civil Registry (NID)',
-      portalUrl: 'https://www.icsa.gov.pg',
-      idStandard: 'Papua New Guinea e-Passport & National Identification (NID) Card',
-      enabledDocs: ['passport', 'idcard'],
-    },
-    {
-      key: 'samoa',
-      name: 'Samoa',
-      flag: '🇼🇸',
-      subtitle: 'Samoa Passport (WSM)',
-      iso3: 'WSM',
-      authority: 'Immigration Division · Ministry of the Prime Minister and Cabinet',
-      portalName: 'Government of Samoa Immigration Services',
-      portalUrl: 'https://www.mygov.gov.ws',
-      idStandard: 'Independent State of Samoa Machine-Readable Passport (WSM)',
-      enabledDocs: ['passport'],
-    },
-    {
-      key: 'tonga',
-      name: 'Tonga',
-      flag: '🇹🇴',
-      subtitle: 'Passport & National ID (TON)',
-      iso3: 'TON',
-      authority: 'Immigration Division (Ministry of Foreign Affairs) & National Identity Card Office',
-      portalName: 'Kingdom of Tonga Immigration & NID Office',
-      portalUrl: 'https://www.gov.to',
-      idStandard: 'Kingdom of Tonga Passport & National Identity Card (TON)',
-      enabledDocs: ['passport', 'idcard'],
-    },
-    {
-      key: 'vanuatu',
-      name: 'Vanuatu',
-      flag: '🇻🇺',
-      subtitle: 'Passport & National ID (VUT)',
-      iso3: 'VUT',
-      authority: 'Department of Immigration & Passport Services and Civil Registry & Identity Management (CRIMD)',
-      portalName: 'Republic of Vanuatu Immigration & Civil Registry',
-      portalUrl: 'https://immigration.gov.vu',
-      idStandard: 'Republic of Vanuatu Passport & National Identity Card (VUT)',
-      enabledDocs: ['passport', 'idcard'],
-    },
-    {
-      key: 'solomonislands',
-      name: 'Solomon Islands',
-      flag: '🇸🇧',
-      subtitle: 'Solomon Islands Passport (SLB)',
-      iso3: 'SLB',
-      authority: 'Immigration Division · Ministry of Commerce, Industries, Labour and Immigration',
-      portalName: 'Solomon Islands Immigration Division',
-      portalUrl: 'https://commerce.gov.sb',
-      idStandard: 'Solomon Islands Machine-Readable Passport (SLB)',
-      enabledDocs: ['passport'],
-    },
-    {
-      key: 'kiribati',
-      name: 'Kiribati',
-      flag: '🇰🇮',
-      subtitle: 'Passport & National ID (KIR)',
-      iso3: 'KIR',
-      authority: 'Immigration Division (Ministry of Foreign Affairs & Immigration) & Ministry of Justice',
-      portalName: 'Republic of Kiribati Immigration & Civil Registry',
-      portalUrl: 'https://www.mfa.gov.ki',
-      idStandard: 'Republic of Kiribati Passport & National Identity Card (KIR)',
-      enabledDocs: ['passport', 'idcard'],
-    },
-    {
-      key: 'micronesia',
-      name: 'Federated States of Micronesia',
-      flag: '🇫🇲',
-      subtitle: 'FSM Passport (FSM)',
-      iso3: 'FSM',
-      authority: 'Department of Justice · Division of Immigration & Labor',
-      portalName: 'FSM Department of Justice Immigration',
-      portalUrl: 'https://www.gov.fm',
-      idStandard: 'Federated States of Micronesia Biometric Passport (FSM)',
-      enabledDocs: ['passport'],
-    },
-    {
       key: 'trinidadandtobago',
       name: 'Trinidad and Tobago',
       flag: '🇹🇹',
@@ -948,6 +852,17 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
     updatedAt: nowIso,
   }));
 }
+
+const REMOVED_COUNTRY_KEYS = new Set<string>([
+  'fiji',
+  'papuanewguinea',
+  'samoa',
+  'tonga',
+  'vanuatu',
+  'solomonislands',
+  'kiribati',
+  'micronesia',
+]);
 
 function sha256Hex(value: string): string {
   return crypto.createHash('sha256').update(value, 'utf8').digest('hex');
@@ -1103,15 +1018,16 @@ export class KycAdminService {
                 ? doc.previewProtectedArea
                 : { ...(DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA[doc.docType] || DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.passport) },
           }));
-          const existingCountryKeys = new Set(parsed.countries.map((c) => c.key));
+          const filteredPersistedCountries = parsed.countries.filter((c) => !REMOVED_COUNTRY_KEYS.has(c.key));
+          const existingCountryKeys = new Set(filteredPersistedCountries.map((c) => c.key));
           const mergedCountries =
-            parsed.countries.length > 0
+            filteredPersistedCountries.length > 0
               ? [
-                  ...parsed.countries,
+                  ...filteredPersistedCountries,
                   ...defaultState.countries.filter((c) => !existingCountryKeys.has(c.key)),
                 ]
               : defaultState.countries;
-          return {
+          const loadedState: PersistedAdminState = {
             claimedPasswordSalt: typeof parsed.claimedPasswordSalt === 'string' ? parsed.claimedPasswordSalt : null,
             claimedPasswordHash: typeof parsed.claimedPasswordHash === 'string' ? parsed.claimedPasswordHash : null,
             claimedUsername: typeof parsed.claimedUsername === 'string' ? parsed.claimedUsername : null,
@@ -1120,6 +1036,8 @@ export class KycAdminService {
             documents: normalizedDocs,
             auditLogs: Array.isArray(parsed.auditLogs) ? parsed.auditLogs.slice(0, MAX_AUDIT_LOGS) : [],
           };
+          this.saveState(loadedState);
+          return loadedState;
         }
       }
     } catch {
