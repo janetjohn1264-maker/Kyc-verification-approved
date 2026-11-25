@@ -37,6 +37,7 @@ export interface CustomerMonthlyEntitlement {
 
 export interface CustomerAccountRecord {
   customerId: string;
+  username?: string;
   email: string;
   passwordSalt: string;
   passwordHash: string;
@@ -61,6 +62,7 @@ export interface CustomerSessionRecord {
 
 export interface PublicCustomerAccountView {
   customerId: string;
+  username: string;
   email: string;
   createdAt: string;
   lastLoginAt: string | null;
@@ -193,6 +195,18 @@ function parseCookies(cookieHeader: string | undefined): Record<string, string> 
 function normalizeEmail(raw: unknown): string {
   if (typeof raw !== 'string') return '';
   return raw.trim().toLowerCase().slice(0, 160);
+}
+
+function deriveCustomerUsername(account: { username?: unknown; email?: unknown }): string {
+  if (typeof account.username === 'string' && account.username.trim().length > 0) {
+    return account.username.trim().slice(0, 80);
+  }
+  const email = typeof account.email === 'string' ? account.email.trim() : '';
+  const atIndex = email.indexOf('@');
+  if (atIndex > 0) {
+    return email.slice(0, atIndex).trim();
+  }
+  return email || 'User';
 }
 
 function isValidEmailFormat(email: string): boolean {
@@ -465,6 +479,7 @@ export class KycCustomerService {
 
     return {
       customerId: customer.customerId,
+      username: deriveCustomerUsername(customer),
       email: customer.email,
       createdAt: customer.createdAt,
       lastLoginAt: customer.lastLoginAt,
@@ -1166,6 +1181,7 @@ export class KycCustomerService {
 
       const newCustomer: CustomerAccountRecord = {
         customerId: `CUST-${crypto.randomUUID()}`,
+        username: deriveCustomerUsername({ username: body.username, email }),
         email,
         passwordSalt: saltHex,
         passwordHash,

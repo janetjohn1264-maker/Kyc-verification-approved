@@ -24810,9 +24810,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-[#0d5bd9] flex items-center justify-center shrink-0">
               <i class="fa-solid fa-user-check text-xl"></i>
             </div>
-            <div>
+            <div class="space-y-0.5">
               <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Customer Account</div>
-              <div id="customerAccountEmailValue" class="text-base sm:text-lg font-extrabold text-[#0d2658] break-all">—</div>
+              <h2 id="customerAccountUserGreeting" class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight leading-snug"></h2>
+              <div id="customerAccountEmailValue" class="text-xs sm:text-sm font-bold text-[#3b5482] break-all">—</div>
             </div>
           </div>
 
@@ -40896,6 +40897,16 @@ EPSOM</div>
       }
       window.__kycIsCustomerPaidAccessVerifiedActive = isCustomerPaidAccessVerifiedActive;
 
+      function deriveCustomerUsername(customerObj) {
+        if (!customerObj || typeof customerObj !== 'object') return '';
+        const explicitUsername = typeof customerObj.username === 'string' ? customerObj.username.trim() : '';
+        if (explicitUsername) return explicitUsername;
+        const rawEmail = typeof customerObj.email === 'string' ? customerObj.email.trim() : '';
+        if (!rawEmail) return '';
+        const atIdx = rawEmail.indexOf('@');
+        return (atIdx > 0 ? rawEmail.slice(0, atIdx) : rawEmail).trim();
+      }
+
       function applyServerCustomerAuthState(data) {
         if (data && typeof data.pendingCheckoutPlan === 'object') {
           _pendingCheckoutPlan = data.pendingCheckoutPlan;
@@ -40904,9 +40915,12 @@ EPSOM</div>
           _pendingPlanIntentToken = data.planIntentToken.trim();
         }
         if (data && data.authenticated === true && data.customer && data.customer.id) {
+          const emailStr = String(data.customer.email || '');
+          const usernameStr = deriveCustomerUsername(data.customer);
           _customerProfile = {
             id: String(data.customer.id),
-            email: String(data.customer.email || ''),
+            username: usernameStr,
+            email: emailStr,
             createdAt: String(data.customer.createdAt || ''),
             lastLoginAt: data.customer.lastLoginAt || null
           };
@@ -41055,7 +41069,10 @@ EPSOM</div>
               ? `Create your customer account to continue directly to ${_pendingCheckoutPlan.label} (${_pendingCheckoutPlan.displayPrice} USD) payment.`
               : 'Create a secure customer account to manage your One-Time Access ($55) or Monthly Access ($12/month) plan.';
           } else if (effectiveMode === 'account') {
-            heroTitle.textContent = 'My Customer Account';
+            const activeUsername = (_customerProfile && _customerProfile.username)
+              ? _customerProfile.username
+              : deriveCustomerUsername(_customerProfile);
+            heroTitle.textContent = activeUsername ? `Hi, ${activeUsername} 👋` : 'My Customer Account';
             heroSubtitle.textContent =
               'View your account details and server-verified Sifalo Pay access entitlements.';
           } else {
@@ -41066,9 +41083,15 @@ EPSOM</div>
           }
         }
 
+        const greetingEl = document.getElementById('customerAccountUserGreeting');
+        const emailEl = document.getElementById('customerAccountEmailValue');
+
         // Populate Customer Account details if logged in
         if (loggedIn && _customerProfile) {
-          const emailEl = document.getElementById('customerAccountEmailValue');
+          const activeUsername = _customerProfile.username || deriveCustomerUsername(_customerProfile);
+          if (greetingEl) {
+            greetingEl.textContent = activeUsername ? `Hi, ${activeUsername} 👋` : '';
+          }
           if (emailEl) emailEl.textContent = _customerProfile.email;
 
           const currentBadge = document.getElementById('customerCurrentAccessBadge');
@@ -41158,6 +41181,9 @@ EPSOM</div>
               monthlyDetail.textContent = 'Monthly payment ($12/month USD) · 30-day access period.';
             }
           }
+        } else {
+          if (greetingEl) greetingEl.textContent = '';
+          if (emailEl) emailEl.textContent = '—';
         }
       }
       window.__kycSyncCustomerAccountUI = syncCustomerNavigationAndAccountUI;
