@@ -4285,6 +4285,12 @@ var $ = window.$ || (id => document.getElementById(id));
         portalName: 'Republic of Trinidad and Tobago Immigration Division',
         portalUrl: 'https://nationalsecurity.gov.tt',
         idStandard: 'Republic of Trinidad and Tobago Machine-Readable Passport (TTO)'
+      },
+      indonesia: {
+        authority: 'Direktorat Jenderal Imigrasi · Kementerian Hukum dan HAM Republik Indonesia',
+        portalName: 'Direktorat Jenderal Imigrasi Republik Indonesia',
+        portalUrl: 'https://www.imigrasi.go.id',
+        idStandard: 'Republik Indonesia Machine-Readable Passport (Paspor / IDN)'
       }
     };
 
@@ -4537,6 +4543,10 @@ var $ = window.$ || (id => document.getElementById(id));
         'trinidadandtobago-passport-view': {
           name: 'Republic of Trinidad and Tobago Passport',
           description: `Republic of Trinidad and Tobago · Immigration Division Biometric Passport (TTO) Accepted by ${providerMeta.name}`
+        },
+        'indonesia-passport-view': {
+          name: 'Republik Indonesia Paspor / Passport',
+          description: `Republik Indonesia · Direktorat Jenderal Imigrasi Passport (IDN) Accepted by ${providerMeta.name}`
         }
       };
 
@@ -4659,7 +4669,8 @@ var $ = window.$ || (id => document.getElementById(id));
         'kiribati:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('kiribati', 'passport'); },
         'kiribati:idcard': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('kiribati', 'idcard'); },
         'micronesia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('micronesia', 'passport'); },
-        'trinidadandtobago:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('trinidadandtobago', 'passport'); }
+        'trinidadandtobago:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('trinidadandtobago', 'passport'); },
+        'indonesia:passport': () => { if (typeof updateOceaniaPreview === 'function') updateOceaniaPreview('indonesia', 'passport'); }
       };
       const fn = fnByCountryDoc[`${countryKey}:${docType}`];
       if (fn) {
@@ -4733,7 +4744,11 @@ var $ = window.$ || (id => document.getElementById(id));
         tocaco: 'trinidadandtobago',
         tobacco: 'trinidadandtobago',
         tto: 'trinidadandtobago',
-        tt: 'trinidadandtobago'
+        tt: 'trinidadandtobago',
+        'republik indonesia': 'indonesia',
+        'republic of indonesia': 'indonesia',
+        idn: 'indonesia',
+        id: 'indonesia'
       };
       return aliases[raw] || raw;
     }
@@ -6454,6 +6469,11 @@ var $ = window.$ || (id => document.getElementById(id));
           active: "country-pill-btn p-3.5 rounded-2xl border-2 border-red-700 bg-gradient-to-br from-red-50 via-white to-slate-50/50 text-red-950 text-left shadow-sm ring-2 ring-red-600/20 transition-all cursor-pointer",
           inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-red-50/40 hover:border-red-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
           dotColor: "bg-red-700"
+        },
+        indonesia: {
+          active: "country-pill-btn p-3.5 rounded-2xl border-2 border-teal-700 bg-gradient-to-br from-teal-50 via-white to-emerald-50/50 text-teal-950 text-left shadow-sm ring-2 ring-teal-600/20 transition-all cursor-pointer",
+          inactive: "country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-teal-50/40 hover:border-teal-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer",
+          dotColor: "bg-teal-700"
         }
       };
 
@@ -6506,7 +6526,8 @@ var $ = window.$ || (id => document.getElementById(id));
         solomonislands: 'Solomon Islands',
         kiribati: 'Kiribati',
         micronesia: 'Federated States of Micronesia',
-        trinidadandtobago: 'Trinidad and Tobago'
+        trinidadandtobago: 'Trinidad and Tobago',
+        indonesia: 'Indonesia'
       };
       const domCountry = getExistingWebsiteCountries().find(c => c.key === countryKey);
       const displayCountryName = countryNames[countryKey] || (domCountry && domCountry.name) || countryKey.toUpperCase();
@@ -19995,6 +20016,28 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           { passNo: 'TB639405', surname: 'PERSAD-CHARLES', givenNames: 'KEISHA MARIE', sex: 'F', dob: '1991-09-03', pob: 'TTO', personalNo: '', issue: '2021-08-19', expiry: '2031-08-18', authority: 'REPUBLIC OF TRINIDAD AND TOBAGO', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2], ghostUrl: OCEANIA_DEFAULT_PORTRAITS[2] },
           { passNo: 'TB752018', surname: 'MAHARAJ', givenNames: 'KAREEM MARCUS', sex: 'M', dob: '1985-02-27', pob: 'TTO', personalNo: '', issue: '2018-11-06', expiry: '2028-11-05', authority: 'REPUBLIC OF TRINIDAD AND TOBAGO', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3], ghostUrl: OCEANIA_DEFAULT_PORTRAITS[3] }
         ]
+      },
+      indonesia: {
+        key: 'indonesia',
+        name: 'Indonesia',
+        officialName: 'REPUBLIK INDONESIA / REPUBLIC OF INDONESIA',
+        flag: '🇮🇩',
+        iso3: 'IDN',
+        passportTitle: 'Paspor Republik Indonesia / Passport',
+        passportHeader: 'REPUBLIK INDONESIA',
+        passportAuthority: 'SAMARINDA',
+        nationality: 'INDONESIA',
+        accentHex: '#2f6d73',
+        secondaryHex: '#7a7554',
+        tailwindAccent: 'teal',
+        passPrefix: 'C',
+        hasNationalId: false,
+        passportProfiles: [
+          { passNo: 'C7830497', surname: 'SETYARINI', givenNames: 'AGNES AMBARWULAN', sex: 'F', dob: '1968-08-10', pob: 'KLATEN', personalNo: '1A13MCK10246-VSQ', mrzPersonalNo: '64080450080002', issue: '2021-12-24', expiry: '2026-12-24', authority: 'SAMARINDA', photoUrl: '/assets/aistudio/idn_passport_portrait.png' },
+          { passNo: 'C8419205', surname: 'PRATAMA', givenNames: 'BUDI SANTOSO', sex: 'M', dob: '1985-04-17', pob: 'SURABAYA', personalNo: '1A11JKT49201-KLP', mrzPersonalNo: '35780417048500', issue: '2022-06-15', expiry: '2027-06-15', authority: 'JAKARTA SELATAN', photoUrl: OCEANIA_DEFAULT_PORTRAITS[1] },
+          { passNo: 'C6190482', surname: 'KUSUMAWATI', givenNames: 'DEWI RATNA', sex: 'F', dob: '1992-11-03', pob: 'BANDUNG', personalNo: '1A14BDG83910-MNR', mrzPersonalNo: '32730351119200', issue: '2023-02-10', expiry: '2028-02-10', authority: 'BANDUNG', photoUrl: OCEANIA_DEFAULT_PORTRAITS[2] },
+          { passNo: 'C9205174', surname: 'HIDAYAT', givenNames: 'RIZKY MAULANA', sex: 'M', dob: '1979-09-22', pob: 'YOGYAKARTA', personalNo: '1A12YGY60184-PQR', mrzPersonalNo: '34712209097900', issue: '2021-08-19', expiry: '2026-08-19', authority: 'YOGYAKARTA', photoUrl: OCEANIA_DEFAULT_PORTRAITS[3] }
+        ]
       }
     };
 
@@ -20452,12 +20495,183 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       `;
     }
 
+    function renderIdnPerforatedDotMatrixSvg(docNo) {
+      const clean = String(docNo || 'C7830497').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 9) || 'C7830497';
+      const stepX = 5.6;
+      const stepY = 8.6;
+      const glyphW = 5 * stepX;
+      const gap = 11.2;
+      const chars = clean.split('');
+      const totalW = chars.length * glyphW + Math.max(0, chars.length - 1) * gap;
+      const totalH = 7 * stepY;
+      let circles = '';
+      chars.forEach((ch, ci) => {
+        const pattern = AUS_DOT_MATRIX_5X7[ch] || AUS_DOT_MATRIX_5X7[' '];
+        const ox = ci * (glyphW + gap);
+        for (let r = 0; r < 7; r++) {
+          for (let c = 0; c < 5; c++) {
+            if (pattern[r][c] === '1') {
+              const cx = (ox + c * stepX + 2.4).toFixed(1);
+              const cy = (r * stepY + 3.2).toFixed(1);
+              circles += `<circle cx="${cx}" cy="${cy}" r="1.95" fill="#3a3532" fill-opacity="0.88"/>`;
+            }
+          }
+        }
+      });
+      return `<svg viewBox="0 0 ${totalH} ${totalW}" class="w-full h-full" preserveAspectRatio="none" aria-hidden="true"><g transform="translate(0, ${totalW}) rotate(-90)">${circles}</g></svg>`;
+    }
+
+    function formatIdnFullName(givenNames, surname) {
+      const g = String(givenNames || '').trim().toUpperCase();
+      const s = String(surname || '').trim().toUpperCase();
+      return [g, s].filter(Boolean).join(' ') || 'AGNES AMBARWULAN SETYARINI';
+    }
+
+    function formatIdnSex(sexVal) {
+      const raw = String(sexVal || 'F').trim().toUpperCase();
+      if (raw === 'P/F' || raw === 'L/M') return raw;
+      if (raw.startsWith('F') || raw.startsWith('P')) return 'P/F';
+      if (raw.startsWith('M') || raw.startsWith('L')) return 'L/M';
+      return raw;
+    }
+
+    function buildIndonesiaReferencePassportMarkup(cfg) {
+      const p = ocPrefix(cfg.key, 'passport');
+      const s = cfg.passportProfiles[0];
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs flex flex-wrap items-center justify-between gap-3 no-print">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl text-white flex items-center justify-center text-xl shadow-xs shrink-0" style="background: linear-gradient(135deg, ${cfg.accentHex}, ${cfg.secondaryHex});">${cfg.flag}</div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-sm sm:text-base font-black text-slate-900 tracking-tight">${cfg.name} — ${cfg.passportTitle} (${cfg.iso3})</h2>
+                <span class="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-extrabold uppercase">${cfg.iso3} · ICAO TD3 Sample</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Republik Indonesia · Demonstration Prototype 2-Page Passport Spread Editor</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','passport')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-black shadow-md border border-indigo-300/40 transition-all cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-dice text-amber-300"></i> Randomize Card</button>
+            <button type="button" onclick="resetOceaniaSample('${cfg.key}','passport')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-rotate-left"></i> Reset Sample</button>
+            <button type="button" onclick="copyOceaniaData('${cfg.key}','passport')" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"><i class="fa-regular fa-copy"></i> Copy Data &amp; MRZ</button>
+            <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','passport')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center gap-1.5"><i class="fa-solid fa-download"></i> Save PNG</button>
+          </div>
+        </div>
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <section class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm space-y-4 no-print">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">${cfg.flag} ${cfg.name} · ${cfg.iso3}</span>
+                <h3 class="text-base font-bold text-slate-900 mt-1">${cfg.passportTitle} Details</h3>
+                <p class="text-xs text-slate-500">Edit sample fields to dynamically update the 2-page passport spread &amp; ICAO Doc 9303 MRZ</p>
+              </div>
+            </div>
+            <button type="button" onclick="randomizeOceaniaDoc('${cfg.key}','passport')" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-lg border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all cursor-pointer">
+              <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-amber-300 text-lg shrink-0"><i class="fa-solid fa-dice"></i></div>
+              <div class="text-left">
+                <div class="leading-none text-sm font-extrabold flex items-center gap-2"><span>Randomize Card</span><span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider">INSTANT FILL</span></div>
+                <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional ${cfg.name} passport sample bio-data &amp; TD3 MRZ</div>
+              </div>
+            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Jenis / Type</label><input id="${p}_type" type="text" maxlength="2" value="P" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Kode Negara</label><input id="${p}_code" type="text" maxlength="3" value="${cfg.iso3}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">No. Paspor</label><input id="${p}_docNo" type="text" maxlength="9" value="${s.passNo}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Given Name(s) (Nama Depan)</label><input id="${p}_givenNames" type="text" value="${s.givenNames}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Kelamin / Sex</label><select id="${p}_sex" onchange="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"><option value="F" ${s.sex === 'F' ? 'selected' : ''}>P/F (Female)</option><option value="M" ${s.sex === 'M' ? 'selected' : ''}>L/M (Male)</option></select></div>
+              <div class="sm:col-span-3"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Surname / Family Name (Nama Belakang)</label><input id="${p}_surname" type="text" value="${s.surname}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Kewarganegaraan</label><input id="${p}_nationality" type="text" value="${cfg.nationality}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">No. Reg.</label><input id="${p}_personalNo" type="text" value="${s.personalNo}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm font-mono bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Tgl. Lahir / DOB</label><input id="${p}_dob" type="date" value="${s.dob}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Tempat Lahir / Place of Birth</label><input id="${p}_pob" type="text" value="${s.pob}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Tgl. Pengeluaran</label><input id="${p}_issue" type="date" value="${s.issue}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-2"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Kantor Yang Mengeluarkan / Issuing Office</label><input id="${p}_authority" type="text" value="${s.authority}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+              <div class="sm:col-span-3"><label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">Tgl. Habis Berlaku / Date of Expiry</label><input id="${p}_expiry" type="date" value="${s.expiry}" oninput="updateOceaniaPreview('${cfg.key}','passport')" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg"></div>
+            </div>
+            <div class="pt-3 border-t border-slate-100 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-slate-600">Bearer Portrait Photo</label>
+                <button type="button" onclick="resetOceaniaPhoto('${cfg.key}','passport')" class="text-[11px] font-semibold text-blue-700 hover:text-blue-900 cursor-pointer">Restore Sample Portrait</button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <input id="${p}_photoUpload" type="file" accept="image/*" class="text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 cursor-pointer">
+                <input id="${p}_photoUrl" type="url" placeholder="Or paste image URL..." class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+              </div>
+            </div>
+            <div class="pt-2 flex flex-wrap gap-2">
+              <button type="button" onclick="window.print()" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5"><i class="fa-solid fa-print"></i> Print Spread</button>
+              <button type="button" onclick="downloadOceaniaPNG('${cfg.key}','passport')" class="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-xs transition cursor-pointer flex items-center justify-center gap-1.5"><i class="fa-solid fa-file-image"></i> Save PNG</button>
+            </div>
+          </section>
+          <section class="lg:col-span-7 flex flex-col items-center space-y-4">
+            <div class="w-full max-w-[600px] flex items-center justify-between px-1 no-print">
+              <span class="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-teal-700"></span>
+                REPUBLIK INDONESIA · 2-PAGE PASSPORT SPREAD (IDN)
+              </span>
+              <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-lg">
+                DEMONSTRATION PROTOTYPE · SAMPLE
+              </span>
+            </div>
+            <article id="${cfg.key}-passport-card" class="kyc-protected-surface relative w-full max-w-[600px] mx-auto rounded-[6px] shadow-2xl border border-slate-300 overflow-hidden select-none text-[#232221] bg-white" style="aspect-ratio: 720 / 929; container-type: inline-size; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;">
+              <!-- Base Plate: 1:1 Reference Background with All Variable Personal Values Cleanly Inpainted -->
+              <img src="/assets/aistudio/idn_passport_clean_bg.png" alt="Republik Indonesia Passport Spread Base" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+              <!-- ============ TOP PAGE (PAGE 3 · PERHATIAN): VERTICAL LASER-PERFORATED PASSPORT NO. (x=615..675, y=89..396 on 720x929) ============ -->
+              <div id="${p}_outPerforatedSvg" class="absolute flex items-center justify-center pointer-events-none select-none z-10" style="left: 85.42%; top: 9.58%; width: 8.33%; height: 33.05%;">${renderIdnPerforatedDotMatrixSvg(s.passNo)}</div>
+              <span id="${p}_outPerforated" class="hidden">${s.passNo}</span>
+
+              <!-- ============ BOTTOM PAGE (PAGE 2 · BIO-DATA PAGE): PORTRAIT, BILINGUAL FIELDS & TD3 MRZ ============ -->
+              <!-- Left Main Color Bearer Portrait (x=58..221, y=604..791 on 720x929) -->
+              <div class="absolute overflow-hidden pointer-events-none select-none z-10" style="left: 8.06%; top: 65.02%; width: 22.64%; height: 20.13%;">
+                <img id="${p}_outPhoto" src="${s.photoUrl}" alt="Bearer Sample Portrait" class="w-full h-full object-cover object-top" />
+              </div>
+
+              <!-- Row 1: Jenis / Type (x=254, y=565), Kode Negara / Country Code (x=369, y=564), No. Paspor / Passport No. (x=560, y=555) -->
+              <div id="${p}_outType" data-no-autofit="1" class="absolute font-bold uppercase text-[#242322] whitespace-nowrap leading-none z-10" style="left: 35.28%; top: 60.71%; font-size: 2.15cqw; letter-spacing: 0.04em;">P</div>
+              <div id="${p}_outCode" data-no-autofit="1" class="absolute font-bold uppercase text-[#242322] whitespace-nowrap leading-none z-10" style="left: 51.25%; top: 60.60%; font-size: 2.15cqw; letter-spacing: 0.04em;">${cfg.iso3}</div>
+              <div id="${p}_outDocNo" data-no-autofit="1" class="absolute font-normal uppercase text-[#3d3938] whitespace-nowrap leading-none z-10" style="left: 77.78%; top: 59.63%; font-family: 'Arial Narrow', Arial, sans-serif; font-size: 2.65cqw; letter-spacing: 0.045em; transform: scaleX(0.84) scaleY(1.22); transform-origin: left top;">${s.passNo}</div>
+
+              <!-- Row 2: Nama Lengkap / Full Name (x=253, y=607) -->
+              <div id="${p}_outFullName" data-no-autofit="1" class="absolute font-bold uppercase text-[#242322] whitespace-nowrap leading-none z-10" style="left: 35.14%; top: 65.23%; font-size: 2.18cqw; letter-spacing: 0.035em;">${formatIdnFullName(s.givenNames, s.surname)}</div>
+              <span id="${p}_outSurname" class="hidden">${s.surname}</span>
+              <span id="${p}_outGivenNames" class="hidden">${s.givenNames}</span>
+
+              <!-- Row 3: Kewarganegaraan / Nationality (x=253, y=656) -->
+              <div id="${p}_outNationality" data-no-autofit="1" class="absolute font-bold uppercase text-[#242322] whitespace-nowrap leading-none z-10" style="left: 35.14%; top: 70.51%; font-size: 2.18cqw; letter-spacing: 0.035em;">${cfg.nationality}</div>
+
+              <!-- Row 4: Tgl. Lahir / Date of Birth (x=253, y=699), Kelamin / Sex (x=435, y=699), Tempat Lahir / Place of Birth (right=45px -> 6.25%, y=694) -->
+              <div id="${p}_outDob" data-no-autofit="1" class="absolute font-bold uppercase text-[#242322] whitespace-nowrap leading-none z-10" style="left: 35.14%; top: 75.13%; font-size: 2.16cqw; letter-spacing: 0.03em;">${ocFormatDate(s.dob)}</div>
+              <div id="${p}_outSex" data-no-autofit="1" class="absolute font-bold uppercase text-[#242322] whitespace-nowrap leading-none z-10" style="left: 60.42%; top: 75.13%; font-size: 2.16cqw; letter-spacing: 0.03em;">${formatIdnSex(s.sex)}</div>
+              <div id="${p}_outPob" data-no-autofit="1" class="absolute font-bold uppercase text-[#383635] whitespace-nowrap leading-none text-right z-10" style="right: 6.25%; top: 74.60%; font-size: 2.18cqw; letter-spacing: 0.04em;">${s.pob}</div>
+
+              <!-- Row 5: Tgl. Pengeluaran / Date of Issue (x=252, y=745) & Tgl. Habis Berlaku / Date of Expiry (right=46px -> 6.39%, y=741) -->
+              <div id="${p}_outIssue" data-no-autofit="1" class="absolute font-bold uppercase text-[#242322] whitespace-nowrap leading-none z-10" style="left: 35.00%; top: 80.09%; font-size: 2.16cqw; letter-spacing: 0.03em;">${ocFormatDate(s.issue)}</div>
+              <div id="${p}_outExpiry" data-no-autofit="1" class="absolute font-bold uppercase text-[#383635] whitespace-nowrap leading-none text-right z-10" style="right: 6.39%; top: 79.66%; font-size: 2.16cqw; letter-spacing: 0.03em;">${ocFormatDate(s.expiry)}</div>
+
+              <!-- Row 6: No. Reg. (x=254, y=796) & Kantor Yang Mengeluarkan / Issuing Office (right=48px -> 6.67%, y=792) -->
+              <div id="${p}_outPersonalNo" data-no-autofit="1" class="absolute font-bold uppercase text-[#282626] whitespace-nowrap leading-none z-10" style="left: 35.28%; top: 85.58%; font-size: 2.14cqw; letter-spacing: 0.035em;">${s.personalNo}</div>
+              <div id="${p}_outAuthority" data-no-autofit="1" class="absolute font-bold uppercase text-[#383635] whitespace-nowrap leading-none text-right z-10" style="right: 6.67%; top: 85.15%; font-size: 2.16cqw; letter-spacing: 0.035em;">${s.authority}</div>
+
+              <!-- Bottom Machine Readable Zone (TD3 2 x 44 chars at x=67..675, y=835 & y=875) -->
+              <div id="${p}_mrz1" data-no-autofit="1" class="absolute font-mono font-bold text-[#252423] whitespace-nowrap overflow-hidden leading-none z-10" style="left: 9.31%; top: 89.77%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-size: 2.26cqw; letter-spacing: 0.015em;"></div>
+              <div id="${p}_mrz2" data-no-autofit="1" class="absolute font-mono font-bold text-[#252423] whitespace-nowrap overflow-hidden leading-none z-10" style="left: 9.58%; top: 94.08%; font-family: 'OCR-B', 'Courier New', Courier, monospace; font-size: 2.26cqw; letter-spacing: 0.015em;"></div>
+            </article>
+            <p class="text-[11px] text-slate-400 text-center leading-snug">Demonstration prototype · Republik Indonesia (IDN) ICAO Doc 9303 TD3 passport spread matching the reference layout, bilingual Indonesian/English labels, perforated vertical passport number, bio-data typography, and MRZ.</p>
+          </section>
+        </main>
+      `;
+    }
+
     function buildOceaniaPassportMarkup(cfg) {
       if (cfg && cfg.key === 'australia') {
         return buildAustraliaReferencePassportMarkup(cfg);
       }
       if (cfg && cfg.key === 'trinidadandtobago') {
         return buildTrinidadAndTobagoReferencePassportMarkup(cfg);
+      }
+      if (cfg && cfg.key === 'indonesia') {
+        return buildIndonesiaReferencePassportMarkup(cfg);
       }
       const p = ocPrefix(cfg.key, 'passport');
       const s = cfg.passportProfiles[0];
@@ -21115,6 +21329,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setTxt('outDocNo', fields.docNo.toUpperCase());
       setTxt('outSurname', fields.surname.toUpperCase());
       setTxt('outGivenNames', fields.givenNames.toUpperCase());
+      setTxt('outFullName', formatIdnFullName(fields.givenNames, fields.surname));
       setTxt('outPersonalNo', fields.personalNo.toUpperCase());
       if (countryKey === 'tonga' && dtype === 'idcard') {
         setTxt('outNationality', (fields.nationality || cfg.nationality).toUpperCase());
@@ -21142,7 +21357,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         }
       } else {
         setTxt('outDob', ocFormatDate(fields.dob));
-        setTxt('outSex', fields.sex.toUpperCase());
+        setTxt('outSex', countryKey === 'indonesia' ? formatIdnSex(fields.sex) : fields.sex.toUpperCase());
         setTxt('outIssue', ocFormatDate(fields.issue));
         setTxt('outExpiry', ocFormatDate(fields.expiry));
         setTxt('outSignature', `${fields.givenNames.split(' ')[0] || 'Sample'} ${fields.surname}`);
@@ -21175,10 +21390,20 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           setTxt('outPerforated', fields.docNo.toUpperCase().split('').join(' '));
         }
         const perfSvgEl = $(`${p}_outPerforatedSvg`);
-        if (perfSvgEl && typeof renderAusPerforatedDotMatrixSvg === 'function') {
-          perfSvgEl.innerHTML = renderAusPerforatedDotMatrixSvg(fields.docNo);
+        if (perfSvgEl) {
+          if (countryKey === 'indonesia' && typeof renderIdnPerforatedDotMatrixSvg === 'function') {
+            perfSvgEl.innerHTML = renderIdnPerforatedDotMatrixSvg(fields.docNo);
+          } else if (typeof renderAusPerforatedDotMatrixSvg === 'function') {
+            perfSvgEl.innerHTML = renderAusPerforatedDotMatrixSvg(fields.docNo);
+          }
         }
-        const mrz = buildOceaniaTd3Mrz(cfg, fields);
+        let mrzFields = fields;
+        if (countryKey === 'indonesia') {
+          const matchedProf = (cfg.passportProfiles || []).find(pr => pr.personalNo && pr.personalNo.toUpperCase() === String(fields.personalNo || '').trim().toUpperCase());
+          const mrzPersonal = matchedProf && matchedProf.mrzPersonalNo ? matchedProf.mrzPersonalNo : fields.personalNo;
+          mrzFields = Object.assign({}, fields, { personalNo: mrzPersonal });
+        }
+        const mrz = buildOceaniaTd3Mrz(cfg, mrzFields);
         setTxt('mrz1', mrz.line1);
         setTxt('mrz2', mrz.line2);
         setTxt('obsMicroMrz', mrz.line2);
@@ -23926,6 +24151,18 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Trinidad and Tobago</div>
                 <div class="text-[10px] font-medium text-slate-500">Republic of Trinidad &amp; Tobago Passport (TTO)</div>
+              </div>
+            </button>
+
+            <!-- Republik Indonesia (IDN) -->
+            <button type="button" id="country-btn-indonesia" data-docs="passport" onclick="switchVerificationCountry('indonesia')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-teal-50/40 hover:border-teal-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl drop-shadow-xs">🇮🇩</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
+              </div>
+              <div class="mt-2.5">
+                <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Indonesia</div>
+                <div class="text-[10px] font-medium text-slate-500">Paspor Republik Indonesia (IDN)</div>
               </div>
             </button>
           </div>
@@ -34747,6 +34984,7 @@ EPSOM</div>
       <div id="kiribati-idcard-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
       <div id="micronesia-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
       <div id="trinidadandtobago-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
+      <div id="indonesia-passport-view" class="hidden max-w-7xl mx-auto space-y-6"></div>
     </div>
   </section>
 
@@ -35980,6 +36218,7 @@ EPSOM</div>
         'kiribati-id-back',
         'micronesia-passport-card',
         'trinidadandtobago-passport-card',
+        'indonesia-passport-card',
         'turkey-passport-card',
         'proof-of-account-card',
         'poa-wise-card',
@@ -38977,6 +39216,7 @@ EPSOM</div>
         'kiribati-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
         'micronesia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
         'trinidadandtobago-passport-card': { enabled: true, position: 'bottom', height: '11.5%', heightPercent: 11.5 },
+        'indonesia-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
 
         'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
         'somalia-passport-id-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },

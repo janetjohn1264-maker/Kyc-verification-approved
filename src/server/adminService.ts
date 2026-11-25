@@ -403,6 +403,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
   'kiribati-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
   'micronesia-passport-card': { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
   'trinidadandtobago-passport-card': { enabled: true, position: 'bottom', height: '11.5%', heightPercent: 11.5 },
+  'indonesia-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
 
   // Single-Page Passport Data Cards
   'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
@@ -923,6 +924,18 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       portalName: 'Republic of Trinidad and Tobago Immigration Division',
       portalUrl: 'https://nationalsecurity.gov.tt',
       idStandard: 'Republic of Trinidad and Tobago Machine-Readable Passport (TTO)',
+      enabledDocs: ['passport'],
+    },
+    {
+      key: 'indonesia',
+      name: 'Indonesia',
+      flag: '🇮🇩',
+      subtitle: 'Paspor Republik Indonesia (IDN)',
+      iso3: 'IDN',
+      authority: 'Direktorat Jenderal Imigrasi · Kementerian Hukum dan HAM Republik Indonesia',
+      portalName: 'Direktorat Jenderal Imigrasi Republik Indonesia',
+      portalUrl: 'https://www.imigrasi.go.id',
+      idStandard: 'Republik Indonesia Machine-Readable Passport (Paspor / IDN)',
       enabledDocs: ['passport'],
     },
   ];
