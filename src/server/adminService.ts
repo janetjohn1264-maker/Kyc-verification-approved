@@ -405,6 +405,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
   'trinidadandtobago-passport-card': { enabled: true, position: 'bottom', height: '11.5%', heightPercent: 11.5 },
   'indonesia-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
   'pakistan-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
+  'india-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
 
   // Single-Page Passport Data Cards
   'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
@@ -841,6 +842,18 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       portalName: 'Direktorat Jenderal Imigrasi Republik Indonesia',
       portalUrl: 'https://www.imigrasi.go.id',
       idStandard: 'Republik Indonesia Machine-Readable Passport (Paspor / IDN)',
+      enabledDocs: ['passport'],
+    },
+    {
+      key: 'india',
+      name: 'India',
+      flag: '🇮🇳',
+      subtitle: 'Republic of India Passport / भारत गणराज्य (IND)',
+      iso3: 'IND',
+      authority: 'Ministry of External Affairs · Consular, Passport & Visa Division',
+      portalName: 'Passport Seva · Government of India',
+      portalUrl: 'https://www.passportindia.gov.in',
+      idStandard: 'Republic of India Machine-Readable Passport (भारत गणराज्य / IND)',
       enabledDocs: ['passport'],
     },
   ];
