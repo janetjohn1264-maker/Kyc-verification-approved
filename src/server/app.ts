@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 import { createSifaloPaymentService, type SifaloPaymentServiceDeps } from './sifaloPayments.js';
 import { KycAdminService } from './adminService.js';
+import { KycCustomerService } from './customerService.js';
 
 if (!process.env.VERCEL) {
   dotenv.config();
@@ -10,6 +11,7 @@ if (!process.env.VERCEL) {
 
 export interface ApiAppDeps extends SifaloPaymentServiceDeps {
   adminPersistencePath?: string;
+  customerPersistencePath?: string;
 }
 
 export function createApiApp(deps: ApiAppDeps = {}) {
@@ -17,10 +19,23 @@ export function createApiApp(deps: ApiAppDeps = {}) {
   app.set('trust proxy', 1);
   app.set('etag', false);
 
-  const sifaloPaymentService = createSifaloPaymentService(deps);
-  const kycAdminService = new KycAdminService(sifaloPaymentService, deps.adminPersistencePath);
+  const kycCustomerService = new KycCustomerService(deps.customerPersistencePath, deps.now);
+  const sifaloPaymentService = createSifaloPaymentService({
+    ...deps,
+    resolveAuthenticatedCustomerId: (req) => kycCustomerService.resolveAuthenticatedCustomerId(req),
+    onVerifiedCustomerAccessOrder: (order) => kycCustomerService.grantVerifiedSifaloOrderToCustomer(order),
+    onRevokedCustomerAccessOrder: (orderId, reason) =>
+      kycCustomerService.revokeSifaloOrderEntitlement(orderId, reason),
+    evaluateCustomerPaidAccess: (req) => kycCustomerService.evaluateCustomerPaidAccess(req),
+  });
+  const kycAdminService = new KycAdminService(
+    sifaloPaymentService,
+    deps.adminPersistencePath,
+    kycCustomerService
+  );
   app.locals.sifaloPaymentService = sifaloPaymentService;
   app.locals.kycAdminService = kycAdminService;
+  app.locals.kycCustomerService = kycCustomerService;
 
   const captureRawBody = (req: Request, _res: Response, buf: Buffer) => {
     (req as Request & { rawBody?: Buffer }).rawBody = buf;
@@ -46,6 +61,7 @@ export function createApiApp(deps: ApiAppDeps = {}) {
         req.url.startsWith('/catalog') ||
         req.url.startsWith('/preview-protection') ||
         req.url.startsWith('/admin') ||
+        req.url.startsWith('/customer') ||
         req.url.startsWith('/webhooks/sifalo') ||
         req.url.startsWith('/sifalo/webhook') ||
         req.url.startsWith('/payments/sifalo'))
@@ -80,6 +96,7 @@ export function createApiApp(deps: ApiAppDeps = {}) {
         previewProtectionConfig: '/api/preview-protection/config',
         previewProtectionVerify: '/api/preview-protection/verify-access',
         adminAuthStatus: '/api/admin/auth/status',
+        customerAuthStatus: '/api/customer/auth/status',
         sifaloConfig: '/api/payments/sifalo/config',
         sifaloDiagnostics: '/api/payments/sifalo/diagnostics',
         sifaloWebhook: '/api/webhooks/sifalo',
@@ -97,6 +114,8 @@ export function createApiApp(deps: ApiAppDeps = {}) {
   app.use('/api/catalog', kycAdminService.createPublicCatalogRouter());
   app.use('/api/preview-protection', kycAdminService.createPreviewProtectionRouter());
   app.use('/api/admin', kycAdminService.createAdminRouter());
+  app.use('/api/customer', kycCustomerService.createCustomerRouter());
 
   return app;
 }
+

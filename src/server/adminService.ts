@@ -4,6 +4,7 @@ import os from 'os';
 import path from 'path';
 import express, { Request, Response, NextFunction } from 'express';
 import { createSifaloPaymentService, type UnlockProductKey } from './sifaloPayments.js';
+import type { KycCustomerService } from './customerService.js';
 
 export type SifaloPaymentService = ReturnType<typeof createSifaloPaymentService>;
 
@@ -980,14 +981,20 @@ export function toPublicAdminUser(user: AdminUserRecord): PublicAdminUserView {
 
 export class KycAdminService {
   private readonly sifaloService: SifaloPaymentService;
+  private readonly customerService?: KycCustomerService;
   private readonly persistencePath: string;
   private state: PersistedAdminState;
   private readonly sessions = new Map<string, AdminSessionRecord>();
   private readonly testTokens = new Map<string, AdminTestActionTokenRecord>();
   private readonly loginFailuresByIp = new Map<string, { count: number; windowStartMs: number }>();
 
-  constructor(sifaloService: SifaloPaymentService, customPersistencePath?: string) {
+  constructor(
+    sifaloService: SifaloPaymentService,
+    customPersistencePath?: string,
+    customerService?: KycCustomerService
+  ) {
     this.sifaloService = sifaloService;
+    this.customerService = customerService;
     this.persistencePath = customPersistencePath || this.resolvePersistencePath();
     this.state = this.loadOrInitializeState();
     this.syncBootstrapSuperAdminAccount();
@@ -1606,6 +1613,24 @@ export class KycAdminService {
         expiresAt: adminResolved.context.session.expiresAtMs,
         previewProtectedArea: resolvedSpec.previewProtectedArea,
       };
+    }
+
+    // 3. Check authoritative server-side authenticated Customer Paid Access (One-Time or non-expired Monthly)
+    if (this.customerService) {
+      const custAccess = this.customerService.evaluateCustomerPaidAccess(req);
+      if (custAccess.authorized) {
+        return {
+          fullDocumentAuthorized: true,
+          previewMode: 'FULL_UNRESTRICTED',
+          authorizationSource: 'sifalo_verified_payment',
+          orderId: custAccess.orderId,
+          productKey: expectedProductKey,
+          docType: resolvedSpec.docType,
+          templateId: resolvedSpec.templateId,
+          expiresAt: custAccess.expiresAtMs,
+          previewProtectedArea: resolvedSpec.previewProtectedArea,
+        };
+      }
     }
 
     return {

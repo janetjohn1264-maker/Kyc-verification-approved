@@ -16,7 +16,9 @@ export type UnlockProductKey =
   | 'nationalIdentity'
   | 'driverLicense'
   | 'proofOfAddress'
-  | 'proofOfAccount';
+  | 'proofOfAccount'
+  | 'oneTimeAccess'
+  | 'monthlyAccess';
 
 export type SifaloEnvironment = 'staging' | 'production';
 export type OrderStatus =
@@ -107,6 +109,30 @@ export const AUTHORITATIVE_PRODUCT_PRICING: Record<UnlockProductKey, ProductPric
     sifaloMethodRuleNote:
       'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
   },
+  oneTimeAccess: {
+    productKey: 'oneTimeAccess',
+    label: 'One-Time Access',
+    amountCents: 5500,
+    amountUsdString: '55.00',
+    formattedPrice: '$55.00',
+    currency: 'USD',
+    sifaloHostedMethods: ['card', 'mobile_money'],
+    sifaloCardSupported: true,
+    sifaloMethodRuleNote:
+      'Amount is $55.00 (5500 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
+  },
+  monthlyAccess: {
+    productKey: 'monthlyAccess',
+    label: 'Monthly Access',
+    amountCents: 1200,
+    amountUsdString: '12.00',
+    formattedPrice: '$12.00',
+    currency: 'USD',
+    sifaloHostedMethods: ['card', 'mobile_money'],
+    sifaloCardSupported: true,
+    sifaloMethodRuleNote:
+      'Amount is $12.00 (1200 cents > 51 cents threshold in Sifalo checkout.js), so Sifalo displays both Card and Mobile Money.',
+  },
 };
 
 export function normalizeDocTypeToProductKey(rawDocType: unknown): UnlockProductKey | null {
@@ -130,6 +156,14 @@ export function normalizeDocTypeToProductKey(rawDocType: unknown): UnlockProduct
     case 'account':
     case 'bankdocument':
       return 'proofOfAccount';
+    case 'onetimeaccess':
+    case 'onetime':
+    case 'onetimeplan':
+      return 'oneTimeAccess';
+    case 'monthlyaccess':
+    case 'monthly':
+    case 'monthlyplan':
+      return 'monthlyAccess';
     default:
       return null;
   }
@@ -206,6 +240,7 @@ export interface SifaloOrderRecord {
   countryKey: string;
   providerKey: string;
   sessionId?: string | null;
+  customerId?: string | null;
   amountCents: number;
   amountUsdString: string;
   currency: 'USD';
@@ -246,6 +281,23 @@ export interface SifaloPaymentServiceDeps {
   persistenceFilePath?: string | null;
   getPersistentDataDir?: () => string;
   now?: () => number;
+  resolveAuthenticatedCustomerId?: (req: Request) => string | null;
+  onVerifiedCustomerAccessOrder?: (
+    order: SifaloOrderRecord,
+    fallbackCustomerId?: string | null
+  ) => unknown;
+  onRevokedCustomerAccessOrder?: (order: SifaloOrderRecord, reason: string) => void;
+  evaluateCustomerPaidAccess?: (req: Request) => {
+    authorized: boolean;
+    customerId: string | null;
+    email: string | null;
+    activePlan: 'oneTimeAccess' | 'monthlyAccess' | null;
+    label: string | null;
+    formattedPrice: string | null;
+    orderId: string | null;
+    sid: string | null;
+    expiresAtMs: number;
+  };
 }
 
 interface SignedOrderPayload {
@@ -254,6 +306,7 @@ interface SignedOrderPayload {
   countryKey: string;
   providerKey: string;
   sessionId?: string | null;
+  customerId?: string | null;
   amountCents: number;
   amountUsdString: string;
   currency: 'USD';
@@ -1370,6 +1423,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       countryKey: order.countryKey,
       providerKey: order.providerKey,
       sessionId: order.sessionId || null,
+      customerId: order.customerId || null,
       amountCents: order.amountCents,
       amountUsdString: order.amountUsdString,
       currency: order.currency,
@@ -1430,6 +1484,9 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         if (!existing.sessionId && parsed.sessionId) {
           existing.sessionId = sanitizeSessionId(parsed.sessionId);
         }
+        if (!existing.customerId && typeof parsed.customerId === 'string' && parsed.customerId.trim()) {
+          existing.customerId = parsed.customerId.trim();
+        }
         return existing;
       }
       const recovered: SifaloOrderRecord = {
@@ -1438,6 +1495,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         countryKey: sanitizeShortSlug(parsed.countryKey, 'global'),
         providerKey: sanitizeShortSlug(parsed.providerKey, 'virtual-account'),
         sessionId: sanitizeSessionId(parsed.sessionId),
+        customerId: typeof parsed.customerId === 'string' && parsed.customerId.trim() ? parsed.customerId.trim() : null,
         amountCents: priceSpec.amountCents,
         amountUsdString: priceSpec.amountUsdString,
         currency: 'USD',
@@ -1643,6 +1701,14 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
     });
     orders.set(order.orderId, order);
     persistState();
+    if (deps.onRevokedCustomerAccessOrder) {
+      try {
+        deps.onRevokedCustomerAccessOrder(
+          order,
+          reason || `Order invalidated with status ${nextStatus}.`
+        );
+      } catch {}
+    }
     console.info(
       `[Sifalo] Order invalidated (${nextStatus}): orderId=${order.orderId} product=${order.productKey}`
     );
@@ -2035,6 +2101,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       });
       orders.set(order.orderId, order);
       persistState();
+      if (deps.onVerifiedCustomerAccessOrder) {
+        try {
+          deps.onVerifiedCustomerAccessOrder(order, order.customerId || null);
+        } catch {}
+      }
       console.info(
         `[Sifalo] Order verified PAID: orderId=${order.orderId} sid=${verifiedSid} product=${order.productKey} amount=$${order.amountUsdString}`
       );
@@ -2449,6 +2520,22 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         const webhookAuthToken = computeOrderWebhookToken(orderId);
 
         const authorizationId = `AUTH-${orderId.replace(/^KYC-/, '')}`;
+        const authenticatedCustomerId = deps.resolveAuthenticatedCustomerId
+          ? deps.resolveAuthenticatedCustomerId(req)
+          : null;
+        if (
+          (productKey === 'oneTimeAccess' || productKey === 'monthlyAccess') &&
+          deps.resolveAuthenticatedCustomerId &&
+          !authenticatedCustomerId
+        ) {
+          return res.status(401).json({
+            ok: false,
+            requiresCustomerAuth: true,
+            productKey,
+            productCode: productKey === 'monthlyAccess' ? 'MONTHLY_ACCESS' : 'ONE_TIME_ACCESS',
+            error: 'Please log in or create a customer account before proceeding to payment.',
+          });
+        }
         const order: SifaloOrderRecord = {
           orderId,
           authorizationId,
@@ -2456,6 +2543,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           countryKey,
           providerKey,
           sessionId,
+          customerId: authenticatedCustomerId || null,
           amountCents: priceSpec.amountCents,
           amountUsdString: priceSpec.amountUsdString,
           currency: priceSpec.currency,
@@ -2830,6 +2918,19 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         // Clear any legacy grants cookie so browser cookies never act as persistent proof of payment
         setSignedGrantsCookie(req, res, activeSessionId, {});
 
+        let customerEntitlement = null;
+        if (deps.onVerifiedCustomerAccessOrder) {
+          try {
+            const currentCustomerId = deps.resolveAuthenticatedCustomerId
+              ? deps.resolveAuthenticatedCustomerId(req)
+              : null;
+            customerEntitlement = deps.onVerifiedCustomerAccessOrder(
+              order,
+              order.customerId || currentCustomerId || null
+            );
+          } catch {}
+        }
+
         return res.status(200).json({
           verified: true,
           status: 'PAID',
@@ -2848,6 +2949,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           unlockToken: grant.unlockToken,
           expiresAt: grant.expiresAt,
           autoDownloadEligible: !autoDownloadConsumedOrders.has(order.orderId),
+          customerEntitlement: customerEntitlement || null,
         });
       } catch (err) {
         console.error('[Sifalo] Verify order error:', err instanceof Error ? err.message : err);
@@ -3489,10 +3591,26 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         // Clear any legacy grants cookie so browser refresh never inherits a persistent unlock
         setSignedGrantsCookie(req, res, sessionId, {});
 
+        const customerPaidAccess = deps.evaluateCustomerPaidAccess
+          ? deps.evaluateCustomerPaidAccess(req)
+          : null;
+
         return res.status(200).json({
           authenticatedSession: true,
           sessionId,
           unlockedProducts,
+          customerPaidAccess:
+            customerPaidAccess && customerPaidAccess.authorized
+              ? {
+                  authorized: true,
+                  activePlan: customerPaidAccess.activePlan,
+                  label: customerPaidAccess.label,
+                  formattedPrice: customerPaidAccess.formattedPrice,
+                  orderId: customerPaidAccess.orderId,
+                  sid: customerPaidAccess.sid,
+                  expiresAt: customerPaidAccess.expiresAtMs,
+                }
+              : null,
         });
       } catch (err) {
         console.error('[Sifalo] Session status error:', err instanceof Error ? err.message : err);
@@ -3524,6 +3642,28 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         if (!requestedProductKey) {
           return res.status(400).json({ authorized: false, error: 'Missing document type.' });
+        }
+
+        // Check if the caller is an authenticated customer with active server-verified One-Time Access ($55) or active non-expired Monthly Access ($12/month)
+        if (deps.evaluateCustomerPaidAccess) {
+          const customerAccess = deps.evaluateCustomerPaidAccess(req);
+          if (customerAccess && customerAccess.authorized) {
+            const spec = AUTHORITATIVE_PRODUCT_PRICING[requestedProductKey];
+            return res.status(200).json({
+              authorized: true,
+              consumed: false,
+              autoDownloadAuthorized: Boolean(body.consumePostPaymentAutoDownload),
+              authorizationSource: 'customer_paid_access',
+              activePlan: customerAccess.activePlan,
+              orderId: customerAccess.orderId || '',
+              sid: customerAccess.sid || '',
+              productKey: requestedProductKey,
+              label: spec ? spec.label : customerAccess.label || '',
+              formattedPrice: spec ? spec.formattedPrice : customerAccess.formattedPrice || '',
+              expiresAt: customerAccess.expiresAtMs,
+              unlockToken: '',
+            });
+          }
         }
 
         // Require an explicit, server-signed unlockToken (never fall back to persistent cookies or old session history)

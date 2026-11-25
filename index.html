@@ -1220,6 +1220,18 @@
         label: 'Proof of Account',
         price: '$0.50',
         methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
+      onetimeaccess: {
+        productKey: 'oneTimeAccess',
+        label: 'One-Time Access',
+        price: '$55.00',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
+      monthlyaccess: {
+        productKey: 'monthlyAccess',
+        label: 'Monthly Access',
+        price: '$12.00',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
       }
     };
 
@@ -1272,7 +1284,14 @@
     }
 
     function isProductUnlockedInUi(productKey) {
-      if (!productKey || !window.__kycVerifiedUnlockState) return false;
+      if (!productKey) return false;
+      if (
+        typeof window.__kycIsCustomerPaidAccessVerifiedActive === 'function' &&
+        window.__kycIsCustomerPaidAccessVerifiedActive(productKey)
+      ) {
+        return true;
+      }
+      if (!window.__kycVerifiedUnlockState) return false;
       const entry = window.__kycVerifiedUnlockState[productKey];
       if (!entry || entry.authorized !== true) return false;
       if (entry.expiresAt && entry.expiresAt <= Date.now()) {
@@ -1394,9 +1413,75 @@
         if (typeof window.__kycSyncPreviewProtectionState === 'function') {
           window.__kycSyncPreviewProtectionState();
         }
+        if (typeof syncPricingPageUnlockStatusUI === 'function') {
+          syncPricingPageUnlockStatusUI();
+        }
       } catch (e) {}
     }
     window.syncActiveProductUnlockUI = syncActiveProductUnlockUI;
+
+    function syncPricingPageUnlockStatusUI() {
+      try {
+        const banner = document.getElementById('pricingVerifiedStatusBanner');
+        const bannerTitle = document.getElementById('pricingVerifiedStatusTitle');
+        const bannerDetail = document.getElementById('pricingVerifiedStatusDetail');
+        const oneTimeBadge = document.getElementById('pricingOneTimeVerifiedBadge');
+        const monthlyBadge = document.getElementById('pricingMonthlyVerifiedBadge');
+
+        const custEnt = window.__kycCustomerEntitlements || null;
+        const custOneTimeActive = Boolean(
+          custEnt && custEnt.oneTimeAccess && custEnt.oneTimeAccess.status === 'active'
+        );
+        const custMonthlyActive = Boolean(
+          custEnt &&
+            custEnt.monthlyAccess &&
+            custEnt.monthlyAccess.status === 'active' &&
+            (!custEnt.monthlyAccess.expiresAtMs || custEnt.monthlyAccess.expiresAtMs > Date.now())
+        );
+
+        const oneTimeEntry =
+          (window.__kycVerifiedUnlockState && window.__kycVerifiedUnlockState.oneTimeAccess) ||
+          (custOneTimeActive ? custEnt.oneTimeAccess : null);
+        const monthlyEntry =
+          (window.__kycVerifiedUnlockState && window.__kycVerifiedUnlockState.monthlyAccess) ||
+          (custMonthlyActive ? custEnt.monthlyAccess : null);
+        const oneTimeUnlocked = custOneTimeActive || isProductUnlockedInUi('oneTimeAccess');
+        const monthlyUnlocked = custMonthlyActive || isProductUnlockedInUi('monthlyAccess');
+
+        if (oneTimeBadge) {
+          oneTimeBadge.classList.toggle('hidden', !oneTimeUnlocked);
+        }
+        if (monthlyBadge) {
+          monthlyBadge.classList.toggle('hidden', !monthlyUnlocked);
+        }
+
+        if (typeof window.__kycSyncCustomerAccountUI === 'function') {
+          window.__kycSyncCustomerAccountUI();
+        }
+
+        if (!banner) return;
+        if (oneTimeUnlocked || monthlyUnlocked) {
+          const activePlan = oneTimeUnlocked ? oneTimeEntry : monthlyEntry;
+          const planTitle = oneTimeUnlocked
+            ? 'One-Time Access ($55 USD) — Payment Verified by Sifalo Pay'
+            : 'Monthly Access ($12/month USD) — Payment Verified by Sifalo Pay';
+          const orderRef = activePlan && activePlan.orderId ? `Order ${activePlan.orderId}` : '';
+          const sidRef = activePlan && activePlan.sid ? `Transaction SID: ${activePlan.sid}` : '';
+          const refParts = [orderRef, sidRef].filter(Boolean).join(' · ');
+
+          if (bannerTitle) bannerTitle.textContent = planTitle;
+          if (bannerDetail) {
+            bannerDetail.textContent = refParts
+              ? `Server-verified Sifalo Pay confirmation (${refParts}). Your access is active.`
+              : 'Server-verified Sifalo Pay confirmation completed. Your access is active.';
+          }
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+        }
+      } catch (e) {}
+    }
+    window.syncPricingPageUnlockStatusUI = syncPricingPageUnlockStatusUI;
 
     function captureWorkbenchFieldSnapshot() {
       const fieldSnapshot = {};
@@ -2158,15 +2243,21 @@
       const recheckBtn = document.getElementById('kycSifaloRecheckBtn');
 
       // Fire /create-checkout IMMEDIATELY with cache: 'no-store' to guarantee a fresh Sifalo payment session
-      const checkoutFetchPromise = fetch('/api/payments/sifalo/create-checkout', {
-        method: 'POST',
-        credentials: 'same-origin',
-        cache: 'no-store',
-        headers: {
+      const checkoutHeaders = Object.assign(
+        {
           'Content-Type': 'application/json',
           'Cache-Control': 'no-store, no-cache',
           'X-Kyc-Session-Id': sessionId
         },
+        typeof window.__kycGetCustomerAuthHeaders === 'function'
+          ? window.__kycGetCustomerAuthHeaders()
+          : {}
+      );
+      const checkoutFetchPromise = fetch('/api/payments/sifalo/create-checkout', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: checkoutHeaders,
         body: JSON.stringify({
           docType: spec.productKey,
           sessionId,
@@ -2192,12 +2283,23 @@
         const res = await checkoutFetchPromise;
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data || !data.checkoutUrl) {
-          const message =
-            (data && data.error) ||
-            'Unable to start Sifalo Pay checkout right now. Please try again.';
           _isSifaloCheckoutInFlight = false;
           window.__kycSifaloCheckoutInFlight = false;
           setOpeningPaymentButtonState(triggerBtn, false);
+          if (
+            res.status === 401 &&
+            data &&
+            data.requiresCustomerAuth === true &&
+            typeof window.__kycSelectPricingPlanWithAuthGate === 'function'
+          ) {
+            await window.__kycSelectPricingPlanWithAuthGate(spec.productKey, triggerBtn, {
+              forceAuthRedirect: true
+            });
+            return;
+          }
+          const message =
+            (data && data.error) ||
+            'Unable to start Sifalo Pay checkout right now. Please try again.';
           openSifaloPayModal(spec, { message });
           return;
         }
@@ -2206,46 +2308,51 @@
         window.__kycSifaloSessionId = effectiveSessionId;
         writeSessionOnlyStorage(KYC_SIFALO_SESSION_KEY, effectiveSessionId);
 
-        const activeSnapshot = captureWorkbenchFieldSnapshot();
+        const isPricingPlan =
+          spec.productKey === 'oneTimeAccess' || spec.productKey === 'monthlyAccess';
+        const activeSnapshot = isPricingPlan ? {} : captureWorkbenchFieldSnapshot();
         const sideState = {
           rwaCurrentSide: typeof rwaCurrentSide === 'string' ? rwaCurrentSide : 'front',
           uaeCurrentSide: typeof uaeCurrentSide === 'string' ? uaeCurrentSide : 'both',
           turCurrentSide: typeof turCurrentSide === 'string' ? turCurrentSide : 'both'
         };
         const checkoutUiPayload = {
+          workflowStep: isPricingPlan ? 'pricing' : 'editor',
           orderId: data.orderId,
           orderStateToken: data.orderStateToken || '',
           sessionId: effectiveSessionId,
           productKey: spec.productKey,
-          countryKey: countryKey || 'kenya',
+          countryKey: isPricingPlan ? 'global' : (countryKey || 'kenya'),
           rawDocType: spec.rawType,
           providerKey: providerKey || 'paypal',
           fieldSnapshot: activeSnapshot,
           sideState,
-          actionDescriptor: resolvedActionDescriptor,
+          actionDescriptor: isPricingPlan ? null : resolvedActionDescriptor,
           savedAt: Date.now()
         };
         writeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY, JSON.stringify(checkoutUiPayload));
 
-        // Store one-time pendingSavePngAfterPayment state to resume automatically ONLY after server-side payment verification
-        const pendingSavePngPayload = {
-          action: 'save_png',
-          status: 'awaiting_payment_verification',
-          consumed: false,
-          orderId: data.orderId,
-          orderStateToken: data.orderStateToken || '',
-          sessionId: effectiveSessionId,
-          productKey: spec.productKey,
-          rawDocType: spec.rawType,
-          countryKey: countryKey || 'kenya',
-          providerKey: providerKey || 'paypal',
-          actionDescriptor: resolvedActionDescriptor,
-          sideState,
-          fieldSnapshot: activeSnapshot,
-          createdAt: Date.now()
-        };
-        writeSessionOnlyStorage(KYC_PENDING_SAVE_PNG_KEY, JSON.stringify(pendingSavePngPayload));
-        saveActiveEditorUiState(activeSnapshot);
+        if (!isPricingPlan) {
+          // Store one-time pendingSavePngAfterPayment state to resume automatically ONLY after server-side payment verification
+          const pendingSavePngPayload = {
+            action: 'save_png',
+            status: 'awaiting_payment_verification',
+            consumed: false,
+            orderId: data.orderId,
+            orderStateToken: data.orderStateToken || '',
+            sessionId: effectiveSessionId,
+            productKey: spec.productKey,
+            rawDocType: spec.rawType,
+            countryKey: countryKey || 'kenya',
+            providerKey: providerKey || 'paypal',
+            actionDescriptor: resolvedActionDescriptor,
+            sideState,
+            fieldSnapshot: activeSnapshot,
+            createdAt: Date.now()
+          };
+          writeSessionOnlyStorage(KYC_PENDING_SAVE_PNG_KEY, JSON.stringify(pendingSavePngPayload));
+          saveActiveEditorUiState(activeSnapshot);
+        }
 
         // Redirect directly to the exact fresh checkout URL constructed by the server without re-encoding or mutating key/token
         const finalCheckoutUrl = String(data.checkoutUrl).trim();
@@ -2261,13 +2368,51 @@
       }
     }
 
-    async function choosePaidCheckoutUnlock() {
+    async function startPricingPlanCheckout(planProductKey, triggerBtn, opts) {
       if (_isSifaloCheckoutInFlight) return;
-      const spec = getActiveUnlockDocSpec();
+      const options = opts || {};
+      const normalizedKey =
+        planProductKey === 'monthlyAccess' || planProductKey === 'MONTHLY_ACCESS'
+          ? 'monthlyAccess'
+          : 'oneTimeAccess';
+      const spec = getDocSpecByProductKey(normalizedKey) || {
+        rawType: normalizedKey.toLowerCase(),
+        productKey: normalizedKey,
+        label: normalizedKey === 'monthlyAccess' ? 'Monthly Access' : 'One-Time Access',
+        price: normalizedKey === 'monthlyAccess' ? '$12.00' : '$55.00',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      };
+      if (
+        !options.skipAuthGate &&
+        typeof window.__kycSelectPricingPlanWithAuthGate === 'function'
+      ) {
+        return window.__kycSelectPricingPlanWithAuthGate(
+          normalizedKey,
+          triggerBtn || getClickedTriggerButton()
+        );
+      }
       clearSifaloGrantForProduct(spec.productKey);
       syncActiveProductUnlockUI();
+      return startSifaloCheckoutImmediately(spec, triggerBtn || getClickedTriggerButton(), null);
+    }
+    window.startPricingPlanCheckout = startPricingPlanCheckout;
+
+    async function choosePaidCheckoutUnlock() {
+      if (_isSifaloCheckoutInFlight) return;
       const payBtn = document.getElementById('kycSifaloPayBtn');
-      return startSifaloCheckoutImmediately(spec, payBtn, window.__kycLastSavePngActionDescriptor);
+      const requestedProductKey = payBtn && payBtn.dataset ? payBtn.dataset.productKey : '';
+      const spec =
+        (requestedProductKey && getDocSpecByProductKey(requestedProductKey)) ||
+        getActiveUnlockDocSpec();
+      clearSifaloGrantForProduct(spec.productKey);
+      syncActiveProductUnlockUI();
+      const isPricingPlan =
+        spec.productKey === 'oneTimeAccess' || spec.productKey === 'monthlyAccess';
+      return startSifaloCheckoutImmediately(
+        spec,
+        payBtn,
+        isPricingPlan ? null : window.__kycLastSavePngActionDescriptor
+      );
     }
     window.choosePaidCheckoutUnlock = choosePaidCheckoutUnlock;
 
@@ -2313,24 +2458,34 @@
         activeGrant && typeof activeGrant.unlockToken === 'string'
           ? activeGrant.unlockToken.trim()
           : '';
-      // Never rely on cookies or stale browser state if there is no active, unconsumed server-issued unlockToken
-      if (!candidateToken) {
+      const hasAuthenticatedCustomerSession =
+        typeof window.__kycIsCustomerAuthenticated === 'function' &&
+        window.__kycIsCustomerAuthenticated();
+
+      // Never rely on cookies or stale browser state if there is neither an active server-issued unlockToken nor an authenticated customer session
+      if (!candidateToken && !hasAuthenticatedCustomerSession) {
         clearSifaloGrantForProduct(productKey);
         syncActiveProductUnlockUI();
         return false;
       }
 
       const sessionId = getOrCreateSifaloSessionId();
+      const authHeaders = Object.assign(
+        {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache',
+          'X-Kyc-Session-Id': sessionId
+        },
+        typeof window.__kycGetCustomerAuthHeaders === 'function'
+          ? window.__kycGetCustomerAuthHeaders()
+          : {}
+      );
       try {
         const res = await fetch('/api/payments/sifalo/authorize-unlock', {
           method: 'POST',
           credentials: 'same-origin',
           cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-store, no-cache',
-            'X-Kyc-Session-Id': sessionId
-          },
+          headers: authHeaders,
           body: JSON.stringify({
             unlockToken: candidateToken,
             orderId: (activeGrant && activeGrant.orderId) || '',
@@ -2342,12 +2497,17 @@
         });
         if (!res.ok) {
           clearSifaloGrantForProduct(productKey);
+          if (typeof window.__kycRefreshCustomerAuthStatus === 'function') {
+            window.__kycRefreshCustomerAuthStatus();
+          }
           syncActiveProductUnlockUI();
           return false;
         }
         const data = await res.json().catch(() => null);
         if (data && data.authorized === true && data.productKey === productKey) {
-          if (consumeUnlock !== false || data.consumed === true) {
+          if (data.customerAccessType === 'one_time' || data.customerAccessType === 'monthly') {
+            recordServerVerifiedUnlock(data, sessionId);
+          } else if (consumeUnlock !== false || data.consumed === true) {
             // Single-use authorization has been consumed on the server; clear it immediately so any next click requires payment
             clearSifaloGrantForProduct(productKey);
           } else {
@@ -2378,14 +2538,21 @@
         });
       }
 
+      const statusHeaders = Object.assign(
+        {
+          'Content-Type': 'application/json',
+          'X-Kyc-Session-Id': sessionId
+        },
+        typeof window.__kycGetCustomerAuthHeaders === 'function'
+          ? window.__kycGetCustomerAuthHeaders()
+          : {}
+      );
+
       try {
         const res = await fetch('/api/payments/sifalo/session-status', {
           method: 'POST',
           credentials: 'same-origin',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Kyc-Session-Id': sessionId
-          },
+          headers: statusHeaders,
           body: JSON.stringify({
             sessionId,
             candidateGrants
@@ -2684,13 +2851,19 @@
         recheckBtn.textContent = 'Checking Sifalo Pay confirmation...';
       }
       try {
-        const verifyRes = await fetch('/api/payments/sifalo/verify-order', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: {
+        const verifyHeaders = Object.assign(
+          {
             'Content-Type': 'application/json',
             'X-Kyc-Session-Id': sessionId
           },
+          typeof window.__kycGetCustomerAuthHeaders === 'function'
+            ? window.__kycGetCustomerAuthHeaders()
+            : {}
+        );
+        const verifyRes = await fetch('/api/payments/sifalo/verify-order', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: verifyHeaders,
           body: JSON.stringify({
             orderId: pending.orderId,
             sid: pending.sid || '',
@@ -2708,6 +2881,9 @@
           verifyData.productKey
         ) {
           recordServerVerifiedUnlock(verifyData, sessionId);
+          if (typeof window.__kycRefreshCustomerAuthStatus === 'function') {
+            await window.__kycRefreshCustomerAuthStatus();
+          }
           window.__kycLastUnconfirmedOrder = null;
           _pendingSifaloCallback = null;
           const pendingSavePng = readPendingSavePngAfterPayment();
@@ -2798,7 +2974,20 @@
         }
 
         if (orderId) {
-          restoreEditorContextFromData(effectiveUiContext, true);
+          const isPricingReturnContext =
+            Boolean(
+              effectiveUiContext &&
+              (effectiveUiContext.workflowStep === 'pricing' ||
+                effectiveUiContext.productKey === 'oneTimeAccess' ||
+                effectiveUiContext.productKey === 'monthlyAccess')
+            );
+          if (isPricingReturnContext) {
+            if (typeof window.openPricingPage === 'function') {
+              window.openPricingPage({ noScroll: true });
+            }
+          } else {
+            restoreEditorContextFromData(effectiveUiContext, true);
+          }
           if (typeof showToast === 'function') {
             showToast('Verifying Payment...', 'Checking Sifalo Pay payment confirmation with our server');
           }
@@ -2806,16 +2995,22 @@
           let verifyRes = null;
           let verifyData = null;
           const maxAttempts = returnStatus === 'failed' || returnStatus === 'cancelled' ? 1 : 4;
+          const verifyReturnHeaders = Object.assign(
+            {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-store, no-cache',
+              'X-Kyc-Session-Id': sessionId
+            },
+            typeof window.__kycGetCustomerAuthHeaders === 'function'
+              ? window.__kycGetCustomerAuthHeaders()
+              : {}
+          );
           for (let attempt = 0; attempt < maxAttempts; attempt++) {
             verifyRes = await fetch('/api/payments/sifalo/verify-order', {
               method: 'POST',
               credentials: 'same-origin',
               cache: 'no-store',
-              headers: {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-store, no-cache',
-                'X-Kyc-Session-Id': sessionId
-              },
+              headers: verifyReturnHeaders,
               body: JSON.stringify({
                 orderId,
                 sid,
@@ -2846,38 +3041,77 @@
             verifyData.productKey &&
             verifyData.sid
           ) {
-            const hasActiveEditor = Boolean(effectiveUiContext && effectiveUiContext.countryKey);
-            if (!hasActiveEditor && verifyData.countryKey && verifyData.countryKey !== 'global') {
-              const fallbackSpec = getDocSpecByProductKey(verifyData.productKey);
-              restoreEditorContextFromData({
-                countryKey: verifyData.countryKey,
-                providerKey: verifyData.providerKey || 'paypal',
-                rawDocType: (fallbackSpec && fallbackSpec.rawType) || 'passport'
-              }, true);
-            } else if (!hasActiveEditor && !restoreSavedEditorUiOnRefresh()) {
-              const fallbackSpec = getDocSpecByProductKey(verifyData.productKey);
-              restoreEditorContextFromData({
-                countryKey: 'kenya',
-                providerKey: verifyData.providerKey || 'paypal',
-                rawDocType: (fallbackSpec && fallbackSpec.rawType) || 'passport'
-              }, true);
+            const isVerifiedPricingPlan =
+              verifyData.productKey === 'oneTimeAccess' ||
+              verifyData.productKey === 'monthlyAccess' ||
+              isPricingReturnContext;
+            if (isVerifiedPricingPlan) {
+              if (typeof window.__kycRefreshCustomerAuthStatus === 'function') {
+                await window.__kycRefreshCustomerAuthStatus();
+              }
+              if (
+                typeof window.__kycIsCustomerAuthenticated === 'function' &&
+                window.__kycIsCustomerAuthenticated() &&
+                typeof window.openCustomerAuthPage === 'function'
+              ) {
+                window.openCustomerAuthPage('account', { noScroll: true });
+              } else if (typeof window.openPricingPage === 'function') {
+                window.openPricingPage({ noScroll: true });
+              }
+            } else {
+              const hasActiveEditor = Boolean(effectiveUiContext && effectiveUiContext.countryKey);
+              if (!hasActiveEditor && verifyData.countryKey && verifyData.countryKey !== 'global') {
+                const fallbackSpec = getDocSpecByProductKey(verifyData.productKey);
+                restoreEditorContextFromData({
+                  countryKey: verifyData.countryKey,
+                  providerKey: verifyData.providerKey || 'paypal',
+                  rawDocType: (fallbackSpec && fallbackSpec.rawType) || 'passport'
+                }, true);
+              } else if (!hasActiveEditor && !restoreSavedEditorUiOnRefresh()) {
+                const fallbackSpec = getDocSpecByProductKey(verifyData.productKey);
+                restoreEditorContextFromData({
+                  countryKey: 'kenya',
+                  providerKey: verifyData.providerKey || 'paypal',
+                  rawDocType: (fallbackSpec && fallbackSpec.rawType) || 'passport'
+                }, true);
+              }
             }
             recordServerVerifiedUnlock(verifyData, sessionId);
             window.__kycLastUnconfirmedOrder = null;
             removeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY);
-            saveActiveEditorUiState();
+            if (!isVerifiedPricingPlan) {
+              saveActiveEditorUiState();
+            }
             closeSifaloPayModal(true);
             syncActiveProductUnlockUI();
+            if (isVerifiedPricingPlan && typeof showToast === 'function') {
+              showToast(
+                'Payment Verified!',
+                `${verifyData.label || 'Access Plan'} confirmed by Sifalo Pay.`
+              );
+            }
             return {
               handled: true,
               verifiedData: verifyData,
-              pendingSavePng: pendingSavePng && !pendingSavePng.consumed ? pendingSavePng : null
+              pendingSavePng:
+                !isVerifiedPricingPlan && pendingSavePng && !pendingSavePng.consumed
+                  ? pendingSavePng
+                  : null
             };
           } else {
             const targetProductKey =
               (verifyData && verifyData.productKey) ||
               (effectiveUiContext && effectiveUiContext.productKey) ||
               getActiveUnlockDocSpec().productKey;
+            if (
+              targetProductKey === 'oneTimeAccess' ||
+              targetProductKey === 'monthlyAccess' ||
+              isPricingReturnContext
+            ) {
+              if (typeof window.openPricingPage === 'function') {
+                window.openPricingPage({ noScroll: true });
+              }
+            }
             clearSifaloGrantForProduct(targetProductKey);
             syncActiveProductUnlockUI();
 
@@ -3075,7 +3309,14 @@
       }
 
       if (hasValidPaidUnlock) {
-        return executePaidDownloadCallback(downloadCallback, clickedBtn, docSpec.productKey);
+        const keepUnlockedForCustomerPlan =
+          typeof window.__kycIsCustomerPaidAccessVerifiedActive === 'function' &&
+          window.__kycIsCustomerPaidAccessVerifiedActive(docSpec.productKey);
+        return executePaidDownloadCallback(
+          downloadCallback,
+          clickedBtn,
+          keepUnlockedForCustomerPlan ? null : docSpec.productKey
+        );
       }
 
       // Not authorized: immediately start a fresh Sifalo checkout session without generating any PNG
@@ -3269,6 +3510,39 @@
       if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
       if (typeof window.setWorkflowViewStep === 'function') {
         window.setWorkflowViewStep('about', { silent: true, noScroll: options.noScroll });
+      }
+      if (!options.noScroll && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.openPricingPage = function(opts) {
+      const options = opts || {};
+      if (typeof window.closeAboutModal === 'function') window.closeAboutModal();
+      if (typeof window.closePrivacyModal === 'function') window.closePrivacyModal();
+      if (typeof window.closeTermsModal === 'function') window.closeTermsModal();
+      if (typeof window.closeContactModal === 'function') window.closeContactModal();
+      if (typeof window.closeFaqModal === 'function') window.closeFaqModal();
+      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+      if (typeof window.setWorkflowViewStep === 'function') {
+        window.setWorkflowViewStep('pricing', { silent: true, noScroll: options.noScroll });
+      }
+      if (!options.noScroll && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+    window.openCustomerAuthPage = function(mode, opts) {
+      const options = opts || {};
+      if (typeof window.closeAboutModal === 'function') window.closeAboutModal();
+      if (typeof window.closePrivacyModal === 'function') window.closePrivacyModal();
+      if (typeof window.closeTermsModal === 'function') window.closeTermsModal();
+      if (typeof window.closeContactModal === 'function') window.closeContactModal();
+      if (typeof window.closeFaqModal === 'function') window.closeFaqModal();
+      if (typeof window.closeMobileMenu === 'function') window.closeMobileMenu();
+      if (typeof window.__kycSetCustomerAuthViewMode === 'function') {
+        window.__kycSetCustomerAuthViewMode(mode || 'auto');
+      }
+      if (typeof window.setWorkflowViewStep === 'function') {
+        window.setWorkflowViewStep('customer', { silent: true, noScroll: options.noScroll });
       }
       if (!options.noScroll && typeof window.scrollTo === 'function') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -5321,6 +5595,8 @@ var $ = window.$ || (id => document.getElementById(id));
       const whySection = $('homepage-why-section');
       const vaSection = $('our-virtual-accounts');
       const aboutSection = $('about-page-section');
+      const pricingSection = $('pricing-page-section');
+      const customerSection = $('customer-auth-page-section');
       const privacySection = $('privacy-page-section');
       const termsSection = $('terms-page-section');
       const contactSection = $('contact-page-section');
@@ -5332,14 +5608,68 @@ var $ = window.$ || (id => document.getElementById(id));
 
       const navHome = $('nav-link-home');
       const navAccounts = $('nav-link-accounts');
+      const navPricing = $('nav-link-pricing');
       const navAbout = $('nav-link-about');
       const navContact = $('nav-link-contact');
       if (navHome) navHome.classList.toggle('text-[#0d5bd9]', nextStep === 'home');
       if (navAccounts) navAccounts.classList.toggle('text-[#0d5bd9]', nextStep === 'accounts' || nextStep === 'provider' || nextStep === 'editor');
+      if (navPricing) navPricing.classList.toggle('text-[#0d5bd9]', nextStep === 'pricing');
       if (navAbout) navAbout.classList.toggle('text-[#0d5bd9]', nextStep === 'about');
       if (navContact) navContact.classList.toggle('text-[#0d5bd9]', nextStep === 'contact');
 
-      if (nextStep === 'contact') {
+      if (pricingSection && nextStep !== 'pricing') {
+        pricingSection.classList.add('hidden');
+      }
+      if (customerSection && nextStep !== 'customer') {
+        customerSection.classList.add('hidden');
+      }
+
+      if (nextStep === 'customer') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (pricingSection) pricingSection.classList.add('hidden');
+        if (customerSection) customerSection.classList.remove('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
+        if (unifiedCard) unifiedCard.classList.add('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        if (typeof window.__kycSyncCustomerAccountUI === 'function') {
+          window.__kycSyncCustomerAccountUI();
+        }
+        if (!options.noScroll && customerSection) {
+          customerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'pricing') {
+        if (heroSection) heroSection.classList.add('hidden');
+        if (heroHomeContent) heroHomeContent.classList.add('hidden');
+        if (whySection) whySection.classList.add('hidden');
+        if (vaSection) vaSection.classList.add('hidden');
+        if (aboutSection) aboutSection.classList.add('hidden');
+        if (pricingSection) pricingSection.classList.remove('hidden');
+        if (privacySection) privacySection.classList.add('hidden');
+        if (termsSection) termsSection.classList.add('hidden');
+        if (contactSection) contactSection.classList.add('hidden');
+        if (unifiedCard) unifiedCard.classList.add('hidden');
+        if (workbench) workbench.classList.add('hidden');
+        if (editorBar) editorBar.classList.add('hidden');
+        if (poaAccountBar) poaAccountBar.classList.add('hidden');
+        if (noDocView) noDocView.classList.add('hidden');
+        document.querySelectorAll('#verification-workbench [id$="-view"]').forEach(v => v.classList.add('hidden'));
+        if (typeof syncPricingPageUnlockStatusUI === 'function') {
+          syncPricingPageUnlockStatusUI();
+        }
+        if (!options.noScroll && pricingSection) {
+          pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (nextStep === 'contact') {
         if (heroSection) heroSection.classList.add('hidden');
         if (heroHomeContent) heroHomeContent.classList.add('hidden');
         if (whySection) whySection.classList.add('hidden');
@@ -21877,13 +22207,55 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       <nav aria-label="Primary Navigation" class="hidden md:flex items-center gap-7 text-sm font-semibold text-[#1e3a6e]">
         <button id="nav-link-home" type="button" onclick="goToHomePage(event)" class="text-[#0d5bd9] hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Home</button>
         <button id="nav-link-accounts" type="button" onclick="setWorkflowViewStep('accounts')" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Virtual Accounts</button>
+        <button id="nav-link-pricing" type="button" onclick="openPricingPage()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Pricing</button>
         <button id="nav-link-about" type="button" onclick="openAboutPage()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">KYC Guide</button>
         <button type="button" onclick="openFaqModal()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">FAQ</button>
         <button id="nav-link-contact" type="button" onclick="openContactPage()" class="hover:text-[#0d5bd9] transition-colors whitespace-nowrap shrink-0 cursor-pointer">Contact</button>
       </nav>
 
-      <!-- Right Controls: Mobile Hamburger Menu Only -->
-      <div class="flex items-center shrink-0">
+      <!-- Right Controls: Customer Auth Navigation + Mobile Hamburger Menu -->
+      <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <!-- Logged-Out Desktop Auth Buttons -->
+        <div id="navCustomerLoggedOutGroup" class="hidden md:flex items-center gap-2">
+          <button
+            type="button"
+            id="nav-link-customer-login"
+            onclick="openCustomerAuthPage('login')"
+            class="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-white hover:bg-blue-50 text-[#0d2658] border border-blue-200 font-bold text-xs transition-colors shadow-2xs cursor-pointer whitespace-nowrap"
+          >
+            Login
+          </button>
+          <button
+            type="button"
+            id="nav-link-customer-register"
+            onclick="openCustomerAuthPage('register')"
+            class="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-[#0d5bd9] hover:bg-[#0b4bb5] text-white font-bold text-xs transition-colors shadow-2xs cursor-pointer whitespace-nowrap"
+          >
+            Register
+          </button>
+        </div>
+
+        <!-- Logged-In Desktop Auth Buttons -->
+        <div id="navCustomerLoggedInGroup" class="hidden items-center gap-2">
+          <button
+            type="button"
+            id="nav-link-customer-account"
+            onclick="openCustomerAuthPage('account')"
+            class="min-h-[38px] px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold text-xs inline-flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer whitespace-nowrap"
+          >
+            <i class="fa-solid fa-circle-user text-emerald-600 text-xs"></i>
+            <span>My Account</span>
+          </button>
+          <button
+            type="button"
+            id="nav-link-customer-logout"
+            onclick="window.__kycHandleCustomerLogout && window.__kycHandleCustomerLogout()"
+            class="min-h-[38px] px-3 py-1.5 rounded-xl bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 border border-slate-200 font-bold text-xs transition-colors cursor-pointer whitespace-nowrap"
+          >
+            Logout
+          </button>
+        </div>
+
         <button type="button" id="mobileMenuBtn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation Menu" class="md:hidden w-11 h-11 text-[#0d2658] bg-white hover:bg-blue-50 rounded-xl border border-blue-100 shadow-sm cursor-pointer transition-colors flex items-center justify-center">
           <i id="mobileMenuIcon" class="fa-solid fa-bars text-base"></i>
         </button>
@@ -21901,6 +22273,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           <i class="fa-solid fa-wallet text-sm text-[#0d5bd9]"></i>
           <span>Virtual Accounts</span>
         </button>
+        <button type="button" onclick="openPricingPage(); closeMobileMenu();" class="min-h-[44px] flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
+          <i class="fa-solid fa-tags text-sm text-[#0d5bd9]"></i>
+          <span>Pricing</span>
+        </button>
         <button type="button" onclick="openAboutPage(); closeMobileMenu();" class="min-h-[44px] flex items-center gap-2.5 p-3 rounded-xl bg-slate-50 text-[#0d2658] font-bold text-xs border border-slate-200 cursor-pointer">
           <i class="fa-solid fa-shield-halved text-sm text-[#16a34a]"></i>
           <span>KYC Guide</span>
@@ -21910,6 +22286,30 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           <span>FAQ</span>
         </button>
       </div>
+
+      <!-- Mobile Customer Auth Controls -->
+      <div id="mobileCustomerLoggedOutGroup" class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
+        <button type="button" onclick="openCustomerAuthPage('login'); closeMobileMenu();" class="min-h-[44px] flex items-center justify-center gap-2 p-3 rounded-xl bg-white text-[#0d2658] font-bold text-xs border border-blue-200 cursor-pointer">
+          <i class="fa-solid fa-right-to-bracket text-xs text-[#0d5bd9]"></i>
+          <span>Login</span>
+        </button>
+        <button type="button" onclick="openCustomerAuthPage('register'); closeMobileMenu();" class="min-h-[44px] flex items-center justify-center gap-2 p-3 rounded-xl bg-emerald-600 text-white font-bold text-xs shadow-2xs cursor-pointer">
+          <i class="fa-solid fa-user-plus text-xs"></i>
+          <span>Register</span>
+        </button>
+      </div>
+
+      <div id="mobileCustomerLoggedInGroup" class="hidden grid-cols-2 gap-2 pt-1 border-t border-slate-100">
+        <button type="button" onclick="openCustomerAuthPage('account'); closeMobileMenu();" class="min-h-[44px] flex items-center justify-center gap-2 p-3 rounded-xl bg-emerald-50 text-emerald-900 font-extrabold text-xs border border-emerald-300 cursor-pointer">
+          <i class="fa-solid fa-circle-user text-xs text-emerald-600"></i>
+          <span>My Account</span>
+        </button>
+        <button type="button" onclick="window.__kycHandleCustomerLogout && window.__kycHandleCustomerLogout(); closeMobileMenu();" class="min-h-[44px] flex items-center justify-center gap-2 p-3 rounded-xl bg-white text-red-700 font-bold text-xs border border-red-200 cursor-pointer">
+          <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+
       <button type="button" onclick="openContactModal(); closeMobileMenu();" class="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-[#0d5bd9] text-white font-bold text-xs shadow-xs cursor-pointer">
         <i class="fa-solid fa-headset text-sm"></i>
         <span>Contact Support</span>
@@ -23963,6 +24363,534 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           <button type="button" onclick="setWorkflowViewStep('accounts')" class="kyc-green-pill min-h-[48px] shrink-0 inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base transition-transform hover:-translate-y-0.5 cursor-pointer">
             <span>Get Started Now</span>
             <i class="fa-solid fa-arrow-right text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= DEDICATED PRICING PAGE ================= -->
+  <section id="pricing-page-section" class="hidden no-print relative overflow-x-hidden bg-white">
+    <!-- 1. Pricing Hero Band -->
+    <div class="kyc-hero-surface relative overflow-hidden pt-8 sm:pt-12 lg:pt-14 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8">
+      <!-- Subtle Dotted World Map Backdrop -->
+      <svg aria-hidden="true" class="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" viewBox="0 0 1200 520" fill="none">
+        <defs>
+          <pattern id="pricingHeroWorldDots" width="12" height="12" patternUnits="userSpaceOnUse">
+            <circle cx="3" cy="3" r="1.4" fill="#7fb5fb" />
+          </pattern>
+          <mask id="pricingHeroWorldMask">
+            <rect width="1200" height="520" fill="black" />
+            <ellipse cx="260" cy="180" rx="160" ry="95" fill="white" />
+            <ellipse cx="320" cy="310" rx="85" ry="95" fill="white" />
+            <ellipse cx="620" cy="170" rx="185" ry="90" fill="white" />
+            <ellipse cx="640" cy="300" rx="95" ry="105" fill="white" />
+            <ellipse cx="890" cy="210" rx="170" ry="110" fill="white" />
+            <ellipse cx="980" cy="370" rx="90" ry="60" fill="white" />
+          </mask>
+        </defs>
+        <rect width="1200" height="520" fill="url(#pricingHeroWorldDots)" mask="url(#pricingHeroWorldMask)" />
+      </svg>
+
+      <!-- Bottom Cyan-to-White Swoosh Divider -->
+      <svg aria-hidden="true" class="absolute bottom-0 inset-x-0 w-full h-14 sm:h-20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 1440 120">
+        <defs>
+          <linearGradient id="pricingHeroWaveWash" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.45" />
+            <stop offset="50%" stop-color="#ccfbf1" stop-opacity="0.6" />
+            <stop offset="100%" stop-color="#bae6fd" stop-opacity="0.65" />
+          </linearGradient>
+        </defs>
+        <path d="M0,44 C360,104 920,-10 1440,56 L1440,120 L0,120 Z" fill="url(#pricingHeroWaveWash)" />
+        <path d="M0,76 C420,28 960,108 1440,62 L1440,120 L0,120 Z" fill="#ffffff" />
+      </svg>
+
+      <div class="max-w-5xl mx-auto relative z-10 text-center space-y-4">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-blue-100 text-[#0d2658] text-xs sm:text-sm font-bold shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-[#0d5bd9] text-white flex items-center justify-center text-[11px]">
+            <i class="fa-solid fa-tag"></i>
+          </span>
+          <span>Simple, Transparent Pricing</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-5xl lg:text-[3.25rem] font-extrabold text-[#0d2658] tracking-tight leading-[1.08]">
+          Choose Your Access Plan
+        </h1>
+
+        <p class="text-sm sm:text-base lg:text-lg text-[#3b5482] font-medium leading-relaxed max-w-2xl mx-auto">
+          Select either one-time access with no recurring monthly charge or flexible monthly access. All payments are processed in USD and verified server-side through Sifalo Pay.
+        </p>
+
+        <div class="pt-1 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" onclick="goToHomePage(event)" class="min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white/90 hover:bg-white text-[#0d2658] border border-blue-200 font-bold text-xs sm:text-sm transition-colors shadow-sm cursor-pointer">
+            <i class="fa-solid fa-house text-xs text-[#0d5bd9]"></i>
+            <span>Back to Home</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Pricing Cards Container -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 pb-14 sm:pb-20 space-y-8 relative z-20">
+
+      <!-- Server-Verified Payment Status Banner (Shown ONLY when server confirms PAID order) -->
+      <div id="pricingVerifiedStatusBanner" class="hidden rounded-2xl border-2 border-emerald-300 bg-emerald-50/95 px-5 py-4 shadow-md">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <i class="fa-solid fa-shield-check text-base"></i>
+            </div>
+            <div>
+              <h3 id="pricingVerifiedStatusTitle" class="text-sm sm:text-base font-extrabold text-emerald-950">
+                Payment Verified by Sifalo Pay
+              </h3>
+              <p id="pricingVerifiedStatusDetail" class="text-xs sm:text-sm text-emerald-800 font-medium mt-0.5">
+                Server-verified Sifalo Pay confirmation completed. Your access is active.
+              </p>
+            </div>
+          </div>
+          <button type="button" onclick="setWorkflowViewStep('accounts')" class="min-h-[40px] px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs inline-flex items-center gap-2 transition-colors shrink-0 cursor-pointer">
+            <span>Open Virtual Accounts</span>
+            <i class="fa-solid fa-arrow-right text-[11px]"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Two Pricing Cards Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+
+        <!-- CARD 1: ONE-TIME ($55 — One-Time Access) -->
+        <div class="kyc-about-card rounded-3xl bg-white border-2 border-blue-200/90 p-6 sm:p-8 shadow-lg flex flex-col justify-between relative overflow-hidden transition-all hover:border-[#0d5bd9]">
+          <div class="space-y-5">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0d5bd9] text-xs font-extrabold uppercase tracking-wider">
+                <i class="fa-solid fa-bolt text-[11px]"></i>
+                <span>ONE-TIME</span>
+              </span>
+              <span id="pricingOneTimeVerifiedBadge" class="hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] font-extrabold">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                <span>Verified Active</span>
+              </span>
+            </div>
+
+            <div class="space-y-1.5">
+              <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight">
+                One-Time Access
+              </h2>
+              <p class="text-xs sm:text-sm text-[#3b5482] font-semibold leading-relaxed">
+                &ldquo;Pay once without a recurring monthly charge.&rdquo;
+              </p>
+            </div>
+
+            <div class="pt-2 pb-4 border-b border-slate-100 flex items-baseline gap-2">
+              <span class="text-4xl sm:text-5xl font-black text-[#0d2658] tracking-tight">$55</span>
+              <span class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">USD · One-time payment</span>
+            </div>
+
+            <ul class="space-y-3 text-xs sm:text-sm font-semibold text-[#1e3a6e]">
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-[#16a34a] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>One-time payment</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-[#16a34a] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>No recurring monthly charge</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-[#16a34a] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>Full access to supported virtual accounts &amp; KYC templates</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-emerald-100 text-[#16a34a] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>Server-side payment verification via Sifalo Pay</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-7">
+            <button
+              type="button"
+              id="pricingOneTimeBtn"
+              onclick="startPricingPlanCheckout('oneTimeAccess', this)"
+              class="kyc-green-pill w-full min-h-[52px] px-6 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2.5 shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer"
+            >
+              <span>Get One-Time Access</span>
+              <i class="fa-solid fa-arrow-right text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 2: MONTHLY ($12/month — Monthly Access) -->
+        <div class="kyc-about-card rounded-3xl bg-white border-2 border-blue-200/90 p-6 sm:p-8 shadow-lg flex flex-col justify-between relative overflow-hidden transition-all hover:border-[#0d5bd9]">
+          <div class="space-y-5">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-[#0d5bd9] text-xs font-extrabold uppercase tracking-wider">
+                <i class="fa-solid fa-calendar-check text-[11px]"></i>
+                <span>MONTHLY</span>
+              </span>
+              <span id="pricingMonthlyVerifiedBadge" class="hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-[11px] font-extrabold">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                <span>Verified Active</span>
+              </span>
+            </div>
+
+            <div class="space-y-1.5">
+              <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658] tracking-tight">
+                Monthly Access
+              </h2>
+              <p class="text-xs sm:text-sm text-[#3b5482] font-semibold leading-relaxed">
+                &ldquo;Flexible monthly access billed each month.&rdquo;
+              </p>
+            </div>
+
+            <div class="pt-2 pb-4 border-b border-slate-100 flex items-baseline gap-1.5">
+              <span class="text-4xl sm:text-5xl font-black text-[#0d2658] tracking-tight">$12/month</span>
+              <span class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider">USD · Monthly payment</span>
+            </div>
+
+            <ul class="space-y-3 text-xs sm:text-sm font-semibold text-[#1e3a6e]">
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-blue-100 text-[#0d5bd9] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>Monthly payment</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-blue-100 text-[#0d5bd9] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>Flexible monthly access billed each month</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-blue-100 text-[#0d5bd9] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>Full access to supported virtual accounts &amp; KYC templates</span>
+              </li>
+              <li class="flex items-center gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-blue-100 text-[#0d5bd9] flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-check text-[11px]"></i>
+                </span>
+                <span>Server-side payment verification via Sifalo Pay</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="pt-7">
+            <button
+              type="button"
+              id="pricingMonthlyBtn"
+              onclick="startPricingPlanCheckout('monthlyAccess', this)"
+              class="kyc-va-cta w-full min-h-[52px] px-6 py-3.5 rounded-full text-white font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2.5 shadow-md transition-transform hover:-translate-y-0.5 cursor-pointer"
+            >
+              <span>Get Monthly Access</span>
+              <i class="fa-solid fa-arrow-right text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Secure Payment Powered by Sifalo Pay Note -->
+      <div class="rounded-2xl bg-slate-50 border border-blue-100 px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+        <div class="flex items-center gap-2.5 text-xs sm:text-sm font-extrabold text-[#0d2658]">
+          <span class="w-8 h-8 rounded-xl bg-blue-100 text-[#0d5bd9] flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-lock text-xs"></i>
+          </span>
+          <span>Secure payment powered by Sifalo Pay.</span>
+        </div>
+        <div class="text-[11px] sm:text-xs font-semibold text-[#47608e]">
+          Supports Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL &amp; Premier Wallet (USD)
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= CUSTOMER REGISTRATION, LOGIN & ACCOUNT SECTION ================= -->
+  <section id="customer-auth-page-section" class="hidden no-print relative overflow-x-hidden bg-white">
+    <!-- Hero Header Band -->
+    <div class="kyc-hero-surface relative overflow-hidden pt-8 sm:pt-12 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto relative z-10 text-center space-y-3">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-blue-100 text-[#0d2658] text-xs sm:text-sm font-bold shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-[#0d5bd9] text-white flex items-center justify-center text-[11px]">
+            <i class="fa-solid fa-user-shield"></i>
+          </span>
+          <span id="customerAuthHeroBadgeText">Customer Account Portal</span>
+        </div>
+
+        <h1 id="customerAuthHeroTitle" class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0d2658] tracking-tight leading-tight">
+          Customer Login
+        </h1>
+
+        <p id="customerAuthHeroSubtitle" class="text-sm sm:text-base text-[#3b5482] font-medium max-w-xl mx-auto">
+          Sign in to manage your account and access your server-verified One-Time Access or Monthly Access plan.
+        </p>
+
+        <div class="pt-1 flex flex-wrap items-center justify-center gap-3">
+          <button type="button" onclick="goToHomePage(event)" class="min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/90 hover:bg-white text-[#0d2658] border border-blue-200 font-bold text-xs transition-colors shadow-2xs cursor-pointer">
+            <i class="fa-solid fa-house text-xs text-[#0d5bd9]"></i>
+            <span>Back to Home</span>
+          </button>
+          <button type="button" onclick="openPricingPage()" class="min-h-[40px] inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white/90 hover:bg-white text-[#0d5bd9] border border-blue-200 font-bold text-xs transition-colors shadow-2xs cursor-pointer">
+            <i class="fa-solid fa-tags text-xs"></i>
+            <span>View Pricing Plans</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-10 pb-16 sm:pb-24 relative z-20 space-y-5">
+
+      <!-- SERVER-PRESERVED PENDING CHECKOUT PLAN BANNER -->
+      <div id="customerPendingPlanBanner" class="hidden max-w-md mx-auto rounded-2xl border-2 border-blue-300 bg-blue-50/95 px-5 py-4 shadow-md">
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-xl bg-[#0d5bd9] text-white flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+            <i class="fa-solid fa-cart-shopping text-xs"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#0d5bd9]">Selected Plan Saved</div>
+            <div id="customerPendingPlanTitle" class="text-sm sm:text-base font-extrabold text-[#0d2658]">One-Time Access — $55 USD</div>
+            <p id="customerPendingPlanNote" class="text-xs font-medium text-[#3b5482] mt-0.5">
+              Sign in or create your customer account below to automatically continue to Sifalo Pay checkout.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. CUSTOMER LOGIN CARD -->
+      <div id="customerLoginCard" class="max-w-md mx-auto kyc-about-card rounded-3xl bg-white border-2 border-blue-200/90 p-6 sm:p-8 shadow-xl space-y-6">
+        <div class="space-y-1.5 text-center">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658]">Sign In to Your Account</h2>
+          <p class="text-xs sm:text-sm text-[#47608e] font-medium">Enter your customer email and password below.</p>
+        </div>
+
+        <div id="customerLoginErrorBox" class="hidden rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-xs sm:text-sm font-bold text-red-700"></div>
+        <div id="customerLoginSuccessBox" class="hidden rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-xs sm:text-sm font-bold text-emerald-800"></div>
+
+        <form id="customerLoginForm" class="space-y-4" onsubmit="return window.__kycSubmitCustomerLogin(event)">
+          <div class="space-y-1.5">
+            <label for="customerLoginEmail" class="block text-xs font-extrabold text-[#0d2658] uppercase tracking-wider">Email</label>
+            <input
+              type="email"
+              id="customerLoginEmail"
+              name="email"
+              required
+              autocomplete="email"
+              placeholder="you@example.com"
+              class="w-full min-h-[46px] px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#0d5bd9] focus:outline-none text-sm font-semibold text-slate-900 bg-white"
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <label for="customerLoginPassword" class="block text-xs font-extrabold text-[#0d2658] uppercase tracking-wider">Password</label>
+            <input
+              type="password"
+              id="customerLoginPassword"
+              name="password"
+              required
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              class="w-full min-h-[46px] px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#0d5bd9] focus:outline-none text-sm font-semibold text-slate-900 bg-white"
+            />
+          </div>
+
+          <button
+            type="submit"
+            id="customerLoginSubmitBtn"
+            class="kyc-va-cta w-full min-h-[48px] px-6 py-3 rounded-full text-white font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2 shadow-md cursor-pointer"
+          >
+            <i class="fa-solid fa-right-to-bracket text-sm"></i>
+            <span id="customerLoginSubmitBtnLabel">Login</span>
+          </button>
+        </form>
+
+        <div class="pt-3 border-t border-slate-100 text-center text-xs sm:text-sm font-semibold text-[#3b5482]">
+          Don&rsquo;t have a customer account?
+          <button
+            type="button"
+            onclick="openCustomerAuthPage('register')"
+            class="text-[#0d5bd9] hover:underline font-extrabold ml-1 cursor-pointer"
+          >
+            Create Account
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. CUSTOMER REGISTRATION CARD -->
+      <div id="customerRegisterCard" class="hidden max-w-md mx-auto kyc-about-card rounded-3xl bg-white border-2 border-blue-200/90 p-6 sm:p-8 shadow-xl space-y-6">
+        <div class="space-y-1.5 text-center">
+          <h2 class="text-xl sm:text-2xl font-extrabold text-[#0d2658]">Create Your Customer Account</h2>
+          <p class="text-xs sm:text-sm text-[#47608e] font-medium">Register with your email and a strong password.</p>
+        </div>
+
+        <div id="customerRegisterErrorBox" class="hidden rounded-2xl bg-red-50 border border-red-200 px-4 py-3 text-xs sm:text-sm font-bold text-red-700"></div>
+
+        <form id="customerRegisterForm" class="space-y-4" onsubmit="return window.__kycSubmitCustomerRegister(event)">
+          <div class="space-y-1.5">
+            <label for="customerRegisterEmail" class="block text-xs font-extrabold text-[#0d2658] uppercase tracking-wider">Email address</label>
+            <input
+              type="email"
+              id="customerRegisterEmail"
+              name="email"
+              required
+              autocomplete="email"
+              placeholder="you@example.com"
+              class="w-full min-h-[46px] px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#0d5bd9] focus:outline-none text-sm font-semibold text-slate-900 bg-white"
+            />
+          </div>
+
+          <div class="space-y-1.5">
+            <label for="customerRegisterPassword" class="block text-xs font-extrabold text-[#0d2658] uppercase tracking-wider">Password</label>
+            <input
+              type="password"
+              id="customerRegisterPassword"
+              name="password"
+              required
+              minlength="8"
+              autocomplete="new-password"
+              placeholder="At least 8 chars, upper, lower &amp; number"
+              class="w-full min-h-[46px] px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#0d5bd9] focus:outline-none text-sm font-semibold text-slate-900 bg-white"
+            />
+            <p class="text-[11px] font-medium text-slate-500">
+              Minimum 8 characters including uppercase, lowercase, and a number.
+            </p>
+          </div>
+
+          <div class="space-y-1.5">
+            <label for="customerRegisterConfirmPassword" class="block text-xs font-extrabold text-[#0d2658] uppercase tracking-wider">Confirm password</label>
+            <input
+              type="password"
+              id="customerRegisterConfirmPassword"
+              name="confirmPassword"
+              required
+              minlength="8"
+              autocomplete="new-password"
+              placeholder="Re-enter your password"
+              class="w-full min-h-[46px] px-4 py-2.5 rounded-xl border border-slate-300 focus:border-[#0d5bd9] focus:outline-none text-sm font-semibold text-slate-900 bg-white"
+            />
+          </div>
+
+          <button
+            type="submit"
+            id="customerRegisterSubmitBtn"
+            class="kyc-green-pill w-full min-h-[48px] px-6 py-3 rounded-full text-white font-extrabold text-sm sm:text-base inline-flex items-center justify-center gap-2 shadow-md cursor-pointer"
+          >
+            <i class="fa-solid fa-user-plus text-sm"></i>
+            <span id="customerRegisterSubmitBtnLabel">Create Account</span>
+          </button>
+        </form>
+
+        <div class="pt-3 border-t border-slate-100 text-center text-xs sm:text-sm font-semibold text-[#3b5482]">
+          Already have an account?
+          <button
+            type="button"
+            onclick="openCustomerAuthPage('login')"
+            class="text-[#0d5bd9] hover:underline font-extrabold ml-1 cursor-pointer"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. CUSTOMER ACCOUNT / ACCESS STATUS CARD -->
+      <div id="customerAccountCard" class="hidden kyc-about-card rounded-3xl bg-white border-2 border-blue-200/90 p-6 sm:p-8 shadow-xl space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 text-[#0d5bd9] flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-user-check text-xl"></i>
+            </div>
+            <div>
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Customer Account</div>
+              <div id="customerAccountEmailValue" class="text-base sm:text-lg font-extrabold text-[#0d2658] break-all">—</div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onclick="window.__kycHandleCustomerLogout && window.__kycHandleCustomerLogout()"
+            class="min-h-[42px] px-4 py-2 rounded-xl bg-white hover:bg-red-50 text-red-700 border border-red-200 font-extrabold text-xs inline-flex items-center justify-center gap-2 transition-colors cursor-pointer shrink-0"
+          >
+            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+
+        <!-- Access Status Summary Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Current Access Status -->
+          <div class="rounded-2xl border border-blue-100 bg-slate-50/80 p-4 space-y-1.5">
+            <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Current Access Status</div>
+            <div id="customerCurrentAccessBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-extrabold">
+              <i class="fa-solid fa-lock text-[11px]"></i>
+              <span>No Active Plan</span>
+            </div>
+            <p id="customerCurrentAccessNote" class="text-xs font-medium text-slate-600 pt-1">
+              Purchase One-Time Access ($55) or Monthly Access ($12/month), or unlock individual documents per download.
+            </p>
+          </div>
+
+          <!-- One-Time Access ($55 USD) Status -->
+          <div class="rounded-2xl border border-blue-100 bg-slate-50/80 p-4 space-y-1.5">
+            <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">One-Time Access ($55)</div>
+            <div id="customerOneTimeStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-extrabold">
+              <span>Not Active</span>
+            </div>
+            <p id="customerOneTimeStatusDetail" class="text-xs font-medium text-slate-600 pt-1">
+              One-time payment · No recurring monthly charge.
+            </p>
+          </div>
+
+          <!-- Monthly Access ($12/month USD) Status -->
+          <div class="rounded-2xl border border-blue-100 bg-slate-50/80 p-4 space-y-1.5">
+            <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">Monthly Access ($12/month)</div>
+            <div id="customerMonthlyStatusBadge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-extrabold">
+              <span>Not Active</span>
+            </div>
+            <p id="customerMonthlyStatusDetail" class="text-xs font-medium text-slate-600 pt-1">
+              30-day billing period · Verified via Sifalo Pay.
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onclick="setWorkflowViewStep('accounts')"
+              class="kyc-va-cta min-h-[44px] px-5 py-2.5 rounded-full text-white font-extrabold text-xs sm:text-sm inline-flex items-center gap-2 shadow-sm cursor-pointer"
+            >
+              <i class="fa-solid fa-wallet text-xs"></i>
+              <span>Open Virtual Accounts &amp; Documents</span>
+            </button>
+            <button
+              type="button"
+              onclick="openPricingPage()"
+              class="min-h-[44px] px-5 py-2.5 rounded-full bg-blue-50 hover:bg-blue-100 text-[#0d5bd9] border border-blue-200 font-extrabold text-xs sm:text-sm inline-flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <i class="fa-solid fa-tags text-xs"></i>
+              <span>View Pricing Plans ($55 / $12)</span>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onclick="window.__kycRefreshCustomerAuthStatus && window.__kycRefreshCustomerAuthStatus(true)"
+            class="min-h-[40px] px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <i class="fa-solid fa-rotate text-xs"></i>
+            <span>Refresh Status</span>
           </button>
         </div>
       </div>
@@ -39492,11 +40420,25 @@ EPSOM</div>
           return true;
         }
         const productKey = resolveCardProductKey(cardEl);
+        if (
+          typeof window.__kycIsCustomerPaidAccessVerifiedActive === 'function' &&
+          window.__kycIsCustomerPaidAccessVerifiedActive(productKey)
+        ) {
+          return true;
+        }
+        const serverEntry = _serverVerifiedAccessByProduct[productKey];
+        if (
+          serverEntry &&
+          serverEntry.authorized === true &&
+          (serverEntry.expiresAt === 0 || serverEntry.expiresAt > Date.now())
+        ) {
+          return true;
+        }
         if (typeof isProductUnlockedInUi === 'function' && isProductUnlockedInUi(productKey)) {
           const grant = window.__kycVerifiedUnlockState && window.__kycVerifiedUnlockState[productKey];
           if (
             grant &&
-            grant.unlocked === true &&
+            (grant.unlocked === true || grant.authorized === true) &&
             typeof grant.unlockToken === 'string' &&
             grant.unlockToken.length > 16 &&
             typeof grant.expiresAt === 'number' &&
@@ -39727,6 +40669,9 @@ EPSOM</div>
               { 'Content-Type': 'application/json' },
               typeof window.__kycGetServerAdminPreviewHeaders === 'function'
                 ? window.__kycGetServerAdminPreviewHeaders()
+                : {},
+              typeof window.__kycGetCustomerAuthHeaders === 'function'
+                ? window.__kycGetCustomerAuthHeaders()
                 : {}
             );
 
@@ -39890,6 +40835,728 @@ EPSOM</div>
         document.addEventListener('DOMContentLoaded', initKycPreviewProtectionSystem);
       } else {
         initKycPreviewProtectionSystem();
+      }
+    })();
+  </script>
+
+  <!-- ================= CUSTOMER AUTHENTICATION & SERVER-VERIFIED ENTITLEMENT CONTROLLER ================= -->
+  <script>
+    (function() {
+      // Strictly in-memory session & pending checkout intent state; NEVER persisted to localStorage or sessionStorage
+      let _customerMemoryToken = '';
+      let _customerProfile = null;
+      let _customerEntitlements = null;
+      let _pendingPlanIntentToken = '';
+      let _pendingCheckoutPlan = null;
+      let _customerAuthMode = 'login'; // 'login' | 'register' | 'account'
+      let _customerAuthBusy = false;
+
+      function getCustomerAuthHeaders() {
+        const headers = {
+          'X-Kyc-Customer-Request': '1'
+        };
+        if (_customerMemoryToken) {
+          headers['X-Kyc-Customer-Token'] = _customerMemoryToken;
+        }
+        if (_pendingPlanIntentToken) {
+          headers['X-Kyc-Plan-Intent'] = _pendingPlanIntentToken;
+        }
+        return headers;
+      }
+      window.__kycGetCustomerAuthHeaders = getCustomerAuthHeaders;
+
+      function isCustomerAuthenticated() {
+        return Boolean(_customerProfile && _customerProfile.id && _customerProfile.email);
+      }
+      window.__kycIsCustomerAuthenticated = isCustomerAuthenticated;
+
+      function isCustomerPaidAccessVerifiedActive() {
+        if (!isCustomerAuthenticated() || !_customerEntitlements) return false;
+        const nowMs = Date.now();
+        if (
+          _customerEntitlements.oneTimeAccess &&
+          _customerEntitlements.oneTimeAccess.status === 'active'
+        ) {
+          return true;
+        }
+        if (
+          _customerEntitlements.monthlyAccess &&
+          _customerEntitlements.monthlyAccess.status === 'active'
+        ) {
+          const expMs = Number(_customerEntitlements.monthlyAccess.expiresAtMs) || 0;
+          if (expMs > nowMs) {
+            return true;
+          }
+          // Expired monthly access immediately loses active status
+          _customerEntitlements.monthlyAccess.status = 'expired';
+          _customerEntitlements.hasActivePaidAccess = false;
+          _customerEntitlements.currentAccessStatus = 'Expired Monthly Access';
+        }
+        return false;
+      }
+      window.__kycIsCustomerPaidAccessVerifiedActive = isCustomerPaidAccessVerifiedActive;
+
+      function applyServerCustomerAuthState(data) {
+        if (data && typeof data.pendingCheckoutPlan === 'object') {
+          _pendingCheckoutPlan = data.pendingCheckoutPlan;
+        }
+        if (data && typeof data.planIntentToken === 'string' && data.planIntentToken.trim()) {
+          _pendingPlanIntentToken = data.planIntentToken.trim();
+        }
+        if (data && data.authenticated === true && data.customer && data.customer.id) {
+          _customerProfile = {
+            id: String(data.customer.id),
+            email: String(data.customer.email || ''),
+            createdAt: String(data.customer.createdAt || ''),
+            lastLoginAt: data.customer.lastLoginAt || null
+          };
+          if (typeof data.sessionToken === 'string' && data.sessionToken.trim()) {
+            _customerMemoryToken = data.sessionToken.trim();
+          }
+          _customerEntitlements = data.entitlements || null;
+          window.__kycCustomerEntitlements = _customerEntitlements;
+        } else {
+          _customerMemoryToken = '';
+          _customerProfile = null;
+          _customerEntitlements = null;
+          window.__kycCustomerEntitlements = null;
+        }
+        syncCustomerNavigationAndAccountUI();
+        if (typeof window.syncActiveProductUnlockUI === 'function') {
+          window.syncActiveProductUnlockUI();
+        }
+        if (typeof window.__kycSyncPreviewProtectionState === 'function') {
+          window.__kycSyncPreviewProtectionState();
+        }
+      }
+
+      function formatShortDate(isoStr) {
+        if (!isoStr) return '';
+        try {
+          const d = new Date(isoStr);
+          if (Number.isNaN(d.getTime())) return '';
+          return d.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function setCustomerAuthViewMode(mode) {
+        if (mode === 'register' || mode === 'login' || mode === 'account') {
+          _customerAuthMode = mode;
+        } else {
+          _customerAuthMode = isCustomerAuthenticated() ? 'account' : 'login';
+        }
+        if (_customerAuthMode === 'account' && !isCustomerAuthenticated()) {
+          _customerAuthMode = 'login';
+        }
+        syncCustomerNavigationAndAccountUI();
+      }
+      window.__kycSetCustomerAuthViewMode = setCustomerAuthViewMode;
+
+      function syncCustomerNavigationAndAccountUI() {
+        const loggedIn = isCustomerAuthenticated();
+
+        // Desktop and mobile nav toggles
+        const desktopOut = document.getElementById('navCustomerLoggedOutGroup');
+        const desktopIn = document.getElementById('navCustomerLoggedInGroup');
+        const mobileOut = document.getElementById('mobileCustomerLoggedOutGroup');
+        const mobileIn = document.getElementById('mobileCustomerLoggedInGroup');
+
+        if (desktopOut) {
+          desktopOut.classList.toggle('hidden', loggedIn);
+          desktopOut.classList.toggle('md:flex', !loggedIn);
+        }
+        if (desktopIn) {
+          desktopIn.classList.toggle('hidden', !loggedIn);
+          desktopIn.classList.toggle('flex', loggedIn);
+        }
+        if (mobileOut) {
+          mobileOut.classList.toggle('hidden', loggedIn);
+          mobileOut.classList.toggle('grid', !loggedIn);
+        }
+        if (mobileIn) {
+          mobileIn.classList.toggle('hidden', !loggedIn);
+          mobileIn.classList.toggle('grid', loggedIn);
+        }
+
+        // Card visibility inside #customer-auth-page-section
+        const loginCard = document.getElementById('customerLoginCard');
+        const registerCard = document.getElementById('customerRegisterCard');
+        const accountCard = document.getElementById('customerAccountCard');
+        const heroTitle = document.getElementById('customerAuthHeroTitle');
+        const heroSubtitle = document.getElementById('customerAuthHeroSubtitle');
+        const pendingPlanBanner = document.getElementById('customerPendingPlanBanner');
+        const pendingPlanTitle = document.getElementById('customerPendingPlanTitle');
+        const pendingPlanNote = document.getElementById('customerPendingPlanNote');
+        const loginSubmitLabel = document.getElementById('customerLoginSubmitBtnLabel');
+        const registerSubmitLabel = document.getElementById('customerRegisterSubmitBtnLabel');
+
+        let effectiveMode = _customerAuthMode;
+        if (loggedIn && (effectiveMode === 'login' || effectiveMode === 'register')) {
+          effectiveMode = 'account';
+          _customerAuthMode = 'account';
+        } else if (!loggedIn && effectiveMode === 'account') {
+          effectiveMode = 'login';
+          _customerAuthMode = 'login';
+        }
+
+        if (loginCard) loginCard.classList.toggle('hidden', effectiveMode !== 'login');
+        if (registerCard) registerCard.classList.toggle('hidden', effectiveMode !== 'register');
+        if (accountCard) accountCard.classList.toggle('hidden', effectiveMode !== 'account');
+
+        const hasActivePendingPlan = Boolean(
+          !loggedIn &&
+            _pendingCheckoutPlan &&
+            _pendingCheckoutPlan.productKey &&
+            (!_pendingCheckoutPlan.expiresAtMs || _pendingCheckoutPlan.expiresAtMs > Date.now())
+        );
+
+        if (pendingPlanBanner) {
+          pendingPlanBanner.classList.toggle('hidden', !hasActivePendingPlan);
+          if (hasActivePendingPlan && _pendingCheckoutPlan) {
+            const pLabel = _pendingCheckoutPlan.label || 'Access Plan';
+            const pPrice = _pendingCheckoutPlan.displayPrice || _pendingCheckoutPlan.formattedPrice || '';
+            if (pendingPlanTitle) {
+              pendingPlanTitle.textContent = `${pLabel} — ${pPrice} USD`;
+            }
+            if (pendingPlanNote) {
+              pendingPlanNote.textContent =
+                effectiveMode === 'register'
+                  ? `Create your customer account below to automatically continue to ${pLabel} (${pPrice} USD) Sifalo Pay checkout.`
+                  : `Log in below (or click Create Account) to automatically continue to ${pLabel} (${pPrice} USD) Sifalo Pay checkout.`;
+            }
+          }
+        }
+
+        if (!_customerAuthBusy) {
+          if (loginSubmitLabel) {
+            loginSubmitLabel.textContent =
+              hasActivePendingPlan && _pendingCheckoutPlan
+                ? `Login & Continue to ${_pendingCheckoutPlan.displayPrice || ''} Checkout`
+                : 'Login';
+          }
+          if (registerSubmitLabel) {
+            registerSubmitLabel.textContent =
+              hasActivePendingPlan && _pendingCheckoutPlan
+                ? `Create Account & Continue to ${_pendingCheckoutPlan.displayPrice || ''} Checkout`
+                : 'Create Account';
+          }
+        }
+
+        if (heroTitle && heroSubtitle) {
+          if (effectiveMode === 'register') {
+            heroTitle.textContent = 'Customer Registration';
+            heroSubtitle.textContent = hasActivePendingPlan && _pendingCheckoutPlan
+              ? `Create your customer account to continue directly to ${_pendingCheckoutPlan.label} (${_pendingCheckoutPlan.displayPrice} USD) payment.`
+              : 'Create a secure customer account to manage your One-Time Access ($55) or Monthly Access ($12/month) plan.';
+          } else if (effectiveMode === 'account') {
+            heroTitle.textContent = 'My Customer Account';
+            heroSubtitle.textContent =
+              'View your account details and server-verified Sifalo Pay access entitlements.';
+          } else {
+            heroTitle.textContent = 'Customer Login';
+            heroSubtitle.textContent = hasActivePendingPlan && _pendingCheckoutPlan
+              ? `Sign in to your customer account to continue directly to ${_pendingCheckoutPlan.label} (${_pendingCheckoutPlan.displayPrice} USD) payment.`
+              : 'Sign in to manage your account and access your server-verified One-Time Access or Monthly Access plan.';
+          }
+        }
+
+        // Populate Customer Account details if logged in
+        if (loggedIn && _customerProfile) {
+          const emailEl = document.getElementById('customerAccountEmailValue');
+          if (emailEl) emailEl.textContent = _customerProfile.email;
+
+          const currentBadge = document.getElementById('customerCurrentAccessBadge');
+          const currentNote = document.getElementById('customerCurrentAccessNote');
+          const oneTimeBadge = document.getElementById('customerOneTimeStatusBadge');
+          const oneTimeDetail = document.getElementById('customerOneTimeStatusDetail');
+          const monthlyBadge = document.getElementById('customerMonthlyStatusBadge');
+          const monthlyDetail = document.getElementById('customerMonthlyStatusDetail');
+
+          const activeAccess = isCustomerPaidAccessVerifiedActive();
+          const ent = _customerEntitlements || {};
+          const ot = ent.oneTimeAccess || { status: 'none' };
+          const mo = ent.monthlyAccess || { status: 'none' };
+
+          if (currentBadge) {
+            currentBadge.textContent = '';
+            const iconEl = document.createElement('i');
+            const labelEl = document.createElement('span');
+            if (activeAccess) {
+              currentBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-extrabold';
+              iconEl.className = 'fa-solid fa-circle-check text-emerald-600 text-[11px]';
+              labelEl.textContent = String(ent.currentAccessStatus || 'Active Access');
+            } else {
+              currentBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-extrabold';
+              iconEl.className = 'fa-solid fa-lock text-amber-700 text-[11px]';
+              labelEl.textContent = String(ent.currentAccessStatus || 'No Active Plan');
+            }
+            currentBadge.appendChild(iconEl);
+            currentBadge.appendChild(labelEl);
+          }
+          if (currentNote) {
+            currentNote.textContent = activeAccess
+              ? 'Your customer account has active server-verified access. Full document previews and Save PNG / Download are unlocked.'
+              : 'No active account-wide plan. You can purchase One-Time Access ($55) or Monthly Access ($12/month), or unlock individual documents per download.';
+          }
+
+          if (oneTimeBadge && oneTimeDetail) {
+            if (ot.status === 'active') {
+              oneTimeBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-extrabold';
+              oneTimeBadge.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600 text-[11px]"></i><span>Active (Permanent)</span>';
+              const paidDate = formatShortDate(ot.paidAt);
+              oneTimeDetail.textContent = paidDate
+                ? `Verified via Sifalo Pay on ${paidDate} (${ot.orderId || 'PAID'}). No recurring charge.`
+                : 'Verified via Sifalo Pay · Permanent One-Time Access.';
+            } else if (ot.status === 'revoked') {
+              oneTimeBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 border border-red-300 text-red-800 text-xs font-extrabold';
+              oneTimeBadge.textContent = 'Revoked / Refunded';
+              oneTimeDetail.textContent = 'Previous One-Time Access order was refunded or reversed.';
+            } else {
+              oneTimeBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-extrabold';
+              oneTimeBadge.textContent = 'Not Purchased';
+              oneTimeDetail.textContent = 'One-time payment ($55 USD) · No recurring monthly charge.';
+            }
+          }
+
+          if (monthlyBadge && monthlyDetail) {
+            if (mo.status === 'active' && (!mo.expiresAtMs || mo.expiresAtMs > Date.now())) {
+              monthlyBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-extrabold';
+              monthlyBadge.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600 text-[11px]"></i><span>Active</span>';
+              const expDate = formatShortDate(mo.expiresAt);
+              monthlyDetail.textContent = expDate
+                ? `Active through ${expDate} (${mo.orderId || 'Verified'}).`
+                : 'Active 30-day billing cycle verified by Sifalo Pay.';
+            } else if (mo.status === 'expired' || (mo.expiresAtMs && mo.expiresAtMs <= Date.now())) {
+              monthlyBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs font-extrabold';
+              monthlyBadge.textContent = 'Expired';
+              const expDate = formatShortDate(mo.expiresAt);
+              monthlyDetail.textContent = expDate
+                ? `Monthly period expired on ${expDate}. Renew on the Pricing page to restore access.`
+                : 'Monthly billing period expired. Renew on the Pricing page to restore access.';
+            } else if (mo.status === 'revoked') {
+              monthlyBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 border border-red-300 text-red-800 text-xs font-extrabold';
+              monthlyBadge.textContent = 'Revoked / Refunded';
+              monthlyDetail.textContent = 'Previous Monthly Access order was refunded or reversed.';
+            } else {
+              monthlyBadge.className =
+                'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-200 text-slate-700 text-xs font-extrabold';
+              monthlyBadge.textContent = 'Not Subscribed';
+              monthlyDetail.textContent = 'Monthly payment ($12/month USD) · 30-day access period.';
+            }
+          }
+        }
+      }
+      window.__kycSyncCustomerAccountUI = syncCustomerNavigationAndAccountUI;
+
+      /**
+       * Select a Pricing Plan ($55 One-Time Access or $12/month Monthly Access):
+       * 1. Always records and validates the selected plan on the server (/api/customer/checkout-intent).
+       * 2. If the visitor is not authenticated on the server, redirects to Customer Login/Register first
+       *    while preserving the selected plan on the server.
+       * 3. If the visitor is already authenticated on the server, proceeds directly to Sifalo Pay checkout.
+       */
+      async function selectPricingPlanWithAuthGate(planProductKey, triggerBtn, opts) {
+        const options = opts || {};
+        const normalizedKey =
+          planProductKey === 'monthlyAccess' || planProductKey === 'MONTHLY_ACCESS'
+            ? 'monthlyAccess'
+            : 'oneTimeAccess';
+
+        try {
+          const res = await fetch('/api/customer/checkout-intent', {
+            method: 'POST',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: Object.assign(
+              {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache'
+              },
+              getCustomerAuthHeaders()
+            ),
+            body: JSON.stringify({
+              plan: normalizedKey,
+              productKey: normalizedKey,
+              productCode: normalizedKey === 'monthlyAccess' ? 'MONTHLY_ACCESS' : 'ONE_TIME_ACCESS',
+              planIntentToken: _pendingPlanIntentToken || ''
+            })
+          });
+          const data = await res.json().catch(() => null);
+          if (res.ok && data && data.ok === true && data.pendingCheckoutPlan) {
+            _pendingCheckoutPlan = data.pendingCheckoutPlan;
+            if (typeof data.planIntentToken === 'string' && data.planIntentToken.trim()) {
+              _pendingPlanIntentToken = data.planIntentToken.trim();
+            }
+
+            // If customer is already authenticated on the server and not forced to re-login, proceed directly to Sifalo checkout
+            if (data.authenticated === true && isCustomerAuthenticated() && !options.forceAuthRedirect) {
+              _pendingCheckoutPlan = null;
+              _pendingPlanIntentToken = '';
+              if (typeof window.startPricingPlanCheckout === 'function') {
+                return window.startPricingPlanCheckout(normalizedKey, triggerBtn, {
+                  skipAuthGate: true
+                });
+              }
+            }
+          } else {
+            // Fallback display object while still validated server-side upon checkout creation
+            _pendingCheckoutPlan = {
+              productKey: normalizedKey,
+              productCode: normalizedKey === 'monthlyAccess' ? 'MONTHLY_ACCESS' : 'ONE_TIME_ACCESS',
+              label: normalizedKey === 'monthlyAccess' ? 'Monthly Access' : 'One-Time Access',
+              formattedPrice: normalizedKey === 'monthlyAccess' ? '$12.00' : '$55.00',
+              displayPrice: normalizedKey === 'monthlyAccess' ? '$12/month' : '$55',
+              currency: 'USD',
+              expiresAtMs: Date.now() + 30 * 60 * 1000
+            };
+          }
+        } catch (err) {
+          _pendingCheckoutPlan = {
+            productKey: normalizedKey,
+            productCode: normalizedKey === 'monthlyAccess' ? 'MONTHLY_ACCESS' : 'ONE_TIME_ACCESS',
+            label: normalizedKey === 'monthlyAccess' ? 'Monthly Access' : 'One-Time Access',
+            formattedPrice: normalizedKey === 'monthlyAccess' ? '$12.00' : '$55.00',
+            displayPrice: normalizedKey === 'monthlyAccess' ? '$12/month' : '$55',
+            currency: 'USD',
+            expiresAtMs: Date.now() + 30 * 60 * 1000
+          };
+        }
+
+        // Redirect unauthenticated user to Customer Login/Register page with selected plan preserved
+        _customerAuthMode = 'login';
+        syncCustomerNavigationAndAccountUI();
+        if (typeof window.openCustomerAuthPage === 'function') {
+          window.openCustomerAuthPage('login');
+        }
+        if (typeof window.showToast === 'function' && _pendingCheckoutPlan) {
+          window.showToast(
+            `${_pendingCheckoutPlan.label} Selected (${_pendingCheckoutPlan.displayPrice} USD)`,
+            'Please log in or create your customer account to continue directly to Sifalo Pay checkout.'
+          );
+        }
+      }
+      window.__kycSelectPricingPlanWithAuthGate = selectPricingPlanWithAuthGate;
+
+      async function continueToPendingPlanCheckoutIfPresent(authResponseData, triggerBtn) {
+        const serverPlan =
+          (authResponseData && authResponseData.pendingCheckoutPlan) || _pendingCheckoutPlan;
+        if (!serverPlan || !serverPlan.productKey) {
+          return false;
+        }
+        const planKey =
+          serverPlan.productKey === 'monthlyAccess' || serverPlan.productCode === 'MONTHLY_ACCESS'
+            ? 'monthlyAccess'
+            : 'oneTimeAccess';
+        const planLabel = serverPlan.label || (planKey === 'monthlyAccess' ? 'Monthly Access' : 'One-Time Access');
+        const planPrice = serverPlan.displayPrice || serverPlan.formattedPrice || (planKey === 'monthlyAccess' ? '$12/month' : '$55');
+
+        // Clear local pending plan memory before launching Sifalo checkout
+        _pendingCheckoutPlan = null;
+        _pendingPlanIntentToken = '';
+        syncCustomerNavigationAndAccountUI();
+
+        if (typeof window.showToast === 'function') {
+          window.showToast(
+            `Continuing to ${planLabel} (${planPrice} USD)...`,
+            'Opening your Sifalo Pay checkout session automatically.'
+          );
+        }
+
+        if (typeof window.startPricingPlanCheckout === 'function') {
+          await window.startPricingPlanCheckout(planKey, triggerBtn, {
+            skipAuthGate: true
+          });
+          return true;
+        }
+        return false;
+      }
+
+      async function refreshCustomerAuthStatus(showFeedbackToast) {
+        try {
+          const res = await fetch('/api/customer/auth/status', {
+            method: 'GET',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: Object.assign(
+              { 'Cache-Control': 'no-store, no-cache' },
+              getCustomerAuthHeaders()
+            )
+          });
+          const data = await res.json().catch(() => null);
+          if (res.ok && data) {
+            if (data.pendingCheckoutPlan) {
+              _pendingCheckoutPlan = data.pendingCheckoutPlan;
+            }
+            if (data.authenticated === true) {
+              applyServerCustomerAuthState(data);
+              if (showFeedbackToast && typeof window.showToast === 'function') {
+                window.showToast('Account Status Synced', 'Your customer access status is up to date.');
+              }
+              return true;
+            }
+          }
+          applyServerCustomerAuthState(data && data.pendingCheckoutPlan ? { pendingCheckoutPlan: data.pendingCheckoutPlan } : null);
+          return false;
+        } catch (err) {
+          return false;
+        }
+      }
+      window.__kycRefreshCustomerAuthStatus = refreshCustomerAuthStatus;
+
+      window.__kycSubmitCustomerLogin = async function(event) {
+        if (event && typeof event.preventDefault === 'function') event.preventDefault();
+        if (_customerAuthBusy) return false;
+
+        const emailInput = document.getElementById('customerLoginEmail');
+        const passwordInput = document.getElementById('customerLoginPassword');
+        const errorBox = document.getElementById('customerLoginErrorBox');
+        const successBox = document.getElementById('customerLoginSuccessBox');
+        const submitBtn = document.getElementById('customerLoginSubmitBtn');
+        const submitLabel = document.getElementById('customerLoginSubmitBtnLabel');
+
+        if (errorBox) {
+          errorBox.textContent = '';
+          errorBox.classList.add('hidden');
+        }
+        if (successBox) {
+          successBox.textContent = '';
+          successBox.classList.add('hidden');
+        }
+
+        const email = emailInput ? String(emailInput.value || '').trim() : '';
+        const password = passwordInput ? String(passwordInput.value || '') : '';
+
+        if (!email || !password) {
+          if (errorBox) {
+            errorBox.textContent = 'Please enter both your email address and password.';
+            errorBox.classList.remove('hidden');
+          }
+          return false;
+        }
+
+        _customerAuthBusy = true;
+        if (submitBtn) submitBtn.disabled = true;
+        if (submitLabel) submitLabel.textContent = 'Signing in...';
+
+        try {
+          const res = await fetch('/api/customer/auth/login', {
+            method: 'POST',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: Object.assign(
+              {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache'
+              },
+              getCustomerAuthHeaders()
+            ),
+            body: JSON.stringify({
+              email,
+              password,
+              planIntentToken: _pendingPlanIntentToken || '',
+              pendingPlan: _pendingCheckoutPlan ? _pendingCheckoutPlan.productKey : undefined
+            })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data || data.ok !== true || data.authenticated !== true) {
+            const msg = (data && data.error) || 'Invalid email or password.';
+            if (errorBox) {
+              errorBox.textContent = msg;
+              errorBox.classList.remove('hidden');
+            }
+            return false;
+          }
+
+          if (passwordInput) passwordInput.value = '';
+          const planToResume = data.pendingCheckoutPlan || _pendingCheckoutPlan;
+          _customerAuthMode = 'account';
+          applyServerCustomerAuthState(data);
+
+          // If the customer selected One-Time Access ($55) or Monthly Access ($12) before logging in,
+          // automatically continue directly to Sifalo Pay checkout without making them select the plan again.
+          if (planToResume && planToResume.productKey) {
+            await continueToPendingPlanCheckoutIfPresent(
+              { pendingCheckoutPlan: planToResume },
+              submitBtn
+            );
+            return false;
+          }
+
+          if (typeof window.openCustomerAuthPage === 'function') {
+            window.openCustomerAuthPage('account', { noScroll: true });
+          }
+          if (typeof window.showToast === 'function') {
+            window.showToast('Welcome Back!', `Signed in as ${data.customer.email}`);
+          }
+        } catch (err) {
+          if (errorBox) {
+            errorBox.textContent = 'Network error while signing in. Please try again.';
+            errorBox.classList.remove('hidden');
+          }
+        } finally {
+          _customerAuthBusy = false;
+          if (submitBtn) submitBtn.disabled = false;
+          syncCustomerNavigationAndAccountUI();
+        }
+        return false;
+      };
+
+      window.__kycSubmitCustomerRegister = async function(event) {
+        if (event && typeof event.preventDefault === 'function') event.preventDefault();
+        if (_customerAuthBusy) return false;
+
+        const emailInput = document.getElementById('customerRegisterEmail');
+        const passwordInput = document.getElementById('customerRegisterPassword');
+        const confirmInput = document.getElementById('customerRegisterConfirmPassword');
+        const errorBox = document.getElementById('customerRegisterErrorBox');
+        const submitBtn = document.getElementById('customerRegisterSubmitBtn');
+        const submitLabel = document.getElementById('customerRegisterSubmitBtnLabel');
+
+        if (errorBox) {
+          errorBox.textContent = '';
+          errorBox.classList.add('hidden');
+        }
+
+        const email = emailInput ? String(emailInput.value || '').trim() : '';
+        const password = passwordInput ? String(passwordInput.value || '') : '';
+        const confirmPassword = confirmInput ? String(confirmInput.value || '') : '';
+
+        if (!email || !password || !confirmPassword) {
+          if (errorBox) {
+            errorBox.textContent = 'Please complete all registration fields.';
+            errorBox.classList.remove('hidden');
+          }
+          return false;
+        }
+
+        if (password !== confirmPassword) {
+          if (errorBox) {
+            errorBox.textContent = 'Passwords do not match. Please re-enter your password.';
+            errorBox.classList.remove('hidden');
+          }
+          return false;
+        }
+
+        _customerAuthBusy = true;
+        if (submitBtn) submitBtn.disabled = true;
+        if (submitLabel) submitLabel.textContent = 'Creating account...';
+
+        try {
+          const res = await fetch('/api/customer/auth/register', {
+            method: 'POST',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: Object.assign(
+              {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache'
+              },
+              getCustomerAuthHeaders()
+            ),
+            body: JSON.stringify({
+              email,
+              password,
+              confirmPassword,
+              planIntentToken: _pendingPlanIntentToken || '',
+              pendingPlan: _pendingCheckoutPlan ? _pendingCheckoutPlan.productKey : undefined
+            })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data || data.ok !== true || data.authenticated !== true) {
+            const msg = (data && data.error) || 'Could not create customer account. Please check your details.';
+            if (errorBox) {
+              errorBox.textContent = msg;
+              errorBox.classList.remove('hidden');
+            }
+            return false;
+          }
+
+          if (passwordInput) passwordInput.value = '';
+          if (confirmInput) confirmInput.value = '';
+          const planToResume = data.pendingCheckoutPlan || _pendingCheckoutPlan;
+          _customerAuthMode = 'account';
+          applyServerCustomerAuthState(data);
+
+          // If the customer selected One-Time Access ($55) or Monthly Access ($12) before registering,
+          // automatically continue directly to Sifalo Pay checkout without making them select the plan again.
+          if (planToResume && planToResume.productKey) {
+            await continueToPendingPlanCheckoutIfPresent(
+              { pendingCheckoutPlan: planToResume },
+              submitBtn
+            );
+            return false;
+          }
+
+          if (typeof window.openCustomerAuthPage === 'function') {
+            window.openCustomerAuthPage('account', { noScroll: true });
+          }
+          if (typeof window.showToast === 'function') {
+            window.showToast('Account Created!', `Welcome, ${data.customer.email}`);
+          }
+        } catch (err) {
+          if (errorBox) {
+            errorBox.textContent = 'Network error while creating your account. Please try again.';
+            errorBox.classList.remove('hidden');
+          }
+        } finally {
+          _customerAuthBusy = false;
+          if (submitBtn) submitBtn.disabled = false;
+          syncCustomerNavigationAndAccountUI();
+        }
+        return false;
+      };
+
+      window.__kycHandleCustomerLogout = async function() {
+        try {
+          await fetch('/api/customer/auth/logout', {
+            method: 'POST',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: Object.assign(
+              {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache'
+              },
+              getCustomerAuthHeaders()
+            )
+          });
+        } catch (e) {}
+
+        _customerAuthMode = 'login';
+        _pendingCheckoutPlan = null;
+        _pendingPlanIntentToken = '';
+        applyServerCustomerAuthState(null);
+        if (typeof window.showToast === 'function') {
+          window.showToast('Signed Out', 'Your customer session has been closed.');
+        }
+        if (typeof workflowStep !== 'undefined' && workflowStep === 'customer') {
+          if (typeof window.openCustomerAuthPage === 'function') {
+            window.openCustomerAuthPage('login', { noScroll: true });
+          }
+        }
+      };
+
+      // Initialize customer auth status from server on page load
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          refreshCustomerAuthStatus(false);
+        });
+      } else {
+        refreshCustomerAuthStatus(false);
       }
     })();
   </script>
