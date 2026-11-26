@@ -23,7 +23,8 @@ export function createApiApp(deps: ApiAppDeps = {}) {
   const sifaloPaymentService = createSifaloPaymentService({
     ...deps,
     resolveAuthenticatedCustomerId: (req) => kycCustomerService.resolveAuthenticatedCustomerId(req),
-    onVerifiedCustomerAccessOrder: (order) => kycCustomerService.grantVerifiedSifaloOrderToCustomer(order),
+    onVerifiedCustomerAccessOrder: (order, fallbackCustomerId, req, res) =>
+      kycCustomerService.grantVerifiedSifaloOrderToCustomer(order, fallbackCustomerId, req, res),
     onRevokedCustomerAccessOrder: (orderId, reason) =>
       kycCustomerService.revokeSifaloOrderEntitlement(orderId, reason),
     evaluateCustomerPaidAccess: (req) => kycCustomerService.evaluateCustomerPaidAccess(req),

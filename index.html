@@ -1374,6 +1374,53 @@
     }
     window.getActiveUnlockDocSpec = getActiveUnlockDocSpec;
 
+    function formatDynamicDownloadButtonHtml(btn, btnSpec, unlocked) {
+      let baseText = '';
+      if (btn && btn.dataset && btn.dataset.kycOrigLabelText) {
+        baseText = btn.dataset.kycOrigLabelText;
+      } else if (btn) {
+        baseText = (btn.textContent || '').replace(/\s+/g, ' ').trim();
+        if (btn.dataset) {
+          btn.dataset.kycOrigLabelText = baseText;
+        }
+      }
+      let sideSuffix = '';
+      if (/both\s*sides/i.test(baseText)) {
+        sideSuffix = ' (Both Sides)';
+      } else if (/\bfront\b/i.test(baseText)) {
+        sideSuffix = ' (Front)';
+      } else if (/\bback\b/i.test(baseText)) {
+        sideSuffix = ' (Back)';
+      }
+      const docTitle = (btnSpec && btnSpec.label) ? btnSpec.label : 'Document';
+      const priceText = (btnSpec && btnSpec.price) ? btnSpec.price : '$1.11';
+      const badgeHtml = unlocked
+        ? `<span data-kyc-btn-badge="1" class="ml-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-300 text-[10px] font-extrabold uppercase tracking-wider leading-none shrink-0">Unlocked</span>`
+        : `<span data-kyc-btn-badge="1" class="ml-1.5 px-2 py-0.5 rounded-lg bg-slate-900/25 text-white border border-white/25 text-[10px] font-extrabold tracking-wide leading-none shrink-0">🔒 ${priceText}</span>`;
+      return `<span class="inline-flex items-center justify-center gap-2 flex-wrap"><span class="text-base leading-none" aria-hidden="true">📥</span><span class="font-extrabold tracking-tight">Download ${docTitle}${sideSuffix}</span>${badgeHtml}</span>`;
+    }
+
+    function triggerActiveDocumentSavePngCard(cardBtn) {
+      try {
+        const targetBtn = findRestoredSavePngTriggerButton(null);
+        if (targetBtn && typeof targetBtn.click === 'function') {
+          targetBtn.click();
+          return;
+        }
+        const descriptor = resolveSavePngActionDescriptor(cardBtn);
+        if (
+          descriptor &&
+          descriptor.type === 'function' &&
+          KYC_WHITELISTED_SAVE_PNG_FUNCTIONS.has(descriptor.fnName) &&
+          typeof window[descriptor.fnName] === 'function'
+        ) {
+          const fnArgs = Array.isArray(descriptor.args) ? descriptor.args : [];
+          window[descriptor.fnName](...fnArgs);
+        }
+      } catch (e) {}
+    }
+    window.triggerActiveDocumentSavePngCard = triggerActiveDocumentSavePngCard;
+
     function syncActiveProductUnlockUI() {
       try {
         const spec = getActiveUnlockDocSpec();
@@ -1391,22 +1438,71 @@
         }
 
         const wb = document.getElementById('verification-workbench');
+        const downloadCard = document.getElementById('wbActiveDocDownloadCard');
+        const downloadCardTitle = document.getElementById('wbActiveDocDownloadCardTitle');
+        const downloadCardSub = document.getElementById('wbActiveDocDownloadCardSub');
+        const downloadCardStatusBadge = document.getElementById('wbActiveDocDownloadCardStatusBadge');
+        const downloadCardBtnLabel = document.getElementById('wbActiveDocDownloadCardBtnLabel');
+        const downloadCardBtnPrice = document.getElementById('wbActiveDocDownloadCardBtnPrice');
+
+        let hasVisibleDocView = false;
+        if (wb && !wb.classList.contains('hidden')) {
+          const visibleViews = wb.querySelectorAll('[id$="-view"]:not(.hidden)');
+          for (let i = 0; i < visibleViews.length; i++) {
+            if (visibleViews[i].id && visibleViews[i].id !== 'wb-no-document-view') {
+              hasVisibleDocView = true;
+              break;
+            }
+          }
+        }
+
+        if (downloadCard) {
+          downloadCard.classList.toggle('hidden', !hasVisibleDocView);
+          if (downloadCardTitle) {
+            downloadCardTitle.textContent = `📥 Download ${spec.label}`;
+          }
+          if (downloadCardSub) {
+            downloadCardSub.textContent = unlocked
+              ? `Unlocked & ready — export your high-resolution ${spec.label} PNG immediately.`
+              : `High-resolution PNG export for your configured ${spec.label} (${spec.price} USD or active access plan).`;
+          }
+          if (downloadCardStatusBadge) {
+            if (unlocked) {
+              downloadCardStatusBadge.className =
+                'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs font-extrabold';
+              downloadCardStatusBadge.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i><span>Unlocked · Ready to Download</span>`;
+            } else {
+              downloadCardStatusBadge.className =
+                'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-extrabold';
+              downloadCardStatusBadge.innerHTML = `<i class="fa-solid fa-lock text-amber-600"></i><span>Requires Access · ${spec.price} USD</span>`;
+            }
+          }
+          if (downloadCardBtnLabel) {
+            downloadCardBtnLabel.textContent = `Download ${spec.label}`;
+          }
+          if (downloadCardBtnPrice) {
+            if (unlocked) {
+              downloadCardBtnPrice.className =
+                'px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-900 border border-emerald-200 text-[11px] font-extrabold uppercase tracking-wider';
+              downloadCardBtnPrice.textContent = 'Unlocked';
+            } else {
+              downloadCardBtnPrice.className =
+                'px-2.5 py-0.5 rounded-lg bg-slate-950/25 text-white border border-white/20 text-[11px] font-extrabold';
+              downloadCardBtnPrice.textContent = `🔒 ${spec.price}`;
+            }
+          }
+        }
+
         if (wb) {
           const buttons = wb.querySelectorAll('button[onclick^="download"], #downloadBtn');
           for (let i = 0; i < buttons.length; i++) {
             const btn = buttons[i];
-            btn.dataset.kycUnlockState = unlocked ? 'unlocked' : 'locked';
-            let inlineBadge = btn.querySelector('[data-kyc-btn-badge]');
-            if (unlocked) {
-              if (!inlineBadge) {
-                inlineBadge = document.createElement('span');
-                inlineBadge.setAttribute('data-kyc-btn-badge', '1');
-                inlineBadge.className = 'ml-1 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-300 text-[9px] font-extrabold uppercase tracking-wider leading-none shrink-0';
-                inlineBadge.textContent = 'Unlocked';
-                btn.appendChild(inlineBadge);
-              }
-            } else if (inlineBadge && inlineBadge.parentNode) {
-              inlineBadge.parentNode.removeChild(inlineBadge);
+            const btnSpec = getActiveUnlockDocSpec(btn);
+            const btnUnlocked = isProductUnlockedInUi(btnSpec.productKey);
+            btn.dataset.kycUnlockState = btnUnlocked ? 'unlocked' : 'locked';
+            btn.classList.add('rounded-2xl', 'shadow-md', 'hover:shadow-lg', 'active:scale-[0.99]', 'transition-all', 'duration-150');
+            if (!btn.dataset.kycBusyMode) {
+              btn.innerHTML = formatDynamicDownloadButtonHtml(btn, btnSpec, btnUnlocked);
             }
           }
         }
@@ -2505,7 +2601,13 @@
         }
         const data = await res.json().catch(() => null);
         if (data && data.authorized === true && data.productKey === productKey) {
-          if (data.customerAccessType === 'one_time' || data.customerAccessType === 'monthly') {
+          if (
+            data.authorizationSource === 'customer_paid_access' ||
+            data.activePlan === 'oneTimeAccess' ||
+            data.activePlan === 'monthlyAccess' ||
+            data.customerAccessType === 'one_time' ||
+            data.customerAccessType === 'monthly'
+          ) {
             recordServerVerifiedUnlock(data, sessionId);
           } else if (consumeUnlock !== false || data.consumed === true) {
             // Single-use authorization has been consumed on the server; clear it immediately so any next click requires payment
@@ -2716,15 +2818,21 @@
           ? verifyData.sessionId
           : getOrCreateSifaloSessionId();
       try {
-        const authRes = await fetch('/api/payments/sifalo/authorize-unlock', {
-          method: 'POST',
-          credentials: 'same-origin',
-          cache: 'no-store',
-          headers: {
+        const autoAuthHeaders = Object.assign(
+          {
             'Content-Type': 'application/json',
             'Cache-Control': 'no-store, no-cache',
             'X-Kyc-Session-Id': sessionId
           },
+          typeof window.__kycGetCustomerAuthHeaders === 'function'
+            ? window.__kycGetCustomerAuthHeaders()
+            : {}
+        );
+        const authRes = await fetch('/api/payments/sifalo/authorize-unlock', {
+          method: 'POST',
+          credentials: 'same-origin',
+          cache: 'no-store',
+          headers: autoAuthHeaders,
           body: JSON.stringify({
             unlockToken: verifyData.unlockToken || '',
             docType: productKey,
@@ -3041,6 +3149,12 @@
             verifyData.productKey &&
             verifyData.sid
           ) {
+            if (
+              verifyData.customerEntitlement &&
+              typeof window.__kycApplyVerifiedCustomerEntitlement === 'function'
+            ) {
+              window.__kycApplyVerifiedCustomerEntitlement(verifyData.customerEntitlement);
+            }
             const isVerifiedPricingPlan =
               verifyData.productKey === 'oneTimeAccess' ||
               verifyData.productKey === 'monthlyAccess' ||
@@ -3059,6 +3173,9 @@
                 window.openPricingPage({ noScroll: true });
               }
             } else {
+              if (typeof window.__kycRefreshCustomerAuthStatus === 'function') {
+                await window.__kycRefreshCustomerAuthStatus();
+              }
               const hasActiveEditor = Boolean(effectiveUiContext && effectiveUiContext.countryKey);
               if (!hasActiveEditor && verifyData.countryKey && verifyData.countryKey !== 'global') {
                 const fallbackSpec = getDocSpecByProductKey(verifyData.productKey);
@@ -3285,6 +3402,24 @@
         }
 
         if (!hasValidAdminTestAuth) {
+          // Check customer authentication BEFORE sending the user to Sifalo Pay
+          const isCustomerLoggedIn =
+            typeof window.__kycIsCustomerAuthenticated === 'function' &&
+            window.__kycIsCustomerAuthenticated();
+
+          if (!isCustomerLoggedIn) {
+            _isSifaloAuthorizingInFlight = false;
+            setSavePngButtonState(clickedBtn, 'idle');
+            if (typeof window.__kycPromptLoginForDocumentDownload === 'function') {
+              await window.__kycPromptLoginForDocumentDownload({
+                docSpec,
+                clickedBtn,
+                actionDescriptor
+              });
+              return;
+            }
+          }
+
           // If initial page-load session verification is still in flight, wait up to 1500ms
           if (!_kycSessionStatusResolved && _kycSessionStatusPromise) {
             try {
@@ -3295,7 +3430,7 @@
             } catch (e) {}
           }
 
-          // Always verify with the server whether this exact product & session has a valid single-use payment authorization (and consume it atomically)
+          // Verify with the server whether this authenticated customer or session has active access or a valid single-use payment authorization
           hasValidPaidUnlock = await authorizeServerPaidUnlock(docSpec.productKey, true);
         }
       } finally {
@@ -3319,7 +3454,7 @@
         );
       }
 
-      // Not authorized: immediately start a fresh Sifalo checkout session without generating any PNG
+      // Logged-in customer without active unlock: proceed directly to Sifalo Pay checkout
       return startSifaloCheckoutImmediately(docSpec, clickedBtn, actionDescriptor);
     }
     window.triggerWithSifaloPay = triggerWithSifaloPay;
@@ -25287,6 +25422,37 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         </div>
       </div>
 
+      <!-- DYNAMIC DOCUMENT-SPECIFIC DOWNLOAD CARD (SHOWN IN LIVE DOCUMENT EDITOR) -->
+      <div id="wbActiveDocDownloadCard" class="hidden no-print mt-3 rounded-2xl border border-emerald-200/90 bg-gradient-to-r from-[#f0fdf4] via-white to-[#eff6ff] p-4 sm:px-5 sm:py-4 shadow-sm transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5">
+          <div class="flex items-start sm:items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#16a34a] to-[#059669] text-white flex items-center justify-center text-lg shadow-sm shrink-0">
+              <i class="fa-solid fa-download"></i>
+            </div>
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 id="wbActiveDocDownloadCardTitle" class="text-sm sm:text-base font-extrabold text-[#0d2658] tracking-tight">📥 Download Passport</h3>
+                <span id="wbActiveDocDownloadCardStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-extrabold">
+                  <i class="fa-solid fa-lock text-amber-600"></i>
+                  <span>Requires Access · $1.11 USD</span>
+                </span>
+              </div>
+              <p id="wbActiveDocDownloadCardSub" class="text-xs font-medium text-slate-600">High-resolution PNG export for your configured document.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="wbActiveDocDownloadCardBtn"
+            onclick="window.triggerActiveDocumentSavePngCard && window.triggerActiveDocumentSavePngCard(this)"
+            class="w-full sm:w-auto min-h-[46px] px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#16a34a] to-[#059669] hover:from-[#15803d] hover:to-[#047857] active:scale-[0.99] text-white font-extrabold text-xs sm:text-sm inline-flex items-center justify-center gap-2.5 shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all cursor-pointer shrink-0"
+          >
+            <span class="text-base leading-none" aria-hidden="true">📥</span>
+            <span id="wbActiveDocDownloadCardBtnLabel">Download Passport</span>
+            <span id="wbActiveDocDownloadCardBtnPrice" class="px-2.5 py-0.5 rounded-lg bg-slate-950/25 text-white border border-white/20 text-[11px] font-extrabold">🔒 $1.11</span>
+          </button>
+        </div>
+      </div>
+
       <!-- Proof of Account Provider Selector (Shown ONLY when Proof of Account editor is active) -->
       <div id="poa-step2-account-selector" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
@@ -36988,6 +37154,58 @@ EPSOM</div>
     </div>
   </div>
 
+  <!-- ================= LOGIN TO DOWNLOAD PROMPT MODAL ================= -->
+  <div id="kycLoginToDownloadModal" role="dialog" aria-modal="true" aria-labelledby="kycLoginToDownloadTitle" class="no-print fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-3xl bg-white border border-blue-100 shadow-2xl overflow-hidden text-[#0d2658]">
+      <div class="px-6 pt-5 pb-4 bg-gradient-to-r from-[#eff6ff] via-white to-[#ecfdf5] border-b border-slate-100 flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0d5bd9] to-[#16a34a] text-white flex items-center justify-center shadow-sm shrink-0">
+            <i class="fa-solid fa-user-lock text-lg"></i>
+          </div>
+          <div>
+            <h2 id="kycLoginToDownloadTitle" class="text-lg font-extrabold tracking-tight text-[#0d2658]">Login to Download</h2>
+            <p id="kycLoginToDownloadDocBadge" class="text-xs font-bold text-emerald-700 mt-0.5">📥 Download Passport</p>
+          </div>
+        </div>
+        <button type="button" onclick="window.closeKycLoginToDownloadModal && window.closeKycLoginToDownloadModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer shrink-0" aria-label="Close login prompt">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-5">
+        <div class="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 space-y-2">
+          <p id="kycLoginToDownloadMessage" class="text-sm font-bold text-[#0d2658]">
+            Create an account or log in to continue with your download.
+          </p>
+          <p id="kycLoginToDownloadSubnote" class="text-xs font-medium text-slate-600 leading-relaxed">
+            Your configured document fields are saved. Once you sign in or create an account, you will automatically continue to your download.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            type="button"
+            id="kycLoginToDownloadLoginBtn"
+            onclick="window.__kycProceedFromDownloadAuthModal && window.__kycProceedFromDownloadAuthModal('login')"
+            class="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-[#0d2658] hover:bg-[#15357a] text-white font-extrabold text-xs sm:text-sm inline-flex items-center justify-center gap-2 shadow-md transition cursor-pointer"
+          >
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Login</span>
+          </button>
+          <button
+            type="button"
+            id="kycLoginToDownloadRegisterBtn"
+            onclick="window.__kycProceedFromDownloadAuthModal && window.__kycProceedFromDownloadAuthModal('register')"
+            class="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#16a34a] to-[#059669] hover:brightness-105 text-white font-extrabold text-xs sm:text-sm inline-flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition cursor-pointer"
+          >
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Create Account</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Notification Toast -->
   <div id="toast" role="status" aria-live="polite" class="fixed top-5 right-5 z-[60] -translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-700">
     <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
@@ -40907,7 +41125,28 @@ EPSOM</div>
         return (atIdx > 0 ? rawEmail.slice(0, atIdx) : rawEmail).trim();
       }
 
+      let _pendingDocumentDownloadContext = null;
+
+      function clearLocalUnlockStateForAccountSwitch() {
+        try {
+          window.__kycVerifiedUnlockState = {};
+          window.__kycPaidUnlockGrants = {};
+          if (typeof clearPendingSavePngAfterPayment === 'function') {
+            clearPendingSavePngAfterPayment();
+          }
+          if (typeof removeSessionOnlyStorage === 'function' && typeof KYC_PENDING_CHECKOUT_KEY === 'string') {
+            removeSessionOnlyStorage(KYC_PENDING_CHECKOUT_KEY);
+          }
+          const freshSess = 'kycsess_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+          window.__kycSifaloSessionId = freshSess;
+          if (typeof writeSessionOnlyStorage === 'function' && typeof KYC_SIFALO_SESSION_KEY === 'string') {
+            writeSessionOnlyStorage(KYC_SIFALO_SESSION_KEY, freshSess);
+          }
+        } catch (e) {}
+      }
+
       function applyServerCustomerAuthState(data) {
+        const prevCustomerId = _customerProfile && _customerProfile.id ? String(_customerProfile.id) : null;
         if (data && typeof data.pendingCheckoutPlan === 'object') {
           _pendingCheckoutPlan = data.pendingCheckoutPlan;
         }
@@ -40915,10 +41154,14 @@ EPSOM</div>
           _pendingPlanIntentToken = data.planIntentToken.trim();
         }
         if (data && data.authenticated === true && data.customer && data.customer.id) {
+          const nextCustomerId = String(data.customer.id);
+          if (prevCustomerId && prevCustomerId !== nextCustomerId) {
+            clearLocalUnlockStateForAccountSwitch();
+          }
           const emailStr = String(data.customer.email || '');
           const usernameStr = deriveCustomerUsername(data.customer);
           _customerProfile = {
-            id: String(data.customer.id),
+            id: nextCustomerId,
             username: usernameStr,
             email: emailStr,
             createdAt: String(data.customer.createdAt || ''),
@@ -40930,6 +41173,9 @@ EPSOM</div>
           _customerEntitlements = data.entitlements || null;
           window.__kycCustomerEntitlements = _customerEntitlements;
         } else {
+          if (prevCustomerId) {
+            clearLocalUnlockStateForAccountSwitch();
+          }
           _customerMemoryToken = '';
           _customerProfile = null;
           _customerEntitlements = null;
@@ -40943,6 +41189,22 @@ EPSOM</div>
           window.__kycSyncPreviewProtectionState();
         }
       }
+
+      window.__kycApplyVerifiedCustomerEntitlement = function(entitlementPayload) {
+        if (!entitlementPayload || typeof entitlementPayload !== 'object') return;
+        if (entitlementPayload.publicView && entitlementPayload.publicView.id) {
+          applyServerCustomerAuthState({
+            authenticated: true,
+            customer: entitlementPayload.publicView,
+            entitlements: entitlementPayload.entitlements || _customerEntitlements,
+            sessionToken: entitlementPayload.sessionToken || _customerMemoryToken
+          });
+        } else if (entitlementPayload.entitlements) {
+          _customerEntitlements = entitlementPayload.entitlements;
+          window.__kycCustomerEntitlements = _customerEntitlements;
+          syncCustomerNavigationAndAccountUI();
+        }
+      };
 
       function formatShortDate(isoStr) {
         if (!isoStr) return '';
@@ -41277,23 +41539,250 @@ EPSOM</div>
       }
       window.__kycSelectPricingPlanWithAuthGate = selectPricingPlanWithAuthGate;
 
+      function closeKycLoginToDownloadModal() {
+        const modal = document.getElementById('kycLoginToDownloadModal');
+        if (modal) {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+      }
+      window.closeKycLoginToDownloadModal = closeKycLoginToDownloadModal;
+
+      async function promptLoginForDocumentDownload(ctx) {
+        const docSpec = (ctx && ctx.docSpec) || (typeof getActiveUnlockDocSpec === 'function' ? getActiveUnlockDocSpec(ctx && ctx.clickedBtn) : null) || {
+          rawType: 'passport',
+          productKey: 'passport',
+          label: 'Passport',
+          price: '$1.11'
+        };
+        const countryKey =
+          (typeof workflowSelectedCountry === 'string' && workflowSelectedCountry) ||
+          (typeof currentCountry === 'string' ? currentCountry : 'kenya');
+        const providerKey =
+          (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
+          (typeof currentVirtualAccount === 'string' ? currentVirtualAccount : 'paypal');
+        const fieldSnapshot =
+          typeof captureWorkbenchFieldSnapshot === 'function' ? captureWorkbenchFieldSnapshot() : {};
+        const sideState = {
+          rwaCurrentSide: typeof rwaCurrentSide === 'string' ? rwaCurrentSide : 'front',
+          uaeCurrentSide: typeof uaeCurrentSide === 'string' ? uaeCurrentSide : 'both',
+          turCurrentSide: typeof turCurrentSide === 'string' ? turCurrentSide : 'both'
+        };
+        const actionDescriptor =
+          (ctx && ctx.actionDescriptor) ||
+          (typeof resolveSavePngActionDescriptor === 'function' ? resolveSavePngActionDescriptor(ctx && ctx.clickedBtn) : null);
+
+        _pendingDocumentDownloadContext = {
+          intentType: 'document_download',
+          productKey: docSpec.productKey,
+          rawDocType: docSpec.rawType,
+          label: docSpec.label,
+          price: docSpec.price,
+          countryKey,
+          providerKey,
+          fieldSnapshot,
+          sideState,
+          actionDescriptor,
+          savedAt: Date.now()
+        };
+
+        if (typeof saveActiveEditorUiState === 'function') {
+          saveActiveEditorUiState(fieldSnapshot);
+        }
+
+        // Record checkout intent on the server so login/registration preserves the exact document download intent
+        try {
+          const res = await fetch('/api/customer/checkout-intent', {
+            method: 'POST',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: Object.assign(
+              {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, no-cache'
+              },
+              getCustomerAuthHeaders()
+            ),
+            body: JSON.stringify({
+              plan: docSpec.productKey,
+              productKey: docSpec.productKey,
+              intentType: 'document_download',
+              countryKey,
+              providerKey,
+              rawDocType: docSpec.rawType,
+              planIntentToken: _pendingPlanIntentToken || ''
+            })
+          });
+          const data = await res.json().catch(() => null);
+          if (res.ok && data && data.ok === true && data.pendingCheckoutPlan) {
+            _pendingCheckoutPlan = data.pendingCheckoutPlan;
+            if (typeof data.planIntentToken === 'string' && data.planIntentToken.trim()) {
+              _pendingPlanIntentToken = data.planIntentToken.trim();
+            }
+          } else {
+            _pendingCheckoutPlan = {
+              productKey: docSpec.productKey,
+              productCode: docSpec.productKey.toUpperCase(),
+              label: docSpec.label,
+              formattedPrice: docSpec.price,
+              displayPrice: docSpec.price,
+              currency: 'USD',
+              intentType: 'document_download',
+              countryKey,
+              providerKey,
+              rawDocType: docSpec.rawType,
+              expiresAtMs: Date.now() + 30 * 60 * 1000
+            };
+          }
+        } catch (e) {
+          _pendingCheckoutPlan = {
+            productKey: docSpec.productKey,
+            productCode: docSpec.productKey.toUpperCase(),
+            label: docSpec.label,
+            formattedPrice: docSpec.price,
+            displayPrice: docSpec.price,
+            currency: 'USD',
+            intentType: 'document_download',
+            countryKey,
+            providerKey,
+            rawDocType: docSpec.rawType,
+            expiresAtMs: Date.now() + 30 * 60 * 1000
+          };
+        }
+
+        // Open the "Login to Download" modal card
+        const modal = document.getElementById('kycLoginToDownloadModal');
+        const badgeEl = document.getElementById('kycLoginToDownloadDocBadge');
+        if (badgeEl) {
+          badgeEl.textContent = `📥 Download ${docSpec.label} (${docSpec.price} USD)`;
+        }
+        if (modal) {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        } else if (typeof window.openCustomerAuthPage === 'function') {
+          window.openCustomerAuthPage('login');
+        }
+      }
+      window.__kycPromptLoginForDocumentDownload = promptLoginForDocumentDownload;
+
+      window.__kycProceedFromDownloadAuthModal = function(mode) {
+        closeKycLoginToDownloadModal();
+        const targetMode = mode === 'register' ? 'register' : 'login';
+        _customerAuthMode = targetMode;
+        syncCustomerNavigationAndAccountUI();
+        if (typeof window.openCustomerAuthPage === 'function') {
+          window.openCustomerAuthPage(targetMode);
+        }
+      };
+
       async function continueToPendingPlanCheckoutIfPresent(authResponseData, triggerBtn) {
         const serverPlan =
           (authResponseData && authResponseData.pendingCheckoutPlan) || _pendingCheckoutPlan;
-        if (!serverPlan || !serverPlan.productKey) {
+        const localDocCtx = _pendingDocumentDownloadContext;
+
+        if ((!serverPlan || !serverPlan.productKey) && !localDocCtx) {
           return false;
         }
-        const planKey =
-          serverPlan.productKey === 'monthlyAccess' || serverPlan.productCode === 'MONTHLY_ACCESS'
-            ? 'monthlyAccess'
-            : 'oneTimeAccess';
-        const planLabel = serverPlan.label || (planKey === 'monthlyAccess' ? 'Monthly Access' : 'One-Time Access');
-        const planPrice = serverPlan.displayPrice || serverPlan.formattedPrice || (planKey === 'monthlyAccess' ? '$12/month' : '$55');
 
-        // Clear local pending plan memory before launching Sifalo checkout
+        const rawKey = (serverPlan && serverPlan.productKey) || (localDocCtx && localDocCtx.productKey) || '';
+        const isPricingPlan =
+          rawKey === 'oneTimeAccess' ||
+          rawKey === 'monthlyAccess' ||
+          (serverPlan &&
+            (serverPlan.productCode === 'ONE_TIME_ACCESS' || serverPlan.productCode === 'MONTHLY_ACCESS') &&
+            serverPlan.intentType !== 'document_download');
+
+        // Clear local pending plan & document download memory before continuing
         _pendingCheckoutPlan = null;
         _pendingPlanIntentToken = '';
+        _pendingDocumentDownloadContext = null;
+        closeKycLoginToDownloadModal();
         syncCustomerNavigationAndAccountUI();
+
+        if (!isPricingPlan) {
+          // Document download flow initiated before login/registration:
+          // 1. Restore the document editor and all entered fields
+          const docSpec =
+            (typeof getDocSpecByProductKey === 'function' && getDocSpecByProductKey(rawKey)) ||
+            (localDocCtx && {
+              rawType: localDocCtx.rawDocType || 'passport',
+              productKey: rawKey || 'passport',
+              label: localDocCtx.label || 'Passport',
+              price: localDocCtx.price || '$1.11'
+            }) ||
+            (typeof getActiveUnlockDocSpec === 'function' ? getActiveUnlockDocSpec() : {
+              rawType: 'passport',
+              productKey: 'passport',
+              label: 'Passport',
+              price: '$1.11'
+            });
+
+          const restorePayload = {
+            workflowStep: 'editor',
+            countryKey:
+              (localDocCtx && localDocCtx.countryKey) ||
+              (serverPlan && serverPlan.countryKey) ||
+              (typeof workflowSelectedCountry === 'string' && workflowSelectedCountry) ||
+              'kenya',
+            providerKey:
+              (localDocCtx && localDocCtx.providerKey) ||
+              (serverPlan && serverPlan.providerKey) ||
+              (typeof workflowActiveAccount === 'string' && workflowActiveAccount) ||
+              'paypal',
+            rawDocType:
+              (localDocCtx && localDocCtx.rawDocType) ||
+              (serverPlan && serverPlan.rawDocType) ||
+              docSpec.rawType ||
+              'passport',
+            fieldSnapshot: (localDocCtx && localDocCtx.fieldSnapshot) || {},
+            sideState: (localDocCtx && localDocCtx.sideState) || null
+          };
+
+          if (typeof restoreEditorContextFromData === 'function') {
+            restoreEditorContextFromData(restorePayload, false);
+          }
+
+          const descriptor = (localDocCtx && localDocCtx.actionDescriptor) || window.__kycLastSavePngActionDescriptor || null;
+          const restoredBtn =
+            (typeof findRestoredSavePngTriggerButton === 'function' && findRestoredSavePngTriggerButton(descriptor)) ||
+            triggerBtn;
+
+          // 2. If the logged-in account already has an active plan (One-Time Access $55 or Monthly Access $12/month),
+          //    trigger the PNG download automatically without sending them through another payment!
+          if (isCustomerPaidAccessVerifiedActive()) {
+            if (typeof window.showToast === 'function') {
+              window.showToast(
+                `Active Plan Verified — Downloading ${docSpec.label}...`,
+                `Generating your ${docSpec.label} PNG automatically.`
+              );
+            }
+            await new Promise((r) => setTimeout(r, 80));
+            if (restoredBtn && typeof restoredBtn.click === 'function') {
+              restoredBtn.click();
+              return true;
+            }
+          }
+
+          // 3. Otherwise, automatically proceed to Sifalo Pay checkout for the selected document
+          if (typeof window.showToast === 'function') {
+            window.showToast(
+              `Continuing to ${docSpec.label} (${docSpec.price} USD)...`,
+              'Opening your Sifalo Pay checkout session automatically.'
+            );
+          }
+          if (typeof startSifaloCheckoutImmediately === 'function') {
+            await startSifaloCheckoutImmediately(docSpec, restoredBtn, descriptor);
+            return true;
+          }
+          return false;
+        }
+
+        const planKey =
+          rawKey === 'monthlyAccess' || (serverPlan && serverPlan.productCode === 'MONTHLY_ACCESS')
+            ? 'monthlyAccess'
+            : 'oneTimeAccess';
+        const planLabel = (serverPlan && serverPlan.label) || (planKey === 'monthlyAccess' ? 'Monthly Access' : 'One-Time Access');
+        const planPrice = (serverPlan && (serverPlan.displayPrice || serverPlan.formattedPrice)) || (planKey === 'monthlyAccess' ? '$12/month' : '$55');
 
         if (typeof window.showToast === 'function') {
           window.showToast(
@@ -41565,6 +42054,8 @@ EPSOM</div>
         _customerAuthMode = 'login';
         _pendingCheckoutPlan = null;
         _pendingPlanIntentToken = '';
+        _pendingDocumentDownloadContext = null;
+        clearLocalUnlockStateForAccountSwitch();
         applyServerCustomerAuthState(null);
         if (typeof window.showToast === 'function') {
           window.showToast('Signed Out', 'Your customer session has been closed.');

@@ -3,7 +3,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import express, { type NextFunction, type Request, type Response } from 'express';
-import { AUTHORITATIVE_PRODUCT_PRICING, type SifaloOrderRecord } from './sifaloPayments.js';
+import {
+  AUTHORITATIVE_PRODUCT_PRICING,
+  normalizeDocTypeToProductKey,
+  type SifaloOrderRecord,
+  type UnlockProductKey,
+} from './sifaloPayments.js';
 
 export type CustomerPlanStatus = 'INACTIVE' | 'ACTIVE' | 'EXPIRED' | 'REVOKED';
 
@@ -91,15 +96,28 @@ export interface PublicCustomerAccountView {
   };
 }
 
+export type PendingProductCode =
+  | 'PASSPORT'
+  | 'NATIONAL_IDENTITY_CARD'
+  | 'DRIVER_LICENSE'
+  | 'PROOF_OF_ADDRESS'
+  | 'PROOF_OF_ACCOUNT'
+  | 'ONE_TIME_ACCESS'
+  | 'MONTHLY_ACCESS';
+
 export interface PublicPendingPlanView {
-  productKey: 'oneTimeAccess' | 'monthlyAccess';
-  productCode: 'ONE_TIME_ACCESS' | 'MONTHLY_ACCESS';
-  label: 'One-Time Access' | 'Monthly Access';
+  productKey: UnlockProductKey;
+  productCode: PendingProductCode;
+  intentType: 'plan' | 'document_download';
+  label: string;
   amountCents: number;
   amountUsd: string;
   formattedPrice: string;
   displayPrice: string;
   currency: 'USD';
+  countryKey?: string;
+  providerKey?: string;
+  rawDocType?: string;
   expiresAtMs: number;
 }
 
@@ -121,35 +139,55 @@ const CUSTOMER_PLAN_INTENT_COOKIE_NAME = 'kyc_customer_plan_intent';
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_AUTH_FAILURES_PER_WINDOW = 10;
 
-function normalizeRequestedCustomerPlan(
-  rawPlan: unknown
-): 'oneTimeAccess' | 'monthlyAccess' | null {
-  if (typeof rawPlan !== 'string') return null;
-  const cleaned = rawPlan.trim().toLowerCase().replace(/[\s_-]+/g, '');
-  if (cleaned === 'onetimeaccess' || cleaned === 'onetime' || cleaned === 'onetimeplan') {
-    return 'oneTimeAccess';
+function normalizeRequestedCustomerPlan(rawPlan: unknown): UnlockProductKey | null {
+  return normalizeDocTypeToProductKey(rawPlan);
+}
+
+function getPendingProductCode(productKey: UnlockProductKey): PendingProductCode {
+  switch (productKey) {
+    case 'passport':
+      return 'PASSPORT';
+    case 'nationalIdentity':
+      return 'NATIONAL_IDENTITY_CARD';
+    case 'driverLicense':
+      return 'DRIVER_LICENSE';
+    case 'proofOfAddress':
+      return 'PROOF_OF_ADDRESS';
+    case 'proofOfAccount':
+      return 'PROOF_OF_ACCOUNT';
+    case 'monthlyAccess':
+      return 'MONTHLY_ACCESS';
+    case 'oneTimeAccess':
+    default:
+      return 'ONE_TIME_ACCESS';
   }
-  if (cleaned === 'monthlyaccess' || cleaned === 'monthly' || cleaned === 'monthlyplan') {
-    return 'monthlyAccess';
-  }
-  return null;
 }
 
 function buildAuthoritativePendingPlanView(
-  productKey: 'oneTimeAccess' | 'monthlyAccess',
-  expiresAtMs: number
+  productKey: UnlockProductKey,
+  expiresAtMs: number,
+  extra?: { countryKey?: unknown; providerKey?: unknown; rawDocType?: unknown }
 ): PublicPendingPlanView {
   const spec = AUTHORITATIVE_PRODUCT_PRICING[productKey];
+  const isPlan = productKey === 'oneTimeAccess' || productKey === 'monthlyAccess';
   const isMonthly = productKey === 'monthlyAccess';
+  const cleanSlug = (val: unknown, fallback: string) =>
+    typeof val === 'string' && val.trim()
+      ? val.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 48) || fallback
+      : fallback;
   return {
     productKey,
-    productCode: isMonthly ? 'MONTHLY_ACCESS' : 'ONE_TIME_ACCESS',
-    label: isMonthly ? 'Monthly Access' : 'One-Time Access',
+    productCode: getPendingProductCode(productKey),
+    intentType: isPlan ? 'plan' : 'document_download',
+    label: spec.label,
     amountCents: spec.amountCents,
     amountUsd: spec.amountUsdString,
     formattedPrice: spec.formattedPrice,
-    displayPrice: isMonthly ? '$12/month' : '$55',
+    displayPrice: isPlan ? (isMonthly ? '$12/month' : '$55') : spec.formattedPrice,
     currency: 'USD',
+    countryKey: isPlan ? 'global' : cleanSlug(extra?.countryKey, 'kenya'),
+    providerKey: isPlan ? 'paypal' : cleanSlug(extra?.providerKey, 'paypal'),
+    rawDocType: isPlan ? productKey.toLowerCase() : cleanSlug(extra?.rawDocType, 'passport'),
     expiresAtMs,
   };
 }
@@ -565,19 +603,32 @@ export class KycCustomerService {
     return '';
   }
 
-  private setCustomerSessionCookie(res: Response, rawToken: string): void {
+  private isSecureRequest(req?: Request): boolean {
+    if (!req) return true;
+    const forwardedProto = String(req.headers['x-forwarded-proto'] || '')
+      .split(',')[0]
+      .trim()
+      .toLowerCase();
+    return Boolean(req.secure || forwardedProto === 'https');
+  }
+
+  private buildCookieFlags(req: Request | undefined, maxAgeSec: number): string {
+    if (this.isSecureRequest(req)) {
+      return `Path=/; Max-Age=${maxAgeSec}; HttpOnly; Secure; SameSite=None; Partitioned`;
+    }
+    return `Path=/; Max-Age=${maxAgeSec}; HttpOnly; SameSite=Lax`;
+  }
+
+  private setCustomerSessionCookie(res: Response, rawToken: string, req?: Request): void {
     const maxAgeSec = Math.floor(CUSTOMER_SESSION_TTL_MS / 1000);
     res.append(
       'Set-Cookie',
-      `${CUSTOMER_COOKIE_NAME}=${encodeURIComponent(rawToken)}; Path=/; Max-Age=${maxAgeSec}; HttpOnly; Secure; SameSite=None; Partitioned`
+      `${CUSTOMER_COOKIE_NAME}=${encodeURIComponent(rawToken)}; ${this.buildCookieFlags(req, maxAgeSec)}`
     );
   }
 
-  private clearCustomerSessionCookie(res: Response): void {
-    res.append(
-      'Set-Cookie',
-      `${CUSTOMER_COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None; Partitioned`
-    );
+  private clearCustomerSessionCookie(res: Response, req?: Request): void {
+    res.append('Set-Cookie', `${CUSTOMER_COOKIE_NAME}=; ${this.buildCookieFlags(req, 0)}`);
   }
 
   private extractRawPlanIntentToken(req: Request, body?: Record<string, unknown>): string {
@@ -599,22 +650,25 @@ export class KycCustomerService {
     return '';
   }
 
-  private setPlanIntentCookie(res: Response, rawIntentToken: string): void {
+  private setPlanIntentCookie(res: Response, rawIntentToken: string, req?: Request): void {
     const maxAgeSec = Math.floor(PLAN_INTENT_TTL_MS / 1000);
     res.append(
       'Set-Cookie',
-      `${CUSTOMER_PLAN_INTENT_COOKIE_NAME}=${encodeURIComponent(rawIntentToken)}; Path=/; Max-Age=${maxAgeSec}; HttpOnly; Secure; SameSite=None; Partitioned`
+      `${CUSTOMER_PLAN_INTENT_COOKIE_NAME}=${encodeURIComponent(rawIntentToken)}; ${this.buildCookieFlags(req, maxAgeSec)}`
     );
   }
 
-  private clearPlanIntentCookie(res: Response): void {
+  private clearPlanIntentCookie(res: Response, req?: Request): void {
     res.append(
       'Set-Cookie',
-      `${CUSTOMER_PLAN_INTENT_COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=None; Partitioned`
+      `${CUSTOMER_PLAN_INTENT_COOKIE_NAME}=; ${this.buildCookieFlags(req, 0)}`
     );
   }
 
-  private createPendingPlanIntent(productKey: 'oneTimeAccess' | 'monthlyAccess'): {
+  private createPendingPlanIntent(
+    productKey: UnlockProductKey,
+    extra?: { countryKey?: unknown; providerKey?: unknown; rawDocType?: unknown }
+  ): {
     rawIntentToken: string;
     intent: CustomerPendingPlanIntentRecord;
     publicPlan: PublicPendingPlanView;
@@ -624,7 +678,7 @@ export class KycCustomerService {
     const tokenHash = sha256Hex(rawIntentToken);
     const nowMs = this.now();
     const expiresAtMs = nowMs + PLAN_INTENT_TTL_MS;
-    const publicPlan = buildAuthoritativePendingPlanView(productKey, expiresAtMs);
+    const publicPlan = buildAuthoritativePendingPlanView(productKey, expiresAtMs, extra);
     const intent: CustomerPendingPlanIntentRecord = {
       ...publicPlan,
       intentId: `PINT-${crypto.randomUUID()}`,
@@ -651,7 +705,11 @@ export class KycCustomerService {
     if (!record && body && typeof body.pendingPlan !== 'undefined') {
       const fallbackPlanKey = normalizeRequestedCustomerPlan(body.pendingPlan);
       if (fallbackPlanKey) {
-        return buildAuthoritativePendingPlanView(fallbackPlanKey, this.now() + PLAN_INTENT_TTL_MS);
+        return buildAuthoritativePendingPlanView(
+          fallbackPlanKey,
+          this.now() + PLAN_INTENT_TTL_MS,
+          body
+        );
       }
     }
     if (!record) return null;
@@ -665,12 +723,16 @@ export class KycCustomerService {
     return {
       productKey: record.productKey,
       productCode: record.productCode,
+      intentType: record.intentType,
       label: record.label,
       amountCents: record.amountCents,
       amountUsd: record.amountUsd,
       formattedPrice: record.formattedPrice,
       displayPrice: record.displayPrice,
       currency: record.currency,
+      countryKey: record.countryKey,
+      providerKey: record.providerKey,
+      rawDocType: record.rawDocType,
       expiresAtMs: record.expiresAtMs,
     };
   }
@@ -828,13 +890,19 @@ export class KycCustomerService {
   }
 
   /**
-   * Grants One-Time Access ($55.00 USD) or Monthly Access ($12.00 USD) to a customer account
-   * ONLY after strict server-side Sifalo Pay payment verification.
+   * Grants a verified Sifalo Pay entitlement (One-Time Access, Monthly Access, or per-document download)
+   * to the authenticated customer account ONLY after strict server-side Sifalo Pay payment verification.
    */
   public grantVerifiedSifaloOrderToCustomer(
     order: SifaloOrderRecord,
-    fallbackCustomerId?: string | null
-  ): PublicCustomerAccountView | null {
+    fallbackCustomerId?: string | null,
+    req?: Request,
+    res?: Response
+  ): {
+    publicView: PublicCustomerAccountView;
+    entitlements: ReturnType<KycCustomerService['toClientEntitlementsPayload']>;
+    sessionToken?: string;
+  } | null {
     if (!order || order.status !== 'PAID' || order.revokedAt) {
       return null;
     }
@@ -842,9 +910,6 @@ export class KycCustomerService {
       return null;
     }
     if (order.currency !== 'USD') {
-      return null;
-    }
-    if (order.productKey !== 'oneTimeAccess' && order.productKey !== 'monthlyAccess') {
       return null;
     }
 
@@ -872,59 +937,81 @@ export class KycCustomerService {
       customer.appliedOrderIds = [];
     }
 
-    // Bind order to customer so future refunds/reversals can also locate it
+    // Bind order to customer so future refunds/reversals and ownership checks locate it
     if (!order.customerId) {
       order.customerId = customer.customerId;
     }
 
     // Prevent duplicate application of the same verified order
-    if (customer.appliedOrderIds.includes(order.orderId)) {
-      return this.toPublicCustomerView(customer);
+    if (!customer.appliedOrderIds.includes(order.orderId)) {
+      if (order.productKey === 'oneTimeAccess') {
+        customer.oneTimeAccess = {
+          status: 'ACTIVE',
+          active: true,
+          orderId: order.orderId,
+          providerSid: order.providerSid,
+          amountCents: order.amountCents,
+          amountUsd: order.amountUsdString,
+          currency: 'USD',
+          activatedAt: nowIso,
+          revokedAt: null,
+          revocationReason: null,
+        };
+      } else if (order.productKey === 'monthlyAccess') {
+        this.refreshCustomerEntitlementExpirations(customer);
+        const baseTimeMs =
+          customer.monthlyAccess.status === 'ACTIVE' &&
+          customer.monthlyAccess.active &&
+          customer.monthlyAccess.expiresAtMs &&
+          customer.monthlyAccess.expiresAtMs > nowMs
+            ? customer.monthlyAccess.expiresAtMs
+            : nowMs;
+        const nextExpiresAtMs = baseTimeMs + MONTHLY_ACCESS_DURATION_MS;
+        customer.monthlyAccess = {
+          status: 'ACTIVE',
+          active: true,
+          orderId: order.orderId,
+          providerSid: order.providerSid,
+          amountCents: order.amountCents,
+          amountUsd: order.amountUsdString,
+          currency: 'USD',
+          activatedAt: nowIso,
+          expiresAt: new Date(nextExpiresAtMs).toISOString(),
+          expiresAtMs: nextExpiresAtMs,
+          revokedAt: null,
+          revocationReason: null,
+        };
+      }
+
+      customer.appliedOrderIds.push(order.orderId);
+      customer.updatedAt = nowIso;
+      this.saveState();
     }
 
-    if (order.productKey === 'oneTimeAccess') {
-      customer.oneTimeAccess = {
-        status: 'ACTIVE',
-        active: true,
-        orderId: order.orderId,
-        providerSid: order.providerSid,
-        amountCents: order.amountCents,
-        amountUsd: order.amountUsdString,
-        currency: 'USD',
-        activatedAt: nowIso,
-        revokedAt: null,
-        revocationReason: null,
-      };
-    } else if (order.productKey === 'monthlyAccess') {
-      this.refreshCustomerEntitlementExpirations(customer);
-      const baseTimeMs =
-        customer.monthlyAccess.status === 'ACTIVE' &&
-        customer.monthlyAccess.active &&
-        customer.monthlyAccess.expiresAtMs &&
-        customer.monthlyAccess.expiresAtMs > nowMs
-          ? customer.monthlyAccess.expiresAtMs
-          : nowMs;
-      const nextExpiresAtMs = baseTimeMs + MONTHLY_ACCESS_DURATION_MS;
-      customer.monthlyAccess = {
-        status: 'ACTIVE',
-        active: true,
-        orderId: order.orderId,
-        providerSid: order.providerSid,
-        amountCents: order.amountCents,
-        amountUsd: order.amountUsdString,
-        currency: 'USD',
-        activatedAt: nowIso,
-        expiresAt: new Date(nextExpiresAtMs).toISOString(),
-        expiresAtMs: nextExpiresAtMs,
-        revokedAt: null,
-        revocationReason: null,
-      };
+    const publicView = this.toPublicCustomerView(customer);
+    const entitlements = this.toClientEntitlementsPayload(publicView);
+
+    // Ensure the customer has an active session token on return from external Sifalo redirect
+    let sessionToken: string | undefined;
+    if (req) {
+      const existingToken = this.extractRawCustomerToken(req);
+      const resolved = this.resolveAuthenticatedCustomer(req);
+      if (resolved.authenticated && resolved.customer?.customerId === customer.customerId && existingToken) {
+        sessionToken = existingToken;
+      } else if (!resolved.authenticated) {
+        const created = this.createCustomerSession(customer);
+        sessionToken = created.rawToken;
+        if (res) {
+          this.setCustomerSessionCookie(res, created.rawToken, req);
+        }
+      }
     }
 
-    customer.appliedOrderIds.push(order.orderId);
-    customer.updatedAt = nowIso;
-    this.saveState();
-    return this.toPublicCustomerView(customer);
+    return {
+      publicView,
+      entitlements,
+      sessionToken,
+    };
   }
 
   /**
@@ -1090,8 +1177,12 @@ export class KycCustomerService {
         this.pendingPlanIntents.delete(sha256Hex(prevRaw));
       }
 
-      const { rawIntentToken, publicPlan } = this.createPendingPlanIntent(productKey);
-      this.setPlanIntentCookie(res, rawIntentToken);
+      const { rawIntentToken, publicPlan } = this.createPendingPlanIntent(productKey, {
+        countryKey: body.countryKey,
+        providerKey: body.providerKey,
+        rawDocType: body.rawDocType || body.docType,
+      });
+      this.setPlanIntentCookie(res, rawIntentToken, req);
       const resolved = this.resolveAuthenticatedCustomer(req);
 
       return res.status(200).json({
@@ -1113,7 +1204,7 @@ export class KycCustomerService {
       if (prevRaw) {
         this.pendingPlanIntents.delete(sha256Hex(prevRaw));
       }
-      this.clearPlanIntentCookie(res);
+      this.clearPlanIntentCookie(res, req);
       return res.status(200).json({
         ok: true,
         pendingCheckoutPlan: null,
@@ -1199,10 +1290,10 @@ export class KycCustomerService {
       this.clearAuthFailures(clientIp);
 
       const { rawToken, session } = this.createCustomerSession(newCustomer);
-      this.setCustomerSessionCookie(res, rawToken);
+      this.setCustomerSessionCookie(res, rawToken, req);
       const pendingCheckoutPlan = this.resolvePendingPlanIntent(req, body, true);
       if (pendingCheckoutPlan) {
-        this.clearPlanIntentCookie(res);
+        this.clearPlanIntentCookie(res, req);
       }
       const publicView = this.toPublicCustomerView(newCustomer);
 
@@ -1274,10 +1365,10 @@ export class KycCustomerService {
       this.saveState();
 
       const { rawToken, session } = this.createCustomerSession(customer);
-      this.setCustomerSessionCookie(res, rawToken);
+      this.setCustomerSessionCookie(res, rawToken, req);
       const pendingCheckoutPlan = this.resolvePendingPlanIntent(req, body, true);
       if (pendingCheckoutPlan) {
-        this.clearPlanIntentCookie(res);
+        this.clearPlanIntentCookie(res, req);
       }
       const publicView = this.toPublicCustomerView(customer);
 
@@ -1308,7 +1399,7 @@ export class KycCustomerService {
         const tokenHash = sha256Hex(rawToken);
         this.sessions.delete(tokenHash);
       }
-      this.clearCustomerSessionCookie(res);
+      this.clearCustomerSessionCookie(res, req);
       return res.status(200).json({
         ok: true,
         authenticated: false,

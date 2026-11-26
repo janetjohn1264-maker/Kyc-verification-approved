@@ -284,7 +284,9 @@ export interface SifaloPaymentServiceDeps {
   resolveAuthenticatedCustomerId?: (req: Request) => string | null;
   onVerifiedCustomerAccessOrder?: (
     order: SifaloOrderRecord,
-    fallbackCustomerId?: string | null
+    fallbackCustomerId?: string | null,
+    req?: Request,
+    res?: Response
   ) => unknown;
   onRevokedCustomerAccessOrder?: (order: SifaloOrderRecord, reason: string) => void;
   evaluateCustomerPaidAccess?: (req: Request) => {
@@ -320,6 +322,7 @@ interface UnlockTokenPayload {
   orderId: string;
   productKey: UnlockProductKey;
   sessionId?: string | null;
+  customerId?: string | null;
   amountCents?: number;
   currency?: 'USD';
   sid?: string | null;
@@ -1605,6 +1608,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       orderId: order.orderId,
       productKey: order.productKey,
       sessionId: order.sessionId || null,
+      customerId: order.customerId || null,
       amountCents: order.amountCents,
       currency: order.currency,
       sid: order.providerSid || order.transactionRef || null,
@@ -2523,17 +2527,21 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         const authenticatedCustomerId = deps.resolveAuthenticatedCustomerId
           ? deps.resolveAuthenticatedCustomerId(req)
           : null;
-        if (
-          (productKey === 'oneTimeAccess' || productKey === 'monthlyAccess') &&
-          deps.resolveAuthenticatedCustomerId &&
-          !authenticatedCustomerId
-        ) {
+        if (deps.resolveAuthenticatedCustomerId && !authenticatedCustomerId) {
           return res.status(401).json({
             ok: false,
             requiresCustomerAuth: true,
             productKey,
-            productCode: productKey === 'monthlyAccess' ? 'MONTHLY_ACCESS' : 'ONE_TIME_ACCESS',
-            error: 'Please log in or create a customer account before proceeding to payment.',
+            productCode:
+              productKey === 'monthlyAccess'
+                ? 'MONTHLY_ACCESS'
+                : productKey === 'oneTimeAccess'
+                  ? 'ONE_TIME_ACCESS'
+                  : productKey.toUpperCase(),
+            error:
+              productKey === 'oneTimeAccess' || productKey === 'monthlyAccess'
+                ? 'Please log in or create a customer account before proceeding to payment.'
+                : 'Please log in or create an account to continue with your download.',
           });
         }
         const order: SifaloOrderRecord = {
@@ -2732,6 +2740,23 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
 
         const priceSpec = AUTHORITATIVE_PRODUCT_PRICING[order.productKey];
 
+        const currentCustomerId = deps.resolveAuthenticatedCustomerId
+          ? deps.resolveAuthenticatedCustomerId(req)
+          : null;
+
+        // Prevent one logged-in customer account from verifying or claiming another customer's order
+        if (order.customerId && currentCustomerId && order.customerId !== currentCustomerId) {
+          return res.status(403).json({
+            verified: false,
+            status: order.status,
+            orderId: order.orderId,
+            productKey: order.productKey,
+            label: priceSpec.label,
+            formattedPrice: priceSpec.formattedPrice,
+            error: 'Payment order belongs to a different customer account.',
+          });
+        }
+
         // Enforce user/session binding when order was created with a session ID
         if (order.sessionId && order.sessionId !== requestSessionId) {
           return res.status(403).json({
@@ -2921,12 +2946,11 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
         let customerEntitlement = null;
         if (deps.onVerifiedCustomerAccessOrder) {
           try {
-            const currentCustomerId = deps.resolveAuthenticatedCustomerId
-              ? deps.resolveAuthenticatedCustomerId(req)
-              : null;
             customerEntitlement = deps.onVerifiedCustomerAccessOrder(
               order,
-              order.customerId || currentCustomerId || null
+              order.customerId || currentCustomerId || null,
+              req,
+              res
             );
           } catch {}
         }
@@ -2970,6 +2994,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
       unlockToken?: string;
       cookieGrantEntry?: SignedGrantCookieEntry;
       requestSessionId: string | null;
+      requestCustomerId?: string | null;
     }): Promise<
       | {
           authorized: true;
@@ -2989,7 +3014,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           clearGrant?: boolean;
         }
     > {
-      const { requestedProductKey, unlockToken, cookieGrantEntry, requestSessionId } = params;
+      const { requestedProductKey, unlockToken, cookieGrantEntry, requestSessionId, requestCustomerId } = params;
       const expectedSpec = AUTHORITATIVE_PRODUCT_PRICING[requestedProductKey];
 
       let payload: UnlockTokenPayload | null = null;
@@ -3112,6 +3137,28 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           httpStatus: 403,
           error: 'Payment authorization belongs to a different user session.',
         };
+      }
+
+      const boundCustomerId = (order && order.customerId) || payload.customerId || null;
+      if (boundCustomerId && deps.resolveAuthenticatedCustomerId) {
+        if (!requestCustomerId || requestCustomerId !== boundCustomerId) {
+          recordUnlockAuditEvent({
+            eventType: 'INVALID_UNLOCK_BLOCKED',
+            order,
+            orderId: payload.orderId,
+            productKey: payload.productKey,
+            requestedProductKey,
+            sessionId: requestSessionId,
+            rawTokenOrTid: payload.tid,
+            reason: 'Payment authorization belongs to a different customer account or logged-out session.',
+          });
+          return {
+            authorized: false,
+            httpStatus: 403,
+            error: 'Payment authorization belongs to a different customer account.',
+            clearGrant: true,
+          };
+        }
       }
 
       if (payload.amountCents !== undefined && payload.amountCents !== expectedSpec.amountCents) {
@@ -3551,6 +3598,10 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
           >
         > = {};
 
+        const requestCustomerId = deps.resolveAuthenticatedCustomerId
+          ? deps.resolveAuthenticatedCustomerId(req)
+          : null;
+
         // Never auto-unlock from cookies or old session history on page refresh;
         // only validate explicitly provided, unconsumed, non-expired candidate unlock tokens.
         const allProductKeys = Object.keys(AUTHORITATIVE_PRODUCT_PRICING) as UnlockProductKey[];
@@ -3572,6 +3623,7 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             requestedProductKey: productKey,
             unlockToken: candidateToken,
             requestSessionId: sessionId,
+            requestCustomerId,
           });
 
           if (auth.authorized) {
@@ -3679,10 +3731,15 @@ export function createSifaloPaymentService(deps: SifaloPaymentServiceDeps = {}) 
             .json({ authorized: false, error: 'Missing payment token or document type.' });
         }
 
+        const requestCustomerId = deps.resolveAuthenticatedCustomerId
+          ? deps.resolveAuthenticatedCustomerId(req)
+          : null;
+
         const result = await authorizeUnlockCandidate({
           requestedProductKey,
           unlockToken,
           requestSessionId,
+          requestCustomerId,
         });
 
         if (!result.authorized) {
