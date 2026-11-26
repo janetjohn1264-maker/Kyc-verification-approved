@@ -407,6 +407,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
   'indonesia-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
   'pakistan-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
   'india-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
+  'srilanka-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
 
   // Single-Page Passport Data Cards
   'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
@@ -855,6 +856,18 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       portalName: 'Passport Seva · Government of India',
       portalUrl: 'https://www.passportindia.gov.in',
       idStandard: 'Republic of India Machine-Readable Passport (भारत गणराज्य / IND)',
+      enabledDocs: ['passport'],
+    },
+    {
+      key: 'srilanka',
+      name: 'Sri Lanka',
+      flag: '🇱🇰',
+      subtitle: 'Democratic Socialist Republic of Sri Lanka Passport (LKA)',
+      iso3: 'LKA',
+      authority: 'Department of Immigration and Emigration · Colombo, Sri Lanka',
+      portalName: 'Department of Immigration & Emigration · Sri Lanka',
+      portalUrl: 'https://www.immigration.gov.lk',
+      idStandard: 'Democratic Socialist Republic of Sri Lanka Machine-Readable Passport (LKA)',
       enabledDocs: ['passport'],
     },
   ];
