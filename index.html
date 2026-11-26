@@ -1894,6 +1894,15 @@
               new Promise((r) => setTimeout(r, 3000))
             ]);
           }
+          if (typeof window.fitContainedPortraitImg === 'function') {
+            imgs.forEach((img) => {
+              try {
+                if (img && img.dataset && img.dataset.containPortrait === '1') {
+                  window.fitContainedPortraitImg(img);
+                }
+              } catch (e) {}
+            });
+          }
         }
 
         // 6. Run one synchronous auto-fit pass while auto-fit observer is paused, then wait for layout paint
@@ -21470,9 +21479,9 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               <span id="${p}_outPerforated" class="hidden">${s.passNo}</span>
 
               <!-- ============ BOTTOM PAGE (BIO-DATA PAGE): PORTRAIT, TRILINGUAL FIELDS, SIGNATURE & TD3 MRZ ============ -->
-              <!-- Left Main Color Bearer Portrait (x=48..216, y=615..836 on 720x974) -->
-              <div class="absolute overflow-hidden pointer-events-none select-none z-10" style="left: 6.67%; top: 63.14%; width: 23.33%; height: 22.69%;">
-                <img id="${p}_outPhoto" src="${s.photoUrl}" alt="Bearer Sample Portrait" class="w-full h-full object-cover object-top" />
+              <!-- Left Main Color Bearer Portrait (x=42..220, y=608..838 on 720x974) -->
+              <div id="${p}_outPhotoWrap" class="absolute overflow-hidden flex items-center justify-center pointer-events-none select-none z-10" style="left: 5.83%; top: 62.42%; width: 24.72%; height: 23.61%; background: transparent;">
+                <img id="${p}_outPhoto" data-contain-portrait="1" data-box-aspect="0.773913" src="${s.photoUrl}" alt="Bearer Sample Portrait" class="max-w-full max-h-full object-contain object-center block" style="width: 100%; height: 100%; object-fit: contain; object-position: center; background: transparent;" onload="if(window.fitContainedPortraitImg)window.fitContainedPortraitImg(this)" />
               </div>
 
               <!-- Row 1 Header Values: Type (x=248, y=550), Country Code (x=364, y=550), Passport No. (x=553, y=549) -->
@@ -22498,6 +22507,35 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
     window.downloadOceaniaPNG = downloadOceaniaPNG;
 
+    function fitContainedPortraitImg(imgEl) {
+      if (!imgEl || !imgEl.dataset || imgEl.dataset.containPortrait !== '1') return;
+      const nw = imgEl.naturalWidth || 0;
+      const nh = imgEl.naturalHeight || 0;
+      if (!nw || !nh) return;
+      const wrap = imgEl.parentElement;
+      const cw = wrap && wrap.clientWidth ? wrap.clientWidth : 0;
+      const ch = wrap && wrap.clientHeight ? wrap.clientHeight : 0;
+      const fallbackRatio = parseFloat(imgEl.dataset.boxAspect || '0.773913') || (178 / 230);
+      const boxRatio = (cw > 0 && ch > 0) ? (cw / ch) : fallbackRatio;
+      const imgRatio = nw / nh;
+      imgEl.style.maxWidth = '100%';
+      imgEl.style.maxHeight = '100%';
+      imgEl.style.objectFit = 'contain';
+      imgEl.style.objectPosition = 'center';
+      imgEl.style.background = 'transparent';
+      if (Math.abs(imgRatio - boxRatio) <= 0.008) {
+        imgEl.style.width = '100%';
+        imgEl.style.height = '100%';
+      } else if (imgRatio > boxRatio) {
+        imgEl.style.width = '100%';
+        imgEl.style.height = 'auto';
+      } else {
+        imgEl.style.width = 'auto';
+        imgEl.style.height = '100%';
+      }
+    }
+    window.fitContainedPortraitImg = fitContainedPortraitImg;
+
     function bindOceaniaPhotoInputs(countryKey, docType) {
       const p = ocPrefix(countryKey, docType);
       const upEl = $(`${p}_photoUpload`);
@@ -22510,7 +22548,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           reader.onload = ev => {
             const ph = $(`${p}_outPhoto`);
             const gh = $(`${p}_outGhost`);
-            if (ph) ph.src = ev.target.result;
+            if (ph) {
+              ph.src = ev.target.result;
+              fitContainedPortraitImg(ph);
+            }
             if (gh) gh.src = ev.target.result;
           };
           reader.readAsDataURL(file);
@@ -22524,7 +22565,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
           if (!v) return;
           const ph = $(`${p}_outPhoto`);
           const gh = $(`${p}_outGhost`);
-          if (ph) ph.src = v;
+          if (ph) {
+            ph.src = v;
+            fitContainedPortraitImg(ph);
+          }
           if (gh) gh.src = v;
         });
       }
