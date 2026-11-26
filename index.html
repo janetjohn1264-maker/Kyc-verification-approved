@@ -41061,8 +41061,50 @@ EPSOM</div>
   <!-- ================= CUSTOMER AUTHENTICATION & SERVER-VERIFIED ENTITLEMENT CONTROLLER ================= -->
   <script>
     (function() {
-      // Strictly in-memory session & pending checkout intent state; NEVER persisted to localStorage or sessionStorage
-      let _customerMemoryToken = '';
+      const KYC_CUSTOMER_SESSION_TOKEN_STORAGE_KEY = 'kyc_customer_session_token_v1';
+      const KYC_CUSTOMER_VAULT_TOKEN_STORAGE_KEY = 'kyc_customer_vault_token_v1';
+
+      function readStoredOpaqueToken(key, prefix) {
+        try {
+          if (typeof window !== 'undefined' && window.sessionStorage) {
+            const val = String(window.sessionStorage.getItem(key) || '').trim();
+            if (val && val.startsWith(prefix)) return val;
+          }
+        } catch (e) {}
+        try {
+          if (typeof window !== 'undefined' && window.localStorage && key === KYC_CUSTOMER_VAULT_TOKEN_STORAGE_KEY) {
+            const val = String(window.localStorage.getItem(key) || '').trim();
+            if (val && val.startsWith(prefix)) return val;
+          }
+        } catch (e) {}
+        return '';
+      }
+
+      function writeStoredOpaqueToken(key, val, allowLocalVaultBackup) {
+        try {
+          if (typeof window !== 'undefined' && window.sessionStorage) {
+            if (val) {
+              window.sessionStorage.setItem(key, val);
+            } else {
+              window.sessionStorage.removeItem(key);
+            }
+          }
+        } catch (e) {}
+        if (allowLocalVaultBackup) {
+          try {
+            if (typeof window !== 'undefined' && window.localStorage) {
+              if (val) {
+                window.localStorage.setItem(key, val);
+              } else {
+                window.localStorage.removeItem(key);
+              }
+            }
+          } catch (e) {}
+        }
+      }
+
+      let _customerMemoryToken = readStoredOpaqueToken(KYC_CUSTOMER_SESSION_TOKEN_STORAGE_KEY, 'kyccust_');
+      let _customerVaultToken = readStoredOpaqueToken(KYC_CUSTOMER_VAULT_TOKEN_STORAGE_KEY, 'kycvault_');
       let _customerProfile = null;
       let _customerEntitlements = null;
       let _pendingPlanIntentToken = '';
@@ -41076,6 +41118,10 @@ EPSOM</div>
         };
         if (_customerMemoryToken) {
           headers['X-Kyc-Customer-Token'] = _customerMemoryToken;
+          headers['Authorization'] = 'Bearer ' + _customerMemoryToken;
+        }
+        if (_customerVaultToken) {
+          headers['X-Kyc-Customer-Vault'] = _customerVaultToken;
         }
         if (_pendingPlanIntentToken) {
           headers['X-Kyc-Plan-Intent'] = _pendingPlanIntentToken;
@@ -41083,6 +41129,86 @@ EPSOM</div>
         return headers;
       }
       window.__kycGetCustomerAuthHeaders = getCustomerAuthHeaders;
+
+      async function customerApiFetch(endpoint, options) {
+        const opts = options || {};
+        const method = String(opts.method || 'GET').toUpperCase();
+        const buildHeaders = () => {
+          const base = Object.assign(
+            {
+              'Accept': 'application/json'
+            },
+            getCustomerAuthHeaders(),
+            opts.headers || {}
+          );
+          if (opts.body !== undefined) {
+            base['Content-Type'] = 'application/json';
+          }
+          return base;
+        };
+        const rawBody =
+          opts.body !== undefined
+            ? typeof opts.body === 'string'
+              ? opts.body
+              : JSON.stringify(opts.body)
+            : undefined;
+
+        let lastErr = null;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const res = await fetch(endpoint, {
+              method,
+              credentials: 'include',
+              cache: 'no-store',
+              headers: buildHeaders(),
+              body: rawBody
+            });
+            const text = await res.text();
+            let data = null;
+            if (text) {
+              try {
+                data = JSON.parse(text);
+              } catch (parseErr) {
+                data = null;
+              }
+            }
+            if (data && typeof data === 'object') {
+              return { res, data };
+            }
+            // If a reverse proxy returned an HTML challenge/warmup page on attempt 0, warm up and retry once
+            if (attempt === 0) {
+              await fetch('/api/health', {
+                method: 'GET',
+                credentials: 'include',
+                cache: 'no-store'
+              }).catch(() => null);
+              await new Promise((r) => setTimeout(r, 150));
+              continue;
+            }
+            return {
+              res,
+              data: {
+                ok: false,
+                error: res.ok
+                  ? 'Unexpected server response. Please try again.'
+                  : `Server returned status ${res.status}. Please try again.`
+              }
+            };
+          } catch (networkErr) {
+            lastErr = networkErr;
+            if (attempt === 0) {
+              await fetch('/api/health', {
+                method: 'GET',
+                credentials: 'include',
+                cache: 'no-store'
+              }).catch(() => null);
+              await new Promise((r) => setTimeout(r, 150));
+              continue;
+            }
+          }
+        }
+        throw lastErr || new Error('Network request failed');
+      }
 
       function isCustomerAuthenticated() {
         return Boolean(_customerProfile && _customerProfile.id && _customerProfile.email);
@@ -41153,6 +41279,10 @@ EPSOM</div>
         if (data && typeof data.planIntentToken === 'string' && data.planIntentToken.trim()) {
           _pendingPlanIntentToken = data.planIntentToken.trim();
         }
+        if (data && typeof data.customerVaultToken === 'string' && data.customerVaultToken.trim()) {
+          _customerVaultToken = data.customerVaultToken.trim();
+          writeStoredOpaqueToken(KYC_CUSTOMER_VAULT_TOKEN_STORAGE_KEY, _customerVaultToken, true);
+        }
         if (data && data.authenticated === true && data.customer && data.customer.id) {
           const nextCustomerId = String(data.customer.id);
           if (prevCustomerId && prevCustomerId !== nextCustomerId) {
@@ -41169,6 +41299,7 @@ EPSOM</div>
           };
           if (typeof data.sessionToken === 'string' && data.sessionToken.trim()) {
             _customerMemoryToken = data.sessionToken.trim();
+            writeStoredOpaqueToken(KYC_CUSTOMER_SESSION_TOKEN_STORAGE_KEY, _customerMemoryToken, false);
           }
           _customerEntitlements = data.entitlements || null;
           window.__kycCustomerEntitlements = _customerEntitlements;
@@ -41177,6 +41308,7 @@ EPSOM</div>
             clearLocalUnlockStateForAccountSwitch();
           }
           _customerMemoryToken = '';
+          writeStoredOpaqueToken(KYC_CUSTOMER_SESSION_TOKEN_STORAGE_KEY, '', false);
           _customerProfile = null;
           _customerEntitlements = null;
           window.__kycCustomerEntitlements = null;
@@ -41197,7 +41329,8 @@ EPSOM</div>
             authenticated: true,
             customer: entitlementPayload.publicView,
             entitlements: entitlementPayload.entitlements || _customerEntitlements,
-            sessionToken: entitlementPayload.sessionToken || _customerMemoryToken
+            sessionToken: entitlementPayload.sessionToken || _customerMemoryToken,
+            customerVaultToken: entitlementPayload.customerVaultToken || _customerVaultToken
           });
         } else if (entitlementPayload.entitlements) {
           _customerEntitlements = entitlementPayload.entitlements;
@@ -41465,25 +41598,15 @@ EPSOM</div>
             : 'oneTimeAccess';
 
         try {
-          const res = await fetch('/api/customer/checkout-intent', {
+          const { res, data } = await customerApiFetch('/api/customer/checkout-intent', {
             method: 'POST',
-            credentials: 'same-origin',
-            cache: 'no-store',
-            headers: Object.assign(
-              {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-store, no-cache'
-              },
-              getCustomerAuthHeaders()
-            ),
-            body: JSON.stringify({
+            body: {
               plan: normalizedKey,
               productKey: normalizedKey,
               productCode: normalizedKey === 'monthlyAccess' ? 'MONTHLY_ACCESS' : 'ONE_TIME_ACCESS',
               planIntentToken: _pendingPlanIntentToken || ''
-            })
+            }
           });
-          const data = await res.json().catch(() => null);
           if (res.ok && data && data.ok === true && data.pendingCheckoutPlan) {
             _pendingCheckoutPlan = data.pendingCheckoutPlan;
             if (typeof data.planIntentToken === 'string' && data.planIntentToken.trim()) {
@@ -41592,18 +41715,9 @@ EPSOM</div>
 
         // Record checkout intent on the server so login/registration preserves the exact document download intent
         try {
-          const res = await fetch('/api/customer/checkout-intent', {
+          const { res, data } = await customerApiFetch('/api/customer/checkout-intent', {
             method: 'POST',
-            credentials: 'same-origin',
-            cache: 'no-store',
-            headers: Object.assign(
-              {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-store, no-cache'
-              },
-              getCustomerAuthHeaders()
-            ),
-            body: JSON.stringify({
+            body: {
               plan: docSpec.productKey,
               productKey: docSpec.productKey,
               intentType: 'document_download',
@@ -41611,9 +41725,8 @@ EPSOM</div>
               providerKey,
               rawDocType: docSpec.rawType,
               planIntentToken: _pendingPlanIntentToken || ''
-            })
+            }
           });
-          const data = await res.json().catch(() => null);
           if (res.ok && data && data.ok === true && data.pendingCheckoutPlan) {
             _pendingCheckoutPlan = data.pendingCheckoutPlan;
             if (typeof data.planIntentToken === 'string' && data.planIntentToken.trim()) {
@@ -41802,16 +41915,9 @@ EPSOM</div>
 
       async function refreshCustomerAuthStatus(showFeedbackToast) {
         try {
-          const res = await fetch('/api/customer/auth/status', {
-            method: 'GET',
-            credentials: 'same-origin',
-            cache: 'no-store',
-            headers: Object.assign(
-              { 'Cache-Control': 'no-store, no-cache' },
-              getCustomerAuthHeaders()
-            )
+          const { res, data } = await customerApiFetch('/api/customer/auth/status', {
+            method: 'GET'
           });
-          const data = await res.json().catch(() => null);
           if (res.ok && data) {
             if (data.pendingCheckoutPlan) {
               _pendingCheckoutPlan = data.pendingCheckoutPlan;
@@ -41868,27 +41974,31 @@ EPSOM</div>
         if (submitLabel) submitLabel.textContent = 'Signing in...';
 
         try {
-          const res = await fetch('/api/customer/auth/login', {
-            method: 'POST',
-            credentials: 'same-origin',
-            cache: 'no-store',
-            headers: Object.assign(
-              {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-store, no-cache'
-              },
-              getCustomerAuthHeaders()
-            ),
-            body: JSON.stringify({
-              email,
-              password,
-              planIntentToken: _pendingPlanIntentToken || '',
-              pendingPlan: _pendingCheckoutPlan ? _pendingCheckoutPlan.productKey : undefined
-            })
-          });
-          const data = await res.json().catch(() => ({}));
+          let res;
+          let data;
+          try {
+            const loginResult = await customerApiFetch('/api/customer/auth/login', {
+              method: 'POST',
+              body: {
+                email,
+                password,
+                customerVaultToken: _customerVaultToken || undefined,
+                planIntentToken: _pendingPlanIntentToken || '',
+                pendingPlan: _pendingCheckoutPlan ? _pendingCheckoutPlan.productKey : undefined
+              }
+            });
+            res = loginResult.res;
+            data = loginResult.data;
+          } catch (networkErr) {
+            if (errorBox) {
+              errorBox.textContent = 'Network error while signing in. Please try again.';
+              errorBox.classList.remove('hidden');
+            }
+            return false;
+          }
+
           if (!res.ok || !data || data.ok !== true || data.authenticated !== true) {
-            const msg = (data && data.error) || 'Invalid email or password.';
+            const msg = (data && data.error) || 'Invalid email address or password.';
             if (errorBox) {
               errorBox.textContent = msg;
               errorBox.classList.remove('hidden');
@@ -41901,14 +42011,18 @@ EPSOM</div>
           _customerAuthMode = 'account';
           applyServerCustomerAuthState(data);
 
-          // If the customer selected One-Time Access ($55) or Monthly Access ($12) before logging in,
-          // automatically continue directly to Sifalo Pay checkout without making them select the plan again.
+          // If the customer selected One-Time Access ($55), Monthly Access ($12), or a document download before logging in,
+          // automatically continue directly without making them select it again.
           if (planToResume && planToResume.productKey) {
-            await continueToPendingPlanCheckoutIfPresent(
-              { pendingCheckoutPlan: planToResume },
-              submitBtn
-            );
-            return false;
+            try {
+              await continueToPendingPlanCheckoutIfPresent(
+                { pendingCheckoutPlan: planToResume },
+                submitBtn
+              );
+              return false;
+            } catch (resumeErr) {
+              console.error('Post-login checkout continuation error:', resumeErr);
+            }
           }
 
           if (typeof window.openCustomerAuthPage === 'function') {
@@ -41916,11 +42030,6 @@ EPSOM</div>
           }
           if (typeof window.showToast === 'function') {
             window.showToast('Welcome Back!', `Signed in as ${data.customer.email}`);
-          }
-        } catch (err) {
-          if (errorBox) {
-            errorBox.textContent = 'Network error while signing in. Please try again.';
-            errorBox.classList.remove('hidden');
           }
         } finally {
           _customerAuthBusy = false;
@@ -41971,26 +42080,30 @@ EPSOM</div>
         if (submitLabel) submitLabel.textContent = 'Creating account...';
 
         try {
-          const res = await fetch('/api/customer/auth/register', {
-            method: 'POST',
-            credentials: 'same-origin',
-            cache: 'no-store',
-            headers: Object.assign(
-              {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-store, no-cache'
-              },
-              getCustomerAuthHeaders()
-            ),
-            body: JSON.stringify({
-              email,
-              password,
-              confirmPassword,
-              planIntentToken: _pendingPlanIntentToken || '',
-              pendingPlan: _pendingCheckoutPlan ? _pendingCheckoutPlan.productKey : undefined
-            })
-          });
-          const data = await res.json().catch(() => ({}));
+          let res;
+          let data;
+          try {
+            const regResult = await customerApiFetch('/api/customer/auth/register', {
+              method: 'POST',
+              body: {
+                email,
+                password,
+                confirmPassword,
+                customerVaultToken: _customerVaultToken || undefined,
+                planIntentToken: _pendingPlanIntentToken || '',
+                pendingPlan: _pendingCheckoutPlan ? _pendingCheckoutPlan.productKey : undefined
+              }
+            });
+            res = regResult.res;
+            data = regResult.data;
+          } catch (networkErr) {
+            if (errorBox) {
+              errorBox.textContent = 'Network error while creating your account. Please try again.';
+              errorBox.classList.remove('hidden');
+            }
+            return false;
+          }
+
           if (!res.ok || !data || data.ok !== true || data.authenticated !== true) {
             const msg = (data && data.error) || 'Could not create customer account. Please check your details.';
             if (errorBox) {
@@ -42006,14 +42119,18 @@ EPSOM</div>
           _customerAuthMode = 'account';
           applyServerCustomerAuthState(data);
 
-          // If the customer selected One-Time Access ($55) or Monthly Access ($12) before registering,
-          // automatically continue directly to Sifalo Pay checkout without making them select the plan again.
+          // If the customer selected One-Time Access ($55), Monthly Access ($12), or a document download before registering,
+          // automatically continue directly without making them select it again.
           if (planToResume && planToResume.productKey) {
-            await continueToPendingPlanCheckoutIfPresent(
-              { pendingCheckoutPlan: planToResume },
-              submitBtn
-            );
-            return false;
+            try {
+              await continueToPendingPlanCheckoutIfPresent(
+                { pendingCheckoutPlan: planToResume },
+                submitBtn
+              );
+              return false;
+            } catch (resumeErr) {
+              console.error('Post-registration checkout continuation error:', resumeErr);
+            }
           }
 
           if (typeof window.openCustomerAuthPage === 'function') {
@@ -42021,11 +42138,6 @@ EPSOM</div>
           }
           if (typeof window.showToast === 'function') {
             window.showToast('Account Created!', `Welcome, ${data.customer.email}`);
-          }
-        } catch (err) {
-          if (errorBox) {
-            errorBox.textContent = 'Network error while creating your account. Please try again.';
-            errorBox.classList.remove('hidden');
           }
         } finally {
           _customerAuthBusy = false;
@@ -42037,17 +42149,8 @@ EPSOM</div>
 
       window.__kycHandleCustomerLogout = async function() {
         try {
-          await fetch('/api/customer/auth/logout', {
-            method: 'POST',
-            credentials: 'same-origin',
-            cache: 'no-store',
-            headers: Object.assign(
-              {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-store, no-cache'
-              },
-              getCustomerAuthHeaders()
-            )
+          await customerApiFetch('/api/customer/auth/logout', {
+            method: 'POST'
           });
         } catch (e) {}
 

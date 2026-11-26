@@ -38,21 +38,6 @@ export function createApiApp(deps: ApiAppDeps = {}) {
   app.locals.kycAdminService = kycAdminService;
   app.locals.kycCustomerService = kycCustomerService;
 
-  const captureRawBody = (req: Request, _res: Response, buf: Buffer) => {
-    (req as Request & { rawBody?: Buffer }).rawBody = buf;
-  };
-
-  app.use(express.json({ limit: '15mb', verify: captureRawBody }));
-  app.use(express.urlencoded({ extended: true, limit: '15mb', verify: captureRawBody }));
-
-  // Prevent browser or CDN edge caching of dynamic payment/health status
-  app.use((_req: Request, res: Response, next: NextFunction) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    next();
-  });
-
   // Normalize URL prefix when Vercel rewrites /api/(.*) to /api/index.ts
   app.use((req: Request, _res: Response, next: NextFunction) => {
     if (
@@ -69,6 +54,85 @@ export function createApiApp(deps: ApiAppDeps = {}) {
     ) {
       req.url = `/api${req.url}`;
     }
+    next();
+  });
+
+  // CORS and OPTIONS preflight handling for preview iframe, custom domains, and Vercel deployments
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const origin = typeof req.headers.origin === 'string' ? req.headers.origin.trim() : '';
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    res.setHeader(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+    );
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Accept, Authorization, Cache-Control, Pragma, X-Kyc-Customer-Request, X-Kyc-Customer-Token, X-Kyc-Customer-Vault, X-Kyc-Plan-Intent, X-Kyc-Admin-Request, X-Kyc-Session-Id'
+    );
+
+    if (req.method === 'OPTIONS') {
+      return res.status(204).end();
+    }
+    next();
+  });
+
+  // Normalize pre-parsed req.body on Vercel serverless functions before body-parser runs
+  app.use((req: Request, _res: Response, next: NextFunction) => {
+    const anyReq = req as Request & {
+      rawBody?: Buffer;
+      _body?: boolean;
+      body?: unknown;
+    };
+    if (anyReq.body !== undefined && anyReq.body !== null) {
+      if (Buffer.isBuffer(anyReq.body)) {
+        anyReq.rawBody = anyReq.body;
+        const rawStr = anyReq.body.toString('utf8');
+        try {
+          anyReq.body = rawStr ? JSON.parse(rawStr) : {};
+        } catch {
+          anyReq.body = {};
+        }
+        anyReq._body = true;
+      } else if (typeof anyReq.body === 'string') {
+        anyReq.rawBody = Buffer.from(anyReq.body, 'utf8');
+        try {
+          anyReq.body = anyReq.body ? JSON.parse(anyReq.body) : {};
+        } catch {
+          anyReq.body = {};
+        }
+        anyReq._body = true;
+      } else if (typeof anyReq.body === 'object') {
+        if (!anyReq.rawBody) {
+          try {
+            anyReq.rawBody = Buffer.from(JSON.stringify(anyReq.body), 'utf8');
+          } catch {
+            // ignore serialization errors
+          }
+        }
+        anyReq._body = true;
+      }
+    }
+    next();
+  });
+
+  const captureRawBody = (req: Request, _res: Response, buf: Buffer) => {
+    (req as Request & { rawBody?: Buffer }).rawBody = buf;
+  };
+
+  app.use(express.json({ limit: '15mb', verify: captureRawBody }));
+  app.use(express.urlencoded({ extended: true, limit: '15mb', verify: captureRawBody }));
+
+  // Prevent browser or CDN edge caching of dynamic payment/health status
+  app.use((_req: Request, res: Response, next: NextFunction) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     next();
   });
 

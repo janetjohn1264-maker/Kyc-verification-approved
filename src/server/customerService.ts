@@ -129,15 +129,64 @@ interface CustomerPendingPlanIntentRecord extends PublicPendingPlanView {
 
 interface PersistedCustomerState {
   customers: CustomerAccountRecord[];
+  sessions?: CustomerSessionRecord[];
+  pendingPlanIntents?: CustomerPendingPlanIntentRecord[];
+  revokedSessionHashes?: string[];
 }
 
 const CUSTOMER_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const CUSTOMER_VAULT_TTL_MS = 365 * 24 * 60 * 60 * 1000; // 365 days
 const PLAN_INTENT_TTL_MS = 30 * 60 * 1000; // 30 minutes
 const MONTHLY_ACCESS_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const CUSTOMER_COOKIE_NAME = 'kyc_customer_session';
+const CUSTOMER_VAULT_COOKIE_NAME = 'kyc_customer_vault';
 const CUSTOMER_PLAN_INTENT_COOKIE_NAME = 'kyc_customer_plan_intent';
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_AUTH_FAILURES_PER_WINDOW = 10;
+
+function getCustomerSigningSecret(): Buffer {
+  const seed = (
+    process.env.KYC_CUSTOMER_SECRET ||
+    process.env.SIFALO_WEBHOOK_SECRET ||
+    process.env.SIFALO_API_KEY ||
+    process.env.SIFALO_API_USER ||
+    'kycapproved-customer-auth-signing-key-v1'
+  ).trim();
+  return crypto.createHash('sha256').update(`kycapproved:customer-auth:${seed}`).digest();
+}
+
+function signHmacPayloadBase64Url(payloadObj: unknown): string {
+  const json = JSON.stringify(payloadObj);
+  const b64 = Buffer.from(json, 'utf8').toString('base64url');
+  const sig = crypto
+    .createHmac('sha256', getCustomerSigningSecret())
+    .update(b64, 'utf8')
+    .digest('base64url');
+  return `${b64}.${sig}`;
+}
+
+function verifyHmacPayloadBase64Url<T>(signedPart: string): T | null {
+  if (!signedPart || typeof signedPart !== 'string') return null;
+  const dotIdx = signedPart.lastIndexOf('.');
+  if (dotIdx <= 0) return null;
+  const b64 = signedPart.slice(0, dotIdx);
+  const providedSig = signedPart.slice(dotIdx + 1);
+  if (!b64 || !providedSig) return null;
+  try {
+    const expectedSig = crypto
+      .createHmac('sha256', getCustomerSigningSecret())
+      .update(b64, 'utf8')
+      .digest('base64url');
+    const providedBuf = Buffer.from(providedSig, 'utf8');
+    const expectedBuf = Buffer.from(expectedSig, 'utf8');
+    if (providedBuf.length !== expectedBuf.length) return null;
+    if (!crypto.timingSafeEqual(providedBuf, expectedBuf)) return null;
+    const rawJson = Buffer.from(b64, 'base64url').toString('utf8');
+    return JSON.parse(rawJson) as T;
+  } catch {
+    return null;
+  }
+}
 
 function normalizeRequestedCustomerPlan(rawPlan: unknown): UnlockProductKey | null {
   return normalizeDocTypeToProductKey(rawPlan);
@@ -321,11 +370,75 @@ function createDefaultMonthlyEntitlement(): CustomerMonthlyEntitlement {
   };
 }
 
+function normalizeCustomerAccountRecord(c: Partial<CustomerAccountRecord>): CustomerAccountRecord | null {
+  if (
+    !c ||
+    typeof c.customerId !== 'string' ||
+    typeof c.email !== 'string' ||
+    typeof c.passwordSalt !== 'string' ||
+    typeof c.passwordHash !== 'string'
+  ) {
+    return null;
+  }
+  const normalizedEmail = normalizeEmail(c.email);
+  if (!normalizedEmail) return null;
+  return {
+    customerId: c.customerId,
+    username: deriveCustomerUsername({ username: c.username, email: normalizedEmail }),
+    email: normalizedEmail,
+    passwordSalt: c.passwordSalt,
+    passwordHash: c.passwordHash,
+    enabled: c.enabled !== false,
+    createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date().toISOString(),
+    updatedAt: typeof c.updatedAt === 'string' ? c.updatedAt : new Date().toISOString(),
+    lastLoginAt: typeof c.lastLoginAt === 'string' ? c.lastLoginAt : null,
+    oneTimeAccess: {
+      ...createDefaultOneTimeEntitlement(),
+      ...(c.oneTimeAccess || {}),
+    },
+    monthlyAccess: {
+      ...createDefaultMonthlyEntitlement(),
+      ...(c.monthlyAccess || {}),
+    },
+    appliedOrderIds: Array.isArray(c.appliedOrderIds)
+      ? c.appliedOrderIds.filter((id): id is string => typeof id === 'string')
+      : [],
+  };
+}
+
+interface SignedSessionPayload {
+  v: 1;
+  sid: string;
+  cid: string;
+  em: string;
+  iat: number;
+  exp: number;
+  acct: CustomerAccountRecord;
+}
+
+interface SignedVaultPayload {
+  v: 1;
+  iat: number;
+  acct: CustomerAccountRecord;
+}
+
+interface SignedPlanIntentPayload {
+  v: 1;
+  iid: string;
+  pk: UnlockProductKey;
+  ctry?: string;
+  prov?: string;
+  doc?: string;
+  iat: number;
+  exp: number;
+}
+
 export class KycCustomerService {
   private readonly persistencePath: string;
   private state: PersistedCustomerState;
   private readonly sessions = new Map<string, CustomerSessionRecord>();
   private readonly pendingPlanIntents = new Map<string, CustomerPendingPlanIntentRecord>();
+  private readonly revokedSessionHashes = new Set<string>();
   private readonly authFailuresByIp = new Map<string, { count: number; windowStartMs: number }>();
   private readonly now: () => number;
 
@@ -355,46 +468,169 @@ export class KycCustomerService {
     }
   }
 
+  private mergeAccountRecordIntoState(incoming: CustomerAccountRecord): CustomerAccountRecord {
+    const existing = this.state.customers.find(
+      (c) =>
+        c.customerId === incoming.customerId ||
+        c.email.toLowerCase() === incoming.email.toLowerCase()
+    );
+    if (!existing) {
+      this.state.customers.push(incoming);
+      return incoming;
+    }
+
+    // Preserve any local revocation or disabled state while merging newer entitlements
+    if (existing.enabled === false) {
+      return existing;
+    }
+    if (!existing.username && incoming.username) {
+      existing.username = incoming.username;
+    }
+
+    const mergedOrders = new Set<string>([
+      ...(Array.isArray(existing.appliedOrderIds) ? existing.appliedOrderIds : []),
+      ...(Array.isArray(incoming.appliedOrderIds) ? incoming.appliedOrderIds : []),
+    ]);
+    existing.appliedOrderIds = Array.from(mergedOrders);
+
+    if (
+      existing.oneTimeAccess.status !== 'REVOKED' &&
+      incoming.oneTimeAccess.status === 'ACTIVE' &&
+      incoming.oneTimeAccess.active
+    ) {
+      existing.oneTimeAccess = { ...incoming.oneTimeAccess };
+    } else if (incoming.oneTimeAccess.status === 'REVOKED') {
+      existing.oneTimeAccess = { ...incoming.oneTimeAccess };
+    }
+
+    if (
+      existing.monthlyAccess.status !== 'REVOKED' &&
+      incoming.monthlyAccess.status === 'ACTIVE' &&
+      incoming.monthlyAccess.active &&
+      (!existing.monthlyAccess.expiresAtMs ||
+        (incoming.monthlyAccess.expiresAtMs || 0) > existing.monthlyAccess.expiresAtMs)
+    ) {
+      existing.monthlyAccess = { ...incoming.monthlyAccess };
+    } else if (incoming.monthlyAccess.status === 'REVOKED') {
+      existing.monthlyAccess = { ...incoming.monthlyAccess };
+    }
+
+    return existing;
+  }
+
+  private syncFromDisk(): void {
+    try {
+      if (!fs.existsSync(this.persistencePath)) return;
+      const raw = fs.readFileSync(this.persistencePath, 'utf8');
+      const parsed = JSON.parse(raw) as Partial<PersistedCustomerState>;
+      if (!parsed || typeof parsed !== 'object') return;
+
+      if (Array.isArray(parsed.customers)) {
+        for (const rawCust of parsed.customers) {
+          const normalized = normalizeCustomerAccountRecord(rawCust);
+          if (normalized) {
+            this.mergeAccountRecordIntoState(normalized);
+          }
+        }
+      }
+
+      const nowMs = this.now();
+      if (Array.isArray(parsed.revokedSessionHashes)) {
+        for (const h of parsed.revokedSessionHashes) {
+          if (typeof h === 'string' && h) {
+            this.revokedSessionHashes.add(h);
+            this.sessions.delete(h);
+          }
+        }
+      }
+
+      if (Array.isArray(parsed.sessions)) {
+        for (const s of parsed.sessions) {
+          if (
+            s &&
+            typeof s.tokenHash === 'string' &&
+            typeof s.customerId === 'string' &&
+            typeof s.expiresAtMs === 'number' &&
+            s.expiresAtMs > nowMs &&
+            !this.revokedSessionHashes.has(s.tokenHash) &&
+            !this.sessions.has(s.tokenHash)
+          ) {
+            this.sessions.set(s.tokenHash, s);
+          }
+        }
+      }
+
+      if (Array.isArray(parsed.pendingPlanIntents)) {
+        for (const p of parsed.pendingPlanIntents) {
+          if (
+            p &&
+            typeof p.tokenHash === 'string' &&
+            typeof p.expiresAtMs === 'number' &&
+            p.expiresAtMs > nowMs &&
+            !this.pendingPlanIntents.has(p.tokenHash)
+          ) {
+            this.pendingPlanIntents.set(p.tokenHash, p);
+          }
+        }
+      }
+    } catch {
+      // Ignore transient disk read errors
+    }
+  }
+
   private loadOrInitializeState(): PersistedCustomerState {
-    const defaultState: PersistedCustomerState = { customers: [] };
+    const defaultState: PersistedCustomerState = {
+      customers: [],
+      sessions: [],
+      pendingPlanIntents: [],
+      revokedSessionHashes: [],
+    };
     try {
       if (fs.existsSync(this.persistencePath)) {
         const raw = fs.readFileSync(this.persistencePath, 'utf8');
         const parsed = JSON.parse(raw) as Partial<PersistedCustomerState>;
         if (parsed && Array.isArray(parsed.customers)) {
-          const normalizedCustomers: CustomerAccountRecord[] = parsed.customers
-            .filter(
-              (c): c is CustomerAccountRecord =>
-                Boolean(
-                  c &&
-                    typeof c.customerId === 'string' &&
-                    typeof c.email === 'string' &&
-                    typeof c.passwordSalt === 'string' &&
-                    typeof c.passwordHash === 'string'
-                )
-            )
-            .map((c) => ({
-              customerId: c.customerId,
-              email: normalizeEmail(c.email),
-              passwordSalt: c.passwordSalt,
-              passwordHash: c.passwordHash,
-              enabled: c.enabled !== false,
-              createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date().toISOString(),
-              updatedAt: typeof c.updatedAt === 'string' ? c.updatedAt : new Date().toISOString(),
-              lastLoginAt: typeof c.lastLoginAt === 'string' ? c.lastLoginAt : null,
-              oneTimeAccess: {
-                ...createDefaultOneTimeEntitlement(),
-                ...(c.oneTimeAccess || {}),
-              },
-              monthlyAccess: {
-                ...createDefaultMonthlyEntitlement(),
-                ...(c.monthlyAccess || {}),
-              },
-              appliedOrderIds: Array.isArray(c.appliedOrderIds)
-                ? c.appliedOrderIds.filter((id): id is string => typeof id === 'string')
-                : [],
-            }));
-          return { customers: normalizedCustomers };
+          const normalizedCustomers: CustomerAccountRecord[] = [];
+          for (const rawCust of parsed.customers) {
+            const norm = normalizeCustomerAccountRecord(rawCust);
+            if (norm) normalizedCustomers.push(norm);
+          }
+          const loadedState: PersistedCustomerState = {
+            customers: normalizedCustomers,
+            sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [],
+            pendingPlanIntents: Array.isArray(parsed.pendingPlanIntents)
+              ? parsed.pendingPlanIntents
+              : [],
+            revokedSessionHashes: Array.isArray(parsed.revokedSessionHashes)
+              ? parsed.revokedSessionHashes
+              : [],
+          };
+          const nowMs = this.now();
+          for (const h of loadedState.revokedSessionHashes || []) {
+            if (typeof h === 'string' && h) this.revokedSessionHashes.add(h);
+          }
+          for (const s of loadedState.sessions || []) {
+            if (
+              s &&
+              typeof s.tokenHash === 'string' &&
+              typeof s.expiresAtMs === 'number' &&
+              s.expiresAtMs > nowMs &&
+              !this.revokedSessionHashes.has(s.tokenHash)
+            ) {
+              this.sessions.set(s.tokenHash, s);
+            }
+          }
+          for (const p of loadedState.pendingPlanIntents || []) {
+            if (
+              p &&
+              typeof p.tokenHash === 'string' &&
+              typeof p.expiresAtMs === 'number' &&
+              p.expiresAtMs > nowMs
+            ) {
+              this.pendingPlanIntents.set(p.tokenHash, p);
+            }
+          }
+          return loadedState;
         }
       }
     } catch {
@@ -410,9 +646,85 @@ export class KycCustomerService {
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
-      fs.writeFileSync(this.persistencePath, JSON.stringify(stateToSave, null, 2), 'utf8');
+      const serialized: PersistedCustomerState = {
+        customers: stateToSave.customers,
+        sessions: Array.from(this.sessions.values()),
+        pendingPlanIntents: Array.from(this.pendingPlanIntents.values()),
+        revokedSessionHashes: Array.from(this.revokedSessionHashes).slice(-500),
+      };
+      fs.writeFileSync(this.persistencePath, JSON.stringify(serialized, null, 2), 'utf8');
     } catch {
       // Ignore write failures on read-only filesystems
+    }
+  }
+
+  private createCustomerVaultToken(customer: CustomerAccountRecord): string {
+    const payload: SignedVaultPayload = {
+      v: 1,
+      iat: this.now(),
+      acct: customer,
+    };
+    return `kycvault_${signHmacPayloadBase64Url(payload)}`;
+  }
+
+  private setCustomerVaultCookie(res: Response, customer: CustomerAccountRecord, req?: Request): string {
+    const vaultToken = this.createCustomerVaultToken(customer);
+    const maxAgeSec = Math.floor(CUSTOMER_VAULT_TTL_MS / 1000);
+    res.append(
+      'Set-Cookie',
+      `${CUSTOMER_VAULT_COOKIE_NAME}=${encodeURIComponent(vaultToken)}; ${this.buildCookieFlags(req, maxAgeSec)}`
+    );
+    return vaultToken;
+  }
+
+  private hydrateCustomersFromRequestVault(req: Request, body?: Record<string, unknown>): void {
+    const candidates: string[] = [];
+    const headerVault = String(req.headers['x-kyc-customer-vault'] || '').trim();
+    if (headerVault.startsWith('kycvault_')) {
+      candidates.push(headerVault);
+    }
+    if (body && typeof body.customerVaultToken === 'string') {
+      const bodyVault = body.customerVaultToken.trim();
+      if (bodyVault.startsWith('kycvault_')) {
+        candidates.push(bodyVault);
+      }
+    }
+    const cookies = parseCookies(req.headers.cookie);
+    const cookieVault = (cookies[CUSTOMER_VAULT_COOKIE_NAME] || '').trim();
+    if (cookieVault.startsWith('kycvault_')) {
+      candidates.push(cookieVault);
+    }
+
+    // Also inspect any signed session token if present
+    const rawSessionToken = this.extractRawCustomerToken(req);
+    if (rawSessionToken.startsWith('kyccust_')) {
+      const parts = rawSessionToken.split('_');
+      if (parts.length >= 3) {
+        const signedSegment = parts.slice(2).join('_');
+        const verifiedSess = verifyHmacPayloadBase64Url<SignedSessionPayload>(signedSegment);
+        if (verifiedSess && verifiedSess.v === 1 && verifiedSess.acct) {
+          const normalized = normalizeCustomerAccountRecord(verifiedSess.acct);
+          if (normalized) {
+            this.mergeAccountRecordIntoState(normalized);
+          }
+        }
+      }
+    }
+
+    let hydrated = false;
+    for (const rawVault of candidates) {
+      const signedPart = rawVault.slice('kycvault_'.length);
+      const verified = verifyHmacPayloadBase64Url<SignedVaultPayload>(signedPart);
+      if (verified && verified.v === 1 && verified.acct) {
+        const normalized = normalizeCustomerAccountRecord(verified.acct);
+        if (normalized) {
+          this.mergeAccountRecordIntoState(normalized);
+          hydrated = true;
+        }
+      }
+    }
+    if (hydrated) {
+      this.saveState();
     }
   }
 
@@ -566,6 +878,12 @@ export class KycCustomerService {
     if (customHeader === '1') {
       return false;
     }
+    const secFetchSite = String(req.headers['sec-fetch-site'] || '')
+      .trim()
+      .toLowerCase();
+    if (secFetchSite === 'same-origin' || secFetchSite === 'same-site' || secFetchSite === 'none') {
+      return false;
+    }
     const origin = typeof req.headers.origin === 'string' ? req.headers.origin.trim() : '';
     if (!origin) return false;
     try {
@@ -673,19 +991,32 @@ export class KycCustomerService {
     intent: CustomerPendingPlanIntentRecord;
     publicPlan: PublicPendingPlanView;
   } {
+    this.syncFromDisk();
     this.cleanupExpiredSessions();
-    const rawIntentToken = `kycplan_${crypto.randomUUID()}_${crypto.randomBytes(18).toString('hex')}`;
-    const tokenHash = sha256Hex(rawIntentToken);
     const nowMs = this.now();
     const expiresAtMs = nowMs + PLAN_INTENT_TTL_MS;
     const publicPlan = buildAuthoritativePendingPlanView(productKey, expiresAtMs, extra);
+    const intentId = `PINT-${crypto.randomUUID()}`;
+    const signedPayload: SignedPlanIntentPayload = {
+      v: 1,
+      iid: intentId,
+      pk: productKey,
+      ctry: publicPlan.countryKey,
+      prov: publicPlan.providerKey,
+      doc: publicPlan.rawDocType,
+      iat: nowMs,
+      exp: expiresAtMs,
+    };
+    const rawIntentToken = `kycplan_${crypto.randomUUID()}_${signHmacPayloadBase64Url(signedPayload)}`;
+    const tokenHash = sha256Hex(rawIntentToken);
     const intent: CustomerPendingPlanIntentRecord = {
       ...publicPlan,
-      intentId: `PINT-${crypto.randomUUID()}`,
+      intentId,
       tokenHash,
       createdAtMs: nowMs,
     };
     this.pendingPlanIntents.set(tokenHash, intent);
+    this.saveState();
     return { rawIntentToken, intent, publicPlan };
   }
 
@@ -694,6 +1025,7 @@ export class KycCustomerService {
     body?: Record<string, unknown>,
     consume = false
   ): PublicPendingPlanView | null {
+    this.syncFromDisk();
     this.cleanupExpiredSessions();
     const rawToken = this.extractRawPlanIntentToken(req, body);
     let record: CustomerPendingPlanIntentRecord | undefined;
@@ -701,6 +1033,31 @@ export class KycCustomerService {
     if (rawToken) {
       tokenHash = sha256Hex(rawToken);
       record = this.pendingPlanIntents.get(tokenHash);
+      if (!record && rawToken.startsWith('kycplan_')) {
+        const parts = rawToken.split('_');
+        if (parts.length >= 3) {
+          const signedSegment = parts.slice(2).join('_');
+          const verified = verifyHmacPayloadBase64Url<SignedPlanIntentPayload>(signedSegment);
+          if (verified && verified.v === 1 && verified.exp > this.now()) {
+            const reconstructedView = buildAuthoritativePendingPlanView(
+              verified.pk,
+              verified.exp,
+              {
+                countryKey: verified.ctry,
+                providerKey: verified.prov,
+                rawDocType: verified.doc,
+              }
+            );
+            record = {
+              ...reconstructedView,
+              intentId: verified.iid,
+              tokenHash,
+              createdAtMs: verified.iat,
+            };
+            this.pendingPlanIntents.set(tokenHash, record);
+          }
+        }
+      }
     }
     if (!record && body && typeof body.pendingPlan !== 'undefined') {
       const fallbackPlanKey = normalizeRequestedCustomerPlan(body.pendingPlan);
@@ -715,10 +1072,12 @@ export class KycCustomerService {
     if (!record) return null;
     if (this.now() >= record.expiresAtMs) {
       this.pendingPlanIntents.delete(tokenHash);
+      this.saveState();
       return null;
     }
     if (consume && tokenHash) {
       this.pendingPlanIntents.delete(tokenHash);
+      this.saveState();
     }
     return {
       productKey: record.productKey,
@@ -743,17 +1102,47 @@ export class KycCustomerService {
     session: CustomerSessionRecord | null;
     publicView: PublicCustomerAccountView | null;
   } {
+    this.syncFromDisk();
+    this.hydrateCustomersFromRequestVault(req);
     this.cleanupExpiredSessions();
     const rawToken = this.extractRawCustomerToken(req);
     if (!rawToken || !rawToken.startsWith('kyccust_')) {
       return { authenticated: false, customer: null, session: null, publicView: null };
     }
     const tokenHash = sha256Hex(rawToken);
-    const session = this.sessions.get(tokenHash);
-    if (!session) {
+    if (this.revokedSessionHashes.has(tokenHash)) {
+      this.sessions.delete(tokenHash);
       return { authenticated: false, customer: null, session: null, publicView: null };
     }
     const nowMs = this.now();
+    let session = this.sessions.get(tokenHash);
+    if (!session) {
+      const parts = rawToken.split('_');
+      if (parts.length >= 3) {
+        const signedSegment = parts.slice(2).join('_');
+        const verified = verifyHmacPayloadBase64Url<SignedSessionPayload>(signedSegment);
+        if (verified && verified.v === 1 && verified.exp > nowMs && verified.acct) {
+          const normalizedAcct = normalizeCustomerAccountRecord(verified.acct);
+          if (normalizedAcct) {
+            this.mergeAccountRecordIntoState(normalizedAcct);
+            session = {
+              sessionId: verified.sid,
+              tokenHash,
+              customerId: normalizedAcct.customerId,
+              email: normalizedAcct.email,
+              createdAtMs: verified.iat,
+              expiresAtMs: verified.exp,
+              lastActiveAtMs: nowMs,
+            };
+            this.sessions.set(tokenHash, session);
+            this.saveState();
+          }
+        }
+      }
+    }
+    if (!session) {
+      return { authenticated: false, customer: null, session: null, publicView: null };
+    }
     if (nowMs >= session.expiresAtMs) {
       this.sessions.delete(tokenHash);
       return { authenticated: false, customer: null, session: null, publicView: null };
@@ -902,7 +1291,12 @@ export class KycCustomerService {
     publicView: PublicCustomerAccountView;
     entitlements: ReturnType<KycCustomerService['toClientEntitlementsPayload']>;
     sessionToken?: string;
+    customerVaultToken?: string;
   } | null {
+    this.syncFromDisk();
+    if (req) {
+      this.hydrateCustomersFromRequestVault(req);
+    }
     if (!order || order.status !== 'PAID' || order.revokedAt) {
       return null;
     }
@@ -991,19 +1385,19 @@ export class KycCustomerService {
     const publicView = this.toPublicCustomerView(customer);
     const entitlements = this.toClientEntitlementsPayload(publicView);
 
-    // Ensure the customer has an active session token on return from external Sifalo redirect
+    // Ensure the customer has an active session token & updated vault cookie on return from external Sifalo redirect
     let sessionToken: string | undefined;
+    let customerVaultToken: string | undefined;
+    if (res) {
+      customerVaultToken = this.setCustomerVaultCookie(res, customer, req);
+    } else {
+      customerVaultToken = this.createCustomerVaultToken(customer);
+    }
     if (req) {
-      const existingToken = this.extractRawCustomerToken(req);
-      const resolved = this.resolveAuthenticatedCustomer(req);
-      if (resolved.authenticated && resolved.customer?.customerId === customer.customerId && existingToken) {
-        sessionToken = existingToken;
-      } else if (!resolved.authenticated) {
-        const created = this.createCustomerSession(customer);
-        sessionToken = created.rawToken;
-        if (res) {
-          this.setCustomerSessionCookie(res, created.rawToken, req);
-        }
+      const created = this.createCustomerSession(customer);
+      sessionToken = created.rawToken;
+      if (res) {
+        this.setCustomerSessionCookie(res, created.rawToken, req);
       }
     }
 
@@ -1011,6 +1405,7 @@ export class KycCustomerService {
       publicView,
       entitlements,
       sessionToken,
+      customerVaultToken,
     };
   }
 
@@ -1019,6 +1414,7 @@ export class KycCustomerService {
    * is later refunded or reversed.
    */
   public revokeSifaloOrderEntitlement(order: SifaloOrderRecord, reason: string): void {
+    this.syncFromDisk();
     if (!order || (order.productKey !== 'oneTimeAccess' && order.productKey !== 'monthlyAccess')) {
       return;
     }
@@ -1091,19 +1487,31 @@ export class KycCustomerService {
     session: CustomerSessionRecord;
   } {
     this.cleanupExpiredSessions();
-    const rawToken = `kyccust_${crypto.randomUUID()}_${crypto.randomBytes(24).toString('hex')}`;
-    const tokenHash = sha256Hex(rawToken);
     const nowMs = this.now();
+    const expiresAtMs = nowMs + CUSTOMER_SESSION_TTL_MS;
+    const sessionId = `CSESS-${crypto.randomUUID()}`;
+    const signedPayload: SignedSessionPayload = {
+      v: 1,
+      sid: sessionId,
+      cid: customer.customerId,
+      em: customer.email,
+      iat: nowMs,
+      exp: expiresAtMs,
+      acct: customer,
+    };
+    const rawToken = `kyccust_${crypto.randomUUID()}_${signHmacPayloadBase64Url(signedPayload)}`;
+    const tokenHash = sha256Hex(rawToken);
     const session: CustomerSessionRecord = {
-      sessionId: `CSESS-${crypto.randomUUID()}`,
+      sessionId,
       tokenHash,
       customerId: customer.customerId,
       email: customer.email,
       createdAtMs: nowMs,
-      expiresAtMs: nowMs + CUSTOMER_SESSION_TTL_MS,
+      expiresAtMs,
       lastActiveAtMs: nowMs,
     };
     this.sessions.set(tokenHash, session);
+    this.saveState();
     return { rawToken, session };
   }
 
@@ -1120,7 +1528,7 @@ export class KycCustomerService {
     router.get('/auth/status', (req: Request, res: Response) => {
       const resolved = this.resolveAuthenticatedCustomer(req);
       const pendingPlan = this.resolvePendingPlanIntent(req, undefined, false);
-      if (!resolved.authenticated || !resolved.publicView || !resolved.session) {
+      if (!resolved.authenticated || !resolved.publicView || !resolved.session || !resolved.customer) {
         return res.status(200).json({
           ok: true,
           authenticated: false,
@@ -1129,9 +1537,11 @@ export class KycCustomerService {
           pendingCheckoutPlan: pendingPlan,
         });
       }
+      const customerVaultToken = this.setCustomerVaultCookie(res, resolved.customer, req);
       return res.status(200).json({
         ok: true,
         authenticated: true,
+        customerVaultToken,
         customer: {
           ...resolved.publicView,
           id: resolved.publicView.customerId,
@@ -1203,6 +1613,7 @@ export class KycCustomerService {
       const prevRaw = this.extractRawPlanIntentToken(req);
       if (prevRaw) {
         this.pendingPlanIntents.delete(sha256Hex(prevRaw));
+        this.saveState();
       }
       this.clearPlanIntentCookie(res, req);
       return res.status(200).json({
@@ -1229,6 +1640,9 @@ export class KycCustomerService {
 
       const body =
         req.body && typeof req.body === 'object' ? (req.body as Record<string, unknown>) : {};
+      this.syncFromDisk();
+      this.hydrateCustomersFromRequestVault(req, body);
+
       const email = normalizeEmail(body.email);
       const password = typeof body.password === 'string' ? body.password : '';
       const confirmPassword = typeof body.confirmPassword === 'string' ? body.confirmPassword : '';
@@ -1291,6 +1705,7 @@ export class KycCustomerService {
 
       const { rawToken, session } = this.createCustomerSession(newCustomer);
       this.setCustomerSessionCookie(res, rawToken, req);
+      const customerVaultToken = this.setCustomerVaultCookie(res, newCustomer, req);
       const pendingCheckoutPlan = this.resolvePendingPlanIntent(req, body, true);
       if (pendingCheckoutPlan) {
         this.clearPlanIntentCookie(res, req);
@@ -1302,6 +1717,7 @@ export class KycCustomerService {
         authenticated: true,
         token: rawToken,
         sessionToken: rawToken,
+        customerVaultToken,
         customer: {
           ...publicView,
           id: publicView.customerId,
@@ -1330,6 +1746,9 @@ export class KycCustomerService {
 
       const body =
         req.body && typeof req.body === 'object' ? (req.body as Record<string, unknown>) : {};
+      this.syncFromDisk();
+      this.hydrateCustomersFromRequestVault(req, body);
+
       const email = normalizeEmail(body.email);
       const password = typeof body.password === 'string' ? body.password : '';
 
@@ -1366,6 +1785,7 @@ export class KycCustomerService {
 
       const { rawToken, session } = this.createCustomerSession(customer);
       this.setCustomerSessionCookie(res, rawToken, req);
+      const customerVaultToken = this.setCustomerVaultCookie(res, customer, req);
       const pendingCheckoutPlan = this.resolvePendingPlanIntent(req, body, true);
       if (pendingCheckoutPlan) {
         this.clearPlanIntentCookie(res, req);
@@ -1377,6 +1797,7 @@ export class KycCustomerService {
         authenticated: true,
         token: rawToken,
         sessionToken: rawToken,
+        customerVaultToken,
         customer: {
           ...publicView,
           id: publicView.customerId,
@@ -1394,10 +1815,13 @@ export class KycCustomerService {
           error: 'Cross-origin logout request rejected.',
         });
       }
+      this.syncFromDisk();
       const rawToken = this.extractRawCustomerToken(req);
       if (rawToken) {
         const tokenHash = sha256Hex(rawToken);
+        this.revokedSessionHashes.add(tokenHash);
         this.sessions.delete(tokenHash);
+        this.saveState();
       }
       this.clearCustomerSessionCookie(res, req);
       return res.status(200).json({
