@@ -5052,8 +5052,8 @@ var $ = window.$ || (id => document.getElementById(id));
           description: `The Open Learning Campus · PEFA Certificate & Somali National Identity Card Accepted by ${providerMeta.name}`
         },
         'somalia-proofofaccount-view': {
-          name: 'Salaam Somali Bank - E Statment (Bank Statement)',
-          description: `Salaam Somali Bank · Statement of Accounts (USD) Accepted by ${providerMeta.name} for Account & Address Verification`
+          name: 'Salaam Somali Bank – E Statement (Bank Statement)',
+          description: 'Salaam Somali Bank · Statement of Accounts (USD) Official Bank Statement Editor'
         }
       };
 
@@ -5384,6 +5384,9 @@ var $ = window.$ || (id => document.getElementById(id));
       const items = getCountryDocumentItems(activeCountryKey, activeAccountKey);
       const activeDocKey = workflowSelectedDoc || currentDocType;
       const activeItem = items.find(it => it.docType === activeDocKey) || items[0] || null;
+      const docProviderConfig = typeof getDocumentProviderConfig === 'function'
+        ? getDocumentProviderConfig(activeCountryKey, activeDocKey)
+        : null;
 
       const platEl = $('wbBarPlatformName');
       const platIconEl = $('wbBarPlatformIcon');
@@ -5393,8 +5396,13 @@ var $ = window.$ || (id => document.getElementById(id));
       const docNameEl = $('wbBarDocName');
       const backDocsLabelEl = $('wbBackToDocsLabel');
 
-      if (platEl) platEl.textContent = platformMeta.name;
-      if (platIconEl) platIconEl.className = `${platformMeta.icon} text-xs text-blue-600`;
+      if (docProviderConfig && docProviderConfig.dedicatedInstitution) {
+        if (platEl) platEl.textContent = docProviderConfig.dedicatedInstitution.name;
+        if (platIconEl) platIconEl.className = `${docProviderConfig.dedicatedInstitution.icon} text-xs text-sky-700`;
+      } else {
+        if (platEl) platEl.textContent = platformMeta.name;
+        if (platIconEl) platIconEl.className = `${platformMeta.icon} text-xs text-blue-600`;
+      }
       if (countryFlagEl) countryFlagEl.textContent = countryInfo ? countryInfo.flag : '🌍';
       if (countryNameEl) countryNameEl.textContent = countryInfo ? countryInfo.name : activeCountryKey;
       if (countryQuickSelectEl) {
@@ -5412,7 +5420,9 @@ var $ = window.$ || (id => document.getElementById(id));
         docNameEl.textContent = activeItem ? activeItem.name : 'Document Preview';
       }
       if (backDocsLabelEl) {
-        backDocsLabelEl.textContent = `Back to ${platformMeta.name} Card`;
+        backDocsLabelEl.textContent = (docProviderConfig && docProviderConfig.dedicatedInstitution)
+          ? 'Back to Documents'
+          : `Back to ${platformMeta.name} Card`;
       }
       if (typeof window.syncActiveProductUnlockUI === 'function') {
         window.syncActiveProductUnlockUI();
@@ -5471,7 +5481,7 @@ var $ = window.$ || (id => document.getElementById(id));
           const shortTitle = selectedItem.docType === 'driverlicense'
             ? "Driver's License"
             : selectedItem.docType === 'proofofaccount'
-            ? 'Proof of Account'
+            ? (workflowSelectedCountry === 'somalia' ? 'Salaam Somali Bank – E Statement' : 'Proof of Account')
             : selectedItem.category;
           helperEl.textContent = `Selected: ${shortTitle}`;
           helperEl.className = 'text-xs font-bold text-[#0d2658]';
@@ -5560,7 +5570,7 @@ var $ = window.$ || (id => document.getElementById(id));
           passport: 'Passport',
           driverlicense: "Driver's License",
           refugeecard: resolvedCountryKey === 'somalia' ? 'Somali Certificate' : 'Proof of Address',
-          proofofaccount: resolvedCountryKey === 'somalia' ? 'Bank Statement (Proof of Account)' : 'Proof of Account'
+          proofofaccount: resolvedCountryKey === 'somalia' ? 'Salaam Somali Bank – E Statement' : 'Proof of Account'
         };
 
         docsListEl.innerHTML = items.map(item => {
@@ -6081,8 +6091,8 @@ var $ = window.$ || (id => document.getElementById(id));
         if (unifiedCard) unifiedCard.classList.add('hidden');
         if (workbench) workbench.classList.remove('hidden');
         if (editorBar) editorBar.classList.remove('hidden');
-        if (poaAccountBar) {
-          poaAccountBar.classList.toggle('hidden', workflowSelectedDoc !== 'proofofaccount');
+        if (typeof syncDocumentProviderStateAndUI === 'function') {
+          syncDocumentProviderStateAndUI(workflowSelectedCountry || currentCountry, workflowSelectedDoc || currentDocType);
         }
         renderActiveDocumentView();
         syncActiveWorkflowBar();
@@ -6260,9 +6270,8 @@ var $ = window.$ || (id => document.getElementById(id));
         poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
       }
 
-      const poaAccountBar = $('poa-step2-account-selector');
-      if (poaAccountBar) {
-        poaAccountBar.classList.toggle('hidden', docType !== 'proofofaccount' || currentCountry === 'somalia');
+      if (typeof syncDocumentProviderStateAndUI === 'function') {
+        syncDocumentProviderStateAndUI(currentCountry, docType);
       }
 
       // Activate selected tab
@@ -7290,6 +7299,10 @@ var $ = window.$ || (id => document.getElementById(id));
       if (poaDocView) poaDocView.classList.add('hidden');
       if (poaddrDocView) poaddrDocView.classList.add('hidden');
       if (noDocView) noDocView.classList.add('hidden');
+
+      if (typeof syncDocumentProviderStateAndUI === 'function') {
+        syncDocumentProviderStateAndUI(currentCountry, currentDocType);
+      }
 
       const configuredDocs = getConfiguredDocsForCountry(currentCountry, workflowActiveAccount || currentVirtualAccount);
       if (configuredDocs.length === 0 || !configuredDocs.includes(currentDocType)) {
@@ -12502,15 +12515,6 @@ var $ = window.$ || (id => document.getElementById(id));
         dotColor: 'bg-emerald-600',
         badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
       },
-      somalia: {
-        name: 'Somalia',
-        fullName: 'Federal Republic of Somalia',
-        city: 'Mogadishu',
-        address: 'KM4 Airport Road, Wadajir District, Mogadishu, Somalia',
-        bank: 'Salaam Somali Bank (E-Statment)',
-        dotColor: 'bg-sky-600',
-        badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
-      },
       ethiopia: {
         name: 'Ethiopia',
         fullName: 'Federal Democratic Republic of Ethiopia',
@@ -12599,41 +12603,190 @@ var $ = window.$ || (id => document.getElementById(id));
       }
     }
 
-    window.currentPoaProvider = 'wise';
+    const DOCUMENT_PROVIDER_CATALOG = {
+      grey: {
+        key: 'grey',
+        badge: 'GREY',
+        title: 'Grey Account',
+        subtitle: 'Community Federal Savings Bank · USD',
+        badgeBoxClass: 'bg-slate-950 text-white',
+        activeCardClass: 'border-2 border-slate-900 bg-gradient-to-br from-slate-100 via-white to-slate-50 ring-2 ring-slate-900/15 shadow-md',
+        subtitleActiveClass: 'text-slate-600',
+        radioActiveClass: 'bg-slate-900 text-amber-300'
+      },
+      wise: {
+        key: 'wise',
+        badge: 'WISE',
+        title: 'Wise Account',
+        subtitle: 'Wise Payments Ltd · EUR IBAN & SWIFT',
+        badgeBoxClass: 'bg-[#163300] text-[#9fe870]',
+        activeCardClass: 'border-2 border-[#163300] bg-gradient-to-br from-[#9fe870]/25 via-white to-emerald-50/40 ring-2 ring-[#163300]/15 shadow-md',
+        subtitleActiveClass: 'text-[#163300]',
+        radioActiveClass: 'bg-[#163300] text-[#9fe870]'
+      },
+      revolut: {
+        key: 'revolut',
+        badge: 'REV',
+        title: 'Revolut',
+        subtitle: 'Revolut Bank UAB · Global IBAN',
+        badgeBoxClass: 'bg-[#0075EB] text-white',
+        activeCardClass: 'border-2 border-[#0075EB] bg-gradient-to-br from-sky-50 via-white to-blue-50/40 ring-2 ring-[#0075EB]/20 shadow-md',
+        subtitleActiveClass: 'text-[#0075EB]',
+        radioActiveClass: 'bg-[#0075EB] text-white'
+      }
+    };
+
+    window.selectedCountry = 'kenya';
+    window.selectedDocument = 'passport';
+    window.selectedProvider = null;
+    window.currentPoaProvider = null;
+
+    function getDocumentProviderConfig(countryKey, docType) {
+      const resolvedCountry = typeof normalizeCountryKey === 'function'
+        ? normalizeCountryKey(countryKey || currentCountry || workflowSelectedCountry || '')
+        : String(countryKey || currentCountry || '').toLowerCase().trim();
+      const resolvedDoc = String(docType || currentDocType || workflowSelectedDoc || '').toLowerCase().trim();
+
+      if (resolvedDoc !== 'proofofaccount') {
+        return {
+          countryKey: resolvedCountry,
+          docType: resolvedDoc,
+          requiresProviderSelection: false,
+          providers: [],
+          defaultProvider: null,
+          dedicatedInstitution: null
+        };
+      }
+
+      // Dedicated country-specific bank statement views (e.g., Somalia -> Salaam Somali Bank E-Statement)
+      const dedicatedCountryPoaView = resolvedCountry ? $(`${resolvedCountry}-proofofaccount-view`) : null;
+      if (resolvedCountry === 'somalia' || dedicatedCountryPoaView) {
+        return {
+          countryKey: resolvedCountry,
+          docType: resolvedDoc,
+          requiresProviderSelection: false,
+          providers: [],
+          defaultProvider: null,
+          dedicatedInstitution: resolvedCountry === 'somalia'
+            ? { key: 'salaam', name: 'Salaam Somali Bank', icon: 'fa-solid fa-building-columns' }
+            : null
+        };
+      }
+
+      if (resolvedCountry && poaCountryMap[resolvedCountry]) {
+        return {
+          countryKey: resolvedCountry,
+          docType: resolvedDoc,
+          requiresProviderSelection: true,
+          providers: ['grey', 'wise', 'revolut'],
+          defaultProvider: 'wise',
+          dedicatedInstitution: null
+        };
+      }
+
+      return {
+        countryKey: resolvedCountry,
+        docType: resolvedDoc,
+        requiresProviderSelection: false,
+        providers: [],
+        defaultProvider: null,
+        dedicatedInstitution: null
+      };
+    }
+    window.getDocumentProviderConfig = getDocumentProviderConfig;
+
+    function syncDocumentProviderStateAndUI(countryKey, docType, requestedProvider) {
+      const config = getDocumentProviderConfig(countryKey, docType);
+      window.selectedCountry = config.countryKey;
+      window.selectedDocument = config.docType;
+
+      const poaAccountBar = $('poa-step2-account-selector');
+      if (!config.requiresProviderSelection) {
+        // Completely reset previous document's provider state and unmount provider cards from the DOM
+        window.selectedProvider = null;
+        window.currentPoaProvider = null;
+        if (poaAccountBar) {
+          poaAccountBar.innerHTML = '';
+          poaAccountBar.classList.add('hidden');
+        }
+        return null;
+      }
+
+      const candidate = requestedProvider
+        || (config.providers.includes(window.selectedProvider) ? window.selectedProvider : '')
+        || (config.providers.includes(currentVirtualAccount) ? currentVirtualAccount : '')
+        || config.defaultProvider
+        || 'wise';
+      const activeProvider = config.providers.includes(candidate) ? candidate : config.defaultProvider;
+
+      window.selectedProvider = activeProvider;
+      window.currentPoaProvider = activeProvider;
+
+      if (poaAccountBar) {
+        const providerButtonsHtml = config.providers.map((pKey) => {
+          const meta = DOCUMENT_PROVIDER_CATALOG[pKey];
+          if (!meta) return '';
+          const isSelected = pKey === activeProvider;
+          const cardClass = isSelected
+            ? `p-3.5 rounded-2xl text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${meta.activeCardClass}`
+            : 'p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs';
+          const subtitleClass = isSelected
+            ? `text-[10px] font-semibold ${meta.subtitleActiveClass}`
+            : 'text-[10px] font-semibold text-slate-500';
+          const radioClass = isSelected
+            ? `w-6 h-6 rounded-full ${meta.radioActiveClass} flex items-center justify-center text-xs shadow-xs shrink-0`
+            : 'w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0';
+
+          return `
+            <button type="button" id="poa-step2-btn-${meta.key}" onclick="switchPoaProvider('${meta.key}')" class="${cardClass}">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl ${meta.badgeBoxClass} flex items-center justify-center font-black text-xs shrink-0 shadow-xs">${meta.badge}</div>
+                <div>
+                  <div class="text-xs sm:text-sm font-black text-slate-900">${meta.title}</div>
+                  <div class="${subtitleClass}">${meta.subtitle}</div>
+                </div>
+              </div>
+              <div id="poa-step2-radio-${meta.key}" class="${radioClass}"><i class="fa-solid fa-check"></i></div>
+            </button>
+          `;
+        }).join('');
+
+        poaAccountBar.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <span class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-file-invoice-dollar text-slate-900"></i>
+              Select Proof of Account Provider (Grey Account, Wise Account, Revolut):
+            </span>
+            <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">Live Preview Editor Active</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            ${providerButtonsHtml}
+          </div>
+        `;
+
+        const wb = $('verification-workbench');
+        const isEditorOpen = (typeof workflowStep !== 'undefined' && workflowStep === 'editor') || (wb && !wb.classList.contains('hidden'));
+        poaAccountBar.classList.toggle('hidden', !isEditorOpen);
+      }
+
+      return activeProvider;
+    }
+    window.syncDocumentProviderStateAndUI = syncDocumentProviderStateAndUI;
 
     function switchPoaProvider(providerKey, silent) {
-      const validProviders = ['grey', 'wise', 'revolut'];
-      const provider = validProviders.includes(providerKey) ? providerKey : 'wise';
-      window.currentPoaProvider = provider;
+      const config = getDocumentProviderConfig(currentCountry, currentDocType);
+      if (!config.requiresProviderSelection) {
+        syncDocumentProviderStateAndUI(currentCountry, currentDocType, null);
+        return;
+      }
+      const validProviders = config.providers;
+      const provider = syncDocumentProviderStateAndUI(currentCountry, currentDocType, providerKey) || 'wise';
 
-      // Update button styles across Step 2 bar, Top POA bar, and Builder Panel
+      // Update button styles across Top POA bar and Builder Panel
       validProviders.forEach((p) => {
         const isSelected = p === provider;
-        const step2Btn = $(`poa-step2-btn-${p}`);
         const topBtn = $(`poa-top-btn-${p}`);
         const formBtn = $(`poa-form-btn-${p}`);
-        const step2Radio = $(`poa-step2-radio-${p}`);
-
-        if (step2Btn) {
-          if (isSelected) {
-            const activeRing = p === 'wise'
-              ? 'border-2 border-[#163300] bg-gradient-to-br from-[#9fe870]/25 via-white to-emerald-50/40 ring-2 ring-[#163300]/15 shadow-md'
-              : p === 'revolut'
-              ? 'border-2 border-[#0075EB] bg-gradient-to-br from-sky-50 via-white to-blue-50/40 ring-2 ring-[#0075EB]/20 shadow-md'
-              : 'border-2 border-slate-900 bg-gradient-to-br from-slate-100 via-white to-slate-50 ring-2 ring-slate-900/15 shadow-md';
-            step2Btn.className = `p-3.5 rounded-2xl text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${activeRing}`;
-          } else {
-            step2Btn.className = 'p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs';
-          }
-        }
-        if (step2Radio) {
-          if (isSelected) {
-            const radioBg = p === 'wise' ? 'bg-[#163300] text-[#9fe870]' : p === 'revolut' ? 'bg-[#0075EB] text-white' : 'bg-slate-900 text-amber-300';
-            step2Radio.className = `w-6 h-6 rounded-full ${radioBg} flex items-center justify-center text-xs shadow-xs shrink-0`;
-          } else {
-            step2Radio.className = 'w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0';
-          }
-        }
         if (topBtn) {
           if (isSelected) {
             const topActive = p === 'wise'
@@ -26304,48 +26457,8 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         </div>
       </div>
 
-      <!-- Proof of Account Provider Selector (Shown ONLY when Proof of Account editor is active) -->
-      <div id="poa-step2-account-selector" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-            <i class="fa-solid fa-file-invoice-dollar text-slate-900"></i>
-            Select Proof of Account Provider (Grey Account, Wise Account, Revolut):
-          </span>
-          <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">Live Preview Editor Active</span>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <button type="button" id="poa-step2-btn-grey" onclick="switchPoaProvider('grey')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-slate-950 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">GREY</div>
-              <div>
-                <div class="text-xs sm:text-sm font-black text-slate-900">Grey Account</div>
-                <div class="text-[10px] font-semibold text-slate-500">Community Federal Savings Bank · USD</div>
-              </div>
-            </div>
-            <div id="poa-step2-radio-grey" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0"><i class="fa-solid fa-check"></i></div>
-          </button>
-          <button type="button" id="poa-step2-btn-wise" onclick="switchPoaProvider('wise')" class="p-3.5 rounded-2xl border-2 border-[#163300] bg-gradient-to-br from-[#9fe870]/25 via-white to-emerald-50/40 ring-2 ring-[#163300]/15 shadow-md text-left transition-all cursor-pointer flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#163300] text-[#9fe870] flex items-center justify-center font-black text-xs shrink-0 shadow-xs">WISE</div>
-              <div>
-                <div class="text-xs sm:text-sm font-black text-slate-900">Wise Account</div>
-                <div class="text-[10px] font-semibold text-[#163300]">Wise Payments Ltd · EUR IBAN &amp; SWIFT</div>
-              </div>
-            </div>
-            <div id="poa-step2-radio-wise" class="w-6 h-6 rounded-full bg-[#163300] text-[#9fe870] flex items-center justify-center text-xs shadow-xs shrink-0"><i class="fa-solid fa-check"></i></div>
-          </button>
-          <button type="button" id="poa-step2-btn-revolut" onclick="switchPoaProvider('revolut')" class="p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-left transition-all cursor-pointer flex items-center justify-between gap-3 shadow-2xs">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#0075EB] text-white flex items-center justify-center font-black text-xs shrink-0 shadow-xs">REV</div>
-              <div>
-                <div class="text-xs sm:text-sm font-black text-slate-900">Revolut</div>
-                <div class="text-[10px] font-semibold text-slate-500">Revolut Bank UAB · Global IBAN</div>
-              </div>
-            </div>
-            <div id="poa-step2-radio-revolut" class="w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0"><i class="fa-solid fa-check"></i></div>
-          </button>
-        </div>
-      </div>
+      <!-- Proof of Account Provider Selector (Dynamically mounted ONLY when the selected country + document requires multi-provider selection) -->
+      <div id="poa-step2-account-selector" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3"></div>
 
       <!-- Empty State View when a Country has no Configured Document Template -->
       <div id="wb-no-document-view" class="hidden max-w-2xl mx-auto my-8 bg-white border border-slate-200 rounded-3xl p-8 text-center shadow-sm space-y-4">
