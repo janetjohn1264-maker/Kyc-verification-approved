@@ -1227,6 +1227,18 @@
         price: '$0.50',
         methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
       },
+      somalicertificate: {
+        productKey: 'somaliCertificate',
+        label: 'Somali Certificate',
+        price: '$0.50',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
+      certificatecard: {
+        productKey: 'certificateCard',
+        label: 'Certificate Card',
+        price: '$0.50',
+        methodsText: 'Visa, Mastercard, EVC Plus / Waafi, eDahab, Zaad, SAHAL & Premier Wallet'
+      },
       onetimeaccess: {
         productKey: 'oneTimeAccess',
         label: 'One-Time Access',
@@ -1330,6 +1342,8 @@
 
     function classifyUnlockDocViewId(vid) {
       if (!vid || vid === 'wb-no-document-view') return '';
+      if (vid.includes('somalicertificate')) return 'somalicertificate';
+      if (vid.includes('certificatecard')) return 'certificatecard';
       if (vid.includes('proofofaccount')) return 'proofofaccount';
       if (vid.includes('proofofaddress')) return 'refugeecard';
       if (vid.includes('driverlicense')) return 'driverlicense';
@@ -2182,7 +2196,8 @@
       'downloadSomPassIdCardPNG',
       'downloadSomLicPNG',
       'downloadNzDlPNG',
-      'downloadOceaniaPNG'
+      'downloadOceaniaPNG',
+      'downloadCertificateCardPNG'
     ]);
 
     function parseOnclickSavePngDescriptor(onclickAttr) {
@@ -4524,25 +4539,25 @@ var $ = window.$ || (id => document.getElementById(id));
     };
 
     const PROVIDER_SUPPORTED_DOCS = {
-      payoneer: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      paypal: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      wise: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      grey: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
-      raenest: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
-      revolut: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      mercury: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
-      elevate: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
-      paxum: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
-      stripe: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      chipper: ['passport', 'idcard', 'refugeecard', 'proofofaccount'],
-      binance: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
-      bybit: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
-      okx: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
-      kucoin: ['passport', 'idcard', 'driverlicense', 'refugeecard'],
-      salaam: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      dahabshil: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      mybank: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'],
-      premierwallet: ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount']
+      payoneer: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      paypal: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      wise: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      grey: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      raenest: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      revolut: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      mercury: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      elevate: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      paxum: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      stripe: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      chipper: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      binance: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'certificatecard'],
+      bybit: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'certificatecard'],
+      okx: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'certificatecard'],
+      kucoin: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'certificatecard'],
+      salaam: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      dahabshil: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      mybank: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'],
+      premierwallet: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard']
     };
 
     const COUNTRY_OFFICIAL_AUTHORITIES = {
@@ -4827,8 +4842,10 @@ var $ = window.$ || (id => document.getElementById(id));
       if (dataDocs) {
         docs = dataDocs.split(',').map(s => s.trim()).filter(Boolean);
         if (countryKey === 'somalia') {
-          if (!docs.includes('refugeecard')) docs.push('refugeecard');
+          docs = docs.map(d => (d === 'refugeecard' ? 'somalicertificate' : d));
+          if (!docs.includes('somalicertificate')) docs.push('somalicertificate');
           if (!docs.includes('proofofaccount')) docs.push('proofofaccount');
+          docs = Array.from(new Set(docs));
         }
       } else {
         if ($(countryKey + '-passport-view')) {
@@ -4837,7 +4854,10 @@ var $ = window.$ || (id => document.getElementById(id));
         if ($(countryKey + '-idcard-view') || $(countryKey + '-doc-view')) {
           docs.push('idcard');
         }
-        if (countryKey === 'bangladesh' || countryKey === 'somalia' || $(countryKey + '-proofofaddress-view')) {
+        if (countryKey === 'somalia' || $(countryKey + '-somalicertificate-view')) {
+          docs.push('somalicertificate');
+        }
+        if (countryKey === 'bangladesh' || $(countryKey + '-proofofaddress-view')) {
           docs.push('refugeecard');
         }
         if ($(countryKey + '-driverlicense-view')) {
@@ -4845,6 +4865,9 @@ var $ = window.$ || (id => document.getElementById(id));
         }
         if ((Array.isArray(window.poaConfiguredCountryKeys) && window.poaConfiguredCountryKeys.includes(countryKey)) || $(countryKey + '-proofofaccount-view')) {
           docs.push('proofofaccount');
+        }
+        if ($(countryKey + '-certificatecard-view')) {
+          docs.push('certificatecard');
         }
       }
 
@@ -4861,13 +4884,16 @@ var $ = window.$ || (id => document.getElementById(id));
       if (!countryKey || !docType) return null;
       if (docType === 'passport') return $(`${countryKey}-passport-view`);
       if (docType === 'idcard') return $(`${countryKey}-idcard-view`) || $(`${countryKey}-doc-view`);
+      if (docType === 'somalicertificate') {
+        return $(`${countryKey}-somalicertificate-view`) || $('somalia-somalicertificate-view');
+      }
+      if (docType === 'certificatecard') {
+        return $(`${countryKey}-certificatecard-view`) || $('certificatecard-doc-view');
+      }
       if (docType === 'driverlicense') {
         return $(`${countryKey}-driverlicense-view`) || $('somalia-driverlicense-view');
       }
       if (docType === 'refugeecard') {
-        if (countryKey === 'somalia' && $('somalia-doc-view')) {
-          return $('somalia-doc-view');
-        }
         return $(`${countryKey}-proofofaddress-view`) || $('proofofaddress-doc-view');
       }
       if (docType === 'proofofaccount') {
@@ -4889,7 +4915,10 @@ var $ = window.$ || (id => document.getElementById(id));
       if (viewEl.id === 'tonga-idcard-view') {
         return '/assets/aistudio/1795281954260_95a93fa4.jpg';
       }
-      if (viewEl.id === 'somalia-doc-view') {
+      if (viewEl.id === 'somalia-idcard-view') {
+        return '/assets/aistudio/uk_bearer_portrait.png';
+      }
+      if (viewEl.id === 'somalia-somalicertificate-view' || viewEl.id === 'somalia-doc-view' || viewEl.id === 'certificatecard-doc-view') {
         return '/assets/aistudio/FB_IMG_1794648137510_c954c568.jpg';
       }
       if (viewEl.id === 'somalia-proofofaccount-view') {
@@ -4923,23 +4952,29 @@ var $ = window.$ || (id => document.getElementById(id));
       const categoryLabels = {
         passport: 'Passport',
         idcard: 'National Identity Card',
+        somalicertificate: 'Somali Certificate',
         driverlicense: "Government-Issued Identity Document (Driver's License)",
-        refugeecard: countryKey === 'somalia' ? 'Somali Certificate' : 'Proof of Address',
-        proofofaccount: countryKey === 'somalia' ? 'Bank Statement (Proof of Account)' : 'Proof of Address & Account Confirmation'
+        refugeecard: 'Proof of Address',
+        proofofaccount: countryKey === 'somalia' ? 'Bank Statement (Proof of Account)' : 'Proof of Address & Account Confirmation',
+        certificatecard: 'Certificate Card'
       };
       const iconMap = {
         passport: 'fa-solid fa-passport',
         idcard: 'fa-solid fa-id-card',
+        somalicertificate: 'fa-solid fa-certificate',
         driverlicense: 'fa-solid fa-id-badge',
-        refugeecard: countryKey === 'somalia' ? 'fa-solid fa-certificate' : 'fa-solid fa-bolt',
-        proofofaccount: 'fa-solid fa-file-invoice-dollar'
+        refugeecard: 'fa-solid fa-bolt',
+        proofofaccount: 'fa-solid fa-file-invoice-dollar',
+        certificatecard: 'fa-solid fa-award'
       };
       const accentMap = {
         passport: { bg: 'bg-emerald-600', border: 'border-emerald-200 hover:border-emerald-500', tint: 'from-emerald-50/75 to-white', arrow: 'text-emerald-700' },
         idcard: { bg: 'bg-blue-600', border: 'border-blue-200 hover:border-blue-500', tint: 'from-blue-50/75 to-white', arrow: 'text-blue-700' },
+        somalicertificate: { bg: 'bg-sky-700', border: 'border-sky-200 hover:border-sky-500', tint: 'from-sky-50/75 to-white', arrow: 'text-sky-700' },
         driverlicense: { bg: 'bg-sky-600', border: 'border-sky-200 hover:border-sky-500', tint: 'from-sky-50/75 to-white', arrow: 'text-sky-700' },
         refugeecard: { bg: 'bg-amber-600', border: 'border-amber-200 hover:border-amber-500', tint: 'from-amber-50/75 to-white', arrow: 'text-amber-700' },
-        proofofaccount: { bg: 'bg-slate-900', border: 'border-slate-300 hover:border-slate-700', tint: 'from-slate-50 to-white', arrow: 'text-slate-800' }
+        proofofaccount: { bg: 'bg-slate-900', border: 'border-slate-300 hover:border-slate-700', tint: 'from-slate-50 to-white', arrow: 'text-slate-800' },
+        certificatecard: { bg: 'bg-indigo-600', border: 'border-indigo-200 hover:border-indigo-500', tint: 'from-indigo-50/75 to-white', arrow: 'text-indigo-700' }
       };
 
       const viewTitleRefinements = {
@@ -5047,13 +5082,21 @@ var $ = window.$ || (id => document.getElementById(id));
           name: 'People’s Republic of China Passport / 中华人民共和国护照',
           description: `People’s Republic of China · MPS Exit & Entry Administration e-Passport (CHN) Accepted by ${providerMeta.name}`
         },
-        'somalia-doc-view': {
-          name: 'Somali Certificate (The Open Learning Campus / PEFA)',
-          description: `The Open Learning Campus · PEFA Certificate & Somali National Identity Card Accepted by ${providerMeta.name}`
+        'somalia-idcard-view': {
+          name: 'Somali National Identity Card',
+          description: 'Federal Republic of Somalia · Official Smart Polycarbonate National Identity Card (Waraqadda Aqoonsiga)'
+        },
+        'somalia-somalicertificate-view': {
+          name: 'Somali Certificate',
+          description: 'The Open Learning Campus · Public Expenditure and Financial Accountability (PEFA) Certificate'
         },
         'somalia-proofofaccount-view': {
           name: 'Salaam Somali Bank – E Statement (Bank Statement)',
           description: 'Salaam Somali Bank · Statement of Accounts (USD) Official Bank Statement Editor'
+        },
+        'certificatecard-doc-view': {
+          name: `${countryName} Certificate Card`,
+          description: `${countryName} · Official Verification Certificate Card`
         }
       };
 
@@ -5063,12 +5106,15 @@ var $ = window.$ || (id => document.getElementById(id));
         let name = categoryLabels[docType] || docType;
         let description = `${countryName} official verification document accepted for ${providerMeta.name} KYC`;
 
-        if (countryKey === 'somalia' && docType === 'refugeecard') {
-          name = 'Somali Certificate (The Open Learning Campus / PEFA)';
-          description = `The Open Learning Campus · PEFA Certificate Awarded to Recipient for ${providerMeta.name}`;
+        if (docType === 'somalicertificate') {
+          name = 'Somali Certificate';
+          description = 'The Open Learning Campus · Public Expenditure and Financial Accountability (PEFA) Certificate';
         } else if (countryKey === 'somalia' && docType === 'idcard') {
-          name = 'Somali Certificate & National Identity Card';
-          description = `Federal Republic of Somalia · Somali PEFA Certificate & National Identity Card for ${providerMeta.name}`;
+          name = 'Somali National Identity Card';
+          description = 'Federal Republic of Somalia · Official Smart Polycarbonate National Identity Card (Waraqadda Aqoonsiga)';
+        } else if (docType === 'certificatecard') {
+          name = `${countryName} Certificate Card`;
+          description = `${countryName} · Official Verification Certificate Card`;
         } else if (docType === 'proofofaccount' && (!viewEl || viewId === 'proofofaccount-doc-view')) {
           const poaInfo = (typeof poaCountryMap !== 'undefined' && poaCountryMap[countryKey]) ? poaCountryMap[countryKey] : null;
           name = `${countryName} Proof of Account & Address Confirmation`;
@@ -5135,12 +5181,15 @@ var $ = window.$ || (id => document.getElementById(id));
         }
         return;
       }
+      if (docType === 'somalicertificate') {
+        if (typeof updateSomPreview === 'function') updateSomPreview();
+        return;
+      }
+      if (docType === 'certificatecard') {
+        if (typeof updateCertificateCardPreview === 'function') updateCertificateCardPreview(countryKey);
+        return;
+      }
       if (docType === 'refugeecard') {
-        if (countryKey === 'somalia') {
-          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
-          if (typeof updateSomPreview === 'function') updateSomPreview();
-          return;
-        }
         if (typeof updateProofOfAddressPreview === 'function') updateProofOfAddressPreview();
         return;
       }
@@ -5149,8 +5198,9 @@ var $ = window.$ || (id => document.getElementById(id));
         'kenya:idcard': () => { if (typeof updateKidPreview === 'function') updateKidPreview(); },
         'somalia:passport': () => { if (typeof updateSomPassPreview === 'function') updateSomPassPreview(); },
         'somalia:idcard': () => {
-          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
           if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
+        },
+        'somalia:somalicertificate': () => {
           if (typeof updateSomPreview === 'function') updateSomPreview();
         },
         'somalia:driverlicense': () => { if (typeof updateSomLicPreview === 'function') updateSomLicPreview(); },
@@ -5568,9 +5618,11 @@ var $ = window.$ || (id => document.getElementById(id));
         const displayTitleByType = {
           idcard: 'National Identity Card',
           passport: 'Passport',
+          somalicertificate: 'Somali Certificate',
           driverlicense: "Driver's License",
-          refugeecard: resolvedCountryKey === 'somalia' ? 'Somali Certificate' : 'Proof of Address',
-          proofofaccount: resolvedCountryKey === 'somalia' ? 'Salaam Somali Bank – E Statement' : 'Proof of Account'
+          refugeecard: 'Proof of Address',
+          proofofaccount: resolvedCountryKey === 'somalia' ? 'Salaam Somali Bank – E Statement' : 'Proof of Account',
+          certificatecard: 'Certificate Card'
         };
 
         docsListEl.innerHTML = items.map(item => {
@@ -6222,8 +6274,31 @@ var $ = window.$ || (id => document.getElementById(id));
     window.selectFlowDocument = selectFlowDocument;
 
 
-    // Switch Document Type: 'passport' vs 'idcard' vs 'driverlicense' vs 'refugeecard'
+    function resetDocumentStateOnSwitch(countryKey, prevDocType, nextDocType) {
+      if (!prevDocType || prevDocType === nextDocType) return;
+      if (countryKey === 'somalia') {
+        if (prevDocType === 'idcard' && typeof resetSomSmartIdSample === 'function') {
+          resetSomSmartIdSample(true);
+        }
+        if (prevDocType === 'somalicertificate' && typeof resetSomDetailsToSample === 'function') {
+          resetSomDetailsToSample(true);
+        }
+        if (prevDocType === 'proofofaccount' && typeof resetSomBankStatementDefaults === 'function') {
+          resetSomBankStatementDefaults(true);
+        }
+      }
+      if (prevDocType === 'certificatecard' && typeof resetCertificateCardSample === 'function') {
+        resetCertificateCardSample(true);
+      }
+    }
+    window.resetDocumentStateOnSwitch = resetDocumentStateOnSwitch;
+
+    // Switch Document Type: 'passport' vs 'idcard' vs 'somalicertificate' vs 'driverlicense' vs 'refugeecard' vs 'proofofaccount' vs 'certificatecard'
     function switchVerificationDoc(docType, silent) {
+      const prevDocType = currentDocType;
+      if (prevDocType && prevDocType !== docType) {
+        resetDocumentStateOnSwitch(currentCountry, prevDocType, docType);
+      }
       currentDocType = docType;
       workflowSelectedDoc = docType;
       const passTab = $('tab-doc-passport');
@@ -6290,9 +6365,12 @@ var $ = window.$ || (id => document.getElementById(id));
           idRadio.className = "w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
         if (currentCountry === 'somalia') {
-          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
-          if (typeof updateSomPreview === 'function') updateSomPreview();
+          if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
         }
+      } else if (docType === 'somalicertificate') {
+        if (typeof updateSomPreview === 'function') updateSomPreview();
+      } else if (docType === 'certificatecard') {
+        if (typeof updateCertificateCardPreview === 'function') updateCertificateCardPreview(currentCountry);
       } else if (docType === 'driverlicense') {
         if (dlTab) {
           dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50/90 via-cyan-50/30 to-white text-slate-900 shadow-md ring-2 ring-sky-500/20 transition-all cursor-pointer relative group";
@@ -6307,10 +6385,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) {
           refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
-        if (currentCountry === 'somalia') {
-          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
-          if (typeof updateSomPreview === 'function') updateSomPreview();
-        } else if (typeof updateProofOfAddressPreview === 'function') {
+        if (typeof updateProofOfAddressPreview === 'function') {
           updateProofOfAddressPreview();
         }
       } else if (docType === 'proofofaccount') {
@@ -6358,16 +6433,20 @@ var $ = window.$ || (id => document.getElementById(id));
       const docTitles = {
         passport: 'Passport Selected',
         idcard: 'National ID Selected',
+        somalicertificate: 'Somali Certificate Selected',
         driverlicense: "Driver's License Selected",
         refugeecard: "Proof of Address Selected",
-        proofofaccount: "Proof of Address & Account Selected"
+        proofofaccount: currentCountry === 'somalia' ? 'Salaam Somali Bank E-Statement Selected' : "Proof of Address & Account Selected",
+        certificatecard: 'Certificate Card Selected'
       };
       const docDescs = {
         passport: 'official biometric passport',
         idcard: 'official national ID card',
+        somalicertificate: 'Somali PEFA Certificate',
         driverlicense: "International Driver's License",
         refugeecard: "Proof of Address specimen",
-        proofofaccount: "official Proof of Address & Account confirmation PDF"
+        proofofaccount: currentCountry === 'somalia' ? 'Salaam Somali Bank E-Statement' : "official Proof of Address & Account confirmation PDF",
+        certificatecard: 'official Certificate Card specimen'
       };
       if (!silent) {
         showToast(docTitles[docType] || 'Document Selected', `Switched specimen generator to ${docDescs[docType] || 'official document'}`);
@@ -6497,12 +6576,13 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
 
-        if (countryKey === 'somalia') {
-          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
-          if (typeof updateSomPreview === 'function') updateSomPreview();
-        } else if (typeof updateProofOfAddressPreview === 'function') {
+        if (typeof updateProofOfAddressPreview === 'function') {
           updateProofOfAddressPreview();
         }
+      } else if (currentDocType === 'somalicertificate') {
+        if (typeof updateSomPreview === 'function') updateSomPreview();
+      } else if (currentDocType === 'certificatecard') {
+        if (typeof updateCertificateCardPreview === 'function') updateCertificateCardPreview(countryKey);
       } else if (countryKey === 'uk') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -6917,7 +6997,7 @@ var $ = window.$ || (id => document.getElementById(id));
       } else if (countryKey === 'somalia') {
         currentDocType = (options.preferredDocType && configuredDocs.includes(options.preferredDocType))
           ? options.preferredDocType
-          : 'refugeecard';
+          : (configuredDocs[0] || 'idcard');
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
         const dlTab = $('tab-doc-driverlicense');
@@ -6931,16 +7011,15 @@ var $ = window.$ || (id => document.getElementById(id));
         if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
-        if (typeof updateSomPreview === 'function') updateSomPreview();
         if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
+        if (typeof updateSomPreview === 'function') updateSomPreview();
         if (typeof updateSomBankStatementPreview === 'function') updateSomBankStatementPreview();
         if (typeof updateSomPassPreview === 'function') updateSomPassPreview();
       } else if (countryKey === 'uae') {
@@ -7235,9 +7314,12 @@ var $ = window.$ || (id => document.getElementById(id));
     function renderActiveDocumentView() {
       const kenyaPassView = $('kenya-passport-view');
       const kenyaIdView = $('kenya-idcard-view');
-      const somaliaIdView = $('somalia-doc-view');
+      const somaliaIdView = $('somalia-idcard-view');
+      const somaliaCertView = $('somalia-somalicertificate-view');
+      const somaliaLegacyDocView = $('somalia-doc-view');
       const somaliaPassView = $('somalia-passport-view');
       const somaliaDlView = $('somalia-driverlicense-view');
+      const certCardDocView = $('certificatecard-doc-view');
       const ethiopiaDocView = $('ethiopia-doc-view');
       const nigeriaDocView = $('nigeria-doc-view');
       const nigeriaPassView = $('nigeria-passport-view');
@@ -7270,8 +7352,11 @@ var $ = window.$ || (id => document.getElementById(id));
       if (kenyaPassView) kenyaPassView.classList.add('hidden');
       if (kenyaIdView) kenyaIdView.classList.add('hidden');
       if (somaliaIdView) somaliaIdView.classList.add('hidden');
+      if (somaliaCertView) somaliaCertView.classList.add('hidden');
+      if (somaliaLegacyDocView) somaliaLegacyDocView.classList.add('hidden');
       if (somaliaPassView) somaliaPassView.classList.add('hidden');
       if (somaliaDlView) somaliaDlView.classList.add('hidden');
+      if (certCardDocView) certCardDocView.classList.add('hidden');
       if (ethiopiaDocView) ethiopiaDocView.classList.add('hidden');
       if (ethPassView) ethPassView.classList.add('hidden');
       if (nigeriaDocView) nigeriaDocView.classList.add('hidden');
@@ -7318,6 +7403,10 @@ var $ = window.$ || (id => document.getElementById(id));
         const customPoaView = $(`${currentCountry}-proofofaccount-view`);
         if (customPoaView) customPoaView.classList.remove('hidden');
         else if (poaDocView) poaDocView.classList.remove('hidden');
+      } else if (currentDocType === 'somalicertificate') {
+        if (somaliaCertView) somaliaCertView.classList.remove('hidden');
+      } else if (currentDocType === 'certificatecard') {
+        if (certCardDocView) certCardDocView.classList.remove('hidden');
       } else if (currentDocType === 'refugeecard') {
         const customAddrView = $(`${currentCountry}-proofofaddress-view`);
         if (customAddrView) customAddrView.classList.remove('hidden');
@@ -7339,10 +7428,16 @@ var $ = window.$ || (id => document.getElementById(id));
         } else if (typeof randomizeProofOfAccount === 'function') {
           randomizeProofOfAccount();
         }
+      } else if (currentDocType === 'somalicertificate') {
+        if (typeof randomizeSomaliaCertificate === 'function') {
+          randomizeSomaliaCertificate();
+        }
+      } else if (currentDocType === 'certificatecard') {
+        if (typeof randomizeCertificateCard === 'function') {
+          randomizeCertificateCard();
+        }
       } else if (currentDocType === 'refugeecard') {
-        if (currentCountry === 'somalia' && typeof randomizeSomaliaIdCard === 'function') {
-          randomizeSomaliaIdCard();
-        } else if (typeof randomizeProofOfAddress === 'function') {
+        if (typeof randomizeProofOfAddress === 'function') {
           randomizeProofOfAddress();
         }
       } else if (currentCountry === 'turkey') {
@@ -7408,8 +7503,10 @@ var $ = window.$ || (id => document.getElementById(id));
           randomizeSomaliaPassport();
         } else if (currentDocType === 'driverlicense' && typeof randomizeSomaliaDriverLicense === 'function') {
           randomizeSomaliaDriverLicense();
-        } else if (typeof randomizeSomaliaIdCard === 'function') {
-          randomizeSomaliaIdCard();
+        } else if (currentDocType === 'somalicertificate' && typeof randomizeSomaliaCertificate === 'function') {
+          randomizeSomaliaCertificate();
+        } else if (typeof randomizeSomaliaSmartIdCard === 'function') {
+          randomizeSomaliaSmartIdCard();
         }
       } else if (currentCountry === 'kenya') {
         if (currentDocType === 'idcard' && typeof randomizeKenyaIdCard === 'function') {
@@ -18036,38 +18133,19 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
     }
 
-    function resetSomSmartIdPhoto() {
+    function resetSomSmartIdPhoto(silent) {
       if ($('somSmartIdPreviewPhoto')) $('somSmartIdPreviewPhoto').src = defaultSomSmartIdSrc;
       if ($('somSmartIdPhotoInput')) $('somSmartIdPhotoInput').value = '';
-      showToast('Photo Reset', 'Restored Somali National ID reference specimen portrait');
+      if (!silent) {
+        showToast('Photo Reset', 'Restored Somali National ID reference specimen portrait');
+      }
     }
 
     function setSomIdFormat(format) {
-      const smartIdWrap = $('somalia-smart-id-specimen-wrap');
-      const niraCertWrap = $('somCardContainer');
-      const formSmart = $('somSmartIdControlsForm');
-      const formNira = $('somNiraControlsForm');
-
-      const btnSmart = $('btn-som-fmt-smartid');
-      const btnCert = $('btn-som-fmt-cert');
-
-      if (smartIdWrap) smartIdWrap.classList.add('hidden');
-      if (niraCertWrap) niraCertWrap.classList.add('hidden');
-      if (formSmart) formSmart.classList.add('hidden');
-      if (formNira) formNira.classList.add('hidden');
-
-      [btnSmart, btnCert].forEach(btn => {
-        if (btn) btn.className = "px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center";
-      });
-
       if (format === 'smartid') {
-        if (smartIdWrap) smartIdWrap.classList.remove('hidden');
-        if (formSmart) formSmart.classList.remove('hidden');
-        if (btnSmart) btnSmart.className = "px-2 py-1.5 rounded-md text-[11px] font-bold bg-emerald-700 text-white shadow-xs cursor-pointer transition-all text-center";
-      } else {
-        if (niraCertWrap) niraCertWrap.classList.remove('hidden');
-        if (formNira) formNira.classList.remove('hidden');
-        if (btnCert) btnCert.className = "px-2 py-1.5 rounded-md text-[11px] font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all text-center";
+        if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
+      } else if (format === 'cert') {
+        if (typeof updateSomPreview === 'function') updateSomPreview();
       }
     }
 
@@ -18095,7 +18173,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setText('somSmartIdPreviewGender', getVal('somSmartIdInputGender', 'MALE').toUpperCase());
     }
 
-    function resetSomSmartIdSample() {
+    function resetSomSmartIdSample(silent) {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('somSmartIdInputNo', '28901014439167');
       setVal('somSmartIdInputName', 'MOHAMED ALI ABDULLAHI');
@@ -18106,40 +18184,34 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setVal('somSmartIdInputExpiry', '11 Feb 2023');
       setVal('somSmartIdInputGender', 'MALE');
 
-      resetSomSmartIdPhoto();
+      resetSomSmartIdPhoto(true);
       updateSomSmartIdPreview();
-      showToast('Sample Restored', 'Restored Somali National Identity Card reference specimen details');
+      if (!silent) {
+        showToast('Sample Restored', 'Restored Somali National Identity Card reference specimen details');
+      }
     }
 
-    function randomizeSomaliaIdCard() {
+    function randomizeSomaliaSmartIdCard() {
       const maleNamesSom = [
-        { som: 'MOHAMED ABDI HASSAN', afaran: 'MAXAMED CABDI XASAN', en: 'Mohamed Abdi Hassan', certName: 'Yahye abdirahman Khaliif' },
-        { som: 'AHMED YUSUF ALI', afaran: 'AXMED YUUSUF CALI', en: 'Ahmed Yusuf Ali', certName: 'Ahmed Yusuf Ali' },
-        { som: 'IBRAHIM OSMAN FARAH', afaran: 'IBRAAHIIM CUSMAAN FAARAX', en: 'Ibrahim Osman Farah', certName: 'Ibrahim Osman Farah' },
-        { som: 'DAHIR ADEN NUR', afaran: 'DAAHIR AADAN NUUR', en: 'Dahir Aden Nur', certName: 'Dahir Aden Nur' },
-        { som: 'ISMAIL GUULED SHIRE', afaran: 'ISMAACIIL GUULEED SHIRE', en: 'Ismail Guled Shire', certName: 'Ismail Guled Shire' },
-        { som: 'KHALID WARSAME GELLE', afaran: 'KHAALID WARSAME GEELLE', en: 'Khalid Warsame Gelle', certName: 'Khalid Warsame Gelle' }
+        'MOHAMED ABDI HASSAN',
+        'AHMED YUSUF ALI',
+        'IBRAHIM OSMAN FARAH',
+        'DAHIR ADEN NUR',
+        'ISMAIL GUULED SHIRE',
+        'KHALID WARSAME GELLE'
       ];
       const femaleNamesSom = [
-        { som: 'FADUMA HASSAN WARSAME', afaran: 'FAADUMO XASAN WARSAME', en: 'Faduma Hassan Warsame', certName: 'Faduma Hassan Warsame' },
-        { som: 'HALIMA OMAR ELMI', afaran: 'XALIIMO CUMAR CILMI', en: 'Halima Omar Elmi', certName: 'Halima Omar Elmi' },
-        { som: 'MARYAN ABDULLAHI DIRIE', afaran: 'MARYAN CABDULLAAHI DIIRIYE', en: 'Maryan Abdullahi Dirie', certName: 'Maryan Abdullahi Dirie' },
-        { som: 'SAFIA ADEN ROBLE', afaran: 'SAFIYA AADAN ROOBLE', en: 'Safia Aden Roble', certName: 'Safia Aden Roble' },
-        { som: 'ASHO MOHAMUD JAMA', afaran: 'CAASHO MAXAMUUD JAAMAC', en: 'Asha Mohamud Jama', certName: 'Asha Mohamud Jama' }
-      ];
-      const courses = [
-        '“Introduction to Public Expenditure and Financial Accountability (PEFA)”',
-        '“Public Financial Management and Accountability Framework (PEFA)”',
-        '“Subnational Public Expenditure and Financial Accountability (PEFA)”',
-        '“Gender Responsive Public Financial Management (PEFA)”',
-        '“Climate Responsive Public Financial Management (PEFA)”'
+        'FADUMA HASSAN WARSAME',
+        'HALIMA OMAR ELMI',
+        'MARYAN ABDULLAHI DIRIE',
+        'SAFIA ADEN ROBLE',
+        'ASHO MOHAMUD JAMA'
       ];
       const cities = ['MOGADISHU', 'HARGEYSA', 'KISMAYO', 'BAIDOA', 'BELEDWEYN', 'GAROWE', 'BOSASO', 'BERBERA', 'JOWHAR'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
       const isMale = Math.random() > 0.45;
-      const person = isMale
+      const pickedName = isMale
         ? maleNamesSom[Math.floor(Math.random() * maleNamesSom.length)]
         : femaleNamesSom[Math.floor(Math.random() * femaleNamesSom.length)];
 
@@ -18156,17 +18228,13 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       const iDay = String(iDayNum).padStart(2, '0');
       const mIdx = Math.floor(Math.random() * months.length);
       const iMonth = months[mIdx];
-      const iFullMonth = fullMonths[mIdx];
-      const iYear = String(Math.floor(2024 + Math.random() * 3));
+      const iYear = String(Math.floor(2021 + Math.random() * 4));
       const issueDate = `${iDay} ${iMonth} ${iYear}`;
       const expiryDate = `${iDay} ${iMonth} ${parseInt(iYear, 10) + 5}`;
-      const certAwardDate = `${iDayNum} ${iFullMonth} ${iYear}`;
 
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
-
-      // Update Smart ID fields
       setVal('somSmartIdInputNo', smartIdNo);
-      setVal('somSmartIdInputName', person.som);
+      setVal('somSmartIdInputName', pickedName);
       setVal('somSmartIdInputDob', dob);
       setVal('somSmartIdInputPob', pob);
       setVal('somSmartIdInputIssue', issueDate);
@@ -18174,31 +18242,66 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setVal('somSmartIdInputExpiry', expiryDate);
       setVal('somSmartIdInputGender', isMale ? 'MALE' : 'FEMALE');
 
-      // Update Somali PEFA / OLC Certificate fields
+      updateSomSmartIdPreview();
+      showToast('National ID Randomized!', `Generated Somali National Identity Card for ${pickedName}`);
+    }
+    window.randomizeSomaliaSmartIdCard = randomizeSomaliaSmartIdCard;
+
+    function randomizeSomaliaCertificate() {
+      const recipients = [
+        { certName: 'Yahye abdirahman Khaliif', afaran: 'YAHYE ABDIRAHMAN KHALIIF', sex: 'MALE' },
+        { certName: 'Ahmed Yusuf Ali', afaran: 'AXMED YUUSUF CALI', sex: 'MALE' },
+        { certName: 'Ibrahim Osman Farah', afaran: 'IBRAAHIIM CUSMAAN FAARAX', sex: 'MALE' },
+        { certName: 'Dahir Aden Nur', afaran: 'DAAHIR AADAN NUUR', sex: 'MALE' },
+        { certName: 'Ismail Guled Shire', afaran: 'ISMAACIIL GUULEED SHIRE', sex: 'MALE' },
+        { certName: 'Khalid Warsame Gelle', afaran: 'KHAALID WARSAME GEELLE', sex: 'MALE' },
+        { certName: 'Faduma Hassan Warsame', afaran: 'FAADUMO XASAN WARSAME', sex: 'FEMALE' },
+        { certName: 'Halima Omar Elmi', afaran: 'XALIIMO CUMAR CILMI', sex: 'FEMALE' },
+        { certName: 'Maryan Abdullahi Dirie', afaran: 'MARYAN CABDULLAAHI DIIRIYE', sex: 'FEMALE' },
+        { certName: 'Safia Aden Roble', afaran: 'SAFIYA AADAN ROOBLE', sex: 'FEMALE' },
+        { certName: 'Asha Mohamud Jama', afaran: 'CAASHO MAXAMUUD JAAMAC', sex: 'FEMALE' }
+      ];
+      const courses = [
+        '“Introduction to Public Expenditure and Financial Accountability (PEFA)”',
+        '“Public Financial Management and Accountability Framework (PEFA)”',
+        '“Subnational Public Expenditure and Financial Accountability (PEFA)”',
+        '“Gender Responsive Public Financial Management (PEFA)”',
+        '“Climate Responsive Public Financial Management (PEFA)”'
+      ];
+      const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const person = recipients[Math.floor(Math.random() * recipients.length)];
+      const selectedCourse = courses[Math.floor(Math.random() * courses.length)];
+      const iDayNum = Math.floor(1 + Math.random() * 28);
+      const iFullMonth = fullMonths[Math.floor(Math.random() * fullMonths.length)];
+      const iYear = String(Math.floor(2024 + Math.random() * 3));
+      const certAwardDate = `${iDayNum} ${iFullMonth} ${iYear}`;
+
       const serialPart1 = '00000' + String(Math.floor(10000 + Math.random() * 90000));
       const serialPart2 = '000' + String(Math.floor(1000000 + Math.random() * 9000000));
       const trackingNo = `${serialPart1}-${serialPart2}`;
       const idNo = String(Math.floor(60000000000 + Math.random() * 40000000000));
-      const monthIdx = months.indexOf(bMonth) + 1;
-      const monthStr = String(monthIdx).padStart(2, '0');
-      const selectedCourse = courses[Math.floor(Math.random() * courses.length)];
 
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('somInputTracking', trackingNo);
       setVal('somInputIdNo', idNo);
       setVal('somInputIssueDate', certAwardDate);
       setVal('somInputCourseTitle', selectedCourse);
       setVal('somInputNameAfaran', person.afaran);
       setVal('somInputFullName', person.certName);
-      setVal('somInputSex', isMale ? 'MALE' : 'FEMALE');
-      setVal('somInputDob', `${bDay}-${monthStr}-${bYear}`);
-      setVal('somInputPob', `${pob}, SOMALIA`);
-      setVal('somInputCountry', 'SOMALIA');
-      setVal('somInputAddress', `WABERI, ${pob}, SOMALIA`);
+      setVal('somInputSex', person.sex);
 
-      updateSomSmartIdPreview();
       updateSomPreview();
       showToast('Certificate Randomized!', `Generated Somali Certificate for ${person.certName}`);
     }
+    window.randomizeSomaliaCertificate = randomizeSomaliaCertificate;
+    function randomizeSomaliaIdCard() {
+      if (currentDocType === 'idcard') {
+        randomizeSomaliaSmartIdCard();
+      } else {
+        randomizeSomaliaCertificate();
+      }
+    }
+    window.randomizeSomaliaIdCard = randomizeSomaliaIdCard;
 
     async function downloadSomSmartIdPNG() {
       triggerWithSifaloPay(async () => {
@@ -18246,7 +18349,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       showToast('Photo Reset', 'Restored official Somali portrait');
     }
 
-    function resetSomDetailsToSample() {
+    function resetSomDetailsToSample(silent) {
       if ($('somInputTracking')) $('somInputTracking').value = '0000075999-0003518832';
       if ($('somInputIdNo')) $('somInputIdNo').value = '85194026384';
       if ($('somInputIssueDate')) $('somInputIssueDate').value = '12 November 2026';
@@ -18260,7 +18363,9 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       if ($('somInputCountry')) $('somInputCountry').value = 'SOMALIA';
       if ($('somInputAddress')) $('somInputAddress').value = 'HODAN, MUQDISHO, BANAADIR, SOMALIA';
       updateSomPreview();
-      showToast('Sample Restored', 'Somali Certificate details reset to reference specimen');
+      if (!silent) {
+        showToast('Sample Restored', 'Somali Certificate details reset to reference specimen');
+      }
     }
 
     // Somalia Certificate Live Preview
@@ -18368,7 +18473,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     }
     window.updateSomBankStatementPreview = updateSomBankStatementPreview;
 
-    function resetSomBankStatementDefaults() {
+    function resetSomBankStatementDefaults(silent) {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
       setVal('somBankInputCustomerName', somBankDefaults.customerName);
       setVal('somBankInputAccountNo', somBankDefaults.accountNo);
@@ -18384,9 +18489,98 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setVal('somBankInputUnclearBalance', somBankDefaults.unclearBalance);
       setVal('somBankInputAvailableBalance', somBankDefaults.availableBalance);
       updateSomBankStatementPreview();
-      showToast('Reference Restored', 'Restored Salaam Somali Bank E-Statment reference specimen details');
+      if (!silent) {
+        showToast('Reference Restored', 'Restored Salaam Somali Bank E-Statment reference specimen details');
+      }
     }
     window.resetSomBankStatementDefaults = resetSomBankStatementDefaults;
+
+    // ================= CERTIFICATE CARD CONTROLLER =================
+    function updateCertificateCardPreview() {
+      const fullName = $('certCardInputFullName')?.value || 'Yahye abdirahman Khaliif';
+      const courseTitle = $('certCardInputCourseTitle')?.value || '“Introduction to Public Expenditure and Financial Accountability (PEFA)”';
+      const issueDate = $('certCardInputIssueDate')?.value || '12 November 2026';
+      const tracking = $('certCardInputTracking')?.value || '0000075999-0003518832';
+
+      if ($('certCardPreviewFullName')) $('certCardPreviewFullName').textContent = fullName;
+      if ($('certCardPreviewCourseTitle')) $('certCardPreviewCourseTitle').textContent = courseTitle;
+      if ($('certCardPreviewIssueDate')) $('certCardPreviewIssueDate').textContent = issueDate;
+      if ($('certCardPreviewTracking')) $('certCardPreviewTracking').textContent = tracking;
+    }
+    window.updateCertificateCardPreview = updateCertificateCardPreview;
+
+    function resetCertificateCardSample(silent) {
+      if ($('certCardInputFullName')) $('certCardInputFullName').value = 'Yahye abdirahman Khaliif';
+      if ($('certCardInputCourseTitle')) $('certCardInputCourseTitle').value = '“Introduction to Public Expenditure and Financial Accountability (PEFA)”';
+      if ($('certCardInputIssueDate')) $('certCardInputIssueDate').value = '12 November 2026';
+      if ($('certCardInputTracking')) $('certCardInputTracking').value = '0000075999-0003518832';
+      updateCertificateCardPreview();
+      if (!silent) {
+        showToast('Sample Restored', 'Certificate Card details reset to reference specimen');
+      }
+    }
+    window.resetCertificateCardSample = resetCertificateCardSample;
+
+    function randomizeCertificateCard() {
+      const recipients = [
+        'Yahye abdirahman Khaliif',
+        'Ahmed Yusuf Ali',
+        'Ibrahim Osman Farah',
+        'Dahir Aden Nur',
+        'Faduma Hassan Warsame',
+        'Halima Omar Elmi',
+        'Maryan Abdullahi Dirie'
+      ];
+      const courses = [
+        '“Introduction to Public Expenditure and Financial Accountability (PEFA)”',
+        '“Public Financial Management and Accountability Framework (PEFA)”',
+        '“Subnational Public Expenditure and Financial Accountability (PEFA)”',
+        '“Gender Responsive Public Financial Management (PEFA)”'
+      ];
+      const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const pickedName = recipients[Math.floor(Math.random() * recipients.length)];
+      const pickedCourse = courses[Math.floor(Math.random() * courses.length)];
+      const day = Math.floor(1 + Math.random() * 28);
+      const month = fullMonths[Math.floor(Math.random() * fullMonths.length)];
+      const year = String(Math.floor(2024 + Math.random() * 3));
+      const serialPart1 = '00000' + String(Math.floor(10000 + Math.random() * 90000));
+      const serialPart2 = '000' + String(Math.floor(1000000 + Math.random() * 9000000));
+
+      if ($('certCardInputFullName')) $('certCardInputFullName').value = pickedName;
+      if ($('certCardInputCourseTitle')) $('certCardInputCourseTitle').value = pickedCourse;
+      if ($('certCardInputIssueDate')) $('certCardInputIssueDate').value = `${day} ${month} ${year}`;
+      if ($('certCardInputTracking')) $('certCardInputTracking').value = `${serialPart1}-${serialPart2}`;
+      updateCertificateCardPreview();
+      showToast('Certificate Card Randomized!', `Generated Certificate Card for ${pickedName}`);
+    }
+    window.randomizeCertificateCard = randomizeCertificateCard;
+
+    async function downloadCertificateCardPNG() {
+      triggerWithSifaloPay(async () => {
+        const card = $('certificate-card-specimen');
+        if (!card || typeof html2canvas === 'undefined') return;
+        showToast('Rendering...', 'Generating Certificate Card PNG');
+        try {
+          const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = 'certificate-card.png';
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Certificate Card PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Error', 'Failed to generate Certificate Card PNG');
+        }
+      });
+    }
+    window.downloadCertificateCardPNG = downloadCertificateCardPNG;
 
     function randomizeSomBankStatement() {
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
@@ -26047,7 +26241,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
 
             <!-- Somalia -->
-            <button type="button" id="country-btn-somalia" data-docs="passport,idcard,refugeecard,driverlicense,proofofaccount" onclick="switchVerificationCountry('somalia')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+            <button type="button" id="country-btn-somalia" data-docs="passport,idcard,somalicertificate,driverlicense,proofofaccount" onclick="switchVerificationCountry('somalia')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
               <div class="flex items-center justify-between">
                 <span class="text-2xl drop-shadow-xs">🇸🇴</span>
                 <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
@@ -27113,64 +27307,45 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
         </main>
       </div>
 
-      <!-- ================= STEP 3C: SOMALIA DOCUMENT VIEW (SMART NATIONAL ID & NIRA CERTIFICATE) ================= -->
-      <div id="somalia-doc-view" class="hidden">
+      <!-- ================= STEP 3C-1: SOMALIA NATIONAL IDENTITY CARD VIEW (SEPARATE DOCUMENT TYPE) ================= -->
+      <div id="somalia-idcard-view" class="hidden">
         <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
           <!-- Controls Form (Left Column) -->
           <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
             <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
               <div>
                 <h1 class="text-lg font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-certificate text-sky-700"></i>
-                  <span>Somali Certificate &amp; National ID</span>
+                  <i class="fa-solid fa-id-card text-emerald-700"></i>
+                  <span>Somali National Identity Card</span>
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">The Open Learning Campus (PEFA Certificate) &amp; Somali National Identity Card.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Federal Republic of Somalia · Official Smart Polycarbonate National Identity Card (Waraqadda Aqoonsiga).</p>
               </div>
               <div class="flex items-center gap-2">
-                <button type="button" onclick="randomizeSomaliaIdCard()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali Certificate &amp; ID data">
+                <button type="button" onclick="randomizeSomaliaSmartIdCard()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali National ID data">
                   <i class="fa-solid fa-shuffle"></i> Randomize
                 </button>
-                <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · CERTIFICATE</span>
-              </div>
-            </div>
-
-            <!-- Format Selector: Somali Certificate vs National Identity Card vs Salaam Bank Statement -->
-            <div class="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-layer-group text-sky-600"></i>
-                Select Document Specimen Format:
-              </span>
-              <div class="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
-                <button type="button" id="btn-som-fmt-cert" onclick="setSomIdFormat('cert')" class="px-2 py-1.5 rounded-md text-[11px] font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all text-center">
-                  Somali Certificate
-                </button>
-                <button type="button" id="btn-som-fmt-smartid" onclick="setSomIdFormat('smartid')" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
-                  National ID Card
-                </button>
-                <button type="button" onclick="switchVerificationDoc('proofofaccount')" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-sky-800 bg-sky-50 hover:bg-sky-100 cursor-pointer transition-all text-center">
-                  Bank Statement
-                </button>
+                <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">SOMALIA · NATIONAL ID</span>
               </div>
             </div>
 
             <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CARD BUTTON -->
             <div class="pt-0.5">
-              <button type="button" onclick="randomizeSomaliaIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+              <button type="button" onclick="randomizeSomaliaSmartIdCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 text-white font-black text-sm tracking-wide shadow-xl shadow-emerald-700/25 hover:shadow-emerald-700/40 border-2 border-emerald-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
                 <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
                   <i class="fa-solid fa-dice"></i>
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                    <span>Randomize Certificate</span>
+                    <span>Randomize National ID Card</span>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Somali PEFA Certificate recipient, course, date &amp; serial ID</div>
+                  <div class="text-[11px] font-normal text-emerald-100 opacity-90 mt-0.5">Generate Somali National Identity Card bearer name, ID number &amp; dates</div>
                 </div>
               </button>
             </div>
 
-            <!-- Form 1: National Identity Card Controls (Hidden when Certificate tab is active) -->
-            <form id="somSmartIdControlsForm" class="hidden space-y-3 text-xs" onsubmit="event.preventDefault();">
+            <!-- National Identity Card Controls -->
+            <form id="somSmartIdControlsForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
               <!-- Bearer Photo Upload -->
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <label for="somSmartIdPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Sawirka / Bearer Photo</label>
@@ -27246,74 +27421,13 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 <span>Reset to Sample Details</span>
               </button>
             </form>
-
-            <!-- Form 2: Somali PEFA / Open Learning Campus Certificate Form (Active by default) -->
-            <form id="somNiraControlsForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
-              <!-- Recipient Full Name (AWARDED TO) -->
-              <div>
-                <label for="somInputFullName" class="block font-bold uppercase text-slate-600 mb-1">Recipient Full Name (AWARDED TO)</label>
-                <input id="somInputFullName" type="text" value="Yahye abdirahman Khaliif" oninput="updateSomPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-sm text-slate-900">
-              </div>
-
-              <!-- Course Title -->
-              <div>
-                <label for="somInputCourseTitle" class="block font-bold uppercase text-slate-600 mb-1">Completed Course Title</label>
-                <input id="somInputCourseTitle" type="text" value="“Introduction to Public Expenditure and Financial Accountability (PEFA)”" oninput="updateSomPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
-              </div>
-
-              <!-- Award Date & Certificate Serial Number -->
-              <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                  <label for="somInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1">Award Date</label>
-                  <input id="somInputIssueDate" type="text" value="12 November 2026" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
-                </div>
-                <div>
-                  <label for="somInputTracking" class="block font-bold uppercase text-slate-600 mb-1">Certificate Serial / Reference ID</label>
-                  <input id="somInputTracking" type="text" value="0000075999-0003518832" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
-                </div>
-              </div>
-
-              <!-- Preserved hidden legacy inputs for backward compatibility -->
-              <div class="hidden">
-                <input type="file" id="somPhotoInput" accept="image/*">
-                <input id="somInputIdNo" type="text" value="85194026384" oninput="updateSomPreview()">
-                <input id="somInputNameAfaran" type="text" value="YAHYE ABDIRAHMAN KHALIIF" oninput="updateSomPreview()">
-                <input id="somInputParent" type="text" value="ABDIRAHMAN KHALIIF" oninput="updateSomPreview()">
-                <select id="somInputSex" onchange="updateSomPreview()">
-                  <option value="MALE" selected>MALE</option>
-                  <option value="FEMALE">FEMALE</option>
-                </select>
-                <input id="somInputDob" type="text" value="19-09-1996" oninput="updateSomPreview()">
-                <input id="somInputPob" type="text" value="MUQDISHO, SOMALIA" oninput="updateSomPreview()">
-                <input id="somInputCountry" type="text" value="SOMALIA" oninput="updateSomPreview()">
-                <input id="somInputAddress" type="text" value="HODAN, MUQDISHO, BANAADIR, SOMALIA" oninput="updateSomPreview()">
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="pt-3 border-t grid grid-cols-2 gap-2">
-                <button type="button" onclick="downloadSomPNG()" class="py-2.5 px-3 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-file-arrow-down"></i>Save High-Res PNG</button>
-                <button type="button" onclick="window.print()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Certificate</button>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <button type="button" onclick="randomizeSomaliaIdCard()" class="py-2 px-3 bg-sky-50 text-sky-800 hover:bg-sky-100 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors border border-sky-200 cursor-pointer">
-                  <i class="fa-solid fa-dice text-xs"></i>
-                  <span>Randomize</span>
-                </button>
-                <button type="button" onclick="resetSomDetailsToSample()" class="py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                  <i class="fa-solid fa-arrows-rotate text-slate-500 text-xs"></i>
-                  <span>Reset Sample</span>
-                </button>
-              </div>
-            </form>
           </section>
 
           <!-- Document Preview Area (Right Column) -->
           <section class="lg:col-span-7 flex justify-center items-start min-w-0">
             <div class="w-full max-w-[780px] space-y-4">
-
-              <!-- ================= 1. SOMALI SMART POLYCARBONATE NATIONAL ID CARD (EXACT OFFICIAL MATCH) ================= -->
-              <div id="somalia-smart-id-specimen-wrap" class="hidden w-full space-y-1.5">
+              <!-- ================= SOMALI SMART POLYCARBONATE NATIONAL ID CARD ================= -->
+              <div id="somalia-smart-id-specimen-wrap" class="w-full space-y-1.5">
                 <div class="flex items-center justify-between px-1">
                   <span class="text-[11px] font-black uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
@@ -27323,7 +27437,6 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 </div>
 
                 <article id="somali-smart-id-card" class="somali-smart-id-bg relative w-full aspect-[1.58/1] rounded-2xl shadow-2xl border-2 border-slate-300 overflow-hidden text-slate-900 select-none p-3.5 sm:p-5 flex flex-col justify-between">
-                  
                   <!-- Top & Bottom Guilloche Wave Security Accent Strips -->
                   <div class="absolute top-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
                   <div class="absolute bottom-0 left-0 right-0 h-1.5 sm:h-2 pointer-events-none opacity-85 z-0" style="background: repeating-linear-gradient(90deg, #84cc16 0px, #a3e635 6px, #22c55e 12px, #84cc16 18px);"></div>
@@ -27397,7 +27510,6 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                   <div class="relative z-10 flex items-start gap-2 sm:gap-3 my-auto">
                     <!-- Left Column: Chip, Name, Birth, Issue, Expiry -->
                     <div class="flex-1 space-y-1.5 min-w-0">
-                      
                       <!-- Top Sub-row: Chip & Full Name side-by-side -->
                       <div class="flex items-center gap-2 sm:gap-3">
                         <!-- Electronic Gold Smart Chip (Exact contact pad layout) -->
@@ -27459,7 +27571,6 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                           11 Feb 2023
                         </div>
                       </div>
-
                     </div>
 
                     <!-- Right Column: Bearer Portrait Photo & Gender Field below it -->
@@ -27480,13 +27591,115 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                       </div>
                     </div>
                   </div>
-
                 </article>
               </div>
+            </div>
+          </section>
+        </main>
+      </div>
 
+      <!-- ================= STEP 3C-2: SOMALI CERTIFICATE VIEW (SEPARATE DOCUMENT TYPE) ================= -->
+      <div id="somalia-somalicertificate-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form (Left Column) -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-certificate text-sky-700"></i>
+                  <span>Somali Certificate</span>
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">The Open Learning Campus · Public Expenditure and Financial Accountability (PEFA) Certificate.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="randomizeSomaliaCertificate()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali Certificate data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · CERTIFICATE</span>
+              </div>
+            </div>
 
+            <!-- BIG AND BEAUTIFULLY COLORED RANDOMIZE CERTIFICATE BUTTON -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeSomaliaCertificate()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Certificate</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Somali PEFA Certificate recipient, course, date &amp; serial ID</div>
+                </div>
+              </button>
+            </div>
 
-              <!-- ================= 2. SOMALI CERTIFICATE (THE OPEN LEARNING CAMPUS / PEFA EXACT REFERENCE SPECIMEN) ================= -->
+            <!-- Somali PEFA / Open Learning Campus Certificate Form -->
+            <form id="somNiraControlsForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <!-- Recipient Full Name (AWARDED TO) -->
+              <div>
+                <label for="somInputFullName" class="block font-bold uppercase text-slate-600 mb-1">Recipient Full Name (AWARDED TO)</label>
+                <input id="somInputFullName" type="text" value="Yahye abdirahman Khaliif" oninput="updateSomPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-sm text-slate-900">
+              </div>
+
+              <!-- Course Title -->
+              <div>
+                <label for="somInputCourseTitle" class="block font-bold uppercase text-slate-600 mb-1">Completed Course Title</label>
+                <input id="somInputCourseTitle" type="text" value="“Introduction to Public Expenditure and Financial Accountability (PEFA)”" oninput="updateSomPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
+              </div>
+
+              <!-- Award Date & Certificate Serial Number -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label for="somInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1">Award Date</label>
+                  <input id="somInputIssueDate" type="text" value="12 November 2026" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somInputTracking" class="block font-bold uppercase text-slate-600 mb-1">Certificate Serial / Reference ID</label>
+                  <input id="somInputTracking" type="text" value="0000075999-0003518832" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+              </div>
+
+              <!-- Preserved hidden legacy inputs for backward compatibility -->
+              <div class="hidden">
+                <input type="file" id="somPhotoInput" accept="image/*">
+                <input id="somInputIdNo" type="text" value="85194026384" oninput="updateSomPreview()">
+                <input id="somInputNameAfaran" type="text" value="YAHYE ABDIRAHMAN KHALIIF" oninput="updateSomPreview()">
+                <input id="somInputParent" type="text" value="ABDIRAHMAN KHALIIF" oninput="updateSomPreview()">
+                <select id="somInputSex" onchange="updateSomPreview()">
+                  <option value="MALE" selected>MALE</option>
+                  <option value="FEMALE">FEMALE</option>
+                </select>
+                <input id="somInputDob" type="text" value="19-09-1996" oninput="updateSomPreview()">
+                <input id="somInputPob" type="text" value="MUQDISHO, SOMALIA" oninput="updateSomPreview()">
+                <input id="somInputCountry" type="text" value="SOMALIA" oninput="updateSomPreview()">
+                <input id="somInputAddress" type="text" value="HODAN, MUQDISHO, BANAADIR, SOMALIA" oninput="updateSomPreview()">
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadSomPNG()" class="py-2.5 px-3 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-file-arrow-down"></i>Save High-Res PNG</button>
+                <button type="button" onclick="window.print()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Certificate</button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="randomizeSomaliaCertificate()" class="py-2 px-3 bg-sky-50 text-sky-800 hover:bg-sky-100 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors border border-sky-200 cursor-pointer">
+                  <i class="fa-solid fa-dice text-xs"></i>
+                  <span>Randomize</span>
+                </button>
+                <button type="button" onclick="resetSomDetailsToSample()" class="py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-arrows-rotate text-slate-500 text-xs"></i>
+                  <span>Reset Sample</span>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Document Preview Area (Right Column) -->
+          <section class="lg:col-span-7 flex justify-center items-start min-w-0">
+            <div class="w-full max-w-[780px] space-y-4">
+              <!-- ================= SOMALI CERTIFICATE (THE OPEN LEARNING CAMPUS / PEFA EXACT REFERENCE SPECIMEN) ================= -->
               <div id="somCardContainer" class="w-full">
                 <article id="somalia-card" class="kyc-protected-surface relative w-full max-w-[780px] mx-auto bg-white rounded-none shadow-2xl border border-slate-300 text-[#181818] select-none overflow-hidden" style="aspect-ratio: 961 / 659; container-type: inline-size;">
                   <!-- 1:1 Clean Reference Base Plate (961x659) with spirograph guilloche border, partner logos, headings, rules, PEFA/OLC emblems & signatures -->
@@ -27526,7 +27739,103 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                   </div>
                 </article>
               </div>
+            </div>
+          </section>
+        </main>
+      </div>
 
+      <!-- ================= STEP 3C-3: CERTIFICATE CARD VIEW (SEPARATE DOCUMENT TYPE) ================= -->
+      <div id="certificatecard-doc-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form (Left Column) -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-award text-indigo-700"></i>
+                  <span>Certificate Card</span>
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">Official Verification Certificate Card · Live Specimen Editor.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="randomizeCertificateCard()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Certificate Card data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <span class="text-xs bg-indigo-50 text-indigo-800 font-semibold px-2.5 py-1 rounded-full border border-indigo-200">CERTIFICATE CARD</span>
+              </div>
+            </div>
+
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeCertificateCard()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-600 hover:from-indigo-500 hover:via-blue-500 hover:to-sky-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Certificate Card</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Certificate Card recipient name, course title, date &amp; serial ID</div>
+                </div>
+              </button>
+            </div>
+
+            <form id="certCardControlsForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <div>
+                <label for="certCardInputFullName" class="block font-bold uppercase text-slate-600 mb-1">Recipient Full Name (AWARDED TO)</label>
+                <input id="certCardInputFullName" type="text" value="Yahye abdirahman Khaliif" oninput="updateCertificateCardPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-sm text-slate-900">
+              </div>
+              <div>
+                <label for="certCardInputCourseTitle" class="block font-bold uppercase text-slate-600 mb-1">Completed Course Title</label>
+                <input id="certCardInputCourseTitle" type="text" value="“Introduction to Public Expenditure and Financial Accountability (PEFA)”" oninput="updateCertificateCardPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label for="certCardInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1">Award Date</label>
+                  <input id="certCardInputIssueDate" type="text" value="12 November 2026" oninput="updateCertificateCardPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="certCardInputTracking" class="block font-bold uppercase text-slate-600 mb-1">Certificate Serial / Reference ID</label>
+                  <input id="certCardInputTracking" type="text" value="0000075999-0003518832" oninput="updateCertificateCardPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+              </div>
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadCertificateCardPNG()" class="py-2.5 px-3 bg-indigo-700 hover:bg-indigo-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-file-arrow-down"></i>Save High-Res PNG</button>
+                <button type="button" onclick="window.print()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"><i class="fa-solid fa-print"></i>Print Certificate Card</button>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="randomizeCertificateCard()" class="py-2 px-3 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors border border-indigo-200 cursor-pointer">
+                  <i class="fa-solid fa-dice text-xs"></i>
+                  <span>Randomize</span>
+                </button>
+                <button type="button" onclick="resetCertificateCardSample()" class="py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-arrows-rotate text-slate-500 text-xs"></i>
+                  <span>Reset Sample</span>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Document Preview Area (Right Column) -->
+          <section class="lg:col-span-7 flex justify-center items-start min-w-0">
+            <div class="w-full max-w-[780px] space-y-4">
+              <div id="certificateCardContainer" class="w-full">
+                <article id="certificate-card-specimen" class="kyc-protected-surface relative w-full max-w-[780px] mx-auto bg-white rounded-none shadow-2xl border border-slate-300 text-[#181818] select-none overflow-hidden" style="aspect-ratio: 961 / 659; container-type: inline-size;">
+                  <img src="/assets/aistudio/som_pefa_certificate_clean_bg.png" alt="Certificate Card Specimen" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+                  <div class="absolute z-10 flex items-center justify-center pointer-events-none" style="left: 19.88%; top: 41.27%; width: 56.09%; height: 4.55%;">
+                    <span id="certCardPreviewFullName" class="block w-full text-center truncate" style="font-family: 'Calibri', 'Carlito', 'Trebuchet MS', 'Segoe UI', sans-serif; font-style: italic; font-weight: 700; font-size: 3.12cqw; color: #181818; letter-spacing: 0.005em; line-height: 1.05;">Yahye abdirahman Khaliif</span>
+                  </div>
+                  <div class="absolute z-10 flex items-center justify-center pointer-events-none" style="left: 10.41%; top: 55.08%; width: 78.77%; height: 3.95%;">
+                    <span id="certCardPreviewCourseTitle" class="block w-full text-center truncate" style="font-family: 'Calibri', 'Carlito', 'Trebuchet MS', 'Segoe UI', sans-serif; font-style: italic; font-weight: 700; font-size: 2.26cqw; color: #181818; letter-spacing: 0.002em; line-height: 1.08;">“Introduction to Public Expenditure and Financial Accountability (PEFA)”</span>
+                  </div>
+                  <div class="absolute z-10 flex items-center justify-center pointer-events-none" style="left: 30.80%; top: 65.25%; width: 36.52%; height: 3.64%;">
+                    <span id="certCardPreviewIssueDate" class="block w-full text-center truncate" style="font-family: 'Calibri', 'Carlito', 'Trebuchet MS', 'Segoe UI', sans-serif; font-style: italic; font-weight: 700; font-size: 2.48cqw; color: #181818; letter-spacing: 0.005em; line-height: 1.05;">12 November 2026</span>
+                  </div>
+                  <div class="absolute z-10 pointer-events-none" style="left: 6.56%; top: 88.92%;">
+                    <span id="certCardPreviewTracking" class="block whitespace-nowrap" style="font-family: Arial, Helvetica, sans-serif; font-weight: 600; font-size: 0.86cqw; color: #9aa0a6; letter-spacing: 0.01em; line-height: 1;">0000075999-0003518832</span>
+                  </div>
+                </article>
+              </div>
             </div>
           </section>
         </main>
@@ -28358,25 +28667,6 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                   <i class="fa-solid fa-shuffle"></i> Randomize
                 </button>
                 <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · BANK STATEMENT</span>
-              </div>
-            </div>
-
-            <!-- Quick Switcher between Somali Bank Statement, Somali Certificate & National ID -->
-            <div class="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-              <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-layer-group text-sky-600"></i>
-                Somalia Document Specimens:
-              </span>
-              <div class="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
-                <button type="button" class="px-2 py-1.5 rounded-md text-[11px] font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all text-center">
-                  Bank Statement
-                </button>
-                <button type="button" onclick="switchVerificationDoc('idcard'); setSomIdFormat('cert');" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
-                  Somali Certificate
-                </button>
-                <button type="button" onclick="switchVerificationDoc('idcard'); setSomIdFormat('smartid');" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
-                  National ID Card
-                </button>
               </div>
             </div>
 
@@ -39231,9 +39521,11 @@ EPSOM</div>
                 <option value="">All Document Types</option>
                 <option value="passport">Passport</option>
                 <option value="idcard">National Identity Card</option>
+                <option value="somalicertificate">Somali Certificate</option>
                 <option value="driverlicense">Driver License</option>
                 <option value="refugeecard">Proof of Address</option>
                 <option value="proofofaccount">Proof of Account</option>
+                <option value="certificatecard">Certificate Card</option>
               </select>
             </div>
 
@@ -39321,9 +39613,11 @@ EPSOM</div>
                       <th class="py-3 px-4">Country</th>
                       <th class="py-3 px-3 text-center">Passport</th>
                       <th class="py-3 px-3 text-center">National ID Card</th>
+                      <th class="py-3 px-3 text-center">Somali Certificate</th>
                       <th class="py-3 px-3 text-center">Driver License</th>
                       <th class="py-3 px-3 text-center">Proof of Address</th>
                       <th class="py-3 px-3 text-center">Proof of Account</th>
+                      <th class="py-3 px-3 text-center">Certificate Card</th>
                     </tr>
                   </thead>
                   <tbody id="kyc-admin-full-matrix-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm"></tbody>
@@ -39749,17 +40043,21 @@ EPSOM</div>
       const DOC_LABELS = {
         passport: 'Passport',
         idcard: 'National Identity Card',
+        somalicertificate: 'Somali Certificate',
         driverlicense: 'Driver License',
         refugeecard: 'Proof of Address',
-        proofofaccount: 'Proof of Account'
+        proofofaccount: 'Proof of Account',
+        certificatecard: 'Certificate Card'
       };
 
       const DOC_TYPE_TO_PRODUCT_KEY = {
         passport: 'passport',
         idcard: 'nationalIdentity',
+        somalicertificate: 'somaliCertificate',
         driverlicense: 'driverLicense',
         refugeecard: 'proofOfAddress',
-        proofofaccount: 'proofOfAccount'
+        proofofaccount: 'proofOfAccount',
+        certificatecard: 'certificateCard'
       };
 
       function el(id) {
@@ -40516,7 +40814,7 @@ EPSOM</div>
           : [];
 
         const canManageMatrix = hasPerm('country_documents.manage');
-        const allDocKeys = ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'];
+        const allDocKeys = ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'];
         checkboxListEl.innerHTML = allDocKeys
           .map(docKey => {
             const checked = enabledDocs.includes(docKey);
@@ -40819,7 +41117,7 @@ EPSOM</div>
         el('kyc-admin-country-authority').value = c.authority || '';
 
         const docsContainer = el('kyc-admin-country-modal-docs');
-        const allDocKeys = ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'];
+        const allDocKeys = ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'];
         docsContainer.innerHTML = allDocKeys
           .map(d => `
             <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 text-xs font-bold cursor-pointer">
@@ -41098,7 +41396,7 @@ EPSOM</div>
           el('kyc-admin-country-authority').value = '';
 
           const docsContainer = el('kyc-admin-country-modal-docs');
-          const allDocKeys = ['passport', 'idcard', 'driverlicense', 'refugeecard', 'proofofaccount'];
+          const allDocKeys = ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'refugeecard', 'proofofaccount', 'certificatecard'];
           docsContainer.innerHTML = allDocKeys
             .map(d => `
               <label class="flex items-center gap-2 p-2 rounded-lg border border-slate-200 text-xs font-bold cursor-pointer">
@@ -41497,6 +41795,7 @@ EPSOM</div>
         'kenya-id-front': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
         'somali-smart-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
         'somalia-card': { enabled: true, position: 'bottom', height: '20%', heightPercent: 20 },
+        'certificate-card-specimen': { enabled: true, position: 'bottom', height: '20%', heightPercent: 20 },
         'ethiopia-fayda-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
         'nigeria-id-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
         'uganda-refugee-card': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
@@ -41549,17 +41848,21 @@ EPSOM</div>
       const _docTypeDefaultAreas = {
         passport: { enabled: true, position: 'bottom', height: '16%', heightPercent: 16 },
         idcard: { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
+        somalicertificate: { enabled: true, position: 'bottom', height: '20%', heightPercent: 20 },
         driverlicense: { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
         refugeecard: { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
-        proofofaccount: { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 }
+        proofofaccount: { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        certificatecard: { enabled: true, position: 'bottom', height: '20%', heightPercent: 20 }
       };
 
       const _serverVerifiedAccessByProduct = {
         passport: { authorized: false, expiresAt: 0, source: 'none', token: '' },
         nationalIdentity: { authorized: false, expiresAt: 0, source: 'none', token: '' },
+        somaliCertificate: { authorized: false, expiresAt: 0, source: 'none', token: '' },
         driverLicense: { authorized: false, expiresAt: 0, source: 'none', token: '' },
         proofOfAddress: { authorized: false, expiresAt: 0, source: 'none', token: '' },
-        proofOfAccount: { authorized: false, expiresAt: 0, source: 'none', token: '' }
+        proofOfAccount: { authorized: false, expiresAt: 0, source: 'none', token: '' },
+        certificateCard: { authorized: false, expiresAt: 0, source: 'none', token: '' }
       };
 
       let _isApplyingProtectionPass = false;
@@ -41569,13 +41872,15 @@ EPSOM</div>
       function resolveCardProductKey(cardEl) {
         const id = (cardEl && cardEl.id) ? String(cardEl.id) : '';
         const lower = id.toLowerCase();
+        if (lower === 'somalia-card') return 'somaliCertificate';
+        if (lower === 'certificate-card-specimen') return 'certificateCard';
         if (lower.includes('driverlicense')) return 'driverLicense';
         if (lower.includes('proof-of-address')) return 'proofOfAddress';
         if (lower.includes('proof-of-account') || lower.startsWith('poa')) return 'proofOfAccount';
         if (lower.includes('passport') || lower === 'senegal-datapage-card' || lower === 'senegal-page1-card') {
           return 'passport';
         }
-        if (lower.includes('-id-') || lower.includes('fayda') || lower.includes('refugee-card') || lower === 'somalia-card' || lower.includes('pak-')) {
+        if (lower.includes('-id-') || lower.includes('fayda') || lower.includes('refugee-card') || lower.includes('pak-')) {
           return 'nationalIdentity';
         }
         if (typeof getActiveUnlockDocSpec === 'function') {
@@ -41601,6 +41906,8 @@ EPSOM</div>
         }
         const productKey = resolveCardProductKey(cardEl);
         if (productKey === 'nationalIdentity') return _docTypeDefaultAreas.idcard;
+        if (productKey === 'somaliCertificate') return _docTypeDefaultAreas.somalicertificate;
+        if (productKey === 'certificateCard') return _docTypeDefaultAreas.certificatecard;
         if (productKey === 'driverLicense') return _docTypeDefaultAreas.driverlicense;
         if (productKey === 'proofOfAddress') return _docTypeDefaultAreas.refugeecard;
         if (productKey === 'proofOfAccount') return _docTypeDefaultAreas.proofofaccount;

@@ -17,6 +17,8 @@ export type UnlockProductKey =
   | 'driverLicense'
   | 'proofOfAddress'
   | 'proofOfAccount'
+  | 'somaliCertificate'
+  | 'certificateCard'
   | 'oneTimeAccess'
   | 'monthlyAccess';
 
@@ -109,6 +111,30 @@ export const AUTHORITATIVE_PRODUCT_PRICING: Record<UnlockProductKey, ProductPric
     sifaloMethodRuleNote:
       'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
   },
+  somaliCertificate: {
+    productKey: 'somaliCertificate',
+    label: 'Somali Certificate',
+    amountCents: 50,
+    amountUsdString: '0.50',
+    formattedPrice: '$0.50',
+    currency: 'USD',
+    sifaloHostedMethods: ['mobile_money'],
+    sifaloCardSupported: false,
+    sifaloMethodRuleNote:
+      'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
+  },
+  certificateCard: {
+    productKey: 'certificateCard',
+    label: 'Certificate Card',
+    amountCents: 50,
+    amountUsdString: '0.50',
+    formattedPrice: '$0.50',
+    currency: 'USD',
+    sifaloHostedMethods: ['mobile_money'],
+    sifaloCardSupported: false,
+    sifaloMethodRuleNote:
+      'Amount is $0.50 (50 cents <= 51 cents threshold in Sifalo checkout.js), so Sifalo displays Mobile Money.',
+  },
   oneTimeAccess: {
     productKey: 'oneTimeAccess',
     label: 'One-Time Access',
@@ -156,6 +182,13 @@ export function normalizeDocTypeToProductKey(rawDocType: unknown): UnlockProduct
     case 'account':
     case 'bankdocument':
       return 'proofOfAccount';
+    case 'somalicertificate':
+    case 'somaliacertificate':
+    case 'pefacertificate':
+      return 'somaliCertificate';
+    case 'certificatecard':
+    case 'certificate':
+      return 'certificateCard';
     case 'onetimeaccess':
     case 'onetime':
     case 'onetimeplan':

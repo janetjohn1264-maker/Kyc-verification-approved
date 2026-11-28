@@ -13,7 +13,9 @@ export type DocTypeKey =
   | 'idcard'
   | 'driverlicense'
   | 'refugeecard'
-  | 'proofofaccount';
+  | 'proofofaccount'
+  | 'somalicertificate'
+  | 'certificatecard';
 
 export type AdminRole =
   | 'super_admin'
@@ -321,6 +323,8 @@ const VALID_DOC_TYPES: DocTypeKey[] = [
   'driverlicense',
   'refugeecard',
   'proofofaccount',
+  'somalicertificate',
+  'certificatecard',
 ];
 
 const DOC_TYPE_TO_PRODUCT_KEY: Record<DocTypeKey, UnlockProductKey> = {
@@ -329,6 +333,8 @@ const DOC_TYPE_TO_PRODUCT_KEY: Record<DocTypeKey, UnlockProductKey> = {
   driverlicense: 'driverLicense',
   refugeecard: 'proofOfAddress',
   proofofaccount: 'proofOfAccount',
+  somalicertificate: 'somaliCertificate',
+  certificatecard: 'certificateCard',
 };
 
 export const DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA: Record<DocTypeKey, PreviewProtectedAreaConfig> = {
@@ -366,6 +372,20 @@ export const DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA: Record<DocTypeKey, Preview
     height: '17%',
     heightPercent: 17,
     label: 'Lower Account Certification & Bank Stamp Strip',
+  },
+  somalicertificate: {
+    enabled: true,
+    position: 'bottom',
+    height: '20%',
+    heightPercent: 20,
+    label: 'Lower Certificate Signatures, Serial & Seal Strip',
+  },
+  certificatecard: {
+    enabled: true,
+    position: 'bottom',
+    height: '19%',
+    heightPercent: 19,
+    label: 'Lower Certificate Verification & Seal Strip',
   },
 };
 
@@ -468,6 +488,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
   'poa-revolut-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
   'poaPdfContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
   'poaLetterContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+  'certificate-card-specimen': { enabled: true, position: 'bottom', height: '19%', heightPercent: 19 },
 };
 
 function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
@@ -532,6 +553,30 @@ function createDefaultDocuments(nowIso: string): AdminDocumentTypeConfig[] {
       previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.proofofaccount },
       updatedAt: nowIso,
     },
+    {
+      docType: 'somalicertificate',
+      productKey: 'somaliCertificate',
+      name: 'Somali Certificate',
+      categoryLabel: 'The Open Learning Campus / PEFA Certificate',
+      priceUsd: '0.50',
+      description: 'Official Open Learning Campus / Public Expenditure and Financial Accountability (PEFA) Certificate.',
+      icon: 'fa-solid fa-certificate',
+      enabled: true,
+      previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.somalicertificate },
+      updatedAt: nowIso,
+    },
+    {
+      docType: 'certificatecard',
+      productKey: 'certificateCard',
+      name: 'Certificate Card',
+      categoryLabel: 'Official Verification & Qualification Certificate Card',
+      priceUsd: '0.50',
+      description: 'Official verification & qualification certificate card with security guilloche border and seal.',
+      icon: 'fa-solid fa-award',
+      enabled: true,
+      previewProtectedArea: { ...DOC_TYPE_DEFAULT_PREVIEW_PROTECTED_AREA.certificatecard },
+      updatedAt: nowIso,
+    },
   ];
 }
 
@@ -564,13 +609,13 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       key: 'somalia',
       name: 'Somalia',
       flag: '🇸🇴',
-      subtitle: 'Somali Certificate, National ID, Passport & Bank Statement',
+      subtitle: 'National ID, Somali Certificate, Passport & Bank Statement',
       iso3: 'SOM',
       authority: 'Immigration and Citizenship Agency (ICA) & National Identification and Registration Authority (NIRA)',
       portalName: 'Federal Republic of Somalia NIRA / ICA',
       portalUrl: 'https://nira.gov.so',
-      idStandard: 'Somali PEFA Certificate, Biometric e-Passport, NIRA National Identity Card, Driving License & Salaam Somali Bank Statement',
-      enabledDocs: ['passport', 'idcard', 'refugeecard', 'driverlicense', 'proofofaccount'],
+      idStandard: 'Somali Biometric e-Passport, National Identity Card, Somali PEFA Certificate, Driving License & Salaam Somali Bank Statement',
+      enabledDocs: ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'proofofaccount'],
     },
     {
       key: 'ethiopia',
@@ -1057,7 +1102,14 @@ export class KycAdminService {
         const raw = fs.readFileSync(this.persistencePath, 'utf8');
         const parsed = JSON.parse(raw) as Partial<PersistedAdminState>;
         if (parsed && Array.isArray(parsed.countries) && Array.isArray(parsed.documents)) {
-          const normalizedDocs = (parsed.documents.length > 0 ? parsed.documents : defaultState.documents).map((doc) => ({
+          const rawPersistedDocs = parsed.documents.length > 0 ? parsed.documents : defaultState.documents;
+          const persistedDocMap = new Map(rawPersistedDocs.map((d) => [d.docType, d]));
+          for (const defDoc of defaultState.documents) {
+            if (!persistedDocMap.has(defDoc.docType)) {
+              persistedDocMap.set(defDoc.docType, defDoc);
+            }
+          }
+          const normalizedDocs = Array.from(persistedDocMap.values()).map((doc) => ({
             ...doc,
             previewProtectedArea:
               doc.previewProtectedArea &&
@@ -1077,11 +1129,12 @@ export class KycAdminService {
                 };
               }
               if (c.key === 'somalia' && Array.isArray(c.enabledDocs)) {
-                const requiredSomDocs: DocTypeKey[] = ['passport', 'idcard', 'refugeecard', 'driverlicense', 'proofofaccount'];
-                const mergedSomDocs = Array.from(new Set<DocTypeKey>([...requiredSomDocs, ...c.enabledDocs]));
+                const requiredSomDocs: DocTypeKey[] = ['passport', 'idcard', 'somalicertificate', 'driverlicense', 'proofofaccount'];
+                const cleanedPrev = c.enabledDocs.filter((d) => d !== 'refugeecard');
+                const mergedSomDocs = Array.from(new Set<DocTypeKey>([...requiredSomDocs, ...cleanedPrev]));
                 return {
                   ...c,
-                  subtitle: 'Somali Certificate, National ID, Passport & Bank Statement',
+                  subtitle: 'National ID, Somali Certificate, Passport & Bank Statement',
                   enabledDocs: mergedSomDocs,
                 };
               }

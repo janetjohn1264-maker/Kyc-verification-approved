@@ -102,6 +102,8 @@ export type PendingProductCode =
   | 'DRIVER_LICENSE'
   | 'PROOF_OF_ADDRESS'
   | 'PROOF_OF_ACCOUNT'
+  | 'SOMALI_CERTIFICATE'
+  | 'CERTIFICATE_CARD'
   | 'ONE_TIME_ACCESS'
   | 'MONTHLY_ACCESS';
 
@@ -204,6 +206,10 @@ function getPendingProductCode(productKey: UnlockProductKey): PendingProductCode
       return 'PROOF_OF_ADDRESS';
     case 'proofOfAccount':
       return 'PROOF_OF_ACCOUNT';
+    case 'somaliCertificate':
+      return 'SOMALI_CERTIFICATE';
+    case 'certificateCard':
+      return 'CERTIFICATE_CARD';
     case 'monthlyAccess':
       return 'MONTHLY_ACCESS';
     case 'oneTimeAccess':
