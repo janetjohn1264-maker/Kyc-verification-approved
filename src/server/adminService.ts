@@ -408,6 +408,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
   'pakistan-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
   'india-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
   'srilanka-passport-card': { enabled: true, position: 'bottom', height: '12%', heightPercent: 12 },
+  'china-passport-card': { enabled: true, position: 'bottom', height: '18%', heightPercent: 18 },
 
   // Single-Page Passport Data Cards
   'senegal-datapage-card': { enabled: true, position: 'bottom', height: '22%', heightPercent: 22 },
@@ -868,6 +869,18 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       portalName: 'Department of Immigration & Emigration · Sri Lanka',
       portalUrl: 'https://www.immigration.gov.lk',
       idStandard: 'Democratic Socialist Republic of Sri Lanka Machine-Readable Passport (LKA)',
+      enabledDocs: ['passport'],
+    },
+    {
+      key: 'china',
+      name: 'China',
+      flag: '🇨🇳',
+      subtitle: 'People’s Republic of China Passport / 中华人民共和国护照 (CHN)',
+      iso3: 'CHN',
+      authority: '公安部出入境管理局 · MPS Exit & Entry Administration',
+      portalName: 'National Immigration Administration · People’s Republic of China',
+      portalUrl: 'https://www.nia.gov.cn',
+      idStandard: 'People’s Republic of China Biometric e-Passport (中华人民共和国护照 / CHN)',
       enabledDocs: ['passport'],
     },
   ];
