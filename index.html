@@ -1177,7 +1177,8 @@
     const KYC_PENDING_SAVE_PNG_KEY = 'pendingSavePngAfterPayment';
     const KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY = 'kyc_sifalo_consumed_auto_orders_v1';
     const KYC_LEGACY_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v1';
-    const KYC_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v2';
+    const KYC_PREV_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v2';
+    const KYC_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v3';
 
     // Purge any legacy cross-browser-session localStorage payment flags so a new browser session never auto-unlocks
     (function purgeLegacyLocalStoragePaymentFlags() {
@@ -1188,6 +1189,7 @@
         localStorage.removeItem(KYC_PENDING_SAVE_PNG_KEY);
         localStorage.removeItem(KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY);
         localStorage.removeItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY);
+        localStorage.removeItem(KYC_PREV_ACTIVE_EDITOR_UI_KEY);
         localStorage.removeItem(KYC_ACTIVE_EDITOR_UI_KEY);
       } catch (e) {}
     })();
@@ -3294,21 +3296,23 @@
 
     function restoreSavedEditorUiOnRefresh() {
       try {
-        const legacyRaw = sessionStorage.getItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY);
+        const legacyRaw = sessionStorage.getItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY) || sessionStorage.getItem(KYC_PREV_ACTIVE_EDITOR_UI_KEY);
         if (legacyRaw) {
           sessionStorage.removeItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY);
+          sessionStorage.removeItem(KYC_PREV_ACTIVE_EDITOR_UI_KEY);
           try {
             const legacyParsed = JSON.parse(legacyRaw);
             if (legacyParsed && legacyParsed.workflowStep === 'editor') {
               const migrated = {
                 workflowStep: 'editor',
                 providerKey: legacyParsed.providerKey || 'paypal',
-                countryKey: 'china',
-                rawDocType: 'passport',
+                countryKey: 'somalia',
+                rawDocType: 'idcard',
                 fieldSnapshot: null,
                 updatedAt: Date.now()
               };
               sessionStorage.setItem(KYC_ACTIVE_EDITOR_UI_KEY, JSON.stringify(migrated));
+              if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
               return restoreEditorContextFromData(migrated, false);
             }
           } catch (innerErr) {}
@@ -4870,6 +4874,9 @@ var $ = window.$ || (id => document.getElementById(id));
       }
       if (viewEl.id === 'tonga-idcard-view') {
         return '/assets/aistudio/1795281954260_95a93fa4.jpg';
+      }
+      if (viewEl.id === 'somalia-doc-view') {
+        return '/assets/aistudio/FB_IMG_1794648137510_c954c568.jpg';
       }
       const imgs = Array.from(viewEl.querySelectorAll('img[src]'));
       const candidates = imgs.map(img => img.getAttribute('src') || '').filter(src => {
@@ -6838,7 +6845,7 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateNplPreview === 'function') updateNplPreview();
       } else if (countryKey === 'somalia') {
-        currentDocType = 'passport';
+        currentDocType = 'idcard';
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
         const dlTab = $('tab-doc-driverlicense');
@@ -6849,16 +6856,19 @@ var $ = window.$ || (id => document.getElementById(id));
         const dlRadio = $('driverlicense-radio-indicator');
         const refRadio = $('refugeecard-radio-indicator');
         const poaRadio = $('proofofaccount-radio-indicator');
-        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-emerald-600 bg-gradient-to-br from-emerald-50/90 via-white to-amber-50/30 text-slate-900 shadow-md ring-2 ring-emerald-500/20 transition-all cursor-pointer relative group";
-        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-cyan-300 hover:bg-cyan-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-sky-500/20 transition-all cursor-pointer relative group";
         if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (passRadio) passRadio.className = "w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
-        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
+        if (typeof updateSomPreview === 'function') updateSomPreview();
+        if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
         if (typeof updateSomPassPreview === 'function') updateSomPassPreview();
       } else if (countryKey === 'uae') {
         currentDocType = 'idcard';
@@ -17878,22 +17888,30 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
     function randomizeSomaliaIdCard() {
       const maleNamesSom = [
-        { som: 'MOHAMED ABDI HASSAN', afaran: 'MAXAMED CABDI XASAN', en: 'MOHAMED ABDI HASSAN' },
-        { som: 'AHMED YUSUF ALI', afaran: 'AXMED YUUSUF CALI', en: 'AHMED YUSUF ALI' },
-        { som: 'IBRAHIM OSMAN FARAH', afaran: 'IBRAAHIIM CUSMAAN FAARAX', en: 'IBRAHIM OSMAN FARAH' },
-        { som: 'DAHIR ADEN NUR', afaran: 'DAAHIR AADAN NUUR', en: 'DAHIR ADEN NUR' },
-        { som: 'ISMAIL GUULED SHIRE', afaran: 'ISMAACIIL GUULEED SHIRE', en: 'ISMAIL GULED SHIRE' },
-        { som: 'KHALID WARSAME GELLE', afaran: 'KHAALID WARSAME GEELLE', en: 'KHALID WARSAME GELLE' }
+        { som: 'MOHAMED ABDI HASSAN', afaran: 'MAXAMED CABDI XASAN', en: 'Mohamed Abdi Hassan', certName: 'Yahye abdirahman Khaliif' },
+        { som: 'AHMED YUSUF ALI', afaran: 'AXMED YUUSUF CALI', en: 'Ahmed Yusuf Ali', certName: 'Ahmed Yusuf Ali' },
+        { som: 'IBRAHIM OSMAN FARAH', afaran: 'IBRAAHIIM CUSMAAN FAARAX', en: 'Ibrahim Osman Farah', certName: 'Ibrahim Osman Farah' },
+        { som: 'DAHIR ADEN NUR', afaran: 'DAAHIR AADAN NUUR', en: 'Dahir Aden Nur', certName: 'Dahir Aden Nur' },
+        { som: 'ISMAIL GUULED SHIRE', afaran: 'ISMAACIIL GUULEED SHIRE', en: 'Ismail Guled Shire', certName: 'Ismail Guled Shire' },
+        { som: 'KHALID WARSAME GELLE', afaran: 'KHAALID WARSAME GEELLE', en: 'Khalid Warsame Gelle', certName: 'Khalid Warsame Gelle' }
       ];
       const femaleNamesSom = [
-        { som: 'FADUMA HASSAN WARSAME', afaran: 'FAADUMO XASAN WARSAME', en: 'FADUMA HASSAN WARSAME' },
-        { som: 'HALIMA OMAR ELMI', afaran: 'XALIIMO CUMAR CILMI', en: 'HALIMA OMAR ELMI' },
-        { som: 'MARYAN ABDULLAHI DIRIE', afaran: 'MARYAN CABDULLAAHI DIIRIYE', en: 'MARYAN ABDULLAHI DIRIE' },
-        { som: 'SAFIA ADEN ROBLE', afaran: 'SAFIYA AADAN ROOBLE', en: 'SAFIA ADEN ROBLE' },
-        { som: 'ASHO MOHAMUD JAMA', afaran: 'CAASHO MAXAMUUD JAAMAC', en: 'ASHA MOHAMUD JAMA' }
+        { som: 'FADUMA HASSAN WARSAME', afaran: 'FAADUMO XASAN WARSAME', en: 'Faduma Hassan Warsame', certName: 'Faduma Hassan Warsame' },
+        { som: 'HALIMA OMAR ELMI', afaran: 'XALIIMO CUMAR CILMI', en: 'Halima Omar Elmi', certName: 'Halima Omar Elmi' },
+        { som: 'MARYAN ABDULLAHI DIRIE', afaran: 'MARYAN CABDULLAAHI DIIRIYE', en: 'Maryan Abdullahi Dirie', certName: 'Maryan Abdullahi Dirie' },
+        { som: 'SAFIA ADEN ROBLE', afaran: 'SAFIYA AADAN ROOBLE', en: 'Safia Aden Roble', certName: 'Safia Aden Roble' },
+        { som: 'ASHO MOHAMUD JAMA', afaran: 'CAASHO MAXAMUUD JAAMAC', en: 'Asha Mohamud Jama', certName: 'Asha Mohamud Jama' }
+      ];
+      const courses = [
+        '“Introduction to Public Expenditure and Financial Accountability (PEFA)”',
+        '“Public Financial Management and Accountability Framework (PEFA)”',
+        '“Subnational Public Expenditure and Financial Accountability (PEFA)”',
+        '“Gender Responsive Public Financial Management (PEFA)”',
+        '“Climate Responsive Public Financial Management (PEFA)”'
       ];
       const cities = ['MOGADISHU', 'HARGEYSA', 'KISMAYO', 'BAIDOA', 'BELEDWEYN', 'GAROWE', 'BOSASO', 'BERBERA', 'JOWHAR'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const fullMonths = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
       const isMale = Math.random() > 0.45;
       const person = isMale
@@ -17909,11 +17927,15 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       const bYear = String(Math.floor(1980 + Math.random() * 23));
       const dob = `${bDay} ${bMonth} ${bYear}`;
 
-      const iDay = String(Math.floor(1 + Math.random() * 28)).padStart(2, '0');
-      const iMonth = months[Math.floor(Math.random() * months.length)];
-      const iYear = String(Math.floor(2020 + Math.random() * 5));
+      const iDayNum = Math.floor(1 + Math.random() * 28);
+      const iDay = String(iDayNum).padStart(2, '0');
+      const mIdx = Math.floor(Math.random() * months.length);
+      const iMonth = months[mIdx];
+      const iFullMonth = fullMonths[mIdx];
+      const iYear = String(Math.floor(2024 + Math.random() * 3));
       const issueDate = `${iDay} ${iMonth} ${iYear}`;
       const expiryDate = `${iDay} ${iMonth} ${parseInt(iYear, 10) + 5}`;
+      const certAwardDate = `${iDayNum} ${iFullMonth} ${iYear}`;
 
       const setVal = (id, val) => { if ($(id)) $(id).value = val; };
 
@@ -17927,16 +17949,21 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       setVal('somSmartIdInputExpiry', expiryDate);
       setVal('somSmartIdInputGender', isMale ? 'MALE' : 'FEMALE');
 
-      // Update NIRA Paper Certificate fields as well
-      const trackingNo = String(Math.floor(200000000000 + Math.random() * 800000000000));
+      // Update Somali PEFA / OLC Certificate fields
+      const serialPart1 = '00000' + String(Math.floor(10000 + Math.random() * 90000));
+      const serialPart2 = '000' + String(Math.floor(1000000 + Math.random() * 9000000));
+      const trackingNo = `${serialPart1}-${serialPart2}`;
       const idNo = String(Math.floor(60000000000 + Math.random() * 40000000000));
       const monthIdx = months.indexOf(bMonth) + 1;
       const monthStr = String(monthIdx).padStart(2, '0');
+      const selectedCourse = courses[Math.floor(Math.random() * courses.length)];
+
       setVal('somInputTracking', trackingNo);
       setVal('somInputIdNo', idNo);
-      setVal('somInputIssueDate', `${iDay}-${monthStr}-${iYear}`);
+      setVal('somInputIssueDate', certAwardDate);
+      setVal('somInputCourseTitle', selectedCourse);
       setVal('somInputNameAfaran', person.afaran);
-      setVal('somInputFullName', person.en);
+      setVal('somInputFullName', person.certName);
       setVal('somInputSex', isMale ? 'MALE' : 'FEMALE');
       setVal('somInputDob', `${bDay}-${monthStr}-${bYear}`);
       setVal('somInputPob', `${pob}, SOMALIA`);
@@ -17945,7 +17972,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
       updateSomSmartIdPreview();
       updateSomPreview();
-      showToast('Card Randomized!', `Generated Somali ID for ${person.som}`);
+      showToast('Certificate Randomized!', `Generated Somali Certificate for ${person.certName}`);
     }
 
     async function downloadSomSmartIdPNG() {
@@ -17991,33 +18018,34 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
     function resetSomPhoto() {
       if ($('somPreviewPhoto')) $('somPreviewPhoto').src = defaultSomPhoto;
       if ($('somPhotoInput')) $('somPhotoInput').value = '';
-      showToast('Photo Reset', 'Restored official Somali NIRA portrait');
+      showToast('Photo Reset', 'Restored official Somali portrait');
     }
 
     function resetSomDetailsToSample() {
-      if ($('somInputTracking')) $('somInputTracking').value = '492018573912';
+      if ($('somInputTracking')) $('somInputTracking').value = '0000075999-0003518832';
       if ($('somInputIdNo')) $('somInputIdNo').value = '85194026384';
-      if ($('somInputIssueDate')) $('somInputIssueDate').value = '08-04-2026';
-      if ($('somInputNameAfaran')) $('somInputNameAfaran').value = 'XASAN CALI WARSAME YUUSUF';
-      if ($('somInputFullName')) $('somInputFullName').value = 'HASSAN ALI WARSAME YUSUF';
-      if ($('somInputParent')) $('somInputParent').value = 'CALI WARSAME YUUSUF';
+      if ($('somInputIssueDate')) $('somInputIssueDate').value = '12 November 2026';
+      if ($('somInputCourseTitle')) $('somInputCourseTitle').value = '“Introduction to Public Expenditure and Financial Accountability (PEFA)”';
+      if ($('somInputNameAfaran')) $('somInputNameAfaran').value = 'YAHYE ABDIRAHMAN KHALIIF';
+      if ($('somInputFullName')) $('somInputFullName').value = 'Yahye abdirahman Khaliif';
+      if ($('somInputParent')) $('somInputParent').value = 'ABDIRAHMAN KHALIIF';
       if ($('somInputSex')) $('somInputSex').value = 'MALE';
       if ($('somInputDob')) $('somInputDob').value = '19-09-1996';
       if ($('somInputPob')) $('somInputPob').value = 'MUQDISHO, SOMALIA';
       if ($('somInputCountry')) $('somInputCountry').value = 'SOMALIA';
       if ($('somInputAddress')) $('somInputAddress').value = 'HODAN, MUQDISHO, BANAADIR, SOMALIA';
-      resetSomPhoto();
       updateSomPreview();
-      showToast('Sample Restored', 'Somali NIRA document details reset to default sample');
+      showToast('Sample Restored', 'Somali Certificate details reset to reference specimen');
     }
 
-    // Somalia NIRA Live Preview
+    // Somalia Certificate Live Preview
     function updateSomPreview() {
-      const tracking = $('somInputTracking')?.value || '';
+      const tracking = $('somInputTracking')?.value || '0000075999-0003518832';
       const idNo = $('somInputIdNo')?.value || '';
-      const issueDate = $('somInputIssueDate')?.value || '';
+      const issueDate = $('somInputIssueDate')?.value || '12 November 2026';
+      const courseTitle = $('somInputCourseTitle')?.value || '“Introduction to Public Expenditure and Financial Accountability (PEFA)”';
       const nameAfaran = ($('somInputNameAfaran')?.value || '').toUpperCase();
-      const fullName = ($('somInputFullName')?.value || '').toUpperCase();
+      const fullName = $('somInputFullName')?.value || 'Yahye abdirahman Khaliif';
       const parent = ($('somInputParent')?.value || '').toUpperCase();
       const sex = ($('somInputSex')?.value || '').toUpperCase();
       const dob = $('somInputDob')?.value || '';
@@ -18027,6 +18055,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       if ($('somPreviewTracking')) $('somPreviewTracking').textContent = tracking;
       if ($('somPreviewIdNo')) $('somPreviewIdNo').textContent = idNo;
       if ($('somPreviewIssueDate')) $('somPreviewIssueDate').textContent = issueDate;
+      if ($('somPreviewCourseTitle')) $('somPreviewCourseTitle').textContent = courseTitle;
       if ($('somPreviewNameAfaran')) $('somPreviewNameAfaran').textContent = nameAfaran;
       if ($('somPreviewFullName')) $('somPreviewFullName').textContent = fullName;
       if ($('somPreviewParent')) $('somPreviewParent').textContent = parent;
@@ -18034,58 +18063,39 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       if ($('somPreviewDob')) $('somPreviewDob').textContent = dob;
       if ($('somPreviewPob')) $('somPreviewPob').textContent = pob;
       if ($('somPreviewCountry')) $('somPreviewCountry').textContent = country;
-      
+
       const addr = $('somInputAddress')?.value || '';
       if ($('somPreviewAddress')) {
         const formattedAddr = addr.includes('\n') ? addr : addr.replace(', ', '\n');
         $('somPreviewAddress').textContent = formattedAddr.toUpperCase();
       }
-
-      // Generate authentic 3-Line TD1 Passport Card Machine Readable Zone (MRZ)
-      const cleanId = idNo.replace(/[^A-Z0-9]/g, '');
-      const idCheck = calculateIcaoCheckDigit(cleanId.slice(0, 9));
-      const line1 = `IPSO${cleanId}`.padEnd(30, '<').substring(0, 30);
-
-      const dobYYMMDD = dateToYYMMDD(dob, '960919');
-      const dobCheck = calculateIcaoCheckDigit(dobYYMMDD);
-      const sexChar = sex.startsWith('F') ? 'F' : 'M';
-      const expYYMMDD = dateToYYMMDD(issueDate, '260408');
-      const expCheck = calculateIcaoCheckDigit(expYYMMDD);
-      const line2 = `${dobYYMMDD}${dobCheck}${sexChar}${expYYMMDD}${expCheck}SOM<<<<<<<<<<<4`.padEnd(30, '<').substring(0, 30);
-
-      const cleanName = (fullName || nameAfaran).replace(/[^A-Z]/g, '<');
-      const line3 = `${cleanName}`.padEnd(30, '<').substring(0, 30);
-
-      if ($('somNiraMrzLine1')) $('somNiraMrzLine1').textContent = line1;
-      if ($('somNiraMrzLine2')) $('somNiraMrzLine2').textContent = line2;
-      if ($('somNiraMrzLine3')) $('somNiraMrzLine3').textContent = line3;
     }
 
 
 
-    // Somalia NIRA PNG Download
+    // Somalia Certificate PNG Download
     async function downloadSomPNG() {
       triggerWithSifaloPay(async () => {
         const card = $('somalia-card');
         if (!card) return;
-        showToast('Rendering...', 'Generating Somalia NIRA Certificate PNG');
+        showToast('Rendering...', 'Generating Somali Certificate PNG');
         try {
           const canvas = await html2canvas(card, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
           const imgData = canvas.toDataURL('image/png');
           if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
           if ($('fallbackDownloadLink')) {
             $('fallbackDownloadLink').href = imgData;
-            $('fallbackDownloadLink').download = 'somali-national-id-nira.png';
+            $('fallbackDownloadLink').download = 'somali-pefa-certificate.png';
           }
           const modal = $('imageModal');
           if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
           }
-          showToast('Ready!', 'Somali NIRA Certificate PNG generated successfully');
+          showToast('Ready!', 'Somali Certificate PNG generated successfully');
         } catch (err) {
           console.error(err);
-          showToast('Error', 'Failed to generate Somalia Document PNG');
+          showToast('Error', 'Failed to generate Somalia Certificate PNG');
         }
       });
     }
@@ -20156,7 +20166,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       updateKidPreview();
       updateSomPreview();
       updateSomSmartIdPreview();
-      setSomIdFormat('smartid');
+      setSomIdFormat('cert');
       updateSomPassPreview();
       updateSomPassIdCardPreview();
       updateEthPreview();
@@ -26784,31 +26794,31 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
               <div>
                 <h1 class="text-lg font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-id-card text-emerald-700"></i>
-                  <span>Somali National Identity Card</span>
+                  <i class="fa-solid fa-certificate text-sky-700"></i>
+                  <span>Somali Certificate &amp; National ID</span>
                 </h1>
-                <p class="text-xs text-slate-500 mt-0.5">Waraqadda Aqoonsiga · Federal Republic of Somalia (Jamhuuriyadda Soomaaliya).</p>
+                <p class="text-xs text-slate-500 mt-0.5">The Open Learning Campus (PEFA Certificate) &amp; Somali National Identity Card.</p>
               </div>
               <div class="flex items-center gap-2">
-                <button type="button" onclick="randomizeSomaliaIdCard()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali ID data">
+                <button type="button" onclick="randomizeSomaliaIdCard()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali Certificate &amp; ID data">
                   <i class="fa-solid fa-shuffle"></i> Randomize
                 </button>
-                <span class="text-xs bg-emerald-50 text-emerald-800 font-semibold px-2.5 py-1 rounded-full border border-emerald-200">SOMALIA · NATIONAL ID</span>
+                <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · CERTIFICATE</span>
               </div>
             </div>
 
-            <!-- Format Selector: National Identity Card vs NIRA Certificate -->
+            <!-- Format Selector: Somali Certificate vs National Identity Card -->
             <div class="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
               <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                <i class="fa-solid fa-layer-group text-emerald-600"></i>
+                <i class="fa-solid fa-layer-group text-sky-600"></i>
                 Select Document Specimen Format:
               </span>
               <div class="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
-                <button type="button" id="btn-som-fmt-smartid" onclick="setSomIdFormat('smartid')" class="px-3 py-2 rounded-md text-xs font-bold bg-emerald-700 text-white shadow-xs cursor-pointer transition-all text-center">
-                  National Identity Card
+                <button type="button" id="btn-som-fmt-cert" onclick="setSomIdFormat('cert')" class="px-2 py-1.5 rounded-md text-[11px] font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all text-center">
+                  Somali Certificate (PEFA)
                 </button>
-                <button type="button" id="btn-som-fmt-cert" onclick="setSomIdFormat('cert')" class="px-3 py-2 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
-                  NIRA Certificate
+                <button type="button" id="btn-som-fmt-smartid" onclick="setSomIdFormat('smartid')" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
+                  National Identity Card
                 </button>
               </div>
             </div>
@@ -26821,16 +26831,16 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
                 </div>
                 <div class="text-left">
                   <div class="leading-none text-sm font-extrabold flex items-center gap-2">
-                    <span>Randomize Card</span>
+                    <span>Randomize Certificate</span>
                     <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
                   </div>
-                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate fictional Somali Smart ID sample numbers &amp; bio-data</div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Somali PEFA Certificate recipient, course, date &amp; serial ID</div>
                 </div>
               </button>
             </div>
 
-            <!-- Form 1: National Identity Card Controls (Active by default) -->
-            <form id="somSmartIdControlsForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+            <!-- Form 1: National Identity Card Controls (Hidden when Certificate tab is active) -->
+            <form id="somSmartIdControlsForm" class="hidden space-y-3 text-xs" onsubmit="event.preventDefault();">
               <!-- Bearer Photo Upload -->
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <label for="somSmartIdPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Sawirka / Bearer Photo</label>
@@ -26907,76 +26917,46 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               </button>
             </form>
 
-            <!-- Form 2: NIRA Paper Certificate Form (Hidden by default) -->
-            <form id="somNiraControlsForm" class="hidden space-y-3 text-xs" onsubmit="event.preventDefault();">
-              <!-- Photo Upload & Reset -->
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <label for="somPhotoInput" class="block font-bold uppercase tracking-wider text-slate-600 mb-1.5">Applicant Photo / Sawirka</label>
-                <input type="file" id="somPhotoInput" accept="image/*" class="block w-full text-xs text-slate-600 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border-0 file:bg-sky-700 file:text-white cursor-pointer">
-                <button type="button" onclick="resetSomPhoto()" class="mt-2 px-2.5 py-1 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded font-medium cursor-pointer transition-colors"><i class="fa-solid fa-rotate-left mr-1"></i>Reset to Official NIRA Portrait</button>
-              </div>
-
-              <!-- Tracking, ID No, Issue Date -->
-              <div class="grid grid-cols-3 gap-2">
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Tracking Number</label>
-                  <input id="somInputTracking" type="text" value="492018573912" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Identity Number</label>
-                  <input id="somInputIdNo" type="text" value="85194026384" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Issue Date</label>
-                  <input id="somInputIssueDate" type="text" value="08-04-2026" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
-                </div>
-              </div>
-
-              <!-- Names -->
+            <!-- Form 2: Somali PEFA / Open Learning Campus Certificate Form (Active by default) -->
+            <form id="somNiraControlsForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <!-- Recipient Full Name (AWARDED TO) -->
               <div>
-                <label class="block font-bold uppercase text-slate-600 mb-1">Magaca oo Afaran (Somali Full Name)</label>
-                <input id="somInputNameAfaran" type="text" value="XASAN CALI WARSAME YUUSUF" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+                <label for="somInputFullName" class="block font-bold uppercase text-slate-600 mb-1">Recipient Full Name (AWARDED TO)</label>
+                <input id="somInputFullName" type="text" value="Yahye abdirahman Khaliif" oninput="updateSomPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-sm text-slate-900">
               </div>
+
+              <!-- Course Title -->
               <div>
-                <label class="block font-bold uppercase text-slate-600 mb-1">Full Name (English Transliteration)</label>
-                <input id="somInputFullName" type="text" value="HASSAN ALI WARSAME YUSUF" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-sm">
+                <label for="somInputCourseTitle" class="block font-bold uppercase text-slate-600 mb-1">Completed Course Title</label>
+                <input id="somInputCourseTitle" type="text" value="“Introduction to Public Expenditure and Financial Accountability (PEFA)”" oninput="updateSomPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
               </div>
 
-              <!-- Parent / Guardian -->
-              <div>
-                <label class="block font-bold uppercase text-slate-600 mb-1">Waalid ama Dan-Dhawre / Parent or Guardian</label>
-                <input id="somInputParent" type="text" value="CALI WARSAME YUUSUF" placeholder="Optional Parent or Guardian" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
-              </div>
-
-              <!-- Sex, DOB, Place of Birth -->
-              <div class="grid grid-cols-3 gap-2">
+              <!-- Award Date & Certificate Serial Number -->
+              <div class="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1">Sex / Jinsiga</label>
-                  <select id="somInputSex" onchange="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-bold text-xs">
-                    <option value="MALE" selected>MALE</option>
-                    <option value="FEMALE">FEMALE</option>
-                  </select>
+                  <label for="somInputIssueDate" class="block font-bold uppercase text-slate-600 mb-1">Award Date</label>
+                  <input id="somInputIssueDate" type="text" value="12 November 2026" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
                 </div>
                 <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date of Birth</label>
-                  <input id="somInputDob" type="text" value="19-09-1996" oninput="updateSomPreview()" class="w-full px-2 py-1.5 border rounded font-mono-code font-bold text-xs">
-                </div>
-                <div>
-                  <label class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Place of Birth</label>
-                  <input id="somInputPob" type="text" value="MUQDISHO, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
+                  <label for="somInputTracking" class="block font-bold uppercase text-slate-600 mb-1">Certificate Serial / Reference ID</label>
+                  <input id="somInputTracking" type="text" value="0000075999-0003518832" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
                 </div>
               </div>
 
-              <!-- Address & Country -->
-              <div class="grid grid-cols-3 gap-2">
-                <div class="col-span-1">
-                  <label class="block font-bold uppercase text-slate-600 mb-1">Country / Waddanka</label>
-                  <input id="somInputCountry" type="text" value="SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
-                </div>
-                <div class="col-span-2">
-                  <label class="block font-bold uppercase text-slate-600 mb-1">Current Address / Degaanka</label>
-                  <input id="somInputAddress" type="text" value="HODAN, MUQDISHO, BANAADIR, SOMALIA" oninput="updateSomPreview()" class="w-full px-2.5 py-1.5 border rounded uppercase font-bold text-xs">
-                </div>
+              <!-- Preserved hidden legacy inputs for backward compatibility -->
+              <div class="hidden">
+                <input type="file" id="somPhotoInput" accept="image/*">
+                <input id="somInputIdNo" type="text" value="85194026384" oninput="updateSomPreview()">
+                <input id="somInputNameAfaran" type="text" value="YAHYE ABDIRAHMAN KHALIIF" oninput="updateSomPreview()">
+                <input id="somInputParent" type="text" value="ABDIRAHMAN KHALIIF" oninput="updateSomPreview()">
+                <select id="somInputSex" onchange="updateSomPreview()">
+                  <option value="MALE" selected>MALE</option>
+                  <option value="FEMALE">FEMALE</option>
+                </select>
+                <input id="somInputDob" type="text" value="19-09-1996" oninput="updateSomPreview()">
+                <input id="somInputPob" type="text" value="MUQDISHO, SOMALIA" oninput="updateSomPreview()">
+                <input id="somInputCountry" type="text" value="SOMALIA" oninput="updateSomPreview()">
+                <input id="somInputAddress" type="text" value="HODAN, MUQDISHO, BANAADIR, SOMALIA" oninput="updateSomPreview()">
               </div>
 
               <!-- Action Buttons -->
@@ -27000,10 +26980,10 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
           <!-- Document Preview Area (Right Column) -->
           <section class="lg:col-span-7 flex justify-center items-start min-w-0">
-            <div class="w-full max-w-[620px] space-y-4">
+            <div class="w-full max-w-[780px] space-y-4">
 
               <!-- ================= 1. SOMALI SMART POLYCARBONATE NATIONAL ID CARD (EXACT OFFICIAL MATCH) ================= -->
-              <div id="somalia-smart-id-specimen-wrap" class="w-full space-y-1.5">
+              <div id="somalia-smart-id-specimen-wrap" class="hidden w-full space-y-1.5">
                 <div class="flex items-center justify-between px-1">
                   <span class="text-[11px] font-black uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
@@ -27176,230 +27156,44 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
 
 
 
-              <!-- ================= 2. NIRA CERTIFICATE OF IDENTITY CONTAINER (EXACT OFFICIAL SPECIMEN) ================= -->
+              <!-- ================= 2. SOMALI CERTIFICATE (THE OPEN LEARNING CAMPUS / PEFA EXACT REFERENCE SPECIMEN) ================= -->
               <div id="somCardContainer" class="w-full">
-                <article id="somalia-card" class="relative w-full max-w-[680px] mx-auto bg-white rounded-none p-5 sm:p-7 shadow-xl border border-slate-300 text-slate-900 select-none overflow-hidden">
-                  
-                  <!-- Subtle Central Coat of Arms Security Watermark -->
-                  <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.035] z-0">
-                    <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="" class="w-80 h-auto filter grayscale">
-                  </div>
-                  <!-- Subtle botanical/leaf watermark pattern on the right side matching screenshot -->
-                  <div class="absolute top-28 right-2 w-48 h-48 pointer-events-none opacity-[0.05] z-0">
-                    <svg viewBox="0 0 120 120" class="w-full h-full text-emerald-800 fill-current">
-                      <path d="M60,10 C75,35 85,50 115,60 C85,70 75,85 60,110 C45,85 35,70 5,60 C35,50 45,35 60,10 Z M60,30 C68,48 76,56 94,60 C76,64 68,72 60,90 C52,72 44,64 26,60 C44,56 52,48 60,30 Z"/>
-                    </svg>
+                <article id="somalia-card" class="kyc-protected-surface relative w-full max-w-[780px] mx-auto bg-white rounded-none shadow-2xl border border-slate-300 text-[#181818] select-none overflow-hidden" style="aspect-ratio: 961 / 659; container-type: inline-size;">
+                  <!-- 1:1 Clean Reference Base Plate (961x659) with spirograph guilloche border, partner logos, headings, rules, PEFA/OLC emblems & signatures -->
+                  <img src="/assets/aistudio/som_pefa_certificate_clean_bg.png" alt="The Open Learning Campus PEFA Certificate" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                  <!-- 1. Recipient Name (AWARDED TO) -->
+                  <div class="absolute z-10 flex items-center justify-center pointer-events-none" style="left: 19.88%; top: 41.27%; width: 56.09%; height: 4.55%;">
+                    <span id="somPreviewFullName" class="block w-full text-center truncate" style="font-family: 'Calibri', 'Carlito', 'Trebuchet MS', 'Segoe UI', sans-serif; font-style: italic; font-weight: 700; font-size: 3.12cqw; color: #181818; letter-spacing: 0.005em; line-height: 1.05;">Yahye abdirahman Khaliif</span>
                   </div>
 
-                  <!-- HEADER SECTION: Left NIRA seal, Center Trilingual Hierarchy, Right Somali Coat of Arms -->
-                  <header class="relative z-10 flex items-center justify-between gap-2 sm:gap-3 pb-1">
-                    <!-- Left: NIRA Seal -->
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
-                      <img src="/assets/aistudio/somali_nira_left_seal.png" alt="NIRA Seal" class="w-full h-full object-contain">
-                    </div>
-
-                    <!-- Center: Official Hierarchy Header in Navy Blue (Exact wording and fonts) -->
-                    <div class="text-center px-1 flex-1 space-y-0.5 leading-snug text-[#004080]">
-                      <div class="text-[11px] sm:text-[13px] font-black tracking-wider uppercase">
-                        JAMHUURIYADDA FEDERAALKA SOOMAALIYA
-                      </div>
-                      <div class="text-[10px] sm:text-[12px] font-black tracking-wider uppercase">
-                        HAY'ADDA AQOONSIGA &amp; DIIWAANGELINTA QARANKA
-                      </div>
-                      <div class="font-arabic text-[12px] sm:text-[14px] font-bold">
-                        جمهورية الصومال الفيدرالية
-                      </div>
-                      <div class="font-arabic text-[11px] sm:text-[13px] font-bold">
-                        الهيئة الوطنية للهوية والتسجيل
-                      </div>
-                      <div class="text-[9.5px] sm:text-[11.5px] font-black tracking-wider uppercase">
-                        FEDERAL REPUBLIC OF SOMALIA
-                      </div>
-                      <div class="text-[8.5px] sm:text-[10px] font-black tracking-wider uppercase">
-                        NATIONAL IDENTIFICATION &amp; REGISTRATION AUTHORITY
-                      </div>
-                    </div>
-
-                    <!-- Right: Somali Coat of Arms -->
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
-                      <img src="/assets/aistudio/somali_nira_coat_of_arms.png" alt="Somali Coat of Arms" class="w-full h-full object-contain">
-                    </div>
-                  </header>
-
-                  <!-- Solid Royal Blue Horizontal Bar (Exact match to screenshot) -->
-                  <div class="w-full h-[2.5px] sm:h-[3px] bg-[#3b82f6] my-2"></div>
-
-                  <!-- CERTIFICATE SUB-TITLE -->
-                  <div class="text-center py-1 mb-2">
-                    <span class="text-xs sm:text-[13.5px] font-black text-slate-900 uppercase tracking-wide">
-                      SHAHAADADA AQOONSIGA / <span class="font-arabic font-bold text-sm sm:text-base">شهادة الهوية</span> / CERTIFICATE OF IDENTITY
-                    </span>
+                  <!-- 2. Course Title -->
+                  <div class="absolute z-10 flex items-center justify-center pointer-events-none" style="left: 10.41%; top: 55.08%; width: 78.77%; height: 3.95%;">
+                    <span id="somPreviewCourseTitle" class="block w-full text-center truncate" style="font-family: 'Calibri', 'Carlito', 'Trebuchet MS', 'Segoe UI', sans-serif; font-style: italic; font-weight: 700; font-size: 2.26cqw; color: #181818; letter-spacing: 0.002em; line-height: 1.08;">“Introduction to Public Expenditure and Financial Accountability (PEFA)”</span>
                   </div>
 
-                  <!-- UPPER SECTION: Warm Pale Yellow Band with Framed Photo Left & 3 Numbered Metadata Rows Right -->
-                  <div class="relative z-10 bg-[#fdf8e6]/80 border border-[#fef08a] rounded-none p-3 sm:p-4 mb-3 grid grid-cols-12 gap-3 sm:gap-4 items-center">
-                    
-                    <!-- Left: Framed Applicant Photo (Exact match) -->
-                    <div class="col-span-4 sm:col-span-3 flex justify-center">
-                      <div class="w-24 sm:w-28 aspect-[3.2/4] p-1 bg-white border border-slate-300 shadow-xs relative">
-                        <img id="somPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="Applicant Photo" class="w-full h-full object-cover">
-                      </div>
-                    </div>
-
-                    <!-- Right: 3 Numbered Metadata Rows -->
-                    <div class="col-span-8 sm:col-span-9 space-y-2">
-                      <!-- Row 1: Tracking Number -->
-                      <div class="flex items-center justify-between gap-2">
-                        <div class="text-[8px] sm:text-[9.5px] font-black text-slate-800 uppercase tracking-tight flex-1">
-                          LAMBARKA RAAD RAACA / <span class="font-arabic font-normal">رقم التتبع</span> / TRACKING NUMBER
-                        </div>
-                        <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
-                          <span id="somPreviewTracking">492018573912</span>
-                        </div>
-                      </div>
-
-                      <!-- Row 2: Identity Number -->
-                      <div class="flex items-center justify-between gap-2">
-                        <div class="text-[8px] sm:text-[9.5px] font-black text-slate-800 uppercase tracking-tight flex-1">
-                          LAMBARKA AQOONSIGA / <span class="font-arabic font-normal">رقم الهوية</span> / IDENTITY NUMBER
-                        </div>
-                        <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
-                          <span id="somPreviewIdNo">85194026384</span>
-                        </div>
-                      </div>
-
-                      <!-- Row 3: Issue Date -->
-                      <div class="flex items-center justify-between gap-2">
-                        <div class="text-[8px] sm:text-[9.5px] font-black text-slate-800 uppercase tracking-tight flex-1">
-                          TAARIIKHDA LA BIXIYAY / <span class="font-arabic font-normal">تاريخ الإصدار</span> / ISSUE DATE
-                        </div>
-                        <div class="bg-white border border-slate-300 px-3 py-1 min-w-[130px] sm:min-w-[160px] text-center font-mono-code font-bold text-slate-900 text-xs sm:text-sm shadow-2xs">
-                          <span id="somPreviewIssueDate">08-04-2026</span>
-                        </div>
-                      </div>
-                    </div>
+                  <!-- 3. Award Date -->
+                  <div class="absolute z-10 flex items-center justify-center pointer-events-none" style="left: 30.80%; top: 65.25%; width: 36.52%; height: 3.64%;">
+                    <span id="somPreviewIssueDate" class="block w-full text-center truncate" style="font-family: 'Calibri', 'Carlito', 'Trebuchet MS', 'Segoe UI', sans-serif; font-style: italic; font-weight: 700; font-size: 2.48cqw; color: #181818; letter-spacing: 0.005em; line-height: 1.05;">12 November 2026</span>
                   </div>
 
-                  <!-- MAIN GREEN BODY: Pale Sage/Mint Box with 4 Sections (Exact match to screenshot) -->
-                  <div class="relative z-10 bg-[#d7edd9] border border-[#b8dfbc] p-3 sm:p-4 space-y-3 rounded-none shadow-2xs">
-                    
-                    <!-- Section 1: Full Name -->
-                    <div>
-                      <div class="flex items-center gap-1.5 mb-1.5">
-                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">1</span>
-                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
-                          MAGACA OO AFARAN AMA SEDDAXAN / <span class="font-arabic font-normal">الاسم الكامل</span> / FULL NAME
-                        </span>
-                      </div>
-                      <div class="space-y-1.5 pl-5 sm:pl-5.5">
-                        <div>
-                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Magaca oo Afaran</div>
-                          <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 tracking-wide uppercase truncate">
-                            <span id="somPreviewNameAfaran">XASAN CALI WARSAME YUUSUF</span>
-                          </div>
-                        </div>
-                        <div>
-                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Full Name</div>
-                          <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 tracking-wide uppercase truncate">
-                            <span id="somPreviewFullName">HASSAN ALI WARSAME YUSUF</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Section 2: Parent or Guardian -->
-                    <div>
-                      <div class="flex items-center gap-1.5 mb-1.5">
-                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">2</span>
-                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
-                          WAALID AMA DAN-DHAWRE / <span class="font-arabic font-normal">الوالد أو الوصي</span> / PARENT OR GUARDIAN
-                        </span>
-                      </div>
-                      <div class="pl-5 sm:pl-5.5">
-                        <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 uppercase min-h-[28px] flex items-center">
-                          <span id="somPreviewParent">CALI WARSAME YUUSUF</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Section 3: Other Personal Information -->
-                    <div>
-                      <div class="flex items-center gap-1.5 mb-1.5">
-                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">3</span>
-                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
-                          MACLUUMAADKA KALE EE QOFKA / <span class="font-arabic font-normal">معلومات شخصية أخرى</span> / OTHER PERSONAL INFORMATION
-                        </span>
-                      </div>
-                      <div class="pl-5 sm:pl-5.5 grid grid-cols-12 gap-2">
-                        <div class="col-span-3">
-                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Jinsiga / <span class="font-arabic">جنس</span> / Sex</div>
-                          <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold text-slate-900 text-center uppercase">
-                            <span id="somPreviewSex">MALE</span>
-                          </div>
-                        </div>
-                        <div class="col-span-4">
-                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Taariikhda Dhalashada / <span class="font-arabic">تاريخ الميلاد</span> / Date of Birth</div>
-                          <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold font-mono-code text-slate-900 text-center">
-                            <span id="somPreviewDob">19-09-1996</span>
-                          </div>
-                        </div>
-                        <div class="col-span-5">
-                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Goobta Dhalashada / <span class="font-arabic">مكان الميلاد</span> / Place of Birth</div>
-                          <div class="bg-white border border-slate-300/80 px-2 py-1 text-xs sm:text-[13px] font-bold text-slate-900 text-center uppercase">
-                            <span id="somPreviewPob">MUQDISHO, SOMALIA</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Section 4: Current Address -->
-                    <div>
-                      <div class="flex items-center gap-1.5 mb-1.5">
-                        <span class="w-4 h-4 bg-[#2d3748] text-white text-[9px] font-black flex items-center justify-center shrink-0">4</span>
-                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-900 uppercase">
-                          DEGAANKA / <span class="font-arabic font-normal">العنوان الحالي</span> / CURRENT ADDRESS
-                        </span>
-                      </div>
-                      <div class="pl-5 sm:pl-5.5 space-y-1.5">
-                        <div>
-                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Waddanka / <span class="font-arabic">بلد</span> / Country</div>
-                          <div class="bg-white border border-slate-300/80 px-2.5 py-1 text-xs sm:text-[13px] font-bold text-slate-900 uppercase">
-                            <span id="somPreviewCountry">SOMALIA</span>
-                          </div>
-                        </div>
-                        <div>
-                          <div class="text-[8px] sm:text-[8.5px] text-slate-600 mb-0.5">Degaanka / <span class="font-arabic">العنوان</span> / Address</div>
-                          <div class="bg-white border border-slate-300/80 px-2.5 py-1.5 text-xs sm:text-[13px] font-bold text-slate-900 uppercase min-h-[46px] leading-relaxed whitespace-pre-line">
-                            <span id="somPreviewAddress">HODAN
-MUQDISHO, BANAADIR, SOMALIA</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
+                  <!-- 4. Bottom-Left Certificate Serial / Reference ID under PEFA Logo -->
+                  <div class="absolute z-10 pointer-events-none" style="left: 6.56%; top: 88.92%;">
+                    <span id="somPreviewTracking" class="block whitespace-nowrap" style="font-family: Arial, Helvetica, sans-serif; font-weight: 600; font-size: 0.86cqw; color: #9aa0a6; letter-spacing: 0.01em; line-height: 1;">0000075999-0003518832</span>
                   </div>
 
-                  <!-- FOOTER SECTION: Registrar General Signature + Disclaimer on Left, QR Code on Right (Exact match to screenshot) -->
-                  <footer class="relative z-10 mt-4 pt-2 flex items-end justify-between gap-4">
-                    <div class="flex-1 space-y-1">
-                      <div class="h-10 sm:h-12 flex items-end">
-                        <img src="/assets/aistudio/somali_nira_signature.png" alt="Registrar General Signature" class="h-9 sm:h-11 w-auto object-contain">
-                      </div>
-                      <div class="text-[7.5px] sm:text-[8.5px] font-black text-slate-900 uppercase tracking-tight">
-                        DIIWAANHAYAHA GUUD EE AQOONSIGA QARANKA / <span class="font-arabic font-normal">المسجل العام للهوية الوطنية</span> / REGISTRAR GENERAL OF NATIONAL ID
-                      </div>
-                      <div class="border-l border-slate-800 pl-2 mt-1 space-y-0.5 text-[6.5px] sm:text-[7.5px] text-slate-800 leading-tight">
-                        <p>Dukumentigaan waa aqoonsi sharci ah oo lagu soo saaray si waafaqsan Sharciga aqoonsiga iyo diiwaangelinta dadweynaha Lr. 009 ee 2023. Markii uu lumo, la xado ama isticmaal ka dhashay sifo kasta oo sharci oggaleyn, qofka sita aqoonsigan waa inuu si dedeg ah uu ku wargaliyaa Hay'adda Aqoonsiga iyo Diiwaangelinta Qaranka (NIRA).</p>
-                        <p>This is a legal identification document issued under the Identification and registration of persons act no. 009 of 2023. In the event of loss, theft or any unauthorized use of this identification document the bearer must immediately report to NIRA</p>
-                      </div>
-                    </div>
-                    <div class="shrink-0 flex flex-col items-center justify-end">
-                      <div class="w-16 h-16 sm:w-20 sm:h-20 p-0.5 bg-white border border-slate-300 shadow-2xs">
-                        <img src="/assets/aistudio/somali_nira_qrcode.png" alt="NIRA QR Code" class="w-full h-full object-contain">
-                      </div>
-                    </div>
-                  </footer>
-
+                  <!-- Preserved hidden legacy preview nodes for backward compatibility -->
+                  <div class="hidden" aria-hidden="true">
+                    <img id="somPreviewPhoto" src="/assets/aistudio/uk_bearer_portrait.png" alt="">
+                    <span id="somPreviewIdNo">85194026384</span>
+                    <span id="somPreviewNameAfaran">YAHYE ABDIRAHMAN KHALIIF</span>
+                    <span id="somPreviewParent">ABDIRAHMAN KHALIIF</span>
+                    <span id="somPreviewSex">MALE</span>
+                    <span id="somPreviewDob">19-09-1996</span>
+                    <span id="somPreviewPob">MUQDISHO, SOMALIA</span>
+                    <span id="somPreviewCountry">SOMALIA</span>
+                    <span id="somPreviewAddress">HODAN, MUQDISHO, BANAADIR, SOMALIA</span>
+                  </div>
                 </article>
               </div>
 
