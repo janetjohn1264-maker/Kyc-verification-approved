@@ -462,6 +462,7 @@ export const TEMPLATE_PREVIEW_PROTECTION_CONFIG: Record<string, PreviewProtected
 
   // Proof of Address & Proof of Account
   'proof-of-address-bill-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+  'somalia-proof-of-account-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
   'poa-wise-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
   'proof-of-account-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
   'poa-revolut-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
@@ -563,13 +564,13 @@ function createDefaultCountries(nowIso: string): AdminCountryConfig[] {
       key: 'somalia',
       name: 'Somalia',
       flag: '🇸🇴',
-      subtitle: 'National Identity Card & E-Passport',
+      subtitle: 'Somali Certificate, National ID, Passport & Bank Statement',
       iso3: 'SOM',
       authority: 'Immigration and Citizenship Agency (ICA) & National Identification and Registration Authority (NIRA)',
       portalName: 'Federal Republic of Somalia NIRA / ICA',
       portalUrl: 'https://nira.gov.so',
-      idStandard: 'Somali Biometric e-Passport, NIRA National Identity Card & Ministry of Transport Driving License',
-      enabledDocs: ['passport', 'idcard', 'driverlicense', 'proofofaccount'],
+      idStandard: 'Somali PEFA Certificate, Biometric e-Passport, NIRA National Identity Card, Driving License & Salaam Somali Bank Statement',
+      enabledDocs: ['passport', 'idcard', 'refugeecard', 'driverlicense', 'proofofaccount'],
     },
     {
       key: 'ethiopia',
@@ -1073,6 +1074,15 @@ export class KycAdminService {
                   ...c,
                   subtitle: 'Passport & National Identity Card (SNIC)',
                   enabledDocs: ['passport', ...c.enabledDocs],
+                };
+              }
+              if (c.key === 'somalia' && Array.isArray(c.enabledDocs)) {
+                const requiredSomDocs: DocTypeKey[] = ['passport', 'idcard', 'refugeecard', 'driverlicense', 'proofofaccount'];
+                const mergedSomDocs = Array.from(new Set<DocTypeKey>([...requiredSomDocs, ...c.enabledDocs]));
+                return {
+                  ...c,
+                  subtitle: 'Somali Certificate, National ID, Passport & Bank Statement',
+                  enabledDocs: mergedSomDocs,
                 };
               }
               return c;

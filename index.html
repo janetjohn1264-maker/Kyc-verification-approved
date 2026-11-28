@@ -1178,7 +1178,8 @@
     const KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY = 'kyc_sifalo_consumed_auto_orders_v1';
     const KYC_LEGACY_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v1';
     const KYC_PREV_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v2';
-    const KYC_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v3';
+    const KYC_PREV3_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v3';
+    const KYC_ACTIVE_EDITOR_UI_KEY = 'kyc_active_editor_ui_v4';
 
     // Purge any legacy cross-browser-session localStorage payment flags so a new browser session never auto-unlocks
     (function purgeLegacyLocalStoragePaymentFlags() {
@@ -1190,6 +1191,7 @@
         localStorage.removeItem(KYC_CONSUMED_AUTO_DOWNLOAD_ORDERS_KEY);
         localStorage.removeItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY);
         localStorage.removeItem(KYC_PREV_ACTIVE_EDITOR_UI_KEY);
+        localStorage.removeItem(KYC_PREV3_ACTIVE_EDITOR_UI_KEY);
         localStorage.removeItem(KYC_ACTIVE_EDITOR_UI_KEY);
       } catch (e) {}
     })();
@@ -2175,6 +2177,7 @@
       'downloadUkPassPNG',
       'downloadSomSmartIdPNG',
       'downloadSomPNG',
+      'downloadSomBankStatementPNG',
       'downloadSomPassPNG',
       'downloadSomPassIdCardPNG',
       'downloadSomLicPNG',
@@ -2227,7 +2230,7 @@
             if (kenyaBtn) {
               return { type: 'buttonId', buttonId: 'downloadBtn', fnName: '', args: [], onclickRaw: '' };
             }
-            const dlBtn = view.querySelector('button[onclick^="download"]');
+            const dlBtn = view.querySelector('form:not(.hidden) button[onclick^="download"]') || view.querySelector('button[onclick^="download"]');
             if (dlBtn) {
               const parsed = parseOnclickSavePngDescriptor(dlBtn.getAttribute('onclick') || '');
               if (parsed) return parsed;
@@ -3296,23 +3299,27 @@
 
     function restoreSavedEditorUiOnRefresh() {
       try {
-        const legacyRaw = sessionStorage.getItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY) || sessionStorage.getItem(KYC_PREV_ACTIVE_EDITOR_UI_KEY);
+        const legacyRaw =
+          sessionStorage.getItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY) ||
+          sessionStorage.getItem(KYC_PREV_ACTIVE_EDITOR_UI_KEY) ||
+          sessionStorage.getItem(KYC_PREV3_ACTIVE_EDITOR_UI_KEY);
         if (legacyRaw) {
           sessionStorage.removeItem(KYC_LEGACY_ACTIVE_EDITOR_UI_KEY);
           sessionStorage.removeItem(KYC_PREV_ACTIVE_EDITOR_UI_KEY);
+          sessionStorage.removeItem(KYC_PREV3_ACTIVE_EDITOR_UI_KEY);
           try {
             const legacyParsed = JSON.parse(legacyRaw);
             if (legacyParsed && legacyParsed.workflowStep === 'editor') {
               const migrated = {
                 workflowStep: 'editor',
-                providerKey: legacyParsed.providerKey || 'paypal',
+                providerKey: legacyParsed.providerKey || 'salaam',
                 countryKey: 'somalia',
-                rawDocType: 'idcard',
+                rawDocType: 'proofofaccount',
                 fieldSnapshot: null,
                 updatedAt: Date.now()
               };
               sessionStorage.setItem(KYC_ACTIVE_EDITOR_UI_KEY, JSON.stringify(migrated));
-              if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
+              if (typeof updateSomBankStatementPreview === 'function') updateSomBankStatementPreview();
               return restoreEditorContextFromData(migrated, false);
             }
           } catch (innerErr) {}
@@ -4819,6 +4826,10 @@ var $ = window.$ || (id => document.getElementById(id));
       let docs = [];
       if (dataDocs) {
         docs = dataDocs.split(',').map(s => s.trim()).filter(Boolean);
+        if (countryKey === 'somalia') {
+          if (!docs.includes('refugeecard')) docs.push('refugeecard');
+          if (!docs.includes('proofofaccount')) docs.push('proofofaccount');
+        }
       } else {
         if ($(countryKey + '-passport-view')) {
           docs.push('passport');
@@ -4826,11 +4837,11 @@ var $ = window.$ || (id => document.getElementById(id));
         if ($(countryKey + '-idcard-view') || $(countryKey + '-doc-view')) {
           docs.push('idcard');
         }
+        if (countryKey === 'bangladesh' || countryKey === 'somalia' || $(countryKey + '-proofofaddress-view')) {
+          docs.push('refugeecard');
+        }
         if ($(countryKey + '-driverlicense-view')) {
           docs.push('driverlicense');
-        }
-        if (countryKey === 'bangladesh' || $(countryKey + '-proofofaddress-view')) {
-          docs.push('refugeecard');
         }
         if ((Array.isArray(window.poaConfiguredCountryKeys) && window.poaConfiguredCountryKeys.includes(countryKey)) || $(countryKey + '-proofofaccount-view')) {
           docs.push('proofofaccount');
@@ -4854,6 +4865,9 @@ var $ = window.$ || (id => document.getElementById(id));
         return $(`${countryKey}-driverlicense-view`) || $('somalia-driverlicense-view');
       }
       if (docType === 'refugeecard') {
+        if (countryKey === 'somalia' && $('somalia-doc-view')) {
+          return $('somalia-doc-view');
+        }
         return $(`${countryKey}-proofofaddress-view`) || $('proofofaddress-doc-view');
       }
       if (docType === 'proofofaccount') {
@@ -4877,6 +4891,9 @@ var $ = window.$ || (id => document.getElementById(id));
       }
       if (viewEl.id === 'somalia-doc-view') {
         return '/assets/aistudio/FB_IMG_1794648137510_c954c568.jpg';
+      }
+      if (viewEl.id === 'somalia-proofofaccount-view') {
+        return '/assets/aistudio/1795434897066_940cf0b7.jpg';
       }
       const imgs = Array.from(viewEl.querySelectorAll('img[src]'));
       const candidates = imgs.map(img => img.getAttribute('src') || '').filter(src => {
@@ -4907,14 +4924,14 @@ var $ = window.$ || (id => document.getElementById(id));
         passport: 'Passport',
         idcard: 'National Identity Card',
         driverlicense: "Government-Issued Identity Document (Driver's License)",
-        refugeecard: 'Proof of Address',
-        proofofaccount: 'Proof of Address & Account Confirmation'
+        refugeecard: countryKey === 'somalia' ? 'Somali Certificate' : 'Proof of Address',
+        proofofaccount: countryKey === 'somalia' ? 'Bank Statement (Proof of Account)' : 'Proof of Address & Account Confirmation'
       };
       const iconMap = {
         passport: 'fa-solid fa-passport',
         idcard: 'fa-solid fa-id-card',
         driverlicense: 'fa-solid fa-id-badge',
-        refugeecard: 'fa-solid fa-bolt',
+        refugeecard: countryKey === 'somalia' ? 'fa-solid fa-certificate' : 'fa-solid fa-bolt',
         proofofaccount: 'fa-solid fa-file-invoice-dollar'
       };
       const accentMap = {
@@ -5029,6 +5046,14 @@ var $ = window.$ || (id => document.getElementById(id));
         'china-passport-view': {
           name: 'People’s Republic of China Passport / 中华人民共和国护照',
           description: `People’s Republic of China · MPS Exit & Entry Administration e-Passport (CHN) Accepted by ${providerMeta.name}`
+        },
+        'somalia-doc-view': {
+          name: 'Somali Certificate (The Open Learning Campus / PEFA)',
+          description: `The Open Learning Campus · PEFA Certificate & Somali National Identity Card Accepted by ${providerMeta.name}`
+        },
+        'somalia-proofofaccount-view': {
+          name: 'Salaam Somali Bank - E Statment (Bank Statement)',
+          description: `Salaam Somali Bank · Statement of Accounts (USD) Accepted by ${providerMeta.name} for Account & Address Verification`
         }
       };
 
@@ -5038,7 +5063,13 @@ var $ = window.$ || (id => document.getElementById(id));
         let name = categoryLabels[docType] || docType;
         let description = `${countryName} official verification document accepted for ${providerMeta.name} KYC`;
 
-        if (docType === 'proofofaccount' && (!viewEl || viewId === 'proofofaccount-doc-view')) {
+        if (countryKey === 'somalia' && docType === 'refugeecard') {
+          name = 'Somali Certificate (The Open Learning Campus / PEFA)';
+          description = `The Open Learning Campus · PEFA Certificate Awarded to Recipient for ${providerMeta.name}`;
+        } else if (countryKey === 'somalia' && docType === 'idcard') {
+          name = 'Somali Certificate & National Identity Card';
+          description = `Federal Republic of Somalia · Somali PEFA Certificate & National Identity Card for ${providerMeta.name}`;
+        } else if (docType === 'proofofaccount' && (!viewEl || viewId === 'proofofaccount-doc-view')) {
           const poaInfo = (typeof poaCountryMap !== 'undefined' && poaCountryMap[countryKey]) ? poaCountryMap[countryKey] : null;
           name = `${countryName} Proof of Account & Address Confirmation`;
           description = poaInfo
@@ -5088,6 +5119,10 @@ var $ = window.$ || (id => document.getElementById(id));
     function refreshActiveDocumentPreview(countryKey, docType) {
       if (!countryKey || !docType) return;
       if (docType === 'proofofaccount') {
+        if (countryKey === 'somalia' && typeof updateSomBankStatementPreview === 'function') {
+          updateSomBankStatementPreview();
+          return;
+        }
         if (typeof switchPoaViewMode === 'function') switchPoaViewMode('letter', true);
         if (typeof updatePoaCountryDisplay === 'function') updatePoaCountryDisplay(countryKey);
         if (typeof switchPoaProvider === 'function') {
@@ -5101,6 +5136,11 @@ var $ = window.$ || (id => document.getElementById(id));
         return;
       }
       if (docType === 'refugeecard') {
+        if (countryKey === 'somalia') {
+          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
+          if (typeof updateSomPreview === 'function') updateSomPreview();
+          return;
+        }
         if (typeof updateProofOfAddressPreview === 'function') updateProofOfAddressPreview();
         return;
       }
@@ -5109,6 +5149,7 @@ var $ = window.$ || (id => document.getElementById(id));
         'kenya:idcard': () => { if (typeof updateKidPreview === 'function') updateKidPreview(); },
         'somalia:passport': () => { if (typeof updateSomPassPreview === 'function') updateSomPassPreview(); },
         'somalia:idcard': () => {
+          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
           if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
           if (typeof updateSomPreview === 'function') updateSomPreview();
         },
@@ -5518,8 +5559,8 @@ var $ = window.$ || (id => document.getElementById(id));
           idcard: 'National Identity Card',
           passport: 'Passport',
           driverlicense: "Driver's License",
-          refugeecard: 'Proof of Address',
-          proofofaccount: 'Proof of Account'
+          refugeecard: resolvedCountryKey === 'somalia' ? 'Somali Certificate' : 'Proof of Address',
+          proofofaccount: resolvedCountryKey === 'somalia' ? 'Bank Statement (Proof of Account)' : 'Proof of Account'
         };
 
         docsListEl.innerHTML = items.map(item => {
@@ -6221,7 +6262,7 @@ var $ = window.$ || (id => document.getElementById(id));
 
       const poaAccountBar = $('poa-step2-account-selector');
       if (poaAccountBar) {
-        poaAccountBar.classList.toggle('hidden', docType !== 'proofofaccount');
+        poaAccountBar.classList.toggle('hidden', docType !== 'proofofaccount' || currentCountry === 'somalia');
       }
 
       // Activate selected tab
@@ -6239,6 +6280,10 @@ var $ = window.$ || (id => document.getElementById(id));
         if (idRadio) {
           idRadio.className = "w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
+        if (currentCountry === 'somalia') {
+          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
+          if (typeof updateSomPreview === 'function') updateSomPreview();
+        }
       } else if (docType === 'driverlicense') {
         if (dlTab) {
           dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50/90 via-cyan-50/30 to-white text-slate-900 shadow-md ring-2 ring-sky-500/20 transition-all cursor-pointer relative group";
@@ -6253,7 +6298,10 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) {
           refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
-        if (typeof updateProofOfAddressPreview === 'function') {
+        if (currentCountry === 'somalia') {
+          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
+          if (typeof updateSomPreview === 'function') updateSomPreview();
+        } else if (typeof updateProofOfAddressPreview === 'function') {
           updateProofOfAddressPreview();
         }
       } else if (docType === 'proofofaccount') {
@@ -6263,15 +6311,19 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaRadio) {
           poaRadio.className = "w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         }
-        switchPoaViewMode('letter', true);
-        updatePoaCountryDisplay(currentCountry);
-        if (typeof switchPoaProvider === 'function') {
-          const initialProvider = (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut')
-            ? currentVirtualAccount
-            : (window.currentPoaProvider || 'wise');
-          switchPoaProvider(initialProvider, true);
-        } else if (typeof updateProofOfAccountPreview === 'function') {
-          updateProofOfAccountPreview();
+        if (currentCountry === 'somalia' && typeof updateSomBankStatementPreview === 'function') {
+          updateSomBankStatementPreview();
+        } else {
+          switchPoaViewMode('letter', true);
+          updatePoaCountryDisplay(currentCountry);
+          if (typeof switchPoaProvider === 'function') {
+            const initialProvider = (currentVirtualAccount === 'grey' || currentVirtualAccount === 'wise' || currentVirtualAccount === 'revolut')
+              ? currentVirtualAccount
+              : (window.currentPoaProvider || 'wise');
+            switchPoaProvider(initialProvider, true);
+          } else if (typeof updateProofOfAccountPreview === 'function') {
+            updateProofOfAccountPreview();
+          }
         }
       }
 
@@ -6405,9 +6457,13 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
 
         // Show the interactive live preview editor of Proof of Account
-        switchPoaViewMode('letter', true);
-        updatePoaCountryDisplay(countryKey);
-        if (typeof updateProofOfAccountPreview === 'function') updateProofOfAccountPreview();
+        if (countryKey === 'somalia') {
+          if (typeof updateSomBankStatementPreview === 'function') updateSomBankStatementPreview();
+        } else {
+          switchPoaViewMode('letter', true);
+          updatePoaCountryDisplay(countryKey);
+          if (typeof updateProofOfAccountPreview === 'function') updateProofOfAccountPreview();
+        }
       } else if (currentDocType === 'refugeecard') {
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
@@ -6432,7 +6488,12 @@ var $ = window.$ || (id => document.getElementById(id));
         if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
 
-        if (typeof updateProofOfAddressPreview === 'function') updateProofOfAddressPreview();
+        if (countryKey === 'somalia') {
+          if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
+          if (typeof updateSomPreview === 'function') updateSomPreview();
+        } else if (typeof updateProofOfAddressPreview === 'function') {
+          updateProofOfAddressPreview();
+        }
       } else if (countryKey === 'uk') {
         currentDocType = 'passport';
         const passTab = $('tab-doc-passport');
@@ -6845,7 +6906,9 @@ var $ = window.$ || (id => document.getElementById(id));
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof updateNplPreview === 'function') updateNplPreview();
       } else if (countryKey === 'somalia') {
-        currentDocType = 'idcard';
+        currentDocType = (options.preferredDocType && configuredDocs.includes(options.preferredDocType))
+          ? options.preferredDocType
+          : 'refugeecard';
         const passTab = $('tab-doc-passport');
         const idTab = $('tab-doc-idcard');
         const dlTab = $('tab-doc-driverlicense');
@@ -6857,18 +6920,19 @@ var $ = window.$ || (id => document.getElementById(id));
         const refRadio = $('refugeecard-radio-indicator');
         const poaRadio = $('proofofaccount-radio-indicator');
         if (passTab) passTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-sky-600 bg-gradient-to-br from-sky-50/90 via-white to-emerald-50/30 text-slate-900 shadow-md ring-2 ring-sky-500/20 transition-all cursor-pointer relative group";
+        if (idTab) idTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (dlTab) dlTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
-        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-amber-400 hover:bg-amber-50/20 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
+        if (refTab) refTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border-2 border-amber-600 bg-gradient-to-br from-amber-50/90 via-yellow-50/30 to-white text-slate-900 shadow-md ring-2 ring-amber-500/20 transition-all cursor-pointer relative group";
         if (poaTab) poaTab.className = "doc-type-card text-left p-4 sm:p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-800 hover:bg-slate-50/60 text-slate-700 shadow-xs transition-all cursor-pointer relative group";
         if (passRadio) passRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (idRadio) idRadio.className = "w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
+        if (idRadio) idRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (dlRadio) dlRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
-        if (refRadio) refRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
+        if (refRadio) refRadio.className = "w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0";
         if (poaRadio) poaRadio.className = "w-6 h-6 rounded-full border-2 border-slate-300 text-transparent flex items-center justify-center text-xs shrink-0";
         if (typeof setSomIdFormat === 'function') setSomIdFormat('cert');
         if (typeof updateSomPreview === 'function') updateSomPreview();
         if (typeof updateSomSmartIdPreview === 'function') updateSomSmartIdPreview();
+        if (typeof updateSomBankStatementPreview === 'function') updateSomBankStatementPreview();
         if (typeof updateSomPassPreview === 'function') updateSomPassPreview();
       } else if (countryKey === 'uae') {
         currentDocType = 'idcard';
@@ -7257,9 +7321,17 @@ var $ = window.$ || (id => document.getElementById(id));
 
     function randomizeActiveDocument() {
       if (currentDocType === 'proofofaccount') {
-        if (typeof randomizeProofOfAccount === 'function') randomizeProofOfAccount();
+        if (currentCountry === 'somalia' && typeof randomizeSomBankStatement === 'function') {
+          randomizeSomBankStatement();
+        } else if (typeof randomizeProofOfAccount === 'function') {
+          randomizeProofOfAccount();
+        }
       } else if (currentDocType === 'refugeecard') {
-        if (typeof randomizeProofOfAddress === 'function') randomizeProofOfAddress();
+        if (currentCountry === 'somalia' && typeof randomizeSomaliaIdCard === 'function') {
+          randomizeSomaliaIdCard();
+        } else if (typeof randomizeProofOfAddress === 'function') {
+          randomizeProofOfAddress();
+        }
       } else if (currentCountry === 'turkey') {
         if (currentDocType === 'idcard') {
           if (typeof randomizeTurId === 'function') randomizeTurId();
@@ -12435,7 +12507,7 @@ var $ = window.$ || (id => document.getElementById(id));
         fullName: 'Federal Republic of Somalia',
         city: 'Mogadishu',
         address: 'KM4 Airport Road, Wadajir District, Mogadishu, Somalia',
-        bank: 'Premier Bank / Clear Junction Global',
+        bank: 'Salaam Somali Bank (E-Statment)',
         dotColor: 'bg-sky-600',
         badgeClass: 'bg-sky-500/20 text-sky-300 border-sky-500/40'
       },
@@ -18100,6 +18172,147 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       });
     }
 
+    // ================= SOMALIA BANK STATEMENT (SALAAM SOMALI BANK - E STATMENT) CONTROLLER =================
+    const somBankDefaults = {
+      customerName: 'MOHAMED ABDIKADIR MOHAMEDNUR IBRAHIM',
+      accountNo: '31897213',
+      accountType: '2103',
+      currency: 'USD',
+      description: 'Dollar',
+      period: '07-OCT-23 to 02-JAN-24',
+      date: '2-Jan-24',
+      time: '13:45:13',
+      user: 'eStatment',
+      closingWithdrawals: '153.00',
+      closingDeposits: '153.00',
+      unclearBalance: '0.00',
+      availableBalance: '0.00'
+    };
+
+    function updateSomBankStatementPreview() {
+      const getVal = (id, fallback) => {
+        const el = $(id);
+        return el && typeof el.value === 'string' && el.value.trim().length > 0 ? el.value.trim() : fallback;
+      };
+      const setText = (id, val) => {
+        const el = $(id);
+        if (el) el.textContent = val;
+      };
+
+      setText('somBankPreviewCustomerName', getVal('somBankInputCustomerName', somBankDefaults.customerName));
+      setText('somBankPreviewAccountNo', getVal('somBankInputAccountNo', somBankDefaults.accountNo));
+      setText('somBankPreviewAccountType', getVal('somBankInputAccountType', somBankDefaults.accountType));
+      setText('somBankPreviewCurrency', getVal('somBankInputCurrency', somBankDefaults.currency));
+      setText('somBankPreviewDescription', getVal('somBankInputDescription', somBankDefaults.description));
+      setText('somBankPreviewPeriod', getVal('somBankInputPeriod', somBankDefaults.period));
+      setText('somBankPreviewDate', getVal('somBankInputDate', somBankDefaults.date));
+      setText('somBankPreviewTime', getVal('somBankInputTime', somBankDefaults.time));
+      setText('somBankPreviewUser', getVal('somBankInputUser', somBankDefaults.user));
+      setText('somBankPreviewClosingWithdrawals', getVal('somBankInputClosingWithdrawals', somBankDefaults.closingWithdrawals));
+      setText('somBankPreviewClosingDeposits', getVal('somBankInputClosingDeposits', somBankDefaults.closingDeposits));
+      setText('somBankPreviewUnclearBalance', getVal('somBankInputUnclearBalance', somBankDefaults.unclearBalance));
+      setText('somBankPreviewAvailableBalance', getVal('somBankInputAvailableBalance', somBankDefaults.availableBalance));
+    }
+    window.updateSomBankStatementPreview = updateSomBankStatementPreview;
+
+    function resetSomBankStatementDefaults() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      setVal('somBankInputCustomerName', somBankDefaults.customerName);
+      setVal('somBankInputAccountNo', somBankDefaults.accountNo);
+      setVal('somBankInputAccountType', somBankDefaults.accountType);
+      setVal('somBankInputCurrency', somBankDefaults.currency);
+      setVal('somBankInputDescription', somBankDefaults.description);
+      setVal('somBankInputPeriod', somBankDefaults.period);
+      setVal('somBankInputDate', somBankDefaults.date);
+      setVal('somBankInputTime', somBankDefaults.time);
+      setVal('somBankInputUser', somBankDefaults.user);
+      setVal('somBankInputClosingWithdrawals', somBankDefaults.closingWithdrawals);
+      setVal('somBankInputClosingDeposits', somBankDefaults.closingDeposits);
+      setVal('somBankInputUnclearBalance', somBankDefaults.unclearBalance);
+      setVal('somBankInputAvailableBalance', somBankDefaults.availableBalance);
+      updateSomBankStatementPreview();
+      showToast('Reference Restored', 'Restored Salaam Somali Bank E-Statment reference specimen details');
+    }
+    window.resetSomBankStatementDefaults = resetSomBankStatementDefaults;
+
+    function randomizeSomBankStatement() {
+      const setVal = (id, val) => { if ($(id)) $(id).value = val; };
+      const customerNames = [
+        'MOHAMED ABDIKADIR MOHAMEDNUR IBRAHIM',
+        'YAHYE ABDIRAHMAN KHALIIF HASSAN',
+        'AHMED YUSUF ALI WARSAME',
+        'FADUMA HASSAN WARSAME ELMI',
+        'IBRAHIM OSMAN FARAH ROBLE',
+        'HALIMA OMAR ELMI DIRIE',
+        'ABDIRAHMAN MOHAMED ADAN NUR',
+        'KHALID WARSAME GELLE SHIRE'
+      ];
+      const periods = [
+        { period: '07-OCT-23 to 02-JAN-24', date: '2-Jan-24' },
+        { period: '01-NOV-23 to 15-FEB-24', date: '15-Feb-24' },
+        { period: '12-JAN-24 to 08-APR-24', date: '8-Apr-24' },
+        { period: '05-MAR-24 to 20-JUN-24', date: '20-Jun-24' },
+        { period: '10-JUL-24 to 14-OCT-24', date: '14-Oct-24' }
+      ];
+      const pickedName = customerNames[Math.floor(Math.random() * customerNames.length)];
+      const pickedPeriod = periods[Math.floor(Math.random() * periods.length)];
+      const accountNo = '31' + String(Math.floor(100000 + Math.random() * 899999));
+      const hh = String(Math.floor(8 + Math.random() * 10)).padStart(2, '0');
+      const mm = String(Math.floor(10 + Math.random() * 49)).padStart(2, '0');
+      const ss = String(Math.floor(10 + Math.random() * 49)).padStart(2, '0');
+
+      setVal('somBankInputCustomerName', pickedName);
+      setVal('somBankInputAccountNo', accountNo);
+      setVal('somBankInputAccountType', '2103');
+      setVal('somBankInputCurrency', 'USD');
+      setVal('somBankInputDescription', 'Dollar');
+      setVal('somBankInputPeriod', pickedPeriod.period);
+      setVal('somBankInputDate', pickedPeriod.date);
+      setVal('somBankInputTime', `${hh}:${mm}:${ss}`);
+      setVal('somBankInputUser', 'eStatment');
+      setVal('somBankInputClosingWithdrawals', '153.00');
+      setVal('somBankInputClosingDeposits', '153.00');
+      setVal('somBankInputUnclearBalance', '0.00');
+      setVal('somBankInputAvailableBalance', '0.00');
+      updateSomBankStatementPreview();
+      showToast('Statement Randomized!', `Generated Salaam Somali Bank E-Statment for ${pickedName}`);
+    }
+    window.randomizeSomBankStatement = randomizeSomBankStatement;
+
+    async function downloadSomBankStatementPNG() {
+      triggerWithSifaloPay(async () => {
+        const card = $('somalia-proof-of-account-card');
+        if (!card || typeof html2canvas === 'undefined') {
+          showToast('Export Error', 'Rendering engine unavailable');
+          return;
+        }
+        showToast('Generating PNG...', 'Rendering high-resolution Salaam Somali Bank E-Statment PNG');
+        try {
+          const canvas = await html2canvas(card, {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          });
+          const imgData = canvas.toDataURL('image/png');
+          if ($('modalPreviewImg')) $('modalPreviewImg').src = imgData;
+          if ($('fallbackDownloadLink')) {
+            $('fallbackDownloadLink').href = imgData;
+            $('fallbackDownloadLink').download = `salaam-somali-bank-statement-${$('somBankInputAccountNo') ? $('somBankInputAccountNo').value : '31897213'}.png`;
+          }
+          const modal = $('imageModal');
+          if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          }
+          showToast('Ready!', 'Salaam Somali Bank E-Statment PNG generated successfully');
+        } catch (err) {
+          console.error(err);
+          showToast('Download Error', 'Could not export Salaam Somali Bank statement PNG');
+        }
+      });
+    }
+    window.downloadSomBankStatementPNG = downloadSomBankStatementPNG;
+
     // ================= SOMALIA BIOMETRIC PASSPORT CONTROLLER =================
     const defaultSomPassPhoto = '/assets/aistudio/image_309a7992.png';
     let somPassCustomPhotoLoaded = false;
@@ -20166,6 +20379,7 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
       updateKidPreview();
       updateSomPreview();
       updateSomSmartIdPreview();
+      if (typeof updateSomBankStatementPreview === 'function') updateSomBankStatementPreview();
       setSomIdFormat('cert');
       updateSomPassPreview();
       updateSomPassIdCardPreview();
@@ -25680,14 +25894,14 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
             </button>
 
             <!-- Somalia -->
-            <button type="button" id="country-btn-somalia" onclick="switchVerificationCountry('somalia')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
+            <button type="button" id="country-btn-somalia" data-docs="passport,idcard,refugeecard,driverlicense,proofofaccount" onclick="switchVerificationCountry('somalia')" class="country-pill-btn p-3.5 rounded-2xl border border-slate-200 bg-white hover:bg-sky-50/40 hover:border-sky-300 text-slate-700 text-left shadow-xs transition-all cursor-pointer">
               <div class="flex items-center justify-between">
                 <span class="text-2xl drop-shadow-xs">🇸🇴</span>
                 <span class="w-2.5 h-2.5 rounded-full bg-transparent"></span>
               </div>
               <div class="mt-2.5">
                 <div class="text-xs sm:text-sm font-black text-slate-900 tracking-tight">Somalia</div>
-                <div class="text-[10px] font-medium text-slate-500">National Identity Card &amp; E-Passport</div>
+                <div class="text-[10px] font-medium text-slate-500">Somali Certificate, Bank Statement, National ID &amp; E-Passport</div>
               </div>
             </button>
 
@@ -26807,18 +27021,21 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               </div>
             </div>
 
-            <!-- Format Selector: Somali Certificate vs National Identity Card -->
+            <!-- Format Selector: Somali Certificate vs National Identity Card vs Salaam Bank Statement -->
             <div class="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
               <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                 <i class="fa-solid fa-layer-group text-sky-600"></i>
                 Select Document Specimen Format:
               </span>
-              <div class="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
+              <div class="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
                 <button type="button" id="btn-som-fmt-cert" onclick="setSomIdFormat('cert')" class="px-2 py-1.5 rounded-md text-[11px] font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all text-center">
-                  Somali Certificate (PEFA)
+                  Somali Certificate
                 </button>
                 <button type="button" id="btn-som-fmt-smartid" onclick="setSomIdFormat('smartid')" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
-                  National Identity Card
+                  National ID Card
+                </button>
+                <button type="button" onclick="switchVerificationDoc('proofofaccount')" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-sky-800 bg-sky-50 hover:bg-sky-100 cursor-pointer transition-all text-center">
+                  Bank Statement
                 </button>
               </div>
             </div>
@@ -28005,6 +28222,230 @@ ${$('ukPassMrzLine2')?.textContent || '1208344767GBR9202036M3301317<<<<<<<<<<<<<
               </div>
 
 
+            </div>
+          </section>
+        </main>
+      </div>
+
+      <!-- ================= STEP 3E-2: SOMALIA BANK STATEMENT (SALAAM SOMALI BANK - E STATMENT) VIEW ================= -->
+      <div id="somalia-proofofaccount-view" class="hidden">
+        <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Controls Form (Left Column) -->
+          <section class="lg:col-span-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200 no-print space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div>
+                <h1 class="text-lg font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-file-invoice-dollar text-sky-700"></i>
+                  <span>Salaam Somali Bank - E Statment</span>
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">Somali Bank Statement · Statement of Accounts (USD) Live Specimen Editor.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="randomizeSomBankStatement()" class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs flex items-center gap-1 cursor-pointer" title="Generate random Somali Bank Statement data">
+                  <i class="fa-solid fa-shuffle"></i> Randomize
+                </button>
+                <span class="text-xs bg-sky-50 text-sky-800 font-semibold px-2.5 py-1 rounded-full border border-sky-200">SOMALIA · BANK STATEMENT</span>
+              </div>
+            </div>
+
+            <!-- Quick Switcher between Somali Bank Statement, Somali Certificate & National ID -->
+            <div class="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+              <span class="text-[11px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-layer-group text-sky-600"></i>
+                Somalia Document Specimens:
+              </span>
+              <div class="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
+                <button type="button" class="px-2 py-1.5 rounded-md text-[11px] font-bold bg-sky-700 text-white shadow-xs cursor-pointer transition-all text-center">
+                  Bank Statement
+                </button>
+                <button type="button" onclick="switchVerificationDoc('idcard'); setSomIdFormat('cert');" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
+                  Somali Certificate
+                </button>
+                <button type="button" onclick="switchVerificationDoc('idcard'); setSomIdFormat('smartid');" class="px-2 py-1.5 rounded-md text-[11px] font-semibold text-slate-600 hover:text-slate-900 cursor-pointer transition-all text-center">
+                  National ID Card
+                </button>
+              </div>
+            </div>
+
+            <!-- Big Randomize Button -->
+            <div class="pt-0.5">
+              <button type="button" onclick="randomizeSomBankStatement()" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:via-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wide shadow-xl shadow-indigo-700/25 hover:shadow-indigo-700/40 border-2 border-indigo-300/40 flex items-center justify-center gap-3.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer group">
+                <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-xs flex items-center justify-center text-amber-300 text-lg group-hover:rotate-180 transition-transform duration-500 shadow-inner shrink-0">
+                  <i class="fa-solid fa-dice"></i>
+                </div>
+                <div class="text-left">
+                  <div class="leading-none text-sm font-extrabold flex items-center gap-2">
+                    <span>Randomize Statement</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider shadow-xs">INSTANT FILL</span>
+                  </div>
+                  <div class="text-[11px] font-normal text-indigo-100 opacity-90 mt-0.5">Generate Somali account holder name, account number &amp; statement dates</div>
+                </div>
+              </button>
+            </div>
+
+            <form id="somBankControlsForm" class="space-y-3 text-xs" onsubmit="event.preventDefault();">
+              <!-- Customer Name -->
+              <div>
+                <label for="somBankInputCustomerName" class="block font-bold uppercase text-slate-600 mb-1">Customer Name</label>
+                <input id="somBankInputCustomerName" type="text" value="MOHAMED ABDIKADIR MOHAMEDNUR IBRAHIM" oninput="updateSomBankStatementPreview()" class="w-full px-2.5 py-2 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+              </div>
+
+              <!-- Account No, Account Type, Currency, Description -->
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label for="somBankInputAccountNo" class="block font-bold uppercase text-slate-600 mb-1">Account No</label>
+                  <input id="somBankInputAccountNo" type="text" value="31897213" oninput="updateSomBankStatementPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputAccountType" class="block font-bold uppercase text-slate-600 mb-1">Account Type</label>
+                  <input id="somBankInputAccountType" type="text" value="2103" oninput="updateSomBankStatementPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputCurrency" class="block font-bold uppercase text-slate-600 mb-1">Currency</label>
+                  <input id="somBankInputCurrency" type="text" value="USD" oninput="updateSomBankStatementPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputDescription" class="block font-bold uppercase text-slate-600 mb-1">Description</label>
+                  <input id="somBankInputDescription" type="text" value="Dollar" oninput="updateSomBankStatementPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+              </div>
+
+              <!-- Statement Period & Top-Right Metadata -->
+              <div>
+                <label for="somBankInputPeriod" class="block font-bold uppercase text-slate-600 mb-1">Statement Period (from ... to ...)</label>
+                <input id="somBankInputPeriod" type="text" value="07-OCT-23 to 02-JAN-24" oninput="updateSomBankStatementPreview()" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg font-bold text-xs text-slate-900">
+              </div>
+
+              <div class="grid grid-cols-3 gap-2">
+                <div>
+                  <label for="somBankInputDate" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Date</label>
+                  <input id="somBankInputDate" type="text" value="2-Jan-24" oninput="updateSomBankStatementPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputTime" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Time</label>
+                  <input id="somBankInputTime" type="text" value="13:45:13" oninput="updateSomBankStatementPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputUser" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">User</label>
+                  <input id="somBankInputUser" type="text" value="eStatment" oninput="updateSomBankStatementPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+              </div>
+
+              <!-- Closing & Available Balances -->
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="somBankInputClosingWithdrawals" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Closing Withdrawals</label>
+                  <input id="somBankInputClosingWithdrawals" type="text" value="153.00" oninput="updateSomBankStatementPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputClosingDeposits" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Closing Deposits</label>
+                  <input id="somBankInputClosingDeposits" type="text" value="153.00" oninput="updateSomBankStatementPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputUnclearBalance" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Unclear Balance</label>
+                  <input id="somBankInputUnclearBalance" type="text" value="0.00" oninput="updateSomBankStatementPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+                <div>
+                  <label for="somBankInputAvailableBalance" class="block font-bold uppercase text-slate-600 mb-1 text-[10px]">Available Balance</label>
+                  <input id="somBankInputAvailableBalance" type="text" value="0.00" oninput="updateSomBankStatementPreview()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg font-mono-code font-bold text-xs text-slate-900">
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="pt-3 border-t grid grid-cols-2 gap-2">
+                <button type="button" onclick="downloadSomBankStatementPNG()" class="py-2.5 px-3 bg-sky-700 hover:bg-sky-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-file-arrow-down"></i>Save High-Res PNG
+                </button>
+                <button type="button" onclick="window.print()" class="py-2.5 px-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all">
+                  <i class="fa-solid fa-print"></i>Print Statement
+                </button>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" onclick="randomizeSomBankStatement()" class="py-2 px-3 bg-sky-50 text-sky-800 hover:bg-sky-100 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors border border-sky-200 cursor-pointer">
+                  <i class="fa-solid fa-dice text-xs"></i>
+                  <span>Randomize</span>
+                </button>
+                <button type="button" onclick="resetSomBankStatementDefaults()" class="py-2 px-3 border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-semibold rounded-xl text-center flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  <i class="fa-solid fa-arrows-rotate text-slate-500 text-xs"></i>
+                  <span>Reset Sample</span>
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Document Preview Area (Right Column) -->
+          <section class="lg:col-span-7 flex justify-center items-start min-w-0">
+            <div class="w-full max-w-[720px] space-y-4">
+              <article id="somalia-proof-of-account-card" class="kyc-protected-surface relative w-full max-w-[700px] mx-auto bg-white rounded-none shadow-2xl border border-slate-300 text-[#111111] select-none overflow-hidden" style="aspect-ratio: 720 / 1036; container-type: inline-size;">
+                <!-- 1:1 Clean Reference Base Plate (720x1036) with Salaam Somali Bank logo, header, QR code, bordered 9-row transaction ledger, and footer -->
+                <img src="/assets/aistudio/som_salaam_bank_statement_clean_bg.png" alt="Salaam Somali Bank E-Statment" class="absolute inset-0 w-full h-full object-fill pointer-events-none select-none z-0">
+
+                <!-- 1. Statement Period (from 07-OCT-23 to 02-JAN-24) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 38.06%; top: 12.26%;">
+                  <span id="somBankPreviewPeriod" class="block whitespace-nowrap" style="font-family: 'Times New Roman', Times, Georgia, serif; font-weight: 500; font-size: 1.98cqw; color: #111111; letter-spacing: 0.005em; line-height: 1;">07-OCT-23 to 02-JAN-24</span>
+                </div>
+
+                <!-- 2. Top-Right Date (2-Jan-24) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 86.25%; top: 8.69%;">
+                  <span id="somBankPreviewDate" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">2-Jan-24</span>
+                </div>
+
+                <!-- 3. Top-Right Time (13:45:13) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 86.25%; top: 10.71%;">
+                  <span id="somBankPreviewTime" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">13:45:13</span>
+                </div>
+
+                <!-- 4. Top-Right User (eStatment) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 85.14%; top: 12.74%;">
+                  <span id="somBankPreviewUser" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">eStatment</span>
+                </div>
+
+                <!-- 5. Account Type (2103) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 20.42%; top: 16.89%;">
+                  <span id="somBankPreviewAccountType" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">2103</span>
+                </div>
+
+                <!-- 6. Account No (31897213) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 45.00%; top: 16.89%;">
+                  <span id="somBankPreviewAccountNo" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">31897213</span>
+                </div>
+
+                <!-- 7. Currency (USD) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 70.69%; top: 16.89%;">
+                  <span id="somBankPreviewCurrency" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">USD</span>
+                </div>
+
+                <!-- 8. Customer Name (MOHAMED ABDIKADIR MOHAMEDNUR IBRAHIM) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 20.28%; top: 18.92%; width: 37.50%;">
+                  <span id="somBankPreviewCustomerName" class="block truncate" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.005em; line-height: 1;">MOHAMED ABDIKADIR MOHAMEDNUR IBRAHIM</span>
+                </div>
+
+                <!-- 9. Description (Dollar) -->
+                <div class="absolute z-10 pointer-events-none" style="left: 70.83%; top: 18.92%;">
+                  <span id="somBankPreviewDescription" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">Dollar</span>
+                </div>
+
+                <!-- 10. Closing Withdrawals Total (153.00) -->
+                <div class="absolute z-10 pointer-events-none text-right" style="left: 61.11%; top: 63.22%; width: 10.42%;">
+                  <span id="somBankPreviewClosingWithdrawals" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">153.00</span>
+                </div>
+
+                <!-- 11. Closing Deposits Total (153.00) -->
+                <div class="absolute z-10 pointer-events-none text-right" style="left: 72.92%; top: 63.22%; width: 10.42%;">
+                  <span id="somBankPreviewClosingDeposits" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">153.00</span>
+                </div>
+
+                <!-- 12. Unclear Balance (0.00) -->
+                <div class="absolute z-10 pointer-events-none text-right" style="left: 86.11%; top: 67.37%; width: 8.61%;">
+                  <span id="somBankPreviewUnclearBalance" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">0.00</span>
+                </div>
+
+                <!-- 13. Available Balance (0.00) -->
+                <div class="absolute z-10 pointer-events-none text-right" style="left: 85.69%; top: 69.40%; width: 8.61%;">
+                  <span id="somBankPreviewAvailableBalance" class="block whitespace-nowrap" style="font-family: 'Courier New', Courier, monospace; font-weight: 600; font-size: 1.48cqw; color: #111111; letter-spacing: 0.01em; line-height: 1;">0.00</span>
+                </div>
+              </article>
             </div>
           </section>
         </main>
@@ -37931,6 +38372,7 @@ EPSOM</div>
         'china-passport-card',
         'turkey-passport-card',
         'proof-of-account-card',
+        'somalia-proof-of-account-card',
         'poa-wise-card',
         'poa-revolut-card',
         'poaPdfContainer',
@@ -40985,6 +41427,7 @@ EPSOM</div>
         'proof-of-address-bill-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
         'poa-wise-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
         'proof-of-account-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
+        'somalia-proof-of-account-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
         'poa-revolut-card': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
         'poaPdfContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 },
         'poaLetterContainer': { enabled: true, position: 'bottom', height: '17%', heightPercent: 17 }
